@@ -1,0 +1,148 @@
+/* =====***** PAGE LOGIN REGISTER *****===== */
+
+.login-register-title {
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.775);
+  font-size: 25px;
+}
+
+.input-group-text-login-register {
+  height: 100%;
+}
+
+.icon-login-register {
+  color: gray;
+}
+
+.group-prepend-login-register {
+  height: 58px;
+  border: 1px #98b0a8 solid;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.group-prepend-password-login-register {
+  height: 58px;
+  border: 1px #98b0a8 solid;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.input-group-login-register {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.bg-login-register {
+  background-size: cover;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.bg-login-register .card.card-login-register {
+  background: #FFFFFF;
+  box-shadow: 0px 2px 10px rgba(231, 50, 58, 0.05);
+  border-radius: 20px;
+}
+
+.bg-login-register .card.card-login-register .card-body h4 {
+  color: #657c74 !important;
+  margin-left: 15px;
+  margin-bottom: 0px;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .form-floating
+  .form-control {
+  font-size: 14px;
+  font-weight: 500;
+  color: #657c74 !important;
+  border: 1px #98b0a8 solid;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .form-floating
+  .username {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .form-floating
+  .password {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-right: 0px;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .form-floating
+  .input-group-append
+  .input-group-text {
+  border-radius: 0px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #559884 !important;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .form-floating
+  .form-control:focus {
+  box-shadow: none !important;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .btn.btn-login-register {
+  background-color: #E7323A;
+  border-radius: 6px;
+  height: 40px;
+  font-size: 14px;
+  letter-spacing: 0.8px;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: none !important;
+  border: 0px #559884 solid;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .btn.btn-login-register:hover,
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .btn.btn-login-register:focus,
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .btn.btn-login-register:active {
+  opacity: 0.82;
+  transition: 0.3s ease-in;
+}
