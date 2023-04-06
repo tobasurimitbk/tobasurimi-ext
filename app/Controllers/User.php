@@ -39,11 +39,4 @@ class User extends BaseController
 
         return view('auth/userDetail', $data);
     }
-
-    public function create()
-    {
-        $data = [];
-
-        return view('auth/register', $data);
-    }
 }
