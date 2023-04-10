@@ -70,18 +70,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    <?php
-    if (session()->getFlashData("errors")) {
-    ?>
-        Swal.fire({
-            icon: 'error',
-            title: '<?= session()->getFlashData("errors"); ?>',
-            confirmButtonColor: '#4e73df',
-        })
-    <?php
-    }
-    ?>
-
     const password_show_hide = function() {
         var x = document.getElementById("password");
         var show_eye = document.getElementById("show_eye");

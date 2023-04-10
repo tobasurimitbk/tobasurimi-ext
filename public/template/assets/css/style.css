@@ -178,7 +178,7 @@ p, ul:not(.list-unstyled), ol {
 }
 
 /* 3.2 Form */
-.form-control,
+/* .form-control,
 .input-group-text,
 .custom-select,
 .custom-file-label {
@@ -191,15 +191,15 @@ p, ul:not(.list-unstyled), ol {
 .custom-file-label:focus {
   background-color: #fefeff;
   border-color: #95a0f4;
-}
-
+} */
+/* 
 .input-group-text,
 select.form-control:not([size]):not([multiple]),
 .form-control:not(.form-control-sm):not(.form-control-lg) {
   font-size: 14px;
   padding: 10px 15px;
   height: 42px;
-}
+} */
 
 textarea.form-control {
   height: 64px;
@@ -3731,10 +3731,42 @@ body.layout-3 .main-wrapper {
   color: #dc3545 !important;
 }
 
-.modal-header
+/* =====***** MODAL *****===== */
+.modal-title
  {
     padding:9px 15px;
     border-bottom:1px solid #E7323A !important;
-    margin-left: 20px;
-    margin-right: 20px;
+    width: 100%;
  }
+
+ .form-floating
+ .form-control {
+ font-size: 14px;
+ font-weight: 500;
+ color: #657c74 !important;
+ border: 1px #98b0a8 solid;
+}
+
+.form-floating
+.form-control:focus {
+box-shadow: none !important;
+}
+
+.input-group-password {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.group-prepend-password {
+  height: 58px;
+  border: 1px #98b0a8 solid;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.form-floating
+.password {
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+border-right: 0px;
+}
