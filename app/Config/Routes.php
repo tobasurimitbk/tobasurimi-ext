@@ -40,6 +40,11 @@ $routes->get('/', 'User::login');
  */
 $routes->get('/dashboard', 'Dashboard::dashboard');
 
+/**
+ * Get Page Management User
+ */
+$routes->get('/user', 'User::user');
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

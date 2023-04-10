@@ -1129,6 +1129,9 @@ select.form-control:not([size]):not([multiple]) {
 .table {
   color: inherit;
 }
+.table, .table th, .table td {
+  border: 1px solid #BDBDBD !important;
+}
 .table td, .table:not(.table-bordered) th {
   border-top: none;
 }
@@ -1472,7 +1475,7 @@ h6 .badge {
   padding-left: 10px;
 }
 .btn:not(.btn-social):not(.btn-social-icon):active, .btn:not(.btn-social):not(.btn-social-icon):focus, .btn:not(.btn-social):not(.btn-social-icon):hover {
-  border-color: transparent !important;
+  /* border-color: transparent !important; */
   background-color: white;
 }
 .btn > i {
@@ -3160,7 +3163,7 @@ body.sidebar-mini .main-sidebar .sidebar-menu > li ul.dropdown-menu li a {
   background-color: #fff;
 }
 body.sidebar-mini .main-sidebar .sidebar-menu > li ul.dropdown-menu li a.has-dropdown:after {
-  content: "\f054";
+  content: "\f077";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
@@ -3294,7 +3297,7 @@ body.layout-3 .navbar.navbar-secondary .navbar-nav > .nav-item > .nav-link.has-d
   margin-right: 35px;
 }
 body.layout-3 .navbar.navbar-secondary .navbar-nav > .nav-item > .nav-link.has-dropdown:after {
-  content: "\f054";
+  content: "\f077";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
@@ -3337,7 +3340,7 @@ body.layout-3 .navbar.navbar-secondary .navbar-nav > .nav-item .dropdown-menu .n
   padding-right: 20px !important;
 }
 body.layout-3 .navbar.navbar-secondary .navbar-nav > .nav-item .dropdown-menu .nav-item .nav-link.has-dropdown:after {
-  content: "\f054";
+  content: "\f077";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
@@ -3453,17 +3456,22 @@ body.layout-3 .main-footer {
 .main-sidebar .sidebar-menu li.active a {
   color: #ffffff;
   font-weight: 600;
-  background-color: #E7323A;
+  /* background-color: #E7323A; */
 }
 
 .main-sidebar .sidebar-menu li.active a.has-dropdown:after {
   transform: translate(0, -50%) rotate(90deg);
 }
 .main-sidebar .sidebar-menu li.active ul.dropdown-menu {
+  background-color: #191d21;
+}
+
+.main-sidebar .sidebar-menu li.active a.has-dropdown:hover {
   background-color: #E7323A;
 }
+
 .main-sidebar .sidebar-menu li a.has-dropdown:after {
-  content: "\f054";
+  content: "\f077";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
@@ -3682,5 +3690,51 @@ body.layout-3 .main-wrapper {
 .navbar-border {
   box-sizing: border-box;
   border-bottom: 1px solid #9597a375 !important;
-  background-color: #ffffff;
+  background-color: #ffffff !important;
 }
+
+/* =====***** MAIN PAGE *****===== */
+
+.btn-add {
+  background-color: #E7323A !important;
+  color: #ffffff !important;
+  border-color: #E7323A !important;
+}
+
+.btn-add:hover {
+  background-color: #ba4147 !important;
+  color: #ffffff !important;
+  border-color: #ba4147 !important;
+}
+
+.btn-submit-form {
+  background-color: #E7323A !important;
+  color: #ffffff !important;
+  width: 20% !important;
+  border-color: #E7323A !important;
+}
+
+.btn-submit-form:hover {
+  background-color: #ba4147 !important;
+  color: #ffffff !important;
+  width: 20% !important;
+  border-color: #ba4147 !important;
+}
+
+.btn-discard {
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.btn-discard:hover {
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+.modal-header
+ {
+    padding:9px 15px;
+    border-bottom:1px solid #E7323A !important;
+    margin-left: 20px;
+    margin-right: 20px;
+ }

@@ -14,4 +14,9 @@ class User extends BaseController
     {
         return view('login/index');
     }
+
+    public function user()
+    {
+        return view('user/index');
+    }
 }

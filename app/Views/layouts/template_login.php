@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Toba Surimi Industries</title>
+    <title><?= getenv('pageTitle') ?></title>
     <link href="<?= base_url(); ?>assets/_vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="<?= base_url(); ?>assets/img/favicon.png" type="image/png" />
     <!-- Custom fonts for this template-->

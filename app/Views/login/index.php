@@ -42,9 +42,9 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <button class="btn btn-login-register btn-block">
+                                    <a class="btn btn-login-register btn-block" href="<?= base_url("dashboard"); ?>">
                                         Log In
-                                    </button>
+                                    </a>
                                 </form>
                             </div>
                         </div>
