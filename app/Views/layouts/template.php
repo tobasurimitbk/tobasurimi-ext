@@ -10,16 +10,9 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
-    <!-- CSS Libraries -->
-    <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/bootstrap-social/bootstrap-social.css">
-    <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/jqvmap/dist/jqvmap.min.css">
-    <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/weathericons/css/weather-icons.min.css">
-    <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/weathericons/css/weather-icons-wind.min.css">
-    <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/summernote/dist/summernote-bs4.css">
-
     <!-- Template CSS -->
-    <link rel="stylesheet" href="<?= base_url() ?>/template/assets/css/style.css">
-    <link rel="stylesheet" href="<?= base_url() ?>/template/assets/css/components.css">
+    <link rel="stylesheet" href="<?= base_url(); ?>template/assets/css/style.css">
+    <link rel="stylesheet" href="<?= base_url(); ?>template/assets/css/components.css">
 </head>
 
 <body>
@@ -48,22 +41,11 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-    <script src="<?= base_url() ?>/template/assets/js/stisla.js"></script>
-
-    <!-- JS Libraies -->
-    <script src="<?= base_url() ?>/template/node_modules/simpleweather/jquery.simpleWeather.min.js"></script>
-    <script src="<?= base_url() ?>/template/node_modules/chart.js/dist/Chart.min.js"></script>
-    <script src="<?= base_url() ?>/template/node_modules/jqvmap/dist/jquery.vmap.min.js"></script>
-    <script src="<?= base_url() ?>/template/node_modules/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="<?= base_url() ?>/template/node_modules/summernote/dist/summernote-bs4.js"></script>
-    <script src="<?= base_url() ?>/template/node_modules/chocolat/dist/js/jquery.chocolat.min.js"></script>
+    <script src="<?= base_url(); ?>template/assets/js/stisla.js"></script>
 
     <!-- Template JS File -->
-    <script src="<?= base_url() ?>/template/assets/js/scripts.js"></script>
-    <script src="<?= base_url() ?>/template/assets/js/custom.js"></script>
-
-    <!-- Page Specific JS File -->
-    <script src="<?= base_url() ?>/template/assets/js/page/index-0.js"></script>
+    <script src="<?= base_url(); ?>template/assets/js/scripts.js"></script>
+    <script src="<?= base_url(); ?>template/assets/js/custom.js"></script>
 
 </body>
 
