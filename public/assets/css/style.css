@@ -115,7 +115,6 @@
 .bg-login-register
   .card.card-login-register
   .card-body
-  form.user
   .btn.btn-login-register {
   background-color: #E7323A;
   border-radius: 6px;
@@ -136,7 +135,6 @@
 .bg-login-register
   .card.card-login-register
   .card-body
-  form.user
   .btn.btn-login-register:focus,
 .bg-login-register
   .card.card-login-register
