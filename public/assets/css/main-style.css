@@ -3729,6 +3729,9 @@ body.layout-3 .main-wrapper {
     padding:9px 15px;
     border-bottom:1px solid #E7323A !important;
     width: 100%;
+    color: #404040 !important;
+    font-size: 14px;
+    font-weight: bold;
  }
 
  .form-floating
