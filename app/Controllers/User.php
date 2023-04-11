@@ -35,6 +35,9 @@ class User extends BaseController
             ]);
             $response = curl_request("POST", "/auth/login", $token, $data);
 
+            var_dump($response);
+            die;
+
             if ($response["code"] === 200) {
                 $data = json_decode($response["body"]);
                 $expired = date("Y-m-d H:i:s", strtotime($data->expires));

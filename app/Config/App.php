@@ -24,7 +24,7 @@ class App extends BaseConfig
      *
      * @var string
      */
-    public $baseURL = 'https://pbtc.lyrid.id/';
+    public $baseURL = 'https://tobasurimi.lyrid.id/';
 
     /**
      * --------------------------------------------------------------------------
