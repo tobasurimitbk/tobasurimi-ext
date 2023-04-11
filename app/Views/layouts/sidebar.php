@@ -13,6 +13,11 @@ $arrDashboardURI = ['dashboard'];
             <img src="<?= base_url("assets/img/logo.png"); ?>" width="170" height="60">
         </div>
 
+        <div class="sidebar-brand sidebar-brand-sm">
+            <img src="<?= base_url("assets/img/favicon.png"); ?>" width="35" height="35">
+        </div>
+
+
         <ul class="sidebar-menu">
             <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrDashboardURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
                 <a href="<?= base_url("dashboard"); ?>" class="nav-link"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
