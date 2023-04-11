@@ -35,36 +35,15 @@ class User extends BaseController
             ]);
             $response = curl_request("POST", "/auth/login", $token, $data);
 
-            var_dump($response);
-            die;
-
             if ($response["code"] === 200) {
                 $data = json_decode($response["body"]);
-                $expired = date("Y-m-d H:i:s", strtotime($data->expires));
 
                 $session = (object) [
                     "isLogin" => true,
-                    "id" => $data->id,
                     "token" => $data->token,
-                    "expired" => $expired,
-                    "uname" => $data->uname,
                     "name" => $data->name,
-                    "akses" => $data->akses,
-                    "id_role" => $data->id_role,
-                    "role" => $data->role
                 ];
-
-                //cara 2
-                $date1 = new DateTime($expired);
-                $now = new DateTime();
-
-                $difference_in_seconds = $date1->format('U') - $now->format('U');
-
-                //cara 1
-                //$sessionExpired = date_diff(new DateTime($expired), new DateTime())->h * 60 * 60;
-
-                //session()->setTempdata("login", $session);
-                session()->setTempdata("login", $session, $difference_in_seconds);
+                session()->setTempdata("login", $session, 36000);
 
                 return redirect()->to("/dashboard")->with("success", "Login Berhasil");
             } else {
@@ -74,6 +53,13 @@ class User extends BaseController
         } else {
             return redirect()->back()->withInput()->with("errors", "Login Gagal, Coba Lagi");
         }
+    }
+
+    public function doLogout()
+    {
+        session()->destroy();
+
+        return redirect()->to("/");
     }
 
     public function user()

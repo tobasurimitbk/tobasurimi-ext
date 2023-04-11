@@ -33,9 +33,11 @@ $routes->set404Override();
 /**
  * Get Page Login
  * Post Login
+ * Get Logout
  */
 $routes->get('/', 'User::login');
 $routes->post('/login', 'User::doLogin');
+$routes->get('/logout', 'User::doLogout');
 
 
 /**

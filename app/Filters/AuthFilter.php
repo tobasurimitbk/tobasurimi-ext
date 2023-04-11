@@ -13,13 +13,13 @@ class AuthFilter implements FilterInterface
         if (empty(session()->getTempdata("login"))) {
             return redirect()->to("/")->with('error', "Invalid Credential");
         } else {
-            $now = date("Y-m-d H:i:s");
-            $expired = session()->getTempdata("login")->expired;
+            // $now = date("Y-m-d H:i:s");
+            // $expired = session()->getTempdata("login")->expired;
 
-            if ($now > $expired) {
-                session()->destroy();
-                return redirect()->to("/")->with('error', "Invalid Credential");
-            }
+            // if ($now > $expired) {
+            //     session()->destroy();
+            //     return redirect()->to("/")->with('error', "Invalid Credential");
+            // }
         }
     }
 
