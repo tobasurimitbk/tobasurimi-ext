@@ -30,10 +30,10 @@ class User extends BaseController
         if ($this->validate($rules)) {
             $token = "";
             $data = json_encode([
-                "uname" => $this->request->getPost("username"),
-                "passwd" => $this->request->getPost("password")
+                "username" => $this->request->getPost("username"),
+                "password" => $this->request->getPost("password")
             ]);
-            $response = curl_request("POST", "/user/login", $token, $data);
+            $response = curl_request("POST", "/auth/login", $token, $data);
 
             if ($response["code"] === 200) {
                 $data = json_decode($response["body"]);
@@ -65,11 +65,11 @@ class User extends BaseController
 
                 return redirect()->to("/dashboard")->with("success", "Login Berhasil");
             } else {
-
-                return redirect()->back()->withInput();
+                $message = json_decode($response["body"])->message;
+                return redirect()->back()->withInput()->with("errors", $message);
             }
         } else {
-            return redirect()->back()->withInput();
+            return redirect()->back()->withInput()->with("errors", "Login Gagal, Coba Lagi");
         }
     }
 
