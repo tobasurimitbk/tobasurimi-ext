@@ -18,6 +18,7 @@
                                     <img src="<?= base_url("assets/img/logo.png"); ?>" width="100%" height="120">
                                 </div>
                                 <form class="user" method="POST" action="<?= base_url("login"); ?>" enctype="multipart/form-data">
+                                    <?= csrf_field() ?>
                                     <div class="input-group input-group-login-register">
                                         <div class="input-group-prepend group-prepend-login-register align-items-center">
                                             <span class="input-group-text input-group-text-login-register" id="basic-addon1"><i class="icon-login-register fas fa-user"></i></span>

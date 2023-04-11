@@ -33,6 +33,11 @@ class Filters extends BaseConfig
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
+            'csrf' => ['except' => [
+                    'api/contact/save',
+                    'api/contact/delete'
+                ]
+            ]
         ],
         'after' => [
             'toolbar',

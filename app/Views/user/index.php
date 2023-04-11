@@ -8,62 +8,65 @@
                 <h5 class="modal-title">Create User</h5>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col">
-                        <div class="form-floating mb-3" style="height: 5opx;">
-                            <input type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
-                            <label for="floatingInput">Username</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3">
-                                <input type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
-                                <label for="floatingInput">Password</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2" onclick="password_show_hide()">
-                                    <i class="fas fa-eye d-none" id="show_eye"></i>
-                                    <i class="fas fa-eye-slash" id="hide_eye"></i>
-                                </span>
+                <form method="post">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 5opx;">
+                                <input type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
+                                <label for="floatingInput">Username</label>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="form-floating mb-3" style="height: 5opx;">
-                            <input type="text" class="form-control name" id="name" name="name" placeholder="Name" maxlength="30">
-                            <label for="floatingInput">Name</label>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
+                                    <label for="floatingInput">Password</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2" onclick="password_show_hide()">
+                                        <i class="fas fa-eye d-none" id="show_eye"></i>
+                                        <i class="fas fa-eye-slash" id="hide_eye"></i>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="form-floating mb-3" style="height: 5opx;">
-                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <option value="Manager">Manager</option>
-                                <option value="Accounting">Accounting</option>
-                            </select>
-                            <label for="floatingInput">Role</label>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 5opx;">
+                                <input type="text" class="form-control name" id="name" name="name" placeholder="Name" maxlength="30">
+                                <label for="floatingInput">Name</label>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="form-floating mb-3" style="height: 5opx;">
-                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <option value="Aktif">Aktif</option>
-                                <option value="Tidak Aktif">Tidak Aktif</option>
-                            </select>
-                            <label for="floatingInput">Status</label>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 5opx;">
+                                <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Accounting">Accounting</option>
+                                </select>
+                                <label for="floatingInput">Role</label>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 5opx;">
+                                <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                </select>
+                                <label for="floatingInput">Status</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-discard" onclick="hideAddForm()">Discard</button>
