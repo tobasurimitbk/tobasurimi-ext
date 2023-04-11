@@ -16,8 +16,8 @@
             <li class="nav-item dropdown{{ ' active'|is_active('^index(.*)', page)|safe }}">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-cog"></i><span>Settings</span></a>
                 <ul class="dropdown-menu">
-                    <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a></li>
-                    <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link">Manajemen Role</a></li>
+                    <li><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a></li>
+                    <li><a class="nav-link">Manajemen Role</a></li>
                     <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link">Manajemen Hak Akses</a></li>
                 </ul>
             </li>
