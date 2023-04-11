@@ -41,12 +41,12 @@ $routes->post('/login', 'User::doLogin');
 /**
  * Get Page Dashboard
  */
-$routes->get('/dashboard', 'Dashboard::dashboard');
+$routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
 
 /**
  * Get Page Management User
  */
-$routes->get('/user', 'User::user');
+$routes->get('/user', 'User::user', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------
