@@ -1,5 +1,6 @@
 <!-- Header -->
 <nav class="navbar navbar-expand-lg main-navbar navbar-border">
+    <a href="#" data-toggle="sidebar" class="nav-bar nav-link nav-link-lg"><i class="fas fa-bars"></i></a>
     <ul class="navbar-nav profile-button">
         <li class="dropdown">
             <a class="nav-link nav-link-lg nav-link-user dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
