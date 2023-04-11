@@ -3702,14 +3702,14 @@ body.layout-3 .main-wrapper {
 .btn-submit-form {
   background-color: #E7323A !important;
   color: #ffffff !important;
-  width: 20% !important;
+  width: 100px !important;
   border-color: #E7323A !important;
 }
 
 .btn-submit-form:hover {
   background-color: #ba4147 !important;
   color: #ffffff !important;
-  width: 20% !important;
+  width: 100px !important;
   border-color: #ba4147 !important;
 }
 
@@ -3823,4 +3823,14 @@ h2.swal2-title {
   border: 0px #559884 solid !important;
   min-width: 100px !important;
   font-family: "Poppins", sans-serif !important;
+}
+
+/* =====***** INPUT FILE *****===== */
+
+input[type="file"]{
+  height:60px;
+}
+
+input[type="file"]::-webkit-file-upload-button{
+  height:60px;
 }

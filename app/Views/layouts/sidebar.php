@@ -1,5 +1,6 @@
 <?php
 $currentUriSegment = service('uri')->getSegment(1);
+$arrMasterURI = ['employee'];
 $arrSettingURI = ['user'];
 $arrDashboardURI = ['dashboard'];
 ?>
@@ -19,7 +20,20 @@ $arrDashboardURI = ['dashboard'];
         </ul>
 
         <ul class="sidebar-menu">
-        <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrSettingURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrMasterURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+                <a href="#" class="nav-link has-dropdown"><i class="fas fa-database"></i><span>Master Data</span></a>
+                <ul class="dropdown-menu">
+                    <?php if($currentUriSegment === "employee") { ?>
+                    <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("employee"); ?>">Employee</a></li>
+                    <?php }else {?>
+                    <li><a class="nav-link" href="<?= base_url("employee"); ?>">Employee</a></li>
+                    <?php } ?>
+                </ul>
+            </li>
+        </ul>
+
+        <ul class="sidebar-menu">
+            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrSettingURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-cog"></i><span>Settings</span></a>
                 <ul class="dropdown-menu">
                     <?php if($currentUriSegment === "user") { ?>

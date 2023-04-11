@@ -10,7 +10,7 @@ if (!function_exists('curl_request')) {
          "Cache-Control: no-cache",
          "Pragma: no-cache",
          'Content-Type: application/json',
-         "access_token:" . $token
+         "Authorization: Bearer " . $token
       );
 
       $ch = curl_init();

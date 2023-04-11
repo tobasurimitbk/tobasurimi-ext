@@ -99,12 +99,20 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>johndoe</td>
-                    <td>John Doe</td>
-                    <td>Manager</td>
-                    <td>Aktif</td>
-                </tr>
+            <?php
+                if (!empty($dataUser)) {
+                    foreach ($dataUser as $user) {
+                ?>
+                    <tr>
+                        <td><?= $user->username; ?></td>
+                        <td><?= $user->name; ?></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                <?php
+                    }
+                }
+            ?>
             </tbody>
         </table>
     </div>

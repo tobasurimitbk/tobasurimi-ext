@@ -38,6 +38,7 @@ class User extends BaseController
             if ($response["code"] === 200) {
                 $data = json_decode($response["body"]);
 
+                // token add bearer
                 $session = (object) [
                     "isLogin" => true,
                     "token" => $data->token,
@@ -48,10 +49,10 @@ class User extends BaseController
                 return redirect()->to("/dashboard")->with("success", "Login Berhasil");
             } else {
                 $message = json_decode($response["body"])->message;
-                return redirect()->back()->withInput()->with("errors", $message);
+                return redirect()->back()->with("errors", $message);
             }
         } else {
-            return redirect()->back()->withInput()->with("errors", "Login Gagal, Coba Lagi");
+            return redirect()->back()->with("errors", "Login Gagal, Coba Lagi");
         }
     }
 
@@ -64,6 +65,19 @@ class User extends BaseController
 
     public function user()
     {
-        return view('user/index');
+        $token = session()->get("login")->token;
+         //Get User
+        $responseUser = curl_request("GET", "/users", $token);
+
+        $dataUser = [];
+        if ($responseUser["code"] === 200) {
+            $dataUser = json_decode($responseUser["body"])->data;
+        }
+         
+        $data = [
+            "dataUser" => $dataUser,
+        ];
+
+        return view('user/index', $data);
     }
 }

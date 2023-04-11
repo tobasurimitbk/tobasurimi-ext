@@ -46,6 +46,11 @@ $routes->get('/logout', 'User::doLogout');
 $routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
 
 /**
+ * Get Page Employee
+ */
+$routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
+
+/**
  * Get Page Management User
  */
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
