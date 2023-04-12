@@ -3836,3 +3836,28 @@ input[type="file"]{
 input[type="file"]::-webkit-file-upload-button{
   height:60px;
 }
+
+.input-image {
+  border: 1px #98b0a8 solid;
+}
+
+.input-image:focus {
+  border: 1px #98b0a8 solid;
+}
+
+/* =====***** SELECT *****===== */
+
+.form-select {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: #657c74 !important;
+  border-radius: 6px;
+  border: 1px #98b0a8 solid;
+  box-shadow: none !important;
+}
+
+.form-select:focus {
+  box-shadow: none !important;
+  border: 1px #98b0a8 solid !important;
+}

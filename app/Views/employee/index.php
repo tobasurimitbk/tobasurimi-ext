@@ -17,7 +17,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <input onchange="previewPhoto();" type="file" class="form-control employeeImg" id="employeeImg" name="employeeImg" accept="image/png, image/jpg, image/jpeg">
+                            <input onchange="previewPhoto();" type="file" class="form-control input-image employeeImg" id="employeeImg" name="employeeImg" accept="image/png, image/jpg, image/jpeg">
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 5opx;">
@@ -252,11 +252,15 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     setLoading()
+                    let data = new FormData(document.querySelector(".create-form"));
+
                     $.ajax({
                         url: "<?= base_url("employee/save"); ?>",
-                        data: $(".create-form").serialize(),
+                        data: data,
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             if (response.status) {
                                 stopLoading()
