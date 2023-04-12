@@ -61,10 +61,12 @@
     <script>
         //Function Set Spinner Button
         const setLoading = function() {
+            $(".delete-btn").attr("disabled", true)
             $(".btn-submit-form").attr("disabled", true)
         }
 
         const stopLoading = function() {
+            $(".delete-btn").attr("disabled", false)
             $(".btn-submit-form").attr("disabled", false)
         }
     </script>

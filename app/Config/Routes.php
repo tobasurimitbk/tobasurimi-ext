@@ -47,10 +47,18 @@ $routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
 
 /**
  * Get Page Employee
+ * Get All Employee
+ * Get By id Employee
  * Save Employee
+ * Update Employee
+ * Delete Employee
  */
 $routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
+$routes->get('/employee/all', 'Employee::allEmployee', ['filter' => 'Auth']);
+$routes->get('/employee/id/(:segment)', 'Employee::getByIdEmployee/$1', ['filter' => 'Auth']);
 $routes->post('/employee/save', 'Employee::saveEmployee', ['filter' => 'Auth']);
+$routes->post('/employee/update', 'Employee::updateEmployee', ['filter' => 'Auth']);
+$routes->post('/employee/delete', 'Employee::deleteEmployee', ['filter' => 'Auth']);
 
 
 /**

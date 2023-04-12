@@ -13,6 +13,10 @@ class User extends BaseController
 
     public function login()
     {
+        if (!empty(is_login())) {
+            return redirect()->to("/dashboard");
+        }
+
         return view('login/index');
     }
 

@@ -5,14 +5,15 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create Employee</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Employee</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6 mb-2">
-                            <img class="preview-photo" height="230" width="175" id="preview_photo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAMAAAC93eDPAAAAMFBMVEXk5ueutLfn6eqyt7qrsbTh4+TDx8q2u77Z3N3Jzc/U19nO0dPq7Oy8wcSnrrHd4OEuWFw9AAADAUlEQVR4nO2a23LjIAxAjQAbsIH//9vFTjpNUhckRyI7u5ynTF84lSVuYpoGg8FgMBgMBoPB4H8DYNs2gE+NvkEOfo4xzj7YD2jAFKIy3+jZ9bUA67Ux6hFjlnXqJwH+Zfy7hQ5bJwF3KrCTou0SCP+bwBEIJ+8Ac/rdYJcI0g6wVGJw+xirrAPElkGJg6gDzG0D2W8BK8agOIgZTBlnoNQiFQZYkAZiKQmhXo5PWBGFSeMNzCwRBmwu3h0kwoDPhEPBC4TBUYJQ4F80cbPSN4l/vdpoMZBISEuoyIOF24BWDwfsNTFTDZLjVohkBfZJmjA13uDPR7KCYlcgG6jIrUAuiH9SgWzAr/D5iqAt1YcC+3JNn5q4t/JQO0meK2ReA9re9UAzGxSoCpHdYCPmo8TJkrhhSOwCZdtECwL7xDRR968m8BsQDrU7MgdbShgEtvAHFq0gkgk7+F10EjpY73MDzkHyxgtXmCYKXsIC5mxr2M9RZActfAkMoeFgBFbIVwenahJi5fjkYCt1IXK5csLm07lEUrlXUwTKNu7nDiZ164jcJCa/mIdYGKNi6NgXukvkNepbh0wtc8gfaRXCBpPN2drjV+/BYf+fc3YuFJxz2d7/1mf0MnbwcdFafTUqjzlxieVr2EncA8D5qFM6bxKmpEtWCFrAZp/L4JziIdO5BcheN4f/LlF2C4C9Q40b/8tiWRlXTID1tUONslAz02QF00oLwINEmjkiAUFfFLhFwr8bCciI3miVsni95bCdvxIgSsTrgYCM3LS3uNy+hXA1DX86XLt928i3SzWHK8fc1jsFqoOmJ8S7lfAT4r4S806BiKEdcQQMFO0aEDxrHnxBOGw2D22XHdBHrSwjoPCXkdiLjCvgbiPpF94UFtSBS9IA1SKgduipIKqCdMF5gXZGSgehTFDNLyEsUMLQaqdLzUoPCo29g8zi8OJQr0uQN2g9bMgi69Mz9SuxC89FLlBtnMmX5E5939AhGxvPISHqDtTf+kAXqh9iMBgMBn8LfwAfLCKVi1nppAAAAABJRU5ErkJggg==" />
+                            <img crossorigin="anonymous" class="preview-photo" height="230" width="175" id="preview_photo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAMAAAC93eDPAAAAMFBMVEXk5ueutLfn6eqyt7qrsbTh4+TDx8q2u77Z3N3Jzc/U19nO0dPq7Oy8wcSnrrHd4OEuWFw9AAADAUlEQVR4nO2a23LjIAxAjQAbsIH//9vFTjpNUhckRyI7u5ynTF84lSVuYpoGg8FgMBgMBoPB4H8DYNs2gE+NvkEOfo4xzj7YD2jAFKIy3+jZ9bUA67Ux6hFjlnXqJwH+Zfy7hQ5bJwF3KrCTou0SCP+bwBEIJ+8Ac/rdYJcI0g6wVGJw+xirrAPElkGJg6gDzG0D2W8BK8agOIgZTBlnoNQiFQZYkAZiKQmhXo5PWBGFSeMNzCwRBmwu3h0kwoDPhEPBC4TBUYJQ4F80cbPSN4l/vdpoMZBISEuoyIOF24BWDwfsNTFTDZLjVohkBfZJmjA13uDPR7KCYlcgG6jIrUAuiH9SgWzAr/D5iqAt1YcC+3JNn5q4t/JQO0meK2ReA9re9UAzGxSoCpHdYCPmo8TJkrhhSOwCZdtECwL7xDRR968m8BsQDrU7MgdbShgEtvAHFq0gkgk7+F10EjpY73MDzkHyxgtXmCYKXsIC5mxr2M9RZActfAkMoeFgBFbIVwenahJi5fjkYCt1IXK5csLm07lEUrlXUwTKNu7nDiZ164jcJCa/mIdYGKNi6NgXukvkNepbh0wtc8gfaRXCBpPN2drjV+/BYf+fc3YuFJxz2d7/1mf0MnbwcdFafTUqjzlxieVr2EncA8D5qFM6bxKmpEtWCFrAZp/L4JziIdO5BcheN4f/LlF2C4C9Q40b/8tiWRlXTID1tUONslAz02QF00oLwINEmjkiAUFfFLhFwr8bCciI3miVsni95bCdvxIgSsTrgYCM3LS3uNy+hXA1DX86XLt928i3SzWHK8fc1jsFqoOmJ8S7lfAT4r4S806BiKEdcQQMFO0aEDxrHnxBOGw2D22XHdBHrSwjoPCXkdiLjCvgbiPpF94UFtSBS9IA1SKgduipIKqCdMF5gXZGSgehTFDNLyEsUMLQaqdLzUoPCo29g8zi8OJQr0uQN2g9bMgi69Mz9SuxC89FLlBtnMmX5E5939AhGxvPISHqDtTf+kAXqh9iMBgMBn8LfwAfLCKVi1nppAAAAABJRU5ErkJggg==" />
                         </div>
                     </div>
                     <div class="row">
@@ -110,9 +111,13 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard">Discard</button>
-                <button type="submit" class="btn btn-submit-form" onclick="saveForm()">Save</button>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <label>&nbsp;</label>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
+                    <button type="submit" class="btn btn-submit-form" onclick="saveForm()">Save</button>
+                </div>
             </div>
         </div>
     </div>
@@ -141,12 +146,12 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="body-table" id="body-table" style="cursor: pointer;">
             <?php
                 if (!empty($dataEmployee)) {
                     foreach ($dataEmployee as $employee) {
                 ?>
-                    <tr>
+                    <tr class="row-table" data-id="<?= $employee->id; ?>">
                         <td><?= $employee->nip; ?></td>
                         <td><?= $employee->name; ?></td>
                         <td></td>
@@ -168,6 +173,9 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
+                employeeImg: {
+                    required: true
+                },
                 nip: {
                     required: true
                 },
@@ -181,10 +189,16 @@
                     required: true
                 },
                 address: {
-                    required: true
+                    required: true,
+                },
+                email: {
+                    email: true,
                 }
             },
             messages: {
+                employeeImg: {
+                    required: "Image is Required"
+                },
                 nip: {
                     required: "NIP is Required"
                 },
@@ -199,6 +213,9 @@
                 },
                 address: {
                     required: "Address is Required"
+                },
+                email: {
+                    email: "Email must be valid"
                 }
             },
             errorElement: 'span',
@@ -233,15 +250,161 @@
         $(".phone_no, .acc_no").mask("000000000000000")
 
         $(".btn-show-form").click(function() {
+            $(".title-name").text("Create");
             validator.resetForm();
             validator.reset();
             document.getElementById("preview_photo").src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAMAAAC93eDPAAAAMFBMVEXk5ueutLfn6eqyt7qrsbTh4+TDx8q2u77Z3N3Jzc/U19nO0dPq7Oy8wcSnrrHd4OEuWFw9AAADAUlEQVR4nO2a23LjIAxAjQAbsIH//9vFTjpNUhckRyI7u5ynTF84lSVuYpoGg8FgMBgMBoPB4H8DYNs2gE+NvkEOfo4xzj7YD2jAFKIy3+jZ9bUA67Ux6hFjlnXqJwH+Zfy7hQ5bJwF3KrCTou0SCP+bwBEIJ+8Ac/rdYJcI0g6wVGJw+xirrAPElkGJg6gDzG0D2W8BK8agOIgZTBlnoNQiFQZYkAZiKQmhXo5PWBGFSeMNzCwRBmwu3h0kwoDPhEPBC4TBUYJQ4F80cbPSN4l/vdpoMZBISEuoyIOF24BWDwfsNTFTDZLjVohkBfZJmjA13uDPR7KCYlcgG6jIrUAuiH9SgWzAr/D5iqAt1YcC+3JNn5q4t/JQO0meK2ReA9re9UAzGxSoCpHdYCPmo8TJkrhhSOwCZdtECwL7xDRR968m8BsQDrU7MgdbShgEtvAHFq0gkgk7+F10EjpY73MDzkHyxgtXmCYKXsIC5mxr2M9RZActfAkMoeFgBFbIVwenahJi5fjkYCt1IXK5csLm07lEUrlXUwTKNu7nDiZ164jcJCa/mIdYGKNi6NgXukvkNepbh0wtc8gfaRXCBpPN2drjV+/BYf+fc3YuFJxz2d7/1mf0MnbwcdFafTUqjzlxieVr2EncA8D5qFM6bxKmpEtWCFrAZp/L4JziIdO5BcheN4f/LlF2C4C9Q40b/8tiWRlXTID1tUONslAz02QF00oLwINEmjkiAUFfFLhFwr8bCciI3miVsni95bCdvxIgSsTrgYCM3LS3uNy+hXA1DX86XLt928i3SzWHK8fc1jsFqoOmJ8S7lfAT4r4S806BiKEdcQQMFO0aEDxrHnxBOGw2D22XHdBHrSwjoPCXkdiLjCvgbiPpF94UFtSBS9IA1SKgduipIKqCdMF5gXZGSgehTFDNLyEsUMLQaqdLzUoPCo29g8zi8OJQr0uQN2g9bMgi69Mz9SuxC89FLlBtnMmX5E5939AhGxvPISHqDtTf+kAXqh9iMBgMBn8LfwAfLCKVi1nppAAAAABJRU5ErkJggg==";
             $(".create-form")[0].reset()
+            $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show")
         })
 
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
+        })
+
+        $(".delete-btn").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $(".id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("employee/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    $(".add-modal").modal("hide")
+
+                                    var tag_html = "";
+
+                                    // TABLE SEMENTARA RELOAD
+                                    $.ajax({
+                                        url: "<?= base_url("employee/all"); ?>",
+                                        method: "GET",
+                                        dataType: "json",
+                                        success: function(res) {
+                                            if (res.status) {
+                                                $(".body-table").empty();
+                                                res.data.forEach((item) => {
+                                                    tag_html += `<tr class="row-table" style="cursor: pointer;" data-id='`+ item.id +`'>`;
+                                                    tag_html += "<td>";
+                                                    tag_html += item.nip;
+                                                    tag_html += "</td>";
+                                                    tag_html += "<td>";
+                                                    tag_html += item.name;
+                                                    tag_html += "</td>";
+                                                    tag_html += "<td>";
+                                                    tag_html += "</td>";
+                                                    tag_html += "<td>";
+                                                    tag_html += item.email;
+                                                    tag_html += "</td>";
+                                                    tag_html += "<td>";
+                                                    tag_html += item.status;
+                                                    tag_html += "</td>";
+                                                    tag_html += "</tr>";
+                                                })
+                                                $(".body-table").append(tag_html);
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                            }
+                                        }
+                                    })
+
+
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+        })
+
+        $(document).on('click', '.row-table', function() {
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', '');
+            let id = $(this).data('id');
+            $(".title-name").text("Update");
+
+            $.ajax({
+                url: "<?= base_url("employee/id"); ?>" + "/" + id,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".id").val(id);
+                        $(".division_id").val(res?.data?.division_id);
+                        $(".address").val(res?.data?.address);
+                        $(".acc_no").val(res?.data?.acc_no);
+                        $(".dob").val(res?.data?.dob);
+                        $(".email").val(res?.data?.email);
+                        $(".gender").val(res?.data?.gender);
+                        $(".name").val(res?.data?.name);
+                        $(".nip").val(res?.data?.nip);
+                        $(".phone_no").val(res?.data?.phone_no);
+                        $(".status").val(res?.data?.status);
+                        document.getElementById("preview_photo").src = res?.data?.employee_img;
+                        validator.resetForm();
+                        validator.reset();
+                        $(".add-modal").modal("show")
+                        console.log(res.data);
+                    }
+                    else
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            })
         })
     })
 
@@ -268,47 +431,183 @@
                     setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
 
-                    $.ajax({
-                        url: "<?= base_url("employee/save"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    $(".add-modal").modal("hide")
-                                })
-                            } else {
+                    let id = $(".id").val();
+                    // UPDATE
+                    if(id)
+                    {
+                        $.ajax({
+                            url: "<?= base_url("employee/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal").modal("hide")
+
+                                        var tag_html = "";
+
+                                        // TABLE SEMENTARA RELOAD
+                                        $.ajax({
+                                            url: "<?= base_url("employee/all"); ?>",
+                                            method: "GET",
+                                            dataType: "json",
+                                            success: function(res) {
+                                                if (res.status) {
+                                                    $(".body-table").empty();
+                                                    res.data.forEach((item) => {
+                                                        tag_html += `<tr class="row-table" style="cursor: pointer;" data-id='`+ item.id +`'>`;
+                                                        tag_html += "<td>";
+                                                        tag_html += item.nip;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += item.name;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += item.email;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += item.status;
+                                                        tag_html += "</td>";
+                                                        tag_html += "</tr>";
+                                                    })
+                                                    $(".body-table").append(tag_html);
+                                                }
+                                                else
+                                                {
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                }
+                                            }
+                                        })
+
+
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
                                 Swal.fire({
                                     icon: 'error',
-                                    title: response.message,
+                                    title: 'Data Gagal Disimpan, coba Lagi',
                                     confirmButtonColor: '#4e73df',
                                 })
                                 stopLoading()
                             }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
+                        });
+                    }
+                    // CREATE
+                    else
+                    {
+                        $.ajax({
+                            url: "<?= base_url("employee/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal").modal("hide")
+
+                                        var tag_html = "";
+
+                                        // TABLE SEMENTARA RELOAD
+                                        $.ajax({
+                                            url: "<?= base_url("employee/all"); ?>",
+                                            method: "GET",
+                                            dataType: "json",
+                                            success: function(res) {
+                                                if (res.status) {
+                                                    $(".body-table").empty();
+                                                    res.data.forEach((item) => {
+                                                        tag_html += `<tr class="row-table" style="cursor: pointer;" data-id='`+ item.id +`'>`;
+                                                        tag_html += "<td>";
+                                                        tag_html += item.nip;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += item.name;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += item.email;
+                                                        tag_html += "</td>";
+                                                        tag_html += "<td>";
+                                                        tag_html += item.status;
+                                                        tag_html += "</td>";
+                                                        tag_html += "</tr>";
+                                                    })
+                                                    $(".body-table").append(tag_html);
+                                                }
+                                                else
+                                                {
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                }
+                                            }
+                                        })
+
+
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
                 }
             })
         }
