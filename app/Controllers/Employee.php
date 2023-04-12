@@ -14,15 +14,24 @@ class Employee extends BaseController
     {
         $token = session()->get("login")->token;
          //Get User
-        $responseEmployee = curl_request("GET", "/employees", $token);
+         $responseEmployee = curl_request("GET", "/employees", $token);
 
-        $dataEmployee = [];
-        if ($responseEmployee["code"] === 200) {
-            $dataEmployee = json_decode($responseEmployee["body"])->data;
+         $dataEmployee = [];
+         if ($responseEmployee["code"] === 200) {
+             $dataEmployee = json_decode($responseEmployee["body"])->data;
+         }
+
+         //Get Divisi
+        $responseDivisi = curl_request("GET", "/divisis/all", $token);
+
+        $dataDivisi = [];
+        if ($responseDivisi["code"] === 200) {
+            $dataDivisi = json_decode($responseDivisi["body"])->data;
         }
          
         $data = [
             "dataEmployee" => $dataEmployee,
+            "dataDivisi" => $dataDivisi,
         ];
 
         return view('employee/index', $data);
@@ -49,6 +58,7 @@ class Employee extends BaseController
         ];
 
         if ($this->validate($rules)) {
+            $payload = '';
             $token = session()->get("login")->token;
 
             $file = $this->request->getFile("employeeImg");
@@ -61,31 +71,13 @@ class Employee extends BaseController
                     "name" => $this->request->getPost("name"),
                     "gender" => $this->request->getPost("gender"),
                     "dob" => $this->request->getPost("dob"),
-                    "phone_no" => formatter($this->request->getPost("phone_no"), "STR_TO_INT"),
-                    "acc_no" => formatter($this->request->getPost("acc_no"), "STR_TO_INT"),
+                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                    "phone_no" => $this->request->getPost("phone_no"),
+                    "acc_no" => $this->request->getPost("acc_no"),
                     "email" => $this->request->getPost("email"),
                     "address" => $this->request->getPost("address"),
                     "status" => $this->request->getPost("status")
                 ]);
-
-                $response = curl_request("POST", "/employees", $token, $payload);
-
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = json_decode($response["body"])->message;
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload
-                    ];
-                    echo json_encode($data);
-                }
             }
             else
             {
@@ -99,41 +91,47 @@ class Employee extends BaseController
                         "name" => $this->request->getPost("name"),
                         "gender" => $this->request->getPost("gender"),
                         "dob" => $this->request->getPost("dob"),
-                        "phone_no" => formatter($this->request->getPost("phone_no"), "STR_TO_INT"),
-                        "acc_no" => formatter($this->request->getPost("acc_no"), "STR_TO_INT"),
+                        "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                        "phone_no" => $this->request->getPost("phone_no"),
+                        "acc_no" => $this->request->getPost("acc_no"),
                         "email" => $this->request->getPost("email"),
                         "address" => $this->request->getPost("address"),
                         "status" => $this->request->getPost("status")
                     ]);
-
-                    $response = curl_request("POST", "/employees", $token, $payload);
-
-                    if ($response["code"] === 200) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil disimpan",
-                            "payload"   => $payload
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = json_decode($response["body"])->message;
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            "payload"   => $payload
-                        ];
-                        echo json_encode($data);
-                    }
                 }
-                else
-                {
+            }
+
+            if($payload)
+            {
+                $response = curl_request("POST", "/employees", $token, $payload);
+
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = json_decode($response["body"])->message;
                     $data = [
                         "status"            => false,
-                        "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                        "payload"   => ''
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
+            }
+            else
+            {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Format gambar harus bertipe png, jpg, jpeg",
+                    "payload"   => ''
+                ];
+                echo json_encode($data);
             }
         } else {
             $data = [
