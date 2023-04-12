@@ -95,23 +95,32 @@
             },
             messages: {
                 username: {
-                    required: "Username Harus Diisi"
+                    required: "Username is Required"
                 },
                 password: {
-                    required: "Password Harus Diisi"
+                    required: "Password is Required"
                 }
             },
-            errorElement: "div",
-            errorPlacement: function ( error, element ) {
-                    error.addClass( "invalid-feedback" );
-                    error.insertAfter( element );
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
             },
-            highlight: function(element) {
-                $(element).removeClass('is-valid').addClass('is-invalid');
+            highlight: function (element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');                      
+
             },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid').addClass('is-valid');
-            }
+            unhighlight: function (element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');   
+            },
         });
     })
 

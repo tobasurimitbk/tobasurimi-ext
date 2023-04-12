@@ -47,8 +47,11 @@ $routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
 
 /**
  * Get Page Employee
+ * Save Employee
  */
 $routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
+$routes->post('/employee/save', 'Employee::saveEmployee', ['filter' => 'Auth']);
+
 
 /**
  * Get Page Management User

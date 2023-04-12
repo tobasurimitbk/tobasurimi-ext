@@ -72,3 +72,40 @@ if (!function_exists('is_login')) {
       return session()->get("login");
    }
 }
+
+if (!function_exists('formatter')) {
+   function formatter($value, $type)
+   {
+      switch ($type) {
+         case "ARR_TO_INT":
+            $return = [];
+            if (is_array($value)) {
+               foreach ($value as $val) {
+                  $return[] = intval($val);
+               }
+            }
+            return $return;
+            break;
+         case "STR_TO_INT":
+            return !empty($value) ? intval($value) : "";
+            break;
+         case "STR_TO_BOOL":
+            return !empty($value) ? ($value === "true" ? true : false)  : "";
+            break;
+         case "STR_TO_FLOAT":
+            return !empty($value) ? floatval($value) : "";
+            break;
+         case "CURR_TO_INT":
+            return intval(str_replace(".", "", $value));
+            break;
+         case "NUM_TO_CURR":
+            return str_replace(",", ".", number_format($value));
+            break;
+         case "TO_YMD":
+            return implode("/", array_reverse(explode("/", $value)));
+            break;
+         default:
+            return $value;
+      }
+   }
+}
