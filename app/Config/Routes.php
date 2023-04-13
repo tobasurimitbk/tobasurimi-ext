@@ -66,6 +66,21 @@ $routes->post('/employee/delete', 'Employee::deleteEmployee', ['filter' => 'Auth
  */
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
 
+/**
+ * Get Page Role
+ * Get All Role
+ * Get By id Role
+ * Save Role
+ * Update Role
+ * Delete Role
+ */
+$routes->get('/role', 'Role::role', ['filter' => 'Auth']);
+$routes->get('/role/all', 'Role::allRole', ['filter' => 'Auth']);
+$routes->get('/role/id/(:segment)', 'Role::getByIdRole/$1', ['filter' => 'Auth']);
+$routes->post('/role/save', 'Role::saveRole', ['filter' => 'Auth']);
+$routes->post('/role/update', 'Role::updateRole', ['filter' => 'Auth']);
+$routes->post('/role/delete', 'Role::deleteRole', ['filter' => 'Auth']);
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

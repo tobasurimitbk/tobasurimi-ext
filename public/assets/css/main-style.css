@@ -3057,7 +3057,7 @@ body.sidebar-mini .hide-sidebar-mini {
 body.sidebar-mini .main-sidebar {
   width: 65px;
   overflow: initial !important;
-  position: absolute;
+  position: fixed;
   box-shadow: none;
 }
 body.sidebar-mini .main-sidebar:after {
@@ -3681,6 +3681,7 @@ body.layout-3 .main-wrapper {
   box-sizing: border-box;
   border-bottom: 1px solid #9597a375 !important;
   background-color: #ffffff !important;
+  position: fixed !important;
 }
 
 .nav-bar {

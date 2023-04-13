@@ -46,7 +46,11 @@ $arrDashboardURI = ['dashboard'];
                     <?php }else {?>
                     <li><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a></li>
                     <?php } ?>
-                    <li><a class="nav-link">Manajemen Role</a></li>
+                    <?php if($currentUriSegment === "role") { ?>
+                    <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
+                    <?php }else {?>
+                    <li><a class="nav-link" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
+                    <?php } ?>
                     <li><a class="nav-link">Manajemen Hak Akses</a></li>
                 </ul>
             </li>
