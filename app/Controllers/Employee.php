@@ -77,6 +77,9 @@ class Employee extends BaseController
             ],
             "address" => [
                 "rules" => "required"
+            ],
+            "division_id" => [
+                "rules" => "required"
             ]
         ];
 
@@ -166,6 +169,9 @@ class Employee extends BaseController
                 "rules" => "required"
             ],
             "address" => [
+                "rules" => "required"
+            ],
+            "division_id" => [
                 "rules" => "required"
             ]
         ];

@@ -193,6 +193,9 @@
                 },
                 email: {
                     email: true,
+                },
+                division_id: {
+                    required: true,
                 }
             },
             messages: {
@@ -216,6 +219,9 @@
                 },
                 email: {
                     email: "Email must be valid"
+                },
+                division_id: {
+                    required: "Divisi is Required"
                 }
             },
             errorElement: 'span',
