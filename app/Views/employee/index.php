@@ -30,7 +30,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="floatingSelect" aria-label="Floating label select example">
+                                <select class="form-select division_id" name="division_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataDivisi)) {
@@ -171,7 +171,9 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-
+        $('.division_id').select2({
+            theme: 'bootstrap4'
+        })
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
