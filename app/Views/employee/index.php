@@ -171,9 +171,9 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        $('.division_id').select2({
-            theme: 'bootstrap4'
-        })
+        // $('.division_id').select2({
+        //     theme: 'bootstrap4'
+        // })
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
