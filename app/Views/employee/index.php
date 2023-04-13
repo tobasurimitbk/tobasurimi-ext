@@ -30,7 +30,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id">
+                                <select class="form-select division_id" name="division_id" id="floatingSelect" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataDivisi)) {
@@ -171,30 +171,6 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        $(".division_id").select2({
-            theme: "bootstrap-5",
-            placeholder: ""
-        })
-
-        $(".division_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-        $(".division_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '18px');
-
-        $(".division_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
