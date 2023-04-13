@@ -1293,7 +1293,7 @@ table tr:hover .table-links {
 
 /* 3.10 Pagination */
 .page-item .page-link {
-  color: black;
+  color: gray;
   border-radius: 3px;
   background-color: transparent;
   border-color: transparent;
@@ -3735,7 +3735,7 @@ body.layout-3 .main-wrapper {
     padding:9px 15px;
     border-bottom:1px solid #E7323A !important;
     width: 100%;
-    color: #404040 !important;
+    color: black !important;
     font-size: 14px;
     font-weight: bold;
  }
@@ -3744,7 +3744,7 @@ body.layout-3 .main-wrapper {
  .form-control {
  font-size: 14px;
  font-weight: 500;
- color: #404040 !important;
+ color: #98b0a8 !important;
  border: 1px #98b0a8 solid;
 }
 
@@ -3756,6 +3756,21 @@ box-shadow: none !important;
 .input-group-password {
   border-top-left-radius: 6px;
   border-bottom-left-radius: 6px;
+}
+
+.form-control {
+  color: #98b0a8 !important;
+  border-radius: 6px;
+  border: 1px #98b0a8 solid;
+  box-shadow: none !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+  border: 1px #98b0a8 solid !important;
 }
 
 .group-prepend-password {
@@ -3797,7 +3812,7 @@ border-right: 0px;
 h2.swal2-title {
   font-size: 14px;
   font-weight: 600;
-  color: #e7323a;
+  color: black;
   font-family: "Poppins", sans-serif !important;
 }
 

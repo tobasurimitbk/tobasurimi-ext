@@ -26,7 +26,7 @@
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form" onclick="saveForm()">Save</button>
+                    <button type="submit" class="btn btn-submit-form">Save</button>
                 </div>
             </div>
         </div>
@@ -112,71 +112,6 @@
             $(".add-modal").modal("hide")
         })
 
-        $(".search").keyup(function () {
-            table.ajax.reload();
-        })
-
-        $(".delete-btn").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $(".id").val();
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("role/delete"); ?>",
-                        data: {
-                            id: id
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    $(".add-modal").modal("hide")
-                                    table.ajax.reload()
-                                })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
-
         const table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
@@ -255,122 +190,188 @@
                 }
             })
         })
-    })
 
-    const saveForm = function() {
-        if ($(".create-form").valid()) {
+        $(".search").keyup(function () {
+            table.ajax.reload();
+        })
+
+        $(".btn-submit-form").click(function() {
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        setLoading()
+                        let data = new FormData(document.querySelector(".create-form"));
+
+                        let id = $(".id").val();
+                        // UPDATE
+                        if(id)
+                        {
+                            $.ajax({
+                                url: "<?= base_url("role/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $(".add-modal").modal("hide")
+
+                                            table.ajax.reload()
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            });
+                        }
+                        // CREATE
+                        else
+                        {
+                            $.ajax({
+                                url: "<?= base_url("role/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $(".add-modal").modal("hide")
+                                            table.ajax.reload()
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+        })
+
+        $(".delete-btn").click(function() {
             Swal.fire({
                 icon: 'question',
-                title: 'Simpan Data?',
+                title: 'Hapus Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Simpan',
+                confirmButtonText: 'Hapus',
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
-                    setLoading()
-                    let data = new FormData(document.querySelector(".create-form"));
-
                     let id = $(".id").val();
-                    // UPDATE
-                    if(id)
-                    {
-                        $.ajax({
-                            url: "<?= base_url("role/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        $(".add-modal").modal("hide")
-
-                                        table.ajax.reload()
-                                    })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("role/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    $(".add-modal").modal("hide")
+                                    table.ajax.reload()
+                                })
+                            } else {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
                                 stopLoading()
                             }
-                        });
-                    }
-                    // CREATE
-                    else
-                    {
-                        $.ajax({
-                            url: "<?= base_url("role/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        $(".add-modal").modal("hide")
-                                    })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
                 }
             })
-        }
-    }
+        })
+    })
 </script>
 
 <?= $this->endSection(); ?>
