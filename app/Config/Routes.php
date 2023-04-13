@@ -53,12 +53,22 @@ $routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
  * Update Employee
  * Delete Employee
  */
+
+//  EMPLOYEE
 $routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
 $routes->get('/employee/all', 'Employee::allEmployee', ['filter' => 'Auth']);
 $routes->get('/employee/id/(:segment)', 'Employee::getByIdEmployee/$1', ['filter' => 'Auth']);
 $routes->post('/employee/save', 'Employee::saveEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/update', 'Employee::updateEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/delete', 'Employee::deleteEmployee', ['filter' => 'Auth']);
+
+// CUSTOMER
+$routes->get('/customer', 'Customer::customer', ['filter' => 'Auth']);
+// $routes->get('/customer/all', 'Customer::allEmployee', ['filter' => 'Auth']);
+// $routes->get('/customer/id/(:segment)', 'Customer::getByIdEmployee/$1', ['filter' => 'Auth']);
+// $routes->post('/customer/save', 'Customer::saveEmployee', ['filter' => 'Auth']);
+// $routes->post('/customer/update', 'Customer::updateEmployee', ['filter' => 'Auth']);
+// $routes->post('/customer/delete', 'Customer::deleteEmployee', ['filter' => 'Auth']);
 
 
 /**
