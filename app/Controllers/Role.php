@@ -12,43 +12,51 @@ class Role extends BaseController
 
     public function role()
     {
-        $token = session()->get("login")->token;
-         //Get Role
-         $responseRole = curl_request("GET", "/roles", $token);
+        // $token = session()->get("login")->token;
 
-         $dataRole = [];
-         if ($responseRole["code"] === 200) {
-             $dataRole = json_decode($responseRole["body"])->data;
-         }
-         
-        $data = [
-            "dataRole" => $dataRole
-        ];
+        // var_dump($token);
+        // die;
 
-        return view('role/index', $data);
+        return view('role/index');
     }
 
     public function allRole()
     {
         $token = session()->get("login")->token;
 
-        $response = curl_request("GET", "/roles", $token);
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            // "order" => $columns[$this->request->getGet("order")[0]["column"]],
+            // "dir" => $this->request->getGet("order")[0]["dir"],
+            "search" => $this->request->getGet("search")
+        ];
+
+        $response = curl_request("GET", "/roles", $token, $payload);
+        $dataRole = [];
+        $totalRecords = 0;
 
         if ($response["code"] === 200) {
-            $data = [
-                "status"            => true,
-                "data"   => json_decode($response["body"])->data,
-            ];
-            echo json_encode($data);
-        } else {
-            $message = json_decode($response["body"])->message;
-            $data = [
-                "status"            => false,
-                "message"    => $message,
-                "data"   => '',
-            ];
-            echo json_encode($data);
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
+
+            foreach ($body as $data) {
+                array_push($dataRole, [
+                    "id" => $data->id,
+                    "name" => $data->name,
+                ]);
+            }
         }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataRole,
+        ];
+
+        echo json_encode($data);
+        return;
     }
 
     public function saveRole()

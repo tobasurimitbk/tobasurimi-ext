@@ -43,27 +43,17 @@
    </div>
    <div class="mb-2">
         <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Role</h5>
-        <input class="form-control" placeholder="Search" style="width: 30%" value="" />
+        <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
    </div>
    <div class="table-responsive">
-        <table class="table table-bordered nowrap table-hover-pbtc" id="dataTable" width="100%" cellspacing="0">
+        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
                     <th>Role</th>
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
-            <?php
-                if (!empty($dataRole)) {
-                    foreach ($dataRole as $role) {
-                ?>
-                    <tr class="row-table" data-id="<?= $role->id; ?>">
-                        <td><?= $role->name; ?></td>
-                    </tr>
-                <?php
-                    }
-                }
-            ?>
+
             </tbody>
         </table>
     </div>
@@ -122,6 +112,10 @@
             $(".add-modal").modal("hide")
         })
 
+        $(".search").keyup(function () {
+            table.ajax.reload();
+        })
+
         $(".delete-btn").click(function() {
             Swal.fire({
                 icon: 'question',
@@ -158,38 +152,7 @@
                                 })
                                 .then(() => {
                                     $(".add-modal").modal("hide")
-
-                                    var tag_html = "";
-
-                                    // TABLE SEMENTARA RELOAD
-                                    $.ajax({
-                                        url: "<?= base_url("role/all"); ?>",
-                                        method: "GET",
-                                        dataType: "json",
-                                        success: function(res) {
-                                            if (res.status) {
-                                                $(".body-table").empty();
-                                                res.data.forEach((item) => {
-                                                    tag_html += `<tr class="row-table" style="cursor: pointer;" data-id='`+ item.id +`'>`;
-                                                    tag_html += "<td>";
-                                                    tag_html += item.name;
-                                                    tag_html += "</td>";
-                                                    tag_html += "</tr>";
-                                                })
-                                                $(".body-table").append(tag_html);
-                                            }
-                                            else
-                                            {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                            }
-                                        }
-                                    })
-
-
+                                    table.ajax.reload()
                                 })
                             } else {
                                 Swal.fire({
@@ -213,6 +176,53 @@
                 }
             })
         })
+
+        const table = $('.dataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: false,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("role/all"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.search = $(".search").val();
+                }
+            },
+            // scrollX: true,
+            "initComplete": function (settings, json) {    
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+            },
+            //responsive: true,
+            display: "stripe",
+            searching: false,
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            columns: [{
+                data: "name",
+                className: "text-center"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+                }
+            },
+            initComplete: function( settings, json ) {
+                // $('#dataTable_length').appendTo('#dataTablePagination'); //jQuery for moving elements around
+                // $('#dataTable_info').appendTo('#dataTablePagination'); //jQuery for moving elements around
+                // $('#dataTable_paginate').appendTo('#dataTablePagination'); //jQuery for moving elements around
+            }
+        });
 
         $(document).on('click', '.row-table', function() {
             $('.employeeImg').rules('remove', 'required');
@@ -290,37 +300,7 @@
                                     .then(() => {
                                         $(".add-modal").modal("hide")
 
-                                        var tag_html = "";
-
-                                        // TABLE SEMENTARA RELOAD
-                                        $.ajax({
-                                            url: "<?= base_url("role/all"); ?>",
-                                            method: "GET",
-                                            dataType: "json",
-                                            success: function(res) {
-                                                if (res.status) {
-                                                    $(".body-table").empty();
-                                                    res.data.forEach((item) => {
-                                                        tag_html += `<tr class="row-table" style="cursor: pointer;" data-id='`+ item.id +`'>`;
-                                                        tag_html += "<td>";
-                                                        tag_html += item.name;
-                                                        tag_html += "</td>";
-                                                        tag_html += "</tr>";
-                                                    })
-                                                    $(".body-table").append(tag_html);
-                                                }
-                                                else
-                                                {
-                                                    Swal.fire({
-                                                        icon: 'error',
-                                                        title: response.message,
-                                                        confirmButtonColor: '#4e73df',
-                                                    })
-                                                }
-                                            }
-                                        })
-
-
+                                        table.ajax.reload()
                                     })
                                 } else {
                                     Swal.fire({
@@ -366,38 +346,6 @@
                                     })
                                     .then(() => {
                                         $(".add-modal").modal("hide")
-
-                                        var tag_html = "";
-
-                                        // TABLE SEMENTARA RELOAD
-                                        $.ajax({
-                                            url: "<?= base_url("role/all"); ?>",
-                                            method: "GET",
-                                            dataType: "json",
-                                            success: function(res) {
-                                                if (res.status) {
-                                                    $(".body-table").empty();
-                                                    res.data.forEach((item) => {
-                                                        tag_html += `<tr class="row-table" style="cursor: pointer;" data-id='`+ item.id +`'>`;
-                                                        tag_html += "<td>";
-                                                        tag_html += item.name;
-                                                        tag_html += "</td>";
-                                                        tag_html += "</tr>";
-                                                    })
-                                                    $(".body-table").append(tag_html);
-                                                }
-                                                else
-                                                {
-                                                    Swal.fire({
-                                                        icon: 'error',
-                                                        title: response.message,
-                                                        confirmButtonColor: '#4e73df',
-                                                    })
-                                                }
-                                            }
-                                        })
-
-
                                     })
                                 } else {
                                     Swal.fire({

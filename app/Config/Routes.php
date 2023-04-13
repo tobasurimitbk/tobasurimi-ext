@@ -63,8 +63,12 @@ $routes->post('/employee/delete', 'Employee::deleteEmployee', ['filter' => 'Auth
 
 /**
  * Get Page Management User
+ * Get All Management User
+ * Save Management User
  */
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
+$routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);
+$routes->post('/user/save', 'User::saveUser', ['filter' => 'Auth']);
 
 /**
  * Get Page Role
