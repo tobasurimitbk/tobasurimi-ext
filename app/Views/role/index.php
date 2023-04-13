@@ -74,7 +74,7 @@
             },
             messages: {
                 name: {
-                    required: "Full Name is Required"
+                    required: "Role is Required"
                 }
             },
             errorElement: 'span',
@@ -117,6 +117,7 @@
             processing: true,
             serverSide: true,
             ordering: false,
+            fixedHeader: true,
             lengthMenu: [
                 [25],
                 [25],
@@ -136,28 +137,25 @@
             //responsive: true,
             display: "stripe",
             searching: false,
+            columns: [{
+                data: "name",
+                className: "text-left"
+            }],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
-            }],
-            columns: [{
-                data: "name",
-                className: "text-center"
             }],
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
                 paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
                 }
-            },
-            initComplete: function( settings, json ) {
-                // $('#dataTable_length').appendTo('#dataTablePagination'); //jQuery for moving elements around
-                // $('#dataTable_info').appendTo('#dataTablePagination'); //jQuery for moving elements around
-                // $('#dataTable_paginate').appendTo('#dataTablePagination'); //jQuery for moving elements around
             }
         });
+
+        $(".dataTable_info").addClass("pt-0");
 
         $(document).on('click', '.row-table', function() {
             $('.employeeImg').rules('remove', 'required');

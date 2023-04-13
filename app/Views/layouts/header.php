@@ -5,7 +5,7 @@
         <li class="dropdown">
             <a class="nav-link nav-link-lg nav-link-user dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="mr-2 d-none d-lg-inline text-black-600 small"><?= session()->get("login")->name; ?></div>
-                <img alt="image" src="<?= base_url() ?>assets/img/avatar/avatar-5.png" class="rounded-circle mr-1">
+                <img alt="image" src="<?= base_url() ?>assets/img/avatar/avatar.png" class="rounded-circle mr-1">
             </a>
             <!-- Dropdown - User Information -->
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

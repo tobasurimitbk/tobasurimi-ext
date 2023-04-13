@@ -25,6 +25,8 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="<?= base_url() ?>/assets/css/main-style.css">
     <link rel="stylesheet" href="<?= base_url() ?>/assets/css/components.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 
     <link href="<?= base_url(); ?>assets/_vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -36,6 +38,8 @@
 <body>
     <!-- Bootstrap core JavaScript-->
     <script src="<?= base_url(); ?>assets/_vendor/jquery/jquery.min.js"></script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script defer src="<?= base_url(); ?>assets/js/datatables.min.js"></script>
     <script defer src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
