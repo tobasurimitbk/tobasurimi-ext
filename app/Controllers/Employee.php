@@ -177,7 +177,6 @@ class Employee extends BaseController
             $id = $this->request->getPost("id");
 
             $file = $this->request->getFile("employeeImg");
-
             if (!empty($file->getName())) 
             {
                 $mime = $file->getMimeType();
@@ -198,6 +197,22 @@ class Employee extends BaseController
                         "status" => $this->request->getPost("status")
                     ]);
                 }
+            }
+            else
+            {
+                $payload = json_encode([
+                    "employeeImg" => '',
+                    "nip" => $this->request->getPost("nip"),
+                    "name" => $this->request->getPost("name"),
+                    "gender" => $this->request->getPost("gender"),
+                    "dob" => $this->request->getPost("dob"),
+                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                    "phone_no" => $this->request->getPost("phone_no"),
+                    "acc_no" => $this->request->getPost("acc_no"),
+                    "email" => $this->request->getPost("email"),
+                    "address" => $this->request->getPost("address"),
+                    "status" => $this->request->getPost("status")
+                ]);
             }
 
             if($payload)
