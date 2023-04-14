@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 5opx;">
-                                <select class="form-select employee_id" name="employee_id" id="floatingSelect" aria-label="Floating label select example">
+                                <select class="form-select employee_id" name="employee_id" id="employee_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataEmployee)) {
@@ -65,7 +65,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 5opx;">
-                                <select class="form-select role_id" name="role_id" id="floatingSelect" aria-label="Floating label select example">
+                                <select class="form-select role_id" name="role_id" id="role_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataRole)) {
@@ -84,7 +84,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 5opx;">
-                                <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
+                                <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                                     <option value="Aktif">Aktif</option>
                                     <option value="Non Aktif">Non Aktif</option>
                                 </select>
@@ -179,7 +179,6 @@
                     element = $(".select2-container").parent(); 
                     error.insertAfter(element);
                 } else {
-                    element = $(".select2-container").parent(); 
                     error.insertAfter(element);
                 }
             },

@@ -42,7 +42,7 @@ class Akses extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -130,7 +130,7 @@ class Akses extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
                     "message"    => $message,
@@ -142,7 +142,7 @@ class Akses extends BaseController
         }
         else
         {
-            $message = is_object($responseAkses["body"]) ? json_decode($responseAkses["body"])->message : 'Menu berdasarkan role tidak ditemukan';
+            $message = is_object(json_decode($responseAkses["body"])) ? json_decode($responseAkses["body"])->message : 'Menu berdasarkan role tidak ditemukan';
 
             $data = [
                 "status"            => false,

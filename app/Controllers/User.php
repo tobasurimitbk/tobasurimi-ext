@@ -52,7 +52,7 @@ class User extends BaseController
 
                 return redirect()->to("/dashboard")->with("success", "Login Berhasil");
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Login Gagal, Coba Lagi';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Login Gagal, Coba Lagi';
                 return redirect()->back()->with("errors", $message);
             }
         } else {
@@ -149,9 +149,9 @@ class User extends BaseController
             "role_id" => [
                 "rules" => "required"
             ],
-            "employee_id" => [
-                "rules" => "required"
-            ]
+            // "employee_id" => [
+            //     "rules" => "required"
+            // ]
         ];
 
         if ($this->validate($rules)) {
@@ -176,7 +176,7 @@ class User extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
                     "message"    => $message,
@@ -207,9 +207,9 @@ class User extends BaseController
             "role_id" => [
                 "rules" => "required"
             ],
-            "employee_id" => [
-                "rules" => "required"
-            ]
+            // "employee_id" => [
+            //     "rules" => "required"
+            // ]
         ];
 
         if ($this->validate($rules)) {
@@ -235,7 +235,7 @@ class User extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
                     "message"    => $message,
@@ -248,6 +248,36 @@ class User extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function getByIdUser($id = null)
+    {
+        $token = session()->get("login")->token;
+
+        if (!empty($id)) {
+            $response = curl_request("GET", "/users/$id", $token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"  => true,
+                    "data"  => json_decode($response["body"])->data,
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
             ];
             echo json_encode($data);
         }
@@ -270,7 +300,7 @@ class User extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
                     "message"    => $message,

@@ -85,7 +85,7 @@ class Role extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -141,7 +141,7 @@ class Role extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
                     "message"    => $message,
@@ -173,7 +173,7 @@ class Role extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -206,7 +206,7 @@ class Role extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
                     "message"    => $message,

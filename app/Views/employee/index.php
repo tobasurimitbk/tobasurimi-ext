@@ -30,7 +30,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-2" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="floatingSelect" aria-label="Floating label select example">
+                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataDivisi)) {
