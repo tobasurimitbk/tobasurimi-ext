@@ -103,7 +103,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
                                     <option value="Aktif">Aktif</option>
-                                    <option value="Non Aktif">Tidak Aktif</option>
+                                    <option value="Non Aktif">Non Aktif</option>
                                 </select>
                                 <label for="floatingInput">Status</label>
                             </div>
