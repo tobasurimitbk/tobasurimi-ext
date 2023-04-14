@@ -1139,7 +1139,7 @@ p {
 .table:not(.table-sm) thead th {
   border-bottom: none;
   background-color: rgba(0, 0, 0, 0.04);
-  color: #666;
+  color: #404040 !important;
   padding-top: 15px;
   padding-bottom: 15px;
 }
@@ -4019,7 +4019,7 @@ input[type="file"]::-webkit-file-upload-button{
   border: 1px solid #BDBDBD !important;
 }
 
-
+/* =====***** SELECT2 *****===== */
 .select2 {
   box-shadow: none !important;
 }
@@ -4128,5 +4128,13 @@ input[type="file"]::-webkit-file-upload-button{
   font-weight: 500;
   color: #657c74 !important;
   box-shadow: none !important;
+}
+
+/* MENU TABLE ACCESS */
+.form-header {
+  font-weight: bold;
+  color: #34395e;
+  font-size: 15px;
+  letter-spacing: 0.5px;
 }
 

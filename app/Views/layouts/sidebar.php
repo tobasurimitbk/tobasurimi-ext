@@ -1,7 +1,7 @@
 <?php
 $currentUriSegment = service('uri')->getSegment(1);
-$arrMasterURI = ['employee'];
-$arrSettingURI = ['user', 'role'];
+$arrMasterURI = ['employee', 'customer'];
+$arrSettingURI = ['user', 'role', 'akses'];
 $arrDashboardURI = ['dashboard'];
 ?>
 
@@ -49,19 +49,22 @@ $arrDashboardURI = ['dashboard'];
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-cog"></i><span>Settings</span></a>
                 <ul class="dropdown-menu">
                     <?php if ($currentUriSegment === "user") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a>
+                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a></li>
+                    <?php } else { ?>
+                        <li><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a></li>
+                    <?php } ?>
+                    <?php if ($currentUriSegment === "role") { ?>
+                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
+                    <?php } else { ?>
+                        <li><a class="nav-link" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
+                    <?php } ?>
+                    <?php if ($currentUriSegment === "akses") { ?>
+                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("akses"); ?>">Manajemen Hak Akses</a></li>
+                    <?php } else { ?>
+                        <li><a class="nav-link" href="<?= base_url("akses"); ?>">Manajemen Hak Akses</a></li>
+                    <?php } ?>
+                </ul>
             </li>
-        <?php } else { ?>
-            <li><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a></li>
-        <?php } ?>
-        <?php if ($currentUriSegment === "role") { ?>
-            <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
-            <?php } else { ?>
-                <li><a class="nav-link" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
-            <?php } ?>
-            <li><a class="nav-link">Manajemen Hak Akses</a></li>
-        </ul>
-        </li>
         </ul>
         </li>
         </ul>

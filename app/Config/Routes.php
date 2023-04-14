@@ -74,11 +74,17 @@ $routes->get('/customer', 'Customer::customer', ['filter' => 'Auth']);
 /**
  * Get Page Management User
  * Get All Management User
+ * Get By Id Management User
  * Save Management User
+ * Update Management User
+ * Delete Management User
  */
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
 $routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);
+$routes->get('/user/id/(:segment)', 'User::getByIdUser/$1', ['filter' => 'Auth']);
 $routes->post('/user/save', 'User::saveUser', ['filter' => 'Auth']);
+$routes->post('/user/update', 'User::updateUser', ['filter' => 'Auth']);
+$routes->post('/user/delete', 'User::deleteUser', ['filter' => 'Auth']);
 
 /**
  * Get Page Role
@@ -94,6 +100,15 @@ $routes->get('/role/id/(:segment)', 'Role::getByIdRole/$1', ['filter' => 'Auth']
 $routes->post('/role/save', 'Role::saveRole', ['filter' => 'Auth']);
 $routes->post('/role/update', 'Role::updateRole', ['filter' => 'Auth']);
 $routes->post('/role/delete', 'Role::deleteRole', ['filter' => 'Auth']);
+
+/**
+ * Get Page Hak Akses
+ * Get By Id Hak Akses
+ * Save Hak Akses
+ */
+$routes->get('/akses', 'Akses::akses', ['filter' => 'Auth']);
+$routes->get('/akses/id/(:segment)', 'Akses::getByIdAkses/$1', ['filter' => 'Auth']);
+$routes->post('/akses/save', 'Akses::saveAkses', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

@@ -9,6 +9,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col">
@@ -39,6 +40,25 @@
                             <div class="form-floating mb-3" style="height: 5opx;">
                                 <input type="text" class="form-control name" id="name" name="name" placeholder="Name" maxlength="30">
                                 <label for="floatingInput">Name</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 5opx;">
+                                <select class="form-select employee_id" name="employee_id" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataEmployee)) {
+                                        foreach ($dataEmployee as $employee) {
+                                    ?>
+                                        <option value="<?= $employee->id; ?>"><?= $employee->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Employee</label>
                             </div>
                         </div>
                     </div>
@@ -118,6 +138,7 @@
         // $('.division_id').select2({
         //     theme: 'bootstrap4'
         // })
+
         var validator = $(".create-form").validate({
             rules: {
                 name: {
@@ -126,10 +147,10 @@
                 username: {
                     required: true
                 },
-                password: {
+                role_id: {
                     required: true
                 },
-                role_id: {
+                employee_id: {
                     required: true
                 }
             },
@@ -145,6 +166,9 @@
                 },
                 role_id: {
                     required: "Role is Required"
+                },
+                employee_id: {
+                    required: "Employee is Required"
                 }
             },
             errorElement: 'span',
@@ -152,9 +176,10 @@
             errorPlacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
+                    element = $(".select2-container").parent(); 
                     error.insertAfter(element);
                 } else {
+                    element = $(".select2-container").parent(); 
                     error.insertAfter(element);
                 }
             },
@@ -170,6 +195,8 @@
         });
 
         $(".btn-show-form").click(function() {
+            $('.password').rules('add', {required: true});
+            $(".id").val("");
             $(".title-name").text("Create");
             validator.resetForm();
             validator.reset();
@@ -262,49 +289,99 @@
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
 
-                        // CREATE
-                        $.ajax({
-                            url: "<?= base_url("user/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        table.ajax.reload()
-                                        $(".add-modal").modal("hide")
-                                    })
-                                } else {
+                        let id = $(".id").val();
+                        // UPDATE
+                        if(id)
+                        {
+                            $.ajax({
+                                url: "<?= base_url("user/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            table.ajax.reload()
+                                            $(".add-modal").modal("hide")
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
+                            });
+                        }
+                        // CREATE
+                        else
+                        {
+                            $.ajax({
+                                url: "<?= base_url("user/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            table.ajax.reload()
+                                            $(".add-modal").modal("hide")
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            });
+                        }
                     }
                 })
             }
@@ -326,7 +403,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("role/delete"); ?>",
+                        url: "<?= base_url("user/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -367,6 +444,42 @@
                             stopLoading()
                         }
                     });
+                }
+            })
+        })
+
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            $('.password').rules('remove', 'required');
+            const data = table.row(this).data();
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', '');
+            let id = data.id;
+            $(".title-name").text("Update");
+
+            $.ajax({
+                url: "<?= base_url("user/id"); ?>" + "/" + id,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".id").val(id);
+                        $(".name").val(res?.data?.name);
+                        $(".username").val(res?.data?.username);
+                        $(".role_id").val(res?.data?.role_id);
+                        $(".status").val(res?.data?.status);
+                        validator.resetForm();
+                        validator.reset();
+                        $(".add-modal").modal("show")
+                        console.log(res.data);
+                    }
+                    else
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
                 }
             })
         })

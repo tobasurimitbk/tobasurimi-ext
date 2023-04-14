@@ -30,7 +30,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-2" style="height: 50px;">
-                                <select class="form-control division_id" name="division_id">
+                                <select class="form-select division_id" name="division_id" id="floatingSelect" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataDivisi)) {
@@ -157,32 +157,6 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        $('.division_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        $(".division_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-        $(".division_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".division_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
@@ -581,7 +555,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".division_id").val(res?.data?.division_id).change();
+                        $(".division_id").val(res?.data?.division_id);
                         $(".address").val(res?.data?.address);
                         $(".acc_no").val(res?.data?.acc_no);
                         $(".dob").val(res?.data?.dob);

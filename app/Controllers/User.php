@@ -52,7 +52,7 @@ class User extends BaseController
 
                 return redirect()->to("/dashboard")->with("success", "Login Berhasil");
             } else {
-                $message = json_decode($response["body"])->message;
+                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Login Gagal, Coba Lagi';
                 return redirect()->back()->with("errors", $message);
             }
         } else {
@@ -70,12 +70,12 @@ class User extends BaseController
     public function user()
     {
         $token = session()->get("login")->token;
-         //Get User
-        $responseUser = curl_request("GET", "/users", $token);
+         //Get Employee
+        $responseEmployee = curl_request("GET", "/employees/selectOption", $token);
 
-        $dataUser = [];
-        if ($responseUser["code"] === 200) {
-            $dataUser = json_decode($responseUser["body"])->data;
+        $dataEmployee = [];
+        if ($responseEmployee["code"] === 200) {
+            $dataEmployee = json_decode($responseEmployee["body"])->data;
         }
 
          //Get Role
@@ -87,7 +87,7 @@ class User extends BaseController
          }
          
         $data = [
-            "dataUser" => $dataUser,
+            "dataEmployee" => $dataEmployee,
             "dataRole" => $dataRole
         ];
 
@@ -148,6 +148,9 @@ class User extends BaseController
             ],
             "role_id" => [
                 "rules" => "required"
+            ],
+            "employee_id" => [
+                "rules" => "required"
             ]
         ];
 
@@ -158,9 +161,8 @@ class User extends BaseController
                 "name" => $this->request->getPost("name"),
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
-                "company_id" => 1, 
                 "role_id" => formatter($this->request->getPost("role_id"), "STR_TO_INT"),
-                "employee_id" => 1, 
+                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT")
             ]);
             
             $response = curl_request("POST", "/users", $token, $payload);
@@ -174,7 +176,7 @@ class User extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = json_decode($response["body"])->message;
+                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
                     "message"    => $message,
@@ -187,6 +189,100 @@ class User extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateUser()
+    {
+        $rules = [
+            "name" => [
+                "rules" => "required"
+            ],
+            "username" => [
+                "rules" => "required"
+            ],
+            "role_id" => [
+                "rules" => "required"
+            ],
+            "employee_id" => [
+                "rules" => "required"
+            ]
+        ];
+
+        if ($this->validate($rules)) {
+            $token = session()->get("login")->token;
+            $id = $this->request->getPost("id");
+
+            $payload = json_encode([
+                "name" => $this->request->getPost("name"),
+                "username" => $this->request->getPost("username"),
+                "password" => $this->request->getPost("password"),
+                "role_id" => formatter($this->request->getPost("role_id"), "STR_TO_INT"),
+                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT")
+            ]);
+            
+            $response = curl_request("PATCH", "/users/$id", $token, $payload);
+
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Diubah",
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function deleteUser()
+    {
+        $token = session()->get("login")->token;
+        
+        $id = $this->request->getPost("id");
+
+        if (!empty($id)) {
+            $response = curl_request("DELETE", "/users/$id", $token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object($response["body"]) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }
