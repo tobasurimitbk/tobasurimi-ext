@@ -4005,12 +4005,6 @@ input[type="file"]::-webkit-file-upload-button{
   min-width: 100% !important;
 }
 
-#dataTable_length,
-#dataTable_info,
-#dataTable_paginate {
-  margin-top: 15px !important;
-}
-
 .dataTables_wrapper table.table thead tr th {
   background-color: #e1eee4;
   border-color: #d7d7d7;

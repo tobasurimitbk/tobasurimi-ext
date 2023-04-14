@@ -132,6 +132,8 @@
             },
             // scrollX: true,
             "initComplete": function (settings, json) {    
+                $('.dataTables_length').empty();    
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
             },
             //responsive: true,
