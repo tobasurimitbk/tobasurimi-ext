@@ -77,9 +77,18 @@ class User extends BaseController
         if ($responseUser["code"] === 200) {
             $dataUser = json_decode($responseUser["body"])->data;
         }
+
+         //Get Role
+         $responseRole = curl_request("GET", "/roles/selectOption", $token);
+
+         $dataRole = [];
+         if ($responseRole["code"] === 200) {
+             $dataRole = json_decode($responseRole["body"])->data;
+         }
          
         $data = [
             "dataUser" => $dataUser,
+            "dataRole" => $dataRole
         ];
 
         return view('user/index', $data);
@@ -89,29 +98,57 @@ class User extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $response = curl_request("GET", "/users", $token);
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            // "order" => $columns[$this->request->getGet("order")[0]["column"]],
+            // "dir" => $this->request->getGet("order")[0]["dir"],
+            "search" => $this->request->getGet("search")
+        ];
+
+        $response = curl_request("GET", "/users", $token, $payload);
+        $dataUser = [];
+        $totalRecords = 0;
 
         if ($response["code"] === 200) {
-            $data = [
-                "status"            => true,
-                "data"   => json_decode($response["body"])->data,
-            ];
-            echo json_encode($data);
-        } else {
-            $message = json_decode($response["body"])->message;
-            $data = [
-                "status"            => false,
-                "message"    => $message,
-                "data"   => '',
-            ];
-            echo json_encode($data);
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
+
+            foreach ($body as $data) {
+                array_push($dataUser, [
+                    "id" => $data->id,
+                    "username" => $data->username,
+                    "name" => $data->name,
+                    "roleName" => $data->roleName,
+                    "status" => $data->status,
+                ]);
+            }
         }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataUser,
+        ];
+
+        echo json_encode($data);
+        return;
     }
 
     public function saveUser()
     {
         $rules = [
             "name" => [
+                "rules" => "required"
+            ],
+            "username" => [
+                "rules" => "required"
+            ],
+            "password" => [
+                "rules" => "required"
+            ],
+            "role_id" => [
                 "rules" => "required"
             ]
         ];

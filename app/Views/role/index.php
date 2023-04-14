@@ -238,9 +238,8 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            $(".add-modal").modal("hide")
-
                                             table.ajax.reload()
+                                            $(".add-modal").modal("hide")
                                         })
                                     } else {
                                         Swal.fire({
@@ -285,8 +284,8 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            $(".add-modal").modal("hide")
                                             table.ajax.reload()
+                                            $(".add-modal").modal("hide")
                                         })
                                     } else {
                                         Swal.fire({
@@ -348,8 +347,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    $(".add-modal").modal("hide")
                                     table.ajax.reload()
+                                    $(".add-modal").modal("hide")
                                 })
                             } else {
                                 Swal.fire({

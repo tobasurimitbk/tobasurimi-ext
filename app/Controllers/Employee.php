@@ -14,7 +14,7 @@ class Employee extends BaseController
     {
         $token = session()->get("login")->token;
 
-         //Get User
+         //Get Employee
          $responseEmployee = curl_request("GET", "/employees", $token);
 
          $dataEmployee = [];
