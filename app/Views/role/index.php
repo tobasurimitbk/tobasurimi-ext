@@ -100,6 +100,7 @@
         });
 
         $(".btn-show-form").click(function() {
+            $(".id").val("");
             $(".title-name").text("Create");
             validator.resetForm();
             validator.reset();

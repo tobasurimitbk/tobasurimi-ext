@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="<?= base_url() ?>/assets/css/main-style.css">
     <link rel="stylesheet" href="<?= base_url() ?>/assets/css/components.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" integrity="sha512-TQQ3J4WkE/rwojNFo6OJdyu6G8Xe9z8rMrlF9y7xpFbQfW5g8aSWcygCQ4vqRiJqFsDsE1T6MoAOMJkFXlrI9A==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
 
     <link href="<?= base_url(); ?>assets/_vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">

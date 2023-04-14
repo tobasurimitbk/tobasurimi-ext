@@ -69,7 +69,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address" maxlength="30">
+                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Address</label>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
                                     <option value="Aktif">Aktif</option>
-                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                    <option value="Non Aktif">Tidak Aktif</option>
                                 </select>
                                 <label for="floatingInput">Status</label>
                             </div>
@@ -116,7 +116,7 @@
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form" onclick="saveForm()">Save</button>
+                    <button type="submit" class="btn btn-submit-form">Save</button>
                 </div>
             </div>
         </div>
@@ -265,6 +265,7 @@
         $(".phone_no, .acc_no").mask("000000000000000")
 
         $(".btn-show-form").click(function() {
+            $(".id").val("");
             $('.employeeImg').rules('add', {required: true});
             $(".title-name").text("Create");
             validator.resetForm();
