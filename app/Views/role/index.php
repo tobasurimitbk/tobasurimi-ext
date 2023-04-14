@@ -40,12 +40,12 @@
         <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Role
         </button>
-   </div>
-   <div class="mb-2">
+    </div>
+    <div class="mb-2">
         <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Role</h5>
         <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
-   </div>
-   <div class="table-responsive">
+    </div>
+    <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
@@ -61,7 +61,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    
+
     $(document).ready(function() {
         // $('.division_id').select2({
         //     theme: 'bootstrap4'
@@ -82,20 +82,20 @@
             errorPlacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
                     error.insertAfter(element);
                 } else {
                     error.insertAfter(element);
                 }
             },
-            highlight: function (element) {
+            highlight: function(element) {
                 $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');                      
+                $(element).addClass('select-class');
 
             },
-            unhighlight: function (element) {
+            unhighlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');   
+                $(element).removeClass('select-class');
             },
         });
 
@@ -132,10 +132,10 @@
                 }
             },
             // scrollX: true,
-            "initComplete": function (settings, json) {    
-                $('.dataTables_length').empty();    
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
             },
             //responsive: true,
             display: "stripe",
@@ -160,12 +160,11 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
+        $(document).on('click', '.row-table', function() {
             $('.employeeImg').rules('remove', 'required');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
-            let id = data.id;
+            let id = $(this).data('id');
             $(".title-name").text("Update");
 
             $.ajax({
@@ -180,9 +179,7 @@
                         validator.reset();
                         $(".add-modal").modal("show")
                         console.log(res.data);
-                    }
-                    else
-                    {
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: response.message,
@@ -193,7 +190,7 @@
             })
         })
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
@@ -216,8 +213,7 @@
 
                         let id = $(".id").val();
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("role/update"); ?>",
                                 data: data,
@@ -233,14 +229,15 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal").modal("hide")
+
+                                                table.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -262,8 +259,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("role/save"); ?>",
                                 data: data,
@@ -279,14 +275,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal").modal("hide")
+                                                table.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -342,14 +338,14 @@
                             if (response.status) {
                                 stopLoading()
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                    $(".add-modal").modal("hide")
-                                })
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal").modal("hide")
+                                        table.ajax.reload()
+                                    })
                             } else {
                                 Swal.fire({
                                     icon: 'error',

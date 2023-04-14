@@ -66,7 +66,7 @@ $routes->post('/employee/delete', 'Employee::deleteEmployee', ['filter' => 'Auth
 $routes->get('/customer', 'Customer::customer', ['filter' => 'Auth']);
 // $routes->get('/customer/all', 'Customer::allEmployee', ['filter' => 'Auth']);
 // $routes->get('/customer/id/(:segment)', 'Customer::getByIdEmployee/$1', ['filter' => 'Auth']);
-// $routes->post('/customer/save', 'Customer::saveEmployee', ['filter' => 'Auth']);
+$routes->post('/customer/save', 'Customer::saveCustomer', ['filter' => 'Auth']);
 // $routes->post('/customer/update', 'Customer::updateEmployee', ['filter' => 'Auth']);
 // $routes->post('/customer/delete', 'Customer::deleteEmployee', ['filter' => 'Auth']);
 
