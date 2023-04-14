@@ -159,11 +159,12 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(document).on('click', '.row-table', function() {
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
             $('.employeeImg').rules('remove', 'required');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
-            let id = $(this).data('id');
+            let id = data.id;
             $(".title-name").text("Update");
 
             $.ajax({

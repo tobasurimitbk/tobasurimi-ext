@@ -13,6 +13,7 @@ class Employee extends BaseController
     public function employee()
     {
         $token = session()->get("login")->token;
+
          //Get User
          $responseEmployee = curl_request("GET", "/employees", $token);
 
@@ -41,23 +42,43 @@ class Employee extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $response = curl_request("GET", "/employees", $token);
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            // "order" => $columns[$this->request->getGet("order")[0]["column"]],
+            // "dir" => $this->request->getGet("order")[0]["dir"],
+            "search" => $this->request->getGet("search")
+        ];
+
+        $response = curl_request("GET", "/employees", $token, $payload);
+        $dataRole = [];
+        $totalRecords = 0;
 
         if ($response["code"] === 200) {
-            $data = [
-                "status"            => true,
-                "data"   => json_decode($response["body"])->data,
-            ];
-            echo json_encode($data);
-        } else {
-            $message = json_decode($response["body"])->message;
-            $data = [
-                "status"            => false,
-                "message"    => $message,
-                "data"   => '',
-            ];
-            echo json_encode($data);
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
+
+            foreach ($body as $data) {
+                array_push($dataRole, [
+                    "id" => $data->id,
+                    "nip" => $data->nip,
+                    "name" => $data->name,
+                    "divisionName" => $data->divisionName,
+                    "email" => $data->email,
+                    "status" => $data->status,
+                ]);
+            }
         }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataRole,
+        ];
+
+        echo json_encode($data);
+        return;
     }
 
     public function saveEmployee()
