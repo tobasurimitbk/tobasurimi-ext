@@ -133,7 +133,7 @@
    </div>
    <div class="mb-2">
         <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Employee</h5>
-        <input class="form-control" placeholder="Search" style="width: 30%" value="" />
+        <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
    </div>
    <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
