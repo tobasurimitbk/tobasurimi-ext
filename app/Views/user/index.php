@@ -147,6 +147,10 @@
                 username: {
                     required: true
                 },
+                password: {
+                    minlength: 6,
+                    required: true
+                },
                 role_id: {
                     required: true
                 },
@@ -162,6 +166,7 @@
                     required: "Username is Required"
                 },
                 password: {
+                    minlength: "Password length must be at least 6 characters long",
                     required: "Password is Required"
                 },
                 role_id: {

@@ -149,9 +149,9 @@ class User extends BaseController
             "role_id" => [
                 "rules" => "required"
             ],
-            // "employee_id" => [
-            //     "rules" => "required"
-            // ]
+            "employee_id" => [
+                "rules" => "required"
+            ]
         ];
 
         if ($this->validate($rules)) {
@@ -207,9 +207,9 @@ class User extends BaseController
             "role_id" => [
                 "rules" => "required"
             ],
-            // "employee_id" => [
-            //     "rules" => "required"
-            // ]
+            "employee_id" => [
+                "rules" => "required"
+            ]
         ];
 
         if ($this->validate($rules)) {
