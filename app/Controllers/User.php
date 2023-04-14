@@ -101,8 +101,6 @@ class User extends BaseController
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            // "order" => $columns[$this->request->getGet("order")[0]["column"]],
-            // "dir" => $this->request->getGet("order")[0]["dir"],
             "search" => $this->request->getGet("search")
         ];
 

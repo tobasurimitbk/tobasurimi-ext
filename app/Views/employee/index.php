@@ -29,8 +29,8 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="floatingSelect" aria-label="Floating label select example">
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <select class="form-control division_id" name="division_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataDivisi)) {
@@ -157,31 +157,31 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        // $('.division_id').select2({
-        //     placeholder: "Divisi",
-        //     theme: "bootstrap-5",
-        //     dropdownParent: $(".add-modal")
-        // })
-        // $(".division_id")
-        // .parent('div')
-        // .children('span')
-        // .children('span')
-        // .children('span')
-        // .css('height', ' calc(3.5rem + 2px)');
+        $('.division_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
 
-        // $(".division_id")
-        // .parent('div')
-        // .children('span')
-        // .children('span')
-        // .children('span')
-        // .children('span')
-        // .css('margin-top', '25px').css('margin-left', '5px');
+        $(".division_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-        // $(".division_id")
-        // .parent('div')
-        // .find('label')
-        // .css('z-index', '1');
+        $(".division_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
+        $(".division_id")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -238,19 +238,19 @@
             errorPlacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
+                    element = $(".select2-container").parent(); 
                     error.insertAfter(element);
                 } else {
                     error.insertAfter(element);
                 }
             },
             highlight: function (element) {
-                $(element).closest('.form-group').addClass('has-error');
+                $(element).closest('.col-md-6').addClass('has-error');
                 $(element).addClass('select-class');                      
 
             },
             unhighlight: function (element) {
-                $(element).closest('.form-group').removeClass('has-error');
+                $(element).closest('.col-md-6').removeClass('has-error');
                 $(element).removeClass('select-class');   
             },
         });
@@ -315,6 +315,7 @@
 
         $(".btn-show-form").click(function() {
             $(".title-name").text("Create");
+            $(".division_id").val("").change();
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()
@@ -580,7 +581,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".division_id").val(res?.data?.division_id);
+                        $(".division_id").val(res?.data?.division_id).change();
                         $(".address").val(res?.data?.address);
                         $(".acc_no").val(res?.data?.acc_no);
                         $(".dob").val(res?.data?.dob);
