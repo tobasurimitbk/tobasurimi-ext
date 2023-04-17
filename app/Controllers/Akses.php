@@ -98,6 +98,7 @@ class Akses extends BaseController
                     array_push(
                         $result,
                         (object) [
+                            "parent_id" => $this->request->getPost("parent_" . $child[$j]->menu_url_id),
                             "menu_url_id" => $child[$j]->menu_url_id,
                             "access" => $access,
                         ]
@@ -110,14 +111,6 @@ class Akses extends BaseController
                 "role_id" => $id
                 
             ]);
-
-            $data = [
-                "status"            => false,
-                "message"    => $payload,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
 
             $response = curl_request("POST", "/accessLists", $token, $payload);
 

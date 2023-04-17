@@ -4138,3 +4138,31 @@ input[type="file"]::-webkit-file-upload-button{
   letter-spacing: 0.5px;
 }
 
+/* CHECKBOX ROUNDED */
+.checkbox-round {
+    width: 1.6em;
+    height: 1.6em;
+    background-color: white;
+    border-radius: 50%;
+    vertical-align: middle;
+    border: 1px solid #404040;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.checkbox-round:checked {
+    background-color: #404040;
+}
+
+.checkbox-round:after { content: ''; }
+.checkbox-round:focus { outline: none; }
+.checkbox-round:checked:after { 
+  content: '⬤'; 
+  color: white; 
+  justify-content: center !important; 
+  align-items: center; 
+  margin-left: 4px;
+}
+
