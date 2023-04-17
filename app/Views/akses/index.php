@@ -106,7 +106,7 @@
                             item.child.forEach((child) => {
                                 tag_html += "<tr>";
                                 tag_html += "<td>";
-                                tag_html += "Employee";
+                                tag_html += child.name;
                                 tag_html += "<input type='hidden' value='" + item.menu_url_id + "' name='parent_" + child.menu_url_id + "'  id='parent_" + child.menu_url_id + "'  />";
                                 tag_html += "</td>";
                                 if (child.access.includes('c')) {

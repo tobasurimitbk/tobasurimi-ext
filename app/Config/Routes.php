@@ -70,6 +70,21 @@ $routes->post('/customer/save', 'Customer::saveCustomer', ['filter' => 'Auth']);
 // $routes->post('/customer/update', 'Customer::updateEmployee', ['filter' => 'Auth']);
 // $routes->post('/customer/delete', 'Customer::deleteEmployee', ['filter' => 'Auth']);
 
+/**
+ * Get Page Company
+ * Get All Company
+ * Get By Id Company
+ * Save Company
+ * Update Company
+ * Delete Company
+ */
+$routes->get('/company', 'Company::company', ['filter' => 'Auth']);
+$routes->get('/company/all', 'Company::allCompany', ['filter' => 'Auth']);
+$routes->get('/company/id/(:segment)', 'Company::getByIdCompany/$1', ['filter' => 'Auth']);
+$routes->post('/company/save', 'User::saveCompany', ['filter' => 'Auth']);
+$routes->post('/company/update', 'User::updateCompany', ['filter' => 'Auth']);
+$routes->post('/company/delete', 'Company::deleteCompany', ['filter' => 'Auth']);
+
 
 /**
  * Get Page Management User

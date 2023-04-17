@@ -100,7 +100,7 @@ class User extends BaseController
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
-            "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search")
         ];
 

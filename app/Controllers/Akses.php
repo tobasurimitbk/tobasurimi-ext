@@ -100,7 +100,7 @@ class Akses extends BaseController
                         (object) [
                             "parent_id" => $this->request->getPost("parent_" . $child[$j]->menu_url_id),
                             "menu_url_id" => $child[$j]->menu_url_id,
-                            "access" => $access,
+                            "action" => $access,
                         ]
                     );
                 }

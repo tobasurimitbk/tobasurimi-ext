@@ -13,15 +13,6 @@ class Employee extends BaseController
     public function employee()
     {
         $token = session()->get("login")->token;
-
-         //Get Employee
-         $responseEmployee = curl_request("GET", "/employees", $token);
-
-         $dataEmployee = [];
-         if ($responseEmployee["code"] === 200) {
-             $dataEmployee = json_decode($responseEmployee["body"])->data;
-         }
-
          //Get Divisi
         $responseDivisi = curl_request("GET", "/divisis/all", $token);
 
@@ -31,7 +22,6 @@ class Employee extends BaseController
         }
          
         $data = [
-            "dataEmployee" => $dataEmployee,
             "dataDivisi" => $dataDivisi,
         ];
 
@@ -44,7 +34,7 @@ class Employee extends BaseController
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
-            "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search")
         ];
 
