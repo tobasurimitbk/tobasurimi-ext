@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 5opx;">
-                                <select class="form-select employee_id" name="employee_id" id="employee_id" aria-label="Floating label select example">
+                                <select class="form-select employee_id" name="employee_id" id="employee_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataEmployee)) {
@@ -65,7 +65,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 5opx;">
-                                <select class="form-select role_id" name="role_id" id="role_id" aria-label="Floating label select example">
+                                <select class="form-select role_id" name="role_id" id="role_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataRole)) {
@@ -135,9 +135,58 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        // $('.division_id').select2({
-        //     theme: 'bootstrap4'
-        // })
+        $('.role_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.employee_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".role_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $(".role_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".role_id")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        $(".employee_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $(".employee_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".employee_id")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -181,7 +230,7 @@
             errorPlacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $(".select2-container").parent(); 
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
                     error.insertAfter(element);
                 } else {
                     error.insertAfter(element);

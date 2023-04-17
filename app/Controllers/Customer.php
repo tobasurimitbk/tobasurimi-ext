@@ -40,7 +40,7 @@ class Customer extends BaseController
     //         ];
     //         echo json_encode($data);
     //     } else {
-    //         $message = json_decode($response["body"])->message;
+    //         $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
     //         $data = [
     //             "status"            => false,
     //             "message"    => $message,
@@ -102,7 +102,7 @@ class Customer extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = json_decode($response["body"])->message;
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
                     "message"    => $message,
@@ -199,7 +199,7 @@ class Customer extends BaseController
     //                 ];
     //                 echo json_encode($data);
     //             } else {
-    //                 $message = json_decode($response["body"])->message;
+    //                 $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
     //                 $data = [
     //                     "status"            => false,
     //                     "message"    => $message,
@@ -241,7 +241,7 @@ class Customer extends BaseController
     //             ];
     //             echo json_encode($data);
     //         } else {
-    //             $message = json_decode($response["body"])->message;
+    //             $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
     //             $data = [
     //                 "status" => false,
     //                 "message"  => $message
@@ -274,7 +274,7 @@ class Customer extends BaseController
     //             ];
     //             echo json_encode($data);
     //         } else {
-    //             $message = json_decode($response["body"])->message;
+    //             $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
     //             $data = [
     //                 "status"            => false,
     //                 "message"    => $message,
