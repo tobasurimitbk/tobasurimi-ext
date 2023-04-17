@@ -250,6 +250,8 @@
         $(".btn-show-form").click(function() {
             $('.password').rules('add', {required: true});
             $(".id").val("");
+            $(".employee_id").val("").change();
+            $(".role_id").val("").change();
             $(".title-name").text("Create");
             validator.resetForm();
             validator.reset();
@@ -518,7 +520,8 @@
                         $(".id").val(id);
                         $(".name").val(res?.data?.name);
                         $(".username").val(res?.data?.username);
-                        $(".role_id").val(res?.data?.role_id);
+                        $(".employee_id").val(res?.data?.employee_id).change();
+                        $(".role_id").val(res?.data?.role_id).change();
                         $(".status").val(res?.data?.status);
                         validator.resetForm();
                         validator.reset();
