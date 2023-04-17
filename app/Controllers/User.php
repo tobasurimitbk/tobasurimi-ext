@@ -162,7 +162,8 @@ class User extends BaseController
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
                 "role_id" => formatter($this->request->getPost("role_id"), "STR_TO_INT"),
-                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT")
+                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                "status" => $this->request->getPost("status")
             ]);
             
             $response = curl_request("POST", "/users", $token, $payload);
@@ -221,7 +222,8 @@ class User extends BaseController
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
                 "role_id" => formatter($this->request->getPost("role_id"), "STR_TO_INT"),
-                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT")
+                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                "status" => $this->request->getPost("status")
             ]);
             
             $response = curl_request("PATCH", "/users/$id", $token, $payload);

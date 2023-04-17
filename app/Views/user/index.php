@@ -94,9 +94,13 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-discard" onclick="hideAddForm()">Discard</button>
-                <button type="submit" class="btn btn-submit-form">Save</button>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <label>&nbsp;</label>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
+                    <button type="submit" class="btn btn-submit-form">Save</button>
+                </div>
             </div>
         </div>
     </div>

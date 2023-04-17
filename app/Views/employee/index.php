@@ -287,20 +287,6 @@
             },
         });
 
-        $(".btn-show-form").click(function() {
-            $(".title-name").text("Create");
-            $(".division_id").val("").change();
-            validator.resetForm();
-            validator.reset();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
-        })
-
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
-
         const table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
             processing: true,
