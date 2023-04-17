@@ -20,35 +20,76 @@ class Customer extends BaseController
             $dataCustomers = json_decode($responseCustomers["body"])->data;
         }
 
+        //Get Provinces
+        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+
+        $dataProvinces = [];
+        if ($responseProvinces["code"] === 200) {
+            $dataProvinces = json_decode($responseProvinces["body"])->data;
+        }
+
+        //Get Cities
+        $responseCities = curl_request("GET", "/cities/all", $token);
+
+        $dataCities = [];
+        if ($responseCities["code"] === 200) {
+            $dataCities = json_decode($responseCities["body"])->data;
+        }
+
         $data = [
             "dataCustomers" => $dataCustomers,
+            "dataProvinces" => $dataProvinces,
+            "dataCities" => $dataCities,
         ];
 
         return view('customer/index', $data);
     }
 
-    // public function allEmployee()
-    // {
-    //     $token = session()->get("login")->token;
+    public function allCustomer()
+    {
+        $token = session()->get("login")->token;
 
-    //     $response = curl_request("GET", "/employees", $token);
 
-    //     if ($response["code"] === 200) {
-    //         $data = [
-    //             "status"            => true,
-    //             "data"   => json_decode($response["body"])->data,
-    //         ];
-    //         echo json_encode($data);
-    //     } else {
-    //         $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
-    //         $data = [
-    //             "status"            => false,
-    //             "message"    => $message,
-    //             "data"   => '',
-    //         ];
-    //         echo json_encode($data);
-    //     }
-    // }
+        $payload = [
+            "page" => $this->request->getGet("length"),
+            "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search")
+        ];
+
+        $response = curl_request("GET", "/customers", $token, $payload);
+        $dataCustomer = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->totalRows;
+
+            foreach ($body as $data) {
+                array_push($dataCustomer, [
+                    "id" => $data->id,
+                    "name" => $data->name,
+                    "address" => $data->address,
+                    "province_id" => $data->province_id,
+                    "city_id" => $data->city_id,
+                    "zip_code" => $data->zip_code,
+                    "phone" => $data->phone,
+                    "email" => $data->email,
+                    "province_name" => $data->province_name,
+                    "city_name" => $data->city_name,
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataCustomer,
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 
     public function saveCustomer()
     {
@@ -228,35 +269,35 @@ class Customer extends BaseController
     //     return;
     // }
 
-    // public function getByIdEmployee($id = null)
-    // {
-    //     $token = session()->get("login")->token;
+    public function getByIdCustomer($id = null)
+    {
+        $token = session()->get("login")->token;
 
-    //     if (!empty($id)) {
-    //         $response = curl_request("GET", "/employees/$id", $token);
-    //         if ($response["code"] === 200) {
-    //             $data = [
-    //                 "status"  => true,
-    //                 "data"  => json_decode($response["body"])->data,
-    //             ];
-    //             echo json_encode($data);
-    //         } else {
-    //             $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
-    //             $data = [
-    //                 "status" => false,
-    //                 "message"  => $message
-    //             ];
-    //             echo json_encode($data);
-    //         }
-    //     } else {
-    //         $data = [
-    //             "status"            => false,
-    //             "message"    => "Tidak Ada Id"
-    //         ];
-    //         echo json_encode($data);
-    //     }
-    //     return;
-    // }
+        if (!empty($id)) {
+            $response = curl_request("GET", "/customer/$id", $token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"  => true,
+                    "data"  => json_decode($response["body"])->data,
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
 
     // public function deleteEmployee()
     // {
