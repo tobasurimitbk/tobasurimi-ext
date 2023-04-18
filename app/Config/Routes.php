@@ -70,6 +70,14 @@ $routes->post('/customer/save', 'Customer::saveCustomer', ['filter' => 'Auth']);
 $routes->post('/customer/update', 'Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer/delete', 'Customer::deleteCustomer', ['filter' => 'Auth']);
 
+// WAREHOUSE
+$routes->get('/warehouse', 'Warehouse::warehouse', ['filter' => 'Auth']);
+$routes->get('/warehouse/all', 'Warehouse::allWarehouse', ['filter' => 'Auth']);
+$routes->get('/warehouse/id/(:segment)', 'Warehouse::getByIdWarehouse/$1', ['filter' => 'Auth']);
+$routes->post('/warehouse/save', 'Warehouse::saveWarehouse', ['filter' => 'Auth']);
+$routes->post('/warehouse/update', 'Warehouse::updateWarehouse', ['filter' => 'Auth']);
+$routes->post('/warehouse/delete', 'Warehouse::deleteWarehouse', ['filter' => 'Auth']);
+
 /**
  * Get Page Company
  * Get All Company

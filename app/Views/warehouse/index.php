@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Customer</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Warehouse</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -14,8 +14,8 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Name</label>
+                                <input type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse Name" maxlength="30">
+                                <label for="floatingInput">Warehouse Name</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -82,6 +82,12 @@
                                 <label for="floatingInput">Email</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control pic_id" id="pic_id" name="pic_id" placeholder="pic_id">
+                                <label for="floatingInput">PIC</label>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -101,20 +107,20 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <div class="mb-5">
-        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Customer</h4>
+        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Warehouse</h4>
         <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Customer
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Warehouse
         </button>
     </div>
     <div class="mb-2">
-        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Customer</h5>
+        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Warehouse</h5>
         <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
     </div>
     <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
-                    <th>Name</th>
+                    <th>Warehouse Name</th>
                     <th>Address</th>
                     <th>Phone</th>
                     <th>Email</th>
@@ -133,7 +139,7 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
-                name: {
+                warehouse_name: {
                     required: true
                 },
                 address: {
@@ -155,9 +161,12 @@
                     required: true,
                     email: true,
                 },
+                pic_id: {
+                    required: true
+                },
             },
             messages: {
-                name: {
+                warehouse_name: {
                     required: "Name is required"
                 },
                 address: {
@@ -178,6 +187,9 @@
                 email: {
                     required: "Email is required",
                     email: "Email must be valid",
+                },
+                pic_id: {
+                    required: "PIC is required"
                 },
             },
             errorElement: 'span',
@@ -299,7 +311,7 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("customer/all"); ?>",
+                url: "<?= base_url("warehouse/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
@@ -315,7 +327,7 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "name",
+                data: "warehouse_name",
                 className: "text-left"
             }, {
                 data: "address",
@@ -349,24 +361,24 @@
             $(".title-name").text("Update");
 
             $.ajax({
-                url: "<?= base_url("customer/id"); ?>" + "/" + id,
+                url: "<?= base_url("warehouse/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
+                        $(".warehouse_name").val(res?.data?.warehouse_name);
                         $(".address").val(res?.data?.address);
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".city_id").val(res?.data?.city_id).change();
                         $(".zip_code").val(res?.data?.zip_code);
                         $(".phone").val(res?.data?.phone);
                         $(".email").val(res?.data?.email);
+                        $(".pic_id").val(res?.data?.pic_id);
 
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")
-                        console.log(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -395,7 +407,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("customer/delete"); ?>",
+                        url: "<?= base_url("warehouse/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -459,7 +471,7 @@
                         let id = $(".id").val();
 
                         $.ajax({
-                            url: id ? "<?= base_url("customer/update"); ?>" : "<?= base_url("customer/save"); ?>",
+                            url: id ? "<?= base_url("warehouse/update"); ?>" : "<?= base_url("warehouse/save"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
