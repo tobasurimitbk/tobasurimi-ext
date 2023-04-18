@@ -51,8 +51,8 @@ class Customer extends BaseController
 
 
         $payload = [
-            "limit" => $this->request->getGet("length"),
-            "page" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search")
         ];
 
@@ -62,7 +62,7 @@ class Customer extends BaseController
 
         if ($response["code"] === 200) {
             $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->totalRows;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
 
             foreach ($body as $data) {
                 array_push($dataCustomer, [

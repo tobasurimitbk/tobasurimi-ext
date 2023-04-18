@@ -272,6 +272,9 @@
             $(".id").val("");
             $(".title-name").text("Create");
 
+            $(".province_id").val("").change();
+            $(".city_id").val("").change();
+
             validator.resetForm();
             validator.reset();
 
