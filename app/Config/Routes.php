@@ -67,8 +67,8 @@ $routes->get('/customer', 'Customer::customer', ['filter' => 'Auth']);
 $routes->get('/customer/all', 'Customer::allCustomer', ['filter' => 'Auth']);
 $routes->get('/customer/id/(:segment)', 'Customer::getByIdCustomer/$1', ['filter' => 'Auth']);
 $routes->post('/customer/save', 'Customer::saveCustomer', ['filter' => 'Auth']);
-// $routes->post('/customer/update', 'Customer::updateEmployee', ['filter' => 'Auth']);
-// $routes->post('/customer/delete', 'Customer::deleteEmployee', ['filter' => 'Auth']);
+$routes->post('/customer/update', 'Customer::updateCustomer', ['filter' => 'Auth']);
+$routes->post('/customer/delete', 'Customer::deleteCustomer', ['filter' => 'Auth']);
 
 /**
  * Get Page Company

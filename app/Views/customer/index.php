@@ -70,7 +70,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone" maxlength="30">
+                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
                                 <label for="floatingInput">Phone</label>
                             </div>
                         </div>
@@ -139,16 +139,16 @@
                 address: {
                     required: true
                 },
-                province: {
+                province_id: {
                     required: true
                 },
-                city: {
+                city_id: {
                     required: true
                 },
                 zip_code: {
                     required: true
                 },
-                phone_no: {
+                phone: {
                     required: true
                 },
                 email: {
@@ -163,16 +163,16 @@
                 address: {
                     required: "Address is required"
                 },
-                province: {
+                province_id: {
                     required: "Province is required"
                 },
-                city: {
+                city_id: {
                     required: "City is required"
                 },
                 zip_code: {
                     required: "Zip code is required"
                 },
-                phone_no: {
+                phone: {
                     required: "Phone is required"
                 },
                 email: {
@@ -202,7 +202,7 @@
             },
         });
 
-        $(".phone_no, .zip_code").mask("000000000000000")
+        $(".phone, .zip_code").mask("000000000000000")
 
         // PROVINCE
         $('.province_id').select2({
@@ -338,6 +338,44 @@
             }
         });
 
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', '');
+            let id = data.id;
+            $(".title-name").text("Update");
+
+            $.ajax({
+                url: "<?= base_url("customer/id"); ?>" + "/" + id,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".id").val(id);
+                        $(".name").val(res?.data?.name);
+                        $(".address").val(res?.data?.address);
+                        $(".province_id").val(res?.data?.province_id).change();
+                        $(".city_id").val(res?.data?.city_id).change();
+                        $(".zip_code").val(res?.data?.zip_code);
+                        $(".phone").val(res?.data?.phone);
+                        $(".name").val(res?.data?.name);
+                        $(".email").val(res?.data?.email);
+
+                        validator.resetForm();
+                        validator.reset();
+                        $(".add-modal").modal("show")
+                        console.log(res.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            })
+        })
+
         // delete
         $(".delete-btn").click(function() {
             Swal.fire({
@@ -416,8 +454,10 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form"));
 
+                        let id = $(".id").val();
+
                         $.ajax({
-                            url: "<?= base_url("customer/save"); ?>",
+                            url: id ? "<?= base_url("customer/update"); ?>" : "<?= base_url("customer/save"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());

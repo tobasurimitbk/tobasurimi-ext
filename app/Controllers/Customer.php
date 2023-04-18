@@ -51,8 +51,8 @@ class Customer extends BaseController
 
 
         $payload = [
-            "page" => $this->request->getGet("length"),
-            "limit" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "limit" => $this->request->getGet("length"),
+            "page" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search")
         ];
 
@@ -100,16 +100,16 @@ class Customer extends BaseController
             "address" => [
                 "rules" => "required"
             ],
-            "province" => [
+            "province_id" => [
                 "rules" => "required"
             ],
-            "city" => [
+            "city_id" => [
                 "rules" => "required"
             ],
             "zip_code" => [
                 "rules" => "required"
             ],
-            "phone_no" => [
+            "phone" => [
                 "rules" => "required"
             ],
             "email" => [
@@ -125,10 +125,10 @@ class Customer extends BaseController
             $payload = json_encode([
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
-                "province_id" => $this->request->getPost("province"),
-                "city_id" => $this->request->getPost("city"),
+                "province_id" => $this->request->getPost("province_id"),
+                "city_id" => $this->request->getPost("city_id"),
                 "zip_code" => $this->request->getPost("zip_code"),
-                "phone" => $this->request->getPost("phone_no"),
+                "phone" => $this->request->getPost("phone"),
                 "email" => $this->request->getPost("email"),
             ]);
 
@@ -162,119 +162,82 @@ class Customer extends BaseController
         return;
     }
 
-    // public function updateEmployee()
-    // {
-    //     $rules = [
-    //         "nip" => [
-    //             "rules" => "required"
-    //         ],
-    //         "name" => [
-    //             "rules" => "required"
-    //         ],
-    //         "gender" => [
-    //             "rules" => "required"
-    //         ],
-    //         "dob" => [
-    //             "rules" => "required"
-    //         ],
-    //         "address" => [
-    //             "rules" => "required"
-    //         ]
-    //     ];
+    public function updateCustomer()
+    {
+        $rules = [
+            "name" => [
+                "rules" => "required"
+            ],
+            "address" => [
+                "rules" => "required"
+            ],
+            "province_id" => [
+                "rules" => "required"
+            ],
+            "city_id" => [
+                "rules" => "required"
+            ],
+            "zip_code" => [
+                "rules" => "required"
+            ],
+            "phone" => [
+                "rules" => "required"
+            ],
+            "email" => [
+                "rules" => "required"
+            ],
+        ];
 
-    //     if ($this->validate($rules)) {
-    //         $payload = '';
-    //         $token = session()->get("login")->token;
+        if ($this->validate($rules)) {
+            $payload = '';
+            $token = session()->get("login")->token;
 
-    //         $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-    //         $file = $this->request->getFile("employeeImg");
-    //         if (!empty($file->getName())) 
-    //         {
-    //             $mime = $file->getMimeType();
-    //             if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
-    //                 $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
 
-    //                 $payload = json_encode([
-    //                     "employeeImg" => $image,
-    //                     "nip" => $this->request->getPost("nip"),
-    //                     "name" => $this->request->getPost("name"),
-    //                     "gender" => $this->request->getPost("gender"),
-    //                     "dob" => $this->request->getPost("dob"),
-    //                     "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-    //                     "phone_no" => $this->request->getPost("phone_no"),
-    //                     "acc_no" => $this->request->getPost("acc_no"),
-    //                     "email" => $this->request->getPost("email"),
-    //                     "address" => $this->request->getPost("address"),
-    //                     "status" => $this->request->getPost("status")
-    //                 ]);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             $payload = json_encode([
-    //                 "employeeImg" => '',
-    //                 "nip" => $this->request->getPost("nip"),
-    //                 "name" => $this->request->getPost("name"),
-    //                 "gender" => $this->request->getPost("gender"),
-    //                 "dob" => $this->request->getPost("dob"),
-    //                 "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-    //                 "phone_no" => $this->request->getPost("phone_no"),
-    //                 "acc_no" => $this->request->getPost("acc_no"),
-    //                 "email" => $this->request->getPost("email"),
-    //                 "address" => $this->request->getPost("address"),
-    //                 "status" => $this->request->getPost("status")
-    //             ]);
-    //         }
+            $payload = json_encode([
+                "name" => $this->request->getPost("name"),
+                "address" => $this->request->getPost("address"),
+                "province_id" => $this->request->getPost("province_id"),
+                "city_id" => $this->request->getPost("city_id"),
+                "zip_code" => $this->request->getPost("zip_code"),
+                "phone" => $this->request->getPost("phone"),
+                "email" => $this->request->getPost("email"),
+            ]);
+        }
 
-    //         if($payload)
-    //         {
-    //             $response = curl_request("PATCH", "/employees/$id", $token, $payload);
+        if ($payload) {
+            $response = curl_request("PATCH", "/customers/$id", $token, $payload);
 
-    //             if ($response["code"] === 200) {
-    //                 $data = [
-    //                     "status"            => true,
-    //                     "message"   => "Data Berhasil diubah",
-    //                     "payload"   => $payload,
-    //                     'token' => csrf_hash()
-    //                 ];
-    //                 echo json_encode($data);
-    //             } else {
-    //                 $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-    //                 $data = [
-    //                     "status"            => false,
-    //                     "message"    => $message,
-    //                     "payload"   => $payload,
-    //                     'token' => csrf_hash()
-    //                 ];
-    //                 echo json_encode($data);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             $data = [
-    //                 "status"            => false,
-    //                 "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-    //                 "payload"   => ''
-    //             ];
-    //             echo json_encode($data);
-    //         }
-    //     } else {
-    //         $data = [
-    //             "status"            => false,
-    //             "message"    => "Data Gagal Diubah",
-    //         ];
-    //         echo json_encode($data);
-    //     }
-    //     return;
-    // }
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        }
+
+        return;
+    }
 
     public function getByIdCustomer($id = null)
     {
         $token = session()->get("login")->token;
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/customer/$id", $token);
+            $response = curl_request("GET", "/customers/$id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -299,38 +262,38 @@ class Customer extends BaseController
         return;
     }
 
-    // public function deleteEmployee()
-    // {
-    //     $token = session()->get("login")->token;
+    public function deleteCustomer()
+    {
+        $token = session()->get("login")->token;
 
-    //     $id = $this->request->getPost("id");
+        $id = $this->request->getPost("id");
 
-    //     if (!empty($id)) {
-    //         $response = curl_request("DELETE", "/employees/$id", $token);
-    //         if ($response["code"] === 200) {
-    //             $data = [
-    //                 "status"            => true,
-    //                 "message"   => "Data Berhasil dihapus",
-    //                 'token' => csrf_hash()
-    //             ];
-    //             echo json_encode($data);
-    //         } else {
-    //             $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-    //             $data = [
-    //                 "status"            => false,
-    //                 "message"    => $message,
-    //                 'token' => csrf_hash()
-    //             ];
-    //             echo json_encode($data);
-    //         }
-    //     } else {
-    //         $data = [
-    //             "status"            => false,
-    //             "message"    => "Data Gagal Dihapus",
-    //             'token' => csrf_hash()
-    //         ];
-    //         echo json_encode($data);
-    //     }
-    //     return;
-    // }
+        if (!empty($id)) {
+            $response = curl_request("DELETE", "/customers/$id", $token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
 }
