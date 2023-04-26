@@ -37,24 +37,31 @@ $arrDashboardURI = ['dashboard'];
             <li><a class="nav-link" href="<?= base_url("customer"); ?>">Customer</a></li>
         <?php } ?>
 
-        <?php if ($currentUriSegment === "company") { ?>
-            <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("company"); ?>">Company</a></li>
+        <?php if ($currentUriSegment === "vendor") { ?>
+            <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("vendor"); ?>">Vendor</a>
+                </li>
             <?php } else { ?>
-                <li><a class="nav-link" href="<?= base_url("company"); ?>">Company</a></li>
+                <li><a class="nav-link" href="<?= base_url("vendor"); ?>">Vendor</a></li>
             <?php } ?>
 
-            <?php if ($currentUriSegment === "warehouse") { ?>
-                <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("warehouse"); ?>">Warehouse</a></li>
+            <?php if ($currentUriSegment === "company") { ?>
+                <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("company"); ?>">Company</a></li>
                 <?php } else { ?>
-                    <li><a class="nav-link" href="<?= base_url("warehouse"); ?>">Warehouse</a></li>
+                    <li><a class="nav-link" href="<?= base_url("company"); ?>">Company</a></li>
                 <?php } ?>
 
-                <?php if ($currentUriSegment === "employee") { ?>
-                    <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("employee"); ?>">Employee</a>
-                        </li>
+                <?php if ($currentUriSegment === "warehouse") { ?>
+                    <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("warehouse"); ?>">Warehouse</a></li>
                     <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("employee"); ?>">Employee</a></li>
+                        <li><a class="nav-link" href="<?= base_url("warehouse"); ?>">Warehouse</a></li>
                     <?php } ?>
+
+                    <?php if ($currentUriSegment === "employee") { ?>
+                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link" href="<?= base_url("employee"); ?>">Employee</a>
+                            </li>
+                        <?php } else { ?>
+                            <li><a class="nav-link" href="<?= base_url("employee"); ?>">Employee</a></li>
+                        <?php } ?>
         </ul>
         </li>
         </ul>

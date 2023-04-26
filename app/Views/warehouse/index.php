@@ -84,7 +84,18 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control pic_id" id="pic_id" name="pic_id" placeholder="pic_id">
+                                <select class="form-select pic_id" name="pic_id" id="pic_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataPic)) {
+                                        foreach ($dataPic as $pic) {
+                                    ?>
+                                            <option value="<?= $pic->id; ?>"><?= $pic->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
                                 <label for="floatingInput">PIC</label>
                             </div>
                         </div>
@@ -272,6 +283,34 @@
             .find('label')
             .css('z-index', '1');
 
+        // PIC
+        $('.pic_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".pic_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".pic_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".pic_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -286,6 +325,7 @@
 
             $(".province_id").val("").change();
             $(".city_id").val("").change();
+            $(".pic_id").val("").change();
 
             validator.resetForm();
             validator.reset();
@@ -371,10 +411,10 @@
                         $(".address").val(res?.data?.address);
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".city_id").val(res?.data?.city_id).change();
+                        $(".pic_id").val(res?.data?.pic_id).change();
                         $(".zip_code").val(res?.data?.zip_code);
                         $(".phone").val(res?.data?.phone);
                         $(".email").val(res?.data?.email);
-                        $(".pic_id").val(res?.data?.pic_id);
 
                         validator.resetForm();
                         validator.reset();

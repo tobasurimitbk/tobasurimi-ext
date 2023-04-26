@@ -78,6 +78,14 @@ $routes->post('/warehouse/save', 'Warehouse::saveWarehouse', ['filter' => 'Auth'
 $routes->post('/warehouse/update', 'Warehouse::updateWarehouse', ['filter' => 'Auth']);
 $routes->post('/warehouse/delete', 'Warehouse::deleteWarehouse', ['filter' => 'Auth']);
 
+// VENDOR
+$routes->get('/vendor', 'Vendor::vendor', ['filter' => 'Auth']);
+$routes->get('/vendor/all', 'Vendor::allVendor', ['filter' => 'Auth']);
+$routes->get('/vendor/id/(:segment)', 'Vendor::getByIdVendor/$1', ['filter' => 'Auth']);
+$routes->post('/vendor/save', 'Vendor::saveVendor', ['filter' => 'Auth']);
+$routes->post('/vendor/update', 'Vendor::updateVendor', ['filter' => 'Auth']);
+$routes->post('/vendor/delete', 'Vendor::deleteVendor', ['filter' => 'Auth']);
+
 /**
  * Get Page Company
  * Get All Company

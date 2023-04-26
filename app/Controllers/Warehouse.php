@@ -12,7 +12,7 @@ class Warehouse extends BaseController
     public function warehouse()
     {
         $token = session()->get("login")->token;
-        //Get User
+        //Get Warehouses
         $responseWarehouses = curl_request("GET", "/warehouses", $token);
 
         $dataWarehouses = [];
@@ -36,7 +36,17 @@ class Warehouse extends BaseController
             $dataCities = json_decode($responseCities["body"])->data;
         }
 
+
+        //Get Pic
+        $responsePic = curl_request("GET", "/employees/selectOption", $token);
+
+        $dataPic = [];
+        if ($responsePic["code"] === 200) {
+            $dataPic = json_decode($responsePic["body"])->data;
+        }
+
         $data = [
+            "dataPic" => $dataPic,
             "dataWarehouses" => $dataWarehouses,
             "dataProvinces" => $dataProvinces,
             "dataCities" => $dataCities,
