@@ -87,6 +87,11 @@ $routes->post('/vendor/update', 'Vendor::updateVendor', ['filter' => 'Auth']);
 $routes->post('/vendor/delete', 'Vendor::deleteVendor', ['filter' => 'Auth']);
 
 /**
+ * Get City By Province
+ */
+$routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
+
+/**
  * Get Page Company
  * Get All Company
  * Get By Id Company
@@ -97,8 +102,8 @@ $routes->post('/vendor/delete', 'Vendor::deleteVendor', ['filter' => 'Auth']);
 $routes->get('/company', 'Company::company', ['filter' => 'Auth']);
 $routes->get('/company/all', 'Company::allCompany', ['filter' => 'Auth']);
 $routes->get('/company/id/(:segment)', 'Company::getByIdCompany/$1', ['filter' => 'Auth']);
-$routes->post('/company/save', 'User::saveCompany', ['filter' => 'Auth']);
-$routes->post('/company/update', 'User::updateCompany', ['filter' => 'Auth']);
+$routes->post('/company/save', 'Company::saveCompany', ['filter' => 'Auth']);
+$routes->post('/company/update', 'Company::updateCompany', ['filter' => 'Auth']);
 $routes->post('/company/delete', 'Company::deleteCompany', ['filter' => 'Auth']);
 
 

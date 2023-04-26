@@ -14,7 +14,19 @@ class Company extends BaseController
     {
         $token = session()->get("login")->token;
 
-        return view('company/index');
+        //Get Provinces
+        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+
+        $dataProvinces = [];
+        if ($responseProvinces["code"] === 200) {
+            $dataProvinces = json_decode($responseProvinces["body"])->data;
+        }
+
+        $data = [
+            "dataProvinces" => $dataProvinces,
+        ];
+
+        return view('company/index', $data);
     }
 
     public function allCompany()
@@ -22,8 +34,8 @@ class Company extends BaseController
         $token = session()->get("login")->token;
 
         $payload = [
-            "limit" => $this->request->getGet("length"),
-            "page" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search")
         ];
 
@@ -33,7 +45,7 @@ class Company extends BaseController
 
         if ($response["code"] === 200) {
             $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->totalRows;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
 
             foreach ($body as $data) {
                 array_push($dataCompany, [
@@ -55,6 +67,124 @@ class Company extends BaseController
         ];
 
         echo json_encode($data);
+        return;
+    }
+
+    public function saveCompany()
+    {
+        $rules = [
+            "holding_company" => [
+                "rules" => "required"
+            ],
+            "company" => [
+                "rules" => "required"
+            ],
+            "address" => [
+                "rules" => "required"
+            ],
+            "phone" => [
+                "rules" => "required"
+            ],
+            "email" => [
+                "rules" => "required"
+            ],
+        ];
+
+        if ($this->validate($rules)) {
+            $payload = '';
+            $token = session()->get("login")->token;
+
+            $file = $this->request->getFile("logo");
+
+            $logo = "";
+
+            if (!empty($file->getName())) 
+            {
+                $mime = $file->getMimeType();
+                if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
+                    $logo = "data:$mime;base64, " . base64_encode(file_get_contents($file));
+
+                    $payload = json_encode([
+                        "logo" => $logo,
+                        "company" => $this->request->getPost("company"),
+                        "holding_company" => $this->request->getPost("holding_company"),
+                        "address" => $this->request->getPost("address"),
+                        "phone" => $this->request->getPost("phone"),
+                        "email" => $this->request->getPost("email"),
+                        "pic_id" => formatter($this->request->getPost("pic_id"), "STR_TO_INT")
+                    ]);
+        
+                    $response = curl_request("POST", "/employees", $token, $payload);
+        
+                    if ($response["code"] === 200) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil disimpan",
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                }
+                else
+                {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Format gambar harus bertipe png, jpg, jpeg",
+                        "payload"   => ''
+                    ];
+                    echo json_encode($data);
+                }
+            }
+            else
+            {
+                $payload = json_encode([
+                    "logo" => $logo,
+                    "company" => $this->request->getPost("company"),
+                    "holding_company" => $this->request->getPost("holding_company"),
+                    "address" => $this->request->getPost("address"),
+                    "phone" => $this->request->getPost("phone"),
+                    "email" => $this->request->getPost("email"),
+                    "pic_id" => formatter($this->request->getPost("pic_id"), "STR_TO_INT")
+                ]);
+    
+                $response = curl_request("POST", "/employees", $token, $payload);
+    
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Disimpan",
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 }

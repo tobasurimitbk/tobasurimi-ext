@@ -2,15 +2,100 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Company</h5>
             </div>
             <div class="modal-body">
-                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <img class="preview-photo" height="230" width="175" id="preview_photo" src="<?= base_url() ?>assets/img/avatar/logo.png" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input onchange="previewPhoto();" type="file" class="form-control input-image logo" id="logo" name="logo" accept="image/png, image/jpg, image/jpeg">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control company" id="company" name="company" placeholder="Company">
+                                <label for="floatingInput">Company</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control holding_company" id="holding_company" name="holding_company" placeholder="Holding Company">
+                                <label for="floatingInput">Holding Company</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <label for="floatingInput">Address</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataProvinces)) {
+                                        foreach ($dataProvinces as $province) {
+                                    ?>
+                                            <option value="<?= $province->id; ?>"><?= $province->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Province</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select city_id" name="city_id" id="city_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">City</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <label for="floatingInput">Zip Code</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
+                                <label for="floatingInput">Phone</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email">
+                                <label for="floatingInput">Email</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control pic_id" id="pic_id" name="pic_id" placeholder="PIC">
+                                <label for="floatingInput">PIC</label>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
@@ -59,19 +144,102 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        // $('.division_id').select2({
-        //     theme: 'bootstrap4'
-        // })
-        var validator = $(".create-form").validate({
+        // PROVINCE
+        $('.province_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $(".phone").mask("000000000000000")
+
+        $(".zip_code").mask("00000")
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".province_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".province_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".province_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // CITY
+        $('.city_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".city_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".city_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".city_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+            var validator = $(".create-form").validate({
             rules: {
-                name: {
+                company: {
                     required: true
-                }
+                },
+                holding_company: {
+                    required: true
+                },
+                address: {
+                    required: true
+                },
+                phone: {
+                    required: true
+                },
+                email: {
+                    required: true,
+                    email: true,
+                },
             },
             messages: {
-                name: {
-                    required: "Role is Required"
-                }
+                company: {
+                    required: "Company is required"
+                },
+                holding_company: {
+                    required: "Holding Company is required"
+                },
+                address: {
+                    required: "Address is required"
+                },
+                phone: {
+                    required: "Phone is required"
+                },
+                email: {
+                    required: "Email is required",
+                    email: "Email must be valid",
+                },
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -84,20 +252,21 @@
                     error.insertAfter(element);
                 }
             },
-            highlight: function (element) {
+            highlight: function(element) {
                 $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');                      
+                $(element).addClass('select-class');
 
             },
-            unhighlight: function (element) {
+            unhighlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');   
+                $(element).removeClass('select-class');
             },
         });
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".title-name").text("Create");
+            document.getElementById("preview_photo").src = "<?= base_url() ?>assets/img/avatar/logo.png";
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()
@@ -230,7 +399,7 @@
                         if(id)
                         {
                             $.ajax({
-                                url: "<?= base_url("role/update"); ?>",
+                                url: "<?= base_url("company/update"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -276,7 +445,7 @@
                         else
                         {
                             $.ajax({
-                                url: "<?= base_url("role/save"); ?>",
+                                url: "<?= base_url("company/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -384,6 +553,31 @@
             })
         })
     })
+
+    const getCity = function() {
+        const id = $(".province_id option:selected").val()
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+                }
+            })
+        }
+    }
+
+    //change picture
+    const previewPhoto = function() {
+        let file = document.getElementById("logo").files[0];
+        document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
+    }
 </script>
 
 <?= $this->endSection(); ?>
