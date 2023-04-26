@@ -127,7 +127,7 @@ class Warehouse extends BaseController
                 "rules" => "required"
             ],
             "pic_id" => [
-                "rulse" => "required"
+                "rules" => "required"
             ]
         ];
 
@@ -202,7 +202,7 @@ class Warehouse extends BaseController
                 "rules" => "required"
             ],
             "pic_id" => [
-                "rulse" => "required"
+                "rules" => "required"
             ]
         ];
 
@@ -213,7 +213,7 @@ class Warehouse extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "name" => $this->request->getPost("name"),
+                "warehouse_name" => $this->request->getPost("warehouse_name"),
                 "address" => $this->request->getPost("address"),
                 "province_id" => $this->request->getPost("province_id"),
                 "city_id" => $this->request->getPost("city_id"),
