@@ -5,105 +5,65 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Company</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Divisi</h5>
             </div>
             <div class="modal-body">
-            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <img class="preview-photo" height="230" width="175" id="preview_photo" src="<?= base_url() ?>assets/img/avatar/logo.png" />
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input onchange="previewPhoto();" type="file" class="form-control input-image logo" id="logo" name="logo" accept="image/png, image/jpg, image/jpeg">
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control company" id="company" name="company" placeholder="Company">
-                                <label for="floatingInput">Company</label>
-                            </div>
-                        </div>
-                    </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control holding_company" id="holding_company" name="holding_company" placeholder="Holding Company">
-                                <label for="floatingInput">Holding Company</label>
+                                <input type="text" class="form-control divisi" id="divisi" name="divisi">
+                                <label for="floatingInput">Divisi</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Address</label>
+                                <input type="number" class="form-control libur" id="libur" name="libur">
+                                <label for="floatingInput">Libur</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataProvinces)) {
-                                        foreach ($dataProvinces as $province) {
-                                    ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">Province</label>
+                                <input type="number" class="form-control jam_kerja" id="jam_kerja" name="jam_kerja">
+                                <label for="floatingInput">Jam Kerja</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">City</label>
+                                <input type="time" class="form-control jam_istirahat" id="jam_istirahat" name="jam_istirahat">
+                                <label for="floatingInput">Jam Istirahat</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
-                                <label for="floatingInput">Zip Code</label>
+                                <input type="time" class="form-control jam_masuk" id="jam_masuk" name="jam_masuk">
+                                <label for="floatingInput">Jam Masuk</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Phone</label>
+                                <input type="time" class="form-control jam_pulang" id="jam_pulang" name="jam_pulang">
+                                <label for="floatingInput">Jam Pulang</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email</label>
+                                <input type="time" class="form-control mulai_istirahat" id="mulai_istirahat" name="mulai_istirahat">
+                                <label for="floatingInput">Jam Mulai Istirahat</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select pic_id" name="pic_id" id="pic_id">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataEmployees)) {
-                                        foreach ($dataEmployees as $employee) {
-                                    ?>
-                                            <option value="<?= $employee->id; ?>"><?= $employee->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">PIC</label>
+                                <input type="time" class="form-control selesai_istirahat" id="selesai_istirahat" name="selesai_istirahat">
+                                <label for="floatingInput">Jam Selesai Istirahat</label>
                             </div>
                         </div>
                     </div>
@@ -124,24 +84,27 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <div class="mb-5">
-        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Company</h4>
+        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Divisi</h4>
         <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Company
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Divisi
         </button>
    </div>
    <div class="mb-2">
-        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Company</h5>
+        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Divisi</h5>
         <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
    </div>
    <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
-                    <th>Company</th>
-                    <th>Holding Company</th>
-                    <th>Address</th>
-                    <th>Phone</th>
-                    <th>Email</th>
+                    <th>Divisi</th>
+                    <th>Libur</th>
+                    <th>Jam Kerja</th>
+                    <th>Jam Istirahat</th>
+                    <th>Jam Masuk</th>
+                    <th>Jam Pulang</th>
+                    <th>Jam Mulai Istirahat</th>
+                    <th>Jam Selesai Istirahat</th>
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -155,157 +118,58 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        $(".phone").mask("0000000000000")
-
-        $(".zip_code").mask("00000")
-        
-        // PROVINCE
-        $('.province_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".province_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".province_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".province_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // CITY
-        $('.city_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".city_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".city_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".city_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // PIC
-        $('.pic_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".pic_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".pic_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".pic_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         var validator = $(".create-form").validate({
             rules: {
-                company: {
+                divisi: {
                     required: true
                 },
-                holding_company: {
+                libur: {
                     required: true
                 },
-                address: {
+                jam_kerja: {
                     required: true
                 },
-                phone: {
+                jam_istirahat: {
                     required: true
                 },
-                zip_code: {
+                jam_masuk: {
                     required: true
                 },
-                province_id: {
+                jam_pulang: {
                     required: true
                 },
-                city_id: {
+                mulai_istirahat: {
                     required: true
                 },
-                pic_id: {
+                selesai_istirahat: {
                     required: true
-                },
-                email: {
-                    required: true,
-                    email: true,
-                },
+                }
             },
             messages: {
-                logo: {
-                    required: "Logo is Required"
+                divisi: {
+                    required: "Divisi is Required"
                 },
-                company: {
-                    required: "Company is required"
+                libur: {
+                    required: "Libur is Required"
                 },
-                holding_company: {
-                    required: "Holding Company is required"
+                jam_kerja: {
+                    required: "Jam Kerja is Required"
                 },
-                address: {
-                    required: "Address is required"
+                jam_istirahat: {
+                    required: "Jam Istirahat is Required"
                 },
-                phone: {
-                    required: "Phone is required"
+                jam_masuk: {
+                    required: "Jam Masuk is Required"
                 },
-                zip_code: {
-                    required: "Zip Code is required"
+                jam_pulang: {
+                    required: "Jam Pulang is Required"
                 },
-                province_id: {
-                    required: "Province is required"
+                mulai_istirahat: {
+                    required: "Mulai Istirahat is Required"
                 },
-                city_id: {
-                    required: "City is required"
-                },
-                pic_id: {
-                    required: "PIC is required"
-                },
-                email: {
-                    required: "Email is required",
-                    email: "Email must be valid",
-                },
+                selesai_istirahat: {
+                    required: "Selesai Istirahat is Required"
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -331,20 +195,9 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $('.logo').rules('add', {
-                required: true
-            });
-            $(".title-name").text("Create");
-            $(".province_id").val('').change();
-            $(".city_id").val('').change();
-            $(".pic_id").val('').change();
-
-            $(".city_id").empty()
-            $(".city_id").append(`<option value=""></option>`)
-
-            document.getElementById("preview_photo").src = "<?= base_url() ?>assets/img/avatar/logo.png";
             validator.resetForm();
             validator.reset();
+            $(".divisi").val('').change();
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show")
@@ -366,7 +219,7 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("company/all"); ?>",
+                url: "<?= base_url("divisi/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
@@ -382,25 +235,37 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "company",
+                data: "divisi",
                 className: "text-left"
             },
             {
-                data: "holding_company",
+                data: "libur",
                 className: "text-left"
             },
             {
-                data: "address",
+                data: "jam_kerja",
                 className: "text-left"
             },
             {
-                data: "phone",
+                data: "jam_istirahat",
                 className: "text-left"
             },
             {
-                data: "email",
+                data: "jam_masuk",
                 className: "text-left"
-            },],
+            },
+            {
+                data: "jam_pulang",
+                className: "text-left"
+            },
+            {
+                data: "mulai_istirahat",
+                className: "text-left"
+            },
+            {
+                data: "selesai_istirahat",
+                className: "text-left"
+            }],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -426,39 +291,20 @@
             $(".title-name").text("Update");
 
             $.ajax({
-                url: "<?= base_url("company/id"); ?>" + "/" + id,
+                url: "<?= base_url("divisi/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".company").val(res?.data?.company);
-                        $(".holding_company").val(res?.data?.holding_company);
-                        $(".pic_id").val(res?.data?.pic_id).change();
-                        $(".address").val(res?.data?.address);
-                        $(".email").val(res?.data?.email);
-                        $(".phone").val(res?.data?.phone);
-                        $(".zip_code").val(res?.data?.zip_code);
-                        $(".province_id").val(res?.data?.province_id).change();
-
-                        // AJAX GET CITY
-                        $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_id").empty()
-                                $(".city_id").val("").change()
-                                $(".city_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
-                                })
-
-                                $(".city_id").val(res?.data?.city_id).change();
-                            }
-                        })
-
-                        document.getElementById("preview_photo").src = res?.data?.logo;
+                        $(".divisi").val(res?.data?.divisi);
+                        $(".libur").val(res?.data?.libur);
+                        $(".jam_kerja").val(res?.data?.jam_kerja);
+                        $(".jam_istirahat").val(res?.data?.jam_istirahat);
+                        $(".jam_masuk").val(res?.data?.jam_masuk);
+                        $(".jam_pulang").val(res?.data?.jam_pulang);
+                        $(".mulai_istirahat").val(res?.data?.mulai_istirahat);
+                        $(".selesai_istirahat").val(res?.data?.selesai_istirahat);
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")
@@ -500,7 +346,7 @@
                         if(id)
                         {
                             $.ajax({
-                                url: "<?= base_url("company/update"); ?>",
+                                url: "<?= base_url("divisi/update"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -546,7 +392,7 @@
                         else
                         {
                             $.ajax({
-                                url: "<?= base_url("company/save"); ?>",
+                                url: "<?= base_url("divisi/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -609,7 +455,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("company/delete"); ?>",
+                        url: "<?= base_url("divisi/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -654,31 +500,6 @@
             })
         })
     })
-
-    const getCity = function() {
-        const id = $(".province_id option:selected").val()
-        if (id) {
-            $.ajax({
-                url: `<?= base_url("city"); ?>/${id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".city_id").empty()
-                    $(".city_id").val("").change()
-                    $(".city_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
-                    })
-                }
-            })
-        }
-    }
-
-    //change picture
-    const previewPhoto = function() {
-        let file = document.getElementById("logo").files[0];
-        document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
-    }
 </script>
 
 <?= $this->endSection(); ?>

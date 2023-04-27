@@ -101,6 +101,21 @@ $routes->post('/supplier/delete', 'Supplier::deleteSupplier', ['filter' => 'Auth
 $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
 
 /**
+ * Get Page Divisi
+ * Get All Divisi
+ * Get By Id Divisi
+ * Save Divisi
+ * Update Divisi
+ * Delete Divisi
+ */
+$routes->get('/divisi', 'Divisi::divisi', ['filter' => 'Auth']);
+$routes->get('/divisi/all', 'Divisi::allDivisi', ['filter' => 'Auth']);
+$routes->get('/divisi/id/(:segment)', 'Divisi::getByIdDivisi/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/save', 'Divisi::saveDivisi', ['filter' => 'Auth']);
+$routes->post('/divisi/update', 'Divisi::updateDivisi', ['filter' => 'Auth']);
+$routes->post('/divisi/delete', 'Divisi::deleteDivisi', ['filter' => 'Auth']);
+
+/**
  * Get Page Company
  * Get All Company
  * Get By Id Company
