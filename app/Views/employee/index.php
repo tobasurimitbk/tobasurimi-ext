@@ -236,7 +236,9 @@
             autoclose: true
         })
 
-        $(".phone_no, .acc_no").mask("000000000000000")
+        $(".phone_no").mask("0000000000000")
+
+        $(".acc_no").mask("000000000000000")
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
@@ -255,39 +257,6 @@
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
         })
-
-        var validator = $(".create-form").validate({
-            rules: {
-                name: {
-                    required: true
-                }
-            },
-            messages: {
-                name: {
-                    required: "Role is Required"
-                }
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
 
         const table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",

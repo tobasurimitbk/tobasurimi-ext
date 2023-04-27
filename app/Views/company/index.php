@@ -91,7 +91,18 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control pic_id" id="pic_id" name="pic_id" placeholder="PIC">
+                                <select class="form-select pic_id" name="pic_id" id="pic_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataEmployees)) {
+                                        foreach ($dataEmployees as $employee) {
+                                    ?>
+                                            <option value="<?= $employee->id; ?>"><?= $employee->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
                                 <label for="floatingInput">PIC</label>
                             </div>
                         </div>
@@ -151,7 +162,7 @@
             dropdownParent: $(".add-modal .modal-content")
         })
 
-        $(".phone").mask("000000000000000")
+        $(".phone").mask("0000000000000")
 
         $(".zip_code").mask("00000")
 
@@ -204,7 +215,35 @@
             .find('label')
             .css('z-index', '1');
 
-            var validator = $(".create-form").validate({
+        // PIC
+        $('.pic_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".pic_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".pic_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".pic_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        var validator = $(".create-form").validate({
             rules: {
                 company: {
                     required: true
@@ -218,12 +257,24 @@
                 phone: {
                     required: true
                 },
+                zip_code: {
+                    required: true
+                },
+                province_id: {
+                    required: true
+                },
+                city_id: {
+                    required: true
+                },
                 email: {
                     required: true,
                     email: true,
                 },
             },
             messages: {
+                logo: {
+                    required: "Logo is Required"
+                },
                 company: {
                     required: "Company is required"
                 },
@@ -235,6 +286,15 @@
                 },
                 phone: {
                     required: "Phone is required"
+                },
+                zip_code: {
+                    required: "Zip Code is required"
+                },
+                province_id: {
+                    required: "Province is required"
+                },
+                city_id: {
+                    required: "City is required"
                 },
                 email: {
                     required: "Email is required",
@@ -265,6 +325,9 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
+            $('.logo').rules('add', {
+                required: true
+            });
             $(".title-name").text("Create");
             document.getElementById("preview_photo").src = "<?= base_url() ?>assets/img/avatar/logo.png";
             validator.resetForm();
@@ -343,26 +406,51 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+            $('.logo').rules('remove', 'required');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
 
             $.ajax({
-                url: "<?= base_url("role/id"); ?>" + "/" + id,
+                url: "<?= base_url("company/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
+                        $(".company").val(res?.data?.company);
+                        $(".holding_company").val(res?.data?.holding_company);
+                        $(".pic_id").val(res?.data?.pic_id).change();
+                        $(".address").val(res?.data?.address);
+                        $(".email").val(res?.data?.email);
+                        $(".phone").val(res?.data?.phone);
+                        $(".zip_code").val(res?.data?.zip_code);
+                        $(".province_id").val(res?.data?.province_id).change();
+
+                        // AJAX GET CITY
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_id").empty()
+                                $(".city_id").val("").change()
+                                $(".city_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                })
+
+                                $(".city_id").val(res?.data?.city_id).change();
+                            }
+                        })
+
+                        document.getElementById("preview_photo").src = res?.data?.logo;
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")
                         console.log(res.data);
-                    }
-                    else
-                    {
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: response.message,
@@ -508,7 +596,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("role/delete"); ?>",
+                        url: "<?= base_url("company/delete"); ?>",
                         data: {
                             id: id
                         },
