@@ -12,13 +12,6 @@ class Customer extends BaseController
     public function customer()
     {
         $token = session()->get("login")->token;
-        //Get User
-        $responseCustomers = curl_request("GET", "/customers", $token);
-
-        $dataCustomers = [];
-        if ($responseCustomers["code"] === 200) {
-            $dataCustomers = json_decode($responseCustomers["body"])->data;
-        }
 
         //Get Provinces
         $responseProvinces = curl_request("GET", "/provinces/all", $token);
@@ -28,18 +21,8 @@ class Customer extends BaseController
             $dataProvinces = json_decode($responseProvinces["body"])->data;
         }
 
-        //Get Cities
-        $responseCities = curl_request("GET", "/cities/all", $token);
-
-        $dataCities = [];
-        if ($responseCities["code"] === 200) {
-            $dataCities = json_decode($responseCities["body"])->data;
-        }
-
         $data = [
-            "dataCustomers" => $dataCustomers,
             "dataProvinces" => $dataProvinces,
-            "dataCities" => $dataCities,
         ];
 
         return view('customer/index', $data);

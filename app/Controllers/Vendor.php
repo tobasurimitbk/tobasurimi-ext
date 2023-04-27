@@ -12,13 +12,6 @@ class Vendor extends BaseController
     public function vendor()
     {
         $token = session()->get("login")->token;
-        //Get Vendor
-        $responseVendors = curl_request("GET", "/vendors", $token);
-
-        $dataVendors = [];
-        if ($responseVendors["code"] === 200) {
-            $dataVendors = json_decode($responseVendors["body"])->data;
-        }
 
         //Get Provinces
         $responseProvinces = curl_request("GET", "/provinces/all", $token);
@@ -28,19 +21,9 @@ class Vendor extends BaseController
             $dataProvinces = json_decode($responseProvinces["body"])->data;
         }
 
-        //Get Cities
-        $responseCities = curl_request("GET", "/cities/all", $token);
-
-        $dataCities = [];
-        if ($responseCities["code"] === 200) {
-            $dataCities = json_decode($responseCities["body"])->data;
-        }
-
 
         $data = [
-            "dataVendors" => $dataVendors,
             "dataProvinces" => $dataProvinces,
-            "dataCities" => $dataCities,
         ];
 
         return view('vendors/index', $data);

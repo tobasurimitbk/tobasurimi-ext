@@ -34,7 +34,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_id" name="province_id" id="province_id">
+                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataProvinces)) {
@@ -56,15 +56,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select city_id" name="city_id" id="city_id">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataCities)) {
-                                        foreach ($dataCities as $city) {
-                                    ?>
-                                            <option value="<?= $city->id; ?>"><?= $city->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">City</label>
                             </div>
@@ -287,8 +278,8 @@
             $(".id").val("");
             $(".title-name").text("Create");
 
-            $(".province_id").val("").change();
-            $(".city_id").val("").change();
+            // $(".province_id").val("").change();
+            // $(".city_id").val("").change();
 
             validator.resetForm();
             validator.reset();
@@ -376,8 +367,8 @@
                         $(".code").val(res?.data?.code);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
-                        $(".province_id").val(res?.data?.province_id).change();
-                        $(".city_id").val(res?.data?.city_id).change();
+                        // $(".province_id").val(res?.data?.province_id).change();
+                        // $(".city_id").val(res?.data?.city_id).change();
                         $(".zip_code").val(res?.data?.zip_code);
                         $(".phone").val(res?.data?.phone);
                         $(".email").val(res?.data?.email);
@@ -523,7 +514,28 @@
             }
         })
 
+
+
     })
+
+    const getCity = function() {
+        const id = $(".province_id option:selected").val()
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+                }
+            })
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>
