@@ -244,7 +244,6 @@ class Company extends BaseController
             else
             {
                 $payload = json_encode([
-                    "logo" => '',
                     "company" => $this->request->getPost("company"),
                     "holding_company" => $this->request->getPost("holding_company"),
                     "address" => $this->request->getPost("address"),

@@ -216,7 +216,6 @@ class Employee extends BaseController
             else
             {
                 $payload = json_encode([
-                    "employeeImg" => '',
                     "nip" => $this->request->getPost("nip"),
                     "name" => $this->request->getPost("name"),
                     "gender" => $this->request->getPost("gender"),
