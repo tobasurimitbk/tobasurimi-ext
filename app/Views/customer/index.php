@@ -263,8 +263,11 @@
             $(".id").val("");
             $(".title-name").text("Create");
 
-            // $(".province_id").val("").change();
-            // $(".city_id").val("").change();
+            $(".province_id").val('').change();
+            $(".city_id").val('').change();
+
+            $(".city_id").empty()
+            $(".city_id").append(`<option value=""></option>`)
 
             validator.resetForm();
             validator.reset();
@@ -348,11 +351,27 @@
                         $(".id").val(id);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
-                        // $(".province_id").val(res?.data?.province_id).change();
-                        // $(".city_id").val(res?.data?.city_id).change();
+                        $(".province_id").val(res?.data?.province_id).change();
+                        $(".city_id").val(res?.data?.city_id).change();
                         $(".zip_code").val(res?.data?.zip_code);
                         $(".phone").val(res?.data?.phone);
                         $(".email").val(res?.data?.email);
+
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_id").empty()
+                                $(".city_id").val("").change()
+                                $(".city_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                })
+
+                                $(".city_id").val(res?.data?.city_id).change();
+                            }
+                        })
 
                         validator.resetForm();
                         validator.reset();
