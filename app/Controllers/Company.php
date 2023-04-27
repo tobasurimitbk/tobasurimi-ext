@@ -105,6 +105,9 @@ class Company extends BaseController
             ],
             "city_id" => [
                 "rules" => "required"
+            ],
+            "pic_id" => [
+                "rules" => "required"
             ]
         ];
 
@@ -204,6 +207,9 @@ class Company extends BaseController
                 "rules" => "required"
             ],
             "city_id" => [
+                "rules" => "required"
+            ],
+            "pic_id" => [
                 "rules" => "required"
             ]
         ];

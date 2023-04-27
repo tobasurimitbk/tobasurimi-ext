@@ -266,6 +266,9 @@
                 city_id: {
                     required: true
                 },
+                pic_id: {
+                    required: true
+                },
                 email: {
                     required: true,
                     email: true,
@@ -295,6 +298,9 @@
                 },
                 city_id: {
                     required: "City is required"
+                },
+                pic_id: {
+                    required: "PIC is required"
                 },
                 email: {
                     required: "Email is required",
