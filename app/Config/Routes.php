@@ -86,6 +86,15 @@ $routes->post('/vendor/save', 'Vendor::saveVendor', ['filter' => 'Auth']);
 $routes->post('/vendor/update', 'Vendor::updateVendor', ['filter' => 'Auth']);
 $routes->post('/vendor/delete', 'Vendor::deleteVendor', ['filter' => 'Auth']);
 
+// SUPPLIER
+$routes->get('/supplier', 'Supplier::supplier', ['filter' => 'Auth']);
+$routes->get('/supplier/all', 'Supplier::allSupplier', ['filter' => 'Auth']);
+$routes->get('/supplier/id/(:segment)', 'Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
+$routes->post('/supplier/save', 'Supplier::saveSupplier', ['filter' => 'Auth']);
+$routes->post('/supplier/update', 'Supplier::updateSupplier', ['filter' => 'Auth']);
+$routes->post('/supplier/delete', 'Supplier::deleteSupplier', ['filter' => 'Auth']);
+
+
 /**
  * Get City By Province
  */
