@@ -329,6 +329,13 @@
                 required: true
             });
             $(".title-name").text("Create");
+            $(".province_id").val('').change();
+            $(".city_id").val('').change();
+            $(".pic_id").val('').change();
+
+            $(".city_id").empty()
+            $(".city_id").append(`<option value=""></option>`)
+
             document.getElementById("preview_photo").src = "<?= base_url() ?>assets/img/avatar/logo.png";
             validator.resetForm();
             validator.reset();
