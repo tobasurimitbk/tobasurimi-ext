@@ -346,7 +346,7 @@
             table.ajax.reload();
         })
 
-        $(".tes_id").onchange(function() {
+        $(".tes_id").change(function() {
             table.ajax.reload();
         })
 
