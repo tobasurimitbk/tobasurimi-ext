@@ -94,6 +94,14 @@ $routes->post('/supplier/save', 'Supplier::saveSupplier', ['filter' => 'Auth']);
 $routes->post('/supplier/update', 'Supplier::updateSupplier', ['filter' => 'Auth']);
 $routes->post('/supplier/delete', 'Supplier::deleteSupplier', ['filter' => 'Auth']);
 
+// PRODUK BARANG JADI
+$routes->get('/produk-barang-jadi', 'ProdukBarangJadi::produkBarangJadi', ['filter' => 'Auth']);
+$routes->get('/produk-barang-jadi/all', 'ProdukBarangJadi::allProdukBarangJadi', ['filter' => 'Auth']);
+$routes->get('/produk-barang-jadi/id/(:segment)', 'ProdukBarangJadi::getByIdProdukBarangJadi/$1', ['filter' => 'Auth']);
+$routes->post('/produk-barang-jadi/save', 'ProdukBarangJadi::saveProdukBarangJadi', ['filter' => 'Auth']);
+$routes->post('/produk-barang-jadi/update', 'ProdukBarangJadi::updateProdukBarangJadi', ['filter' => 'Auth']);
+$routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBarangJadi', ['filter' => 'Auth']);
+
 
 /**
  * Get City By Province

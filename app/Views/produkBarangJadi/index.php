@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Customer</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Produk Barang Jadi</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -14,21 +14,21 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name">
-                                <label for="floatingInput">Name</label>
+                                <input type="text" class="form-control code" id="code" name="code" placeholder="Code">
+                                <label for="floatingInput">Code</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Address</label>
+                                <input type="text" class="form-control product_name" id="product_name" name="product_name" placeholder="Product Name">
+                                <label for="floatingInput">Product Name</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
+                                <select class="form-select category_id" name="category_id" id="category_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataProvinces)) {
@@ -45,35 +45,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id">
+                                <select class="form-select supplier" name="supplier" id="supplier">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">City</label>
+                                <label for="floatingInput">Supplier</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
-                                <label for="floatingInput">Zip Code</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
-                                <label for="floatingInput">Phone</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email</label>
-                            </div>
-                        </div>
-                    </div>
+
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
@@ -92,23 +71,22 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <div class="mb-5">
-        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Customer</h4>
+        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Produk Barang Jadi</h4>
         <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Customer
-        </button>
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Produk
     </div>
     <div class="mb-2">
-        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Customer</h5>
+        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Produk Barang Jadi</h5>
         <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
     </div>
     <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>Phone</th>
-                    <th>Email</th>
+                    <th>Code</th>
+                    <th>Produk Name</th>
+                    <th>Category</th>
+                    <th>Supplier</th>
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -124,51 +102,31 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
-                name: {
+                code: {
                     required: true
                 },
-                address: {
+                product_name: {
                     required: true
                 },
-                province_id: {
+                category_id: {
                     required: true
                 },
-                city_id: {
+                supplier: {
                     required: true
-                },
-                zip_code: {
-                    required: true
-                },
-                phone: {
-                    required: true
-                },
-                email: {
-                    required: true,
-                    email: true,
                 },
             },
             messages: {
-                name: {
-                    required: "Name is required"
+                code: {
+                    required: "Code is required"
                 },
-                address: {
-                    required: "Address is required"
+                product_name: {
+                    required: "Product name is required"
                 },
-                province_id: {
-                    required: "Province is required"
+                category_id: {
+                    required: "Category is required"
                 },
-                city_id: {
-                    required: "City is required"
-                },
-                zip_code: {
-                    required: "Zip code is required"
-                },
-                phone: {
-                    required: "Phone is required"
-                },
-                email: {
-                    required: "Email is required",
-                    email: "Email must be valid",
+                supplier: {
+                    required: "Supplier is required"
                 },
             },
             errorElement: 'span',
@@ -193,24 +151,24 @@
             },
         });
 
-        $(".phone, .zip_code").mask("000000000000000")
+        // $(".phone, .zip_code").mask("000000000000000")
 
         // PROVINCE
-        $('.province_id').select2({
+        $('.category_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $(".province_id")
+        $(".category_id")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".province_id")
+        $(".category_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -218,27 +176,27 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".province_id")
+        $(".category_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
         // CITY
-        $('.city_id').select2({
+        $('.supplier').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $(".city_id")
+        $(".supplier")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".city_id")
+        $(".supplier")
             .parent('div')
             .children('span')
             .children('span')
@@ -246,7 +204,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".city_id")
+        $(".supplier")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -263,11 +221,11 @@
             $(".id").val("");
             $(".title-name").text("Create");
 
-            $(".province_id").val('').change();
-            $(".city_id").val('').change();
+            $(".category_id").val('').change();
+            $(".supplier").val('').change();
 
-            $(".city_id").empty()
-            $(".city_id").append(`<option value=""></option>`)
+            // $(".city_id").empty()
+            // $(".city_id").append(`<option value=""></option>`)
 
             validator.resetForm();
             validator.reset();
@@ -309,16 +267,16 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "name",
+                data: "code",
                 className: "text-left"
             }, {
-                data: "address",
+                data: "product_name",
                 className: "text-left"
             }, {
-                data: "phone",
+                data: "category",
                 className: "text-left"
             }, {
-                data: "email",
+                data: "supplier",
                 className: "text-left"
             }],
             columnDefs: [{
@@ -515,29 +473,7 @@
         })
 
 
-
-
     })
-
-    const getCity = function() {
-        const id = $(".province_id option:selected").val()
-
-        if (id) {
-            $.ajax({
-                url: `<?= base_url("city"); ?>/${id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".city_id").empty()
-                    $(".city_id").val("").change()
-                    $(".city_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
-                    })
-                }
-            })
-        }
-    }
 </script>
 
 

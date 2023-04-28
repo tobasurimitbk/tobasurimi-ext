@@ -14,7 +14,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control code" id="code" name="code" placeholder="Code" maxlength="30">
+                                <input type="text" class="form-control code" id="code" name="code" placeholder="Code">
                                 <label for="floatingInput">Code</label>
                             </div>
                         </div>
@@ -70,7 +70,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
+                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
                                 <label for="floatingInput">Phone</label>
                             </div>
                         </div>
