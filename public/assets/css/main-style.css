@@ -3719,6 +3719,20 @@ body.layout-3 .main-wrapper {
   border-color: #ba4147 !important;
 }
 
+.btn-logout-form {
+  background-color: #E7323A !important;
+  color: #ffffff !important;
+  width: 100px !important;
+  border-color: #E7323A !important;
+}
+
+.btn-logout-form:hover {
+  background-color: #ba4147 !important;
+  color: #ffffff !important;
+  width: 100px !important;
+  border-color: #ba4147 !important;
+}
+
 .btn-discard {
   border-color: #dc3545 !important;
   color: #dc3545 !important;
