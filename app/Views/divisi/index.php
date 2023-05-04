@@ -35,7 +35,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3">
-                                    <input class="form-control input-time jam_istirahat" id="jam_istirahat" name="jam_istirahat">
+                                    <input onkeydown="return false" class="form-control input-time jam_istirahat" id="jam_istirahat" name="jam_istirahat">
                                     <label for="floatingInput">Jam Istirahat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -50,7 +50,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3">
-                                    <input class="form-control input-time jam_masuk" id="jam_masuk" name="jam_masuk">
+                                    <input onkeydown="return false" class="form-control input-time jam_masuk" id="jam_masuk" name="jam_masuk">
                                     <label for="floatingInput">Jam Masuk</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -63,7 +63,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3">
-                                    <input class="form-control input-time jam_pulang" id="jam_pulang" name="jam_pulang">
+                                    <input onkeydown="return false" class="form-control input-time jam_pulang" id="jam_pulang" name="jam_pulang">
                                     <label for="floatingInput">Jam Keluar</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -78,7 +78,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3">
-                                    <input class="form-control input-time mulai_istirahat" id="mulai_istirahat" name="mulai_istirahat">
+                                    <input onkeydown="return false" class="form-control input-time mulai_istirahat" id="mulai_istirahat" name="mulai_istirahat">
                                     <label for="floatingInput">Jam Mulai Istirahat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -91,7 +91,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3">
-                                    <input class="form-control input-time selesai_istirahat" id="selesai_istirahat" name="selesai_istirahat">
+                                    <input onkeydown="return false" class="form-control input-time selesai_istirahat" id="selesai_istirahat" name="selesai_istirahat">
                                     <label for="floatingInput">Jam Selesai Istirahat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
