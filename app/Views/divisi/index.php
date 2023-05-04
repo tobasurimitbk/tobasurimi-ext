@@ -153,7 +153,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        $(".jam_istirahat, .jam_masuk, .jam_keluar, .mulai_istirahat, .selesai_istirahat").datetimepicker({
+        $(".jam_istirahat, .jam_masuk, .jam_pulang, .mulai_istirahat, .selesai_istirahat").datetimepicker({
             format: 'HH:mm',
             useCurrent: false,
             showTodayButton: false,
