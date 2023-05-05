@@ -3481,12 +3481,15 @@ body.layout-3 .main-footer {
 }
 .main-sidebar .sidebar-menu li.active > ul.dropdown-menu li a:hover {
   background-color: #E7323A;
+  margin-left: 1px;
+}
+.active-bar {
+  margin-left: 1px;
 }
 .main-sidebar .sidebar-menu li ul.dropdown-menu {
   padding: 0;
   margin-top: -1px;
   margin-bottom: -1px;
-  margin-left: 1px;
   display: none;
   position: static;
   float: none;
