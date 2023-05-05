@@ -3041,6 +3041,7 @@ pre {
   background-color: #fff;
   z-index: 880;
   left: 0;
+  margin-left: -2px;
 }
 
 .main-sidebar,
@@ -3687,6 +3688,8 @@ body.layout-3 .main-wrapper {
   border-bottom: 1px solid #9597a375 !important;
   background-color: #ffffff !important;
   position: fixed !important;
+  margin-left: -2px;
+  width: auto;
 }
 
 .nav-bar {
