@@ -3809,6 +3809,20 @@ border-bottom-left-radius: 0px;
 border-right: 0px;
 }
 
+.form-floating
+.password:focus {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-right: 0px !important;
+  }
+  
+  .form-floating
+  .password:hover {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-right: 0px !important;
+  }
+
 /* =====***** POP-UP MODAL *****===== */
 
 .swal2-popup {
