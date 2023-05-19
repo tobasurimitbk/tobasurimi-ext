@@ -60,7 +60,7 @@
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form" onclick="saveForm()">Save</button>
+                    <button type="submit" class="btn btn-submit-form">Save</button>
                 </div>
             </div>
         </div>
