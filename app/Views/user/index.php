@@ -28,8 +28,8 @@
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2" onclick="password_show_hide()">
-                                        <i class="fas fa-eye d-none" id="show_eye"></i>
-                                        <i class="fas fa-eye-slash" id="hide_eye"></i>
+                                        <i class="fa fa-eye d-none" id="show_eye"></i>
+                                        <i class="fa fa-eye-slash" id="hide_eye"></i>
                                     </span>
                                 </div>
                             </div>

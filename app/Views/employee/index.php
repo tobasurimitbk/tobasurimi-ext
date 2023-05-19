@@ -75,8 +75,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input class="form-control dob" id="dob" name="dob" placeholder="Date of Birth" maxlength="30">
-                                <label for="floatingInput">Date of Birth</label>
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth" maxlength="30">
+                                        <label for="floatingInput">Date of Birth</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

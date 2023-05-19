@@ -3800,6 +3800,7 @@ box-shadow: none !important;
   border: 1px #98b0a8 solid;
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
+  border-left: 1px transparent;
 }
 
 .form-floating
@@ -4202,17 +4203,17 @@ input[type="file"]::-webkit-file-upload-button{
   margin-left: 4px;
 }
 
-/* DATETIMEPICKER */
+/* DATETIMEPICKER AND DATEPICKER */
 
-.input-time {
+.input-picker {
   border-right: 1px transparent !important;
 }
 
-.input-time:focus {
+.input-picker:focus {
   border-right: 1px transparent !important;
 }
 
-.input-time:hover {
+.input-picker:hover {
   border-right: 1px transparent !important;
 }
 
