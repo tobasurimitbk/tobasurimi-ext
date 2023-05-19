@@ -102,6 +102,8 @@ $routes->post('/produk-barang-jadi/save', 'ProdukBarangJadi::saveProdukBarangJad
 $routes->post('/produk-barang-jadi/update', 'ProdukBarangJadi::updateProdukBarangJadi', ['filter' => 'Auth']);
 $routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBarangJadi', ['filter' => 'Auth']);
 
+// BARANG
+$routes->get('/barang', 'Barang::barang', ['filter' => 'Auth']);
 
 /**
  * Get City By Province

@@ -4613,3 +4613,23 @@ input[type="file"]::-webkit-file-upload-button{
   height: 27px;
   line-height: 27px;
 }
+
+.component-right-button {
+  width: 115px !important;
+}
+
+.label-card {
+  text-align: center !important;
+  color: #404040 !important;
+}
+
+.label-sub-card {
+  text-align: center !important;
+  font-size: 13px !important;
+  color: #404040 !important;
+}
+
+.card-template {
+  background-color: #EEEEEE !important;
+  border: 1px solid #BDBDBD !important;
+}
