@@ -40,7 +40,7 @@
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock icon-form"></i>
+                                        <i class="fa fa-clock fa-jam-istirahat icon-form"></i>
                                     </span>
                                 </div>
                             </div>
@@ -55,7 +55,7 @@
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock icon-form"></i>
+                                        <i class="fa fa-clock fa-jam-masuk icon-form"></i>
                                     </span>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock icon-form"></i>
+                                        <i class="fa fa-clock fa-jam-pulang icon-form"></i>
                                     </span>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock icon-form"></i>
+                                        <i class="fa fa-clock fa-mulai-istirahat icon-form"></i>
                                     </span>
                                 </div>
                             </div>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock icon-form"></i>
+                                        <i class="fa fa-clock fa-selesai-istirahat icon-form"></i>
                                     </span>
                                 </div>
                             </div>
@@ -163,9 +163,29 @@
             icons: {
                 up: "fa fa-arrow-up",
                 down: "fa fa-arrow-down",
-                today: "fa fa-clock icon-form",
+                today: "fa fa-clock",
                 clear: "fa fa-trash"
             }
+        });
+
+        $('.fa-jam-istirahat').click(function() {
+            $(".jam_istirahat").focus();
+        });
+
+        $('.fa-jam-masuk').click(function() {
+            $(".jam_masuk").focus();
+        });
+
+        $('.fa-jam-pulang').click(function() {
+            $(".jam_pulang").focus();
+        });
+
+        $('.fa-mulai-istirahat').click(function() {
+            $(".mulai_istirahat").focus();
+        });
+
+        $('.fa-selesai-istirahat').click(function() {
+            $(".selesai_istirahat").focus();
         });
 
         var validator = $(".create-form").validate({

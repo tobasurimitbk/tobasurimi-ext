@@ -245,6 +245,10 @@
             autoclose: true
         })
 
+        $('.fa-calendar').click(function() {
+            $(".dob").focus();
+        });
+
         $(".phone_no").mask("0000000000000")
 
         $(".acc_no").mask("000000000000000")
