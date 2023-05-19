@@ -156,13 +156,15 @@
         $(".jam_istirahat, .jam_masuk, .jam_pulang, .mulai_istirahat, .selesai_istirahat").datetimepicker({
             format: 'HH:mm',
             useCurrent: false,
-            showTodayButton: false,
-            showClear: false,
+            showTodayButton: true,
+            showClear: true,
             toolbarPlacement: 'bottom',
             sideBySide: true,
             icons: {
                 up: "fa fa-arrow-up",
-                down: "fa fa-arrow-down"
+                down: "fa fa-arrow-down",
+                today: "fa fa-clock",
+                clear: "fa fa-trash"
             }
         });
 

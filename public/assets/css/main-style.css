@@ -4324,7 +4324,7 @@ input[type="file"]::-webkit-file-upload-button{
   margin: 0;
   border-width: 0;
   background-color: transparent;
-  color: #9c27b0;
+  color: #e7323a;
   box-shadow: none;
 }
 
@@ -4334,7 +4334,7 @@ input[type="file"]::-webkit-file-upload-button{
 
 .bootstrap-datetimepicker-widget a[data-action]:hover span {
   background-color: #eee;
-  color: #9c27b0;
+  color: #e7323a;
 }
 
 .bootstrap-datetimepicker-widget a[data-action]:active {
@@ -4547,7 +4547,7 @@ input[type="file"]::-webkit-file-upload-button{
   content: '';
   display: inline-block;
   border: 0 0 7px 7px solid transparent;
-  border-bottom-color: #9c27b0;
+  border-bottom-color: #e7323a;
   border-top-color: rgba(0, 0, 0, 0.2);
   position: absolute;
   bottom: 4px;
@@ -4556,7 +4556,7 @@ input[type="file"]::-webkit-file-upload-button{
 
 .bootstrap-datetimepicker-widget table td.active>div,
 .bootstrap-datetimepicker-widget table td.active:hover>div {
-  background-color: #9c27b0;
+  background-color: #e7323a;
   color: #fff;
   box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(156, 39, 176, 0.4);
 }
@@ -4588,7 +4588,7 @@ input[type="file"]::-webkit-file-upload-button{
 }
 
 .bootstrap-datetimepicker-widget table td span.active {
-  background-color: #9c27b0;
+  background-color: #e7323a;
   color: #fff;
 }
 
