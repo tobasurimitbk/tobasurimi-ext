@@ -82,7 +82,7 @@
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                            <i class="fa fa-calendar"></i>
+                                            <i class="fa fa-calendar icon-form"></i>
                                         </span>
                                     </div>
                                 </div>

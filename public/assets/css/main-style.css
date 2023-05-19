@@ -4203,6 +4203,12 @@ input[type="file"]::-webkit-file-upload-button{
   margin-left: 4px;
 }
 
+/* FORM ICON COLOR */
+.icon-form {
+  text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
+  color: #fff;
+}
+
 /* DATETIMEPICKER AND DATEPICKER */
 
 .input-picker {
@@ -4633,4 +4639,8 @@ input[type="file"]::-webkit-file-upload-button{
 .card-template {
   background-color: #EEEEEE !important;
   border: 1px solid #BDBDBD !important;
+}
+
+.input-group-text {
+  color: gray !important;
 }
