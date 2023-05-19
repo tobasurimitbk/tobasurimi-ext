@@ -193,7 +193,9 @@
             },
         });
 
-        $(".phone, .zip_code").mask("000000000000000")
+        $(".phone").mask("0000000000000")
+
+        $(".zip_code").mask("00000")
 
         // PROVINCE
         $('.province_id').select2({
