@@ -11,21 +11,31 @@
    </div>
    <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
         <?= csrf_field() ?>
-        <div class="mb-5">
-            <div class="form-floating mb-2" style="height: 50px; width: 40%;">
-                <select class="form-control role_id" name="role_id" id="role_id" onchange="setChanges()">
-                    <option value=""></option>
-                    <?php
-                    if (!empty($dataRole)) {
-                        foreach ($dataRole as $role) {
-                    ?>
-                        <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
-                    <?php
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="form-floating mb-2" style="height: 50px;">
+                    <select class="form-control company_id" name="company_id" id="company_id">
+                        <option value=""></option>
+                    </select>
+                    <label for="floatingInput">Company</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-floating mb-2" style="height: 50px;">
+                    <select class="form-control role_id" name="role_id" id="role_id" onchange="setChanges()">
+                        <option value=""></option>
+                        <?php
+                        if (!empty($dataRole)) {
+                            foreach ($dataRole as $role) {
+                        ?>
+                            <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
+                        <?php
+                            }
                         }
-                    }
-                    ?>
-                </select>
-                <label for="floatingInput">Role</label>
+                        ?>
+                    </select>
+                    <label for="floatingInput">Role</label>
+                </div>
             </div>
         </div>
         <div class="table-responsive" id="view_access" name="view_access" style="display: none">
@@ -54,6 +64,33 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
+        $('.company_id').select2({
+            placeholder: "",
+            allowClear: true,
+            theme: "bootstrap-5",
+            //dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.company_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.company_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.company_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
         $('.role_id').select2({
             placeholder: "",
             allowClear: true,

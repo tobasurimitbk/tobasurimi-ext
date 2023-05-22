@@ -40,21 +40,10 @@ $routes->post('/login', 'User::doLogin');
 $routes->get('/logout', 'User::doLogout');
 
 
-/**
- * Get Page Dashboard
- */
+// DASHBOARD
 $routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
 
-/**
- * Get Page Employee
- * Get All Employee
- * Get By id Employee
- * Save Employee
- * Update Employee
- * Delete Employee
- */
-
-//  EMPLOYEE
+// EMPLOYEE
 $routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
 $routes->get('/employee/all', 'Employee::allEmployee', ['filter' => 'Auth']);
 $routes->get('/employee/id/(:segment)', 'Employee::getByIdEmployee/$1', ['filter' => 'Auth']);
@@ -105,19 +94,10 @@ $routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBaran
 // BARANG
 $routes->get('/barang', 'Barang::barang', ['filter' => 'Auth']);
 
-/**
- * Get City By Province
- */
+// CITY
 $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
 
-/**
- * Get Page Divisi
- * Get All Divisi
- * Get By Id Divisi
- * Save Divisi
- * Update Divisi
- * Delete Divisi
- */
+// DIVISI
 $routes->get('/divisi', 'Divisi::divisi', ['filter' => 'Auth']);
 $routes->get('/divisi/all', 'Divisi::allDivisi', ['filter' => 'Auth']);
 $routes->get('/divisi/id/(:segment)', 'Divisi::getByIdDivisi/$1', ['filter' => 'Auth']);
@@ -125,14 +105,7 @@ $routes->post('/divisi/save', 'Divisi::saveDivisi', ['filter' => 'Auth']);
 $routes->post('/divisi/update', 'Divisi::updateDivisi', ['filter' => 'Auth']);
 $routes->post('/divisi/delete', 'Divisi::deleteDivisi', ['filter' => 'Auth']);
 
-/**
- * Get Page Company
- * Get All Company
- * Get By Id Company
- * Save Company
- * Update Company
- * Delete Company
- */
+// COMPANY
 $routes->get('/company', 'Company::company', ['filter' => 'Auth']);
 $routes->get('/company/all', 'Company::allCompany', ['filter' => 'Auth']);
 $routes->get('/company/id/(:segment)', 'Company::getByIdCompany/$1', ['filter' => 'Auth']);
@@ -141,14 +114,7 @@ $routes->post('/company/update', 'Company::updateCompany', ['filter' => 'Auth'])
 $routes->post('/company/delete', 'Company::deleteCompany', ['filter' => 'Auth']);
 
 
-/**
- * Get Page Management User
- * Get All Management User
- * Get By Id Management User
- * Save Management User
- * Update Management User
- * Delete Management User
- */
+// USER
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
 $routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);
 $routes->get('/user/id/(:segment)', 'User::getByIdUser/$1', ['filter' => 'Auth']);
@@ -156,14 +122,7 @@ $routes->post('/user/save', 'User::saveUser', ['filter' => 'Auth']);
 $routes->post('/user/update', 'User::updateUser', ['filter' => 'Auth']);
 $routes->post('/user/delete', 'User::deleteUser', ['filter' => 'Auth']);
 
-/**
- * Get Page Role
- * Get All Role
- * Get By id Role
- * Save Role
- * Update Role
- * Delete Role
- */
+// ROLE
 $routes->get('/role', 'Role::role', ['filter' => 'Auth']);
 $routes->get('/role/all', 'Role::allRole', ['filter' => 'Auth']);
 $routes->get('/role/id/(:segment)', 'Role::getByIdRole/$1', ['filter' => 'Auth']);
@@ -171,14 +130,13 @@ $routes->post('/role/save', 'Role::saveRole', ['filter' => 'Auth']);
 $routes->post('/role/update', 'Role::updateRole', ['filter' => 'Auth']);
 $routes->post('/role/delete', 'Role::deleteRole', ['filter' => 'Auth']);
 
-/**
- * Get Page Hak Akses
- * Get By Id Hak Akses
- * Save Hak Akses
- */
+// AKSES
 $routes->get('/akses', 'Akses::akses', ['filter' => 'Auth']);
 $routes->get('/akses/id/(:segment)', 'Akses::getByIdAkses/$1', ['filter' => 'Auth']);
 $routes->post('/akses/save', 'Akses::saveAkses', ['filter' => 'Auth']);
+
+// COMPANY ACCESS
+$routes->get('/company-access', 'CompanyAccess::companyAccess', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------
