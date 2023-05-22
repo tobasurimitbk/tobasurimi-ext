@@ -11,7 +11,7 @@
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
@@ -19,10 +19,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="input-group input-group-password">
-                                <div class="form-floating mb-3">
+                                <div class="form-floating mb-3" style="height: 50px;">
                                     <input type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
                                     <label for="floatingInput">Password</label>
                                 </div>
@@ -35,7 +35,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control name" id="name" name="name" placeholder="Name" maxlength="30">
@@ -43,7 +43,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select employee_id" name="employee_id" id="employee_id">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select role_id" name="role_id" id="role_id">
@@ -81,7 +81,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
