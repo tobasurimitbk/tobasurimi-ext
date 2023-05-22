@@ -160,14 +160,16 @@
             showClear: true,
             toolbarPlacement: 'bottom',
             sideBySide: true,
+            showClose: true,
             icons: {
                 up: "fa fa-arrow-up",
                 down: "fa fa-arrow-down",
                 today: "fa fa-clock",
-                clear: "fa fa-trash"
+                clear: "fa fa-trash",
+                close: "fa fa-close"
             }
         });
-
+        
         $('.fa-jam-istirahat').click(function() {
             $(".jam_istirahat").focus();
         });
@@ -267,6 +269,7 @@
             $(".id").val("");
             validator.resetForm();
             validator.reset();
+            $(".title-name").text("Create");
             $(".divisi").val('').change();
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
