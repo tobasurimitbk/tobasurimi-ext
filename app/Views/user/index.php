@@ -256,7 +256,7 @@
             $(".id").val("");
             $(".employee_id").val("").change();
             $(".role_id").val("").change();
-            $(".title-name").text("Create");
+            $(".title-name").text("Add New");
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()

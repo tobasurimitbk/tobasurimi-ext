@@ -334,7 +334,7 @@
             $('.logo').rules('add', {
                 required: true
             });
-            $(".title-name").text("Create");
+            $(".title-name").text("Add New");
             $(".province_id").val('').change();
             $(".city_id").val('').change();
             $(".pic_id").val('').change();

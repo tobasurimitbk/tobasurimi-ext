@@ -169,7 +169,7 @@
                 close: "fa fa-close"
             }
         });
-        
+
         $('.fa-jam-istirahat').click(function() {
             $(".jam_istirahat").focus();
         });
@@ -269,7 +269,7 @@
             $(".id").val("");
             validator.resetForm();
             validator.reset();
-            $(".title-name").text("Create");
+            $(".title-name").text("Add New");
             $(".divisi").val('').change();
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');

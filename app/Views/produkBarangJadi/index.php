@@ -219,7 +219,7 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $(".title-name").text("Create");
+            $(".title-name").text("Add New");
 
             $(".category_id").val('').change();
             $(".supplier").val('').change();

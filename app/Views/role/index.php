@@ -101,7 +101,7 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $(".title-name").text("Create");
+            $(".title-name").text("Add New");
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()

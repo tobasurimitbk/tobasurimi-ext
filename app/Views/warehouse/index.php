@@ -323,7 +323,7 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $(".title-name").text("Create");
+            $(".title-name").text("Add New");
 
             $(".province_id").val("").change();
             $(".city_id").val("").change();
