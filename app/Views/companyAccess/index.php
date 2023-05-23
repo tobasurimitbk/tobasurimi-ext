@@ -36,6 +36,15 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select role_id" name="role_id" id="role_id">
                                     <option value=""></option>
+                                    <?php
+                                    if (!empty($dataRole)) {
+                                        foreach ($dataRole as $role) {
+                                    ?>
+                                        <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
                                 </select>
                                 <label for="floatingInput">Role</label>
                             </div>
