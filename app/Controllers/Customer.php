@@ -121,14 +121,6 @@ class Customer extends BaseController
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
-
             $response = curl_request("POST", "/customers", $token, $payload);
 
             if ($response["code"] === 200) {
@@ -207,8 +199,8 @@ class Customer extends BaseController
                 "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
                 "no_rekening" => $this->request->getPost("no_rekening"),
-                "supplier_buyer" => formatter($this->request->getPost("supplier_buyer"), "STR_TO_INT"),
-                "list_address" => $this->request->getPost("list_address"),
+                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
         }
 

@@ -326,7 +326,9 @@
                     required: true
                 },
                 no_npwp: {
-                    required: true
+                    required: true,
+                    minlength: 15,
+                    maxlength: 15,
                 },
                 phone: {
                     required: true
@@ -355,7 +357,9 @@
                     required: "Alamat is Required"
                 },
                 no_npwp: {
-                    required: "Nomor NPWP is Required"
+                    required: "Nomor NPWP is Required",
+                    minlength: "Nomor NPWP min length is 15",
+                    maxlength: "Nomor NPWP max length is 15",
                 },
                 phone: {
                     required: "Phone is Required"
@@ -479,6 +483,12 @@
             $(".id").val("");
             $(".title-name").text("Add New");
 
+            $(".body-detail-table").empty()
+
+            row = 1;
+
+            list_address = [];
+
             validator.resetForm();
             validator.reset();
 
@@ -486,6 +496,10 @@
             $(".delete-btn").css('display', 'none');
             $(".body-detail-table").empty()
             $(".add-modal").modal("show")
+        })
+
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
         })
 
         $(".btn-hide-form").click(function() {
@@ -563,29 +577,68 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
+                        $(".kode").val(res?.data?.kode);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
-                        $(".province_id").val(res?.data?.province_id).change();
-                        $(".city_id").val(res?.data?.city_id).change();
-                        $(".zip_code").val(res?.data?.zip_code);
+                        $(".no_npwp").val(res?.data?.no_npwp);
                         $(".phone").val(res?.data?.phone);
+                        $(".contact_person").val(res?.data?.contact_person);
                         $(".email").val(res?.data?.email);
+                        $(".no_rekening").val(res?.data?.no_rekening);
+                        $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
 
-                        $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_id").empty()
-                                $(".city_id").val("").change()
-                                $(".city_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
-                                })
+                        row = res?.data?.list_address.length + 1;
 
-                                $(".city_id").val(res?.data?.city_id).change();
-                            }
+                        list_address = [];
+
+                        let tag_html = "";
+
+                        $(".body-detail-table").empty()
+
+                        res?.data?.list_address.map((item, index) => {
+                            list_address.push({
+                                id: item.id,
+                                customer_id: item.customer_id,
+                                row: index + 1,
+                                address: item.address,
+                                province_id: item.province_id,
+                                province_name: item.province_name,
+                                city_id: item.city_id,
+                                city_name: item.city_name,
+                                postal_code: item.postal_code,
+                                main_address: item.main_address
+                            })
+
+                            tag_html += "<tr>";
+                            tag_html += "<td>";
+                            tag_html += index + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.address;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.city_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.province_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.postal_code;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            if(item.main_address == 1)
+                            {
+                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${index + 1})" id="main" name="main" value="${index + 1}">`;
+                            }   
+                            else
+                            {
+                                tag_html += `<input type="radio" onchange="changeMainAddress(${index + 1})" id="main" name="main" value="${index + 1}">`;
+                            } 
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
                         })
+                        
+                        $(".body-detail-table").append(tag_html)
 
                         validator.resetForm();
                         validator.reset();
@@ -676,6 +729,8 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     list_address.push({
+                        id: '',
+                        customer_id: '',
                         row: row,
                         address: $(".detail_address").val(),
                         province_id: $(".province_id option:selected").val(),
@@ -721,96 +776,137 @@
         })
 
         $(".btn-submit-form").click(function() {
-            if ($(".create-form").valid()) {
+            if(list_address.length == 0)
+            {
                 Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
+                    icon: 'error',
+                    title: 'List Alamat Pengiriman Tidak Boleh Kosong',
                     confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.querySelector(".create-form"));
+                })
+            }
+            else
+            {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            let data = new FormData(document.querySelector(".create-form"));
 
-                        let update_list_address = [];
-                        let main_address = document.querySelector('input[name="main"]:checked').value;
-                        
-                        list_address.map(obj => {
-                            if (main_address == obj.row) {
-                                update_list_address.push(
-                                    {
-                                        address: obj.address,
-                                        province_id: obj.province_id,
-                                        city_id: obj.city_id,
-                                        main_address: 1
+                            let update_list_address = [];
+                            let main_address = document.querySelector('input[name="main"]:checked').value;
+                            
+                            list_address.map(obj => {
+                                if (main_address == obj.row) {
+                                    if (obj.id) {
+                                        update_list_address.push(
+                                            {
+                                                id: obj.id,
+                                                customer_id: obj.customer_id,
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 1
+                                            }
+                                        )
                                     }
-                                )
-                            }
-                            else
-                            {
-                                update_list_address.push(
+                                    else
                                     {
-                                        address: obj.address,
-                                        province_id: obj.province_id,
-                                        city_id: obj.city_id,
-                                        main_address: 0
+                                        update_list_address.push(
+                                            {
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 1
+                                            }
+                                        )
                                     }
-                                )
-                            }
-                        })
+                                }
+                                else
+                                {
+                                    if (obj.id) {
+                                        update_list_address.push(
+                                            {
+                                                id: obj.id,
+                                                customer_id: obj.customer_id,
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 0
+                                            }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        update_list_address.push(
+                                            {
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 0
+                                            }
+                                        )
+                                    }
+                                }
+                            })
 
-                        data.append("list_address", JSON.stringify(update_list_address))
+                            data.append("list_address", JSON.stringify(update_list_address))
 
-                        let id = $(".id").val();
+                            let id = $(".id").val();
 
-                        $.ajax({
-                            url: id ? "<?= base_url("customer/update"); ?>" : "<?= base_url("customer/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
+                            $.ajax({
+                                url: id ? "<?= base_url("customer/update"); ?>" : "<?= base_url("customer/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal").modal("hide")
+                                                table.ajax.reload()
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        .then(() => {
-                                            $(".add-modal").modal("hide")
-                                            table.ajax.reload()
-                                        })
-                                } else {
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                })
+                            });
+                        }
+                    })
+                }
             }
         })
 
