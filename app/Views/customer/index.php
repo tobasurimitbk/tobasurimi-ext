@@ -205,7 +205,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input disabled="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
+                            <input readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
                             <label for="floatingInput">Postal Code</label>
                         </div>
                     </div>
@@ -483,6 +483,8 @@
             $(".id").val("");
             $(".title-name").text("Add New");
 
+            $(".kode").attr("readonly", false);
+
             $(".body-detail-table").empty()
 
             row = 1;
@@ -569,6 +571,8 @@
             $(".delete-btn").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
+
+            $(".kode").attr("readonly", true);
 
             $.ajax({
                 url: "<?= base_url("customer/id"); ?>" + "/" + id,

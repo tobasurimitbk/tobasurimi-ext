@@ -11,22 +11,7 @@ class Vendor extends BaseController
 
     public function vendor()
     {
-        $token = session()->get("login")->token;
-
-        //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
-
-
-        $data = [
-            "dataProvinces" => $dataProvinces,
-        ];
-
-        return view('vendors/index', $data);
+        return view('vendors/index');
     }
 
     public function allVendor()
@@ -51,16 +36,11 @@ class Vendor extends BaseController
             foreach ($body as $data) {
                 array_push($dataVendor, [
                     "id" => $data->id,
-                    "code" => $data->code,
+                    "kode" => $data->kode,
                     "name" => $data->name,
                     "address" => $data->address,
-                    "province_id" => $data->province_id,
-                    "city_id" => $data->city_id,
-                    "zip_code" => $data->zip_code,
-                    "phone" => $data->phone,
-                    "email" => $data->email,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
+                    "ap" => $data->ap_id,
+                    "ar" => $data->ar_id
                 ]);
             }
         }
@@ -79,7 +59,7 @@ class Vendor extends BaseController
     public function saveVendor()
     {
         $rules = [
-            "code" => [
+            "kode" => [
                 "rules" => "required"
             ],
             "name" => [
@@ -88,38 +68,43 @@ class Vendor extends BaseController
             "address" => [
                 "rules" => "required"
             ],
-            "province_id" => [
-                "rules" => "required"
-            ],
-            "city_id" => [
-                "rules" => "required"
-            ],
-            "zip_code" => [
+            "no_npwp" => [
                 "rules" => "required"
             ],
             "phone" => [
                 "rules" => "required"
             ],
+            "contact_person" => [
+                "rules" => "required"
+            ],
             "email" => [
                 "rules" => "required"
             ],
-
+            "no_rekening" => [
+                "rules" => "required"
+            ],
+            "supplier_buyer" => [
+                "rules" => "required"
+            ]
         ];
 
         if ($this->validate($rules)) {
             $payload = '';
             $token = session()->get("login")->token;
 
-
             $payload = json_encode([
-                "code" => $this->request->getPost("code"),
+                "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
-                "province_id" => $this->request->getPost("province_id"),
-                "city_id" => $this->request->getPost("city_id"),
-                "zip_code" => $this->request->getPost("zip_code"),
+                "no_npwp" => $this->request->getPost("no_npwp"),
                 "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
+                "no_rekening" => $this->request->getPost("no_rekening"),
+                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "ap_id" => 1,
+                "ar_id" => 1,
+                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
             $response = curl_request("POST", "/vendors", $token, $payload);
@@ -155,7 +140,7 @@ class Vendor extends BaseController
     public function updateVendor()
     {
         $rules = [
-            "code" => [
+            "kode" => [
                 "rules" => "required"
             ],
             "name" => [
@@ -164,21 +149,24 @@ class Vendor extends BaseController
             "address" => [
                 "rules" => "required"
             ],
-            "province_id" => [
-                "rules" => "required"
-            ],
-            "city_id" => [
-                "rules" => "required"
-            ],
-            "zip_code" => [
+            "no_npwp" => [
                 "rules" => "required"
             ],
             "phone" => [
                 "rules" => "required"
             ],
+            "contact_person" => [
+                "rules" => "required"
+            ],
             "email" => [
                 "rules" => "required"
             ],
+            "no_rekening" => [
+                "rules" => "required"
+            ],
+            "supplier_buyer" => [
+                "rules" => "required"
+            ]
         ];
 
         if ($this->validate($rules)) {
@@ -188,14 +176,18 @@ class Vendor extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "code" => $this->request->getPost("code"),
+                "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
-                "province_id" => $this->request->getPost("province_id"),
-                "city_id" => $this->request->getPost("city_id"),
-                "zip_code" => $this->request->getPost("zip_code"),
+                "no_npwp" => $this->request->getPost("no_npwp"),
                 "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
+                "no_rekening" => $this->request->getPost("no_rekening"),
+                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "ap_id" => 1,
+                "ar_id" => 1,
+                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
         }
 
