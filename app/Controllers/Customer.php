@@ -50,15 +50,11 @@ class Customer extends BaseController
             foreach ($body as $data) {
                 array_push($dataCustomer, [
                     "id" => $data->id,
+                    "kode" => $data->kode,
                     "name" => $data->name,
                     "address" => $data->address,
-                    "province_id" => $data->province_id,
-                    "city_id" => $data->city_id,
-                    "zip_code" => $data->zip_code,
-                    "phone" => $data->phone,
-                    "email" => $data->email,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
+                    "ap" => $data->ap_id,
+                    "ar" => $data->ar_id
                 ]);
             }
         }
@@ -77,25 +73,31 @@ class Customer extends BaseController
     public function saveCustomer()
     {
         $rules = [
+            "kode" => [
+                "rules" => "required"
+            ],
             "name" => [
                 "rules" => "required"
             ],
             "address" => [
                 "rules" => "required"
             ],
-            "province_id" => [
-                "rules" => "required"
-            ],
-            "city_id" => [
-                "rules" => "required"
-            ],
-            "zip_code" => [
+            "no_npwp" => [
                 "rules" => "required"
             ],
             "phone" => [
                 "rules" => "required"
             ],
+            "contact_person" => [
+                "rules" => "required"
+            ],
             "email" => [
+                "rules" => "required"
+            ],
+            "no_rekening" => [
+                "rules" => "required"
+            ],
+            "supplier_buyer" => [
                 "rules" => "required"
             ],
         ];
@@ -104,16 +106,28 @@ class Customer extends BaseController
             $payload = '';
             $token = session()->get("login")->token;
 
-
             $payload = json_encode([
+                "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
-                "province_id" => $this->request->getPost("province_id"),
-                "city_id" => $this->request->getPost("city_id"),
-                "zip_code" => $this->request->getPost("zip_code"),
+                "no_npwp" => $this->request->getPost("no_npwp"),
                 "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
+                "no_rekening" => $this->request->getPost("no_rekening"),
+                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "ap_id" => 1,
+                "ar_id" => 1,
+                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
+
+            // $data = [
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
 
             $response = curl_request("POST", "/customers", $token, $payload);
 
@@ -148,25 +162,31 @@ class Customer extends BaseController
     public function updateCustomer()
     {
         $rules = [
+            "kode" => [
+                "rules" => "required"
+            ],
             "name" => [
                 "rules" => "required"
             ],
             "address" => [
                 "rules" => "required"
             ],
-            "province_id" => [
-                "rules" => "required"
-            ],
-            "city_id" => [
-                "rules" => "required"
-            ],
-            "zip_code" => [
+            "no_npwp" => [
                 "rules" => "required"
             ],
             "phone" => [
                 "rules" => "required"
             ],
+            "contact_person" => [
+                "rules" => "required"
+            ],
             "email" => [
+                "rules" => "required"
+            ],
+            "no_rekening" => [
+                "rules" => "required"
+            ],
+            "supplier_buyer" => [
                 "rules" => "required"
             ],
         ];
@@ -179,13 +199,16 @@ class Customer extends BaseController
 
 
             $payload = json_encode([
+                "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
-                "province_id" => $this->request->getPost("province_id"),
-                "city_id" => $this->request->getPost("city_id"),
-                "zip_code" => $this->request->getPost("zip_code"),
+                "no_npwp" => $this->request->getPost("no_npwp"),
                 "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
+                "no_rekening" => $this->request->getPost("no_rekening"),
+                "supplier_buyer" => formatter($this->request->getPost("supplier_buyer"), "STR_TO_INT"),
+                "list_address" => $this->request->getPost("list_address"),
             ]);
         }
 

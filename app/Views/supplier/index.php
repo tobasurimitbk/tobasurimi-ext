@@ -40,7 +40,7 @@
                                     if (!empty($dataProvinces)) {
                                         foreach ($dataProvinces as $province) {
                                     ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->name; ?></option>
+                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
                                     <?php
                                         }
                                     }
@@ -387,7 +387,7 @@
                                 $(".city_id").val("").change()
                                 $(".city_id").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                    $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
                                 })
 
                                 $(".city_id").val(res?.data?.city_id).change();
@@ -551,7 +551,7 @@
                     $(".city_id").val("").change()
                     $(".city_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}">${item.name}</option>`)
+                        $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
                     })
                 }
             })
