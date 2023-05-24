@@ -10,6 +10,7 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
+                    <input type="hidden" class="company_role" name="company_role" id="company_role" />
                     <?= csrf_field() ?>
                     <div class="row mb-3">
                         <div class="col">
@@ -65,25 +66,6 @@
                     <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select role_id" name="role_id" id="role_id">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataRole)) {
-                                        foreach ($dataRole as $role) {
-                                    ?>
-                                        <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">Role</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                                     <option value="Aktif">Aktif</option>
                                     <option value="Non Aktif">Non Aktif</option>
@@ -124,7 +106,6 @@
                 <tr>
                     <th>Username</th>
                     <th>Name</th>
-                    <th>Role</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -139,11 +120,6 @@
     const csrfToken = '<?= csrf_token() ?>';
     
     $(document).ready(function() {
-        $('.role_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
 
         $('.employee_id').select2({
             placeholder: "",
@@ -152,25 +128,6 @@
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $(".role_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-        $(".role_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".role_id")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
 
         $(".employee_id")
         .parent('div')
@@ -204,9 +161,6 @@
                     minlength: 6,
                     required: true
                 },
-                role_id: {
-                    required: true
-                },
                 employee_id: {
                     required: true
                 }
@@ -221,9 +175,6 @@
                 password: {
                     minlength: "Password length must be at least 6 characters long",
                     required: "Password is Required"
-                },
-                role_id: {
-                    required: "Role is Required"
                 },
                 employee_id: {
                     required: "Employee is Required"
@@ -255,8 +206,8 @@
             $('.password').rules('add', {required: true});
             $(".id").val("");
             $(".employee_id").val("").change();
-            $(".role_id").val("").change();
             $(".title-name").text("Add New");
+            $(".company_role").val('');
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()
@@ -301,10 +252,6 @@
             },
             {
                 data: "name",
-                className: "text-left"
-            },
-            {
-                data: "roleName",
                 className: "text-left"
             },
             {
@@ -525,8 +472,8 @@
                         $(".name").val(res?.data?.name);
                         $(".username").val(res?.data?.username);
                         $(".employee_id").val(res?.data?.employee_id).change();
-                        $(".role_id").val(res?.data?.role_id).change();
                         $(".status").val(res?.data?.status);
+                        $(".company_role").val(res?.data?.company_role);
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")

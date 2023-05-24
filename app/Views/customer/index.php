@@ -104,7 +104,7 @@
                         </div>
                         <div class="col-md-6">
                             <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                                Add New&nbsp;<i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                             </button>
                         </div>
                     </div>
@@ -121,30 +121,7 @@
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                                <!-- <tr>
-                                    <td>1.</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td><input type="radio" id="main1" name="main" value="1"></td>
-                                </tr>
-                                <tr>
-                                    <td>2.</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td><input type="radio" id="main2" name="main" value="2"></td>
-                                </tr>
-                                <tr>
-                                    <td>3.</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td>tes</td>
-                                    <td><input type="radio" id="main3" name="main" value="3"></td>
-                                </tr> -->
+
                             </tbody>
                         </table>
                     </div>
@@ -159,57 +136,58 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <div class="modal detail-modal" tabindex="1">
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Alamat Pengiriman</h5>
+                <h5 class="modal-title title-secondary">Add New Alamat Pengiriman</h5>
             </div>
             <div class="modal-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
-                            <label for="floatingInput">Address</label>
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
+                                <label for="floatingInput">Address</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataProvinces)) {
-                                    foreach ($dataProvinces as $province) {
-                                ?>
-                                        <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
-                                <?php
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataProvinces)) {
+                                        foreach ($dataProvinces as $province) {
+                                    ?>
+                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                    <?php
+                                        }
                                     }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Province</label>
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Province</label>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select city_id" name="city_id" id="city_id" onchange="getPostalCode()">
-                                <option value="" data-code=""></option>
-                            </select>
-                            <label for="floatingInput">City</label>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select city_id" name="city_id" id="city_id" onchange="getPostalCode()">
+                                    <option value="" data-code=""></option>
+                                </select>
+                                <label for="floatingInput">City</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
+                                <label for="floatingInput">Postal Code</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
-                            <label for="floatingInput">Postal Code</label>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <div class="d-flex">
@@ -399,6 +377,51 @@
             },
         });
 
+        var validator_detail = $(".detail-form").validate({
+            rules: {
+                detail_address: {
+                    required: true
+                },
+                province_id: {
+                    required: true
+                },
+                city_id: {
+                    required: true
+                }
+            },
+            messages: {
+                detail_address: {
+                    required: "Address is Required"
+                },
+                province_id: {
+                    required: "Province is Required"
+                },
+                city_id: {
+                    required: "City is Required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
         $(".phone").mask("0000000000000")
 
         $(".postal_code").mask("00000")
@@ -475,7 +498,7 @@
             $(".province_id").val('').change()
             $(".city_id").val('').change()
             $(".city_id").empty()
-             $(".city_id").append(`<option value=""></option>`)
+            $(".city_id").append(`<option value=""></option>`)
             $(".postal_code").val('')
         })
 
@@ -721,62 +744,64 @@
         })
 
         $(".btn-submit-detail").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    list_address.push({
-                        id: '',
-                        customer_id: '',
-                        row: row,
-                        address: $(".detail_address").val(),
-                        province_id: $(".province_id option:selected").val(),
-                        province_name: $(".province_id option:selected").text(),
-                        city_id: $(".city_id option:selected").val(),
-                        city_name: $(".city_id option:selected").text(),
-                        postal_code: $(".postal_code").val(),
-                        main_address: 0
-                    })
-                   let tag_html = "";
-                    tag_html += "<tr>";
-                    tag_html += "<td>";
-                    tag_html += row;
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += $(".detail_address").val();
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += $(".province_id option:selected").text();
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += $(".city_id option:selected").text();
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += $(".postal_code").val();
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    if(row === 1)
-                    {
-                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
-                    }   
-                    else
-                    {
-                        tag_html += `<input type="radio" onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
-                    } 
-                    tag_html += "</td>";
-                    tag_html += "</tr>";
-                    $(".body-detail-table").append(tag_html)
-                    $(".detail-modal").modal("hide")
-                    row = row + 1;
-                }
-            })
+            if ($(".detail-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        list_address.push({
+                            id: '',
+                            customer_id: '',
+                            row: row,
+                            address: $(".detail_address").val(),
+                            province_id: $(".province_id option:selected").val(),
+                            province_name: $(".province_id option:selected").text(),
+                            city_id: $(".city_id option:selected").val(),
+                            city_name: $(".city_id option:selected").text(),
+                            postal_code: $(".postal_code").val(),
+                            main_address: 0
+                        })
+                    let tag_html = "";
+                        tag_html += "<tr>";
+                        tag_html += "<td>";
+                        tag_html += row;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += $(".detail_address").val();
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += $(".province_id option:selected").text();
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += $(".city_id option:selected").text();
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += $(".postal_code").val();
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        if(row === 1)
+                        {
+                            tag_html += `<input type="radio" checked onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
+                        }   
+                        else
+                        {
+                            tag_html += `<input type="radio" onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
+                        } 
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+                        $(".body-detail-table").append(tag_html)
+                        $(".detail-modal").modal("hide")
+                        row = row + 1;
+                    }
+                })
+            }
         })
 
         $(".btn-submit-form").click(function() {

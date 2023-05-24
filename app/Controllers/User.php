@@ -47,6 +47,10 @@ class User extends BaseController
                     "isLogin" => true,
                     "token" => $data->token,
                     "name" => $data->name,
+                    "username" => $data->username,
+                    "company_role" => $data->company_role,
+                    "employee_id" => $data->employee_id,
+                    "status" => $data->status
                 ];
                 session()->setTempdata("login", $session, 36000);
 
@@ -77,18 +81,9 @@ class User extends BaseController
         if ($responseEmployee["code"] === 200) {
             $dataEmployee = json_decode($responseEmployee["body"])->data;
         }
-
-         //Get Role
-         $responseRole = curl_request("GET", "/roles/selectOption", $token);
-
-         $dataRole = [];
-         if ($responseRole["code"] === 200) {
-             $dataRole = json_decode($responseRole["body"])->data;
-         }
          
         $data = [
-            "dataEmployee" => $dataEmployee,
-            "dataRole" => $dataRole
+            "dataEmployee" => $dataEmployee
         ];
 
         return view('user/index', $data);
@@ -117,7 +112,6 @@ class User extends BaseController
                     "id" => $data->id,
                     "username" => $data->username,
                     "name" => $data->name,
-                    "roleName" => $data->roleName,
                     "status" => $data->status,
                 ]);
             }
@@ -146,9 +140,6 @@ class User extends BaseController
             "password" => [
                 "rules" => "required"
             ],
-            "role_id" => [
-                "rules" => "required"
-            ],
             "employee_id" => [
                 "rules" => "required"
             ]
@@ -161,7 +152,6 @@ class User extends BaseController
                 "name" => $this->request->getPost("name"),
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
-                "role_id" => formatter($this->request->getPost("role_id"), "STR_TO_INT"),
                 "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
                 "status" => $this->request->getPost("status")
             ]);
@@ -205,9 +195,6 @@ class User extends BaseController
             "username" => [
                 "rules" => "required"
             ],
-            "role_id" => [
-                "rules" => "required"
-            ],
             "employee_id" => [
                 "rules" => "required"
             ]
@@ -221,9 +208,9 @@ class User extends BaseController
                 "name" => $this->request->getPost("name"),
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
-                "role_id" => formatter($this->request->getPost("role_id"), "STR_TO_INT"),
                 "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                "status" => $this->request->getPost("status")
+                "status" => $this->request->getPost("status"),
+                "company_role" => json_decode(stripslashes($this->request->getPost("company_role")))
             ]);
             
             $response = curl_request("PATCH", "/users/$id", $token, $payload);

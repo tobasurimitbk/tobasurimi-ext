@@ -2,17 +2,16 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Company Access</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
-                        <div class="col">
+                    <div class="row mb-5">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select user_id" name="user_id" id="user_id">
                                     <option value=""></option>
@@ -21,43 +20,51 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select company_id" name="company_id" id="company_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Company</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select role_id" name="role_id" id="role_id">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataRole)) {
-                                        foreach ($dataRole as $role) {
-                                    ?>
-                                        <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">Role</label>
-                            </div>
-                        </div>
-                    </div>
                 </form>
+                <div class="row mt-5">
+                    <div class="col">
+                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive mt-2">
+                    <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Role</th>
+                                <th>Company</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
-                <label>&nbsp;</label>
+            <div class="modal-footer">
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
                     <button type="submit" class="btn btn-submit-form">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Add New</h5>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Discard</button>
+                    <button type="submit" class="btn btn-submit-detail">Save</button>
                 </div>
             </div>
         </div>
@@ -68,8 +75,8 @@
 <div class="container-fluid">
     <div class="mb-5">
         <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Company Access</h4>
-        <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 216px;">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Company Access
+        <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
         </button>
    </div>
     <div class="mb-2">
@@ -81,8 +88,6 @@
             <thead class="thead-dark">
                 <tr>
                     <th>User</th>
-                    <th>Company</th>
-                    <th>Role</th>
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -220,6 +225,55 @@
             },
         });
 
+        const table = $('.dataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: false,
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("user/all"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.search = $(".search").val();
+                }
+            },
+            // scrollX: true,
+            "initComplete": function (settings, json) {    
+                $('.dataTables_length').empty();    
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+            },
+            //responsive: true,
+            display: "stripe",
+            searching: false,
+            columns: [{
+                data: "name",
+                className: "text-left"
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        $(".btn-show-detail").click(function() {
+            $(".detail-modal").modal("show")
+        })
+
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".user_id").val("").change();
@@ -231,6 +285,10 @@
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show")
+        })
+
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
         })
 
         $(".btn-hide-form").click(function() {
