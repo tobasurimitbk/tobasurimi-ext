@@ -13,8 +13,17 @@
                     <div class="row mb-5">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select user_id" name="user_id" id="user_id">
+                                <select class="form-select user_id" name="user_id" id="user_id" onchange="changeUser()">
                                     <option value=""></option>
+                                    <?php
+                                    if (!empty($dataUser)) {
+                                        foreach ($dataUser as $user) {
+                                    ?>
+                                            <option value="<?= $user->id; ?>"><?= $user->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
                                 </select>
                                 <label for="floatingInput">User</label>
                             </div>
@@ -32,8 +41,8 @@
                     <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Role</th>
                                 <th>Company</th>
+                                <th>Role</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -56,10 +65,38 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary">Add New</h5>
+                <h5 class="modal-title title-secondary">Add New Company And Role</h5>
             </div>
             <div class="modal-body">
-
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select company_id" name="company_id" id="company_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataCompany)) {
+                                        foreach ($dataCompany as $company) {
+                                    ?>
+                                            <option value="<?= $company->id; ?>"><?= $company->company; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Company</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select role_id" name="role_id" id="role_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Role</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <div class="d-flex">
@@ -110,13 +147,13 @@
         $('.company_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
+            dropdownParent: $(".detail-modal .modal-content")
         })
 
         $('.role_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
+            dropdownParent: $(".detail-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -314,6 +351,27 @@
             }
         })
     })
+
+    const changeUser = function() {
+        $.ajax({
+            url: "<?= base_url("user/id"); ?>" + "/" + $(".user_id option:selected").val(),
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    
+                }
+                else
+                {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        })
+    }
 </script>
 
 <?= $this->endSection(); ?>
