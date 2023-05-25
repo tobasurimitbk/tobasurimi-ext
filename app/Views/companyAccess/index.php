@@ -51,7 +51,9 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard delete-form">Delete</button>
+                <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
                     <button type="submit" class="btn btn-submit-form">Save</button>
@@ -65,10 +67,11 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary">Add New Company And Role</h5>
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label>  Company And Role</h5>
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row mb-5">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -91,6 +94,15 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select role_id" name="role_id" id="role_id">
                                     <option value=""></option>
+                                    <?php
+                                    if (!empty($dataRole)) {
+                                        foreach ($dataRole as $role) {
+                                    ?>
+                                            <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
                                 </select>
                                 <label for="floatingInput">Role</label>
                             </div>
@@ -98,7 +110,9 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard delete-detail">Delete</button>
+                <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Discard</button>
                     <button type="submit" class="btn btn-submit-detail">Save</button>
@@ -136,6 +150,48 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+
+    let company_role = [];
+    var row = 0;
+
+    var validator_detail = $(".detail-form").validate({
+            rules: {
+                company_id: {
+                    required: true
+                },
+                role_id: {
+                    required: true
+                }
+            },
+            messages: {
+                company_id: {
+                    required: "Company is Required"
+                },
+                role_id: {
+                    required: "Role is Required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
     
     $(document).ready(function() {
         $('.user_id').select2({
@@ -308,7 +364,28 @@
         });
 
         $(".btn-show-detail").click(function() {
-            $(".detail-modal").modal("show")
+            let user_id = $(".user_id option:selected").val();
+            if(user_id)
+            {
+                $(".title-detail-name").text("Add New")
+                $(".delete-detail").css('display', 'none');
+                $(".id_detail").val('')
+                $(".company_id").val('').change()
+                $(".role_id").val('').change()
+
+                validator_detail.resetForm();
+                validator_detail.reset();
+
+                $(".detail-modal").modal("show")
+            }
+            else
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'User Wajib Dipilih',
+                    confirmButtonColor: '#4e73df',
+                })
+            }
         })
 
         $(".btn-show-form").click(function() {
@@ -332,6 +409,153 @@
             $(".add-modal").modal("hide")
         })
 
+        $(".btn-submit-detail").click(function() {
+            let id = $(".id_detail").val();
+            let company_id = $(".company_id option:selected").val();
+            let role_id = $(".role_id option:selected").val();
+
+            // update detail
+            if(id)
+            {
+                let validate_exist = true;
+
+                company_role.map(item => {
+                    if(item.row != id)
+                    {
+                        if(item.company_id == company_id)
+                        {
+                            validate_exist = false;
+                        }
+                    }
+                })
+
+                if(validate_exist)
+                {
+                    if ($(".detail-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                console.log(id)
+                                let new_company_role = []
+                                let tag_html = "";
+
+                                $(".body-detail-table").empty()
+
+                                company_role.map(item => {
+                                    if(item.row == id)
+                                    {
+                                        tag_html += `<tr class="edit-table-detail" data-id ="${item.row}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
+                                        tag_html += "<td>";
+                                        tag_html += company_id;
+                                        tag_html += "</td>";
+                                        tag_html += "<td>";
+                                        tag_html += role_id;
+                                        tag_html += "</td>";
+                                        tag_html += "</tr>";
+
+                                        new_company_role.push(item);
+                                    }
+                                    else
+                                    {
+                                        tag_html += `<tr class="edit-table-detail" data-id ="${item.row}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
+                                        tag_html += "<td>";
+                                        tag_html += item.company_id;
+                                        tag_html += "</td>";
+                                        tag_html += "<td>";
+                                        tag_html += item.role_id;
+                                        tag_html += "</td>";
+                                        tag_html += "</tr>";
+
+                                        new_company_role.push(item);
+                                    }
+                                })
+
+                                company_role = new_company_role;
+
+                                $(".body-detail-table").append(tag_html)
+                                $(".detail-modal").modal("hide")
+
+                                $(".detail-modal").modal("hide")
+                            }
+                        })
+                    }
+                }
+                else
+                {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Company Already Exist',
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+            // create detail
+            else
+            {
+                let validate_exist = true;
+
+                company_role.map(item => {
+                    if(item.company_id == company_id)
+                    {
+                        validate_exist = false;
+                    }
+                })
+
+                if(validate_exist)
+                {
+                    if ($(".detail-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                company_role.push({
+                                    row: row,
+                                    company_id: company_id,
+                                    role_id: role_id,
+                                })
+                                
+                            let tag_html = "";
+                                tag_html += `<tr class="edit-table-detail" data-id ="${row}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
+                                tag_html += "<td>";
+                                tag_html += company_id;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += role_id;
+                                tag_html += "</td>";
+                                tag_html += "</tr>";
+                                $(".body-detail-table").append(tag_html)
+                                $(".detail-modal").modal("hide")
+                                row = row + 1;
+                            }
+                        })
+                    }
+                }
+                else
+                {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Company Already Exist',
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        })
+
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
@@ -352,25 +576,96 @@
         })
     })
 
-    const changeUser = function() {
-        $.ajax({
-            url: "<?= base_url("user/id"); ?>" + "/" + $(".user_id option:selected").val(),
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                if (res.status) {
-                    
-                }
-                else
-                {
-                    Swal.fire({
-                        icon: 'error',
-                        title: res.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                }
+    $(document).on('click', '.delete-detail', function() {
+        let id = $(".id_detail").val()
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(id)
+                let new_company_role = []
+                let tag_html = "";
+
+                $(".body-detail-table").empty()
+
+                company_role.map(item => {
+                    if(item.row != id)
+                    {
+                        tag_html += `<tr class="edit-table-detail" data-id ="${item.row}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
+                        tag_html += "<td>";
+                        tag_html += item.company_id;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.role_id;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_company_role.push(item);
+                    }
+                })
+
+                company_role = new_company_role;
+
+                $(".body-detail-table").append(tag_html)
+                $(".detail-modal").modal("hide")
+                row = row + 1;
+
+                $(".detail-modal").modal("hide")
             }
         })
+    })
+
+    $(document).on('click', '.edit-table-detail', function() {
+        $(".title-detail-name").text("Update")
+        $(".delete-detail").css('display', '');
+        let company_id = $(this).data('companyid')
+        let role_id = $(this).data('roleid')
+        let id = $(this).data('id')
+
+        $(".id_detail").val(id)
+
+        $(".company_id").val(company_id).change()
+        $(".role_id").val(role_id).change()
+
+        validator_detail.resetForm();
+        validator_detail.reset();
+
+        $(".detail-modal").modal("show")
+    })
+
+    const changeUser = function() {
+        if($(".user_id option:selected").val())
+        {
+            $(".body-detail-table").empty()
+            row = 0;
+            company_role = []
+
+            $.ajax({
+                url: "<?= base_url("user/id"); ?>" + "/" + $(".user_id option:selected").val(),
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        
+                    }
+                    else
+                    {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            })
+        }
     }
 </script>
 

@@ -493,13 +493,17 @@
         $(".dataTable_info").addClass("pt-0");
 
         $(".btn-show-detail").click(function() {
-            $(".detail-modal").modal("show")
             $(".detail_address").val('')
             $(".province_id").val('').change()
             $(".city_id").val('').change()
             $(".city_id").empty()
             $(".city_id").append(`<option value=""></option>`)
             $(".postal_code").val('')
+
+            validator_detail.resetForm();
+            validator_detail.reset();
+
+            $(".detail-modal").modal("show")
         })
 
         $(".btn-show-form").click(function() {
