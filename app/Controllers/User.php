@@ -42,6 +42,14 @@ class User extends BaseController
             if ($response["code"] === 200) {
                 $data = json_decode($response["body"]);
 
+                $this_company_id = "";
+                $this_company = "";
+
+                if(sizeof($data->company_role) !== 0){
+                    $this_company_id = $data->company_role[0]->company_id;
+                    $this_company = $data->company_role[0]->company_name;
+                }
+
                 // token add bearer
                 $session = (object) [
                     "isLogin" => true,
@@ -49,6 +57,8 @@ class User extends BaseController
                     "name" => $data->name,
                     "username" => $data->username,
                     "company_role" => $data->company_role,
+                    "this_company_id" => $this_company_id,
+                    "this_company" => $this_company,
                     "employee_id" => $data->employee_id,
                     "status" => $data->status
                 ];

@@ -2235,6 +2235,7 @@ a.dropdown-item {
   padding: 10px 20px;
   font-weight: 500;
   line-height: 1.2;
+  cursor: pointer;
 }
 a.dropdown-item:focus, a.dropdown-item:active, a.dropdown-item.active {
   /* background-color: #e7323a;
@@ -4740,6 +4741,10 @@ input[type='radio']:checked:before {
 }
 
 .btn-dropdown-company {
-  width: 200px;
+  width: 250px;
   height: 50px;
+}
+
+.list-dropdown-company {
+  width: 250px;
 }

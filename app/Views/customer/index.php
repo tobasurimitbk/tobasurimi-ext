@@ -190,7 +190,9 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard delete-detail">Delete</button>
+                <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Discard</button>
                     <button type="submit" class="btn btn-submit-detail">Save</button>
@@ -494,6 +496,7 @@
         $(".dataTable_info").addClass("pt-0");
 
         $(".btn-show-detail").click(function() {
+            $(".delete-detail").css('display', 'none');
             $(".province_id").val('').change()
             $(".city_id").val('').change()
             $(".city_id").empty()
@@ -789,7 +792,7 @@
                                 {
                                     tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${item.row}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += "<td>";
-                                    tag_html += item.row;
+                                    tag_html += item.row + 1;
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += address;
@@ -832,7 +835,7 @@
                                 {
                                     tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${item.row}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += "<td>";
-                                    tag_html += item.row;
+                                    tag_html += item.row + 1;
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += item.address;
@@ -1070,6 +1073,77 @@
                 }
             }
         })
+    })
+
+    $(document).on('click', '.delete-detail', function() {
+        let id = $(".id_detail").val()
+        let main_address = document.querySelector('input[name="main"]:checked').value;
+
+        if(id === main_address)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Main Address Tidak Dapat Dihapus',
+                confirmButtonColor: '#4e73df',
+            })
+        }
+        else
+        {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log(id)
+                    let new_list_address = []
+                    let tag_html = "";
+
+                    $(".body-detail-table").empty()
+
+                    row = 0;
+
+                    console.log(list_address)
+
+                    list_address.map(item => {
+                        if(item.row != id)
+                        {
+                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${item.row}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+                            tag_html += "<td>";
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.address;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item/province_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.city_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.postal_code;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+
+                            list_address.push(item);
+                        }
+                    })
+
+                    list_address = new_list_address;
+
+                    $(".body-detail-table").append(tag_html)
+                    row = row + 1;
+
+                    $(".detail-modal").modal("hide")
+                }
+            })
+        }
     })
 
     $(document).on('click', '.edit-table-detail', function() {

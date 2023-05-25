@@ -4,12 +4,12 @@
     
     <div class="dropdown dropdown-company">
         <button class="btn btn-add btn-dropdown-company dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 1
+            <i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= session()->get("login")->this_company; ?>
         </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            <li><a class="dropdown-item active" href="#"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 1</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 2</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 3</a></li>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButton1">
+            <?php foreach (session()->get("login")->company_role as $allCompany) { ?>
+                <li><a class="dropdown-item"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany->company_name; ?></a></li>
+            <?php } ?>
         </ul>
     </div>
 
