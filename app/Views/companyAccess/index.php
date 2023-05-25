@@ -461,7 +461,11 @@
                                         tag_html += "</td>";
                                         tag_html += "</tr>";
 
-                                        new_company_role.push(item);
+                                        new_company_role.push({
+                                            row: item.row,
+                                            company_id: company_id,
+                                            role_id: role_id,
+                                        });
                                     }
                                     else
                                     {
@@ -481,7 +485,6 @@
                                 company_role = new_company_role;
 
                                 $(".body-detail-table").append(tag_html)
-                                $(".detail-modal").modal("hide")
 
                                 $(".detail-modal").modal("hide")
                             }
@@ -557,6 +560,7 @@
         })
 
         $(".btn-submit-form").click(function() {
+            $(".detail-modal").modal("hide")
             if ($(".create-form").valid()) {
                 Swal.fire({
                     icon: 'question',

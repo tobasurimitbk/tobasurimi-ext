@@ -4732,3 +4732,12 @@ input[type='radio']:before {
 input[type='radio']:checked:before {
   background: #E7323A;
 }
+
+.dropdown-company {
+  margin-left: 40%;
+}
+
+.btn-dropdown-company {
+  width: 200px;
+  height: 50px;
+}

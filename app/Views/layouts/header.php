@@ -1,6 +1,18 @@
 <!-- Header -->
 <nav class="navbar navbar-expand-lg main-navbar navbar-border">
     <a href="#" data-toggle="sidebar" class="nav-bar nav-link nav-link-lg"><i class="fas fa-bars"></i></a>
+    
+    <div class="dropdown dropdown-company">
+        <button class="btn btn-add btn-dropdown-company dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 1
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item active" href="#"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 1</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 2</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i>KIM 3</a></li>
+        </ul>
+    </div>
+
     <ul class="navbar-nav profile-button">
         <li class="dropdown">
             <a class="nav-link nav-link-lg nav-link-user dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

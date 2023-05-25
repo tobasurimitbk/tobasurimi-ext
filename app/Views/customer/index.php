@@ -142,10 +142,11 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary">Add New Alamat Pengiriman</h5>
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Alamat Pengiriman</h5>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="height: 380px !important; max-height: 380px !important;">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -233,7 +234,52 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     let list_address = [];
-    var row = 1;
+    var row = 0;
+
+    var validator_detail = $(".detail-form").validate({
+            rules: {
+                detail_address: {
+                    required: true
+                },
+                province_id: {
+                    required: true
+                },
+                city_id: {
+                    required: true
+                }
+            },
+            messages: {
+                detail_address: {
+                    required: "Address is Required"
+                },
+                province_id: {
+                    required: "Province is Required"
+                },
+                city_id: {
+                    required: "City is Required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
 
     $(document).ready(function() {
         // PROVINCE
@@ -377,51 +423,6 @@
             },
         });
 
-        var validator_detail = $(".detail-form").validate({
-            rules: {
-                detail_address: {
-                    required: true
-                },
-                province_id: {
-                    required: true
-                },
-                city_id: {
-                    required: true
-                }
-            },
-            messages: {
-                detail_address: {
-                    required: "Address is Required"
-                },
-                province_id: {
-                    required: "Province is Required"
-                },
-                city_id: {
-                    required: "City is Required"
-                },
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-
         $(".phone").mask("0000000000000")
 
         $(".postal_code").mask("00000")
@@ -493,11 +494,15 @@
         $(".dataTable_info").addClass("pt-0");
 
         $(".btn-show-detail").click(function() {
-            $(".detail_address").val('')
             $(".province_id").val('').change()
             $(".city_id").val('').change()
             $(".city_id").empty()
             $(".city_id").append(`<option value=""></option>`)
+
+            $(".title-detail-name").text("Add New")
+            $(".id_detail").val('')
+            $(".detail_address").val('')
+            
             $(".postal_code").val('')
 
             validator_detail.resetForm();
@@ -514,7 +519,7 @@
 
             $(".body-detail-table").empty()
 
-            row = 1;
+            row = 0;
 
             list_address = [];
 
@@ -618,7 +623,7 @@
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
 
-                        row = res?.data?.list_address.length + 1;
+                        row = res?.data?.list_address.length;
 
                         list_address = [];
 
@@ -640,7 +645,7 @@
                                 main_address: item.main_address
                             })
 
-                            tag_html += "<tr>";
+                            tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += "<td>";
                             tag_html += index + 1;
                             tag_html += "</td>";
@@ -748,67 +753,190 @@
         })
 
         $(".btn-submit-detail").click(function() {
-            if ($(".detail-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        list_address.push({
-                            id: '',
-                            customer_id: '',
-                            row: row,
-                            address: $(".detail_address").val(),
-                            province_id: $(".province_id option:selected").val(),
-                            province_name: $(".province_id option:selected").text(),
-                            city_id: $(".city_id option:selected").val(),
-                            city_name: $(".city_id option:selected").text(),
-                            postal_code: $(".postal_code").val(),
-                            main_address: 0
-                        })
-                    let tag_html = "";
-                        tag_html += "<tr>";
-                        tag_html += "<td>";
-                        tag_html += row;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += $(".detail_address").val();
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += $(".province_id option:selected").text();
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += $(".city_id option:selected").text();
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += $(".postal_code").val();
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        if(row === 1)
-                        {
-                            tag_html += `<input type="radio" checked onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
-                        }   
-                        else
-                        {
-                            tag_html += `<input type="radio" onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
-                        } 
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
-                        $(".body-detail-table").append(tag_html)
-                        $(".detail-modal").modal("hide")
-                        row = row + 1;
-                    }
-                })
+            let row_detail = $(".id_detail").val();
+            let address = $(".detail_address").val()
+            let province_id = $(".province_id option:selected").val()
+            let province_name = $(".province_id option:selected").text()
+            let city_id = $(".city_id option:selected").val()
+            let city_name = $(".city_id option:selected").text()
+            let postal_code = $(".postal_code").val();
+
+            // update detail
+            if(row_detail)
+            {
+                let main_address = document.querySelector('input[name="main"]:checked').value;
+
+                if ($(".detail-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            console.log(id)
+                            let new_list_address = []
+                            let tag_html = "";
+
+                            $(".body-detail-table").empty()
+
+                            list_address.map(item => {
+                                if(item.row == row_detail)
+                                {
+                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${item.row}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+                                    tag_html += "<td>";
+                                    tag_html += item.row;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += address;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += province_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += city_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += postal_code;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    if(item.row == main_address)
+                                    {
+                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                    }
+                                    else
+                                    {
+                                        tag_html += `<input type="radio" onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                    }
+                                    tag_html += "</td>";
+                                    tag_html += "</tr>";
+
+                                    new_list_address.push({
+                                        id: item.id,
+                                        customer_id: item.customer_id,
+                                        row: item.row,
+                                        address: address,
+                                        province_id: province_id,
+                                        province_name: province_name,
+                                        city_id: city_id,
+                                        city_name: city_name,
+                                        postal_code: postal_code,
+                                        main_address: item.main_address
+                                    });
+                                }
+                                else
+                                {
+                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${item.row}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+                                    tag_html += "<td>";
+                                    tag_html += item.row;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.address;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.province_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.city_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.postal_code;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    if(item.row == main_address)
+                                    {
+                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                    }
+                                    else
+                                    {
+                                        tag_html += `<input type="radio" onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                    }
+                                    tag_html += "</td>";
+                                    tag_html += "</tr>";
+
+                                    new_list_address.push(item);
+                                }
+                            })
+
+                            list_address = new_list_address;
+
+                            $(".body-detail-table").append(tag_html)
+
+                            $(".detail-modal").modal("hide")
+                        }
+                    })
+                }
+            }
+            // create detail
+            else
+            {
+                if ($(".detail-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            list_address.push({
+                                id: '',
+                                customer_id: '',
+                                row: row,
+                                address: address,
+                                province_id: province_id,
+                                province_name: province_name,
+                                city_id: city_id,
+                                city_name: city_name,
+                                postal_code: postal_code,
+                                main_address: 0
+                            })
+                        let tag_html = "";
+                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+                            tag_html += "<td>";
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += address;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += province_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += city_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += postal_code;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            if(row === 0)
+                            {
+                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
+                            }   
+                            else
+                            {
+                                tag_html += `<input type="radio" onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
+                            } 
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+                            $(".body-detail-table").append(tag_html)
+                            $(".detail-modal").modal("hide")
+                            row = row + 1;
+                        }
+                    })
+                }
             }
         })
 
         $(".btn-submit-form").click(function() {
+            $(".detail-modal").modal("hide")
             if(list_address.length == 0)
             {
                 Swal.fire({
@@ -942,10 +1070,45 @@
                 }
             }
         })
+    })
 
+    $(document).on('click', '.edit-table-detail', function() {
+        $(".title-detail-name").text("Update")
+        $(".delete-detail").css('display', '');
+        let address = $(this).data('address')
+        let province_id = $(this).data('province')
+        let city_id = $(this).data('city')
+        let postal_code = $(this).data('postalcode')
+        let rowid = $(this).data('row')
+        let id = $(this).data('id')
 
+        validator_detail.resetForm();
+        validator_detail.reset();
 
+        $(".province_id").val(province_id).change()
 
+        $(".id_detail").val(rowid)
+        $(".detail_address").val(address)
+
+        // AJAX GET CITY
+        $.ajax({
+            url: `<?= base_url("city"); ?>/${province_id}`,
+            method: "GET",
+            dataType: "json",
+            success: function(result) {
+                $(".city_id").empty()
+                $(".city_id").val("").change()
+                $(".city_id").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                })
+
+                $(".city_id").val(city_id).change()
+                $(".postal_code").val(postal_code)
+
+                $(".detail-modal").modal("show")
+            }
+        })
     })
 
     const getCity = function() {
