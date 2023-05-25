@@ -28,13 +28,13 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_id" name="province_id" id="province_id">
+                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataProvinces)) {
                                         foreach ($dataProvinces as $province) {
                                     ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->name; ?></option>
+                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
                                     <?php
                                         }
                                     }
@@ -47,15 +47,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select city_id" name="city_id" id="city_id">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataCities)) {
-                                        foreach ($dataCities as $city) {
-                                    ?>
-                                            <option value="<?= $city->id; ?>"><?= $city->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">City</label>
                             </div>
@@ -329,6 +320,9 @@
             $(".city_id").val("").change();
             $(".pic_id").val("").change();
 
+            $(".city_id").empty()
+            $(".city_id").append(`<option value=""></option>`)
+
             validator.resetForm();
             validator.reset();
 
@@ -411,12 +405,27 @@
                         $(".id").val(id);
                         $(".warehouse_name").val(res?.data?.warehouse_name);
                         $(".address").val(res?.data?.address);
-                        $(".province_id").val(res?.data?.province_id).change();
-                        $(".city_id").val(res?.data?.city_id).change();
                         $(".pic_id").val(res?.data?.pic_id).change();
                         $(".zip_code").val(res?.data?.zip_code);
                         $(".phone").val(res?.data?.phone);
                         $(".email").val(res?.data?.email);
+
+                        // AJAX GET CITY
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_id").empty()
+                                $(".city_id").val("").change()
+                                $(".city_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
+                                })
+
+                                $(".city_id").val(res?.data?.city_id).change();
+                            }
+                        })
 
                         validator.resetForm();
                         validator.reset();
@@ -558,10 +567,26 @@
                 })
             }
         })
-
-
-
     })
+
+    const getCity = function() {
+        const id = $(".province_id option:selected").val()
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
+                    })
+                }
+            })
+        }
+    }
 </script>
 
 

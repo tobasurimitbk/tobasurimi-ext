@@ -16,6 +16,15 @@
                 <div class="form-floating mb-2" style="height: 50px;">
                     <select class="form-control company_id" name="company_id" id="company_id">
                         <option value=""></option>
+                        <?php
+                            if (!empty($dataCompany)) {
+                                foreach ($dataCompany as $company) {
+                            ?>
+                                    <option value="<?= $company->id; ?>"><?= $company->company; ?></option>
+                            <?php
+                                }
+                            }
+                        ?>
                     </select>
                     <label for="floatingInput">Company</label>
                 </div>

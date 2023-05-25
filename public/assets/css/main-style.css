@@ -2237,8 +2237,10 @@ a.dropdown-item {
   line-height: 1.2;
 }
 a.dropdown-item:focus, a.dropdown-item:active, a.dropdown-item.active {
-  background-color: #e7323a;
-  color: #fff !important;
+  /* background-color: #e7323a;
+  color: #fff !important; */
+  background-color: transparent;
+  color: #e7323a !important;
 }
 
 .dropdown-divider {
@@ -4734,7 +4736,7 @@ input[type='radio']:checked:before {
 }
 
 .dropdown-company {
-  margin-left: 40%;
+  margin-left: 35%;
 }
 
 .btn-dropdown-company {
