@@ -9,11 +9,16 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id" name="id" id="id" />
+                    <input type="hidden" class="username" name="username" id="username" />
+                    <input type="hidden" class="employee_id" name="employee_id" id="employee_id" />
+                    <input type="hidden" class="status" name="status" id="status" />
+                    <input type="hidden" class="password" name="password" id="password" />
                     <?= csrf_field() ?>
                     <div class="row mb-5">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select user_id" name="user_id" id="user_id" onchange="changeUser()">
+                            <div class="form-floating mb-3 create-user" style="height: 50px;">
+                                <select class="form-select user_id" id="edit_user" name="user_id" id="user_id" onchange="changeUser()">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataUser)) {
@@ -25,6 +30,10 @@
                                     }
                                     ?>
                                 </select>
+                                <label for="floatingInput">User</label>
+                            </div>
+                            <div class="form-floating mb-3 edit-user" style="height: 50px;">
+                                <input type="text" readonly="true" class="form-control name" name="name" id="name">
                                 <label for="floatingInput">User</label>
                             </div>
                         </div>
@@ -363,8 +372,27 @@
             }
         });
 
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', '');
+            let id = data.id;
+            $(".title-name").text("Update");
+
+            $(".create-user").css("display", "none");
+            $(".edit-user").css("display", "");
+
+            $(".id").val(id);
+
+            $(".user_id").val(id).change();
+
+            validator.resetForm();
+            validator.reset();
+            $(".add-modal").modal("show")
+        })
+
         $(".btn-show-detail").click(function() {
-            let user_id = $(".user_id option:selected").val();
+            let user_id = $(".id").val();
             if(user_id)
             {
                 $(".title-detail-name").text("Add New")
@@ -390,10 +418,21 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
+            $(".create-user").css("display", "");
+            $(".edit-user").css("display", "none");
             $(".user_id").val("").change();
             $(".company_id").val("").change();
             $(".role_id").val("").change();
             $(".title-name").text("Add New");
+
+            $(".body-detail-table").empty()
+
+            row = 0;
+
+            list_address = [];
+
+            $(".body-detail-table").empty()
+
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()
@@ -413,6 +452,8 @@
             let id = $(".id_detail").val();
             let company_id = $(".company_id option:selected").val();
             let role_id = $(".role_id option:selected").val();
+            let company_name = $(".company_id option:selected").text();
+            let role_name = $(".role_id option:selected").text();
 
             // update detail
             if(id)
@@ -447,17 +488,19 @@
                                 let new_company_role = []
                                 let tag_html = "";
 
+                                row = 0;
+
                                 $(".body-detail-table").empty()
 
                                 company_role.map(item => {
                                     if(item.row == id)
                                     {
-                                        tag_html += `<tr class="edit-table-detail" data-id ="${item.row}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
+                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
                                         tag_html += "<td>";
-                                        tag_html += company_id;
+                                        tag_html += company_name;
                                         tag_html += "</td>";
                                         tag_html += "<td>";
-                                        tag_html += role_id;
+                                        tag_html += role_name;
                                         tag_html += "</td>";
                                         tag_html += "</tr>";
 
@@ -465,21 +508,25 @@
                                             row: item.row,
                                             company_id: company_id,
                                             role_id: role_id,
+                                            company_name: company_name,
+                                            role_name: role_name,
                                         });
                                     }
                                     else
                                     {
-                                        tag_html += `<tr class="edit-table-detail" data-id ="${item.row}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
+                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
                                         tag_html += "<td>";
-                                        tag_html += item.company_id;
+                                        tag_html += item.company_name;
                                         tag_html += "</td>";
                                         tag_html += "<td>";
-                                        tag_html += item.role_id;
+                                        tag_html += item.role_name;
                                         tag_html += "</td>";
                                         tag_html += "</tr>";
 
                                         new_company_role.push(item);
                                     }
+
+                                    row = row + 1;
                                 })
 
                                 company_role = new_company_role;
@@ -527,18 +574,20 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 company_role.push({
-                                    row: row,
+                                    row: row + 1,
                                     company_id: company_id,
                                     role_id: role_id,
+                                    company_name: company_name,
+                                    role_name: role_name,
                                 })
                                 
                             let tag_html = "";
-                                tag_html += `<tr class="edit-table-detail" data-id ="${row}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
+                                tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${company_id}" data-roleid ="${role_id}">`;
                                 tag_html += "<td>";
-                                tag_html += company_id;
+                                tag_html += company_name;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += role_id;
+                                tag_html += role_name;
                                 tag_html += "</td>";
                                 tag_html += "</tr>";
                                 $(".body-detail-table").append(tag_html)
@@ -573,7 +622,56 @@
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                    
+                       
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        let data = new FormData(document.querySelector(".create-form"));
+
+                        data.append("company_role", JSON.stringify(company_role))
+
+                        let id = $(".id").val();
+
+                        $.ajax({
+                            url: "<?= base_url("user/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $(".add-modal").modal("hide")
+                                            table.ajax.reload()
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
                     }
                 })
             }
@@ -597,21 +695,25 @@
                 let new_company_role = []
                 let tag_html = "";
 
+                row = 0;
+
                 $(".body-detail-table").empty()
 
                 company_role.map(item => {
                     if(item.row != id)
                     {
-                        tag_html += `<tr class="edit-table-detail" data-id ="${item.row}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
+                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
                         tag_html += "<td>";
-                        tag_html += item.company_id;
+                        tag_html += item.company_name;
                         tag_html += "</td>";
                         tag_html += "<td>";
-                        tag_html += item.role_id;
+                        tag_html += item.role_name;
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_company_role.push(item);
+                        new_company_role.push({...item, row: row + 1});
+
+                        row = row + 1;
                     }
                 })
 
@@ -619,7 +721,6 @@
 
                 $(".body-detail-table").append(tag_html)
                 $(".detail-modal").modal("hide")
-                row = row + 1;
 
                 $(".detail-modal").modal("hide")
             }
@@ -645,19 +746,48 @@
     })
 
     const changeUser = function() {
-        if($(".user_id option:selected").val())
+        let user_id = $(".user_id option:selected").val();
+        $(".id").val(user_id);
+        if(user_id)
         {
-            $(".body-detail-table").empty()
-            row = 0;
-            company_role = []
-
             $.ajax({
-                url: "<?= base_url("user/id"); ?>" + "/" + $(".user_id option:selected").val(),
+                url: "<?= base_url("user/id"); ?>" + "/" + user_id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        
+                        $(".name").val(res?.data?.name);
+                        $(".username").val(res?.data?.username);
+                        $(".employee_id").val(res?.data?.employee_id); 
+                        $(".status").val(res?.data?.status);
+
+                        $(".body-detail-table").empty()
+                        row = 0;
+                        company_role = []
+                        let tag_html = "" 
+
+                        res.data.company_role.map((item) => {
+                            tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
+                            tag_html += "<td>";
+                            tag_html += item.company_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.role_name;
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+
+                            company_role.push({
+                                row: row + 1,
+                                company_id: item.company_id,
+                                role_id: item.role_id,
+                                company_name: item.company_name,
+                                role_name: item.role_name,
+                            });
+
+                            row = row + 1;
+                        })
+
+                        $(".body-detail-table").append(tag_html)
                     }
                     else
                     {
