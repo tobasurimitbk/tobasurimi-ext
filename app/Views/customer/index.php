@@ -236,6 +236,7 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     let list_address = [];
+    let list_delete = [];
     var row = 0;
 
     var validator_detail = $(".detail-form").validate({
@@ -681,6 +682,7 @@
 
                         validator.resetForm();
                         validator.reset();
+                        list_delete = [];
                         $(".add-modal").modal("show")
                     } else {
                         Swal.fire({
@@ -785,14 +787,16 @@
                             let new_list_address = []
                             let tag_html = "";
 
+                            row = 0;
+
                             $(".body-detail-table").empty()
 
                             list_address.map(item => {
                                 if(item.row == row_detail)
                                 {
-                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${item.row}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += "<td>";
-                                    tag_html += item.row + 1;
+                                    tag_html += row + 1;
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += address;
@@ -809,11 +813,11 @@
                                     tag_html += "<td>";
                                     if(item.row == main_address)
                                     {
-                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
                                     }
                                     else
                                     {
-                                        tag_html += `<input type="radio" onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                        tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
                                     }
                                     tag_html += "</td>";
                                     tag_html += "</tr>";
@@ -821,7 +825,7 @@
                                     new_list_address.push({
                                         id: item.id,
                                         customer_id: item.customer_id,
-                                        row: item.row,
+                                        row: row + 1,
                                         address: address,
                                         province_id: province_id,
                                         province_name: province_name,
@@ -830,12 +834,14 @@
                                         postal_code: postal_code,
                                         main_address: item.main_address
                                     });
+
+                                    row = row + 1;
                                 }
                                 else
                                 {
-                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${item.row}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += "<td>";
-                                    tag_html += item.row + 1;
+                                    tag_html += row + 1;
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += item.address;
@@ -852,18 +858,22 @@
                                     tag_html += "<td>";
                                     if(item.row == main_address)
                                     {
-                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
                                     }
                                     else
                                     {
-                                        tag_html += `<input type="radio" onchange="changeMainAddress(${item.row})" id="main" name="main" value="${item.row}">`;
+                                        tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
                                     }
                                     tag_html += "</td>";
                                     tag_html += "</tr>";
 
                                     new_list_address.push(item);
+
+                                    row = row + 1;
                                 }
                             })
+
+                            list_address = [];
 
                             list_address = new_list_address;
 
@@ -892,7 +902,7 @@
                             list_address.push({
                                 id: '',
                                 customer_id: '',
-                                row: row,
+                                row: row + 1,
                                 address: address,
                                 province_id: province_id,
                                 province_name: province_name,
@@ -902,7 +912,7 @@
                                 main_address: 0
                             })
                         let tag_html = "";
-                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                             tag_html += "<td>";
                             tag_html += row + 1;
                             tag_html += "</td>";
@@ -921,11 +931,11 @@
                             tag_html += "<td>";
                             if(row === 0)
                             {
-                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
+                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
                             }   
                             else
                             {
-                                tag_html += `<input type="radio" onchange="changeMainAddress(${row})" id="main" name="main" value="${row}">`;
+                                tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
                             } 
                             tag_html += "</td>";
                             tag_html += "</tr>";
@@ -967,6 +977,23 @@
 
                             let update_list_address = [];
                             let main_address = document.querySelector('input[name="main"]:checked').value;
+
+                            if(list_delete.length !== 0)
+                            {
+                                list_delete.map(obj => {
+                                    update_list_address.push(
+                                        {
+                                            id: obj.id,
+                                            customer_id: obj.customer_id,
+                                            address: obj.address,
+                                            province_id: obj.province_id,
+                                            city_id: obj.city_id,
+                                            main_address: 0,
+                                            isDelete: true
+                                        }
+                                    )
+                                })
+                            }
                             
                             list_address.map(obj => {
                                 if (main_address == obj.row) {
@@ -1079,6 +1106,9 @@
         let id = $(".id_detail").val()
         let main_address = document.querySelector('input[name="main"]:checked').value;
 
+        console.log(id)
+        console.log(main_address)
+
         if(id === main_address)
         {
             Swal.fire({
@@ -1113,7 +1143,7 @@
                     list_address.map(item => {
                         if(item.row != id)
                         {
-                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${item.row}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += "<td>";
                             tag_html += row + 1;
                             tag_html += "</td>";
@@ -1121,7 +1151,7 @@
                             tag_html += item.address;
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += item/province_name;
+                            tag_html += item.province_name;
                             tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += item.city_name;
@@ -1130,15 +1160,36 @@
                             tag_html += item.postal_code;
                             tag_html += "</td>";
                             tag_html += "<td>";
+                            if(main_address == item.row)
+                            {
+                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                            }   
+                            else
+                            {
+                                tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                            } 
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
 
-                            list_address.push(item);
+                            new_list_address.push({...item, row: row + 1});
+
+                            row = row + 1;
+                        }
+                        else
+                        {
+                            // sent parameter isDelete if have customer id and id
+                            if(item.id)
+                            {
+                                list_delete.push(item)
+                            }
                         }
                     })
+
+                    list_address = [];
 
                     list_address = new_list_address;
 
                     $(".body-detail-table").append(tag_html)
-                    row = row + 1;
 
                     $(".detail-modal").modal("hide")
                 }
