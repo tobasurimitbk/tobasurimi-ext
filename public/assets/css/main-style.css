@@ -4713,6 +4713,10 @@ input[type="file"]::-webkit-file-upload-button{
   color: gray !important;
 }
 
+input[type='checkbox'] {
+  accent-color: #fc544b;
+}
+
 input[type='radio'] {
   -webkit-appearance:none;
   width:20px;
