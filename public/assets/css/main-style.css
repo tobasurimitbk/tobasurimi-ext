@@ -4741,10 +4741,10 @@ input[type='radio']:checked:before {
 }
 
 .btn-dropdown-company {
-  width: 100%;
+  width: 250px;
   height: 50px;
 }
 
 .list-dropdown-company {
-  width: 100%;
+  width: 250px;
 }

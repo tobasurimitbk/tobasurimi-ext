@@ -33,10 +33,12 @@ $routes->set404Override();
 /**
  * Get Page Login
  * Post Login
+ * Post Change Company
  * Get Logout
  */
 $routes->get('/', 'User::login');
 $routes->post('/login', 'User::doLogin');
+$routes->get('/change-company', 'User::changeCompany');
 $routes->get('/logout', 'User::doLogout');
 
 
@@ -117,6 +119,8 @@ $routes->post('/company/delete', 'Company::deleteCompany', ['filter' => 'Auth'])
 // USER
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
 $routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);
+$routes->get('/user/all-user-company', 'User::allUserHaveCompany', ['filter' => 'Auth']);
+
 $routes->get('/user/id/(:segment)', 'User::getByIdUser/$1', ['filter' => 'Auth']);
 $routes->post('/user/save', 'User::saveUser', ['filter' => 'Auth']);
 $routes->post('/user/update', 'User::updateUser', ['filter' => 'Auth']);
@@ -132,7 +136,7 @@ $routes->post('/role/delete', 'Role::deleteRole', ['filter' => 'Auth']);
 
 // AKSES
 $routes->get('/akses', 'Akses::akses', ['filter' => 'Auth']);
-$routes->get('/akses/id/(:segment)', 'Akses::getByIdAkses/$1', ['filter' => 'Auth']);
+$routes->get('/akses/id', 'Akses::getAkses', ['filter' => 'Auth']);
 $routes->post('/akses/save', 'Akses::saveAkses', ['filter' => 'Auth']);
 
 // COMPANY ACCESS

@@ -17,8 +17,50 @@ $arrDashboardURI = ['dashboard'];
             <img src="<?= base_url("assets/img/favicon.png"); ?>" width="35" height="35">
         </div>
 
-
+        <?php foreach(session()->get("login")->this_access as $parent_access){ 
+        ?>
         <ul class="sidebar-menu">
+            <?php if($parent_access->menuName === "Dashboard"){ ?>
+            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrDashboardURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+                <a href="<?= $parent_access->url; ?>" class="nav-link"><i class="<?= $parent_access->icon; ?>"></i><span><?= $parent_access->menuName; ?></span></a>
+            </li>
+            <?php } ?>
+
+            <?php if($parent_access->menuName === "Master Data" && sizeof($parent_access->child) !== 0){ ?>
+            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrMasterURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+                <a href="#" class="nav-link has-dropdown"><i class="<?= $parent_access->icon; ?>"></i><span><?= $parent_access->menuName; ?></span></a>
+                <ul class="dropdown-menu">
+                    <?php foreach($parent_access->child as $child_access){ ?>
+                        <?php if ("/" . $currentUriSegment === $child_access->url) { ?>
+                            <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
+                        <?php } else { ?>
+                            <li><a class="nav-link" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
+                        <?php } ?>
+                    <?php } ?>
+                </ul>
+            </li>
+            <?php } ?>
+
+            <?php if($parent_access->menuName === "Settings"){ ?>
+            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrSettingURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+                <a href="#" class="nav-link has-dropdown"><i class="<?= $parent_access->icon; ?>"></i><span><?= $parent_access->menuName; ?></span></a>
+                <ul class="dropdown-menu">
+                    <?php foreach($parent_access->child as $child_access){ ?>
+                        <?php if ("/" . $currentUriSegment  === $child_access->url) { ?>
+                            <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
+                        <?php } else { ?>
+                            <li><a class="nav-link" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
+                        <?php } ?>
+                    <?php } ?>
+                </ul>
+            </li>
+            <?php } ?>
+        </ul>
+        <?php 
+        } ?>
+
+
+        <!-- <ul class="sidebar-menu">
             <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrDashboardURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
                 <a href="<?= base_url("dashboard"); ?>" class="nav-link"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
             </li>
@@ -99,6 +141,6 @@ $arrDashboardURI = ['dashboard'];
                     <?php } ?>
                 </ul>
             </li>
-        </ul>
+        </ul> -->
     </aside>
 </div>

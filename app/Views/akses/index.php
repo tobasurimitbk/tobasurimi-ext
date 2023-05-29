@@ -14,7 +14,7 @@
         <div class="row mb-5">
             <div class="col-md-4">
                 <div class="form-floating mb-2" style="height: 50px;">
-                    <select class="form-control company_id" name="company_id" id="company_id">
+                    <select class="form-control company_id" name="company_id" id="company_id" onchange="setChanges()">
                         <option value=""></option>
                         <?php
                             if (!empty($dataCompany)) {
@@ -47,7 +47,7 @@
                 </div>
             </div>
         </div>
-        <div class="table-responsive" id="view_access" name="view_access" style="display: none">
+        <div class="table-responsive view_access" id="view_access" name="view_access" style="display: none">
             <table style="overflow-x: scroll;" class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                 <thead class="thead-dark">
                     <tr>
@@ -129,15 +129,19 @@
     })
 
     const setChanges = function() {
-        document.getElementById("role_id").value ? document.getElementById("view_access").style = "" : document.getElementById("view_access").style = "display: none"
+        $(".role_id").val() && $(".company_id").val() ? $(".view_access").css("display", "") : $(".view_access").css("display", "none")
         // document.getElementById("create_1").checked = true;
         var tag_html = "";
         //"[\"c\", \"r\", \"u\", \"d\"]"
 
-        if (document.getElementById("role_id").value) {
+        if ($(".role_id").val() && $(".company_id").val()) {
             $.ajax({
-                url: "<?= base_url("akses/id"); ?>" + "/" + document.getElementById("role_id").value,
+                url: "<?= base_url("akses/id"); ?>",
                 method: "GET",
+                data: {
+                    role_id: $(".role_id").val(), 
+                    company_id: $(".company_id").val()
+                },
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
@@ -270,7 +274,7 @@
                         if (response.status) {
                             document.getElementById('submit-btn').setAttribute("disabled", "disabled");
                             $(".body-akses").empty();
-                            document.getElementById("view_access").style = "display: none";
+                            $(".view_access").css("display", "none")
                             $(".role_id").val('').trigger('change');
 
                             stopLoading()

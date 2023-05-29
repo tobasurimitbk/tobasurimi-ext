@@ -44,10 +44,17 @@ class User extends BaseController
 
                 $this_company_id = "";
                 $this_company = "";
+                $this_access = [];
 
-                if(sizeof($data->company_role) !== 0){
+                if($data->company_role === null)
+                {
+                    return redirect()->back()->with("errors", "User Belum Memiliki Company");
+                }
+                else
+                {
                     $this_company_id = $data->company_role[0]->company_id;
                     $this_company = $data->company_role[0]->company_name;
+                    $this_access = $data->company_role[0]->access_list;
                 }
 
                 // token add bearer
@@ -59,6 +66,7 @@ class User extends BaseController
                     "company_role" => $data->company_role,
                     "this_company_id" => $this_company_id,
                     "this_company" => $this_company,
+                    "this_access" => $this_access,
                     "employee_id" => $data->employee_id,
                     "status" => $data->status
                 ];
@@ -72,6 +80,50 @@ class User extends BaseController
         } else {
             return redirect()->back()->with("errors", "Login Gagal, Coba Lagi");
         }
+    }
+
+    public function changeCompany()
+    {
+        $id = $this->request->getGet("id");
+        $name = $this->request->getGet("name");
+
+        if ($id) {
+
+            $company_role = session()->get("login")->company_role;
+            $this_access = "";
+
+            foreach($company_role as $item)
+            {
+                if($item->company_id == $id)
+                {
+                    $this_access = $item->access_list;
+                }
+            }
+            
+
+            $session = (object) [
+                "isLogin" => true,
+                "token" => session()->get("login")->token,
+                "name" => session()->get("login")->name,
+                "username" => session()->get("login")->username,
+                "company_role" => session()->get("login")->company_role,
+                "this_company_id" => $id,
+                "this_company" => $name,
+                "this_access" => $this_access,
+                "employee_id" => session()->get("login")->employee_id,
+                "status" => session()->get("login")->status
+            ];
+
+            session()->setTempdata("login", $session, 36000);
+
+            $data = [
+                "status"            => true
+            ];
+            echo json_encode($data);
+        } else {
+            return redirect()->to("/dashboard");
+        }
+        return;
     }
 
     public function doLogout()
@@ -132,6 +184,47 @@ class User extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataUser,
+            "response" => $response
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function allUserHaveCompany()
+    {
+        $token = session()->get("login")->token;
+
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search")
+        ];
+
+        $response = curl_request("GET", "/users/userCompany", $token, $payload);
+        $dataUser = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
+
+            foreach ($body as $data) {
+                array_push($dataUser, [
+                    "id" => $data->id,
+                    "username" => $data->username,
+                    "name" => $data->name,
+                    "status" => $data->status,
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataUser,
+            "response" => $response
         ];
 
         echo json_encode($data);

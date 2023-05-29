@@ -38,30 +38,27 @@ class Akses extends BaseController
         return view('akses/index', $data);
     }
 
-    public function getByIdAkses($id = null)
+    public function getAkses()
     {
         $token = session()->get("login")->token;
 
-        if (!empty($id)) {
-            $response = curl_request("GET", "/accessLists/$id", $token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
+        $payload = [
+            "idCompany" => $this->request->getGet("company_id"),
+            "idRole" => $this->request->getGet("role_id")
+        ];
+
+        $response = curl_request("GET", "/accessLists", $token, $payload);
+        if ($response["code"] === 200) {
             $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
+                "status"  => true,
+                "data"  => json_decode($response["body"])->data,
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+            $data = [
+                "status" => false,
+                "message"  => $message
             ];
             echo json_encode($data);
         }
@@ -74,8 +71,15 @@ class Akses extends BaseController
 
         //Get Menu By Role Id
         $dataAkses = array();
-        $id = formatter($this->request->getPost("role_id"), "STR_TO_INT");
-        $responseAkses = curl_request("GET", "/accessLists/$id", $token);
+        $role_id = formatter($this->request->getPost("role_id"), "STR_TO_INT");
+        $company_id = formatter($this->request->getPost("company_id"), "STR_TO_INT");
+
+        $payload = [
+            "idCompany" => $company_id,
+            "idRole" => $role_id
+        ];
+
+        $responseAkses = curl_request("GET", "/accessLists", $token, $payload);
 
         if ($responseAkses["code"] === 200) {
             $dataAkses = json_decode($responseAkses["body"])->data;
@@ -117,8 +121,8 @@ class Akses extends BaseController
 
             $payload = json_encode([
                 "data" => $result,
-                "role_id" => $id
-                
+                "role_id" => $role_id,
+                "company_id" => $company_id,
             ]);
 
             $response = curl_request("POST", "/accessLists", $token, $payload);

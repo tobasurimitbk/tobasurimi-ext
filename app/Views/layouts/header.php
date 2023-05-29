@@ -8,7 +8,7 @@
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButton1">
             <?php foreach (session()->get("login")->company_role as $allCompany) { ?>
-                <li><a class="dropdown-item"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany->company_name; ?></a></li>
+                <li onclick="tes(<?= $allCompany->company_id; ?>, '<?= $allCompany->company_name; ?>')"><a class="<?= $allCompany->company_id == session()->get("login")->this_company_id ? "dropdown-item active" : "dropdown-item" ?>"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany->company_name; ?></a></li>
             <?php } ?>
         </ul>
     </div>
@@ -56,5 +56,23 @@
 
     const hideLogoutForm = function(e) {
         $(".logout-modal").modal("hide")
+    }
+
+    const tes = function(dropdownCompanyId, dropdownCompanyName) {
+        console.log(dropdownCompanyId)
+        $.ajax({
+            url: "<?= base_url("change-company"); ?>",
+            data: {
+                id: dropdownCompanyId,
+                name: dropdownCompanyName
+            },
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    window.location.href = '<?= base_url(); ?>'
+                }
+            }
+        })
     }
 </script>
