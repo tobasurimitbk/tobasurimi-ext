@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
-                    <input type="hidden" class="company_role" name="company_role" id="company_role" />
+                    <!-- <input type="hidden" class="company_role" name="company_role" id="company_role" /> -->
                     <?= csrf_field() ?>
                     <div class="row mb-3">
                         <div class="col">
@@ -473,7 +473,7 @@
                         $(".username").val(res?.data?.username);
                         $(".employee_id").val(res?.data?.employee_id).change();
                         $(".status").val(res?.data?.status);
-                        $(".company_role").val(res?.data?.company_role);
+                        // $(".company_role").val(res?.data?.company_role);
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")

@@ -307,14 +307,27 @@ class User extends BaseController
             $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "name" => $this->request->getPost("name"),
-                "username" => $this->request->getPost("username"),
-                "password" => $this->request->getPost("password"),
-                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                "status" => $this->request->getPost("status"),
-                "company_role" => json_decode(stripslashes($this->request->getPost("company_role")))
-            ]);
+            if($this->request->getPost("company_role"))
+            {
+                $payload = json_encode([
+                    "name" => $this->request->getPost("name"),
+                    "username" => $this->request->getPost("username"),
+                    "password" => $this->request->getPost("password"),
+                    "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                    "status" => $this->request->getPost("status"),
+                    "company_role" => json_decode(stripslashes($this->request->getPost("company_role")))
+                ]);
+            }
+            else
+            {
+                $payload = json_encode([
+                    "name" => $this->request->getPost("name"),
+                    "username" => $this->request->getPost("username"),
+                    "password" => $this->request->getPost("password"),
+                    "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                    "status" => $this->request->getPost("status")
+                ]);
+            }
             
             $response = curl_request("PATCH", "/users/$id", $token, $payload);
 
