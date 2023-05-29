@@ -26,7 +26,7 @@ $arrDashboardURI = ['dashboard'];
             </li>
             <?php } ?>
 
-            <?php if($parent_access->menuName === "Master Data" && sizeof($parent_access->child) !== 0){ ?>
+            <?php if($parent_access->menuName === "Master Data"){ ?>
             <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrMasterURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
                 <a href="#" class="nav-link has-dropdown"><i class="<?= $parent_access->icon; ?>"></i><span><?= $parent_access->menuName; ?></span></a>
                 <ul class="dropdown-menu">

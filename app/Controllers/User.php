@@ -42,20 +42,9 @@ class User extends BaseController
             if ($response["code"] === 200) {
                 $data = json_decode($response["body"]);
 
-                $this_company_id = "";
-                $this_company = "";
-                $this_access = [];
-
-                if($data->company_role === null)
-                {
-                    return redirect()->back()->with("errors", "User Belum Memiliki Company");
-                }
-                else
-                {
-                    $this_company_id = $data->company_role[0]->company_id;
-                    $this_company = $data->company_role[0]->company_name;
-                    $this_access = $data->company_role[0]->access_list;
-                }
+                $this_company_id = $data->company_role[0]->company_id;
+                $this_company = $data->company_role[0]->company_name;
+                $this_access = $data->company_role[0]->access_list;
 
                 // token add bearer
                 $session = (object) [
