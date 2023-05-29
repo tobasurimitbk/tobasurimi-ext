@@ -171,6 +171,7 @@ class Warehouse extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }

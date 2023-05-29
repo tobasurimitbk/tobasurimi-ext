@@ -283,6 +283,7 @@ class User extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }
@@ -353,6 +354,7 @@ class User extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }

@@ -71,36 +71,23 @@ class Role extends BaseController
             $payload = json_encode([
                 "name" => $this->request->getPost("name")
             ]);
-
-            if($payload)
-            {
                 $response = curl_request("POST", "/roles", $token, $payload);
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            }
-            else
-            {
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                    "payload"   => ''
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
@@ -108,6 +95,7 @@ class Role extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }
@@ -153,7 +141,8 @@ class Role extends BaseController
         } else {
             $data = [
                 "status"            => false,
-                "message"    => "Data Gagal Disimpan",
+                "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }

@@ -168,7 +168,8 @@ class Company extends BaseController
                 $data = [
                     "status"            => false,
                     "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                    "payload"   => ''
+                    "payload"   => '',
+                    'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
@@ -176,6 +177,7 @@ class Company extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }
@@ -284,7 +286,8 @@ class Company extends BaseController
                 $data = [
                     "status"            => false,
                     "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                    "payload"   => ''
+                    "payload"   => '',
+                    'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
@@ -292,6 +295,7 @@ class Company extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }
