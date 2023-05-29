@@ -28,15 +28,6 @@ class Warehouse extends BaseController
             $dataProvinces = json_decode($responseProvinces["body"])->data;
         }
 
-        //Get Cities
-        $responseCities = curl_request("GET", "/cities/all", $token);
-
-        $dataCities = [];
-        if ($responseCities["code"] === 200) {
-            $dataCities = json_decode($responseCities["body"])->data;
-        }
-
-
         //Get Pic
         $responsePic = curl_request("GET", "/employees/selectOption", $token);
 
@@ -48,8 +39,7 @@ class Warehouse extends BaseController
         $data = [
             "dataPic" => $dataPic,
             "dataWarehouses" => $dataWarehouses,
-            "dataProvinces" => $dataProvinces,
-            "dataCities" => $dataCities,
+            "dataProvinces" => $dataProvinces
         ];
 
         return view('warehouse/index', $data);
