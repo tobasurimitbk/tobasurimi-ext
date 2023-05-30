@@ -229,7 +229,7 @@ class Vendor extends BaseController
         $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/vendors?id=$id&idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/vendors/$id?idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,

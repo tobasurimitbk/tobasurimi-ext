@@ -229,7 +229,7 @@ class Supplier extends BaseController
         $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/suppliers?id=$id&idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/suppliers/$id?idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
