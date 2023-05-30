@@ -276,6 +276,7 @@
                             $(".body-akses").empty();
                             $(".view_access").css("display", "none")
                             $(".role_id").val('').trigger('change');
+                            $(".company_id").val('').trigger('change');
 
                             stopLoading()
                             

@@ -88,20 +88,12 @@ class User extends BaseController
                     $this_access = $item->access_list;
                 }
             }
-            
 
-            $session = (object) [
-                "isLogin" => true,
-                "token" => session()->get("login")->token,
-                "name" => session()->get("login")->name,
-                "username" => session()->get("login")->username,
-                "company_role" => session()->get("login")->company_role,
-                "this_company_id" => $id,
-                "this_company" => $name,
-                "this_access" => $this_access,
-                "employee_id" => session()->get("login")->employee_id,
-                "status" => session()->get("login")->status
-            ];
+            $session = session()->get("login");
+
+            $session->this_company_id = $id;
+            $session->this_company = $name;
+            $session->this_access = $this_access;
 
             session()->setTempdata("login", $session, 36000);
 

@@ -1,6 +1,6 @@
 <?php
 $currentUriSegment = service('uri')->getSegment(1);
-$arrMasterURI = ['customer', 'supplier', 'vendor', 'company', 'warehouse', 'employee', 'divisi'];
+$arrMasterURI = ['customer', 'supplier', 'vendor', 'barang', 'company', 'warehouse', 'employee', 'divisi'];
 $arrSettingURI = ['user', 'role', 'akses', 'company-access'];
 $arrDashboardURI = ['dashboard'];
 ?>
