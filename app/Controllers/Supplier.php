@@ -17,12 +17,13 @@ class Supplier extends BaseController
     public function allSupplier()
     {
         $token = session()->get("login")->token;
-
+        $this_company_id = session()->get("login")->this_company_id;
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search")
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
         ];
 
         $response = curl_request("GET", "/suppliers", $token, $payload);
@@ -91,9 +92,10 @@ class Supplier extends BaseController
         if ($this->validate($rules)) {
             $payload = '';
             $token = session()->get("login")->token;
-
+            $this_company_id = session()->get("login")->this_company_id;
 
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -174,10 +176,12 @@ class Supplier extends BaseController
         if ($this->validate($rules)) {
             $payload = '';
             $token = session()->get("login")->token;
+            $this_company_id = session()->get("login")->this_company_id;
 
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -222,9 +226,10 @@ class Supplier extends BaseController
     public function getByIdSupplier($id = null)
     {
         $token = session()->get("login")->token;
+        $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/suppliers/$id", $token);
+            $response = curl_request("GET", "/suppliers?id=$id&idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,

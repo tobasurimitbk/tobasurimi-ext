@@ -17,12 +17,13 @@ class Vendor extends BaseController
     public function allVendor()
     {
         $token = session()->get("login")->token;
-
+        $this_company_id = session()->get("login")->this_company_id;
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search")
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
         ];
 
         $response = curl_request("GET", "/vendors", $token, $payload);
@@ -91,8 +92,10 @@ class Vendor extends BaseController
         if ($this->validate($rules)) {
             $payload = '';
             $token = session()->get("login")->token;
+            $this_company_id = session()->get("login")->this_company_id;
 
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -175,8 +178,10 @@ class Vendor extends BaseController
             $token = session()->get("login")->token;
 
             $id = $this->request->getPost("id");
+            $this_company_id = session()->get("login")->this_company_id;
 
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -221,9 +226,10 @@ class Vendor extends BaseController
     public function getByIdVendor($id = null)
     {
         $token = session()->get("login")->token;
+        $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/vendors/$id", $token);
+            $response = curl_request("GET", "/vendors?id=$id&idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,

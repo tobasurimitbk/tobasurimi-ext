@@ -31,12 +31,14 @@ class Customer extends BaseController
     public function allCustomer()
     {
         $token = session()->get("login")->token;
+        $this_company_id = session()->get("login")->this_company_id;
 
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search")
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
         ];
 
         $response = curl_request("GET", "/customers", $token, $payload);
@@ -105,8 +107,10 @@ class Customer extends BaseController
         if ($this->validate($rules)) {
             $payload = '';
             $token = session()->get("login")->token;
+            $this_company_id = session()->get("login")->this_company_id;
 
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -187,11 +191,13 @@ class Customer extends BaseController
         if ($this->validate($rules)) {
             $payload = '';
             $token = session()->get("login")->token;
+            $this_company_id = session()->get("login")->this_company_id;
 
             $id = $this->request->getPost("id");
 
 
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -234,9 +240,10 @@ class Customer extends BaseController
     public function getByIdCustomer($id = null)
     {
         $token = session()->get("login")->token;
+        $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/customers/$id", $token);
+            $response = curl_request("GET", "/customers?id=$id&idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
