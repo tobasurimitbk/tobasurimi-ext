@@ -30,21 +30,16 @@ $routes->set404Override();
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 
-/**
- * Get Page Login
- * Post Login
- * Post Change Company
- * Get Logout
- */
+// AUTH
 $routes->get('/', 'User::login');
 $routes->post('/login', 'User::doLogin');
 $routes->get('/change-company', 'User::changeCompany');
 $routes->get('/logout', 'User::doLogout');
 
-
 // DASHBOARD
 $routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
 
+// MASTER DATA
 // EMPLOYEE
 $routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
 $routes->get('/employee/all', 'Employee::allEmployee', ['filter' => 'Auth']);
@@ -96,9 +91,6 @@ $routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBaran
 // BARANG
 $routes->get('/barang', 'Barang::barang', ['filter' => 'Auth']);
 
-// CITY
-$routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
-
 // DIVISI
 $routes->get('/divisi', 'Divisi::divisi', ['filter' => 'Auth']);
 $routes->get('/divisi/all', 'Divisi::allDivisi', ['filter' => 'Auth']);
@@ -115,7 +107,23 @@ $routes->post('/company/save', 'Company::saveCompany', ['filter' => 'Auth']);
 $routes->post('/company/update', 'Company::updateCompany', ['filter' => 'Auth']);
 $routes->post('/company/delete', 'Company::deleteCompany', ['filter' => 'Auth']);
 
+// RAK
+$routes->get('/penomoran-rak', 'PenomoranRak::penomoranRak', ['filter' => 'Auth']);
+$routes->get('/penomoran-rak/all', 'PenomoranRak::allPenomoranRak', ['filter' => 'Auth']);
+$routes->get('/penomoran-rak/id/(:segment)', 'PenomoranRak::getByIdPenomoranRak/$1', ['filter' => 'Auth']);
+$routes->post('/penomoran-rak/save', 'PenomoranRak::savePenomoranRak', ['filter' => 'Auth']);
+$routes->post('/penomoran-rak/update', 'PenomoranRak::updatePenomoranRak', ['filter' => 'Auth']);
+$routes->post('/penomoran-rak/delete', 'PenomoranRak::deletePenomoranRak', ['filter' => 'Auth']);
 
+// DROPDOWN
+// CITY
+$routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
+
+// ACCOUNT AND FINANCE
+// ACCOUNT
+$routes->get('/account', 'Account::account', ['filter' => 'Auth']);
+
+// SETTINGS
 // USER
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
 $routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);

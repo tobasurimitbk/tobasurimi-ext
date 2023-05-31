@@ -207,11 +207,10 @@
     <div class="mb-5">
         <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Customer</h4>
         <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create Customer
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
         </button>
     </div>
-    <div class="mb-3">
-        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">= List Customer</h5>
+    <div class="mb-2">
         <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
     </div>
     <div class="table-responsive">
