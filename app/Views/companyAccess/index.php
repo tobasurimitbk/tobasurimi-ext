@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal add-modal" tabindex="-1">
+<div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
@@ -688,6 +688,14 @@
                 }
             }
         })
+    })
+
+    $(document).on('show.bs.modal','.detail-modal', function () {
+       document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
+    })
+
+    $(document).on('hide.bs.modal','.detail-modal', function () {
+        document.getElementById("add_modal").style = "display: block;";
     })
 
     $(document).on('click', '.delete-detail', function() {

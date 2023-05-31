@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal add-modal" tabindex="-1">
+<div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
@@ -664,7 +664,7 @@
                             tag_html += "<td>";
                             tag_html += item.postal_code;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += "<td class='actions'>";
                             if(item.main_address == 1)
                             {
                                 tag_html += `<input type="radio" checked onchange="changeMainAddress(${index + 1})" id="main" name="main" value="${index + 1}">`;
@@ -809,7 +809,7 @@
                                     tag_html += "<td>";
                                     tag_html += postal_code;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += "<td class='actions'>";
                                     if(item.row == main_address)
                                     {
                                         tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
@@ -854,7 +854,7 @@
                                     tag_html += "<td>";
                                     tag_html += item.postal_code;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += "<td class='actions'>";
                                     if(item.row == main_address)
                                     {
                                         tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
@@ -927,7 +927,7 @@
                             tag_html += "<td>";
                             tag_html += postal_code;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += "<td class='actions'>";
                             if(row === 0)
                             {
                                 tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
@@ -1158,7 +1158,7 @@
                             tag_html += "<td>";
                             tag_html += item.postal_code;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += "<td class='actions'>";
                             if(main_address == item.row)
                             {
                                 tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
@@ -1196,43 +1196,53 @@
         }
     })
 
-    $(document).on('click', '.edit-table-detail', function() {
-        $(".title-detail-name").text("Update")
-        $(".delete-detail").css('display', '');
-        let address = $(this).data('address')
-        let province_id = $(this).data('province')
-        let city_id = $(this).data('city')
-        let postal_code = $(this).data('postalcode')
-        let rowid = $(this).data('row')
-        let id = $(this).data('id')
+    $(document).on('show.bs.modal','.detail-modal', function () {
+       document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
+    })
 
-        validator_detail.resetForm();
-        validator_detail.reset();
+    $(document).on('hide.bs.modal','.detail-modal', function () {
+        document.getElementById("add_modal").style = "display: block;";
+    })
 
-        $(".province_id").val(province_id).change()
+    $(document).on('click', '.edit-table-detail', function(evt) {
+        if(!$(evt.target).is('.actions')) {
+            $(".title-detail-name").text("Update")
+            $(".delete-detail").css('display', '');
+            let address = $(this).data('address')
+            let province_id = $(this).data('province')
+            let city_id = $(this).data('city')
+            let postal_code = $(this).data('postalcode')
+            let rowid = $(this).data('row')
+            let id = $(this).data('id')
 
-        $(".id_detail").val(rowid)
-        $(".detail_address").val(address)
+            validator_detail.resetForm();
+            validator_detail.reset();
 
-        // AJAX GET CITY
-        $.ajax({
-            url: `<?= base_url("city"); ?>/${province_id}`,
-            method: "GET",
-            dataType: "json",
-            success: function(result) {
-                $(".city_id").empty()
-                $(".city_id").val("").change()
-                $(".city_id").append(`<option value=""></option>`)
-                result.data.forEach(function(item) {
-                    $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                })
+            $(".province_id").val(province_id).change()
 
-                $(".city_id").val(city_id).change()
-                $(".postal_code").val(postal_code)
+            $(".id_detail").val(rowid)
+            $(".detail_address").val(address)
 
-                $(".detail-modal").modal("show")
-            }
-        })
+            // AJAX GET CITY
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${province_id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(result) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+
+                    $(".city_id").val(city_id).change()
+                    $(".postal_code").val(postal_code)
+
+                    $(".detail-modal").modal("show")
+                }
+            })
+        }
     })
 
     const getCity = function() {

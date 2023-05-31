@@ -60,12 +60,12 @@ $arrSettingURI = ['user', 'role', 'akses', 'company-access'];
             <?php 
             } ?>
 
-            <!-- <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrAccFinanceURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrAccFinanceURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
                 <a class="nav-link has-dropdown" href="#"><i class="fas fa-suitcase"></i><span>Acc. & Finance</span></a>
                 <ul class="dropdown-menu">
                     <li><a class="nav-link" href="<?= base_url("account"); ?>">Account</a></li>
                 </ul>
-            </li> -->
+            </li>
 
         </ul>
 

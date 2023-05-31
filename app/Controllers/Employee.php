@@ -31,11 +31,13 @@ class Employee extends BaseController
     public function allEmployee()
     {
         $token = session()->get("login")->token;
+        $this_company_id = session()->get("login")->this_company_id;
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search")
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
         ];
 
         $response = curl_request("GET", "/employees", $token, $payload);
@@ -96,6 +98,8 @@ class Employee extends BaseController
             $payload = '';
             $token = session()->get("login")->token;
 
+            $this_company_id = session()->get("login")->this_company_id;
+
             $file = $this->request->getFile("employeeImg");
 
             if (!empty($file->getName())) 
@@ -105,6 +109,7 @@ class Employee extends BaseController
                     $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
 
                     $payload = json_encode([
+                        "company_id" => $this_company_id,
                         "employeeImg" => $image,
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
@@ -193,6 +198,8 @@ class Employee extends BaseController
 
             $id = $this->request->getPost("id");
 
+            $this_company_id = session()->get("login")->this_company_id;
+
             $file = $this->request->getFile("employeeImg");
             if (!empty($file->getName())) 
             {
@@ -201,6 +208,7 @@ class Employee extends BaseController
                     $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
 
                     $payload = json_encode([
+                        "company_id" => $this_company_id,
                         "employeeImg" => $image,
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
@@ -218,6 +226,7 @@ class Employee extends BaseController
             else
             {
                 $payload = json_encode([
+                    "company_id" => $this_company_id,
                     "nip" => $this->request->getPost("nip"),
                     "name" => $this->request->getPost("name"),
                     "gender" => $this->request->getPost("gender"),
@@ -279,8 +288,10 @@ class Employee extends BaseController
     {
         $token = session()->get("login")->token;
 
+        $this_company_id = session()->get("login")->this_company_id;
+
         if (!empty($id)) {
-            $response = curl_request("GET", "/employees/$id", $token);
+            $response = curl_request("GET", "/employees/$id?idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,

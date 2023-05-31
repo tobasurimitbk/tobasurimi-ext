@@ -33,10 +33,13 @@ class Divisi extends BaseController
     {
         $token = session()->get("login")->token;
 
+        $this_company_id = session()->get("login")->this_company_id;
+
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search")
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
         ];
 
         $response = curl_request("GET", "/divisis", $token, $payload);
@@ -105,7 +108,10 @@ class Divisi extends BaseController
         if ($this->validate($rules)) {
             $token = session()->get("login")->token;
 
+            $this_company_id = session()->get("login")->this_company_id;
+
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
                 "libur" => $this->request->getPost("libur"),
                 "jam_kerja" => $this->request->getPost("jam_kerja"),
@@ -180,7 +186,10 @@ class Divisi extends BaseController
             $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
 
+            $this_company_id = session()->get("login")->this_company_id;
+
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
                 "libur" => $this->request->getPost("libur"),
                 "jam_kerja" => $this->request->getPost("jam_kerja"),
@@ -226,8 +235,10 @@ class Divisi extends BaseController
     {
         $token = session()->get("login")->token;
 
+        $this_company_id = session()->get("login")->this_company_id;
+
         if (!empty($id)) {
-            $response = curl_request("GET", "/divisis/$id", $token);
+            $response = curl_request("GET", "/divisis/$id?idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,

@@ -117,6 +117,8 @@ class User extends BaseController
     public function user()
     {
         $token = session()->get("login")->token;
+
+        $this_company_id = session()->get("login")->this_company_id;
          //Get Employee
         $responseEmployee = curl_request("GET", "/employees/selectOption", $token);
 
@@ -136,10 +138,13 @@ class User extends BaseController
     {
         $token = session()->get("login")->token;
 
+        $this_company_id = session()->get("login")->this_company_id;
+
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search")
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
         ];
 
         $response = curl_request("GET", "/users", $token, $payload);
@@ -176,10 +181,13 @@ class User extends BaseController
     {
         $token = session()->get("login")->token;
 
+        $this_company_id = session()->get("login")->this_company_id;
+
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search")
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
         ];
 
         $response = curl_request("GET", "/users/userCompany", $token, $payload);
@@ -232,7 +240,10 @@ class User extends BaseController
         if ($this->validate($rules)) {
             $token = session()->get("login")->token;
 
+            $this_company_id = session()->get("login")->this_company_id;
+
             $payload = json_encode([
+                "company_id" => $this_company_id,
                 "name" => $this->request->getPost("name"),
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
@@ -289,9 +300,12 @@ class User extends BaseController
             $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
 
+            $this_company_id = session()->get("login")->this_company_id;
+
             if($this->request->getPost("company_role"))
             {
                 $payload = json_encode([
+                    "company_id" => $this_company_id,
                     "name" => $this->request->getPost("name"),
                     "username" => $this->request->getPost("username"),
                     "password" => $this->request->getPost("password"),
@@ -303,6 +317,7 @@ class User extends BaseController
             else
             {
                 $payload = json_encode([
+                    "company_id" => $this_company_id,
                     "name" => $this->request->getPost("name"),
                     "username" => $this->request->getPost("username"),
                     "password" => $this->request->getPost("password"),
@@ -346,8 +361,10 @@ class User extends BaseController
     {
         $token = session()->get("login")->token;
 
+        $this_company_id = session()->get("login")->this_company_id;
+
         if (!empty($id)) {
-            $response = curl_request("GET", "/users/$id", $token);
+            $response = curl_request("GET", "/users/$id?idCompany=$this_company_id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
