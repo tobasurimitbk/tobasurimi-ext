@@ -394,7 +394,7 @@
 }
 
 /* 1.8 DataTables */
-/* table.dataTable {
+table.dataTable {
   border-collapse: collapse !important;
 }
 table.dataTable thead th, table.dataTable thead td {
@@ -404,7 +404,7 @@ table.dataTable.no-footer {
   border-bottom: 1px solid #ddd !important;
 }
 
-.dataTables_wrapper {
+/* .dataTables_wrapper {
   padding: 0 !important;
   font-size: 13px !important;
 }

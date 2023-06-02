@@ -184,7 +184,7 @@ h2.swal2-title {
   text-transform: uppercase;
   font-weight: 600;
   box-shadow: none !important;
-  border: 0px #559884 solid !important;
+  border: 1px transparent !important;
   min-width: 100px;
   font-family: "Poppins", sans-serif !important;
 }
@@ -199,7 +199,7 @@ h2.swal2-title {
   text-transform: uppercase !important;
   font-weight: 600 !important;
   box-shadow: none !important;
-  border: 0px #559884 solid !important;
+  border: 1px transparent !important;
   min-width: 100px !important;
   font-family: "Poppins", sans-serif !important;
 }
