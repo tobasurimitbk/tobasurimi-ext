@@ -1,9 +1,5 @@
 <?php
-$currentUriSegment = service('uri')->getSegment(1);
-$arrDashboardURI = ['dashboard'];
-$arrMasterURI = ['customer', 'supplier', 'vendor', 'barang', 'company', 'warehouse', 'employee', 'divisi'];
-$arrAccFinanceURI = ['account'];
-$arrSettingURI = ['user', 'role', 'akses', 'company-access'];
+$currentUriSegment = "/" . service('uri')->getSegment(1);
 ?>
 
 <!-- Sidebar -->
@@ -19,138 +15,48 @@ $arrSettingURI = ['user', 'role', 'akses', 'company-access'];
         </div>
 
         <ul class="sidebar-menu">
-
-            <?php foreach(session()->get("login")->this_access as $parent_access){ 
+        <?php 
+            $parent_access = session()->get("login")->this_access;
+            for ($i = 0; $i < count($parent_access); $i++) {
             ?>
-                <?php if($parent_access->menuName === "Dashboard"){ ?>
-                <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrDashboardURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
-                    <a href="<?= $parent_access->url; ?>" class="nav-link"><i class="<?= $parent_access->icon; ?>"></i><span><?= $parent_access->menuName; ?></span></a>
+                <!-- DASHBOARD -->
+                <?php if($i === 0){ ?>
+                <li class="nav-item dropdown <?= ($currentUriSegment === $parent_access[$i]->url ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+                    <a href="<?= $parent_access[$i]->url; ?>" class="nav-link"><i class="<?= $parent_access[$i]->icon; ?>"></i><span><?= $parent_access[$i]->menuName; ?></span></a>
                 </li>
-                <?php } ?>
+                <?php } else { ?>
+                    <!-- CHECK PARENT ACTIVE MENU -->
+                    <?php 
+                        $child_access = $parent_access[$i]->child;
 
-                <?php if($parent_access->menuName === "Master Data"){ ?>
-                <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrMasterURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
-                    <a href="#" class="nav-link has-dropdown"><i class="<?= $parent_access->icon; ?>"></i><span><?= $parent_access->menuName; ?></span></a>
-                    <ul class="dropdown-menu">
-                        <?php foreach($parent_access->child as $child_access){ ?>
-                            <?php if ("/" . $currentUriSegment === $child_access->url) { ?>
-                                <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
-                            <?php } else { ?>
-                                <li><a class="nav-link" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
-                            <?php } ?>
-                        <?php } ?>
-                    </ul>
-                </li>
-                <?php } ?>
+                        $exists = false;
+                        for ($j = 0; $j < count($child_access); $j++){
+                            if ($child_access[$j]->url === $currentUriSegment) {
+                                $exists = true;
+                                break;
+                            }
+                        }
+                        ?>
+                        
+                        <!-- PARENT MENU WITH CHILD -->
+                        <li class="nav-item dropdown <?= ($exists ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
+                        <a href="#" class="nav-link has-dropdown"><i class="<?= $parent_access[$i]->icon; ?>"></i><span><?= $parent_access[$i]->menuName; ?></span></a>
+                        <ul class="dropdown-menu">
+                        <?php for ($j = 0; $j < count($child_access); $j++){
+                         if ($currentUriSegment  === $child_access[$j]->url) { ?>
+                            <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url($child_access[$j]->url); ?>"><?= $child_access[$j]->name; ?></a></li>
+                        <?php } else { ?>
+                            <li><a class="nav-link" href="<?= base_url($child_access[$j]->url); ?>"><?= $child_access[$j]->name; ?></a></li>
+                        <?php } 
+                        }?>
 
-                <?php if($parent_access->menuName === "Settings"){ ?>
-                <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrSettingURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
-                    <a href="#" class="nav-link has-dropdown"><i class="<?= $parent_access->icon; ?>"></i><span><?= $parent_access->menuName; ?></span></a>
-                    <ul class="dropdown-menu">
-                        <?php foreach($parent_access->child as $child_access){ ?>
-                            <?php if ("/" . $currentUriSegment  === $child_access->url) { ?>
-                                <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
-                            <?php } else { ?>
-                                <li><a class="nav-link" href="<?= base_url($child_access->url); ?>"><?= $child_access->name; ?></a></li>
-                            <?php } ?>
-                        <?php } ?>
-                    </ul>
-                </li>
-                <?php } ?>
+                        </ul>
+                        </li>
+
+                <?php } ?> 
             <?php 
-            } ?>
-
-            <!-- <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrAccFinanceURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
-                <a class="nav-link has-dropdown" href="#"><i class="fas fa-suitcase"></i><span>Acc. & Finance</span></a>
-                <ul class="dropdown-menu">
-                    <li><a class="nav-link" href="<?= base_url("account"); ?>">Account</a></li>
-                </ul>
-            </li> -->
-
+            } 
+        ?>
         </ul>
-
-
-        <!-- <ul class="sidebar-menu">
-            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrDashboardURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
-                <a href="<?= base_url("dashboard"); ?>" class="nav-link"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
-            </li>
-        </ul>
-
-        <ul class="sidebar-menu">
-            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrMasterURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
-                <a href="#" class="nav-link has-dropdown"><i class="fas fa-database"></i><span>Master Data</span></a>
-                <ul class="dropdown-menu">
-                    <?php if ($currentUriSegment === "customer") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("customer"); ?>">Customer</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("customer"); ?>">Customer</a></li>
-                    <?php } ?>
-
-                    <?php if ($currentUriSegment === "supplier") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("supplier"); ?>">Supplier</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("supplier"); ?>">Supplier</a></li>
-                    <?php } ?>
-
-                    <?php if ($currentUriSegment === "vendor") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("vendor"); ?>">Vendor</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("vendor"); ?>">Vendor</a></li>
-                    <?php } ?>
-
-                    <?php if ($currentUriSegment === "company") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("company"); ?>">Company</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("company"); ?>">Company</a></li>
-                    <?php } ?>
-
-                    <?php if ($currentUriSegment === "warehouse") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("warehouse"); ?>">Warehouse</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("warehouse"); ?>">Warehouse</a></li>
-                    <?php } ?>
-
-                    <?php if ($currentUriSegment === "employee") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("employee"); ?>">Employee</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("employee"); ?>">Employee</a></li>
-                    <?php } ?>
-
-                    <?php if ($currentUriSegment === "divisi") { ?>
-                       <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("divisi"); ?>">Divisi</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("divisi"); ?>">Divisi</a></li>
-                    <?php } ?>
-                </ul>
-            </li>
-        </ul>
-
-        <ul class="sidebar-menu">
-            <li class="nav-item dropdown <?= (in_array($currentUriSegment, $arrSettingURI) ? "active" : "{{ ' active'|is_active('^index(.*)', page)|safe }}") ?>">
-                <a href="#" class="nav-link has-dropdown"><i class="fas fa-cog"></i><span>Settings</span></a>
-                <ul class="dropdown-menu">
-                    <?php if ($currentUriSegment === "user") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("user"); ?>">Manajemen User</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("user"); ?>">Manajemen User</a></li>
-                    <?php } ?>
-                    <?php if ($currentUriSegment === "role") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("role"); ?>">Manajemen Role</a></li>
-                    <?php } ?>
-                    <?php if ($currentUriSegment === "akses") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("akses"); ?>">Manajemen Hak Akses</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("akses"); ?>">Manajemen Hak Akses</a></li>
-                    <?php } ?>
-                    <?php if ($currentUriSegment === "company-access") { ?>
-                        <li{{ ' class="active"'|is_active('^index-0.html', page)|safe }}><a class="nav-link active-bar" href="<?= base_url("company-access"); ?>">Company Access</a></li>
-                    <?php } else { ?>
-                        <li><a class="nav-link" href="<?= base_url("company-access"); ?>">Company Access</a></li>
-                    <?php } ?>
-                </ul>
-            </li>
-        </ul> -->
     </aside>
 </div>
