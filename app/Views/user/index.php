@@ -49,15 +49,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select employee_id" name="employee_id" id="employee_id">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataEmployee)) {
-                                        foreach ($dataEmployee as $employee) {
-                                    ?>
-                                        <option value="<?= $employee->id; ?>"><?= $employee->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">Employee</label>
                             </div>
@@ -204,8 +195,23 @@
         $(".btn-show-form").click(function() {
             $('.password').rules('add', {required: true});
             $(".id").val("");
-            $(".employee_id").val("").change();
             $(".title-name").text("Add New");
+            $(".employee_id").val("").change();
+
+            $.ajax({
+                url: `<?= base_url("employee/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".employee_id").empty()
+                    $(".employee_id").val("").change()
+                    $(".employee_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".employee_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+                }
+            })
+
             $(".company_role").val('');
             validator.resetForm();
             validator.reset();
@@ -456,6 +462,21 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             $('.password').rules('remove', 'required');
             const data = table.row(this).data();
+
+            $.ajax({
+                url: `<?= base_url("employee/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".employee_id").empty()
+                    $(".employee_id").val("").change()
+                    $(".employee_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".employee_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+                }
+            })
+            
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;

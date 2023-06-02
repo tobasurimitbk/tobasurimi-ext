@@ -116,22 +116,7 @@ class User extends BaseController
 
     public function user()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-         //Get Employee
-        $responseEmployee = curl_request("GET", "/employees/selectOption", $token);
-
-        $dataEmployee = [];
-        if ($responseEmployee["code"] === 200) {
-            $dataEmployee = json_decode($responseEmployee["body"])->data;
-        }
-         
-        $data = [
-            "dataEmployee" => $dataEmployee
-        ];
-
-        return view('user/index', $data);
+        return view('user/index');
     }
 
     public function allUser()

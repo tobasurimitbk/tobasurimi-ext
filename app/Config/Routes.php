@@ -42,6 +42,7 @@ $routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
 // MASTER DATA
 // EMPLOYEE
 $routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
+$routes->get('/employee/dropdown', 'Employee::dropdownEmployee', ['filter' => 'Auth']);
 $routes->get('/employee/all', 'Employee::allEmployee', ['filter' => 'Auth']);
 $routes->get('/employee/id/(:segment)', 'Employee::getByIdEmployee/$1', ['filter' => 'Auth']);
 $routes->post('/employee/save', 'Employee::saveEmployee', ['filter' => 'Auth']);

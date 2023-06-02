@@ -28,6 +28,23 @@ class Employee extends BaseController
         return view('employee/index', $data);
     }
 
+    public function dropdownEmployee()
+    {
+        $token = session()->get("login")->token;
+        $dataEmployee = [];
+        $responseEmployee = curl_request("GET", "/employees/selectOption", $token);
+        if ($responseEmployee["code"] === 200) {
+            $dataEmployee = json_decode($responseEmployee["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataEmployee
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function allEmployee()
     {
         $token = session()->get("login")->token;

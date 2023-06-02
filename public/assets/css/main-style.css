@@ -4022,7 +4022,7 @@ input[type="file"]::-webkit-file-upload-button{
 }
 
 .dataTables_wrapper table.table thead tr th {
-  background-color: #e1eee4;
+  /* background-color: #e1eee4; */
   border-color: #d7d7d7;
   border-top: 0px;
   vertical-align: middle;
@@ -4104,7 +4104,7 @@ input[type="file"]::-webkit-file-upload-button{
   .dropdown-menu
   a.dropdown-item:focus,
 
-.dataTables_wrapper
+/* .dataTables_wrapper
   table.table
   tbody
   tr
@@ -4113,7 +4113,7 @@ input[type="file"]::-webkit-file-upload-button{
   .dropdown-menu
   a.dropdown-item:active {
   background-color: #e1eee4;
-}
+} */
 
 .dataTables_wrapper .dataTables_length {
   padding-top: 2px;
