@@ -4741,10 +4741,6 @@ input[type='radio']:checked:before {
   background: #E7323A;
 }
 
-.dropdown-company {
-  margin-left: 35%;
-}
-
 .btn-dropdown-company {
   width: 250px;
   height: 50px;
@@ -4853,4 +4849,29 @@ ul.nav.nav-tabs li.nav-item a.nav-link.active {
   border-radius: 6px !important;
   margin-right: 5px;
   transition: 0.3s ease-in;
+}
+@media (max-width: 575px) {
+  .dropdown-company {
+      margin-left: 10%;
+  }
+}
+@media (min-width: 576px) and (max-width: 767px) {
+  .dropdown-company {
+      margin-left: 15%;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .dropdown-company {
+      margin-left: 20%;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .dropdown-company {
+      margin-left: 30%;
+  }
+}
+@media (min-width: 1200px) {
+  .dropdown-company {
+      margin-left: 35%;
+  }
 }

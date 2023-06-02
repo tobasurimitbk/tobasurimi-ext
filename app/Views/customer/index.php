@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
+    <div class="modal-dialog" style="max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Customer</h5>
@@ -139,7 +139,7 @@
 </div>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
+    <div class="modal-dialog" style="max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Alamat Pengiriman</h5>
