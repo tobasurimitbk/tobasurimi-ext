@@ -13,7 +13,19 @@ class Account extends BaseController
     {
         $token = session()->get("login")->token;
 
-        return view('account/index');
+        //Get Kelompok Akun by Metadata
+        $responseKelompokAkun = curl_request("GET", "/metadata/all", $token);
+
+        $dataKelompokAkun = [];
+        if ($responseKelompokAkun["code"] === 200) {
+            $dataKelompokAkun = json_decode($responseKelompokAkun["body"])->data;
+        }
+
+        $data = [
+            "dataKelompokAkun" => $dataKelompokAkun
+        ];
+
+        return view('account/index', $data);
     }
 }
 ?>
