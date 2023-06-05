@@ -197,14 +197,14 @@
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
             <div class="collapse-kategori-list show" id="collapseKategoriList">
-                <div class="mb-5">
+                <div>
                     <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Account</h4>
-                    <button class="btn btn-show-form-kategori btn-add btn-block" data-btn="create-modal" style="width: 176px;">
+                    <button class="btn btn-show-form-kategori btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                     </button>
                 </div>
                 <div class="mb-2">
-                    <input class="form-control search-kategori" placeholder="Search" style="width: 30%" value="" />
+                    <input class="form-control search-kategori float-right" placeholder="Search" style="width: 30%" value="" />
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
@@ -224,14 +224,14 @@
         </div>
         <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
             <div class="collapse-header-list show" id="collapseHeaderList">
-                <div class="mb-5">
+                <div>
                     <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Account</h4>
-                    <button class="btn btn-show-form-header btn-add btn-block" data-btn="create-modal" style="width: 176px;">
+                    <button class="btn btn-show-form-header btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                     </button>
                 </div>
                 <div class="mb-2">
-                    <input class="form-control search-header" placeholder="Search" style="width: 30%" value="" />
+                    <input class="form-control search-header float-right" placeholder="Search" style="width: 30%" value="" />
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
@@ -251,14 +251,14 @@
         </div>
         <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
             <div class="collapse-header-list show" id="collapseSubList">
-                <div class="mb-5">
+                <div>
                     <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Account</h4>
-                    <button class="btn btn-show-form-sub btn-add btn-block" data-btn="create-modal" style="width: 176px;">
+                    <button class="btn btn-show-form-sub btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                     </button>
                 </div>
                 <div class="mb-2">
-                    <input class="form-control search-sub" placeholder="Search" style="width: 30%" value="" />
+                    <input class="form-control search-sub float-right" placeholder="Search" style="width: 30%" value="" />
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">

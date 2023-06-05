@@ -110,13 +110,11 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <div class="mb-2">
-        <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Barang</h5>
-        <div class="form-row mx-0">
-            <div class="form-group col float-left">
-                <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
-                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-                </button>
-            </div>
+        <div>
+            <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Barang</h5>
+            <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+            </button>
         </div>
         <div class="form-row mx-0">
             <div class="form-group col d-flex">

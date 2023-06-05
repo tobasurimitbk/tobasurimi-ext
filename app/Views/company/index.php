@@ -123,14 +123,14 @@
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-    <div class="mb-5">
+    <div>
         <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Company</h4>
-        <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
+        <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
         </button>
    </div>
    <div class="mb-2">
-        <input class="form-control search" placeholder="Search" style="width: 30%" value="" />
+        <input class="form-control search float-right" placeholder="Search" style="width: 30%" value="" />
    </div>
    <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
