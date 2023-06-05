@@ -40,8 +40,9 @@ class Supplier extends BaseController
                     "kode" => $data->kode,
                     "name" => $data->name,
                     "address" => $data->address,
-                    "ap" => $data->ap_id,
-                    "ar" => $data->ar_id
+                    "country" => "",
+                    "province" => "",
+                    "city" => ""
                 ]);
             }
         }

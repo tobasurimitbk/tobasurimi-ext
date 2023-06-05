@@ -80,20 +80,28 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select akun_ap" name="akun_ap" id="akun_ap">
+                                <select class="form-select country" name="country" id="country">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Akun AP</label>
+                                <label for="floatingInput">Country</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select akun_ar" name="akun_ar" id="akun_ar">
+                                <select class="form-select provinsi" name="provinsi" id="provinsi">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Akun AR</label>
+                                <label for="floatingInput">Provinsi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kota" name="kota" id="kota">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Kota</label>
                             </div>
                         </div>
                     </div>
@@ -131,8 +139,9 @@
                     <th>Kode</th>
                     <th>Nama</th>
                     <th>Alamat</th>
-                    <th>AP</th>
-                    <th>AR</th>
+                    <th>Country</th>
+                    <th>Provinsi</th>
+                    <th>Kota</th>
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -237,62 +246,6 @@
 
         $(".no_rekening").mask("000000000000000")
 
-        // AKUN AP
-        $('.akun_ap').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.akun_ap')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.akun_ap')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.akun_ap')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // AKUN AR
-        $('.akun_ar').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.akun_ar')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.akun_ar')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.akun_ar')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         $(".search").keyup(function() {
             table.ajax.reload();
         })
@@ -354,10 +307,13 @@
                 data: "address",
                 className: "text-left"
             }, {
-                data: "ap",
+                data: "country",
                 className: "text-left"
             }, {
-                data: "ar",
+                data: "province",
+                className: "text-left"
+            }, {
+                data: "city",
                 className: "text-left"
             }],
             columnDefs: [{
