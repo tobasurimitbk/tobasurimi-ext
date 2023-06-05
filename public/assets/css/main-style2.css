@@ -2397,7 +2397,7 @@ a.dropdown-item:focus, a.dropdown-item:active, a.dropdown-item.active {
   }
 }
 /* 3.20 Dropdown */
-/* .tab-content.no-padding > .tab-pane {
+.tab-content.no-padding > .tab-pane {
   padding: 0;
 }
 .tab-content > .tab-pane {
@@ -2417,7 +2417,7 @@ ul.nav-tabs li.nav-item a.nav-link span i {
 
 ul.nav-tabs li.nav-item a.nav-link.active i {
   color: #191d21;
-} */
+}
 
 /* 3.21 Progress Bar */
 .progress-bar {
