@@ -124,12 +124,23 @@ $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Aut
 // ACCOUNT
 $routes->get('/account', 'Account::account', ['filter' => 'Auth']);
 
+$routes->get('/kategori-account/all', 'Account::allKategoriAccount', ['filter' => 'Auth']);
+$routes->get('/kategori-account/id/(:segment)', 'Account::getByIdKategoriAccount/$1', ['filter' => 'Auth']);
+$routes->post('/kategori-account/save', 'Account::saveKategoriAccount', ['filter' => 'Auth']);
+$routes->post('/kategori-account/update', 'Account::updateKategoriAccount', ['filter' => 'Auth']);
+$routes->post('/kategori-account/delete', 'Account::deleteKategoriAccount', ['filter' => 'Auth']);
+
+$routes->get('/header-account/all', 'Account::allHeaderAccount', ['filter' => 'Auth']);
+$routes->get('/header-account/id/(:segment)', 'Account::getByIdHeaderAccount/$1', ['filter' => 'Auth']);
+$routes->post('/header-account/save', 'Account::saveHeaderAccount', ['filter' => 'Auth']);
+$routes->post('/header-account/update', 'Account::updateHeaderAccount', ['filter' => 'Auth']);
+$routes->post('/header-account/delete', 'Account::deleteHeaderAccount', ['filter' => 'Auth']);
+
 // SETTINGS
 // USER
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
 $routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);
 $routes->get('/user/all-user-company', 'User::allUserHaveCompany', ['filter' => 'Auth']);
-
 $routes->get('/user/id/(:segment)', 'User::getByIdUser/$1', ['filter' => 'Auth']);
 $routes->post('/user/save', 'User::saveUser', ['filter' => 'Auth']);
 $routes->post('/user/update', 'User::updateUser', ['filter' => 'Auth']);
