@@ -16,15 +16,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select kelompok_akun_id_kategori" name="kelompok_akun_id_kategori" id="kelompok_akun_id_kategori">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataKelompokAkun)) {
-                                        foreach ($dataKelompokAkun as $kelompokAkun) {
-                                    ?>
-                                            <option value="<?= $kelompokAkun->value; ?>"><?= $kelompokAkun->value; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">Kelompok Akun</label>
                             </div>
@@ -73,19 +64,10 @@
                     <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kelompok_akun_id_header" name="kelompok_akun_id_header" id="kelompok_akun_id_header">
+                                <select class="form-select category_id_header" name="category_id_header" id="category_id_header">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataKelompokAkunKategori)) {
-                                        foreach ($dataKelompokAkunKategori as $kelompokAkunKategori) {
-                                    ?>
-                                            <option value="<?= $kelompokAkunKategori->id; ?>"><?= $kelompokAkunKategori->nama_kategori; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
-                                <label for="floatingInput">Kelompok Akun</label>
+                                <label for="floatingInput">Kategori Akun</label>
                             </div>
                         </div>
                     </div>
@@ -128,21 +110,13 @@
             <div class="modal-body">
                 <form class="create-form-sub" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_sub" name="id_sub" id="id_sub" />
+                    <input type="hidden" class="category_id_sub" name="category_id_sub" id="category_id_sub" />
                     <?= csrf_field() ?>
                     <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select kelompok_akun_id_sub" name="kelompok_akun_id_sub" id="kelompok_akun_id_sub">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataKelompokAkun)) {
-                                        foreach ($dataKelompokAkun as $kelompokAkun) {
-                                    ?>
-                                            <option value="<?= $kelompokAkun->value; ?>"><?= $kelompokAkun->value; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">Kelompok Akun</label>
                             </div>
@@ -164,6 +138,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select coa_id" name="coa_id" id="coa_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">COA</label>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
@@ -171,7 +155,7 @@
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-form-sub btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Save</button>
                 </div>
             </div>
         </div>
@@ -237,9 +221,9 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Kelompok Akun</th>
-                                <th>No. Kategori Akun</th>
-                                <th>Nama Kategori Akun</th>
+                                <th>Kategori Akun</th>
+                                <th>No. Header Akun</th>
+                                <th>Nama Header Akun</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -264,9 +248,11 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Kelompok Akun</th>
-                                <th>No. Kategori Akun</th>
                                 <th>Nama Kategori Akun</th>
+                                <th>No. Header Akun</th>
+                                <th>No. Sub Akun</th>
+                                <th>Nama Sub Akun</th>
+                                <th>Nama Header Akun</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -289,13 +275,19 @@
             dropdownParent: $(".add-modal-kategori .modal-content")
         })
 
-        $('.kelompok_akun_id_header').select2({
+        $('.category_id_header').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal-header .modal-content")
         })
 
         $('.kelompok_akun_id_sub').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal-sub .modal-content")
+        })
+
+        $('.coa_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal-sub .modal-content")
@@ -322,14 +314,14 @@
         .find('label')
         .css('z-index', '1');
 
-        $(".kelompok_akun_id_header")
+        $(".category_id_header")
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-        $(".kelompok_akun_id_header")
+        $(".category_id_header")
         .parent('div')
         .children('span')
         .children('span')
@@ -337,7 +329,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".kelompok_akun_id_header")
+        $(".category_id_header")
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -358,6 +350,26 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".kelompok_akun_id_sub")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        $(".coa_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $(".coa_id")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".coa_id")
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -409,7 +421,7 @@
 
         var validator_header = $(".create-form-header").validate({
             rules: {
-                kelompok_akun_id_header: {
+                category_id_header: {
                     required: true
                 },
                 kode_akun_header: {
@@ -420,7 +432,7 @@
                 }
             },
             messages: {
-                kelompok_akun_id_header: {
+                category_id_header: {
                     required: "Kelompok Akun is Required"
                 },
                 kode_akun_header: {
@@ -428,6 +440,51 @@
                 },
                 nama_akun_header: {
                     required: "Nama Akun is Required"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        var validator_sub = $(".create-form-sub").validate({
+            rules: {
+                kelompok_akun_id_sub: {
+                    required: true
+                },
+                kode_akun_sub: {
+                    required: true
+                },
+                nama_akun_sub: {
+                    required: true
+                }
+            },
+            messages: {
+                kelompok_akun_id_sub: {
+                    required: "Header Akun is Required"
+                },
+                kode_akun_sub: {
+                    required: "Kode Sub Akun is Required"
+                },
+                nama_akun_sub: {
+                    required: "Nama Sub Akun is Required"
                 }
             },
             errorElement: 'span',
@@ -480,7 +537,7 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "kategori_akun",
+                data: "kelompok_akun",
                 className: "text-left"
             },
             {
@@ -533,7 +590,7 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "header_akun",
+                data: "nama_kategori",
                 className: "text-left"
             },
             {
@@ -542,6 +599,67 @@
             },
             {
                 data: "nama_header",
+                className: "text-left"
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        const subTable = $('.subDataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            serverSide: true,
+            ordering: false,
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("sub-account/all"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.search = $(".search-sub").val();
+                }
+            },
+            // scrollX: true,
+            "initComplete": function (settings, json) {    
+                $('.dataTables_length').empty();    
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+                $('.subDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+            },
+            //responsive: true,
+            display: "stripe",
+            searching: false,
+            columns: [{
+                data: "nama_kategori",
+                className: "text-left"
+            },
+            {
+                data: "no_header",
+                className: "text-left"
+            },
+            {
+                data: "no_sub_akun",
+                className: "text-left"
+            },
+            {
+                data: "nama_sub_akun",
+                className: "text-left"
+            },
+            {
+                data: "nama_header_akun",
                 className: "text-left"
             }],
             columnDefs: [{
@@ -574,9 +692,26 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id_kategori").val(id);
-                        $(".kelompok_akun_id_kategori").val(res?.data?.kategori_akun).change();
                         $(".kode_akun_kategori").val(res?.data?.no_kategori);
                         $(".nama_akun_kategori").val(res?.data?.nama_kategori);
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'kelompok_akun'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".kelompok_akun_id_kategori").empty()
+                                $(".kelompok_akun_id_kategori").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".kelompok_akun_id_kategori").val(res?.data?.kelompok_id).change();
+                            }
+                        })
 
                         validator_kategori.resetForm();
                         validator_kategori.reset();
@@ -607,13 +742,94 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id_header").val(id);
-                        $(".kelompok_akun_id_header").val(res?.data?.header_akun).change();
                         $(".kode_akun_header").val(res?.data?.no_header);
                         $(".nama_akun_header").val(res?.data?.nama_header);
+
+                        $.ajax({
+                            url: `<?= base_url("kategori-account/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".category_id_header").empty()
+
+                                $(".category_id_header").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".category_id_header").append(`<option value="${item.id}">${item.nama_kategori}</option>`)
+                                })
+
+                                $(".category_id_header").val(res?.data?.kategori_id).change();
+                            }
+                        })
 
                         validator_header.resetForm();
                         validator_header.reset();
                         $(".add-modal-header").modal("show")
+                        console.log(res.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            })
+        })
+
+        $('#subDataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = subTable.row(this).data();
+            $(".create-form-sub")[0].reset()
+            $(".delete-btn-sub").css('display', '');
+            let id = data.id;
+            $(".title-name-sub").text("Update");
+
+            $.ajax({
+                url: "<?= base_url("sub-account/id"); ?>" + "/" + id,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".id_sub").val(id);
+                        $(".category_id_sub").val(res?.data?.kategori_id);
+                        $(".kode_akun_sub").val(res?.data?.no_sub);
+                        $(".nama_akun_sub").val(res?.data?.nama_sub);
+
+                        $.ajax({
+                            url: `<?= base_url("header-account/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".kelompok_akun_id_sub").empty()
+                                $(".kelompok_akun_id_sub").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".kelompok_akun_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
+                                })
+
+                                $(".kelompok_akun_id_sub").val(res?.data?.header_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'coa'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".coa_id").empty()
+                                $(".coa_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".coa_id").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".coa_id").val(res?.data?.coa_id).change();
+                            }
+                        })
+
+                        validator_sub.resetForm();
+                        validator_sub.reset();
+                        $(".add-modal-sub").modal("show")
                         console.log(res.data);
                     } else {
                         Swal.fire({
@@ -634,6 +850,19 @@
             headerTable.ajax.reload();
         })
 
+        $(".search-sub").keyup(function () {
+            subTable.ajax.reload();
+        })
+
+        $(".kelompok_akun_id_sub").on("change", function() {
+            let dataKategori = $(".kelompok_akun_id_sub option:selected").data("kategori");
+            if (dataKategori) {
+                document.getElementById("category_id_sub").value = dataKategori;
+            } else {
+                document.getElementById("category_id_sub").value = "";
+            }
+        })
+
         $(".btn-show-form-kategori").click(function() {
             $(".id_kategori").val("");
 
@@ -644,6 +873,23 @@
             validator_kategori.reset();
             $(".create-form-kategori")[0].reset()
 
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'kelompok_akun'
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".kelompok_akun_id_kategori").empty()
+                    $(".kelompok_akun_id_kategori").val('').change();
+                    $(".kelompok_akun_id_kategori").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+                }
+            })
+
             $(".delete-btn-kategori").css('display', 'none');
             $(".add-modal-kategori").modal("show")
         })
@@ -652,18 +898,67 @@
             $(".id_header").val("");
 
             $(".title-name-header").text("Add New");
-            $(".kelompok_akun_id_header").val('').change();
 
             validator_header.resetForm();
             validator_header.reset();
             $(".create-form-header")[0].reset()
+
+            $.ajax({
+                url: `<?= base_url("kategori-account/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".category_id_header").empty()
+                    $(".category_id_header").val('').change();
+                    $(".category_id_header").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".category_id_header").append(`<option value="${item.id}">${item.nama_kategori}</option>`)
+                    })
+                }
+            })
 
             $(".delete-btn-header").css('display', 'none');
             $(".add-modal-header").modal("show")
         })
 
         $(".btn-show-form-sub").click(function() {
+            $(".id_sub").val("");
+
             $(".title-name-sub").text("Add New");
+
+            validator_sub.resetForm();
+            validator_sub.reset();
+            $(".create-form-sub")[0].reset()
+
+            $.ajax({
+                url: `<?= base_url("header-account/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".kelompok_akun_id_sub").empty()
+                    $(".kelompok_akun_id_sub").val('').change();
+                    $(".kelompok_akun_id_sub").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".kelompok_akun_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
+                    })
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'coa'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".coa_id").empty()
+                    $(".coa_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".coa_id").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+                }
+            })
             
             $(".delete-btn-sub").css('display', 'none');
             $(".add-modal-sub").modal("show")
@@ -845,7 +1140,7 @@
                                         .then(() => {
                                             $(".add-modal-header").modal("hide")
                                             $(".create-form-header")[0].reset()
-                                            $(".kelompok_akun_id_header").val("").change()
+                                            $(".category_id_header").val("").change()
 
                                             headerTable.ajax.reload()
                                         })
@@ -894,7 +1189,7 @@
                                         .then(() => {
                                             $(".add-modal-header").modal("hide")
                                             $(".create-form-header")[0].reset()
-                                            $(".kelompok_akun_id_header").val("").change()
+                                            $(".category_id_header").val("").change()
 
                                             headerTable.ajax.reload()
                                         })
@@ -922,6 +1217,128 @@
                 })
             }
         })
+
+        $(".btn-submit-form-sub").click(function() {
+            if ($(".create-form-sub").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        setLoading()
+                        let data = new FormData(document.querySelector(".create-form-sub"));
+
+                        let id = $(".id_sub").val();
+                        // UPDATE
+                        if(id)
+                        {
+                            $.ajax({
+                                url: "<?= base_url("sub-account/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $(".add-modal-sub").modal("hide")
+                                            $(".create-form-sub")[0].reset()
+                                            $(".kelompok_akun_id_sub").val("").change()
+
+                                            subTable.ajax.reload()
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            });
+                        }
+                        // CREATE
+                        else
+                        {
+                            $.ajax({
+                                url: "<?= base_url("sub-account/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            $(".add-modal-sub").modal("hide")
+                                            $(".create-form-sub")[0].reset()
+                                            $(".kelompok_akun_id_sub").val("").change()
+
+                                            subTable.ajax.reload()
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+        })
+
 
         $(".delete-btn-kategori").click(function() {
             Swal.fire({
@@ -1024,9 +1441,73 @@
                                 .then(() => {
                                     $(".add-modal-header").modal("hide")
                                     $(".create-form-header")[0].reset()
-                                    $(".kelompok_akun_id_header").val("").change()
+                                    $(".category_id_header").val("").change()
 
                                     headerTable.ajax.reload()
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+        })
+
+        $(".delete-btn-sub").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $(".id_sub").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("sub-account/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    $(".add-modal-sub").modal("hide")
+                                    $(".create-form-sub")[0].reset()
+                                    $(".kelompok_akun_id_sub").val("").change()
+
+                                    subTable.ajax.reload()
                                 })
                             } else {
                                 Swal.fire({

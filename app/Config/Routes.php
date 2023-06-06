@@ -120,6 +120,13 @@ $routes->post('/penomoran-rak/delete', 'PenomoranRak::deletePenomoranRak', ['fil
 // CITY
 $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
 
+// METADATA
+$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
+
+// ACCOUNT
+$routes->get('/kategori-account/dropdown', 'Account::dropdownKategoriAccount', ['filter' => 'Auth']);
+$routes->get('/header-account/dropdown', 'Account::dropdownHeaderAccount', ['filter' => 'Auth']);
+
 // ACCOUNT AND FINANCE
 // ACCOUNT
 $routes->get('/account', 'Account::account', ['filter' => 'Auth']);
@@ -135,6 +142,12 @@ $routes->get('/header-account/id/(:segment)', 'Account::getByIdHeaderAccount/$1'
 $routes->post('/header-account/save', 'Account::saveHeaderAccount', ['filter' => 'Auth']);
 $routes->post('/header-account/update', 'Account::updateHeaderAccount', ['filter' => 'Auth']);
 $routes->post('/header-account/delete', 'Account::deleteHeaderAccount', ['filter' => 'Auth']);
+
+$routes->get('/sub-account/all', 'Account::allSubAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/id/(:segment)', 'Account::getByIdSubAccount/$1', ['filter' => 'Auth']);
+$routes->post('/sub-account/save', 'Account::saveSubAccount', ['filter' => 'Auth']);
+$routes->post('/sub-account/update', 'Account::updateSubAccount', ['filter' => 'Auth']);
+$routes->post('/sub-account/delete', 'Account::deleteSubAccount', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

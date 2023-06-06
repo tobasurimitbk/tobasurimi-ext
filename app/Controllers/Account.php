@@ -13,17 +13,15 @@ class Account extends BaseController
     {
         $token = session()->get("login")->token;
 
+        return view('account/index');
+    }
+
+    public function dropdownKategoriAccount()
+    {
+        $token = session()->get("login")->token;
+
         $this_company_id = session()->get("login")->this_company_id;
 
-        //Get Kelompok Akun For Kategori by Metadata
-        $responseKelompokAkun = curl_request("GET", "/metadata/all", $token);
-
-        $dataKelompokAkun = [];
-        if ($responseKelompokAkun["code"] === 200) {
-            $dataKelompokAkun = json_decode($responseKelompokAkun["body"])->data;
-        }
-
-        //Get Kelompok Akun For Header
         $responseKelompokAkunKategori = curl_request("GET", "/kategoriAkun/all?idCompany=$this_company_id", $token);
 
         $dataKelompokAkunKategori = [];
@@ -32,11 +30,31 @@ class Account extends BaseController
         }
 
         $data = [
-            "dataKelompokAkun" => $dataKelompokAkun,
-            "dataKelompokAkunKategori" => $dataKelompokAkunKategori
+            "data" => $dataKelompokAkunKategori
         ];
 
-        return view('account/index', $data);
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownHeaderAccount()
+    {
+        $token = session()->get("login")->token;
+        $this_company_id = session()->get("login")->this_company_id;
+
+        $responseKelompokAkunKategori = curl_request("GET", "/headerAkun/all?idCompany=$this_company_id", $token);
+
+        $dataKelompokAkunKategori = [];
+        if ($responseKelompokAkunKategori["code"] === 200) {
+            $dataKelompokAkunKategori = json_decode($responseKelompokAkunKategori["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataKelompokAkunKategori
+        ];
+
+        echo json_encode($data);
+        return;
     }
 
     public function allKategoriAccount()
@@ -63,7 +81,7 @@ class Account extends BaseController
             foreach ($body as $data) {
                 array_push($dataKategori, [
                     "id" => $data->id,
-                    "kategori_akun" => $data->kategori_akun,
+                    "kelompok_akun" => $data->kelompok_akun,
                     "no_kategori" => $data->no_kategori,
                     "nama_kategori" => $data->nama_kategori
                 ]);
@@ -102,7 +120,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "kategori_akun" => $this->request->getPost("kelompok_akun_id_kategori"),
+                "kelompok_id" => formatter($this->request->getPost("kelompok_akun_id_kategori"), "STR_TO_INT"),
                 "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                 "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
             ]);
@@ -160,7 +178,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "kategori_akun" => $this->request->getPost("kelompok_akun_id_kategori"),
+                "kelompok_id" => formatter($this->request->getPost("kelompok_akun_id_kategori"), "STR_TO_INT"),
                 "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                 "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
             ]);
@@ -287,7 +305,7 @@ class Account extends BaseController
             foreach ($body as $data) {
                 array_push($dataHeader, [
                     "id" => $data->id,
-                    "kategori_akun" => "",
+                    "nama_kategori" => $data->nama_kategori,
                     "no_header" => $data->no_header,
                     "nama_header" => $data->nama_header
                 ]);
@@ -308,7 +326,7 @@ class Account extends BaseController
     public function saveHeaderAccount()
     {
         $rules = [
-            "kelompok_akun_id_header" => [
+            "category_id_header" => [
                 "rules" => "required"
             ],
             "kode_akun_header" => [
@@ -326,7 +344,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "kategori_id" => $this->request->getPost("kelompok_akun_id_header"),
+                "kategori_id" => $this->request->getPost("category_id_header"),
                 "no_header" => $this->request->getPost("kode_akun_header"),
                 "nama_header" => $this->request->getPost("nama_akun_header"),
             ]);
@@ -365,7 +383,7 @@ class Account extends BaseController
     public function updateHeaderAccount()
     {
         $rules = [
-            "kelompok_akun_id_header" => [
+            "category_id_header" => [
                 "rules" => "required"
             ],
             "kode_akun_header" => [
@@ -384,7 +402,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "kategori_id" => $this->request->getPost("kelompok_akun_id_header"),
+                "kategori_id" => $this->request->getPost("category_id_header"),
                 "no_header" => $this->request->getPost("kode_akun_header"),
                 "nama_header" => $this->request->getPost("nama_akun_header"),
             ]);
@@ -460,6 +478,234 @@ class Account extends BaseController
 
         if (!empty($id)) {
             $response = curl_request("DELETE", "/headerAkun/$id", $token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function allSubAccount()
+    {
+        $token = session()->get("login")->token;
+
+        $this_company_id = session()->get("login")->this_company_id;
+
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "idCompany" => $this_company_id
+        ];
+
+        $response = curl_request("GET", "/subAkun", $token, $payload);
+        $dataHeader = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
+
+            foreach ($body as $data) {
+                array_push($dataHeader, [
+                    "id" => $data->id,
+                    "nama_kategori" => $data->nama_kategori,
+                    "no_header" => $data->no_header,
+                    "no_sub_akun" => $data->no_sub,
+                    "nama_sub_akun" => $data->nama_sub,
+                    "nama_header_akun" => $data->nama_header
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataHeader
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function saveSubAccount()
+    {
+        $rules = [
+            "kelompok_akun_id_sub" => [
+                "rules" => "required"
+            ],
+            "kode_akun_sub" => [
+                "rules" => "required"
+            ],
+            "nama_akun_sub" => [
+                "rules" => "required"
+            ]
+        ];
+
+        if ($this->validate($rules)) {
+            $token = session()->get("login")->token;
+
+            $this_company_id = session()->get("login")->this_company_id;
+
+            $payload = json_encode([
+                "company_id" => $this_company_id,
+                "header_id" => $this->request->getPost("kelompok_akun_id_sub"),
+                "kategori_id" => $this->request->getPost("category_id_sub"),
+                "no_sub" => $this->request->getPost("kode_akun_sub"),
+                "nama_sub" => $this->request->getPost("nama_akun_sub")
+            ]);
+            
+            $response = curl_request("POST", "/subAkun", $token, $payload);
+
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Disimpan",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateSubAccount()
+    {
+        $rules = [
+            "kelompok_akun_id_sub" => [
+                "rules" => "required"
+            ],
+            "kode_akun_sub" => [
+                "rules" => "required"
+            ],
+            "nama_akun_sub" => [
+                "rules" => "required"
+            ]
+        ];
+
+        if ($this->validate($rules)) {
+            $token = session()->get("login")->token;
+            $id = $this->request->getPost("id_sub");
+
+            $this_company_id = session()->get("login")->this_company_id;
+
+            $payload = json_encode([
+                "company_id" => $this_company_id,
+                "header_id" => $this->request->getPost("kelompok_akun_id_sub"),
+                "kategori_id" => $this->request->getPost("category_id_sub"),
+                "no_sub" => $this->request->getPost("kode_akun_sub"),
+                "nama_sub" => $this->request->getPost("nama_akun_sub")
+            ]);
+            
+            $response = curl_request("PATCH", "/subAkun/$id", $token, $payload);
+
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function getByIdSubAccount($id = null)
+    {
+        $token = session()->get("login")->token;
+
+        $this_company_id = session()->get("login")->this_company_id;
+
+        if (!empty($id)) {
+            $response = curl_request("GET", "/subAkun/$id", $token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"  => true,
+                    "data"  => json_decode($response["body"])->data,
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function deleteSubAccount()
+    {
+        $token = session()->get("login")->token;
+        
+        $id = $this->request->getPost("id");
+
+        if (!empty($id)) {
+            $response = curl_request("DELETE", "/subAkun/$id", $token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
