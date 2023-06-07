@@ -344,7 +344,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "kategori_id" => $this->request->getPost("category_id_header"),
+                "kategori_id" => formatter($this->request->getPost("category_id_header"), "STR_TO_INT"),
                 "no_header" => $this->request->getPost("kode_akun_header"),
                 "nama_header" => $this->request->getPost("nama_akun_header"),
             ]);
@@ -402,7 +402,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "kategori_id" => $this->request->getPost("category_id_header"),
+                "kategori_id" => formatter($this->request->getPost("category_id_header"), "STR_TO_INT"),
                 "no_header" => $this->request->getPost("kode_akun_header"),
                 "nama_header" => $this->request->getPost("nama_akun_header"),
             ]);
@@ -515,6 +515,7 @@ class Account extends BaseController
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
+            "status" => $this->request->getGet("status"),
             "idCompany" => $this_company_id
         ];
 
@@ -529,11 +530,15 @@ class Account extends BaseController
             foreach ($body as $data) {
                 array_push($dataHeader, [
                     "id" => $data->id,
+                    "kategori_id" => $data->kategori_id,
+                    "header_id" => $data->header_id,
+                    "coa_id" => $data->coa_id,
                     "nama_kategori" => $data->nama_kategori,
                     "no_header" => $data->no_header,
-                    "no_sub_akun" => $data->no_sub,
-                    "nama_sub_akun" => $data->nama_sub,
-                    "nama_header_akun" => $data->nama_header
+                    "no_sub" => $data->no_sub,
+                    "nama_sub" => $data->nama_sub,
+                    "nama_header" => $data->nama_header,
+                    "status" => $data->status
                 ]);
             }
         }
@@ -570,10 +575,12 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "header_id" => $this->request->getPost("kelompok_akun_id_sub"),
-                "kategori_id" => $this->request->getPost("category_id_sub"),
+                "header_id" => formatter($this->request->getPost("kelompok_akun_id_sub"), "STR_TO_INT"),
+                "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
+                "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                 "no_sub" => $this->request->getPost("kode_akun_sub"),
-                "nama_sub" => $this->request->getPost("nama_akun_sub")
+                "nama_sub" => $this->request->getPost("nama_akun_sub"),
+                "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Tidak aktif"
             ]);
             
             $response = curl_request("POST", "/subAkun", $token, $payload);
@@ -629,10 +636,12 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "header_id" => $this->request->getPost("kelompok_akun_id_sub"),
-                "kategori_id" => $this->request->getPost("category_id_sub"),
+                "header_id" => formatter($this->request->getPost("kelompok_akun_id_sub"), "STR_TO_INT"),
+                "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
+                "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                 "no_sub" => $this->request->getPost("kode_akun_sub"),
-                "nama_sub" => $this->request->getPost("nama_akun_sub")
+                "nama_sub" => $this->request->getPost("nama_akun_sub"),
+                "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Tidak aktif"
             ]);
             
             $response = curl_request("PATCH", "/subAkun/$id", $token, $payload);

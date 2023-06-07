@@ -141,10 +141,23 @@
                     <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select coa_id" name="coa_id" id="coa_id">
+                                <select class="form-select coa_id_sub" name="coa_id_sub" id="coa_id_sub">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">COA</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="mb-3" style="height: 50px;">
+                                <label for="floatingInput">Status</label>
+                                <div>
+                                    <label class="switch">
+                                    <input class="status_sub" name="status_sub" id="status_sub" type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -242,17 +255,28 @@
                     </button>
                 </div>
                 <div class="mb-2">
-                    <input class="form-control search-sub float-right" placeholder="Search" style="width: 30%" value="" />
+                    <div class="form-row justify-content-end">
+                        <div class="form-group col-md-3">
+                            <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                                <option value="Aktif">Active</option>
+                                <option value="Tidak Aktif">Void</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <input class="form-control search-sub" placeholder="Search" value="" />
+                        </div>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Nama Kategori Akun</th>
+                                <th>Kategori Akun</th>
                                 <th>No. Header Akun</th>
+                                <th>Header Akun</th>
                                 <th>No. Sub Akun</th>
                                 <th>Nama Sub Akun</th>
-                                <th>Nama Header Akun</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -267,6 +291,196 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+
+    const kategoriTable = $('.kategoriDataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: false,
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("kategori-account/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search-kategori").val();
+            }
+        },
+        // scrollX: true,
+        "initComplete": function (settings, json) {    
+            $('.dataTables_length').empty();    
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+            $('.kategoriDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "kelompok_akun",
+            className: "text-left"
+        },
+        {
+            data: "no_kategori",
+            className: "text-left"
+        },
+        {
+            data: "nama_kategori",
+            className: "text-left"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    const headerTable = $('.headerDataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: false,
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("header-account/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search-header").val();
+            }
+        },
+        // scrollX: true,
+        "initComplete": function (settings, json) {    
+            $('.dataTables_length').empty();    
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+            $('.headerDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "nama_kategori",
+            className: "text-left"
+        },
+        {
+            data: "no_header",
+            className: "text-left"
+        },
+        {
+            data: "nama_header",
+            className: "text-left"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    const subTable = $('.subDataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: false,
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("sub-account/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search-sub").val();
+                data.status = $(".status").val();
+            }
+        },
+        // scrollX: true,
+        "initComplete": function (settings, json) {    
+            $('.dataTables_length').empty();    
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+            $('.subDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "nama_kategori",
+            className: "text-left"
+        },
+        {
+            data: "no_header",
+            className: "text-left"
+        },
+        {
+            data: "nama_header",
+            className: "text-left"
+        },
+        {
+            data: "no_sub",
+            className: "text-left"
+        },
+        {
+            data: "nama_sub",
+            className: "text-left"
+        },
+        {
+            data: "status",
+            className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    let kategori_id = row?.kategori_id;
+                    let header_id = row?.header_id;
+                    let no_sub = row?.no_sub;
+                    let nama_sub = row?.nama_sub;
+                    let coa_id = row?.id;
+                    return `
+                    <div>
+                    <label class="switch">
+                    <input class="status_table" id=${"status_table_" + id} onchange="changeStatus(event, '${id}', '${kategori_id}', '${header_id}', '${no_sub}', '${nama_sub}', '${coa_id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
+                    <span class="slider round"></span>
+                    </label>
+                    </div>
+                    `
+                }
+        }],              
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     $(document).ready(function() {
         $('.kelompok_akun_id_kategori').select2({
@@ -287,7 +501,7 @@
             dropdownParent: $(".add-modal-sub .modal-content")
         })
 
-        $('.coa_id').select2({
+        $('.coa_id_sub').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal-sub .modal-content")
@@ -354,14 +568,14 @@
         .find('label')
         .css('z-index', '1');
 
-        $(".coa_id")
+        $(".coa_id_sub")
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-        $(".coa_id")
+        $(".coa_id_sub")
         .parent('div')
         .children('span')
         .children('span')
@@ -369,7 +583,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".coa_id")
+        $(".coa_id_sub")
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -509,173 +723,6 @@
             },
         });
 
-        const kategoriTable = $('.kategoriDataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: false,
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("kategori-account/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search-kategori").val();
-                }
-            },
-            // scrollX: true,
-            "initComplete": function (settings, json) {    
-                $('.dataTables_length').empty();    
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
-                $('.kategoriDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
-            },
-            //responsive: true,
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "kelompok_akun",
-                className: "text-left"
-            },
-            {
-                data: "no_kategori",
-                className: "text-left"
-            },
-            {
-                data: "nama_kategori",
-                className: "text-left"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        const headerTable = $('.headerDataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: false,
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("header-account/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search-header").val();
-                }
-            },
-            // scrollX: true,
-            "initComplete": function (settings, json) {    
-                $('.dataTables_length').empty();    
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
-                $('.headerDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
-            },
-            //responsive: true,
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "nama_kategori",
-                className: "text-left"
-            },
-            {
-                data: "no_header",
-                className: "text-left"
-            },
-            {
-                data: "nama_header",
-                className: "text-left"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        const subTable = $('.subDataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: false,
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("sub-account/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search-sub").val();
-                }
-            },
-            // scrollX: true,
-            "initComplete": function (settings, json) {    
-                $('.dataTables_length').empty();    
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
-                $('.subDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
-            },
-            //responsive: true,
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "nama_kategori",
-                className: "text-left"
-            },
-            {
-                data: "no_header",
-                className: "text-left"
-            },
-            {
-                data: "no_sub_akun",
-                className: "text-left"
-            },
-            {
-                data: "nama_sub_akun",
-                className: "text-left"
-            },
-            {
-                data: "nama_header_akun",
-                className: "text-left"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
         $(".dataTable_info").addClass("pt-0");
 
         $('#kategoriDataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
@@ -793,6 +840,7 @@
                         $(".category_id_sub").val(res?.data?.kategori_id);
                         $(".kode_akun_sub").val(res?.data?.no_sub);
                         $(".nama_akun_sub").val(res?.data?.nama_sub);
+                        $(".status_sub").prop( "checked", res?.data?.status === "Aktif" ? true : false);
 
                         $.ajax({
                             url: `<?= base_url("header-account/dropdown"); ?>`,
@@ -813,17 +861,17 @@
                             url: `<?= base_url("metadata/dropdown"); ?>`,
                             method: "GET",
                             data: {
-                                name: 'coa'
+                                name: 'akun_coa'
                             },
                             dataType: "json",
                             success: function(result) {
-                                $(".coa_id").empty()
-                                $(".coa_id").append(`<option value=""></option>`)
+                                $(".coa_id_sub").empty()
+                                $(".coa_id_sub").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".coa_id").append(`<option value="${item.id}">${item.value}</option>`)
+                                    $(".coa_id_sub").append(`<option value="${item.id}">${item.value}</option>`)
                                 })
 
-                                $(".coa_id").val(res?.data?.coa_id).change();
+                                $(".coa_id_sub").val(res?.data?.coa_id).change();
                             }
                         })
 
@@ -851,6 +899,10 @@
         })
 
         $(".search-sub").keyup(function () {
+            subTable.ajax.reload();
+        })
+
+        $(".status").change(function () {
             subTable.ajax.reload();
         })
 
@@ -930,6 +982,8 @@
             validator_sub.reset();
             $(".create-form-sub")[0].reset()
 
+            $(".status_sub").prop( "checked", true);
+
             $.ajax({
                 url: `<?= base_url("header-account/dropdown"); ?>`,
                 method: "GET",
@@ -948,14 +1002,14 @@
                 url: `<?= base_url("metadata/dropdown"); ?>`,
                 method: "GET",
                 data: {
-                    name: 'coa'
+                    name: 'akun_coa'
                 },
                 dataType: "json",
                 success: function(result) {
-                    $(".coa_id").empty()
-                    $(".coa_id").append(`<option value=""></option>`)
+                    $(".coa_id_sub").empty()
+                    $(".coa_id_sub").append(`<option value=""></option>`)
                     result.data.forEach(function(item) {
-                        $(".coa_id").append(`<option value="${item.id}">${item.value}</option>`)
+                        $(".coa_id_sub").append(`<option value="${item.id}">${item.value}</option>`)
                     })
                 }
             })
@@ -1538,6 +1592,65 @@
         $(".collapse-kategori-list").addClass("show")
         $(".collapse-header-list").addClass("show")
         $(".collapse-sub-list").addClass("show")
+    }
+
+    const changeStatus = function(event, id, kategori_id, header_id, no_sub, nama_sub, coa_id)
+    {
+        const csrf = $(`[name="${csrfToken}"]`);
+        let value = document.getElementById('status_table_' + id).checked ? true : false;
+
+        let data = {
+            id_sub: id, 
+            category_id_sub: kategori_id,
+            kelompok_akun_id_sub: header_id, 
+            kode_akun_sub: no_sub,
+            nama_akun_sub: nama_sub,
+            coa_id_sub: coa_id
+        }
+
+        if(value)
+        {
+            data["status_sub"] = true;
+        }
+
+        $.ajax({
+            url: "<?= base_url("sub-account/update"); ?>",
+            data: data,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    stopLoading()
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                    .then(() => {
+                        subTable.ajax.reload()
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Gagal Disimpan, coba Lagi',
+                    confirmButtonColor: '#4e73df',
+                })
+                stopLoading()
+            }
+        });
     }
 </script>
 
