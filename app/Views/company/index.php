@@ -382,23 +382,23 @@
             searching: false,
             columns: [{
                 data: "company",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "holding_company",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "address",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "phone",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "email",
-                className: "text-left"
+                className: "text-center"
             },],
             columnDefs: [{
                 defaultContent: "-",

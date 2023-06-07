@@ -267,16 +267,16 @@
             searching: false,
             columns: [{
                 data: "code",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "product_name",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "category",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "supplier",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",

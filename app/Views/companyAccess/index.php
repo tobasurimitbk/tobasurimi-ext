@@ -355,7 +355,7 @@
             searching: false,
             columns: [{
                 data: "name",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",

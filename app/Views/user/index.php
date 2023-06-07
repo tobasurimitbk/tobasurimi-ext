@@ -253,15 +253,15 @@
             searching: false,
             columns: [{
                 data: "username",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "name",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "status",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",

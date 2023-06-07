@@ -299,22 +299,22 @@
             searching: false,
             columns: [{
                 data: "kode",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "name",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "address",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "country",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "province",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "city",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",

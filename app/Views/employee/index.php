@@ -299,19 +299,19 @@
             searching: false,
             columns: [{
                 data: "nip",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "name",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "divisionName",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "email",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "status",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",

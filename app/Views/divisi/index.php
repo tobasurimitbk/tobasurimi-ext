@@ -308,35 +308,35 @@
             searching: false,
             columns: [{
                 data: "divisi",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "libur",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "jam_kerja",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "jam_istirahat",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "jam_masuk",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "jam_pulang",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "mulai_istirahat",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "selesai_istirahat",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",

@@ -147,6 +147,7 @@ $routes->get('/sub-account/all', 'Account::allSubAccount', ['filter' => 'Auth'])
 $routes->get('/sub-account/id/(:segment)', 'Account::getByIdSubAccount/$1', ['filter' => 'Auth']);
 $routes->post('/sub-account/save', 'Account::saveSubAccount', ['filter' => 'Auth']);
 $routes->post('/sub-account/update', 'Account::updateSubAccount', ['filter' => 'Auth']);
+$routes->post('/sub-account/update-status', 'Account::updateStatusSubAccount', ['filter' => 'Auth']);
 $routes->post('/sub-account/delete', 'Account::deleteSubAccount', ['filter' => 'Auth']);
 
 // SETTINGS

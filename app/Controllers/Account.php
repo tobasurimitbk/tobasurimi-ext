@@ -560,6 +560,9 @@ class Account extends BaseController
             "kelompok_akun_id_sub" => [
                 "rules" => "required"
             ],
+            "coa_id_sub" => [
+                "rules" => "required"
+            ],
             "kode_akun_sub" => [
                 "rules" => "required"
             ],
@@ -580,7 +583,7 @@ class Account extends BaseController
                 "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                 "no_sub" => $this->request->getPost("kode_akun_sub"),
                 "nama_sub" => $this->request->getPost("nama_akun_sub"),
-                "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Tidak aktif"
+                "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
             ]);
             
             $response = curl_request("POST", "/subAkun", $token, $payload);
@@ -620,6 +623,9 @@ class Account extends BaseController
             "kelompok_akun_id_sub" => [
                 "rules" => "required"
             ],
+            "coa_id_sub" => [
+                "rules" => "required"
+            ],
             "kode_akun_sub" => [
                 "rules" => "required"
             ],
@@ -641,7 +647,7 @@ class Account extends BaseController
                 "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                 "no_sub" => $this->request->getPost("kode_akun_sub"),
                 "nama_sub" => $this->request->getPost("nama_akun_sub"),
-                "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Tidak aktif"
+                "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
             ]);
             
             $response = curl_request("PATCH", "/subAkun/$id", $token, $payload);
@@ -668,6 +674,42 @@ class Account extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateStatusSubAccount()
+    {
+        $token = session()->get("login")->token;
+
+        $id = $this->request->getPost("id");
+
+        $this_company_id = session()->get("login")->this_company_id;
+
+        $payload = json_encode([
+            "company_id" => $this_company_id,
+            "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Void"
+        ]);
+        
+        $response = curl_request("PATCH", "/subAkun/$id", $token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Data Berhasil diubah",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

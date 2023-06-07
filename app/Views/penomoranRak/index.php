@@ -151,11 +151,11 @@
             searching: false,
             columns: [{
                 data: "nomor",
-                className: "text-left"
+                className: "text-center"
             },
             {
                 data: "rak",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",

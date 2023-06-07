@@ -258,8 +258,8 @@
                     <div class="form-row justify-content-end">
                         <div class="form-group col-md-3">
                             <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                                <option value="Aktif">Active</option>
-                                <option value="Tidak Aktif">Void</option>
+                                <option value="Aktif">Aktif</option>
+                                <option value="Void">Void</option>
                             </select>
                         </div>
                         <div class="form-group col-md-3">
@@ -321,15 +321,15 @@
         searching: false,
         columns: [{
             data: "kelompok_akun",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "no_kategori",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "nama_kategori",
-            className: "text-left"
+            className: "text-center"
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -374,15 +374,15 @@
         searching: false,
         columns: [{
             data: "nama_kategori",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "no_header",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "nama_header",
-            className: "text-left"
+            className: "text-center"
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -428,23 +428,23 @@
         searching: false,
         columns: [{
             data: "nama_kategori",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "no_header",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "nama_header",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "no_sub",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "nama_sub",
-            className: "text-left"
+            className: "text-center"
         },
         {
             data: "status",
@@ -461,7 +461,7 @@
                     return `
                     <div>
                     <label class="switch">
-                    <input class="status_table" id=${"status_table_" + id} onchange="changeStatus(event, '${id}', '${kategori_id}', '${header_id}', '${no_sub}', '${nama_sub}', '${coa_id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
+                    <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
                     <span class="slider round"></span>
                     </label>
                     </div>
@@ -683,6 +683,9 @@
                 kelompok_akun_id_sub: {
                     required: true
                 },
+                coa_id_sub: {
+                    required: true
+                },
                 kode_akun_sub: {
                     required: true
                 },
@@ -693,6 +696,9 @@
             messages: {
                 kelompok_akun_id_sub: {
                     required: "Header Akun is Required"
+                },
+                coa_id_sub: {
+                    required: "COA is Required"
                 },
                 kode_akun_sub: {
                     required: "Kode Sub Akun is Required"
@@ -1594,27 +1600,22 @@
         $(".collapse-sub-list").addClass("show")
     }
 
-    const changeStatus = function(event, id, kategori_id, header_id, no_sub, nama_sub, coa_id)
+    const changeStatus = function(id)
     {
         const csrf = $(`[name="${csrfToken}"]`);
         let value = document.getElementById('status_table_' + id).checked ? true : false;
 
         let data = {
-            id_sub: id, 
-            category_id_sub: kategori_id,
-            kelompok_akun_id_sub: header_id, 
-            kode_akun_sub: no_sub,
-            nama_akun_sub: nama_sub,
-            coa_id_sub: coa_id
+            id: id
         }
 
         if(value)
         {
-            data["status_sub"] = true;
+            data["status"] = true;
         }
 
         $.ajax({
-            url: "<?= base_url("sub-account/update"); ?>",
+            url: "<?= base_url("sub-account/update-status"); ?>",
             data: data,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());

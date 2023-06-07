@@ -363,16 +363,16 @@
             searching: false,
             columns: [{
                 data: "warehouse_name",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "address",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "phone",
-                className: "text-left"
+                className: "text-center"
             }, {
                 data: "email",
-                className: "text-left"
+                className: "text-center"
             }],
             columnDefs: [{
                 defaultContent: "-",
