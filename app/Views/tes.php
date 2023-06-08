@@ -570,6 +570,19 @@
         let file = document.getElementById("employeeImg").files[0];
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
     }
+
+//     sorting asc desc
+
+// /customers = kode, name, address
+// /suppliers = kode, name, address
+// /vendors = kode, name, address
+// /companies = company, holding_company, address, phone, email
+// /warehouses = warehouse_name, address, phone, email
+// /employees = nip, name, divisionName, email, status
+// /divisis = divisi, libur, jam_kerja, jam_istirahat, jam_masuk, jam_pulang, mulai_istirahat, selesai_istirahat
+// /kategoriAkun = kelompok_akun, no_kategori, nama_kategori
+// /headerAkun = nama_kategori, no_header, nama_header
+// /subAkun = nama_kategori, no_header, nama_header, no_sub, nama_sub
 </script>
 
 <?= $this->endSection(); ?>
