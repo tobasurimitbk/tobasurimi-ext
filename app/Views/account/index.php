@@ -200,7 +200,7 @@
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                     </button>
                 </div>
-                <div class="mb-2">
+                <div>
                     <input class="form-control search-kategori float-right" placeholder="Search" style="width: 30%" value="" />
                 </div>
                 <div class="table-responsive">
@@ -227,7 +227,7 @@
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                     </button>
                 </div>
-                <div class="mb-2">
+                <div>
                     <input class="form-control search-header float-right" placeholder="Search" style="width: 30%" value="" />
                 </div>
                 <div class="table-responsive">
@@ -254,15 +254,15 @@
                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                     </button>
                 </div>
-                <div class="mb-2">
+                <div>
                     <div class="form-row justify-content-end">
-                        <div class="form-group col-md-3">
+                        <div class="col-md-3">
                             <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                                 <option value="Aktif">Aktif</option>
                                 <option value="Void">Void</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="col-md-3">
                             <input class="form-control search-sub" placeholder="Search" value="" />
                         </div>
                     </div>

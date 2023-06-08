@@ -47,7 +47,7 @@
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
         </button>
    </div>
-   <div class="mb-2">
+   <div>
         <input class="form-control search float-right" placeholder="Search" style="width: 30%" value="" />
    </div>
    <div class="table-responsive">
