@@ -33,41 +33,63 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input type="text" class="form-control">
+                                        <label for="floatingInput">Kota</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input type="text" class="form-control">
+                                        <label for="floatingInput">Provinsi</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input type="text" class="form-control">
+                                        <label for="floatingInput">Kode Pos</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
                                 <label for="floatingInput">Nomor NPWP</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
                                 <label for="floatingInput">Phone</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
                                 <label for="floatingInput">Contact Person</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="email" class="form-control email" id="email" name="email" placeholder="Email">
                                 <label for="floatingInput">Email</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
                                 <label for="floatingInput">No. Rekening</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select supplier_buyer" name="supplier_buyer" id="supplier_buyer">
@@ -78,16 +100,16 @@
                                 <label for="floatingInput">Supplier / Buyer</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select country" name="country" id="country">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Country</label>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
-                    <div class="row mb-3">
+                    <!-- <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select provinsi" name="provinsi" id="provinsi">
@@ -104,7 +126,7 @@
                                 <label for="floatingInput">Kota</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </form>
             </div>
 
