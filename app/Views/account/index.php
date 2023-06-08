@@ -257,13 +257,13 @@
                 <div>
                     <div class="form-row justify-content-end">
                         <div class="col-md-3">
+                            <input class="form-control search-sub" placeholder="Search" value="" />
+                        </div>
+                        <div class="col-md-3">
                             <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                                 <option value="Aktif">Aktif</option>
                                 <option value="Void">Void</option>
                             </select>
-                        </div>
-                        <div class="col-md-3">
-                            <input class="form-control search-sub" placeholder="Search" value="" />
                         </div>
                     </div>
                 </div>
@@ -313,7 +313,7 @@
         // scrollX: true,
         "initComplete": function (settings, json) {    
             $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
             $('.kategoriDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
         },
         //responsive: true,
@@ -366,7 +366,7 @@
         // scrollX: true,
         "initComplete": function (settings, json) {    
             $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
             $('.headerDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
         },
         //responsive: true,
@@ -420,7 +420,7 @@
         // scrollX: true,
         "initComplete": function (settings, json) {    
             $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show 25 Entries</label></div>"); 
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
             $('.subDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
         },
         //responsive: true,
@@ -453,13 +453,8 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
-                    let kategori_id = row?.kategori_id;
-                    let header_id = row?.header_id;
-                    let no_sub = row?.no_sub;
-                    let nama_sub = row?.nama_sub;
-                    let coa_id = row?.id;
                     return `
-                    <div>
+                    <div class="mt-2">
                     <label class="switch">
                     <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
                     <span class="slider round"></span>
