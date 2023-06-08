@@ -557,7 +557,7 @@ class Account extends BaseController
     public function saveSubAccount()
     {
         $rules = [
-            "kelompok_akun_id_sub" => [
+            "header_id_sub" => [
                 "rules" => "required"
             ],
             "coa_id_sub" => [
@@ -578,7 +578,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "header_id" => formatter($this->request->getPost("kelompok_akun_id_sub"), "STR_TO_INT"),
+                "header_id" => formatter($this->request->getPost("header_id_sub"), "STR_TO_INT"),
                 "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
                 "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                 "no_sub" => $this->request->getPost("kode_akun_sub"),
@@ -620,7 +620,7 @@ class Account extends BaseController
     public function updateSubAccount()
     {
         $rules = [
-            "kelompok_akun_id_sub" => [
+            "header_id_sub" => [
                 "rules" => "required"
             ],
             "coa_id_sub" => [
@@ -642,7 +642,7 @@ class Account extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
-                "header_id" => formatter($this->request->getPost("kelompok_akun_id_sub"), "STR_TO_INT"),
+                "header_id" => formatter($this->request->getPost("header_id_sub"), "STR_TO_INT"),
                 "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
                 "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                 "no_sub" => $this->request->getPost("kode_akun_sub"),

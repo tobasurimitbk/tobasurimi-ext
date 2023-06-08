@@ -115,10 +115,10 @@
                     <div class="row mb-3">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kelompok_akun_id_sub" name="kelompok_akun_id_sub" id="kelompok_akun_id_sub">
+                                <select class="form-select header_id_sub" name="header_id_sub" id="header_id_sub">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Kelompok Akun</label>
+                                <label for="floatingInput">Header Akun</label>
                             </div>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode_akun_sub" id="kode_akun_sub" name="kode_akun_sub" placeholder="Kode Akun">
-                                <label for="floatingInput">Kode Akun</label>
+                                <label for="floatingInput">Kode Sub Akun</label>
                             </div>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control nama_akun_sub" id="nama_akun_sub" name="nama_akun_sub" placeholder="Nama Akun">
-                                <label for="floatingInput">Nama Akun</label>
+                                <label for="floatingInput">Nama Sub Akun</label>
                             </div>
                         </div>
                     </div>
@@ -490,7 +490,7 @@
             dropdownParent: $(".add-modal-header .modal-content")
         })
 
-        $('.kelompok_akun_id_sub').select2({
+        $('.header_id_sub').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal-sub .modal-content")
@@ -543,14 +543,14 @@
         .find('label')
         .css('z-index', '1');
 
-        $(".kelompok_akun_id_sub")
+        $(".header_id_sub")
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-        $(".kelompok_akun_id_sub")
+        $(".header_id_sub")
         .parent('div')
         .children('span')
         .children('span')
@@ -558,7 +558,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".kelompok_akun_id_sub")
+        $(".header_id_sub")
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -675,7 +675,7 @@
 
         var validator_sub = $(".create-form-sub").validate({
             rules: {
-                kelompok_akun_id_sub: {
+                header_id_sub: {
                     required: true
                 },
                 coa_id_sub: {
@@ -689,7 +689,7 @@
                 }
             },
             messages: {
-                kelompok_akun_id_sub: {
+                header_id_sub: {
                     required: "Header Akun is Required"
                 },
                 coa_id_sub: {
@@ -848,13 +848,13 @@
                             method: "GET",
                             dataType: "json",
                             success: function(result) {
-                                $(".kelompok_akun_id_sub").empty()
-                                $(".kelompok_akun_id_sub").append(`<option value=""></option>`)
+                                $(".header_id_sub").empty()
+                                $(".header_id_sub").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".kelompok_akun_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
+                                    $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
                                 })
 
-                                $(".kelompok_akun_id_sub").val(res?.data?.header_id).change();
+                                $(".header_id_sub").val(res?.data?.header_id).change();
                             }
                         })
 
@@ -907,8 +907,8 @@
             subTable.ajax.reload();
         })
 
-        $(".kelompok_akun_id_sub").on("change", function() {
-            let dataKategori = $(".kelompok_akun_id_sub option:selected").data("kategori");
+        $(".header_id_sub").on("change", function() {
+            let dataKategori = $(".header_id_sub option:selected").data("kategori");
             if (dataKategori) {
                 document.getElementById("category_id_sub").value = dataKategori;
             } else {
@@ -990,11 +990,11 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    $(".kelompok_akun_id_sub").empty()
-                    $(".kelompok_akun_id_sub").val('').change();
-                    $(".kelompok_akun_id_sub").append(`<option value=""></option>`)
+                    $(".header_id_sub").empty()
+                    $(".header_id_sub").val('').change();
+                    $(".header_id_sub").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".kelompok_akun_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
+                        $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
                     })
                 }
             })
@@ -1316,7 +1316,7 @@
                                         .then(() => {
                                             $(".add-modal-sub").modal("hide")
                                             $(".create-form-sub")[0].reset()
-                                            $(".kelompok_akun_id_sub").val("").change()
+                                            $(".header_id_sub").val("").change()
 
                                             subTable.ajax.reload()
                                         })
@@ -1365,7 +1365,7 @@
                                         .then(() => {
                                             $(".add-modal-sub").modal("hide")
                                             $(".create-form-sub")[0].reset()
-                                            $(".kelompok_akun_id_sub").val("").change()
+                                            $(".header_id_sub").val("").change()
 
                                             subTable.ajax.reload()
                                         })
@@ -1560,7 +1560,7 @@
                                 .then(() => {
                                     $(".add-modal-sub").modal("hide")
                                     $(".create-form-sub")[0].reset()
-                                    $(".kelompok_akun_id_sub").val("").change()
+                                    $(".header_id_sub").val("").change()
 
                                     subTable.ajax.reload()
                                 })
