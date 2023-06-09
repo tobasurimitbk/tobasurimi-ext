@@ -33,41 +33,76 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select province_parent_id" name="province_parent_id" id="province_parent_id" onchange="getCityParent()">
+                                            <option value=""></option>
+                                            <?php
+                                            if (!empty($dataProvinces)) {
+                                                foreach ($dataProvinces as $province) {
+                                            ?>
+                                                    <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                        <label for="floatingInput">Provinsi</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
+                                            <option value="" data-code=""></option>
+                                        </select>
+                                        <label for="floatingInput">Kota</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input readonly="true" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Postal Code">
+                                        <label for="floatingInput">Kode Pos</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                     <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
                                 <label for="floatingInput">Nomor NPWP</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
                                 <label for="floatingInput">Phone</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
                                 <label for="floatingInput">Contact Person</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="email" class="form-control email" id="email" name="email" placeholder="Email">
                                 <label for="floatingInput">Email</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
                                 <label for="floatingInput">No. Rekening</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select supplier_buyer" name="supplier_buyer" id="supplier_buyer">
@@ -76,32 +111,6 @@
                                     <option value="BUYER">BUYER</option>
                                 </select>
                                 <label for="floatingInput">Supplier / Buyer</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select country" name="country" id="country">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Country</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select provinsi" name="provinsi" id="provinsi">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Provinsi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kota" name="kota" id="kota">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Kota</label>
                             </div>
                         </div>
                     </div>
@@ -121,10 +130,10 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>No.</th>
-                                    <th>Address</th>
-                                    <th>City</th>
-                                    <th>Province</th>
-                                    <th>Postal Code</th>
+                                    <th>Alamat</th>
+                                    <th>Kota</th>
+                                    <th>Provinsi</th>
+                                    <th>Kode Pos</th>
                                     <th>Main Address</th>
                                 </tr>
                             </thead>
@@ -230,7 +239,6 @@
                     <th>Kode</th>
                     <th>Nama</th>
                     <th>Alamat</th>
-                    <th>Country</th>
                     <th>Provinsi</th>
                     <th>Kota</th>
                 </tr>
@@ -323,6 +331,34 @@
             .find('label')
             .css('z-index', '1');
 
+        // PROVINCE PARENT
+        $('.province_parent_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".province_parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".province_parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".province_parent_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         // CITY
         $('.city_id').select2({
             placeholder: "",
@@ -347,6 +383,34 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".city_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // CITY PARENT
+        $('.city_parent_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.city_parent_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.city_parent_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.city_parent_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -381,6 +445,12 @@
                 },
                 supplier_buyer: {
                     required: true
+                },
+                province_parent_id: {
+                    required: true
+                },
+                city_parent_id: {
+                    required: true
                 }
             },
             messages: {
@@ -413,6 +483,12 @@
                 supplier_buyer: {
                     required: "Supplier / Buyer is Required"
                 },
+                province_parent_id: {
+                    required: "Provinsi is Required"
+                },
+                city_parent_id: {
+                    required: "Kota is Required"
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -472,6 +548,11 @@
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".title-name").text("Add New");
+
+            $(".province_parent_id").val('').change()
+            $(".city_parent_id").val('').change()
+            $(".city_parent_id").empty()
+            $(".city_parent_id").append(`<option value=""></option>`)
 
             $(".kode").attr("readonly", false);
 
@@ -535,13 +616,10 @@
                 data: "address",
                 className: "text-center"
             }, {
-                data: "country",
+                data: "province_name",
                 className: "text-center"
             }, {
-                data: "province",
-                className: "text-center"
-            }, {
-                data: "city",
+                data: "city_name",
                 className: "text-center"
             }],
             columnDefs: [{
@@ -583,6 +661,25 @@
                         $(".email").val(res?.data?.email);
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
+                        $(".province_parent_id").val(res?.data?.province_id).change();
+
+                        // AJAX GET CITY
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_parent_id").empty()
+                                $(".city_parent_id").val("").change()
+                                $(".city_parent_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                                })
+
+                                $(".city_parent_id").val(res?.data?.city_id).change();
+                                $(".parent_postal_code").val(res?.data?.postal_code);
+                            }
+                        })
 
                         row = res?.data?.list_address.length;
 
@@ -625,11 +722,11 @@
                             tag_html += "<td class='actions'>";
                             if(item.main_address == 1)
                             {
-                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${index + 1})" id="main" name="main" value="${index + 1}">`;
+                                tag_html += `<input type="radio" checked id="main" name="main" value="${index + 1}">`;
                             }   
                             else
                             {
-                                tag_html += `<input type="radio" onchange="changeMainAddress(${index + 1})" id="main" name="main" value="${index + 1}">`;
+                                tag_html += `<input type="radio" id="main" name="main" value="${index + 1}">`;
                             } 
                             tag_html += "</td>";
                             tag_html += "</tr>";
@@ -770,11 +867,11 @@
                                     tag_html += "<td class='actions'>";
                                     if(item.row == main_address)
                                     {
-                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                        tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
                                     }
                                     else
                                     {
-                                        tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                        tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
                                     }
                                     tag_html += "</td>";
                                     tag_html += "</tr>";
@@ -815,11 +912,11 @@
                                     tag_html += "<td class='actions'>";
                                     if(item.row == main_address)
                                     {
-                                        tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                        tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
                                     }
                                     else
                                     {
-                                        tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                        tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
                                     }
                                     tag_html += "</td>";
                                     tag_html += "</tr>";
@@ -888,11 +985,11 @@
                             tag_html += "<td class='actions'>";
                             if(row === 0)
                             {
-                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
                             }   
                             else
                             {
-                                tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
                             } 
                             tag_html += "</td>";
                             tag_html += "</tr>";
@@ -1119,11 +1216,11 @@
                             tag_html += "<td class='actions'>";
                             if(main_address == item.row)
                             {
-                                tag_html += `<input type="radio" checked onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
                             }   
                             else
                             {
-                                tag_html += `<input type="radio" onchange="changeMainAddress(${row + 1})" id="main" name="main" value="${row + 1}">`;
+                                tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
                             } 
                             tag_html += "</td>";
                             tag_html += "</tr>";
@@ -1223,12 +1320,32 @@
         }
     }
 
+    const getCityParent = function() {
+        const id = $(".province_parent_id option:selected").val()
+
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_parent_id").empty()
+                    $(".city_parent_id").val("").change()
+                    $(".city_parent_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+                }
+            })
+        }
+    }
+
     const getPostalCode = function() {
         $(".postal_code").val($(".city_id option:selected").attr("data-code"))
     }
 
-    const changeMainAddress = function(index) {
-        
+    const getPostalCodeParent = function() {
+        $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
     }
 </script>
 

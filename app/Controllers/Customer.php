@@ -55,9 +55,8 @@ class Customer extends BaseController
                     "kode" => $data->kode,
                     "name" => $data->name,
                     "address" => $data->address,
-                    "country" => "",
-                    "province" => "",
-                    "city" => ""
+                    "province_name" => $data->province_name,
+                    "city_name" => $data->city_name
                 ]);
             }
         }
@@ -103,6 +102,12 @@ class Customer extends BaseController
             "supplier_buyer" => [
                 "rules" => "required"
             ],
+            "province_parent_id" => [
+                "rules" => "required"
+            ],
+            "city_parent_id" => [
+                "rules" => "required"
+            ]
         ];
 
         if ($this->validate($rules)) {
@@ -121,6 +126,8 @@ class Customer extends BaseController
                 "email" => $this->request->getPost("email"),
                 "no_rekening" => $this->request->getPost("no_rekening"),
                 "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => 1,
                 "ar_id" => 1,
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
@@ -187,6 +194,12 @@ class Customer extends BaseController
             "supplier_buyer" => [
                 "rules" => "required"
             ],
+            "province_parent_id" => [
+                "rules" => "required"
+            ],
+            "city_parent_id" => [
+                "rules" => "required"
+            ]
         ];
 
         if ($this->validate($rules)) {
@@ -208,6 +221,8 @@ class Customer extends BaseController
                 "email" => $this->request->getPost("email"),
                 "no_rekening" => $this->request->getPost("no_rekening"),
                 "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
         }

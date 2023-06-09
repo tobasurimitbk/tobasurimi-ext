@@ -11,7 +11,21 @@ class Vendor extends BaseController
 
     public function vendor()
     {
-        return view('vendors/index');
+        $token = session()->get("login")->token;
+
+        //Get Provinces
+        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+
+        $dataProvinces = [];
+        if ($responseProvinces["code"] === 200) {
+            $dataProvinces = json_decode($responseProvinces["body"])->data;
+        }
+
+        $data = [
+            "dataProvinces" => $dataProvinces,
+        ];
+
+        return view('vendors/index', $data);
     }
 
     public function allVendor()
@@ -40,9 +54,8 @@ class Vendor extends BaseController
                     "kode" => $data->kode,
                     "name" => $data->name,
                     "address" => $data->address,
-                    "country" => "",
-                    "province" => "",
-                    "city" => ""
+                    "province_name" => $data->province_name,
+                    "city_name" => $data->city_name
                 ]);
             }
         }
@@ -87,6 +100,12 @@ class Vendor extends BaseController
             ],
             "supplier_buyer" => [
                 "rules" => "required"
+            ],
+            "province_parent_id" => [
+                "rules" => "required"
+            ],
+            "city_parent_id" => [
+                "rules" => "required"
             ]
         ];
 
@@ -106,6 +125,8 @@ class Vendor extends BaseController
                 "email" => $this->request->getPost("email"),
                 "no_rekening" => $this->request->getPost("no_rekening"),
                 "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => 1,
                 "ar_id" => 1,
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
@@ -171,15 +192,22 @@ class Vendor extends BaseController
             ],
             "supplier_buyer" => [
                 "rules" => "required"
+            ],
+            "province_parent_id" => [
+                "rules" => "required"
+            ],
+            "city_parent_id" => [
+                "rules" => "required"
             ]
         ];
 
         if ($this->validate($rules)) {
             $payload = '';
             $token = session()->get("login")->token;
+            $this_company_id = session()->get("login")->this_company_id;
 
             $id = $this->request->getPost("id");
-            $this_company_id = session()->get("login")->this_company_id;
+
 
             $payload = json_encode([
                 "company_id" => $this_company_id,
@@ -192,8 +220,8 @@ class Vendor extends BaseController
                 "email" => $this->request->getPost("email"),
                 "no_rekening" => $this->request->getPost("no_rekening"),
                 "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                "ap_id" => 1,
-                "ar_id" => 1,
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
         }

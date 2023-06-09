@@ -1,14 +1,14 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal add-modal" tabindex="-1">
+<div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Supplier</h5>
             </div>
             <div class="modal-body">
-            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row mb-3">
@@ -36,19 +36,32 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control">
-                                        <label for="floatingInput">Kota</label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control">
+                                        <select class="form-select province_parent_id" name="province_parent_id" id="province_parent_id" onchange="getCityParent()">
+                                            <option value=""></option>
+                                            <?php
+                                            if (!empty($dataProvinces)) {
+                                                foreach ($dataProvinces as $province) {
+                                            ?>
+                                                    <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
                                         <label for="floatingInput">Provinsi</label>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control">
+                                        <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
+                                            <option value="" data-code=""></option>
+                                        </select>
+                                        <label for="floatingInput">Kota</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input readonly="true" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Postal Code">
                                         <label for="floatingInput">Kode Pos</label>
                                     </div>
                                 </div>
@@ -56,7 +69,7 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                     <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
                                 <label for="floatingInput">Nomor NPWP</label>
@@ -100,36 +113,36 @@
                                 <label for="floatingInput">Supplier / Buyer</label>
                             </div>
                         </div>
-                        <!-- <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select country" name="country" id="country">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Country</label>
-                            </div>
-                        </div> -->
                     </div>
-                    <!-- <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select provinsi" name="provinsi" id="provinsi">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Provinsi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kota" name="kota" id="kota">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Kota</label>
-                            </div>
-                        </div>
-                    </div> -->
                 </form>
-            </div>
+                    <div class="row mt-5">
+                        <div class="col-md-6">
+                            <h5 class="modal-sub-title">List Alamat Pengiriman</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive mt-2">
+                        <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Alamat</th>
+                                    <th>Kota</th>
+                                    <th>Provinsi</th>
+                                    <th>Kode Pos</th>
+                                    <th>Main Address</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
 
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-discard delete-btn">Delete</button>
                 <label>&nbsp;</label>
@@ -140,16 +153,81 @@
             </div>
         </div>
     </div>
+</div>
 
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Alamat Pengiriman</h5>
+            </div>
+            <div class="modal-body" style="height: 380px !important; max-height: 380px !important;">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
+                                <label for="floatingInput">Address</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataProvinces)) {
+                                        foreach ($dataProvinces as $province) {
+                                    ?>
+                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Province</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select city_id" name="city_id" id="city_id" onchange="getPostalCode()">
+                                    <option value="" data-code=""></option>
+                                </select>
+                                <label for="floatingInput">City</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
+                                <label for="floatingInput">Postal Code</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard delete-detail">Delete</button>
+                <label>&nbsp;</label>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Discard</button>
+                    <button type="submit" class="btn btn-submit-detail">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <div>
-        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Supplier</h4>
-        <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-        </button>
+        <div>
+            <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Supplier</h4>
+            <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+            </button>
+        </div>
     </div>
     <div>
         <input class="form-control search float-right" placeholder="Search" style="width: 30%" value="" />
@@ -161,7 +239,6 @@
                     <th>Kode</th>
                     <th>Nama</th>
                     <th>Alamat</th>
-                    <th>Country</th>
                     <th>Provinsi</th>
                     <th>Kota</th>
                 </tr>
@@ -176,7 +253,168 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
 
+    let list_address = [];
+    let list_delete = [];
+    var row = 0;
+
+    var validator_detail = $(".detail-form").validate({
+            rules: {
+                detail_address: {
+                    required: true
+                },
+                province_id: {
+                    required: true
+                },
+                city_id: {
+                    required: true
+                }
+            },
+            messages: {
+                detail_address: {
+                    required: "Address is Required"
+                },
+                province_id: {
+                    required: "Province is Required"
+                },
+                city_id: {
+                    required: "City is Required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
     $(document).ready(function() {
+        // PROVINCE
+        $('.province_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".province_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".province_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".province_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // PROVINCE PARENT
+        $('.province_parent_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".province_parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".province_parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".province_parent_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // CITY
+        $('.city_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".city_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".city_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".city_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // CITY PARENT
+        $('.city_parent_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.city_parent_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.city_parent_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.city_parent_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         var validator = $(".create-form").validate({
             rules: {
                 kode: {
@@ -206,6 +444,12 @@
                     required: true
                 },
                 supplier_buyer: {
+                    required: true
+                },
+                province_parent_id: {
+                    required: true
+                },
+                city_parent_id: {
                     required: true
                 }
             },
@@ -239,6 +483,12 @@
                 supplier_buyer: {
                     required: "Supplier / Buyer is Required"
                 },
+                province_parent_id: {
+                    required: "Provinsi is Required"
+                },
+                city_parent_id: {
+                    required: "Kota is Required"
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -264,6 +514,8 @@
 
         $(".phone").mask("0000000000000")
 
+        $(".postal_code").mask("00000")
+
         $(".no_npwp").mask("000000000000000")
 
         $(".no_rekening").mask("000000000000000")
@@ -274,18 +526,53 @@
 
         $(".dataTable_info").addClass("pt-0");
 
+        $(".btn-show-detail").click(function() {
+            $(".delete-detail").css('display', 'none');
+            $(".province_id").val('').change()
+            $(".city_id").val('').change()
+            $(".city_id").empty()
+            $(".city_id").append(`<option value=""></option>`)
+
+            $(".title-detail-name").text("Add New")
+            $(".id_detail").val('')
+            $(".detail_address").val('')
+            
+            $(".postal_code").val('')
+
+            validator_detail.resetForm();
+            validator_detail.reset();
+
+            $(".detail-modal").modal("show")
+        })
+
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".title-name").text("Add New");
 
+            $(".province_parent_id").val('').change()
+            $(".city_parent_id").val('').change()
+            $(".city_parent_id").empty()
+            $(".city_parent_id").append(`<option value=""></option>`)
+
             $(".kode").attr("readonly", false);
+
+            $(".body-detail-table").empty()
+
+            row = 0;
+
+            list_address = [];
 
             validator.resetForm();
             validator.reset();
 
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
+            $(".body-detail-table").empty()
             $(".add-modal").modal("show")
+        })
+
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
         })
 
         $(".btn-hide-form").click(function() {
@@ -329,13 +616,10 @@
                 data: "address",
                 className: "text-center"
             }, {
-                data: "country",
+                data: "province_name",
                 className: "text-center"
             }, {
-                data: "province",
-                className: "text-center"
-            }, {
-                data: "city",
+                data: "city_name",
                 className: "text-center"
             }],
             columnDefs: [{
@@ -377,9 +661,82 @@
                         $(".email").val(res?.data?.email);
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
+                        $(".province_parent_id").val(res?.data?.province_id).change();
+
+                        // AJAX GET CITY
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_parent_id").empty()
+                                $(".city_parent_id").val("").change()
+                                $(".city_parent_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                                })
+
+                                $(".city_parent_id").val(res?.data?.city_id).change();
+                                $(".parent_postal_code").val(res?.data?.postal_code);
+                            }
+                        })
+
+                        row = res?.data?.list_address.length;
+
+                        list_address = [];
+
+                        let tag_html = "";
+
+                        $(".body-detail-table").empty()
+
+                        res?.data?.list_address.map((item, index) => {
+                            list_address.push({
+                                id: item.id,
+                                supplier_id: item.supplier_id,
+                                row: index + 1,
+                                address: item.address,
+                                province_id: item.province_id,
+                                province_name: item.province_name,
+                                city_id: item.city_id,
+                                city_name: item.city_name,
+                                postal_code: item.postal_code,
+                                main_address: item.main_address
+                            })
+
+                            tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+                            tag_html += "<td>";
+                            tag_html += index + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.address;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.city_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.province_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.postal_code;
+                            tag_html += "</td>";
+                            tag_html += "<td class='actions'>";
+                            if(item.main_address == 1)
+                            {
+                                tag_html += `<input type="radio" checked id="main" name="main" value="${index + 1}">`;
+                            }   
+                            else
+                            {
+                                tag_html += `<input type="radio" id="main" name="main" value="${index + 1}">`;
+                            } 
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+                        })
+                        
+                        $(".body-detail-table").append(tag_html)
 
                         validator.resetForm();
                         validator.reset();
+                        list_delete = [];
                         $(".add-modal").modal("show")
                     } else {
                         Swal.fire({
@@ -454,74 +811,543 @@
             })
         })
 
+        $(".btn-submit-detail").click(function() {
+            let row_detail = $(".id_detail").val();
+            let address = $(".detail_address").val()
+            let province_id = $(".province_id option:selected").val()
+            let province_name = $(".province_id option:selected").text()
+            let city_id = $(".city_id option:selected").val()
+            let city_name = $(".city_id option:selected").text()
+            let postal_code = $(".postal_code").val();
+
+            // update detail
+            if(row_detail)
+            {
+                let main_address = document.querySelector('input[name="main"]:checked').value;
+
+                if ($(".detail-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            console.log(id)
+                            let new_list_address = []
+                            let tag_html = "";
+
+                            row = 0;
+
+                            $(".body-detail-table").empty()
+
+                            list_address.map(item => {
+                                if(item.row == row_detail)
+                                {
+                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+                                    tag_html += "<td>";
+                                    tag_html += row + 1;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += address;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += province_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += city_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += postal_code;
+                                    tag_html += "</td>";
+                                    tag_html += "<td class='actions'>";
+                                    if(item.row == main_address)
+                                    {
+                                        tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+                                    }
+                                    else
+                                    {
+                                        tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+                                    }
+                                    tag_html += "</td>";
+                                    tag_html += "</tr>";
+
+                                    new_list_address.push({
+                                        id: item.id,
+                                        supplier_id: item.supplier_id,
+                                        row: row + 1,
+                                        address: address,
+                                        province_id: province_id,
+                                        province_name: province_name,
+                                        city_id: city_id,
+                                        city_name: city_name,
+                                        postal_code: postal_code,
+                                        main_address: item.main_address
+                                    });
+
+                                    row = row + 1;
+                                }
+                                else
+                                {
+                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+                                    tag_html += "<td>";
+                                    tag_html += row + 1;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.address;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.province_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.city_name;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += item.postal_code;
+                                    tag_html += "</td>";
+                                    tag_html += "<td class='actions'>";
+                                    if(item.row == main_address)
+                                    {
+                                        tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+                                    }
+                                    else
+                                    {
+                                        tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+                                    }
+                                    tag_html += "</td>";
+                                    tag_html += "</tr>";
+
+                                    new_list_address.push(item);
+
+                                    row = row + 1;
+                                }
+                            })
+
+                            list_address = [];
+
+                            list_address = new_list_address;
+
+                            $(".body-detail-table").append(tag_html)
+
+                            $(".detail-modal").modal("hide")
+                        }
+                    })
+                }
+            }
+            // create detail
+            else
+            {
+                if ($(".detail-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            list_address.push({
+                                id: '',
+                                supplier_id: '',
+                                row: row + 1,
+                                address: address,
+                                province_id: province_id,
+                                province_name: province_name,
+                                city_id: city_id,
+                                city_name: city_name,
+                                postal_code: postal_code,
+                                main_address: 0
+                            })
+                        let tag_html = "";
+                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+                            tag_html += "<td>";
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += address;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += province_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += city_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += postal_code;
+                            tag_html += "</td>";
+                            tag_html += "<td class='actions'>";
+                            if(row === 0)
+                            {
+                                tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+                            }   
+                            else
+                            {
+                                tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+                            } 
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+                            $(".body-detail-table").append(tag_html)
+                            $(".detail-modal").modal("hide")
+                            row = row + 1;
+                        }
+                    })
+                }
+            }
+        })
+
         $(".btn-submit-form").click(function() {
-            if ($(".create-form").valid()) {
+            $(".detail-modal").modal("hide")
+            if(list_address.length == 0)
+            {
                 Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
+                    icon: 'error',
+                    title: 'List Alamat Pengiriman Tidak Boleh Kosong',
                     confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.querySelector(".create-form"));
+                })
+            }
+            else
+            {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            let data = new FormData(document.querySelector(".create-form"));
 
-                        let id = $(".id").val();
+                            let update_list_address = [];
+                            let main_address = document.querySelector('input[name="main"]:checked').value;
 
-                        $.ajax({
-                            url: id ? "<?= base_url("supplier/update"); ?>" : "<?= base_url("supplier/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
+                            if(list_delete.length !== 0)
+                            {
+                                list_delete.map(obj => {
+                                    update_list_address.push(
+                                        {
+                                            id: obj.id,
+                                            supplier_id: obj.supplier_id,
+                                            address: obj.address,
+                                            province_id: obj.province_id,
+                                            city_id: obj.city_id,
+                                            main_address: 0,
+                                            isDelete: true
+                                        }
+                                    )
+                                })
+                            }
+                            
+                            list_address.map(obj => {
+                                if (main_address == obj.row) {
+                                    if (obj.id) {
+                                        update_list_address.push(
+                                            {
+                                                id: obj.id,
+                                                supplier_id: obj.supplier_id,
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 1
+                                            }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        update_list_address.push(
+                                            {
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 1
+                                            }
+                                        )
+                                    }
+                                }
+                                else
+                                {
+                                    if (obj.id) {
+                                        update_list_address.push(
+                                            {
+                                                id: obj.id,
+                                                supplier_id: obj.supplier_id,
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 0
+                                            }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        update_list_address.push(
+                                            {
+                                                address: obj.address,
+                                                province_id: obj.province_id,
+                                                city_id: obj.city_id,
+                                                main_address: 0
+                                            }
+                                        )
+                                    }
+                                }
+                            })
+
+                            data.append("list_address", JSON.stringify(update_list_address))
+
+                            let id = $(".id").val();
+
+                            $.ajax({
+                                url: id ? "<?= base_url("supplier/update"); ?>" : "<?= base_url("supplier/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal").modal("hide")
+                                                table.ajax.reload()
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        .then(() => {
-                                            $(".add-modal").modal("hide")
-                                            table.ajax.reload()
-                                        })
-                                } else {
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
                                     Swal.fire({
                                         icon: 'error',
-                                        title: response.message,
+                                        title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                })
+                            });
+                        }
+                    })
+                }
             }
         })
-
-
-
     })
+
+    $(document).on('click', '.delete-detail', function() {
+        let id = $(".id_detail").val()
+        let main_address = document.querySelector('input[name="main"]:checked').value;
+
+        console.log(id)
+        console.log(main_address)
+
+        if(id === main_address)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Main Address Tidak Dapat Dihapus',
+                confirmButtonColor: '#4e73df',
+            })
+        }
+        else
+        {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log(id)
+                    let new_list_address = []
+                    let tag_html = "";
+
+                    $(".body-detail-table").empty()
+
+                    row = 0;
+
+                    console.log(list_address)
+
+                    list_address.map(item => {
+                        if(item.row != id)
+                        {
+                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+                            tag_html += "<td>";
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.address;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.province_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.city_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.postal_code;
+                            tag_html += "</td>";
+                            tag_html += "<td class='actions'>";
+                            if(main_address == item.row)
+                            {
+                                tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+                            }   
+                            else
+                            {
+                                tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+                            } 
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+
+                            new_list_address.push({...item, row: row + 1});
+
+                            row = row + 1;
+                        }
+                        else
+                        {
+                            // sent parameter isDelete if have supplier id and id
+                            if(item.id)
+                            {
+                                list_delete.push(item)
+                            }
+                        }
+                    })
+
+                    list_address = [];
+
+                    list_address = new_list_address;
+
+                    $(".body-detail-table").append(tag_html)
+
+                    $(".detail-modal").modal("hide")
+                }
+            })
+        }
+    })
+
+    $(document).on('show.bs.modal','.detail-modal', function () {
+       document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
+    })
+
+    $(document).on('hide.bs.modal','.detail-modal', function () {
+        document.getElementById("add_modal").style = "display: block;";
+    })
+
+    $(document).on('click', '.edit-table-detail', function(evt) {
+        if(!$(evt.target).is('.actions')) {
+            $(".title-detail-name").text("Update")
+            $(".delete-detail").css('display', '');
+            let address = $(this).data('address')
+            let province_id = $(this).data('province')
+            let city_id = $(this).data('city')
+            let postal_code = $(this).data('postalcode')
+            let rowid = $(this).data('row')
+            let id = $(this).data('id')
+
+            validator_detail.resetForm();
+            validator_detail.reset();
+
+            $(".province_id").val(province_id).change()
+
+            $(".id_detail").val(rowid)
+            $(".detail_address").val(address)
+
+            // AJAX GET CITY
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${province_id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(result) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+
+                    $(".city_id").val(city_id).change()
+                    $(".postal_code").val(postal_code)
+
+                    $(".detail-modal").modal("show")
+                }
+            })
+        }
+    })
+
+    const getCity = function() {
+        const id = $(".province_id option:selected").val()
+
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+                }
+            })
+        }
+    }
+
+    const getCityParent = function() {
+        const id = $(".province_parent_id option:selected").val()
+
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_parent_id").empty()
+                    $(".city_parent_id").val("").change()
+                    $(".city_parent_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+                }
+            })
+        }
+    }
+
+    const getPostalCode = function() {
+        $(".postal_code").val($(".city_id option:selected").attr("data-code"))
+    }
+
+    const getPostalCodeParent = function() {
+        $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
+    }
 </script>
+
 
 <?= $this->endSection(); ?>
