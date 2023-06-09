@@ -177,7 +177,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("user/all-user-company"); ?>",
+            url: "<?= base_url("company-access/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();

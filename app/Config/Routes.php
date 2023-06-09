@@ -154,7 +154,6 @@ $routes->post('/sub-account/delete', 'Account::deleteSubAccount', ['filter' => '
 // USER
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
 $routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);
-$routes->get('/user/all-user-company', 'User::allUserHaveCompany', ['filter' => 'Auth']);
 $routes->get('/user/id/(:segment)', 'User::getByIdUser/$1', ['filter' => 'Auth']);
 $routes->post('/user/save', 'User::saveUser', ['filter' => 'Auth']);
 $routes->post('/user/update', 'User::updateUser', ['filter' => 'Auth']);
@@ -175,6 +174,7 @@ $routes->post('/akses/save', 'Akses::saveAkses', ['filter' => 'Auth']);
 
 // COMPANY ACCESS
 $routes->get('/company-access', 'CompanyAccess::companyAccess', ['filter' => 'Auth']);
+$routes->get('/company-access/all', 'CompanyAccess::allCompanyAccess', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------
