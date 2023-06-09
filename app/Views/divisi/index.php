@@ -131,14 +131,14 @@
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
-                    <th>Divisi</th>
-                    <th>Libur</th>
-                    <th>Jam Kerja</th>
-                    <th>Jam Istirahat</th>
-                    <th>Jam Masuk</th>
-                    <th>Jam Pulang</th>
-                    <th>Jam Mulai Istirahat</th>
-                    <th>Jam Selesai Istirahat</th>
+                    <th onclick="changeSort('divisi')" class="sort">Divisi</th>
+                    <th onclick="changeSort('libur')" class="sort">Libur</th>
+                    <th onclick="changeSort('jam_kerja')" class="sort">Jam Kerja</th>
+                    <th onclick="changeSort('jam_istirahat')" class="sort">Jam Istirahat</th>
+                    <th onclick="changeSort('jam_masuk')" class="sort">Jam Masuk</th>
+                    <th onclick="changeSort('jam_pulang')" class="sort">Jam Pulang</th>
+                    <th onclick="changeSort('mulai_istirahat')" class="sort">Jam Mulai Istirahat</th>
+                    <th onclick="changeSort('selesai_istirahat')" class="sort">Jam Selesai Istirahat</th>
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -150,6 +150,84 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    let sort = "divisi";
+    let sortType = "asc";
+
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [[0, 'asc']],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("divisi/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        // scrollX: true,
+        "initComplete": function (settings, json) {    
+            $('.dataTables_length').empty();    
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "divisi",
+            className: "text-center"
+        },
+        {
+            data: "libur",
+            className: "text-center"
+        },
+        {
+            data: "jam_kerja",
+            className: "text-center"
+        },
+        {
+            data: "jam_istirahat",
+            className: "text-center"
+        },
+        {
+            data: "jam_masuk",
+            className: "text-center"
+        },
+        {
+            data: "jam_pulang",
+            className: "text-center"
+        },
+        {
+            data: "mulai_istirahat",
+            className: "text-center"
+        },
+        {
+            data: "selesai_istirahat",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
     
     $(document).ready(function() {
         $(".jam_istirahat, .jam_masuk, .jam_pulang, .mulai_istirahat, .selesai_istirahat").datetimepicker({
@@ -278,79 +356,6 @@
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
         })
-
-        const table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: false,
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("divisi/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                }
-            },
-            // scrollX: true,
-            "initComplete": function (settings, json) {    
-                $('.dataTables_length').empty();    
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
-            },
-            //responsive: true,
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "divisi",
-                className: "text-center"
-            },
-            {
-                data: "libur",
-                className: "text-center"
-            },
-            {
-                data: "jam_kerja",
-                className: "text-center"
-            },
-            {
-                data: "jam_istirahat",
-                className: "text-center"
-            },
-            {
-                data: "jam_masuk",
-                className: "text-center"
-            },
-            {
-                data: "jam_pulang",
-                className: "text-center"
-            },
-            {
-                data: "mulai_istirahat",
-                className: "text-center"
-            },
-            {
-                data: "selesai_istirahat",
-                className: "text-center"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
 
         $(".dataTable_info").addClass("pt-0");
 
@@ -572,6 +577,18 @@
             })
         })
     })
+
+    const changeSort = function(val) {
+        if(sort !== val)
+        {
+            sortType = "asc";
+            sort = val;
+        }
+        else
+        {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

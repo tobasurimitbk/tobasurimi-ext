@@ -207,9 +207,9 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Kelompok Akun</th>
-                                <th>No. Kategori Akun</th>
-                                <th>Nama Kategori Akun</th>
+                                <th onclick="changeSortKategori('kelompok_akun')" class="sort">Kelompok Akun</th>
+                                <th onclick="changeSortKategori('no_kategori')" class="sort">No. Kategori Akun</th>
+                                <th onclick="changeSortKategori('nama_kategori')" class="sort">Nama Kategori Akun</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -234,9 +234,9 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Kategori Akun</th>
-                                <th>No. Header Akun</th>
-                                <th>Nama Header Akun</th>
+                                <th onclick="changeSortHeader('nama_kategori')" class="sort">Kategori Akun</th>
+                                <th onclick="changeSortHeader('no_header')" class="sort">No. Header Akun</th>
+                                <th onclick="changeSortHeader('nama_header')" class="sort">Nama Header Akun</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -271,11 +271,11 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Kategori Akun</th>
-                                <th>No. Header Akun</th>
-                                <th>Header Akun</th>
-                                <th>No. Sub Akun</th>
-                                <th>Nama Sub Akun</th>
+                                <th onclick="changeSortSub('nama_kategori')" class="sort">Kategori Akun</th>
+                                <th onclick="changeSortSub('no_header')" class="sort">No. Header Akun</th>
+                                <th onclick="changeSortSub('nama_header')" class="sort">Header Akun</th>
+                                <th onclick="changeSortSub('no_sub')" class="sort">No. Sub Akun</th>
+                                <th onclick="changeSortSub('nama_sub')" class="sort">Nama Sub Akun</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -291,12 +291,19 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    let sortKategori = "kelompok_akun";
+    let sortTypeKategori = "asc";
+    let sortHeader = "nama_kategori";
+    let sortTypeHeader = "asc";
+    let sortSub = "nama_kategori";
+    let sortTypeSub = "asc";
 
     const kategoriTable = $('.kategoriDataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
-        ordering: false,
+        ordering: true,
+        order: [[0, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -308,6 +315,8 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search-kategori").val();
+                data.sort = sortKategori;
+                data.sortType = sortTypeKategori;
             }
         },
         // scrollX: true,
@@ -349,7 +358,8 @@
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
-        ordering: false,
+        ordering: true,
+        order: [[0, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -361,6 +371,8 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search-header").val();
+                data.sort = sortHeader;
+                data.sortType = sortTypeHeader;
             }
         },
         // scrollX: true,
@@ -402,7 +414,8 @@
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
-        ordering: false,
+        ordering: true,
+        order: [[0, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -415,6 +428,8 @@
             data: function(data) {
                 data.search = $(".search-sub").val();
                 data.status = $(".status").val();
+                data.sort = sortSub;
+                data.sortType = sortTypeSub;
             }
         },
         // scrollX: true,
@@ -1647,6 +1662,42 @@
                 stopLoading()
             }
         });
+    }
+
+    const changeSortKategori = function(val) {
+        if(sortKategori !== val)
+        {
+            sortTypeKategori = "asc";
+            sortKategori = val;
+        }
+        else
+        {
+            sortTypeKategori = sortTypeKategori === "asc" ? "desc" : "asc";
+        }
+    }
+
+    const changeSortHeader = function(val) {
+        if(sortHeader !== val)
+        {
+            sortTypeHeader = "asc";
+            sortHeader = val;
+        }
+        else
+        {
+            sortTypeHeader = sortTypeHeader === "asc" ? "desc" : "asc";
+        }
+    }
+
+    const changeSortSub = function(val) {
+        if(sortSub !== val)
+        {
+            sortTypeSub = "asc";
+            sortSub = val;
+        }
+        else
+        {
+            sortTypeSub = sortTypeSub === "asc" ? "desc" : "asc";
+        }
     }
 </script>
 

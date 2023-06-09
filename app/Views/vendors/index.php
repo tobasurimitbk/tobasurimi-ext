@@ -33,8 +33,8 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="row">
-                                <div class="col">
+                        <div class="row">
+                                <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select province_parent_id" name="province_parent_id" id="province_parent_id" onchange="getCityParent()">
                                             <option value=""></option>
@@ -51,7 +51,7 @@
                                         <label for="floatingInput">Provinsi</label>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
                                             <option value="" data-code=""></option>
@@ -59,7 +59,7 @@
                                         <label for="floatingInput">Kota</label>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input readonly="true" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Postal Code">
                                         <label for="floatingInput">Kode Pos</label>
@@ -111,6 +111,24 @@
                                     <option value="BUYER">BUYER</option>
                                 </select>
                                 <label for="floatingInput">Supplier / Buyer</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select ap_id" name="ap_id" id="ap_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Akun AP</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select ar_id" name="ar_id" id="ar_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Akun AR</label>
                             </div>
                         </div>
                     </div>
@@ -236,11 +254,11 @@
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
-                    <th>Kode</th>
-                    <th>Nama</th>
-                    <th>Alamat</th>
-                    <th>Provinsi</th>
-                    <th>Kota</th>
+                    <th onclick="changeSort('kode')" class="sort">Kode</th>
+                    <th onclick="changeSort('name')" class="sort">Nama</th>
+                    <th onclick="changeSort('address')" class="sort">Alamat</th>
+                    <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
+                    <th onclick="changeSort('city_name')" class="sort">Kota</th>
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -252,10 +270,72 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    let sort = "kode";
+    let sortType = "asc";
 
     let list_address = [];
     let list_delete = [];
     var row = 0;
+
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [[0, 'asc']],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("vendor/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        // scrollX: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "kode",
+            className: "text-center"
+        }, {
+            data: "name",
+            className: "text-center"
+        }, {
+            data: "address",
+            className: "text-center"
+        }, {
+            data: "province_name",
+            className: "text-center"
+        }, {
+            data: "city_name",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     var validator_detail = $(".detail-form").validate({
             rules: {
@@ -411,6 +491,62 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.city_parent_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // AP
+        $('.ap_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.ap_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.ap_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.ap_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // AR
+        $('.ar_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.ar_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.ar_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.ar_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -578,63 +714,6 @@
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
         })
-
-        const table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: false,
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("vendor/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                }
-            },
-            // scrollX: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            //responsive: true,
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "kode",
-                className: "text-center"
-            }, {
-                data: "name",
-                className: "text-center"
-            }, {
-                data: "address",
-                className: "text-center"
-            }, {
-                data: "province_name",
-                className: "text-center"
-            }, {
-                data: "city_name",
-                className: "text-center"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
@@ -1346,6 +1425,18 @@
 
     const getPostalCodeParent = function() {
         $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
+    }
+
+    const changeSort = function(val) {
+        if(sort !== val)
+        {
+            sortType = "asc";
+            sort = val;
+        }
+        else
+        {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
     }
 </script>
 

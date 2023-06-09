@@ -573,9 +573,9 @@
 
 //     sorting asc desc
 
-// /customers = kode, name, address
-// /suppliers = kode, name, address
-// /vendors = kode, name, address
+// /customers = kode, name, address, province_name, city_name
+// /suppliers = kode, name, address, province_name, city_name
+// /vendors = kode, name, address, province_name, city_name
 // /companies = company, holding_company, address, phone, email
 // /warehouses = warehouse_name, address, phone, email
 // /employees = nip, name, divisionName, email, status
