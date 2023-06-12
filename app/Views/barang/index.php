@@ -127,7 +127,7 @@
                 </div>
                 <div class="col-md-2">
                     <button class="btn btn-show-form btn-add btn-block">
-                        <i class="fa fa-plus fa-sm" aria-hidden="true"></i>Add New
+                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
                     </button>
                 </div>
             </div>

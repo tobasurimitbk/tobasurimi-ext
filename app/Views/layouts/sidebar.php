@@ -3,7 +3,7 @@ $currentUriSegment = "/" . service('uri')->getSegment(1);
 ?>
 
 <!-- Sidebar -->
-<div class="main-sidebar bg-dark sidebar-style-2">
+<div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
 
         <div class="sidebar-brand">
