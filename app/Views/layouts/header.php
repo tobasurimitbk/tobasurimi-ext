@@ -6,8 +6,17 @@
             <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
         </ul>
         <div class="search-element">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="250">
-            <button class="btn" type="submit"><i class="fas fa-search"></i></button>
+            
+            <div class="dropdown dropdown-company">
+                <button class="btn btn-discard btn-dropdown-company dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= session()->get("login")->this_company; ?>
+                </button>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButton1">
+                    <?php foreach (session()->get("login")->company_role as $allCompany) { ?>
+                        <li onclick="tes(<?= $allCompany->company_id; ?>, '<?= $allCompany->company_name; ?>')"><a class="<?= $allCompany->company_id == session()->get("login")->this_company_id ? "dropdown-item active" : "dropdown-item" ?>"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany->company_name; ?></a></li>
+                    <?php } ?>
+                </ul>
+            </div>
             <div class="search-backdrop"></div>
             <div class="search-result">
                 <div class="search-header">
