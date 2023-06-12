@@ -208,21 +208,58 @@
                 <div class="d-sm-none d-lg-inline-block">Artinya apa Bang Messi?</div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-                <div class="dropdown-title">Logged in 5 min ago</div>
-                <a href="features-profile.html" class="dropdown-item has-icon">
-                    <i class="far fa-user"></i> Profile
-                </a>
-                <a href="features-activities.html" class="dropdown-item has-icon">
-                    <i class="fas fa-bolt"></i> Activities
-                </a>
-                <a href="features-settings.html" class="dropdown-item has-icon">
-                    <i class="fas fa-cog"></i> Settings
-                </a>
                 <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item has-icon text-danger">
+                <a onclick="showLogoutForm()" href="#" class="dropdown-item has-icon text-danger">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>
         </li>
     </ul>
 </nav>
+
+<!-- Logout Modal-->
+<div class="modal logout-modal" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-footer">
+                <button class="btn btn-discard" onclick="hideLogoutForm()">Cancel</button>
+                <a class="btn btn-logout-form" href="<?= base_url("logout"); ?>">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const showLogoutForm = function(e) {
+        $(".logout-modal").modal("show")
+    }
+
+    const hideLogoutForm = function(e) {
+        $(".logout-modal").modal("hide")
+    }
+
+    const tes = function(dropdownCompanyId, dropdownCompanyName) {
+        console.log(dropdownCompanyId)
+        $.ajax({
+            url: "<?= base_url("change-company"); ?>",
+            data: {
+                id: dropdownCompanyId,
+                name: dropdownCompanyName
+            },
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    window.location.href = '<?= base_url(); ?>'
+                }
+            }
+        })
+    }
+</script>
