@@ -238,18 +238,21 @@
 </div>
 
 <!-- Begin Page Content -->
-<div class="container-fluid">
-    <div>
-        <div>
-            <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Customer</h4>
-            <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-            </button>
-        </div>
+<section class="section">
+<div class="section-header">
+    <h1>Customer</h1>
+    <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal">
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-10">
     </div>
-    <div>
-        <input class="form-control search float-right" placeholder="Search" style="width: 30%" value="" />
+    <div class="col-md-2">
+        <input class="form-control search" placeholder="Search" value="" />
     </div>
+</div>
+<div class="row">
     <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
@@ -267,6 +270,7 @@
         </table>
     </div>
 </div>
+</section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
