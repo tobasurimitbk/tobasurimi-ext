@@ -11,19 +11,19 @@
 }
 
 .icon-login-register {
-  color: gray;
+  color: #ffffff;
 }
 
 .group-prepend-login-register {
   height: 58px;
-  border: 1px #98b0a8 solid;
+  border: 1px #2f4858 solid;
   border-top-left-radius: 6px;
   border-bottom-left-radius: 6px;
 }
 
 .group-prepend-password-login-register {
   height: 58px;
-  border: 1px #98b0a8 solid;
+  border: 1px #a5ae9d solid;
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
 }
@@ -41,18 +41,63 @@
   align-items: center;
   justify-content: center;
   font-family: "Poppins", sans-serif !important;
+  background: #2f4858;
 }
 
 .bg-login-register .card.card-login-register {
-  background: #FFFFFF;
-  box-shadow: 0px 2px 10px rgba(231, 50, 58, 0.05);
-  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: none;
+  border-radius: 8px;
+  border: 0px #e7323a solid;
+}
+
+.bg-login-register .card.card-login-register .card-body img {
+  width: 100%;
 }
 
 .bg-login-register .card.card-login-register .card-body h4 {
-  color: #657c74 !important;
+  color: #a5ae9d !important;
   margin-left: 15px;
   margin-bottom: 0px;
+}
+
+.group-prepend-login-register .input-group-text {
+  font-size: 13px;
+  background-color: #2f4858;
+  padding: 0.375rem 1.25rem;
+  border: 0px solid #e7323a;
+  border-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.group-prepend-password-login-register .input-group-text {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #e7323a;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .form-floating
+  .text-danger {
+  font-size: 11px;
+  font-weight: 500;
+  color: #e7323a !important;
+}
+
+.bg-login-register
+  .card.card-login-register
+  .card-body
+  form.user
+  .form-floating
+  label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.8;
+  color: #2f4858;
 }
 
 .bg-login-register
@@ -61,10 +106,11 @@
   form.user
   .form-floating
   .form-control {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: #657c74 !important;
-  border: 1px #98b0a8 solid;
+  color: #2f4858 !important;
+  border: 1px #a5ae9d solid;
+  border-left: 0px;
 }
 
 .bg-login-register
@@ -116,11 +162,11 @@
   .card.card-login-register
   .card-body
   .btn.btn-login-register {
-  background-color: #E7323A;
+  background-color: #e7323a;
   border-radius: 6px;
-  height: 40px;
-  font-size: 14px;
-  letter-spacing: 0.8px;
+  height: 58px;
+  font-size: 13px;
+  letter-spacing: 0;
   color: #fff;
   font-weight: 600;
   box-shadow: none !important;

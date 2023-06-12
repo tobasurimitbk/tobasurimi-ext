@@ -6,16 +6,15 @@
     <!-- Outer Row -->
     <div class="row justify-content-center">
 
-        <div class="col-xl-6 col-lg-6 col-md-6">
+        <div class="col-xl-4 col-lg-4 col-md-4">
 
             <div class="card o-hidden card-login-register">
-                <div class="card-body p-0">
+                <div class="card-body p-5">
                     <!-- Nested Row within Card Body -->
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="p-5">
                                 <div class="d-flex justify-content-center align-items-center mb-5">
-                                    <img src="<?= base_url("assets/img/logo.png"); ?>" width="100%" height="120">
+                                    <img src="<?= base_url("assets/img/logo.png"); ?>">
                                 </div>
                                 <form class="user" method="POST" action="<?= base_url("login"); ?>" enctype="multipart/form-data">
                                     <?= csrf_field() ?>
@@ -47,7 +46,6 @@
                                 <button class="btn btn-login-register btn-block" onclick="submitForm()">
                                     Log In
                                 </button>
-                            </div>
                         </div>
                     </div>
                 </div>
