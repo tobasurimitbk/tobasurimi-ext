@@ -185,6 +185,9 @@
             let id = data.id;
             $(".title-name").text("Update");
 
+            validator.resetForm();
+            validator.reset();
+
             $.ajax({
                 url: "<?= base_url("penomoran-rak/id"); ?>" + "/" + id,
                 method: "GET",
@@ -194,10 +197,8 @@
                         $(".id").val(id);
                         $(".nomor").val(res?.data?.nomor);
                         $(".rak").val(res?.data?.rak);
-                        validator.resetForm();
-                        validator.reset();
+                        
                         $(".add-modal").modal("show")
-                        console.log(res.data);
                     }
                     else
                     {

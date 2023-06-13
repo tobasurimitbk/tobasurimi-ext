@@ -520,6 +520,9 @@
             let id = data.id;
             $(".title-name").text("Update");
 
+            validator.resetForm();
+            validator.reset();
+
             $.ajax({
                 url: "<?= base_url("employee/id"); ?>" + "/" + id,
                 method: "GET",
@@ -538,10 +541,7 @@
                         $(".phone_no").val(res?.data?.phone_no);
                         $(".status").val(res?.data?.status);
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
-                        validator.resetForm();
-                        validator.reset();
                         $(".add-modal").modal("show")
-                        console.log(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

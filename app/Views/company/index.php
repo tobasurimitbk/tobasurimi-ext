@@ -56,23 +56,23 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Province</label>
+                                <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id">
+                                <select class="form-select city_id" name="city_id" id="city_id" onchange="getZipCode()">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">City</label>
+                                <label for="floatingInput">Kota</label>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
-                                <label for="floatingInput">Zip Code</label>
+                                <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -401,6 +401,9 @@
             validator.resetForm();
             validator.reset();
 
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', 'none');
+
             $.ajax({
                 url: `<?= base_url("employee/dropdown"); ?>`,
                 method: "GET",
@@ -414,12 +417,9 @@
                     })
 
                     $(".pic_id").val('').change();
+                    $(".add-modal").modal("show")
                 }
             })
-
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
         })
 
         $(".btn-hide-form").click(function() {
@@ -436,6 +436,11 @@
             let id = data.id;
             $(".title-name").text("Update");
 
+            document.getElementById("preview_photo").src = res?.data?.logo;
+
+            validator.resetForm();
+            validator.reset();
+
             $.ajax({
                 url: "<?= base_url("company/id"); ?>" + "/" + id,
                 method: "GET",
@@ -448,7 +453,6 @@
                         $(".address").val(res?.data?.address);
                         $(".email").val(res?.data?.email);
                         $(".phone").val(res?.data?.phone);
-                        $(".zip_code").val(res?.data?.zip_code);
                         $(".province_id").val(res?.data?.province_id).change();
 
                         // AJAX GET CITY
@@ -461,10 +465,11 @@
                                 $(".city_id").val("").change()
                                 $(".city_id").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
+                                    $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                                 })
 
                                 $(".city_id").val(res?.data?.city_id).change();
+                                $(".zip_code").val(res?.data?.zip_code);
                             }
                         })
 
@@ -481,14 +486,10 @@
                                 })
 
                                 $(".pic_id").val(res?.data?.pic_id).change();
+
+                                $(".add-modal").modal("show")
                             }
                         })
-
-                        document.getElementById("preview_photo").src = res?.data?.logo;
-                        validator.resetForm();
-                        validator.reset();
-                        $(".add-modal").modal("show")
-                        console.log(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -693,7 +694,7 @@
                     $(".city_id").val("").change()
                     $(".city_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                     })
                 }
             })
@@ -704,6 +705,10 @@
     const previewPhoto = function() {
         let file = document.getElementById("logo").files[0];
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
+    }
+
+    const getZipCode = function() {
+        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
     }
 
     const changeSort = function(val) {

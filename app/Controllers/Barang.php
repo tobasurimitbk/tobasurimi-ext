@@ -157,7 +157,7 @@ class Barang extends BaseController
         return;
     }
 
-    public function updateCompany()
+    public function updateBarang()
     {
         $rules = [
             "kode_barang" => [
@@ -180,9 +180,6 @@ class Barang extends BaseController
             ],
             "ar_id" => [
                 "rules" => "required"
-            ],
-            "stok" => [
-                "rules" => "required"
             ]
         ];
 
@@ -202,7 +199,6 @@ class Barang extends BaseController
                 "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "stok" => formatter($this->request->getPost("stok"), "STR_TO_INT"),
                 "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
             ]);
 

@@ -171,6 +171,9 @@
             let id = data.id;
             $(".title-name").text("Update");
 
+            validator.resetForm();
+             validator.reset();
+
             $.ajax({
                 url: "<?= base_url("role/id"); ?>" + "/" + id,
                 method: "GET",
@@ -179,10 +182,8 @@
                     if (res.status) {
                         $(".id").val(id);
                         $(".name").val(res?.data?.name);
-                        validator.resetForm();
-                        validator.reset();
+                        
                         $(".add-modal").modal("show")
-                        console.log(res.data);
                     }
                     else
                     {

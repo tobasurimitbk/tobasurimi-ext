@@ -758,6 +758,9 @@
                         $(".kode_akun_kategori").val(res?.data?.no_kategori);
                         $(".nama_akun_kategori").val(res?.data?.nama_kategori);
 
+                        validator_kategori.resetForm();
+                        validator_kategori.reset();
+
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,
                             method: "GET",
@@ -773,13 +776,9 @@
                                 })
 
                                 $(".kelompok_akun_id_kategori").val(res?.data?.kelompok_id).change();
+                                $(".add-modal-kategori").modal("show")
                             }
                         })
-
-                        validator_kategori.resetForm();
-                        validator_kategori.reset();
-                        $(".add-modal-kategori").modal("show")
-                        console.log(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -808,6 +807,9 @@
                         $(".kode_akun_header").val(res?.data?.no_header);
                         $(".nama_akun_header").val(res?.data?.nama_header);
 
+                        validator_header.resetForm();
+                        validator_header.reset();
+
                         $.ajax({
                             url: `<?= base_url("kategori-account/dropdown"); ?>`,
                             method: "GET",
@@ -821,13 +823,9 @@
                                 })
 
                                 $(".category_id_header").val(res?.data?.kategori_id).change();
+                                $(".add-modal-header").modal("show")
                             }
                         })
-
-                        validator_header.resetForm();
-                        validator_header.reset();
-                        $(".add-modal-header").modal("show")
-                        console.log(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -857,6 +855,9 @@
                         $(".kode_akun_sub").val(res?.data?.no_sub);
                         $(".nama_akun_sub").val(res?.data?.nama_sub);
                         $(".status_sub").prop( "checked", res?.data?.status === "Aktif" ? true : false);
+
+                        validator_sub.resetForm();
+                        validator_sub.reset();
 
                         $.ajax({
                             url: `<?= base_url("header-account/dropdown"); ?>`,
@@ -888,13 +889,9 @@
                                 })
 
                                 $(".coa_id_sub").val(res?.data?.coa_id).change();
+                                $(".add-modal-sub").modal("show")
                             }
                         })
-
-                        validator_sub.resetForm();
-                        validator_sub.reset();
-                        $(".add-modal-sub").modal("show")
-                        console.log(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -955,11 +952,10 @@
                     res.data.forEach(function(item) {
                         $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
                     })
+                    $(".delete-btn-kategori").css('display', 'none');
+                    $(".add-modal-kategori").modal("show")
                 }
             })
-
-            $(".delete-btn-kategori").css('display', 'none');
-            $(".add-modal-kategori").modal("show")
         })
 
         $(".btn-show-form-header").click(function() {
@@ -982,11 +978,10 @@
                     res.data.forEach(function(item) {
                         $(".category_id_header").append(`<option value="${item.id}">${item.nama_kategori}</option>`)
                     })
+                    $(".delete-btn-header").css('display', 'none');
+                    $(".add-modal-header").modal("show")
                 }
             })
-
-            $(".delete-btn-header").css('display', 'none');
-            $(".add-modal-header").modal("show")
         })
 
         $(".btn-show-form-sub").click(function() {
@@ -1027,11 +1022,10 @@
                     result.data.forEach(function(item) {
                         $(".coa_id_sub").append(`<option value="${item.id}">${item.value}</option>`)
                     })
+                    $(".delete-btn-sub").css('display', 'none');
+                    $(".add-modal-sub").modal("show")
                 }
             })
-            
-            $(".delete-btn-sub").css('display', 'none');
-            $(".add-modal-sub").modal("show")
         })
 
         $(".btn-hide-form-kategori").click(function() {

@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                        <div class="row">
+                            <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select province_parent_id" name="province_parent_id" id="province_parent_id" onchange="getCityParent()">
@@ -238,18 +238,21 @@
 </div>
 
 <!-- Begin Page Content -->
-<div class="container-fluid">
-    <div>
-        <div>
-            <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Vendor</h4>
-            <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-            </button>
-        </div>
+<section class="section">
+<div class="section-header">
+    <h1>Vendor</h1>
+    <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal">
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+    </button>
+</div>
+<div class="row">
+    <div class="col-md-10">
     </div>
-    <div>
-        <input class="form-control search float-right" placeholder="Search" style="width: 30%" value="" />
+    <div class="col-md-2">
+        <input class="form-control search" placeholder="Search" value="" />
     </div>
+</div>
+<div class="row">
     <div class="table-responsive">
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
@@ -267,6 +270,7 @@
         </table>
     </div>
 </div>
+</section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -551,7 +555,7 @@
             .find('label')
             .css('z-index', '1');
 
-            var validator = $(".create-form").validate({
+        var validator = $(".create-form").validate({
             rules: {
                 kode: {
                     required: true
@@ -713,6 +717,10 @@
             validator.resetForm();
             validator.reset();
 
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', 'none');
+            $(".body-detail-table").empty()
+
             $.ajax({
                 url: `<?= base_url("sub-account/dropdown"); ?>`,
                 method: "GET",
@@ -731,13 +739,10 @@
 
                     $(".ap_id").val().change();
                     $(".ar_id").val().change();
+
+                    $(".add-modal").modal("show")
                 }
             })
-
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".body-detail-table").empty()
-            $(".add-modal").modal("show")
         })
 
         $(".btn-hide-detail").click(function() {
@@ -774,45 +779,6 @@
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
-
-                        // AJAX GET CITY
-                        $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_parent_id").empty()
-                                $(".city_parent_id").val("").change()
-                                $(".city_parent_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                                })
-
-                                $(".city_parent_id").val(res?.data?.city_id).change();
-                                $(".parent_postal_code").val(res?.data?.postal_code);
-                            }
-                        })
-
-                        $.ajax({
-                            url: `<?= base_url("sub-account/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".ap_id").empty()
-                                $(".ar_id").empty()
-
-                                $(".ap_id").append(`<option value=""></option>`)
-                                $(".ar_id").append(`<option value=""></option>`)
-
-                                result.data.forEach(function(item) {
-                                    $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                                    $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                                })
-
-                                $(".ap_id").val(res?.data?.ap_id).change();
-                                $(".ar_id").val(res?.data?.ar_id).change();
-                            }
-                        })
 
                         row = res?.data?.list_address.length;
 
@@ -870,7 +836,46 @@
                         validator.resetForm();
                         validator.reset();
                         list_delete = [];
-                        $(".add-modal").modal("show")
+
+                        // AJAX GET CITY
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_parent_id").empty()
+                                $(".city_parent_id").val("").change()
+                                $(".city_parent_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                                })
+
+                                $(".city_parent_id").val(res?.data?.city_id).change();
+                                $(".parent_postal_code").val(res?.data?.postal_code);
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("sub-account/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".ap_id").empty()
+                                $(".ar_id").empty()
+
+                                $(".ap_id").append(`<option value=""></option>`)
+                                $(".ar_id").append(`<option value=""></option>`)
+
+                                result.data.forEach(function(item) {
+                                    $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                                    $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                                })
+
+                                $(".ap_id").val(res?.data?.ap_id).change();
+                                $(".ar_id").val(res?.data?.ar_id).change();
+                                $(".add-modal").modal("show")
+                            }
+                        })
                     } else {
                         Swal.fire({
                             icon: 'error',

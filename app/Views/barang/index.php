@@ -470,9 +470,6 @@
                 },
                 ar_id: {
                     required: true
-                },
-                stok: {
-                    required: true
                 }
             },
             messages: {
@@ -524,10 +521,15 @@
         });
 
         $(".btn-show-form").click(function() {
+            $('.stok').rules('add', {
+                required: true
+            });
             $(".id").val("");
             $(".title-name").text("Add New");
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
+            $(".stok").attr("readonly", false);
+            $(".kode_barang").attr("readonly", false);
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -543,7 +545,7 @@
                         $(".kategori_id").append(`<option value="${item.id}">${item.value}</option>`)
                     })
 
-                    $(".kategori_id").val().change();
+                    $(".kategori_id").val("").change();
                 }
             })
 
@@ -563,8 +565,8 @@
                         $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
                     })
 
-                    $(".ap_id").val().change();
-                    $(".ar_id").val().change();
+                    $(".ap_id").val("").change();
+                    $(".ar_id").val("").change();
                 }
             })
 
@@ -581,7 +583,7 @@
                         $(".satuan_id").append(`<option value="${item.id}">${item.nama_satuan}</option>`)
                     })
 
-                    $(".satuan_id").val().change();
+                    $(".satuan_id").val("").change();
                 }
             })
 
@@ -598,11 +600,10 @@
                         $(".hs_id").append(`<option value="${item.id}">${item.code}</option>`)
                     })
 
-                    $(".hs_id").val().change();
+                    $(".hs_id").val("").change();
+                    $(".add-modal").modal("show")
                 }
             })
-
-            $(".add-modal").modal("show")
         })
 
         $(".btn-hide-form").click(function() {
@@ -611,10 +612,13 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+            $('.stok').rules('remove', 'required');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
+            $(".stok").attr("readonly", true);
+            $(".kode_barang").attr("readonly", true);
 
             $.ajax({
                 url: "<?= base_url("barang/id"); ?>" + "/" + id,
@@ -625,16 +629,83 @@
                         $(".id").val(id);
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".nama_barang").val(res?.data?.nama_barang);
-                        $(".satuan_id").val(res?.data?.satuan_id).change();
-                        $(".kategori_id").val(res?.data?.kategori_id).change();
-                        $(".hs_id").val(res?.data?.hs_id).change();
-                        $(".ap_id").val(res?.data?.ap_id).change();
-                        $(".ar_id").val(res?.data?.ar_id).change();
-
+                        
                         validator.resetForm();
                         validator.reset();
-                        $(".add-modal").modal("show")
-                        console.log(res.data);
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'kategori_barang'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".kategori_id").empty()
+                                $(".kategori_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".kategori_id").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".kategori_id").val(res?.data?.kategori_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("sub-account/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".ap_id").empty()
+                                $(".ar_id").empty()
+
+                                $(".ap_id").append(`<option value=""></option>`)
+                                $(".ar_id").append(`<option value=""></option>`)
+
+                                result.data.forEach(function(item) {
+                                    $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                                    $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                                })
+
+                                $(".ap_id").val(res?.data?.ap_id).change();
+                                $(".ar_id").val(res?.data?.ar_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("satuan/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".satuan_id").empty()
+
+                                $(".satuan_id").append(`<option value=""></option>`)
+
+                                result.data.forEach(function(item) {
+                                    $(".satuan_id").append(`<option value="${item.id}">${item.nama_satuan}</option>`)
+                                })
+
+                                $(".satuan_id").val(res?.data?.satuan_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("kode-hs/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".hs_id").empty()
+
+                                $(".hs_id").append(`<option value=""></option>`)
+
+                                result.data.forEach(function(item) {
+                                    $(".hs_id").append(`<option value="${item.id}">${item.code}</option>`)
+                                })
+
+                                $(".hs_id").val(res?.data?.hs_id).change();
+                                $(".add-modal").modal("show")
+                            }
+                        })
                     } else {
                         Swal.fire({
                             icon: 'error',

@@ -256,6 +256,12 @@
             $(".title-name").text("Add New");
             $(".employee_id").val("").change();
 
+            $(".company_role").val('');
+            validator.resetForm();
+            validator.reset();
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', 'none');
+
             $.ajax({
                 url: `<?= base_url("employee/dropdown"); ?>`,
                 method: "GET",
@@ -267,15 +273,9 @@
                     res.data.forEach(function(item) {
                         $(".employee_id").append(`<option value="${item.id}">${item.name}</option>`)
                     })
+                    $(".add-modal").modal("show")
                 }
             })
-
-            $(".company_role").val('');
-            validator.resetForm();
-            validator.reset();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
         })
 
         $(".btn-hide-form").click(function() {
@@ -467,25 +467,14 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             $('.password').rules('remove', 'required');
             const data = table.row(this).data();
-
-            $.ajax({
-                url: `<?= base_url("employee/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".employee_id").empty()
-                    $(".employee_id").val("").change()
-                    $(".employee_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".employee_id").append(`<option value="${item.id}">${item.name}</option>`)
-                    })
-                }
-            })
             
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
+
+            validator.resetForm();
+            validator.reset();
 
             $.ajax({
                 url: "<?= base_url("user/id"); ?>" + "/" + id,
@@ -496,13 +485,23 @@
                         $(".id").val(id);
                         $(".name").val(res?.data?.name);
                         $(".username").val(res?.data?.username);
-                        $(".employee_id").val(res?.data?.employee_id).change();
                         $(".status").val(res?.data?.status);
-                        // $(".company_role").val(res?.data?.company_role);
-                        validator.resetForm();
-                        validator.reset();
-                        $(".add-modal").modal("show")
-                        console.log(res.data);
+
+                        $.ajax({
+                            url: `<?= base_url("employee/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".employee_id").empty()
+                                $(".employee_id").val("").change()
+                                $(".employee_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".employee_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                })
+                                $(".employee_id").val(res?.data?.employee_id).change();
+                                $(".add-modal").modal("show")
+                            }
+                        })
                     }
                     else
                     {

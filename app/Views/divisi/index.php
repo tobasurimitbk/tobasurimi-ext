@@ -385,7 +385,6 @@
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")
-                        console.log(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',

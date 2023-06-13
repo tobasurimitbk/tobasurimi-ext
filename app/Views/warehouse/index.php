@@ -45,7 +45,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id">
+                                <select class="form-select city_id" name="city_id" id="city_id" onchange="getZipCode()">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">City</label>
@@ -55,7 +55,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">Zip Code</label>
                             </div>
                         </div>
@@ -400,6 +400,9 @@
             let id = data.id;
             $(".title-name").text("Update");
 
+            validator.resetForm();
+            validator.reset();
+
             $.ajax({
                 url: "<?= base_url("warehouse/id"); ?>" + "/" + id,
                 method: "GET",
@@ -410,9 +413,9 @@
                         $(".warehouse_name").val(res?.data?.warehouse_name);
                         $(".address").val(res?.data?.address);
                         $(".pic_id").val(res?.data?.pic_id).change();
-                        $(".zip_code").val(res?.data?.zip_code);
                         $(".phone").val(res?.data?.phone);
                         $(".email").val(res?.data?.email);
+                        $(".province_id").val(res?.data?.province_id).change();
 
                         // AJAX GET CITY
                         $.ajax({
@@ -424,16 +427,14 @@
                                 $(".city_id").val("").change()
                                 $(".city_id").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
+                                    $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                                 })
 
                                 $(".city_id").val(res?.data?.city_id).change();
+                                $(".zip_code").val(res?.data?.zip_code);
+                                $(".add-modal").modal("show")
                             }
                         })
-
-                        validator.resetForm();
-                        validator.reset();
-                        $(".add-modal").modal("show")
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -585,11 +586,15 @@
                     $(".city_id").val("").change()
                     $(".city_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}">${item.city_name}</option>`)
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
                     })
                 }
             })
         }
+    }
+
+    const getZipCode = function() {
+        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
     }
 
     const changeSort = function(val) {
