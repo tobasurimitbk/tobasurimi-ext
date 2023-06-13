@@ -14,13 +14,13 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" placeholder="Kode Barang">
+                                <input type="text" class="form-control kode_barang" name="kode_barang" id="kode_barang" placeholder="Kode Barang">
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" placeholder="Nama Barang">
+                                <input type="text" class="form-control nama_barang" name="nama_barang" id="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
@@ -28,18 +28,16 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select satuan_barang" name="satuan_barang" id="satuan_barang">
+                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                     <option value=""></option>
-                                    <option value="PCE">PCE</option>
                                 </select>
                                 <label for="floatingInput">Satuan Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select add_kategori" name="add_kategori" id="add_kategori">
+                                <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
                                     <option value=""></option>
-                                    <option value="Non Header">Non Header</option>
                                 </select>
                                 <label for="floatingInput">Kategori</label>
                             </div>
@@ -48,7 +46,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_hs" name="kode_hs" id="kode_hs">
+                                <select class="form-select hs_id" name="hs_id" id="hs_id">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Kode HS</label>
@@ -56,9 +54,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select akun_pembelian_1" name="akun_pembelian_1" id="akun_pembelian_1">
+                                <select class="form-select ap_id" name="ap_id" id="ap_id">
                                     <option value=""></option>
-                                    <option value="30152T.C02">30152T.C02</option>
                                 </select>
                                 <label for="floatingInput">Akun Pembelian</label>
                             </div>
@@ -67,17 +64,29 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select akun_pembelian_2" name="akun_pembelian_2" id="akun_pembelian_2">
+                                <select class="form-select ar_id" name="ar_id" id="ar_id">
                                     <option value=""></option>
-                                    <option value="30152T.C02">30152T.C02</option>
                                 </select>
-                                <label for="floatingInput">Akun Pembelian</label>
+                                <label for="floatingInput">Akun Penjualan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control">
-                                <label for="floatingInput">Stock</label>
+                                <input type="number" class="form-control stok" name="stok" id="stok">
+                                <label for="floatingInput">Stok</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="mb-3" style="height: 50px;">
+                                <label for="floatingInput">Status</label>
+                                <div>
+                                    <label class="switch">
+                                    <input class="status" name="status" id="status" type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -145,7 +154,8 @@
                     <th>Header</th>
                     <th>Akun Pembelian</th>
                     <th>Akun Penjualan</th>
-                    <th>Saldo</th>
+                    <th>Stok</th>
+                    <th>Status</th> 
                 </tr>
             </thead>
             <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -157,6 +167,83 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: false,
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("barang/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+            }
+        },
+        // scrollX: true,
+        "initComplete": function (settings, json) {    
+            $('.dataTables_length').empty();    
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "kode_barang",
+            className: "text-center"
+        },
+        {
+            data: "nama_barang",
+            className: "text-center"
+        },
+        {
+            data: "kode_satuan",
+            className: "text-center"
+        },
+        {
+            data: "kategori",
+            className: "text-center"
+        },
+        {
+            data: "kode_hs",
+            className: "text-center"
+        },
+        {
+            data: "sub_akun_ap",
+            className: "text-center"
+        },
+        {
+            data: "sub_akun_ar",
+            className: "text-center"
+        },
+        {
+            data: "stok",
+            className: "text-center"
+        },
+        {
+            data: "status",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     $(document).ready(function() {
         $('.kategori').select2({
@@ -170,22 +257,21 @@
         })
 
         // SATUAN BARANG
-        $('.satuan_barang').select2({
+        $('.satuan_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $(".satuan_barang")
+        $(".satuan_id")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $(".satuan_barang")
+        $(".satuan_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -193,7 +279,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $(".satuan_barang")
+        $(".satuan_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -202,7 +288,6 @@
         $('.satuan_hs').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         })
 
@@ -228,22 +313,21 @@
             .css('z-index', '1');
 
         // AKUN PEMBELIAN 1
-        $('.akun_pembelian_1').select2({
+        $('.ap_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.akun_pembelian_1')
+        $('.ap_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.akun_pembelian_1')
+        $('.ap_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -251,28 +335,27 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.akun_pembelian_1')
+        $('.ap_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
         // AKUN PEMBELIAN 2
-        $('.akun_pembelian_2').select2({
+        $('.ar_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.akun_pembelian_2')
+        $('.ar_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.akun_pembelian_2')
+        $('.ar_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -280,28 +363,27 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.akun_pembelian_2')
+        $('.ar_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
         // KATEGORI
-        $('.add_kategori').select2({
+        $('.kategori_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.add_kategori')
+        $('.kategori_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.add_kategori')
+        $('.kategori_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -309,28 +391,27 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.add_kategori')
+        $('.kategori_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
         // KODE HS
-        $('.kode_hs').select2({
+        $('.hs_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.kode_hs')
+        $('.hs_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.kode_hs')
+        $('.hs_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -338,21 +419,346 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.kode_hs')
+        $('.hs_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        var validator = $(".create-form").validate({
+            rules: {
+                kode_barang: {
+                    required: true
+                },
+                nama_barang: {
+                    required: true
+                },
+                satuan_id: {
+                    required: true
+                },
+                kategori_id: {
+                    required: true
+                },
+                hs_id: {
+                    required: true
+                },
+                ap_id: {
+                    required: true
+                },
+                ar_id: {
+                    required: true
+                },
+                stok: {
+                    required: true
+                }
+            },
+            messages: {
+                kode_barang: {
+                    required: "Kode is Required"
+                },
+                nama_barang: {
+                    required: "Nama is Required"
+                },
+                satuan_id: {
+                    required: "Satuan is Required"
+                },
+                kategori_id: {
+                    required: "Kategori is Required"
+                },
+                hs_id: {
+                    required: "Kode HS is Required"
+                },
+                ap_id: {
+                    required: "Akun Pembelian is Required"
+                },
+                ar_id: {
+                    required: "Akun Pembelian is Required"
+                },
+                stok: {
+                    required: "Stok is Required"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".title-name").text("Add New");
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'kategori_barang'
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".kategori_id").empty()
+                    $(".kategori_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".kategori_id").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".kategori_id").val().change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("sub-account/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".ap_id").empty()
+                    $(".ar_id").empty()
+
+                    $(".ap_id").append(`<option value=""></option>`)
+                    $(".ar_id").append(`<option value=""></option>`)
+
+                    res.data.forEach(function(item) {
+                        $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                        $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                    })
+
+                    $(".ap_id").val().change();
+                    $(".ar_id").val().change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("satuan/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".satuan_id").empty()
+
+                    $(".satuan_id").append(`<option value=""></option>`)
+
+                    res.data.forEach(function(item) {
+                        $(".satuan_id").append(`<option value="${item.id}">${item.nama_satuan}</option>`)
+                    })
+
+                    $(".satuan_id").val().change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("kode-hs/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".hs_id").empty()
+
+                    $(".hs_id").append(`<option value=""></option>`)
+
+                    res.data.forEach(function(item) {
+                        $(".hs_id").append(`<option value="${item.id}">${item.code}</option>`)
+                    })
+
+                    $(".hs_id").val().change();
+                }
+            })
+
             $(".add-modal").modal("show")
         })
 
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
+        })
+
+        $(".btn-submit-form").click(function() {
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        setLoading()
+                        let data = new FormData(document.querySelector(".create-form"));
+
+                        let id = $(".id").val();
+                        // UPDATE
+                        if(id)
+                        {
+                            $.ajax({
+                                url: "<?= base_url("barang/update"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            table.ajax.reload()
+                                            $(".add-modal").modal("hide")
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            });
+                        }
+                        // CREATE
+                        else
+                        {
+                            $.ajax({
+                                url: "<?= base_url("barang/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        stopLoading()
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            table.ajax.reload()
+                                            $(".add-modal").modal("hide")
+                                        })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            });
+                        }
+                    }
+                })
+            }
+        })
+
+        $(".delete-btn").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $(".id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("barang/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
         })
     })
 </script>

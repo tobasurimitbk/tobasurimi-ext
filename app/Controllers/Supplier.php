@@ -108,6 +108,12 @@ class Supplier extends BaseController
             ],
             "city_parent_id" => [
                 "rules" => "required"
+            ],
+            "ap_id" => [
+                "rules" => "required"
+            ],
+            "ar_id" => [
+                "rules" => "required"
             ]
         ];
 
@@ -129,8 +135,8 @@ class Supplier extends BaseController
                 "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                 "province_id" => $this->request->getPost("province_parent_id"),
                 "city_id" => $this->request->getPost("city_parent_id"),
-                "ap_id" => 1,
-                "ar_id" => 1,
+                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
@@ -200,6 +206,12 @@ class Supplier extends BaseController
             ],
             "city_parent_id" => [
                 "rules" => "required"
+            ],
+            "ap_id" => [
+                "rules" => "required"
+            ],
+            "ar_id" => [
+                "rules" => "required"
             ]
         ];
 
@@ -224,6 +236,8 @@ class Supplier extends BaseController
                 "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                 "province_id" => $this->request->getPost("province_parent_id"),
                 "city_id" => $this->request->getPost("city_parent_id"),
+                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
         }

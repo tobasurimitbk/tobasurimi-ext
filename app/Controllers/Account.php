@@ -57,6 +57,27 @@ class Account extends BaseController
         return;
     }
 
+    public function dropdownSubAccount()
+    {
+        $token = session()->get("login")->token;
+
+        $this_company_id = session()->get("login")->this_company_id;
+
+        $responseKelompokAkunSub = curl_request("GET", "/subAkun/all?idCompany=$this_company_id", $token);
+
+        $dataKelompokAkunSub = [];
+        if ($responseKelompokAkunSub["code"] === 200) {
+            $dataKelompokAkunSub = json_decode($responseKelompokAkunSub["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataKelompokAkunSub
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function allKategoriAccount()
     {
         $token = session()->get("login")->token;
