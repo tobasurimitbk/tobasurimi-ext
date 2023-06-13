@@ -48,7 +48,7 @@
 .bg-login-register .card.card-login-register {
   background: #ffffff;
   box-shadow: none;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 0px #e7323a solid;
 }
 
@@ -163,7 +163,6 @@
   .card.card-login-register
   .card-body
   .btn.btn-login-register {
-  background-color: #e7323a;
   border-radius: 6px;
   height: 58px;
   font-size: 13px;
@@ -172,6 +171,13 @@
   font-weight: 600;
   box-shadow: none !important;
   border: 0px #559884 solid;
+  background: rgb(221, 39, 51);
+  background: linear-gradient(
+    45deg,
+    rgba(221, 39, 51, 1) 0%,
+    rgba(231, 50, 58, 1) 35%,
+    rgba(221, 39, 51, 1) 100%
+  );
 }
 
 .bg-login-register
