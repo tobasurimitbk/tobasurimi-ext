@@ -241,34 +241,36 @@
 <section class="section">
 <div class="section-header">
     <h1>Customer</h1>
-    <button class="btn btn-show-form btn-add btn-block float-right" data-btn="create-modal">
+    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
     </button>
 </div>
-<div class="row">
-    <div class="col-md-10">
+<div class="card">
+    <div class="card-body">
+    <div class="row justify-content-end mb-3">
+        <div class="col-md-2">
+            <input class="form-control search" placeholder="Search" value="" />
+        </div>
     </div>
-    <div class="col-md-2">
-        <input class="form-control search" placeholder="Search" value="" />
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                <thead class="thead-dark">
+                    <tr>
+                        <th onclick="changeSort('kode')" class="sort">Kode</th>
+                        <th onclick="changeSort('name')" class="sort">Nama</th>
+                        <th onclick="changeSort('address')" class="sort">Alamat</th>
+                        <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
+                        <th onclick="changeSort('city_name')" class="sort">Kota</th>
+                    </tr>
+                </thead>
+                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-<div class="row">
-    <div class="table-responsive">
-        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-            <thead class="thead-dark">
-                <tr>
-                    <th onclick="changeSort('kode')" class="sort">Kode</th>
-                    <th onclick="changeSort('name')" class="sort">Nama</th>
-                    <th onclick="changeSort('address')" class="sort">Alamat</th>
-                    <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
-                    <th onclick="changeSort('city_name')" class="sort">Kota</th>
-                </tr>
-            </thead>
-            <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
-            </tbody>
-        </table>
-    </div>
 </div>
 </section>
 

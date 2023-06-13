@@ -7,7 +7,7 @@ $currentUriSegment = "/" . service('uri')->getSegment(1);
     <aside id="sidebar-wrapper">
 
         <div class="sidebar-brand">
-            <img src="<?= base_url("assets/img/logo.png"); ?>" width="170" height="60">
+            <img src="<?= base_url("assets/img/logo.png"); ?>">
         </div>
 
         <div class="sidebar-brand sidebar-brand-sm">
