@@ -551,7 +551,7 @@
             .find('label')
             .css('z-index', '1');
 
-        var validator = $(".create-form").validate({
+            var validator = $(".create-form").validate({
             rules: {
                 kode: {
                     required: true
@@ -586,6 +586,12 @@
                     required: true
                 },
                 city_parent_id: {
+                    required: true
+                },
+                ap_id: {
+                    required: true
+                },
+                ar_id: {
                     required: true
                 }
             },
@@ -624,6 +630,12 @@
                 },
                 city_parent_id: {
                     required: "Kota is Required"
+                },
+                ap_id: {
+                    required: "Akun AP is Required"
+                },
+                ar_id: {
+                    required: "Akun AR is Required"
                 }
             },
             errorElement: 'span',
@@ -701,6 +713,27 @@
             validator.resetForm();
             validator.reset();
 
+            $.ajax({
+                url: `<?= base_url("sub-account/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".ap_id").empty()
+                    $(".ar_id").empty()
+
+                    $(".ap_id").append(`<option value=""></option>`)
+                    $(".ar_id").append(`<option value=""></option>`)
+
+                    res.data.forEach(function(item) {
+                        $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                        $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                    })
+
+                    $(".ap_id").val().change();
+                    $(".ar_id").val().change();
+                }
+            })
+
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
             $(".body-detail-table").empty()
@@ -757,6 +790,27 @@
 
                                 $(".city_parent_id").val(res?.data?.city_id).change();
                                 $(".parent_postal_code").val(res?.data?.postal_code);
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("sub-account/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".ap_id").empty()
+                                $(".ar_id").empty()
+
+                                $(".ap_id").append(`<option value=""></option>`)
+                                $(".ar_id").append(`<option value=""></option>`)
+
+                                result.data.forEach(function(item) {
+                                    $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                                    $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                                })
+
+                                $(".ap_id").val(res?.data?.ap_id).change();
+                                $(".ar_id").val(res?.data?.ar_id).change();
                             }
                         })
 

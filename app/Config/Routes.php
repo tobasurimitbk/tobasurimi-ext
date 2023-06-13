@@ -91,6 +91,12 @@ $routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBaran
 
 // BARANG
 $routes->get('/barang', 'Barang::barang', ['filter' => 'Auth']);
+$routes->get('/barang/all', 'Barang::allBarang', ['filter' => 'Auth']);
+$routes->get('/barang/id/(:segment)', 'Barang::getByIdBarang/$1', ['filter' => 'Auth']);
+$routes->post('/barang/save', 'Barang::saveBarang', ['filter' => 'Auth']);
+$routes->post('/barang/update', 'Barang::updateBarang', ['filter' => 'Auth']);
+$routes->post('/barang/update-status', 'Barang::updateStatusBarang', ['filter' => 'Auth']);
+$routes->post('/barang/delete', 'Barang::deleteBarang', ['filter' => 'Auth']);
 
 // DIVISI
 $routes->get('/divisi', 'Divisi::divisi', ['filter' => 'Auth']);
@@ -123,9 +129,19 @@ $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Aut
 // METADATA
 $routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
 
+// KODE HS
+$routes->get('/kode-hs/dropdown', 'KodeHS::dropdownKodeHS', ['filter' => 'Auth']);
+
+// SATUAN
+$routes->get('/satuan/dropdown', 'Satuan::dropdownSatuan', ['filter' => 'Auth']);
+
+// METADATA
+$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
+
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Account::dropdownHeaderAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/dropdown', 'Account::dropdownSubAccount', ['filter' => 'Auth']);
 
 // ACCOUNT AND FINANCE
 // ACCOUNT
