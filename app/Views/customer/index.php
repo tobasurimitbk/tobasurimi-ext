@@ -739,8 +739,8 @@
                         $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
                     })
 
-                    $(".ap_id").val().change();
-                    $(".ar_id").val().change();
+                    $(".ap_id").val('').change();
+                    $(".ar_id").val('').change();
 
                     $(".add-modal").modal("show")
                 }
