@@ -95,6 +95,7 @@ $routes->get('/barang/all', 'Barang::allBarang', ['filter' => 'Auth']);
 $routes->get('/barang/id/(:segment)', 'Barang::getByIdBarang/$1', ['filter' => 'Auth']);
 $routes->post('/barang/save', 'Barang::saveBarang', ['filter' => 'Auth']);
 $routes->post('/barang/update', 'Barang::updateBarang', ['filter' => 'Auth']);
+$routes->post('/barang/update-status', 'Barang::updateStatusBarang', ['filter' => 'Auth']);
 $routes->post('/barang/delete', 'Barang::deleteBarang', ['filter' => 'Auth']);
 
 // DIVISI

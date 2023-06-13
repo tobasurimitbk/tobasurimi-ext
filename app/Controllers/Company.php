@@ -22,17 +22,8 @@ class Company extends BaseController
             $dataProvinces = json_decode($responseProvinces["body"])->data;
         }
 
-         //Get Employees
-         $responseEmployees = curl_request("GET", "/employees/selectOption", $token);
-
-         $dataEmployees = [];
-         if ($responseEmployees["code"] === 200) {
-             $dataEmployees = json_decode($responseEmployees["body"])->data;
-         }
-
         $data = [
             "dataProvinces" => $dataProvinces,
-            "dataEmployees" => $dataEmployees
         ];
 
         return view('company/index', $data);

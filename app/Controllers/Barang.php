@@ -13,25 +13,16 @@ class Barang extends BaseController
     {
         $token = session()->get("login")->token;
 
-        // Get Satuan
-        $responseSatuan = curl_request("GET", "/satuan/all", $token);
+        // Get Kategori
+        $responseKategori = curl_request("GET", "/metadata/all?name=kategori_barang", $token);
 
-        $dataSatuan = [];
-        if ($responseSatuan["code"] === 200) {
-            $dataSatuan = json_decode($responseSatuan["body"])->data;
-        }
-
-        // Get HS Code
-        $responseHS = curl_request("GET", "/hscode/all", $token);
-
-        $dataHS = [];
-        if ($responseHS["code"] === 200) {
-            $dataHS = json_decode($responseHS["body"])->data;
+        $dataKategori = [];
+        if ($responseKategori["code"] === 200) {
+            $dataKategori = json_decode($responseKategori["body"])->data;
         }
          
         $data = [
-            "dataSatuan" => $dataSatuan,
-            "dataHS" => $dataHS
+            "dataKategori" => $dataKategori
         ];
 
         return view('barang/index', $data);
@@ -70,7 +61,7 @@ class Barang extends BaseController
                     "kode_hs" => "",
                     "sub_akun_ap" => $data->sub_akun_ap,
                     "sub_akun_ar" => $data->sub_akun_ar,
-                    "stok" => "",
+                    "stok" => $data->stok,
                     "status" => $data->status,
                 ]);
             }
@@ -239,6 +230,42 @@ class Barang extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateStatusBarang()
+    {
+        $token = session()->get("login")->token;
+
+        $id = $this->request->getPost("id");
+
+        $this_company_id = session()->get("login")->this_company_id;
+
+        $payload = json_encode([
+            "company_id" => $this_company_id,
+            "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
+        ]);
+        
+        $response = curl_request("PATCH", "/barang/$id", $token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Data Berhasil diubah",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

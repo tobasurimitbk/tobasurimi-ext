@@ -115,12 +115,21 @@
                 <div class="col-md-2">
                     <input class="form-control search" placeholder="Search" value="" />
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <select class="form-select kategori" name="kategori" id="kategori" aria-label="Floating label select example">
                         <option value="">Kategori: All</option>
+                        <?php
+                        if (!empty($dataKategori)) {
+                            foreach ($dataKategori as $kategori) {
+                        ?>
+                                <option value="<?= $kategori->id; ?>"><?= $kategori->value; ?></option>
+                        <?php
+                            }
+                        }
+                        ?>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                         <option value="Aktif">Status: Aktif</option>
                         <option value="Tidak Aktif">Status: Tidak Aktif</option>
@@ -151,7 +160,6 @@
                     <th>Satuan</th>
                     <th>Kategori</th>
                     <th>Kode HS</th>
-                    <th>Header</th>
                     <th>Akun Pembelian</th>
                     <th>Akun Penjualan</th>
                     <th>Stok</th>
@@ -225,11 +233,31 @@
         },
         {
             data: "stok",
-            className: "text-center"
+            className: "text-center",
+            render: function(data, type, row) {
+                return `
+                <div class="text-danger">
+                ${data}
+                </div>
+                `
+            }
         },
         {
             data: "status",
-            className: "text-center"
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                return `
+                <div class="mt-2">
+                <label class="switch">
+                <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
+                <span class="slider round"></span>
+                </label>
+                </div>
+                `
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -248,12 +276,8 @@
     $(document).ready(function() {
         $('.kategori').select2({
             placeholder: "Kategori: All",
-            theme: "bootstrap-5"
-        })
-
-        $('.status').select2({
-            placeholder: "Status: All",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            allowClear: true
         })
 
         // SATUAN BARANG
@@ -585,6 +609,43 @@
             $(".add-modal").modal("hide")
         })
 
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', '');
+            let id = data.id;
+            $(".title-name").text("Update");
+
+            $.ajax({
+                url: "<?= base_url("barang/id"); ?>" + "/" + id,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        $(".id").val(id);
+                        $(".kode_barang").val(res?.data?.kode_barang);
+                        $(".nama_barang").val(res?.data?.nama_barang);
+                        $(".satuan_id").val(res?.data?.satuan_id).change();
+                        $(".kategori_id").val(res?.data?.kategori_id).change();
+                        $(".hs_id").val(res?.data?.hs_id).change();
+                        $(".ap_id").val(res?.data?.ap_id).change();
+                        $(".ar_id").val(res?.data?.ar_id).change();
+
+                        validator.resetForm();
+                        validator.reset();
+                        $(".add-modal").modal("show")
+                        console.log(res.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            })
+        })
+
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
@@ -761,6 +822,60 @@
             })
         })
     })
+
+    const changeStatus = function(id)
+    {
+        const csrf = $(`[name="${csrfToken}"]`);
+        let value = document.getElementById('status_table_' + id).checked ? true : false;
+
+        let data = {
+            id: id
+        }
+
+        if(value)
+        {
+            data["status"] = true;
+        }
+
+        $.ajax({
+            url: "<?= base_url("barang/update-status"); ?>",
+            data: data,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    stopLoading()
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                    .then(() => {
+                        subTable.ajax.reload()
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Gagal Disimpan, coba Lagi',
+                    confirmButtonColor: '#4e73df',
+                })
+                stopLoading()
+            }
+        });
+    }
 </script>
 
 <?= $this->endSection(); ?>

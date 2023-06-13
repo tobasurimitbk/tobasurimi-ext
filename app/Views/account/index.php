@@ -464,19 +464,19 @@
         {
             data: "status",
             className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let id = row?.id;
-                    return `
-                    <div class="mt-2">
-                    <label class="switch">
-                    <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
-                    <span class="slider round"></span>
-                    </label>
-                    </div>
-                    `
-                }
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                return `
+                <div class="mt-2">
+                <label class="switch">
+                <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
+                <span class="slider round"></span>
+                </label>
+                </div>
+                `
+            }
         }],              
         columnDefs: [{
             defaultContent: "-",

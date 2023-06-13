@@ -93,15 +93,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select pic_id" name="pic_id" id="pic_id">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataEmployees)) {
-                                        foreach ($dataEmployees as $employee) {
-                                    ?>
-                                            <option value="<?= $employee->id; ?>"><?= $employee->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">PIC</label>
                             </div>
@@ -402,7 +393,6 @@
             $(".title-name").text("Add New");
             $(".province_id").val('').change();
             $(".city_id").val('').change();
-            $(".pic_id").val('').change();
 
             $(".city_id").empty()
             $(".city_id").append(`<option value=""></option>`)
@@ -410,6 +400,23 @@
             document.getElementById("preview_photo").src = "<?= base_url() ?>assets/img/avatar/logo.png";
             validator.resetForm();
             validator.reset();
+
+            $.ajax({
+                url: `<?= base_url("employee/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".pic_id").empty()
+                    $(".pic_id").val("").change()
+                    $(".pic_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+
+                    $(".pic_id").val('').change();
+                }
+            })
+
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show")
@@ -438,7 +445,6 @@
                         $(".id").val(id);
                         $(".company").val(res?.data?.company);
                         $(".holding_company").val(res?.data?.holding_company);
-                        $(".pic_id").val(res?.data?.pic_id).change();
                         $(".address").val(res?.data?.address);
                         $(".email").val(res?.data?.email);
                         $(".phone").val(res?.data?.phone);
@@ -459,6 +465,22 @@
                                 })
 
                                 $(".city_id").val(res?.data?.city_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("employee/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".pic_id").empty()
+                                $(".pic_id").val("").change()
+                                $(".pic_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                })
+
+                                $(".pic_id").val(res?.data?.pic_id).change();
                             }
                         })
 
