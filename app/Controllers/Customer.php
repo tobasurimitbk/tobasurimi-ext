@@ -68,6 +68,8 @@ class Customer extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataCustomer,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

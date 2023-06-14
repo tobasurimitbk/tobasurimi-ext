@@ -67,6 +67,8 @@ class Vendor extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataVendor,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

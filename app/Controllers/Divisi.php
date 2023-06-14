@@ -71,7 +71,9 @@ class Divisi extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataCompany
+            "data" => $dataCompany,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

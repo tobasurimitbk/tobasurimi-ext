@@ -85,7 +85,8 @@ class CompanyAccess extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataUser,
-            "response" => $response
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

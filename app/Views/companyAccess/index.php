@@ -435,8 +435,6 @@
 
             list_address = [];
 
-            $(".body-detail-table").empty()
-
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()

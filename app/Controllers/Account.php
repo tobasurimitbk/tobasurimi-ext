@@ -115,7 +115,9 @@ class Account extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataKategori
+            "data" => $dataKategori,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);
@@ -341,7 +343,9 @@ class Account extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataHeader
+            "data" => $dataHeader,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);
@@ -547,7 +551,7 @@ class Account extends BaseController
         ];
 
         $response = curl_request("GET", "/subAkun", $token, $payload);
-        $dataHeader = [];
+        $dataSub = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -555,7 +559,7 @@ class Account extends BaseController
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
             foreach ($body as $data) {
-                array_push($dataHeader, [
+                array_push($dataSub, [
                     "id" => $data->id,
                     "kategori_id" => $data->kategori_id,
                     "header_id" => $data->header_id,
@@ -574,7 +578,9 @@ class Account extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataHeader
+            "data" => $dataSub,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

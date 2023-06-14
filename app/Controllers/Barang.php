@@ -38,10 +38,12 @@ class Barang extends BaseController
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
+            "idCategory" => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
+            "status" => $this->request->getGet("status"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
             "idCompany" => $this_company_id
-        ];
+        ]; 
 
         $response = curl_request("GET", "/barang", $token, $payload);
         $dataUser = [];
@@ -58,7 +60,7 @@ class Barang extends BaseController
                     "nama_barang" => $data->nama_barang,
                     "kode_satuan" => $data->kode_satuan,
                     "kategori" => $data->kategori,
-                    "kode_hs" => "",
+                    "code_hs" => $data->code_hs,
                     "sub_akun_ap" => $data->sub_akun_ap,
                     "sub_akun_ar" => $data->sub_akun_ar,
                     "stok" => $data->stok,
@@ -72,7 +74,8 @@ class Barang extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataUser,
-            "response" => $response
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);
