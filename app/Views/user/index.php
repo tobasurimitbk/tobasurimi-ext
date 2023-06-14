@@ -395,9 +395,6 @@
                 password: {
                     minlength: 6,
                     required: true
-                },
-                employee_id: {
-                    required: true
                 }
             },
             messages: {
@@ -452,6 +449,7 @@
 
         $(".btn-show-form").click(function() {
             $('.password').rules('add', {required: true});
+            $('.employee_id').rules('add', {required: true});
             $(".id").val("");
             $(".title-name").text("Add New");
 
@@ -850,6 +848,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             $('.password').rules('remove', 'required');
+            $('.employee_id').rules('remove', 'required');
             const data = table.row(this).data();
             
             $(".create-form")[0].reset()

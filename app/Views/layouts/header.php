@@ -91,32 +91,22 @@
     </ul>
 </nav>
 
-<!-- Logout Modal-->
-<div class="modal logout-modal" tabindex="-1">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-secondary">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-discard" onclick="hideLogoutForm()">Cancel</button>
-                <a class="btn btn-logout-form" href="<?= base_url("logout"); ?>">Logout</a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
-    const showLogoutForm = function(e) {
-        $(".logout-modal").modal("show")
-    }
-
-    const hideLogoutForm = function(e) {
-        $(".logout-modal").modal("hide")
+    const showLogoutForm = function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin anda akan logout?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Logout',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "<?= base_url("logout"); ?>";
+            }
+        })
     }
 
     const tes = function(dropdownCompanyId, dropdownCompanyName) {

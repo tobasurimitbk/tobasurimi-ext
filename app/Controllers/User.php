@@ -260,9 +260,6 @@ class User extends BaseController
             ],
             "username" => [
                 "rules" => "required"
-            ],
-            "employee_id" => [
-                "rules" => "required"
             ]
         ];
 
@@ -272,15 +269,29 @@ class User extends BaseController
 
             $this_company_id = session()->get("login")->this_company_id;
 
-            $payload = json_encode([
-                "company_id" => $this_company_id,
-                "name" => $this->request->getPost("name"),
-                "username" => $this->request->getPost("username"),
-                "password" => $this->request->getPost("password"),
-                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
-                "status" => $this->request->getPost("status")
-            ]);
+            if($this->request->getPost("employee_id")){
+                $payload = json_encode([
+                    "company_id" => $this_company_id,
+                    "name" => $this->request->getPost("name"),
+                    "username" => $this->request->getPost("username"),
+                    "password" => $this->request->getPost("password"),
+                    "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                    "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
+                    "status" => $this->request->getPost("status")
+                ]);
+            }
+            else
+            {
+                $payload = json_encode([
+                    "company_id" => $this_company_id,
+                    "name" => $this->request->getPost("name"),
+                    "username" => $this->request->getPost("username"),
+                    "password" => $this->request->getPost("password"),
+                    "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
+                    "status" => $this->request->getPost("status")
+                ]);
+            }
+            
             
             $response = curl_request("PATCH", "/users/$id", $token, $payload);
 
