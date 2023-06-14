@@ -116,30 +116,7 @@ class User extends BaseController
 
     public function user()
     {
-        $token = session()->get("login")->token;
-
-        //Get Role
-        $responseRole = curl_request("GET", "/roles/selectOption", $token);
-
-        $dataRole = [];
-        if ($responseRole["code"] === 200) {
-            $dataRole = json_decode($responseRole["body"])->data;
-        }
-         
-        //Get Company
-        $responseCompany = curl_request("GET", "/companies/all", $token);
-
-        $dataCompany = [];
-        if ($responseCompany["code"] === 200) {
-            $dataCompany = json_decode($responseCompany["body"])->data;
-        }
-
-        $data = [
-            "dataRole" => $dataRole,
-            "dataCompany" => $dataCompany
-        ];
-
-        return view('user/index', $data);
+        return view('user/index');
     }
 
     public function allUser()
@@ -388,6 +365,25 @@ class User extends BaseController
             ];
             echo json_encode($data);
         }
+        return;
+    }
+
+    public function dropdownUser()
+    {
+        $token = session()->get("login")->token;
+
+        $responseUser = curl_request("GET", "/users/selectOption", $token);
+
+        $dataUser = [];
+        if ($responseUser["code"] === 200) {
+            $dataUser = json_decode($responseUser["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataUser
+        ];
+
+        echo json_encode($data);
         return;
     }
 }

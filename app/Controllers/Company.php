@@ -359,4 +359,23 @@ class Company extends BaseController
         }
         return;
     }
+
+    public function dropdownCompany()
+    {
+        $token = session()->get("login")->token;
+
+        $responseCompany = curl_request("GET", "/companies/all", $token);
+
+        $dataCompany = [];
+        if ($responseCompany["code"] === 200) {
+            $dataCompany = json_decode($responseCompany["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataCompany
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

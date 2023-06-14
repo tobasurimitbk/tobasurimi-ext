@@ -175,9 +175,10 @@
     </div>
 </div>
 
-
 <!-- Begin Page Content -->
-<div class="container-fluid">
+<section class="section">
+<div class="section-header">
+    <h1>Account</h1>
     <!-- Navigation -->
     <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
         <li class="nav-item" role="presentation" style="cursor:pointer">
@@ -190,104 +191,105 @@
             <a class="nav-link" onclick="removeAllTab()" id="sub-tab" data-toggle="tab" data-target="#sub" role="tab" aria-controls="sub" aria-selected="false">Sub Akun</a>
         </li>
     </ul>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
+                <div class="collapse-kategori-list show" id="collapseKategoriList">
+                    <div>
+                        <button class="btn btn-show-form-kategori btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                        </button>
+                    </div>
+                    <div>
+                        <input class="form-control search-kategori float-right" placeholder="Search" style="width: 30%" value="" />
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th onclick="changeSortKategori('kelompok_akun')" class="sort">Kelompok Akun</th>
+                                    <th onclick="changeSortKategori('no_kategori')" class="sort">No. Kategori Akun</th>
+                                    <th onclick="changeSortKategori('nama_kategori')" class="sort">Nama Kategori Akun</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
-            <div class="collapse-kategori-list show" id="collapseKategoriList">
-                <div>
-                    <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Account</h4>
-                    <button class="btn btn-show-form-kategori btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-                    </button>
-                </div>
-                <div>
-                    <input class="form-control search-kategori float-right" placeholder="Search" style="width: 30%" value="" />
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th onclick="changeSortKategori('kelompok_akun')" class="sort">Kelompok Akun</th>
-                                <th onclick="changeSortKategori('no_kategori')" class="sort">No. Kategori Akun</th>
-                                <th onclick="changeSortKategori('nama_kategori')" class="sort">Nama Kategori Akun</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
-            <div class="collapse-header-list show" id="collapseHeaderList">
-                <div>
-                    <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Account</h4>
-                    <button class="btn btn-show-form-header btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-                    </button>
-                </div>
-                <div>
-                    <input class="form-control search-header float-right" placeholder="Search" style="width: 30%" value="" />
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th onclick="changeSortHeader('nama_kategori')" class="sort">Kategori Akun</th>
-                                <th onclick="changeSortHeader('no_header')" class="sort">No. Header Akun</th>
-                                <th onclick="changeSortHeader('nama_header')" class="sort">Nama Header Akun</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
-            <div class="collapse-header-list show" id="collapseSubList">
-                <div>
-                    <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Account</h4>
-                    <button class="btn btn-show-form-sub btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-                    </button>
-                </div>
-                <div>
-                    <div class="form-row justify-content-end">
-                        <div class="col-md-3">
-                            <input class="form-control search-sub" placeholder="Search" value="" />
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                                <option value="Aktif">Aktif</option>
-                                <option value="Void">Void</option>
-                            </select>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th onclick="changeSortSub('nama_kategori')" class="sort">Kategori Akun</th>
-                                <th onclick="changeSortSub('no_header')" class="sort">No. Header Akun</th>
-                                <th onclick="changeSortSub('nama_header')" class="sort">Header Akun</th>
-                                <th onclick="changeSortSub('no_sub')" class="sort">No. Sub Akun</th>
-                                <th onclick="changeSortSub('nama_sub')" class="sort">Nama Sub Akun</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            </div>
+            <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
+                <div class="collapse-header-list show" id="collapseHeaderList">
+                    <div>
+                        <button class="btn btn-show-form-header btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                        </button>
+                    </div>
+                    <div>
+                        <input class="form-control search-header float-right" placeholder="Search" style="width: 30%" value="" />
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th onclick="changeSortHeader('nama_kategori')" class="sort">Kategori Akun</th>
+                                    <th onclick="changeSortHeader('no_header')" class="sort">No. Header Akun</th>
+                                    <th onclick="changeSortHeader('nama_header')" class="sort">Nama Header Akun</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
+                <div class="collapse-header-list show" id="collapseSubList">
+                    <div>
+                        <button class="btn btn-show-form-sub btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                        </button>
+                    </div>
+                    <div>
+                        <div class="form-row justify-content-end">
+                            <div class="col-md-3">
+                                <input class="form-control search-sub" placeholder="Search" value="" />
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Void">Void</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th onclick="changeSortSub('nama_kategori')" class="sort">Kategori Akun</th>
+                                    <th onclick="changeSortSub('no_header')" class="sort">No. Header Akun</th>
+                                    <th onclick="changeSortSub('nama_header')" class="sort">Header Akun</th>
+                                    <th onclick="changeSortSub('no_sub')" class="sort">No. Sub Akun</th>
+                                    <th onclick="changeSortSub('nama_sub')" class="sort">Nama Sub Akun</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+</section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';

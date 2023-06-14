@@ -105,73 +105,73 @@
 </div>
 
 <!-- Begin Page Content -->
-<div class="container-fluid">
-    <div class="mb-2">
-        <div>
-            <h5 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Master Barang</h5>
-        </div>
-        <div>
-            <div class="form-row justify-content-end">
-                <div class="col-md-2">
-                    <input class="form-control search" placeholder="Search" value="" />
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select kategori" name="kategori" id="kategori" aria-label="Floating label select example">
-                        <option value="">Kategori: All</option>
-                        <?php
-                        if (!empty($dataKategori)) {
-                            foreach ($dataKategori as $kategori) {
-                        ?>
-                                <option value="<?= $kategori->id; ?>"><?= $kategori->value; ?></option>
-                        <?php
-                            }
+<section class="section">
+<div class="section-header">
+    <h1>Barang</h1>
+    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+    </button>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row justify-content-end mb-3">
+            <div class="col-md-2">
+                <input class="form-control search" placeholder="Search" value="" />
+            </div>
+            <div class="col-md-3">
+                <select class="form-select kategori" name="kategori" id="kategori" aria-label="Floating label select example">
+                    <option value="">Kategori: All</option>
+                    <?php
+                    if (!empty($dataKategori)) {
+                        foreach ($dataKategori as $kategori) {
+                    ?>
+                            <option value="<?= $kategori->id; ?>"><?= $kategori->value; ?></option>
+                    <?php
                         }
-                        ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select filter_status" name="filter_status" id="filter_status" aria-label="Floating label select example">
-                        <option value="Aktif">Status: Aktif</option>
-                        <option value="Tidak Aktif">Status: Tidak Aktif</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-export btn-dropdown-export dropdown-toggle" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                        Export
-                    </button>
-                    <ul class="dropdown-menu list-dropdown-export" aria-labelledby="dropdownMenuButtonExport">
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select filter_status" name="filter_status" id="filter_status" aria-label="Floating label select example">
+                    <option value="Aktif">Status: Aktif</option>
+                    <option value="Tidak Aktif">Status: Tidak Aktif</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-export btn-dropdown-export dropdown-toggle" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                    Export
+                </button>
+                <ul class="dropdown-menu list-dropdown-export" aria-labelledby="dropdownMenuButtonExport">
 
-                    </ul>
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-show-form btn-add btn-block">
-                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-                    </button>
-                </div>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
+                            <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                            <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
+                            <th onclick="changeSort('kategori')" class="sort">Kategori</th>
+                            <th onclick="changeSort('code_hs')" class="sort">Kode HS</th>
+                            <th onclick="changeSort('sub_akun_ap')" class="sort">Akun Pembelian</th>
+                            <th onclick="changeSort('sub_akun_ar')" class="sort">Akun Penjualan</th>
+                            <th onclick="changeSort('stok')" class="sort">Stok</th>
+                            <th>Status</th> 
+                        </tr>
+                    </thead>
+                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-            <thead class="thead-dark">
-                <tr>
-                    <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                    <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                    <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
-                    <th onclick="changeSort('kategori')" class="sort">Kategori</th>
-                    <th onclick="changeSort('code_hs')" class="sort">Kode HS</th>
-                    <th onclick="changeSort('sub_akun_ap')" class="sort">Akun Pembelian</th>
-                    <th onclick="changeSort('sub_akun_ar')" class="sort">Akun Penjualan</th>
-                    <th onclick="changeSort('stok')" class="sort">Stok</th>
-                    <th>Status</th> 
-                </tr>
-            </thead>
-            <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
-            </tbody>
-        </table>
-    </div>
 </div>
+</section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
