@@ -108,6 +108,9 @@
 <section class="section">
 <div class="section-header">
     <h1>Company Access</h1>
+    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+    </button>
 </div>
 <div class="card">
     <div class="card-body">
@@ -436,6 +439,42 @@
                     confirmButtonColor: '#4e73df',
                 })
             }
+        })
+
+        $(".btn-show-form").click(function() {
+            $(".id").val("");
+            $(".create-user").css("display", "");
+            $(".edit-user").css("display", "none");
+            $(".company_id").val("").change();
+            $(".role_id").val("").change();
+            $(".title-name").text("Add New");
+
+            $(".body-detail-table").empty()
+
+            row = 0;
+
+            list_address = [];
+
+            validator.resetForm();
+            validator.reset();
+            $(".create-form")[0].reset()
+            $(".delete-btn").css('display', 'none');
+
+            $.ajax({
+                url: `<?= base_url("user/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".user_id").empty()
+                    $(".user_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".user_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+
+                    $(".user_id").val("").change();
+                    $(".add-modal").modal("show")
+                }
+            })
         })
 
         $(".btn-hide-detail").click(function() {
