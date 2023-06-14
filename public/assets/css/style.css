@@ -150,7 +150,7 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fab {
 .text-danger-all *,
 .text-danger-all *:before,
 .text-danger-all *:after {
-  color: #fc544b !important;
+  color: #e7323a !important;
 }
 
 .text-light,
@@ -243,8 +243,9 @@ select.form-control:not([size]):not([multiple]),
   font-size: 13px;
   font-weight: 500;
   color: #2f4858;
-  padding: 10px 15px;
-  height: 42px;
+  padding: 12px 12px;
+  height: 50px;
+  padding-bottom: 0px;
 }
 
 textarea.form-control {
@@ -4371,11 +4372,22 @@ footer.main-footer .footer-right a {
   color: #e7323a;
 }
 
+.modal .modal-dialog .modal-content .modal-header .modal-title label {
+  margin-bottom: 0px;
+}
+
 .modal .modal-dialog .modal-content .modal-header .close {
   display: none;
 }
 
 .modal .modal-dialog .modal-content .modal-header {
+  background: #f3eed9;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  padding: 25px;
+}
+
+.modal.logout-modal .modal-dialog .modal-content .modal-header {
   background: #f3eed9;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
@@ -4388,10 +4400,20 @@ footer.main-footer .footer-right a {
   padding: 25px;
   padding-bottom: 0px;
   color: #2f4858;
+}
+
+.modal.logout-modal .modal-dialog .modal-content .modal-body {
+  padding: 25px;
+  padding-bottom: 0px;
+  color: #2f4858;
   text-align: center;
 }
 
 .modal .modal-dialog .modal-content .modal-footer {
+  padding: 25px;
+}
+
+.modal.logout-modal .modal-dialog .modal-content .modal-footer {
   padding: 25px;
   display: block;
   text-align: center;
@@ -4429,4 +4451,78 @@ footer.main-footer .footer-right a {
 .modal .modal-dialog .modal-content .modal-footer .btn-logout-form:active {
   opacity: 0.72;
   transition: 0.3s ease-in;
+}
+
+.select2-container.select2-container--focus .select2-selection--multiple,
+.select2-container.select2-container--focus .select2-selection--single {
+  box-shadow: none !important;
+  border-color: #a5ae9d !important;
+  height: 50px !important;
+}
+
+.select2-container.select2-container--open .select2-selection--single {
+  box-shadow: none;
+  border-color: #a5ae9d !important;
+}
+
+.select2-container .select2-dropdown {
+  border-color: #a5ae9d !important;
+}
+
+.select2-container .select2-dropdown .select2-search .select2-search__field {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2f4858;
+  box-shadow: none !important;
+  border-color: #a5ae9d !important;
+}
+
+.select2-container--bootstrap-5
+  .select2-dropdown
+  .select2-results__options
+  .select2-results__option {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 12px;
+  font-weight: 500;
+  color: #2f4858 !important;
+  margin-left: 0px;
+  top: 0px;
+  position: relative;
+  line-height: 1.8;
+}
+
+.form-floating span.text-danger {
+  font-size: 11px;
+  margin-top: 7px;
+  display: block;
+  margin-left: 12px;
+}
+
+.select2-container--bootstrap-5
+  .select2-selection--single
+  .select2-selection__rendered {
+  margin-top: 14px !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2f4858 !important;
+}
+
+.select2-container--bootstrap-5
+  .select2-dropdown
+  .select2-results__options
+  .select2-results__option.select2-results__option--highlighted {
+  background-color: #f3eed9;
+}
+
+.form-floating > .form-control-plaintext ~ label,
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+  opacity: 0.25 !important;
+}
+
+.select2-container .select2-selection--single {
+  height: 50px !important;
 }
