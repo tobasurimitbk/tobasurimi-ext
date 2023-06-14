@@ -4341,4 +4341,5 @@ footer.main-footer .footer-right {
 
 footer.main-footer .footer-right a {
   color: #e7323a;
+  transition: all 0.5s;
 }
