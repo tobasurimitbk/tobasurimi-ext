@@ -54,6 +54,7 @@
 
 .bg-login-register .card.card-login-register .card-body img {
   width: 100%;
+  max-width: 80%;
 }
 
 .bg-login-register .card.card-login-register .card-body h4 {
