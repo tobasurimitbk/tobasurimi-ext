@@ -41,14 +41,14 @@
   align-items: center;
   justify-content: center;
   font-family: "Poppins", sans-serif !important;
-  background: #2f4858;
-  background-image: url("/../assets/img/bg_login.jpg");
+  background: #f6f4f1;
+  /* background-image: url("/../assets/img/bg_login.jpg"); */
 }
 
 .bg-login-register .card.card-login-register {
   background: #ffffff;
-  box-shadow: none;
-  border-radius: 4px;
+  box-shadow: 0px 2px 10px rgba(231, 50, 58, 0.05);
+  border-radius: 6px;
   border: 0px #e7323a solid;
 }
 
@@ -112,7 +112,7 @@
   font-weight: 500;
   color: #2f4858 !important;
   border: 1px #a5ae9d solid;
-  border-left: 0px;
+  border-left: 1px #a5ae9d solid !important;
 }
 
 .bg-login-register
@@ -179,6 +179,7 @@
     rgba(231, 50, 58, 1) 35%,
     rgba(221, 39, 51, 1) 100%
   );
+  margin-top: 15px;
 }
 
 .bg-login-register
@@ -195,7 +196,7 @@
   .card-body
   form.user
   .btn.btn-login-register:active {
-  opacity: 0.82;
+  opacity: 0.72;
   transition: 0.3s ease-in;
 }
 
