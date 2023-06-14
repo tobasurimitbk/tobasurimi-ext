@@ -124,15 +124,16 @@
 </div>
 
 <!-- Begin Page Content -->
-<div class="container-fluid">
-    <div class="mb-5">
-        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Employee</h4>
-        <button class="btn btn-show-form btn-add btn-block" data-btn="create-modal" style="width: 176px;">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
-        </button>
-    </div>
-    <div class="mb-2">
-        <div class="form-row mx-0">
+<section class="section">
+<div class="section-header">
+    <h1>Employee</h1>
+    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+    </button>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row justify-content-end mb-3">
             <div class="form-group col-md-3">
                 <input class="form-control search" placeholder="Search" value="" />
             </div>
@@ -151,24 +152,27 @@
                 </select>
             </div>
         </div>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-            <thead class="thead-dark">
-                <tr>
-                    <th>NIP</th>
-                    <th>Full Name</th>
-                    <th>Divisi</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>NIP</th>
+                            <th>Full Name</th>
+                            <th>Divisi</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
+</section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';

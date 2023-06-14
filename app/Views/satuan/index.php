@@ -44,34 +44,34 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Kode Satuan</h1>
+    <h1>Data Satuan</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
     <div class="card-body">
-    <div class="row justify-content-end mb-3">
-        <div class="col-md-2">
-            <input class="form-control search" placeholder="Search" value="" />
+        <div class="row justify-content-end mb-3">
+            <div class="col-md-2">
+                <input class="form-control search" placeholder="Search" value="" />
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th onclick="changeSort('kode_satuan')" class="sort">Kode Satuan</th>
-                        <th onclick="changeSort('nama_satuan')" class="sort">Nama Satuan</th>
-                    </tr>
-                </thead>
-                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th onclick="changeSort('kode_satuan')" class="sort">Kode Satuan</th>
+                            <th onclick="changeSort('nama_satuan')" class="sort">Nama Satuan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 </div>
 </section>
 
