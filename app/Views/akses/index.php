@@ -2,72 +2,76 @@
 <?= $this->Section('content'); ?>
 
 <!-- Begin Page Content -->
-<div class="container-fluid">
-    <div class="mb-5 d-flex">
-        <h4 style="padding-top: 6px; color: #3B4758;" class="m-0 font-weight-bold my-2">Management Hak Akses</h4>
-        <div class="col px-0 py-2 text-right">
-            <button type="button" id="submit-btn" class="btn btn-submit-form" onclick="submitForm()" disabled>Save</button>
-        </div>
-   </div>
-   <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-        <?= csrf_field() ?>
-        <div class="row mb-5">
-            <div class="col-md-4">
-                <div class="form-floating mb-2" style="height: 50px;">
-                    <select class="form-control company_id" name="company_id" id="company_id" onchange="setChanges()">
-                        <option value=""></option>
-                        <?php
-                            if (!empty($dataCompany)) {
-                                foreach ($dataCompany as $company) {
+<section class="section">
+<div class="section-header">
+    <h1>Manajemen Hak Akses</h1>
+    <button class="btn btn-show-form btn-add float-right" id="submit-btn" onclick="submitForm()" disabled>
+        Save
+    </button>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+            <?= csrf_field() ?>
+            <div class="row mb-5">
+                <div class="col-md-4">
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <select class="form-control company_id" name="company_id" id="company_id" onchange="setChanges()">
+                            <option value=""></option>
+                            <?php
+                                if (!empty($dataCompany)) {
+                                    foreach ($dataCompany as $company) {
+                                ?>
+                                        <option value="<?= $company->id; ?>"><?= $company->company; ?></option>
+                                <?php
+                                    }
+                                }
                             ?>
-                                    <option value="<?= $company->id; ?>"><?= $company->company; ?></option>
+                        </select>
+                        <label for="floatingInput">Company</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <select class="form-control role_id" name="role_id" id="role_id" onchange="setChanges()">
+                            <option value=""></option>
+                            <?php
+                            if (!empty($dataRole)) {
+                                foreach ($dataRole as $role) {
+                            ?>
+                                <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
                             <?php
                                 }
                             }
-                        ?>
-                    </select>
-                    <label for="floatingInput">Company</label>
+                            ?>
+                        </select>
+                        <label for="floatingInput">Role</label>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="form-floating mb-2" style="height: 50px;">
-                    <select class="form-control role_id" name="role_id" id="role_id" onchange="setChanges()">
-                        <option value=""></option>
-                        <?php
-                        if (!empty($dataRole)) {
-                            foreach ($dataRole as $role) {
-                        ?>
-                            <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
-                        <?php
-                            }
-                        }
-                        ?>
-                    </select>
-                    <label for="floatingInput">Role</label>
-                </div>
-            </div>
-        </div>
-        <div class="table-responsive view_access" id="view_access" name="view_access" style="display: none">
-            <table style="overflow-x: scroll;" class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th style="width: 200px;">Menu</th>
-                        <th class="text-center" width="60">Create</th>
-                        <th class="text-center" width="60">Read</th>
-                        <th class="text-center" width="60">Update</th>
-                        <th class="text-center" width="60">Delete</th>
-                        <th class="text-center" width="60">Print</th>
-                        <th class="text-center" width="60">Approval</th>
-                        <th class="text-center" width="60">All</th>
-                    </tr>
-                </thead>
-                <tbody class="body-akses" id="body-akses">
+            <div class="table-responsive view_access" id="view_access" name="view_access" style="display: none">
+                <table style="overflow-x: scroll;" class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="width: 200px;">Menu</th>
+                            <th class="text-center" width="60">Create</th>
+                            <th class="text-center" width="60">Read</th>
+                            <th class="text-center" width="60">Update</th>
+                            <th class="text-center" width="60">Delete</th>
+                            <th class="text-center" width="60">Print</th>
+                            <th class="text-center" width="60">Approval</th>
+                            <th class="text-center" width="60">All</th>
+                        </tr>
+                    </thead>
+                    <tbody class="body-akses" id="body-akses">
 
-                </tbody>
-            </table>
-        </div>
-   </form>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
 </div>
+</section>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
