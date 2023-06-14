@@ -4238,6 +4238,7 @@ body:not(.sidebar-mini)
   margin-left: 5px;
   margin-right: 5px;
   margin-bottom: 0;
+  cursor: pointer;
 }
 
 table.dataTable {
