@@ -4168,7 +4168,7 @@ body:not(.sidebar-mini)
 }
 
 .navbar ul.navbar-nav li.dropdown .dropdown-menu.dropdown-menu-right {
-  left: -128px;
+  left: -78px;
   border-radius: 4px;
   padding: 0px;
   border: 0px;
@@ -4232,6 +4232,12 @@ body:not(.sidebar-mini)
   letter-spacing: 0;
   padding: 10px 15px;
   border: 0px;
+}
+
+.navbar ul.navbar-nav li.dropdown .nav-link .form-label {
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 0;
 }
 
 table.dataTable {
