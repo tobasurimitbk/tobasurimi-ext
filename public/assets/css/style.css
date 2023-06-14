@@ -76,11 +76,11 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fas,
 a:not(.btn-social-icon):not(.btn-social):not(.page-link) .far,
 a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fal,
 a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fab {
-  margin-left: 4px;
+  margin-left: 0px;
 }
 
 .bg-primary {
-  background-color: #6777ef !important;
+  background-color: #007ae0 !important;
 }
 
 .bg-secondary {
@@ -88,7 +88,7 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fab {
 }
 
 .bg-success {
-  background-color: #47c363 !important;
+  background-color: #4e8a00 !important;
 }
 
 .bg-info {
@@ -100,7 +100,7 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fab {
 }
 
 .bg-danger {
-  background-color: #fc544b !important;
+  background-color: #e7323a !important;
 }
 
 .bg-light {
@@ -784,7 +784,7 @@ select.form-control:not([size]):not([multiple]) {
 .card {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
   background-color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   border: none;
   position: relative;
   margin-bottom: 30px;
@@ -1026,7 +1026,7 @@ select.form-control:not([size]):not([multiple]) {
 .card.card-statistic-1 .card-header h4,
 .card.card-statistic-2 .card-header h4 {
   line-height: 1.2;
-  color: #98a6ad;
+  color: #798897;
 }
 .card.card-statistic-1 .card-body,
 .card.card-statistic-2 .card-body {
@@ -1034,9 +1034,10 @@ select.form-control:not([size]):not([multiple]) {
 }
 .card.card-statistic-1 .card-body,
 .card.card-statistic-2 .card-body {
+  font-family: "Poppins", sans-serif !important;
   font-size: 26px;
   font-weight: 700;
-  color: #34395e;
+  color: #2f4858;
   padding-bottom: 0;
 }
 .card.card-statistic-1,
@@ -1049,7 +1050,7 @@ select.form-control:not([size]):not([multiple]) {
   width: 80px;
   height: 80px;
   margin: 10px;
-  border-radius: 4px;
+  border-radius: 50%;
   line-height: 94px;
   text-align: center;
   float: left;
@@ -1065,8 +1066,10 @@ select.form-control:not([size]):not([multiple]) {
 .card.card-statistic-2 .card-icon .far,
 .card.card-statistic-2 .card-icon .fab,
 .card.card-statistic-2 .card-icon .fal {
-  font-size: 22px;
+  font-size: 28px;
   color: #fff;
+  position: relative;
+  top: 2px;
 }
 .card.card-statistic-1 .card-icon {
   line-height: 90px;
@@ -1092,9 +1095,11 @@ select.form-control:not([size]):not([multiple]) {
 }
 .card.card-statistic-1 .card-header h4,
 .card.card-statistic-2 .card-header h4 {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 13px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0px;
+  font-family: "Poppins", sans-serif !important;
+  margin-top: 5px;
 }
 .card.card-statistic-1 .card-header h4 {
   margin-bottom: 0;
@@ -1422,7 +1427,7 @@ table tr:hover .table-links {
 /* 3.10 Pagination */
 .page-item .page-link {
   color: #6777ef;
-  border-radius: 3px;
+  border-radius: 4px;
   margin: 0 3px;
 }
 .page-item.active .page-link {
@@ -3184,7 +3189,7 @@ pre {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
   background-color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   border: none;
   position: relative;
   margin-bottom: 30px;
@@ -3887,7 +3892,7 @@ body.layout-3 .main-footer {
   border: 0px;
 }
 .main-sidebar .sidebar-menu li ul.dropdown-menu li a {
-  color: #868e96;
+  color: #798897;
   height: 35px;
   padding-left: 65px;
   font-weight: 400;
@@ -3911,7 +3916,7 @@ body.layout-3 .main-footer {
 .main-content {
   padding-left: 280px;
   padding-right: 30px;
-  padding-top: 80px;
+  padding-top: 77px;
   width: 100%;
   position: relative;
 }
@@ -4001,7 +4006,7 @@ body:not(.sidebar-mini)
   ul.dropdown-menu
   li
   a {
-  padding-left: 65px;
+  padding-left: 62px;
   background-color: #fff;
 }
 
@@ -4093,11 +4098,13 @@ body:not(.sidebar-mini)
 }
 
 .navbar .form-inline .search-element .dropdown .btn.btn-dropdown-company {
-  border-radius: 4px;
-  color: #2f4858;
+  border-radius: 6px;
+  color: #fff;
   font-size: 13px;
   font-weight: 600;
   font-family: "Poppins", sans-serif !important;
+  background: #e7323a;
+  border: 1px #fff solid !important;
 }
 
 .navbar .form-inline .search-element .dropdown ul.dropdown-menu {
@@ -4231,7 +4238,7 @@ table.dataTable {
   font-family: "Poppins", sans-serif !important;
   font-size: 13px;
   font-weight: 500;
-  color: #798897;
+  color: #2f4858;
 }
 
 .table:not(.table-sm) thead th {
@@ -4323,13 +4330,13 @@ div.dataTables_wrapper div.dataTables_info {
   ul.dropdown-menu
   .active
   a.nav-link.active-bar {
-  padding-left: 65px;
+  padding-left: 62px;
 }
 
 .main-sidebar .sidebar-menu li.active ul.dropdown-menu .nav-link {
   font-family: "Poppins", sans-serif !important;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 footer.main-footer .footer-right {
@@ -4342,4 +4349,77 @@ footer.main-footer .footer-right {
 footer.main-footer .footer-right a {
   color: #e7323a;
   transition: all 0.5s;
+}
+
+.modal .modal-dialog .modal-content {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.modal .modal-dialog .modal-content .modal-header .modal-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #e7323a;
+}
+
+.modal .modal-dialog .modal-content .modal-header .close {
+  display: none;
+}
+
+.modal .modal-dialog .modal-content .modal-header {
+  background: #f3eed9;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  padding: 25px;
+  display: block;
+  text-align: center;
+}
+
+.modal .modal-dialog .modal-content .modal-body {
+  padding: 25px;
+  padding-bottom: 0px;
+  color: #2f4858;
+  text-align: center;
+}
+
+.modal .modal-dialog .modal-content .modal-footer {
+  padding: 25px;
+  display: block;
+  text-align: center;
+}
+
+.modal .modal-dialog .modal-content .modal-footer .btn-discard {
+  background: #ffffff;
+  color: #e7323a;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px #e7323a solid !important;
+  padding: 10px 15px;
+}
+
+.modal .modal-dialog .modal-content .modal-footer .btn-discard:hover,
+.modal .modal-dialog .modal-content .modal-footer .btn-discard:focus,
+.modal .modal-dialog .modal-content .modal-footer .btn-discard:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.modal .modal-dialog .modal-content .modal-footer .btn-logout-form {
+  background: #e7323a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px #e7323a solid !important;
+  padding: 10px 15px;
+}
+
+.modal .modal-dialog .modal-content .modal-footer .btn-logout-form:hover,
+.modal .modal-dialog .modal-content .modal-footer .btn-logout-form:focus,
+.modal .modal-dialog .modal-content .modal-footer .btn-logout-form:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
 }
