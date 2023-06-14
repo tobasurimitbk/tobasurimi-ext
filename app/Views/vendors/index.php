@@ -139,7 +139,7 @@
                         </div>
                         <div class="col-md-6">
                             <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         </div>
                     </div>
@@ -162,11 +162,11 @@
                     </div>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -186,7 +186,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
-                                <label for="floatingInput">Address</label>
+                                <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -203,7 +203,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Province</label>
+                                <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
                     </div>
@@ -213,24 +213,24 @@
                                 <select class="form-select city_id" name="city_id" id="city_id" onchange="getPostalCode()">
                                     <option value="" data-code=""></option>
                                 </select>
-                                <label for="floatingInput">City</label>
+                                <label for="floatingInput">Kota</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
-                                <label for="floatingInput">Postal Code</label>
+                                <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-detail">Delete</button>
+                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-detail">Save</button>
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-detail">Simpan</button>
                 </div>
             </div>
         </div>
@@ -242,7 +242,7 @@
 <div class="section-header">
     <h1>Vendor</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -357,13 +357,13 @@
             },
             messages: {
                 detail_address: {
-                    required: "Address is Required"
+                    required: "Address wajib diisi"
                 },
                 province_id: {
-                    required: "Province is Required"
+                    required: "Province wajib diisi"
                 },
                 city_id: {
-                    required: "City is Required"
+                    required: "City wajib diisi"
                 },
             },
             errorElement: 'span',
@@ -603,45 +603,45 @@
             },
             messages: {
                 kode: {
-                    required: "Kode is Required"
+                    required: "Kode wajib diisi"
                 },
                 name: {
-                    required: "Nama is Required"
+                    required: "Nama wajib diisi"
                 },
                 address: {
-                    required: "Alamat is Required"
+                    required: "Alamat wajib diisi"
                 },
                 no_npwp: {
-                    required: "Nomor NPWP is Required",
+                    required: "Nomor NPWP wajib diisi",
                     minlength: "Nomor NPWP min length is 15",
                     maxlength: "Nomor NPWP max length is 15",
                 },
                 phone: {
-                    required: "Phone is Required"
+                    required: "Phone wajib diisi"
                 },
                 contact_person: {
-                    required: "Contact Person is Required"
+                    required: "Contact Person wajib diisi"
                 },
                 email: {
-                    required: "Email is Required"
+                    required: "Email wajib diisi"
                 },
                 no_rekening: {
-                    required: "No. Rekening is Required"
+                    required: "No. Rekening wajib diisi"
                 },
                 supplier_buyer: {
-                    required: "Supplier / Buyer is Required"
+                    required: "Supplier / Buyer wajib diisi"
                 },
                 province_parent_id: {
-                    required: "Provinsi is Required"
+                    required: "Provinsi wajib diisi"
                 },
                 city_parent_id: {
-                    required: "Kota is Required"
+                    required: "Kota wajib diisi"
                 },
                 ap_id: {
-                    required: "Akun AP is Required"
+                    required: "Akun AP wajib diisi"
                 },
                 ar_id: {
-                    required: "Akun AR is Required"
+                    required: "Akun AR wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -687,7 +687,7 @@
             $(".city_id").empty()
             $(".city_id").append(`<option value=""></option>`)
 
-            $(".title-detail-name").text("Add New")
+            $(".title-detail-name").text("Tambah")
             $(".id_detail").val('')
             $(".detail_address").val('')
             
@@ -701,7 +701,7 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
 
             $(".province_parent_id").val('').change()
             $(".city_parent_id").val('').change()

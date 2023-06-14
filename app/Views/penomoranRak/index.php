@@ -28,11 +28,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@
 <div class="section-header">
     <h1>Penomoran Rak</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -142,10 +142,10 @@
             },
             messages: {
                 nomor: {
-                    required: "Nomor is Required"
+                    required: "Nomor wajib diisi"
                 },
                 rak: {
-                    required: "Rak is Required"
+                    required: "Rak wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -172,7 +172,7 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()

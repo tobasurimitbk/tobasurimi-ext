@@ -15,13 +15,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse Name" maxlength="30">
-                                <label for="floatingInput">Warehouse Name</label>
+                                <label for="floatingInput">Nama Warehouse</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Address</label>
+                                <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Province</label>
+                                <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -48,7 +48,7 @@
                                 <select class="form-select city_id" name="city_id" id="city_id" onchange="getZipCode()">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">City</label>
+                                <label for="floatingInput">Kota</label>
                             </div>
                         </div>
                     </div>
@@ -56,13 +56,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
-                                <label for="floatingInput">Zip Code</label>
+                                <label for="floatingInput">kode Pos</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Phone</label>
+                                <label for="floatingInput">Nomor Telepon</label>
                             </div>
                         </div>
                     </div>
@@ -94,11 +94,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@
 <div class="section-header">
     <h1>Warehouse</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -126,9 +126,9 @@
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th onclick="changeSort('warehouse_name')" class="sort">Warehouse Name</th>
-                            <th onclick="changeSort('address')" class="sort">Address</th>
-                            <th onclick="changeSort('phone')" class="sort">Phone</th>
+                            <th onclick="changeSort('warehouse_name')" class="sort">Nama Warehouse</th>
+                            <th onclick="changeSort('address')" class="sort">Alamat</th>
+                            <th onclick="changeSort('phone')" class="sort">Nomor Telepon</th>
                             <th onclick="changeSort('email')" class="sort">Email</th>
                         </tr>
                     </thead>
@@ -235,29 +235,29 @@
             },
             messages: {
                 warehouse_name: {
-                    required: "Name is required"
+                    required: "Name wajib diisi"
                 },
                 address: {
-                    required: "Address is required"
+                    required: "Address wajib diisi"
                 },
                 province_id: {
-                    required: "Province is required"
+                    required: "Province wajib diisi"
                 },
                 city_id: {
-                    required: "City is required"
+                    required: "City wajib diisi"
                 },
                 zip_code: {
-                    required: "Zip code is required"
+                    required: "Zip code wajib diisi"
                 },
                 phone: {
-                    required: "Phone is required"
+                    required: "Phone wajib diisi"
                 },
                 email: {
-                    required: "Email is required",
+                    required: "Email wajib diisi",
                     email: "Email must be valid",
                 },
                 pic_id: {
-                    required: "PIC is required"
+                    required: "PIC wajib diisi"
                 },
             },
             errorElement: 'span',
@@ -380,7 +380,7 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
 
             $(".province_id").val("").change();
             $(".city_id").val("").change();

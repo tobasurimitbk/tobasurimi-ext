@@ -6,7 +6,7 @@
 <div class="section-header">
     <h1>Manajemen Hak Akses</h1>
     <button class="btn btn-show-form btn-add float-right" id="submit-btn" onclick="submitForm()" disabled>
-        Save
+        Simpan
     </button>
 </div>
 <div class="card">

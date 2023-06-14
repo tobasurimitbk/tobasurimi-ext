@@ -6282,7 +6282,7 @@
 					.removeClass( sortClass + (i<2 ? i+1 : 3) );
 			}
 	
-			// Add new column sorting
+			// Tambah column sorting
 			for ( i=0, ien=sort.length ; i<ien ; i++ ) {
 				colIdx = sort[i].src;
 	

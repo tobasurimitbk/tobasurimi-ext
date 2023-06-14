@@ -93,10 +93,10 @@
             },
             messages: {
                 username: {
-                    required: "Username is Required"
+                    required: "Username wajib diisi"
                 },
                 password: {
-                    required: "Password is Required"
+                    required: "Password wajib diisi"
                 }
             },
             errorElement: 'span',

@@ -48,7 +48,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Full Name</label>
+                                <label for="floatingInput">Nama Lengkap</label>
                             </div>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Phone</label>
+                                <label for="floatingInput">Nomor Telepon</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -70,7 +70,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Address</label>
+                                <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -78,7 +78,7 @@
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth" maxlength="30">
-                                        <label for="floatingInput">Date of Birth</label>
+                                        <label for="floatingInput">Tanggal Lahir</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
@@ -97,7 +97,7 @@
                                     <option value="Pria">Pria</option>
                                     <option value="Wanita">Wanita</option>
                                 </select>
-                                <label for="floatingInput">Gender</label>
+                                <label for="floatingInput">Jenis Kelamin</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -121,11 +121,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -137,7 +137,7 @@
 <div class="section-header">
     <h1>Employee</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -261,28 +261,28 @@
             },
             messages: {
                 employeeImg: {
-                    required: "Image is Required"
+                    required: "Image wajib diisi"
                 },
                 nip: {
-                    required: "NIP is Required"
+                    required: "NIP wajib diisi"
                 },
                 name: {
-                    required: "Full Name is Required"
+                    required: "Full Name wajib diisi"
                 },
                 gender: {
-                    required: "Gender is Required"
+                    required: "Gender wajib diisi"
                 },
                 dob: {
-                    required: "Date of Birth is Required"
+                    required: "Date of Birth wajib diisi"
                 },
                 address: {
-                    required: "Address is Required"
+                    required: "Address wajib diisi"
                 },
                 email: {
                     email: "Email must be valid"
                 },
                 division_id: {
-                    required: "Divisi is Required"
+                    required: "Divisi wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -327,7 +327,7 @@
             $('.employeeImg').rules('add', {
                 required: true
             });
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
             validator.resetForm();
             validator.reset();
             document.getElementById("preview_photo").src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAMAAAC93eDPAAAAMFBMVEXk5ueutLfn6eqyt7qrsbTh4+TDx8q2u77Z3N3Jzc/U19nO0dPq7Oy8wcSnrrHd4OEuWFw9AAADAUlEQVR4nO2a23LjIAxAjQAbsIH//9vFTjpNUhckRyI7u5ynTF84lSVuYpoGg8FgMBgMBoPB4H8DYNs2gE+NvkEOfo4xzj7YD2jAFKIy3+jZ9bUA67Ux6hFjlnXqJwH+Zfy7hQ5bJwF3KrCTou0SCP+bwBEIJ+8Ac/rdYJcI0g6wVGJw+xirrAPElkGJg6gDzG0D2W8BK8agOIgZTBlnoNQiFQZYkAZiKQmhXo5PWBGFSeMNzCwRBmwu3h0kwoDPhEPBC4TBUYJQ4F80cbPSN4l/vdpoMZBISEuoyIOF24BWDwfsNTFTDZLjVohkBfZJmjA13uDPR7KCYlcgG6jIrUAuiH9SgWzAr/D5iqAt1YcC+3JNn5q4t/JQO0meK2ReA9re9UAzGxSoCpHdYCPmo8TJkrhhSOwCZdtECwL7xDRR968m8BsQDrU7MgdbShgEtvAHFq0gkgk7+F10EjpY73MDzkHyxgtXmCYKXsIC5mxr2M9RZActfAkMoeFgBFbIVwenahJi5fjkYCt1IXK5csLm07lEUrlXUwTKNu7nDiZ164jcJCa/mIdYGKNi6NgXukvkNepbh0wtc8gfaRXCBpPN2drjV+/BYf+fc3YuFJxz2d7/1mf0MnbwcdFafTUqjzlxieVr2EncA8D5qFM6bxKmpEtWCFrAZp/L4JziIdO5BcheN4f/LlF2C4C9Q40b/8tiWRlXTID1tUONslAz02QF00oLwINEmjkiAUFfFLhFwr8bCciI3miVsni95bCdvxIgSsTrgYCM3LS3uNy+hXA1DX86XLt928i3SzWHK8fc1jsFqoOmJ8S7lfAT4r4S806BiKEdcQQMFO0aEDxrHnxBOGw2D22XHdBHrSwjoPCXkdiLjCvgbiPpF94UFtSBS9IA1SKgduipIKqCdMF5gXZGSgehTFDNLyEsUMLQaqdLzUoPCo29g8zi8OJQr0uQN2g9bMgi69Mz9SuxC89FLlBtnMmX5E5939AhGxvPISHqDtTf+kAXqh9iMBgMBn8LfwAfLCKVi1nppAAAAABJRU5ErkJggg==";

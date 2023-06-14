@@ -15,13 +15,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control code" id="code" name="code" placeholder="Code">
-                                <label for="floatingInput">Code</label>
+                                <label for="floatingInput">Kode</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control product_name" id="product_name" name="product_name" placeholder="Product Name">
-                                <label for="floatingInput">Product Name</label>
+                                <label for="floatingInput">Nama Produk</label>
                             </div>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Province</label>
+                                <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -56,11 +56,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -73,7 +73,7 @@
 <div class="section-header">
     <h1>Produk Barang Jadi</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -88,9 +88,9 @@
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th>Code</th>
-                            <th>Produk Name</th>
-                            <th>Category</th>
+                            <th>Kode</th>
+                            <th>Nama Produk</th>
+                            <th>Kategori</th>
                             <th>Supplier</th>
                         </tr>
                     </thead>
@@ -125,16 +125,16 @@
             },
             messages: {
                 code: {
-                    required: "Code is required"
+                    required: "Code wajib diisi"
                 },
                 product_name: {
-                    required: "Product name is required"
+                    required: "Product name wajib diisi"
                 },
                 category_id: {
-                    required: "Category is required"
+                    required: "Category wajib diisi"
                 },
                 supplier: {
-                    required: "Supplier is required"
+                    required: "Supplier wajib diisi"
                 },
             },
             errorElement: 'span',
@@ -227,7 +227,7 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
 
             $(".category_id").val('').change();
             $(".supplier").val('').change();

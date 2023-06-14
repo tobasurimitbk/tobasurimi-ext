@@ -40,11 +40,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Batal</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-kategori btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Save</button>
+                    <button type="button" class="btn btn-hide-form-kategori btn-discard mr-3">Hapus</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Simpan</button>
                 </div>
             </div>
         </div>
@@ -90,11 +90,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn delete-btn-header">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-header">Batal</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-header btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-form-header">Save</button>
+                    <button type="button" class="btn btn-hide-form-header btn-discard mr-3">Hapus</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-form-header">Simpan</button>
                 </div>
             </div>
         </div>
@@ -164,11 +164,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Batal</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-sub btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Save</button>
+                    <button type="button" class="btn btn-hide-form-sub btn-discard mr-3">Hapus</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Simpan</button>
                 </div>
             </div>
         </div>
@@ -199,7 +199,7 @@
                 <div class="collapse-kategori-list show" id="collapseKategoriList">
                     <div>
                         <button class="btn btn-show-form-kategori btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>
                     <div>
@@ -225,7 +225,7 @@
                 <div class="collapse-header-list show" id="collapseHeaderList">
                     <div>
                         <button class="btn btn-show-form-header btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>
                     <div>
@@ -251,7 +251,7 @@
                 <div class="collapse-header-list show" id="collapseSubList">
                     <div>
                         <button class="btn btn-show-form-sub btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>
                     <div>
@@ -614,13 +614,13 @@
             },
             messages: {
                 kelompok_akun_id_kategori: {
-                    required: "Kelompok Akun is Required"
+                    required: "Kelompok Akun wajib diisi"
                 },
                 kode_akun_kategori: {
-                    required: "Kode Akun is Required"
+                    required: "Kode Akun wajib diisi"
                 },
                 nama_akun_kategori: {
-                    required: "Nama Akun is Required"
+                    required: "Nama Akun wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -659,13 +659,13 @@
             },
             messages: {
                 category_id_header: {
-                    required: "Kelompok Akun is Required"
+                    required: "Kelompok Akun wajib diisi"
                 },
                 kode_akun_header: {
-                    required: "Kode Akun is Required"
+                    required: "Kode Akun wajib diisi"
                 },
                 nama_akun_header: {
-                    required: "Nama Akun is Required"
+                    required: "Nama Akun wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -707,16 +707,16 @@
             },
             messages: {
                 header_id_sub: {
-                    required: "Header Akun is Required"
+                    required: "Header Akun wajib diisi"
                 },
                 coa_id_sub: {
-                    required: "COA is Required"
+                    required: "COA wajib diisi"
                 },
                 kode_akun_sub: {
-                    required: "Kode Sub Akun is Required"
+                    required: "Kode Sub Akun wajib diisi"
                 },
                 nama_akun_sub: {
-                    required: "Nama Sub Akun is Required"
+                    required: "Nama Sub Akun wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -933,7 +933,7 @@
         $(".btn-show-form-kategori").click(function() {
             $(".id_kategori").val("");
 
-            $(".title-name-kategori").text("Add New");
+            $(".title-name-kategori").text("Tambah");
             $(".kelompok_akun_id_kategori").val('').change();
 
             validator_kategori.resetForm();
@@ -963,7 +963,7 @@
         $(".btn-show-form-header").click(function() {
             $(".id_header").val("");
 
-            $(".title-name-header").text("Add New");
+            $(".title-name-header").text("Tambah");
 
             validator_header.resetForm();
             validator_header.reset();
@@ -989,7 +989,7 @@
         $(".btn-show-form-sub").click(function() {
             $(".id_sub").val("");
 
-            $(".title-name-sub").text("Add New");
+            $(".title-name-sub").text("Tambah");
 
             validator_sub.resetForm();
             validator_sub.reset();

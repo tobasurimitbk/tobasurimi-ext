@@ -69,7 +69,7 @@
                 <div class="row mt-5">
                     <div class="col">
                         <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>
                 </div>
@@ -88,11 +88,11 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -130,11 +130,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-detail">Delete</button>
+                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-detail">Save</button>
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-detail">Simpan</button>
                 </div>
             </div>
         </div>
@@ -146,7 +146,7 @@
 <div class="section-header">
     <h1>User</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -162,7 +162,7 @@
                     <thead class="thead-dark">
                         <tr>
                             <th onclick="changeSort('username')" class="sort">Username</th>
-                            <th onclick="changeSort('name')" class="sort">Name</th>
+                            <th onclick="changeSort('name')" class="sort">Nama</th>
                             <th onclick="changeSort('employeeName')" class="sort">Employee</th>
                             <th onclick="changeSort('status')" class="sort">Status</th>
                         </tr>
@@ -256,10 +256,10 @@
         },
         messages: {
             company_id: {
-                required: "Company is Required"
+                required: "Company wajib diisi"
             },
             role_id: {
-                required: "Role is Required"
+                required: "Role wajib diisi"
             },
         },
         errorElement: 'span',
@@ -381,17 +381,17 @@
             },
             messages: {
                 name: {
-                    required: "Name is Required"
+                    required: "Name wajib diisi"
                 },
                 username: {
-                    required: "Username is Required"
+                    required: "Username wajib diisi"
                 },
                 password: {
                     minlength: "Password length must be at least 6 characters long",
-                    required: "Password is Required"
+                    required: "Password wajib diisi"
                 },
                 employee_id: {
-                    required: "Employee is Required"
+                    required: "Employee wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -417,7 +417,7 @@
         });
 
         $(".btn-show-detail").click(function() {
-            $(".title-detail-name").text("Add New")
+            $(".title-detail-name").text("Tambah")
             $(".delete-detail").css('display', 'none');
             $(".id_detail").val('')
 
@@ -460,7 +460,7 @@
             $('.password').rules('add', {required: true});
             $('.employee_id').rules('add', {required: true});
             $(".id").val("");
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
 
             $(".company_role").val('');
 

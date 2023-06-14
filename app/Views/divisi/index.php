@@ -105,11 +105,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Delete</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -121,7 +121,7 @@
 <div class="section-header">
     <h1>Divisi</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -304,28 +304,28 @@
             },
             messages: {
                 divisi: {
-                    required: "Divisi is Required"
+                    required: "Divisi wajib diisi"
                 },
                 libur: {
-                    required: "Libur is Required"
+                    required: "Libur wajib diisi"
                 },
                 jam_kerja: {
-                    required: "Jam Kerja is Required"
+                    required: "Jam Kerja wajib diisi"
                 },
                 jam_istirahat: {
-                    required: "Jam Istirahat is Required"
+                    required: "Jam Istirahat wajib diisi"
                 },
                 jam_masuk: {
-                    required: "Jam Masuk is Required"
+                    required: "Jam Masuk wajib diisi"
                 },
                 jam_pulang: {
-                    required: "Jam Pulang is Required"
+                    required: "Jam Pulang wajib diisi"
                 },
                 mulai_istirahat: {
-                    required: "Mulai Istirahat is Required"
+                    required: "Mulai Istirahat wajib diisi"
                 },
                 selesai_istirahat: {
-                    required: "Selesai Istirahat is Required"
+                    required: "Selesai Istirahat wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -354,7 +354,7 @@
             $(".id").val("");
             validator.resetForm();
             validator.reset();
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
             $(".divisi").val('').change();
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');

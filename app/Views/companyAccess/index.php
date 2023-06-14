@@ -33,7 +33,7 @@
                 <div class="row mt-5">
                     <div class="col">
                         <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>
                 </div>
@@ -52,11 +52,11 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-form">Delete</button>
+                <button type="button" class="btn btn-discard delete-form">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-form">Save</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
         </div>
@@ -67,7 +67,7 @@
     <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label>  Company And Role</h5>
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label>  Company dan Role</h5>
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -93,11 +93,11 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-detail">Delete</button>
+                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Discard</button>
-                    <button type="submit" class="btn btn-submit-detail">Save</button>
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-detail">Simpan</button>
                 </div>
             </div>
         </div>
@@ -109,7 +109,7 @@
 <div class="section-header">
     <h1>Company Access</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
 </div>
 <div class="card">
@@ -204,10 +204,10 @@
             },
             messages: {
                 company_id: {
-                    required: "Company is Required"
+                    required: "Company wajib diisi"
                 },
                 role_id: {
-                    required: "Role is Required"
+                    required: "Role wajib diisi"
                 },
             },
             errorElement: 'span',
@@ -326,13 +326,13 @@
             },
             messages: {
                 user_id: {
-                    required: "User is Required"
+                    required: "User wajib diisi"
                 },
                 company_id: {
-                    required: "Company is Required"
+                    required: "Company wajib diisi"
                 },
                 role_id: {
-                    required: "Role is Required"
+                    required: "Role wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -393,7 +393,7 @@
             let user_id = $(".id").val();
             if(user_id)
             {
-                $(".title-detail-name").text("Add New")
+                $(".title-detail-name").text("Tambah")
                 $(".delete-detail").css('display', 'none');
                 $(".id_detail").val('')
 
@@ -447,7 +447,7 @@
             $(".edit-user").css("display", "none");
             $(".company_id").val("").change();
             $(".role_id").val("").change();
-            $(".title-name").text("Add New");
+            $(".title-name").text("Tambah");
 
             $(".body-detail-table").empty()
 
