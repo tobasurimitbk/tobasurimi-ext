@@ -122,6 +122,18 @@ $routes->post('/penomoran-rak/save', 'PenomoranRak::savePenomoranRak', ['filter'
 $routes->post('/penomoran-rak/update', 'PenomoranRak::updatePenomoranRak', ['filter' => 'Auth']);
 $routes->post('/penomoran-rak/delete', 'PenomoranRak::deletePenomoranRak', ['filter' => 'Auth']);
 
+// KODE HS
+$routes->get('/hs-code', 'HSCode::hsCode', ['filter' => 'Auth']);
+$routes->get('/hs-code/all', 'HSCode::allHSCode', ['filter' => 'Auth']);
+
+// SATUAN
+$routes->get('/satuan', 'Satuan::satuan', ['filter' => 'Auth']);
+$routes->get('/satuan/all', 'Satuan::allSatuan', ['filter' => 'Auth']);
+$routes->get('/satuan/id/(:segment)', 'Satuan::getByIdSatuan/$1', ['filter' => 'Auth']);
+$routes->post('/satuan/save', 'Satuan::saveSatuan', ['filter' => 'Auth']);
+$routes->post('/satuan/update', 'Satuan::updateSatuan', ['filter' => 'Auth']);
+$routes->post('/satuan/delete', 'Satuan::deleteSatuan', ['filter' => 'Auth']);
+
 // DROPDOWN
 // CITY
 $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
@@ -130,7 +142,7 @@ $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Aut
 $routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
 
 // KODE HS
-$routes->get('/kode-hs/dropdown', 'KodeHS::dropdownKodeHS', ['filter' => 'Auth']);
+$routes->get('/hs-code/dropdown', 'HSCode::dropdownHSCode', ['filter' => 'Auth']);
 
 // SATUAN
 $routes->get('/satuan/dropdown', 'Satuan::dropdownSatuan', ['filter' => 'Auth']);

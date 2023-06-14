@@ -67,6 +67,8 @@ class Supplier extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataSupplier,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

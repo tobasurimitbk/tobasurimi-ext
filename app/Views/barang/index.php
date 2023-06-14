@@ -72,7 +72,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" class="form-control stok" name="stok" id="stok">
+                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
                                 <label for="floatingInput">Stok</label>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                    <select class="form-select filter_status" name="filter_status" id="filter_status" aria-label="Floating label select example">
                         <option value="Aktif">Status: Aktif</option>
                         <option value="Tidak Aktif">Status: Tidak Aktif</option>
                     </select>
@@ -155,14 +155,14 @@
         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
-                    <th>Kode Barang</th>
-                    <th>Nama Barang</th>
-                    <th>Satuan</th>
-                    <th>Kategori</th>
-                    <th>Kode HS</th>
-                    <th>Akun Pembelian</th>
-                    <th>Akun Penjualan</th>
-                    <th>Stok</th>
+                    <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
+                    <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                    <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
+                    <th onclick="changeSort('kategori')" class="sort">Kategori</th>
+                    <th onclick="changeSort('code_hs')" class="sort">Kode HS</th>
+                    <th onclick="changeSort('sub_akun_ap')" class="sort">Akun Pembelian</th>
+                    <th onclick="changeSort('sub_akun_ar')" class="sort">Akun Penjualan</th>
+                    <th onclick="changeSort('stok')" class="sort">Stok</th>
                     <th>Status</th> 
                 </tr>
             </thead>
@@ -175,12 +175,15 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    let sort = "kode_barang";
+    let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
-        ordering: false,
+        ordering: true,
+        order: [[0, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -192,6 +195,10 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.kategori = $(".kategori").val();
+                data.status = $(".filter_status").val();
+                data.sort = sort;
+                data.sortType = sortType;
             }
         },
         // scrollX: true,
@@ -220,7 +227,7 @@
             className: "text-center"
         },
         {
-            data: "kode_hs",
+            data: "code_hs",
             className: "text-center"
         },
         {
@@ -588,7 +595,7 @@
             })
 
             $.ajax({
-                url: `<?= base_url("kode-hs/dropdown"); ?>`,
+                url: `<?= base_url("hs-code/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -690,7 +697,7 @@
                         })
 
                         $.ajax({
-                            url: `<?= base_url("kode-hs/dropdown"); ?>`,
+                            url: `<?= base_url("hs-code/dropdown"); ?>`,
                             method: "GET",
                             dataType: "json",
                             success: function(result) {
@@ -715,6 +722,10 @@
                     }
                 }
             })
+        })
+
+        $(".kategori, .filter_status").change(function () {
+            table.ajax.reload();
         })
 
         $(".btn-submit-form").click(function() {
@@ -946,6 +957,18 @@
                 stopLoading()
             }
         });
+    }
+
+    const changeSort = function(val) {
+        if(sort !== val)
+        {
+            sortType = "asc";
+            sort = val;
+        }
+        else
+        {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
     }
 </script>
 

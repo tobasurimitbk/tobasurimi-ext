@@ -88,6 +88,8 @@ class Warehouse extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataWarehouse,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

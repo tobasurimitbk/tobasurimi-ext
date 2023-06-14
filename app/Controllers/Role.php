@@ -53,6 +53,8 @@ class Role extends BaseController
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
             "data" => $dataRole,
+            "response" => $response,
+            "payload" => $payload
         ];
 
         echo json_encode($data);
