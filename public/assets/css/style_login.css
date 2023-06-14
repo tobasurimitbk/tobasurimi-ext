@@ -11,7 +11,7 @@
 }
 
 .icon-login-register {
-  color: #e7323a;
+  color: #2f4858;
 }
 
 .group-prepend-login-register {
@@ -41,7 +41,7 @@
   align-items: center;
   justify-content: center;
   font-family: "Poppins", sans-serif !important;
-  background: #f6f4f1;
+  background: #faf7f7;
   /* background-image: url("/../assets/img/bg_login.jpg"); */
 }
 
