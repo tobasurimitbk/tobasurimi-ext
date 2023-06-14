@@ -3923,13 +3923,13 @@ body.layout-3 .main-footer {
   border-top: 0px solid #e3eaef;
   display: inline-block;
   width: 100%;
-  background: rgb(221, 39, 51);
-  background: linear-gradient(
+  background: #ffffff;
+  /* background: linear-gradient(
     45deg,
     rgba(221, 39, 51, 1) 0%,
     rgba(231, 50, 58, 1) 35%,
     rgba(221, 39, 51, 1) 100%
-  );
+  ); */
   position: relative;
   bottom: -10px;
 }
@@ -4336,9 +4336,9 @@ footer.main-footer .footer-right {
   font-family: "Poppins", sans-serif !important;
   font-size: 12px;
   font-weight: 500;
-  color: #ffffff;
+  color: #2f4858;
 }
 
 footer.main-footer .footer-right a {
-  color: #ffffff;
+  color: #e7323a;
 }
