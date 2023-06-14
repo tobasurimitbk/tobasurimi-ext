@@ -217,4 +217,23 @@ class Role extends BaseController
         }
         return;
     }
+
+    public function dropdownRole()
+    {
+        $token = session()->get("login")->token;
+
+        $responseRole = curl_request("GET", "/roles/selectOption", $token);
+
+        $dataRole = [];
+        if ($responseRole["code"] === 200) {
+            $dataRole = json_decode($responseRole["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataRole
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

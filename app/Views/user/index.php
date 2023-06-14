@@ -114,15 +114,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select company_id" name="company_id" id="company_id">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataCompany)) {
-                                        foreach ($dataCompany as $company) {
-                                    ?>
-                                            <option value="<?= $company->id; ?>"><?= $company->company; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">Company</label>
                             </div>
@@ -131,15 +122,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select role_id" name="role_id" id="role_id">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataRole)) {
-                                        foreach ($dataRole as $role) {
-                                    ?>
-                                            <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">Role</label>
                             </div>
@@ -438,13 +420,40 @@
             $(".title-detail-name").text("Add New")
             $(".delete-detail").css('display', 'none');
             $(".id_detail").val('')
-            $(".company_id").val('').change()
-            $(".role_id").val('').change()
 
             validator_detail.resetForm();
             validator_detail.reset();
 
-            $(".detail-modal").modal("show")
+            $.ajax({
+                url: `<?= base_url("company/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".company_id").empty()
+                    $(".company_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".company_id").append(`<option value="${item.id}">${item.company}</option>`)
+                    })
+
+                    $(".company_id").val('').change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("role/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".role_id").empty()
+                    $(".role_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".role_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+
+                    $(".role_id").val('').change();
+                    $(".detail-modal").modal("show");
+                }
+            })
         })
 
         $(".btn-show-form").click(function() {
@@ -993,13 +1002,39 @@
 
         $(".id_detail").val(id)
 
-        $(".company_id").val(company_id).change()
-        $(".role_id").val(role_id).change()
-
         validator_detail.resetForm();
         validator_detail.reset();
 
-        $(".detail-modal").modal("show")
+        $.ajax({
+            url: `<?= base_url("company/dropdown"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".company_id").empty()
+                $(".company_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".company_id").append(`<option value="${item.id}">${item.company}</option>`)
+                })
+
+                $(".company_id").val(company_id).change();
+            }
+        })
+
+        $.ajax({
+            url: `<?= base_url("role/dropdown"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".role_id").empty()
+                $(".role_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".role_id").append(`<option value="${item.id}">${item.name}</option>`)
+                })
+
+                $(".role_id").val(role_id).change();
+                $(".detail-modal").modal("show");
+            }
+        })
     })
 
     const password_show_hide = function() {

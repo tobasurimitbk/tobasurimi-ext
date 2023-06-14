@@ -122,40 +122,6 @@ $routes->post('/penomoran-rak/save', 'PenomoranRak::savePenomoranRak', ['filter'
 $routes->post('/penomoran-rak/update', 'PenomoranRak::updatePenomoranRak', ['filter' => 'Auth']);
 $routes->post('/penomoran-rak/delete', 'PenomoranRak::deletePenomoranRak', ['filter' => 'Auth']);
 
-// KODE HS
-$routes->get('/hs-code', 'HSCode::hsCode', ['filter' => 'Auth']);
-$routes->get('/hs-code/all', 'HSCode::allHSCode', ['filter' => 'Auth']);
-
-// SATUAN
-$routes->get('/satuan', 'Satuan::satuan', ['filter' => 'Auth']);
-$routes->get('/satuan/all', 'Satuan::allSatuan', ['filter' => 'Auth']);
-$routes->get('/satuan/id/(:segment)', 'Satuan::getByIdSatuan/$1', ['filter' => 'Auth']);
-$routes->post('/satuan/save', 'Satuan::saveSatuan', ['filter' => 'Auth']);
-$routes->post('/satuan/update', 'Satuan::updateSatuan', ['filter' => 'Auth']);
-$routes->post('/satuan/delete', 'Satuan::deleteSatuan', ['filter' => 'Auth']);
-
-// DROPDOWN
-// CITY
-$routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
-
-// METADATA
-$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
-
-// KODE HS
-$routes->get('/hs-code/dropdown', 'HSCode::dropdownHSCode', ['filter' => 'Auth']);
-
-// SATUAN
-$routes->get('/satuan/dropdown', 'Satuan::dropdownSatuan', ['filter' => 'Auth']);
-
-// METADATA
-$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
-
-// ACCOUNT
-$routes->get('/kategori-account/dropdown', 'Account::dropdownKategoriAccount', ['filter' => 'Auth']);
-$routes->get('/header-account/dropdown', 'Account::dropdownHeaderAccount', ['filter' => 'Auth']);
-$routes->get('/sub-account/dropdown', 'Account::dropdownSubAccount', ['filter' => 'Auth']);
-
-// ACCOUNT AND FINANCE
 // ACCOUNT
 $routes->get('/account', 'Account::account', ['filter' => 'Auth']);
 
@@ -177,6 +143,51 @@ $routes->post('/sub-account/save', 'Account::saveSubAccount', ['filter' => 'Auth
 $routes->post('/sub-account/update', 'Account::updateSubAccount', ['filter' => 'Auth']);
 $routes->post('/sub-account/update-status', 'Account::updateStatusSubAccount', ['filter' => 'Auth']);
 $routes->post('/sub-account/delete', 'Account::deleteSubAccount', ['filter' => 'Auth']);
+
+// KODE HS
+$routes->get('/hs-code', 'HSCode::hsCode', ['filter' => 'Auth']);
+$routes->get('/hs-code/all', 'HSCode::allHSCode', ['filter' => 'Auth']);
+
+// SATUAN
+$routes->get('/satuan', 'Satuan::satuan', ['filter' => 'Auth']);
+$routes->get('/satuan/all', 'Satuan::allSatuan', ['filter' => 'Auth']);
+$routes->get('/satuan/id/(:segment)', 'Satuan::getByIdSatuan/$1', ['filter' => 'Auth']);
+$routes->post('/satuan/save', 'Satuan::saveSatuan', ['filter' => 'Auth']);
+$routes->post('/satuan/update', 'Satuan::updateSatuan', ['filter' => 'Auth']);
+$routes->post('/satuan/delete', 'Satuan::deleteSatuan', ['filter' => 'Auth']);
+
+// PURCHASE
+$routes->get('/spp', 'SPP::spp', ['filter' => 'Auth']);
+
+// DROPDOWN
+// CITY
+$routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
+
+// METADATA
+$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
+
+// KODE HS
+$routes->get('/hs-code/dropdown', 'HSCode::dropdownHSCode', ['filter' => 'Auth']);
+
+// SATUAN
+$routes->get('/satuan/dropdown', 'Satuan::dropdownSatuan', ['filter' => 'Auth']);
+
+// METADATA
+$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
+
+// COMPANY
+$routes->get('/company/dropdown', 'Company::dropdownCompany', ['filter' => 'Auth']);
+
+// ROLE
+$routes->get('/role/dropdown', 'Role::dropdownRole', ['filter' => 'Auth']);
+
+// USER
+$routes->get('/user/dropdown', 'User::dropdownUser', ['filter' => 'Auth']);
+
+// ACCOUNT
+$routes->get('/kategori-account/dropdown', 'Account::dropdownKategoriAccount', ['filter' => 'Auth']);
+$routes->get('/header-account/dropdown', 'Account::dropdownHeaderAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/dropdown', 'Account::dropdownSubAccount', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER
