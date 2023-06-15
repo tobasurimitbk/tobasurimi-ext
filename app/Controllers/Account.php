@@ -569,6 +569,7 @@ class Account extends BaseController
                     "no_sub" => $data->no_sub,
                     "nama_sub" => $data->nama_sub,
                     "nama_header" => $data->nama_header,
+                    "akun_coa" => $data->akun_coa,
                     "status" => $data->status
                 ]);
             }

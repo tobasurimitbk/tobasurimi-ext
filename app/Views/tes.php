@@ -575,18 +575,25 @@
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
     }
 
-//     sorting asc desc
+/customers = postal_code, no_npwp, phone, contact_person, email, no_rekening, supplier_buyer (sorting asc desc)
+/customers = ap_name, ar_name (sorting asc desc dan tambah kolom)
 
-// /customers = kode, name, address, province_name, city_name
-// /suppliers = kode, name, address, province_name, city_name
-// /vendors = kode, name, address, province_name, city_name
-// /companies = company, holding_company, address, phone, email
-// /warehouses = warehouse_name, address, phone, email
-// /employees = nip, name, divisionName, email, status
-// /divisis = divisi, libur, jam_kerja, jam_istirahat, jam_masuk, jam_pulang, mulai_istirahat, selesai_istirahat
-// /kategoriAkun = kelompok_akun, no_kategori, nama_kategori
-// /headerAkun = nama_kategori, no_header, nama_header
-// /subAkun = nama_kategori, no_header, nama_header, no_sub, nama_sub
+/suppliers = postal_code, no_npwp, phone, contact_person, email, no_rekening, supplier_buyer (sorting asc desc)
+/suppliers = ap_name, ar_name (sorting asc desc dan tambah kolom)
+
+/vendors = postal_code, no_npwp, phone, contact_person, email, no_rekening, supplier_buyer (sorting asc desc)
+/vendors = ap_name, ar_name (sorting asc desc dan tambah kolom)
+
+/employees = phone_no, address, dob, gender, acc_no (sorting asc desc)
+
+/companies = province_name, city_name, zip_code (sorting asc desc)
+/companies = pic_name (sorting asc desc dan tambah kolom)
+
+/warehouses = province_name, city_name, zip_code (sorting asc desc)
+/warehouses = pic_name (sorting asc desc dan tambah kolom)
+
+/subAkun = akun_coa (sorting asc desc)
+
 </script>
 
 <?= $this->endSection(); ?>

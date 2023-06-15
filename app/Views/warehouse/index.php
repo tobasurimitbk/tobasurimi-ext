@@ -130,6 +130,10 @@
                             <th onclick="changeSort('address')" class="sort">Alamat</th>
                             <th onclick="changeSort('phone')" class="sort">Nomor Telepon</th>
                             <th onclick="changeSort('email')" class="sort">Email</th>
+                            <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
+                            <th onclick="changeSort('city_name')" class="sort">Kota</th>
+                            <th onclick="changeSort('zip_code')" class="sort">Kode Pos</th>
+                            <th onclick="changeSort('pic_name')" class="sort">PIC</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -188,6 +192,18 @@
                 className: "text-center"
             }, {
                 data: "email",
+                className: "text-center"
+            }, {
+                data: "province_name",
+                className: "text-center"
+            }, {
+                data: "city_name",
+                className: "text-center"
+            }, {
+                data: "zip_code",
+                className: "text-center"
+            }, {
+                data: "pic_name",
                 className: "text-center"
             }],
             columnDefs: [{
