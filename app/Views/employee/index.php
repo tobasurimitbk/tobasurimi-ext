@@ -153,9 +153,14 @@
                     <thead class="thead-dark">
                         <tr>
                             <th onclick="changeSort('nip')" class="sort">NIP</th>
-                            <th onclick="changeSort('name')" class="sort">Full Name</th>
+                            <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
                             <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
                             <th onclick="changeSort('email')" class="sort">Email</th>
+                            <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
+                            <th onclick="changeSort('address')" class="sort">Alamat</th>
+                            <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
+                            <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
+                            <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
                             <th onclick="changeSort('status')" class="sort">Status</th>
                         </tr>
                     </thead>
@@ -217,6 +222,21 @@
             data: "email",
             className: "text-center"
         }, {
+            data: "phone_no",
+            className: "text-center"
+        }, {
+            data: "address",
+            className: "text-center"
+        }, {
+            data: "dob",
+            className: "text-center"
+        }, {
+            data: "gender",
+            className: "text-center"
+        }, {
+            data: "acc_no",
+            className: "text-center"
+        }, {
             data: "status",
             className: "text-center"
         }],
@@ -261,25 +281,25 @@
             },
             messages: {
                 employeeImg: {
-                    required: "Image wajib diisi"
+                    required: "Foto wajib diisi"
                 },
                 nip: {
                     required: "NIP wajib diisi"
                 },
                 name: {
-                    required: "Full Name wajib diisi"
+                    required: "Nama Lengkap wajib diisi"
                 },
                 gender: {
-                    required: "Gender wajib diisi"
+                    required: "Jenis Kelamin wajib diisi"
                 },
                 dob: {
-                    required: "Date of Birth wajib diisi"
+                    required: "Tanggal Lahir wajib diisi"
                 },
                 address: {
-                    required: "Address wajib diisi"
+                    required: "Alamat wajib diisi"
                 },
                 email: {
-                    email: "Email must be valid"
+                    email: "Email harus benar"
                 },
                 division_id: {
                     required: "Divisi wajib diisi"

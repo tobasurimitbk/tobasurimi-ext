@@ -40,7 +40,7 @@
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control name" id="name" name="name" placeholder="Name" maxlength="30">
-                                <label for="floatingInput">Name</label>
+                                <label for="floatingInput">Nama</label>
                             </div>
                         </div>
                     </div>
@@ -381,7 +381,7 @@
             },
             messages: {
                 name: {
-                    required: "Name wajib diisi"
+                    required: "Nama wajib diisi"
                 },
                 username: {
                     required: "Username wajib diisi"

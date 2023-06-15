@@ -58,7 +58,16 @@ class Customer extends BaseController
                     "name" => $data->name,
                     "address" => $data->address,
                     "province_name" => $data->province_name,
-                    "city_name" => $data->city_name
+                    "city_name" => $data->city_name,
+                    "postal_code" => $data->postal_code, 
+                    "no_npwp" => $data->no_npwp,
+                    "phone" => $data->phone,
+                    "contact_person" => $data->contact_person,
+                    "email" => $data->email,
+                    "no_rekening" => $data->no_rekening,
+                    "supplier_buyer" => $data->supplier_buyer,
+                    "ap_name" => "",
+                    "ar_name" => "",
                 ]);
             }
         }

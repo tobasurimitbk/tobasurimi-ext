@@ -56,7 +56,11 @@ class Company extends BaseController
                     "holding_company" => $data->holding_company,
                     "address" => $data->address,
                     "phone" => $data->phone,
-                    "email" => $data->email
+                    "email" => $data->email,
+                    "province_name" => $data->province_name,
+                    "city_name" => $data->city_name,
+                    "zip_code" => $data->zip_code,
+                    "pic_name" => "",
                 ]);
             }
         }

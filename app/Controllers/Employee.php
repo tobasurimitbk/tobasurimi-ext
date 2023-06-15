@@ -74,6 +74,11 @@ class Employee extends BaseController
                     "name" => $data->name,
                     "divisionName" => $data->divisionName,
                     "email" => $data->email,
+                    "phone_no" => $data->phone_no,
+                    "address" => $data->address,
+                    "dob" => $data->dob,
+                    "gender" => $data->gender,
+                    "acc_no" => $data->acc_no,
                     "status" => $data->status,
                 ]);
             }

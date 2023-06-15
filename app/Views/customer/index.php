@@ -78,7 +78,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
-                                <label for="floatingInput">Phone</label>
+                                <label for="floatingInput">No. Telepon</label>
                             </div>
                         </div>
                     </div>
@@ -268,6 +268,15 @@
                         <th onclick="changeSort('address')" class="sort">Alamat</th>
                         <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
                         <th onclick="changeSort('city_name')" class="sort">Kota</th>
+                        <th onclick="changeSort('postal_code')" class="sort">Kode Pos</th>
+                        <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
+                        <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
+                        <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
+                        <th onclick="changeSort('email')" class="sort">Email</th>
+                        <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
+                        <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
+                        <th onclick="changeSort('ap_name')" class="sort">AP</th>
+                        <th onclick="changeSort('ar_name')" class="sort">AR</th>
                     </tr>
                 </thead>
                 <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -333,6 +342,33 @@
             className: "text-center"
         }, {
             data: "city_name",
+            className: "text-center"
+        }, {
+            data: "postal_code",
+            className: "text-center"
+        }, {
+            data: "no_npwp",
+            className: "text-center"
+        }, {
+            data: "phone",
+            className: "text-center"
+        }, {
+            data: "contact_person",
+            className: "text-center"
+        }, {
+            data: "email",
+            className: "text-center"
+        }, {
+            data: "no_rekening",
+            className: "text-center"
+        }, {
+            data: "supplier_buyer",
+            className: "text-center"
+        }, {
+            data: "ap_name",
+            className: "text-center"
+        }, {
+            data: "ar_name",
             className: "text-center"
         }],
         columnDefs: [{
@@ -619,11 +655,11 @@
                 },
                 no_npwp: {
                     required: "Nomor NPWP wajib diisi",
-                    minlength: "Nomor NPWP min length is 15",
-                    maxlength: "Nomor NPWP max length is 15",
+                    minlength: "Nomor NPWP minimal 15 angka",
+                    maxlength: "Nomor NPWP maksimal 15 angka",
                 },
                 phone: {
-                    required: "Phone wajib diisi"
+                    required: "No. Telepon wajib diisi"
                 },
                 contact_person: {
                     required: "Contact Person wajib diisi"

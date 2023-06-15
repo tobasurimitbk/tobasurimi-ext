@@ -276,6 +276,7 @@
                                     <th onclick="changeSortSub('nama_header')" class="sort">Header Akun</th>
                                     <th onclick="changeSortSub('no_sub')" class="sort">No. Sub Akun</th>
                                     <th onclick="changeSortSub('nama_sub')" class="sort">Nama Sub Akun</th>
+                                    <th onclick="changeSortSub('akun_coa')" class="sort">COA</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -463,6 +464,10 @@
             data: "nama_sub",
             className: "text-center"
         },
+        {
+            data: "akun_coa",
+            className: "text-center"
+        }
         {
             data: "status",
             className: "text-center actions",
