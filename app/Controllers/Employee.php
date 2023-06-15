@@ -45,6 +45,23 @@ class Employee extends BaseController
         return;
     }
 
+    public function dropdownEmployeePIC()
+    {
+        $token = session()->get("login")->token;
+        $dataEmployee = [];
+        $responseEmployee = curl_request("GET", "/employees/all", $token);
+        if ($responseEmployee["code"] === 200) {
+            $dataEmployee = json_decode($responseEmployee["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataEmployee
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function allEmployee()
     {
         $token = session()->get("login")->token;

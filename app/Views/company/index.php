@@ -350,9 +350,6 @@
                 city_id: {
                     required: true
                 },
-                pic_id: {
-                    required: true
-                },
                 email: {
                     required: true,
                     email: true,
@@ -418,6 +415,9 @@
             $('.logo').rules('add', {
                 required: true
             });
+            $('.pic_id').rules('add', {
+                required: true
+            });
             $(".title-name").text("Tambah");
             $(".province_id").val('').change();
             $(".city_id").val('').change();
@@ -433,7 +433,7 @@
             $(".delete-btn").css('display', 'none');
 
             $.ajax({
-                url: `<?= base_url("employee/dropdown"); ?>`,
+                url: `<?= base_url("employee-pic/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -459,12 +459,11 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $('.logo').rules('remove', 'required');
+            $('.pic_id').rules('remove', 'required');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
-
-            document.getElementById("preview_photo").src = res?.data?.logo;
 
             validator.resetForm();
             validator.reset();
@@ -476,6 +475,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
+                        document.getElementById("preview_photo").src = res?.data?.logo;
                         $(".company").val(res?.data?.company);
                         $(".holding_company").val(res?.data?.holding_company);
                         $(".address").val(res?.data?.address);
@@ -502,7 +502,7 @@
                         })
 
                         $.ajax({
-                            url: `<?= base_url("employee/dropdown"); ?>`,
+                            url: `<?= base_url("employee-pic/dropdown"); ?>`,
                             method: "GET",
                             dataType: "json",
                             success: function(result) {

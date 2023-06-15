@@ -66,8 +66,8 @@ class Customer extends BaseController
                     "email" => $data->email,
                     "no_rekening" => $data->no_rekening,
                     "supplier_buyer" => $data->supplier_buyer,
-                    "ap_name" => "",
-                    "ar_name" => "",
+                    "ap_name" => $data->ap_name,
+                    "ar_name" => $data->ar_name
                 ]);
             }
         }

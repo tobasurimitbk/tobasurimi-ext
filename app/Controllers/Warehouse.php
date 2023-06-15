@@ -78,7 +78,7 @@ class Warehouse extends BaseController
                     "email" => $data->email,
                     "province_name" => $data->province_name,
                     "city_name" => $data->city_name,
-                    "pic_name" => "",
+                    "pic_name" => $data->pic_name
                 ]);
             }
         }

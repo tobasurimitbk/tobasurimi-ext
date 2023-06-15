@@ -467,7 +467,7 @@
         {
             data: "akun_coa",
             className: "text-center"
-        }
+        },
         {
             data: "status",
             className: "text-center actions",

@@ -76,16 +76,6 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select pic_id" name="pic_id" id="pic_id">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataPic)) {
-                                        foreach ($dataPic as $pic) {
-                                    ?>
-                                            <option value="<?= $pic->id; ?>"><?= $pic->name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
                                 <label for="floatingInput">PIC</label>
                             </div>
@@ -410,7 +400,23 @@
 
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
+
+            $.ajax({
+                url: `<?= base_url("employee-pic/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(result) {
+                    $(".pic_id").empty()
+                    $(".pic_id").val("").change()
+                    $(".pic_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+
+                    $(".pic_id").val('').change();
+                    $(".add-modal").modal("show")
+                }
+            })
         })
 
         $(".btn-hide-form").click(function() {
@@ -436,10 +442,25 @@
                         $(".id").val(id);
                         $(".warehouse_name").val(res?.data?.warehouse_name);
                         $(".address").val(res?.data?.address);
-                        $(".pic_id").val(res?.data?.pic_id).change();
                         $(".phone").val(res?.data?.phone);
                         $(".email").val(res?.data?.email);
                         $(".province_id").val(res?.data?.province_id).change();
+
+                        $.ajax({
+                            url: `<?= base_url("employee-pic/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".pic_id").empty()
+                                $(".pic_id").val("").change()
+                                $(".pic_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                })
+
+                                $(".pic_id").val(res?.data?.pic_id).change();
+                            }
+                        })
 
                         // AJAX GET CITY
                         $.ajax({

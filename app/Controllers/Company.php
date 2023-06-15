@@ -60,7 +60,7 @@ class Company extends BaseController
                     "province_name" => $data->province_name,
                     "city_name" => $data->city_name,
                     "zip_code" => $data->zip_code,
-                    "pic_name" => "",
+                    "pic_name" => $data->pic_name
                 ]);
             }
         }
@@ -207,9 +207,6 @@ class Company extends BaseController
             ],
             "city_id" => [
                 "rules" => "required"
-            ],
-            "pic_id" => [
-                "rules" => "required"
             ]
         ];
 
@@ -225,7 +222,7 @@ class Company extends BaseController
                 $mime = $file->getMimeType();
                 if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                     $logo = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-
+                    
                     $payload = json_encode([
                         "logo" => $logo,
                         "company" => $this->request->getPost("company"),

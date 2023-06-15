@@ -20,9 +20,7 @@ class Account extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $this_company_id = session()->get("login")->this_company_id;
-
-        $responseKelompokAkunKategori = curl_request("GET", "/kategoriAkun/all?idCompany=$this_company_id", $token);
+        $responseKelompokAkunKategori = curl_request("GET", "/kategoriAkun/all", $token);
 
         $dataKelompokAkunKategori = [];
         if ($responseKelompokAkunKategori["code"] === 200) {
@@ -40,9 +38,8 @@ class Account extends BaseController
     public function dropdownHeaderAccount()
     {
         $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
 
-        $responseKelompokAkunKategori = curl_request("GET", "/headerAkun/all?idCompany=$this_company_id", $token);
+        $responseKelompokAkunKategori = curl_request("GET", "/headerAkun/all", $token);
 
         $dataKelompokAkunKategori = [];
         if ($responseKelompokAkunKategori["code"] === 200) {
@@ -61,9 +58,7 @@ class Account extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $this_company_id = session()->get("login")->this_company_id;
-
-        $responseKelompokAkunSub = curl_request("GET", "/subAkun/all?idCompany=$this_company_id", $token);
+        $responseKelompokAkunSub = curl_request("GET", "/subAkun/all", $token);
 
         $dataKelompokAkunSub = [];
         if ($responseKelompokAkunSub["code"] === 200) {
@@ -82,15 +77,12 @@ class Account extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "sortType" => $this->request->getGet("sortType")
         ];
 
         $response = curl_request("GET", "/kategoriAkun", $token, $payload);
@@ -141,10 +133,7 @@ class Account extends BaseController
         if ($this->validate($rules)) {
             $token = session()->get("login")->token;
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
                 "kelompok_id" => formatter($this->request->getPost("kelompok_akun_id_kategori"), "STR_TO_INT"),
                 "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                 "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
@@ -199,10 +188,7 @@ class Account extends BaseController
             $token = session()->get("login")->token;
             $id = $this->request->getPost("id_kategori");
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
                 "kelompok_id" => formatter($this->request->getPost("kelompok_akun_id_kategori"), "STR_TO_INT"),
                 "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                 "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
@@ -242,8 +228,6 @@ class Account extends BaseController
     public function getByIdKategoriAccount($id = null)
     {
         $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
             $response = curl_request("GET", "/kategoriAkun/$id", $token);
@@ -310,15 +294,12 @@ class Account extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "sortType" => $this->request->getGet("sortType")
         ];
 
         $response = curl_request("GET", "/headerAkun", $token, $payload);
@@ -369,10 +350,7 @@ class Account extends BaseController
         if ($this->validate($rules)) {
             $token = session()->get("login")->token;
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
                 "kategori_id" => formatter($this->request->getPost("category_id_header"), "STR_TO_INT"),
                 "no_header" => $this->request->getPost("kode_akun_header"),
                 "nama_header" => $this->request->getPost("nama_akun_header"),
@@ -427,10 +405,7 @@ class Account extends BaseController
             $token = session()->get("login")->token;
             $id = $this->request->getPost("id_header");
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
                 "kategori_id" => formatter($this->request->getPost("category_id_header"), "STR_TO_INT"),
                 "no_header" => $this->request->getPost("kode_akun_header"),
                 "nama_header" => $this->request->getPost("nama_akun_header"),
@@ -470,8 +445,6 @@ class Account extends BaseController
     public function getByIdHeaderAccount($id = null)
     {
         $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
             $response = curl_request("GET", "/headerAkun/$id", $token);
@@ -538,16 +511,13 @@ class Account extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "status" => $this->request->getGet("status"),
             "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "sortType" => $this->request->getGet("sortType")
         ];
 
         $response = curl_request("GET", "/subAkun", $token, $payload);
@@ -608,10 +578,7 @@ class Account extends BaseController
         if ($this->validate($rules)) {
             $token = session()->get("login")->token;
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
                 "header_id" => formatter($this->request->getPost("header_id_sub"), "STR_TO_INT"),
                 "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
                 "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
@@ -672,10 +639,7 @@ class Account extends BaseController
             $token = session()->get("login")->token;
             $id = $this->request->getPost("id_sub");
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
                 "header_id" => formatter($this->request->getPost("header_id_sub"), "STR_TO_INT"),
                 "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
                 "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
@@ -721,10 +685,7 @@ class Account extends BaseController
 
         $id = $this->request->getPost("id");
 
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = json_encode([
-            "company_id" => $this_company_id,
             "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Void"
         ]);
         
@@ -754,8 +715,6 @@ class Account extends BaseController
     public function getByIdSubAccount($id = null)
     {
         $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
 
         if (!empty($id)) {
             $response = curl_request("GET", "/subAkun/$id", $token);
