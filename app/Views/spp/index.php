@@ -43,22 +43,486 @@
 <section class="section add" style="display: none;">
 <div class="section-header">
     <h1>Tambah</h1>
-    <button class="btn btn-hide-form btn-add">
+    <button class="btn btn-hide-form">
         Batal
+    </button>
+    <button class="btn btn-submit-form">
+        Simpan
     </button>
 </div>
 <div class="card">
     <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label font-weight-bold">Data SPP</label>
+            </div>
+        </div>
+        <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+            <input type="hidden" class="id" name="id" id="id" />
+            <?= csrf_field() ?>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input class="form-control input-picker request_date" id="request_date" name="request_date" placeholder="Tanggal Order">
+                                <label for="floatingInput">Tanggal Order</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= session()->get("login")->name; ?>">
+                        <label for="floatingInput">Order Oleh</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select po_type" name="po_type" id="po_type" aria-label="Floating label select example">
+                            <option value="lokal">Lokal</option>
+                            <option value="import">Import</option>
+                        </select>
+                        <label for="floatingInput">Tipe SPP</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP">
+                                <label for="floatingInput">No. SPP</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" type="checkbox" onchange="changeStatus()" class="auto_generate" id="auto_generate" name="auto_generate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-5">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select spp_type" id="spp_type" name="spp_type" aria-label="Floating label select example">
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Jenis Order</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Departemen</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                        <label for="floatingInput">Catatan (Opsional)</label>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label font-weight-bold">List Barang</label>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive mt-2">
+            <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Kode Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Satuan</th>
+                        <th>Spesifikasi</th>
+                        <th>Harga Barang</th>
+                        <th>Qty</th>
+                        <th>Total Harga</th>
+                        <th>Keterangan</th>
+                        <th>Hapus</th>
+                    </tr>
+                </thead>
+                <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
 
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 </section>
 
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+            </div>
+            <div class="modal-body" style="height: 380px !important; max-height: 380px !important;">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kode_barang" onchange="changeKodeBarang()" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Kode Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" readonly="true" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
+                                <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control spesifikasi" name="spesifikasi" id="spesifikasi" placeholder="Spesifikasi">
+                                <label for="floatingInput">Spesitifikasi</label>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <label for="floatingInput">Harga Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">Qty</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control total" name="total" id="total" placeholder="Total Harga">
+                                <label for="floatingInput">Total Harga</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
+                                <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
+                <label>&nbsp;</label>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                    <button type="submit" class="btn btn-submit-detail">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function() {
+        $(".request_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        // SPP TYPE
+        $('.spp_type').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.spp_type')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.spp_type')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.spp_type')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // WAREHOUSE
+        $('.warehouse_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.warehouse_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.warehouse_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.warehouse_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // KODE BARANG
+        $('.kode_barang').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.kode_barang')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // SATUAN
+        $('.satuan').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.satuan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.satuan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.satuan')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        $('.fa-calendar').click(function() {
+            $(".request_date").focus();
+        });
+
+        var validator = $(".create-form").validate({
+            rules: {
+                request_date: {
+                    required: true
+                },
+                spp_type: {
+                    required: true
+                },
+                spp_no: {
+                    required: true
+                },
+                po_type: {
+                    required: true
+                },
+                warehouse_id: {
+                    required: true,
+                }
+            },
+            messages: {
+                request_date: {
+                    required: "Tanggal Order wajib diisi"
+                },
+                spp_type: {
+                    required: "Jenis Order wajib diisi"
+                },
+                spp_no: {
+                    required: "No. SPP wajib diisi"
+                },
+                po_type: {
+                    required: "Tipe SPP wajib diisi"
+                },
+                warehouse_id: {
+                    required: "Departemen wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $(".select2-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.col-md-6').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.col-md-6').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $(".btn-submit-form").click(function() {
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                    }
+                })
+            }
+        })
+
+        $(".btn-show-detail").click(function() {
+            $(".delete-detail").css('display', 'none');
+
+            $(".title-detail-name").text("Tambah");
+            $(".id_detail").val('');
+
+            $.ajax({
+                url: `<?= base_url("barang/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".kode_barang").empty();
+
+                    $(".kode_barang").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".kode_barang").append(`<option data-nama="${item.nama_barang} data-satuan="${item.satuan} data-stok="${item.stok} value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                    })
+
+                    $(".kode_barang").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("satuan/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".satuan").empty();
+
+                    $(".satuan").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".satuan").append(`<option value="${item.id}">${item.nama_satuan}</option>`);
+                    })
+
+                    $(".satuan").val("").change();
+                    $(".detail-modal").modal("show");
+                }
+            })
+        })
+
         $(".btn-show-form").click(function() {
-            $(".list").css("display", "none");
-            $(".add").css("display", "");
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'tipe_po'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".spp_type").empty()
+                    $(".spp_type").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".spp_type").append(`<option value="${item.value}">${item.value}</option>`)
+                    })
+
+                    $(".spp_type").val('').change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("warehouse/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".warehouse_id").empty()
+                    $(".warehouse_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                    })
+
+                    $(".warehouse_id").val('').change();
+
+                    $(".list").css("display", "none");
+                    $(".add").css("display", "");
+                }
+            })
         })
 
         $(".btn-hide-form").click(function() {
@@ -66,5 +530,21 @@
             $(".add").css("display", "none");
         })
     })
+
+    const changeStatus = function()
+    {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+
+        if(value)
+        {
+            $(".spp_no").attr("readonly", true);
+            $(".spp_no").val("AUTO GENERATE");
+        }
+        else
+        {
+            $(".spp_no").attr("readonly", false);
+            $(".spp_no").val("");
+        }
+    }
 </script>
 <?= $this->endSection(); ?>

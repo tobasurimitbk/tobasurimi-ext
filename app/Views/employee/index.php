@@ -77,7 +77,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth" maxlength="30">
+                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
                                         <label for="floatingInput">Tanggal Lahir</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">

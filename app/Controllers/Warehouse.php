@@ -309,4 +309,21 @@ class Warehouse extends BaseController
         }
         return;
     }
+
+    public function dropdownWarehouse()
+    {
+        $token = session()->get("login")->token;
+        $dataWarehouse = [];
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+        if ($responseWarehouse["code"] === 200) {
+            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataWarehouse
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

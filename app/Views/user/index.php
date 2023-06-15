@@ -387,7 +387,7 @@
                     required: "Username wajib diisi"
                 },
                 password: {
-                    minlength: "Password length must be at least 6 characters long",
+                    minlength: "Password minimal 6 karakter",
                     required: "Password wajib diisi"
                 },
                 employee_id: {

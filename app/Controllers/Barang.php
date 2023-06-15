@@ -336,5 +336,26 @@ class Barang extends BaseController
         }
         return;
     }
+
+    public function dropdownBarang()
+    {
+        $token = session()->get("login")->token;
+
+        $this_company_id = session()->get("login")->this_company_id;
+
+        $responseBarang = curl_request("GET", "/barang/all?idCompany=$this_company_id", $token);
+
+        $dataBarang = [];
+        if ($responseBarang["code"] === 200) {
+            $dataBarang = json_decode($responseBarang["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }
 ?>

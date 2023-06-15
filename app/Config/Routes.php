@@ -184,6 +184,12 @@ $routes->get('/role/dropdown', 'Role::dropdownRole', ['filter' => 'Auth']);
 // USER
 $routes->get('/user/dropdown', 'User::dropdownUser', ['filter' => 'Auth']);
 
+// WAREHOUSE
+$routes->get('/warehouse/dropdown', 'Warehouse::dropdownWarehouse', ['filter' => 'Auth']);
+
+// BARANG
+$routes->get('/barang/dropdown', 'Barang::dropdownBarang', ['filter' => 'Auth']);
+
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Account::dropdownHeaderAccount', ['filter' => 'Auth']);
