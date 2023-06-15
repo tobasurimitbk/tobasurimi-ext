@@ -54,6 +54,11 @@
         </div>
 
     </div>
+    <div class="row justify-content-center">
+        <div class="col-xl-5 col-lg-5 col-md-5">
+            <p class="text-footer-login">Powered by <a href="#">Lyrid Prima Indonesia</a></p>
+        </div>
+    </div>
 
 </div>
 
