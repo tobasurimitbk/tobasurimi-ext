@@ -17,20 +17,20 @@
 .group-prepend-login-register {
   height: 58px;
   border: 1px #a5ae9d solid;
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 
 .group-prepend-password-login-register {
   height: 58px;
   border: 1px #a5ae9d solid;
-  border-top-right-radius: 6px;
-  border-bottom-right-radius: 6px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .input-group-login-register {
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 
 .bg-login-register {
@@ -48,7 +48,7 @@
 .bg-login-register .card.card-login-register {
   background: #ffffff;
   box-shadow: 0px 2px 10px rgba(231, 50, 58, 0.05);
-  border-radius: 6px;
+  border-radius: 4px;
   border: 0px #e7323a solid;
 }
 
@@ -68,7 +68,7 @@
   background-color: #f3eed9;
   padding: 0.375rem 1.25rem;
   border: 0px solid #e7323a;
-  border-radius: 6px;
+  border-radius: 4px;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 }
@@ -144,8 +144,8 @@
   .input-group-append
   .input-group-text {
   border-radius: 0px;
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
   font-size: 14px;
   font-weight: 600;
   color: #559884 !important;
@@ -164,7 +164,7 @@
   .card.card-login-register
   .card-body
   .btn.btn-login-register {
-  border-radius: 6px;
+  border-radius: 4px;
   height: 58px;
   font-size: 13px;
   letter-spacing: 0;
@@ -180,6 +180,7 @@
     rgba(221, 39, 51, 1) 100%
   );
   margin-top: 15px;
+  text-transform: uppercase;
 }
 
 .bg-login-register
@@ -203,7 +204,7 @@
 /* =====***** POP-UP MODAL *****===== */
 
 .swal2-popup {
-  border-radius: 6px !important;
+  border-radius: 4px !important;
 }
 
 .swal2-icon.swal2-error {
