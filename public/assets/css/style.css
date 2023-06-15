@@ -1097,7 +1097,8 @@ select.form-control:not([size]):not([multiple]) {
 .card.card-statistic-1 .card-header h4,
 .card.card-statistic-2 .card-header h4 {
   font-weight: 500;
-  font-size: 13px;
+  font-size: 12px;
+  text-transform: uppercase;
   letter-spacing: 0px;
   font-family: "Poppins", sans-serif !important;
   margin-top: 5px;
@@ -4100,11 +4101,11 @@ body:not(.sidebar-mini)
 
 .navbar .form-inline .search-element .dropdown .btn.btn-dropdown-company {
   border-radius: 6px;
-  color: #fff;
+  color: #2f4858;
   font-size: 13px;
   font-weight: 600;
   font-family: "Poppins", sans-serif !important;
-  background: #e7323a;
+  background: #fff;
   border: 1px #fff solid !important;
 }
 

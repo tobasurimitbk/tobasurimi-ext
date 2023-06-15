@@ -258,3 +258,18 @@ h2.swal2-title {
   min-width: 100px !important;
   font-family: "Poppins", sans-serif !important;
 }
+
+p.text-footer-login {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2f4858 !important;
+  margin: 0;
+  margin-top: 15px;
+  text-align: center;
+}
+
+p.text-footer-login a {
+  color: #e7323a;
+  text-decoration: none;
+}
