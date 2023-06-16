@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="min-width: 900px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> User</h5>
@@ -66,11 +66,13 @@
                         </div>
                     </div>
                 </form>
-                <div class="row mt-5">
-                    <div class="col">
-                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-5">
+                        <div class="col">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive mt-2">
@@ -88,11 +90,13 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
+                </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 </div>
             </div>
         </div>
@@ -101,7 +105,7 @@
 
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="width: 1200px !important; max-width: 1200px !important;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label>  Company And Role</h5>
@@ -109,7 +113,7 @@
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <div class="row mb-5">
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select company_id" name="company_id" id="company_id">
@@ -130,11 +134,13 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
+                </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
-                    <button type="submit" class="btn btn-submit-detail">Simpan</button>
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
                 </div>
             </div>
         </div>
@@ -158,7 +164,7 @@
         </div>
         <div class="row">
             <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th onclick="changeSort('username')" class="sort">Username</th>
@@ -471,7 +477,7 @@
             validator.resetForm();
             validator.reset();
             $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
+            $(".delete-form").css('display', 'none');
 
             $.ajax({
                 url: `<?= base_url("employee/dropdown"); ?>`,
@@ -663,7 +669,7 @@
             }
         })
 
-        $(".btn-submit-form").click(function() {
+        $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
 
             // CHECK IF NO COMPANY ROLE
@@ -794,7 +800,7 @@
             }
         })
 
-        $(".delete-btn").click(function() {
+        $(".delete-form").click(function() {
             Swal.fire({
                 icon: 'question',
                 title: 'Hapus Data?',
@@ -861,7 +867,7 @@
             const data = table.row(this).data();
             
             $(".create-form")[0].reset()
-            $(".delete-btn").css('display', '');
+            $(".delete-form").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
 

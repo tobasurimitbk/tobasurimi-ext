@@ -133,39 +133,39 @@
                         </div>
                     </div>
                 </form>
-                    <div class="col-subtitle-modal">
-                        <div class="row mt-5">
-                            <div class="col-md-6">
-                                <h5 class="modal-sub-title">List Alamat Pengiriman</h5>
-                            </div>
-                            <div class="col-md-6">
-                                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                                </button>
-                            </div>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-5">
+                        <div class="col-md-6">
+                            <h5 class="modal-sub-title">List Alamat Pengiriman</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
                         </div>
                     </div>
-                    <div class="table-responsive mt-2">
-                        <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Alamat</th>
-                                    <th>Kota</th>
-                                    <th>Provinsi</th>
-                                    <th>Kode Pos</th>
-                                    <th>Main Address</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                </div>
+                <div class="table-responsive mt-2">
+                    <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>Alamat</th>
+                                <th>Kota</th>
+                                <th>Provinsi</th>
+                                <th>Kode Pos</th>
+                                <th>Main Address</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
 
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                    <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
                 </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
@@ -231,7 +231,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                    <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
                 </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
@@ -762,7 +762,7 @@
             validator.reset();
 
             $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
+            $(".delete-form").css('display', 'none');
             $(".body-detail-table").empty()
 
             $.ajax({
@@ -800,7 +800,7 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $(".create-form")[0].reset()
-            $(".delete-btn").css('display', '');
+            $(".delete-form").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
 
@@ -932,7 +932,7 @@
         })
 
         // delete
-        $(".delete-btn").click(function() {
+        $(".delete-form").click(function() {
             Swal.fire({
                 icon: 'question',
                 title: 'Hapus Data?',
