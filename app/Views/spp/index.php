@@ -63,7 +63,7 @@
     <button class="btn btn-hide-form">
         Batal
     </button>
-    <button class="btn btn-submit-form">
+    <button class="btn btn-submit-form btn-submit-parent">
         Simpan
     </button>
 </div>
@@ -114,7 +114,7 @@
                                 <label for="floatingInput">No. SPP</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
-                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" type="checkbox" onchange="changeStatus()" class="auto_generate" id="auto_generate" name="auto_generate">
+                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
                     </div>
@@ -256,7 +256,7 @@
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
-                    <button type="submit" class="btn btn-submit-detail">Simpan</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
                 </div>
             </div>
         </div>
@@ -605,7 +605,7 @@
             },
         });
 
-        $(".btn-submit-form").click(function() {
+        $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
 
             // CHECK IF NO BARANG
@@ -782,6 +782,9 @@
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
+
+            validator_detail.resetForm();
+            validator_detail.reset();
 
             $.ajax({
                 url: `<?= base_url("barang/dropdown"); ?>`,
