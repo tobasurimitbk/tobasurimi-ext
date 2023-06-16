@@ -157,6 +157,7 @@ $routes->post('/satuan/delete', 'Satuan::deleteSatuan', ['filter' => 'Auth']);
 
 // PURCHASE
 $routes->get('/spp', 'SPP::spp', ['filter' => 'Auth']);
+$routes->get('/spp/all', 'SPP::allSPP', ['filter' => 'Auth']);
 $routes->get('/spp/id/(:segment)', 'SPP::getByIdSPP/$1', ['filter' => 'Auth']);
 $routes->post('/spp/save', 'SPP::saveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update', 'SPP::updateSPP', ['filter' => 'Auth']);

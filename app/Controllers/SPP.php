@@ -14,6 +14,58 @@ class SPP extends BaseController
         return view('spp/index');
     }
 
+    public function allSPP()
+    {
+        $token = session()->get("login")->token;
+
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        $response = curl_request("GET", "/purchaseRequest", $token, $payload);
+        $dataSPP = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $body = json_decode($response["body"])->data;
+            $totalRecords = 1;
+
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+            foreach ($body as $data) {
+                array_push($dataSPP, [
+                    "no" => $no++,
+                    "id" => $data->id,
+                    "spp_type" => $data->spp_type,
+                    "spp_no" => $data->spp_no,
+                    "warehouseName" => $data->warehouseName,
+                    "po_type" => $data->po_type,
+                    "total" => "",
+                    "request_date" => $data->request_date,
+                    "request_status" => $data->request_status,
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataSPP,
+            "response" => $response,
+            "payload" => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function saveSPP()
     {
         $rules = [
@@ -47,34 +99,34 @@ class SPP extends BaseController
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
-            $data = [
-                "status"            => false,
-                "message"    => $payload,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            // $data = [
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
             
-            // $response = curl_request("POST", "/purchaseRequest", $token, $payload);
+            $response = curl_request("POST", "/purchaseRequest", $token, $payload);
 
-            // if ($response["code"] === 200) {
-            //     $data = [
-            //         "status"            => true,
-            //         "message"   => "Data Berhasil disimpan",
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // } else {
-            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-            //     $data = [
-            //         "status"            => false,
-            //         "message"    => $message,
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // }
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
         } else {
             $data = [
                 "status"            => false,

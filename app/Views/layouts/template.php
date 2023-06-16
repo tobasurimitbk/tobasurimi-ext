@@ -101,7 +101,8 @@
             if (isNaN(el.value.replaceAll(",", ""))) {
                 el.value = ""
             }
-            el.value = Number(el.value.replaceAll(".", "")).toLocaleString().replaceAll(",", ".")
+            el.value = Number(el.value.replaceAll(",", "")).toLocaleString()
+            console.log(el.value)
             return true
         }
     </script>
