@@ -18,7 +18,9 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6" style="height: 50px;">
-                            <input onchange="previewPhoto();" type="file" class="form-control input-image employeeImg" id="employeeImg" name="employeeImg" accept="image/png, image/jpg, image/jpeg">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onchange="previewPhoto();" type="file" class="form-control input-image employeeImg" id="employeeImg" name="employeeImg" accept="image/png, image/jpg, image/jpeg">
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
