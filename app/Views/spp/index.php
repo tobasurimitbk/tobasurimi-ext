@@ -99,7 +99,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select po_type" name="po_type" id="po_type" aria-label="Floating label select example">
+                        <select class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="lokal">Lokal</option>
                             <option value="import">Import</option>
                         </select>
@@ -113,7 +113,7 @@
                                 <input type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP">
                                 <label for="floatingInput">No. SPP</label>
                             </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
+                            <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                 <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
@@ -123,7 +123,7 @@
             <div class="row mb-5">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select spp_type" id="spp_type" name="spp_type" aria-label="Floating label select example">
+                        <select class="form-select order_type" id="order_type" name="order_type" aria-label="Floating label select example">
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">Jenis Order</label>
@@ -141,6 +141,17 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                         <label for="floatingInput">Catatan (Opsional)</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3" style="height: 50px;">
+                        <label for="floatingInput">Status</label>
+                        <div>
+                            <label class="switch">
+                            <input class="is_posted" name="is_posted" id="is_posted" type="checkbox">
+                            <span class="slider round"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -317,7 +328,7 @@
             className: "text-center"
         },
         {
-            data: "po_type",
+            data: "order_type",
             className: "text-center"
         },
         {
@@ -427,20 +438,20 @@
         })
 
         // SPP TYPE
-        $('.spp_type').select2({
+        $('.order_type').select2({
             placeholder: "",
             theme: "bootstrap-5"
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.spp_type')
+        $('.order_type')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.spp_type')
+        $('.order_type')
             .parent('div')
             .children('span')
             .children('span')
@@ -448,7 +459,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.spp_type')
+        $('.order_type')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -553,13 +564,13 @@
                 request_date: {
                     required: true
                 },
-                spp_type: {
+                order_type: {
                     required: true
                 },
                 spp_no: {
                     required: true
                 },
-                po_type: {
+                order_type: {
                     required: true
                 },
                 warehouse_id: {
@@ -570,13 +581,13 @@
                 request_date: {
                     required: "Tanggal Order wajib diisi"
                 },
-                spp_type: {
+                order_type: {
                     required: "Jenis Order wajib diisi"
                 },
                 spp_no: {
                     required: "No. SPP wajib diisi"
                 },
-                po_type: {
+                order_type: {
                     required: "Tipe SPP wajib diisi"
                 },
                 warehouse_id: {
@@ -588,20 +599,20 @@
             errorPlacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $(".select2-container").parent();
+                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
                     error.insertAfter(element);
                 } else {
                     error.insertAfter(element);
                 }
             },
-            highlight: function(element) {
-                $(element).closest('.col-md-6').addClass('has-error');
-                $(element).addClass('select-class');
+            highlight: function (element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');                      
 
             },
-            unhighlight: function(element) {
-                $(element).closest('.col-md-6').removeClass('has-error');
-                $(element).removeClass('select-class');
+            unhighlight: function (element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');   
             },
         });
 
@@ -826,8 +837,10 @@
             $(".id").val("");
             $(".title-name").text("Tambah");
 
+            $(".spp_no").attr("readonly", false);
+            $(".input-generate").css("display", "");
             $(".spp_no").val('').change()
-            $(".spp_type").val('').change()
+            $(".order_type").val('').change()
             $(".warehouse_id").val('').change()
 
             row = 0;
@@ -849,13 +862,13 @@
                 },
                 dataType: "json",
                 success: function(result) {
-                    $(".spp_type").empty()
-                    $(".spp_type").append(`<option value=""></option>`)
+                    $(".order_type").empty()
+                    $(".order_type").append(`<option value=""></option>`)
                     result.data.forEach(function(item) {
-                        $(".spp_type").append(`<option value="${item.value}">${item.value}</option>`)
+                        $(".order_type").append(`<option value="${item.id}">${item.value}</option>`)
                     })
 
-                    $(".spp_type").val('').change();
+                    $(".order_type").val('').change();
                 }
             })
 
@@ -911,6 +924,9 @@
             let id = data.id;
             $(".title-name").text("Update");
 
+            $(".spp_no").attr("readonly", true);
+            $(".input-generate").css("display", "none");
+
             validator.resetForm();
             validator.reset();
 
@@ -922,6 +938,15 @@
                     console.log(res)
                     if (res.status) {
                         $(".id").val(id);
+                        $(".request_date").val(res?.data?.request_date);
+                        $(".spp_type").val(res?.data?.spp_type);
+                        $(".spp_no").val(res?.data?.spp_no);
+                        $(".warehouse_id").val(res?.data?.warehouse_id).change();
+                        $(".is_posted").prop( "checked", res?.data?.is_posted);
+                        $(".note").val(res?.data?.note);
+
+                        $(".list").css("display", "none");
+                        $(".add").css("display", "");
                     }
                     else
                     {
