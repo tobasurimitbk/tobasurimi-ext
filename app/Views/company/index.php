@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog" style="max-width: 1200px !important;">
+    <div class="modal-dialog" style="min-width: 900px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Company</h5>
@@ -12,8 +12,8 @@
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <img class="preview-photo" height="230" width="175" id="preview_photo" src="<?= base_url() ?>assets/img/avatar/logo.png" />
+                        <div class="col-md-3 mb-3">
+                            <img class="preview-photo" id="preview_photo" src="<?= base_url() ?>assets/img/avatar/logo.png" />
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -101,10 +101,12 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3">Batal</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form">Simpan</button>
                 </div>
             </div>
@@ -124,7 +126,7 @@
     <div class="card-body">
         <div class="row justify-content-end mb-3">
             <div class="col-md-2">
-                <input class="form-control search" placeholder="Search" value="" />
+                <input class="form-control search form-out-search" placeholder="Search" value="" />
             </div>
         </div>
         <div class="row">
