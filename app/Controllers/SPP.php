@@ -46,27 +46,35 @@ class SPP extends BaseController
                 "note" => $this->request->getPost("note"),
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
-            
-            $response = curl_request("POST", "/purchaseRequest", $token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            $data = [
+                "status"            => false,
+                "message"    => $payload,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+            
+            // $response = curl_request("POST", "/purchaseRequest", $token, $payload);
+
+            // if ($response["code"] === 200) {
+            //     $data = [
+            //         "status"            => true,
+            //         "message"   => "Data Berhasil disimpan",
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // } else {
+            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+            //     $data = [
+            //         "status"            => false,
+            //         "message"    => $message,
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // }
         } else {
             $data = [
                 "status"            => false,

@@ -170,7 +170,7 @@
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 </div>
             </div>
         </div>
@@ -236,7 +236,7 @@
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
                 </div>
             </div>
         </div>
@@ -1184,7 +1184,7 @@
             }
         })
 
-        $(".btn-submit-form").click(function() {
+        $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
             if(list_address.length == 0)
             {
@@ -1439,6 +1439,7 @@
 
     $(document).on('hide.bs.modal','.detail-modal', function () {
         document.getElementById("add_modal").style = "display: block;";
+        $(".add-modal").css("overflow-y", "auto");
     })
 
     $(document).on('click', '.edit-table-detail', function(evt) {

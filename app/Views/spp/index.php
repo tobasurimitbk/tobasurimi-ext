@@ -489,21 +489,166 @@
         });
 
         $(".btn-submit-form").click(function() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
+            $(".detail-modal").modal("hide")
 
-                    }
+            // CHECK IF NO BARANG
+            if(list_items.length === 0)
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Barang Tidak Boleh Kosong",
+                    confirmButtonColor: '#4e73df',
                 })
+            }
+            else
+            {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading()
+                            let data = new FormData(document.querySelector(".create-form"));
+
+                            let update_list_items = [];
+                            
+                            list_items.map(obj => {
+                                if (obj.id) {
+                                    update_list_items.push(
+                                        {
+                                            id: obj.id,
+                                            item_code: obj.kode_barang,
+                                            qty: obj.qty,
+                                            unit: obj.satuan,
+                                            price: obj.harga,
+                                            note: obj.keterangan,
+                                            spec: obj.spesifikasi
+                                        }
+                                    )
+                                }
+                                else
+                                {
+                                    update_list_items.push(
+                                        {
+                                            item_code: obj.kode_barang,
+                                            qty: obj.qty,
+                                            unit: obj.satuan,
+                                            price: obj.harga,
+                                            note: obj.keterangan,
+                                            spec: obj.spesifikasi
+                                        }
+                                    )
+                                }
+                            })
+
+                            data.append("items", JSON.stringify(update_list_items))
+
+                            let id = $(".id").val();
+                            // UPDATE
+                            if(id)
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("spp/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".list").css("display", "");
+                                                $(".add").css("display", "none");
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                            // CREATE
+                            else
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("spp/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".list").css("display", "");
+                                                $(".add").css("display", "none");
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                        }
+                    })
+                }
             }
         })
 
@@ -757,6 +902,9 @@
                                     tag_html += "<td>";
                                     tag_html += keterangan;
                                     tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                                    tag_html += "</td>";
                                     tag_html += "</tr>";
 
                                     new_list_items.push({
@@ -804,6 +952,9 @@
                                     tag_html += "</td>";
                                     tag_html += "<td>";
                                     tag_html += item.keterangan;
+                                    tag_html += "</td>";
+                                    tag_html += "<td>";
+                                    tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
                                     tag_html += "</td>";
                                     tag_html += "</tr>";
 
@@ -882,6 +1033,9 @@
                             tag_html += "<td>";
                             tag_html += keterangan;
                             tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                            tag_html += "</td>";
                             tag_html += "</tr>";
                             $(".body-detail-table").append(tag_html)
                             $(".detail-modal").modal("hide")
@@ -891,6 +1045,202 @@
                 }
             }
         })
+    })
+
+    const deleteRow = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(id)
+                let new_list_items = []
+                let tag_html = "";
+
+                $(".body-detail-table").empty()
+
+                row = 0;
+
+                console.log(list_items)
+
+                list_items.map(item => {
+                    if(item.row != id)
+                    {
+                        tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}">`;
+                        tag_html += "<td>";
+                        tag_html += row + 1;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.kode_barang;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.nama_barang;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.nama_satuan;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.spesifikasi;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.harga;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.qty;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.total;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.keterangan;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_list_items.push({...item, row: row + 1});
+
+                        row = row + 1;
+                    }
+                    else
+                    {
+                        // sent parameter isDelete if have customer id and id
+                        if(item.id)
+                        {
+                            list_delete.push(item)
+                        }
+                    }
+                })
+
+                list_items = [];
+
+                list_items = new_list_items;
+
+                $(".body-detail-table").append(tag_html)
+
+                $(".detail-modal").modal("hide")
+            }
+        })
+    }
+
+    $(document).on('click', '.delete-detail', function() {
+        let id = $(".id_detail").val()
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(id)
+                let new_list_items = []
+                let tag_html = "";
+
+                $(".body-detail-table").empty()
+
+                row = 0;
+
+                console.log(list_items)
+
+                list_items.map(item => {
+                    if(item.row != id)
+                    {
+                        tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}">`;
+                        tag_html += "<td>";
+                        tag_html += row + 1;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.kode_barang;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.nama_barang;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.nama_satuan;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.spesifikasi;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.harga;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.qty;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.total;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.keterangan;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_list_items.push({...item, row: row + 1});
+
+                        row = row + 1;
+                    }
+                    else
+                    {
+                        // sent parameter isDelete if have customer id and id
+                        if(item.id)
+                        {
+                            list_delete.push(item)
+                        }
+                    }
+                })
+
+                list_items = [];
+
+                list_items = new_list_items;
+
+                $(".body-detail-table").append(tag_html)
+
+                $(".detail-modal").modal("hide")
+            }
+        })
+    })
+
+    $(document).on('click', '.edit-table-detail', function(evt) {
+        if(!$(evt.target).is('.actions')) {
+            $(".title-detail-name").text("Update")
+            $(".delete-detail").css('display', '');
+            let kode_barang = $(this).data('kode_barang')
+            let nama_barang = $(this).data('nama_barang')
+            let satuan = $(this).data('satuan')
+            let spesfikasi = $(this).data('spesifikasi')
+            let harga = $(this).data('harga')
+            let qty = $(this).data('qty')
+            let keterangan = $(this).data('keterangan')
+            let rowid = $(this).data('row')
+            let id = $(this).data('id')
+
+            validator_detail.resetForm();
+            validator_detail.reset();
+
+            $(".id_detail").val(rowid)
+            $(".kode_barang").val(kode_barang).change()
+            $(".nama_barang").val(nama_barang)
+            $(".satuan").val(satuan).change()
+            $(".spesifikasi").val(spesifikasi)
+            $(".harga").val(harga)
+            $(".qty").val(qty)
+            $(".total").val(harga * qty)
+            $(".keterangan").val(keterangan)
+        }
     })
 
     const changeStatus = function()
