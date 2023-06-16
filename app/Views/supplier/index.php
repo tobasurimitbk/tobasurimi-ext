@@ -165,7 +165,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
                 </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
@@ -231,7 +231,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                    <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
                 </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
@@ -762,7 +762,7 @@
             validator.reset();
 
             $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
+            $(".delete-form").css('display', 'none');
             $(".body-detail-table").empty()
 
             $.ajax({
@@ -800,7 +800,7 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $(".create-form")[0].reset()
-            $(".delete-btn").css('display', '');
+            $(".delete-form").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
 
@@ -932,7 +932,7 @@
         })
 
         // delete
-        $(".delete-btn").click(function() {
+        $(".delete-form").click(function() {
             Swal.fire({
                 icon: 'question',
                 title: 'Hapus Data?',
