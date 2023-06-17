@@ -14,6 +14,73 @@ class SPP extends BaseController
         return view('spp/index');
     }
 
+    public function createSPP()
+    {
+        $token = session()->get("login")->token;
+
+        //Get Order Type By Metadata
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $token);
+
+        $dataOrderType = [];
+        if ($responseOrderType["code"] === 200) {
+            $dataOrderType = json_decode($responseOrderType["body"])->data;
+        }
+
+        //Get Warehouse
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+
+        $dataWarehouse = [];
+        if ($responseWarehouse["code"] === 200) {
+            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
+        }
+        
+        $data = [
+            "dataOrderType" => $dataOrderType,
+            "dataWarehouse" => $dataWarehouse
+        ];
+
+        return view('spp/form', $data);
+    }
+
+    public function getByIdSPP($id = null)
+    {
+        $token = session()->get("login")->token;
+
+        //Get Order Type By Metadata
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $token);
+
+        $dataOrderType = [];
+        if ($responseOrderType["code"] === 200) {
+            $dataOrderType = json_decode($responseOrderType["body"])->data;
+        }
+
+        //Get Warehouse
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+
+        $dataWarehouse = [];
+        if ($responseWarehouse["code"] === 200) {
+            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
+        }
+        
+        $data = [
+            "dataOrderType" => $dataOrderType,
+            "dataWarehouse" => $dataWarehouse
+        ];
+
+        if (!empty($id)) {
+            $responseSPP = curl_request("GET", "/purchaseRequest/$id", $token);
+            $dataSPP = [];
+            if ($responseSPP["code"] === 200) {
+                $dataSPP = json_decode($responseSPP["body"])->data;
+            }
+            $data["dataSPP"] = $dataSPP;
+        }
+
+        return view('spp/form', $data);
+        
+        return;
+    }
+
     public function allSPP()
     {
         $token = session()->get("login")->token;
@@ -24,6 +91,7 @@ class SPP extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
+            "status" => $this->request->getGet("status"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -96,7 +164,7 @@ class SPP extends BaseController
                 "spp_type" => $this->request->getPost("spp_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
-                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
+                "is_posted" => false,
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
@@ -110,7 +178,7 @@ class SPP extends BaseController
             
             $response = curl_request("POST", "/purchaseRequest", $token, $payload);
 
-            if ($response["code"] === 200 || $response["code"] === 201) {
+            if ($response["code"] === 201) {
                 $data = [
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
@@ -173,13 +241,12 @@ class SPP extends BaseController
                 "spp_type" => $this->request->getPost("spp_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
-                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
             $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
 
-            if ($response["code"] === 200 || $response["code"] === 201) {
+            if ($response["code"] === 201) {
                 $data = [
                     "status"            => true,
                     "message"   => "Data Berhasil diubah",
@@ -208,36 +275,6 @@ class SPP extends BaseController
         return;
     }
 
-    public function getByIdSPP($id = null)
-    {
-        $token = session()->get("login")->token;
-
-        if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseRequest/$id", $token);
-            if ($response["code"] === 200 || $response["code"] === 201) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
     public function deleteSPP()
     {
         $token = session()->get("login")->token;
@@ -246,7 +283,7 @@ class SPP extends BaseController
 
         if (!empty($id)) {
             $response = curl_request("DELETE", "/purchaseRequest/$id", $token);
-            if ($response["code"] === 200 || $response["code"] === 201) {
+            if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
                     "message"   => "Data Berhasil dihapus",

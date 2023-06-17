@@ -12,20 +12,7 @@ class Employee extends BaseController
 
     public function employee()
     {
-        $token = session()->get("login")->token;
-         //Get Divisi
-        $responseDivisi = curl_request("GET", "/divisis/all", $token);
-
-        $dataDivisi = [];
-        if ($responseDivisi["code"] === 200) {
-            $dataDivisi = json_decode($responseDivisi["body"])->data;
-        }
-         
-        $data = [
-            "dataDivisi" => $dataDivisi,
-        ];
-
-        return view('employee/index', $data);
+        return view('employee/index');
     }
 
     public function dropdownEmployee()

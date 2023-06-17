@@ -301,4 +301,23 @@ class Divisi extends BaseController
         }
         return;
     }
+
+    public function dropdownDivisi()
+    {
+        $token = session()->get("login")->token;
+
+        $responseDivisi = curl_request("GET", "/divisis/all", $token);
+
+        $dataDivisi = [];
+        if ($responseDivisi["code"] === 200) {
+            $dataDivisi = json_decode($responseDivisi["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataDivisi
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }
