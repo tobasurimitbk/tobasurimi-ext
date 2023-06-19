@@ -4318,6 +4318,14 @@ div.dataTables_wrapper div.dataTables_info {
   font-family: "Poppins", sans-serif !important;
   font-size: 12px;
   font-weight: 500;
+  color: #798897;
+}
+
+#dataTable_paginate ul.pagination li .page-link:hover,
+#dataTable_paginate ul.pagination li .page-link:focus,
+#dataTable_paginate ul.pagination li .page-link:active {
+  background-color: #e7323a;
+  color: #ffffff;
 }
 
 .page-item.disabled .page-link {
@@ -4330,6 +4338,7 @@ div.dataTables_wrapper div.dataTables_info {
 .page-item.active .page-link {
   background-color: #e7323a;
   border-color: #e7323a;
+  color: #ffffff !important;
 }
 
 .main-sidebar .sidebar-brand img {
