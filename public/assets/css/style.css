@@ -4775,3 +4775,39 @@ div:where(.swal2-icon).swal2-question {
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 }
+
+.section .section-header .nav.nav-tabs {
+  position: absolute;
+  right: 20px;
+}
+
+.section .section-header .nav.nav-tabs {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #2f4858 !important;
+  border-bottom: 0px #e7323a solid;
+  line-height: 1.8;
+}
+
+.section .section-header .nav.nav-tabs .nav-item {
+  margin-bottom: 0px;
+}
+
+.section .section-header .nav.nav-tabs .nav-item .nav-link {
+  color: #2f4858;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.section .section-header .nav.nav-tabs .nav-item .nav-link:hover,
+.section .section-header .nav.nav-tabs .nav-item .nav-link:focus,
+.section .section-header .nav.nav-tabs .nav-item .nav-link:active {
+  color: #e7323a;
+}
+
+.section .section-header .nav.nav-tabs .nav-item .nav-link.active {
+  color: #ffffff;
+  background-color: #e7323a;
+  border-color: #e7323a #e7323a #fff;
+}

@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal-kategori" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="min-width: 900px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title modal-title-kategori"><label class="title-name-kategori"></label> Kategori Akun</h5>
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control nama_akun_kategori" id="nama_akun_kategori" name="nama_akun_kategori" placeholder="Nama Akun">
@@ -40,10 +40,12 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Batal</button>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Batal</button>
+                </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-kategori btn-discard mr-3">Hapus</button>
+                    <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Hapus</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Simpan</button>
                 </div>
             </div>
@@ -52,7 +54,7 @@
 </div>
 
 <div class="modal add-modal-header" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="min-width: 900px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title modal-title-header"><label class="title-name-header"></label> Header Akun</h5>
@@ -79,7 +81,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control nama_akun_header" id="nama_akun_header" name="nama_akun_header" placeholder="Nama Akun">
@@ -90,10 +92,12 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn delete-btn-header">Batal</button>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-header">Batal</button>
+                </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-header btn-discard mr-3">Hapus</button>
+                    <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Hapus</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-header">Simpan</button>
                 </div>
             </div>
@@ -102,7 +106,7 @@
 </div>
 
 <div class="modal add-modal-sub" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="min-width: 900px !important;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title modal-title-sub"><label class="title-name-sub"></label> Sub Akun</h5>
@@ -148,7 +152,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="mb-3" style="height: 50px;">
                                 <label for="floatingInput">Status</label>
@@ -164,10 +168,12 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Batal</button>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Batal</button>
+                </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-sub btn-discard mr-3">Hapus</button>
+                    <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Hapus</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Simpan</button>
                 </div>
             </div>
@@ -180,7 +186,7 @@
 <div class="section-header">
     <h1>Account</h1>
     <!-- Navigation -->
-    <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+    <ul class="nav nav-tabs float-right" id="myTab" role="tablist">
         <li class="nav-item" role="presentation" style="cursor:pointer">
             <a class="nav-link active" onclick="removeAllTab()" id="kategori-tab" data-toggle="tab" data-target="#kategori" role="tab" aria-controls="kategori" aria-selected="true">Kategori Akun</a>
         </li>
