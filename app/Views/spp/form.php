@@ -510,10 +510,11 @@
 
         // KODE BARANG
         $('.kode_barang').select2({
-            placeholder: "",
+            placeholder: "Pilih Kode Barang / Buat Baru",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true
+            tags: true,
+            allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -943,6 +944,16 @@
                 $(".qty").val(stok);
                 $(".harga").val(harga ? harga.toLocaleString() : "");
                 $(".total").val(harga || stok ? (harga * stok).toLocaleString() : "");
+            }
+            else
+            {
+                $(".kode").val("");
+                $(".nama_barang").val("");
+                $(".barang_id").val("");
+                $(".satuan").val("").change();
+                $(".qty").val("");
+                $(".harga").val("");
+                $(".total").val("");
             }
         })
 
