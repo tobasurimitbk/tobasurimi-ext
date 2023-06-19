@@ -5,23 +5,42 @@
 <section class="section">
 <div class="section-header">
     <h1 class="title-name">Tambah</h1>
+
     <?php if(!empty($dataSPP)){ ?> 
+
+    <?php if($dataSPP->is_posted === false){ ?> 
     <button class="btn btn-primary delete-parent">
         <i class="fa fa-trash" aria-hidden="true"></i>
     </button>
+    <?php } ?> 
+
     <button class="btn btn-warning">
         <i class="fa fa-print" aria-hidden="true"></i>
     </button>
+
+    <?php if($dataSPP->is_posted === false){ ?> 
     <button class="btn btn-success posting-spp">
         <i class="fa fa-paper-plane" aria-hidden="true"></i>
     </button>
     <?php } ?> 
+
+    <?php } ?> 
+
     <a class="btn btn-hide-form" href="<?= base_url("spp"); ?>">
         Batal
     </a>
+
+    <?php if(!empty($dataSPP)){ 
+        if($dataSPP->is_posted === false){ ?> 
     <button class="btn btn-submit-form btn-submit-parent">
         Simpan
     </button>
+    <?php }
+    } else { ?> 
+    <button class="btn btn-submit-form btn-submit-parent">
+        Simpan
+    </button>
+    <?php } ?> 
 </div>
 <div class="card">
     <div class="card-body">
@@ -38,7 +57,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? $dataSPP->request_date : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
+                                <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? $dataSPP->request_date : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
                                 <label for="floatingInput">Tanggal Order</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -55,10 +74,12 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
+
+                        <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "selected" : "") : ""; ?>>Lokal</option>
                             <option value="import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Import" ? "selected" : "") : ""; ?>>Import</option>
                         </select>
+
                         <label for="floatingInput">Tipe SPP</label>
                     </div>
                 </div>
@@ -79,7 +100,7 @@
             <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select order_type" id="order_type" name="order_type" aria-label="Floating label select example">
+                        <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select order_type" id="order_type" name="order_type" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php
                             if (!empty($dataOrderType)) {
@@ -96,7 +117,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                        <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php
                             if (!empty($dataWarehouse)) {
@@ -113,7 +134,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                        <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                         <label for="floatingInput">Catatan (Opsional)</label>
                     </div>
                 </div>
@@ -124,9 +145,18 @@
                 <label class="form-label font-weight-bold">List Barang</label>
             </div>
             <div class="col-md-6">
-                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                </button>
+            <?php if(!empty($dataSPP)){ 
+                if($dataSPP->is_posted === false){ ?> 
+            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+            <?php }
+            } else { ?> 
+            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+            <?php } ?> 
+                
             </div>
         </div>
         <div class="table-responsive mt-2">
@@ -157,17 +187,52 @@
                         $total_qty = $total_qty + $details->qty;
                         $total_harga = $total_harga + formatter(str_replace(",", "", $details->totalPrice), "STR_TO_INT");
                 ?> 
+
                     <tr>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->kodeBarang; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->barangName; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->satuanName; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->spec; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->price; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->qty; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->totalPrice; ?></td>
-                        <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->note; ?></td>
-                        <td><button onclick='deleteRow("<?= $no; ?>")'>X</button></td>
+                        <?php if(!empty($dataSPP)){ 
+
+                            if($dataSPP->is_posted === false){ ?> 
+
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->kodeBarang; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->barangName; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->satuanName; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->spec; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->price; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->qty; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->totalPrice; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->note; ?></td>
+                                <td><button onclick='deleteRow("<?= $no; ?>")'>X</button></td>
+
+                        <?php } else { ?>
+
+                                <td><?= $no; ?></td>
+                                <td><?= $details->kodeBarang; ?></td>
+                                <td><?= $details->barangName; ?></td>
+                                <td><?= $details->satuanName; ?></td>
+                                <td><?= $details->spec; ?></td>
+                                <td><?= $details->price; ?></td>
+                                <td><?= $details->qty; ?></td>
+                                <td><?= $details->totalPrice; ?></td>
+                                <td><?= $details->note; ?></td>
+                                <td></td> 
+
+                        <?php }
+                        } else { ?> 
+
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->kodeBarang; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->barangName; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->satuanName; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->spec; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->price; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->qty; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->totalPrice; ?></td>
+                                <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->note; ?></td>
+                                <td><button onclick='deleteRow("<?= $no; ?>")'>X</button></td>
+
+                        <?php } ?> 
+                       
                     </tr>
                 <?php 
                     $no++;
@@ -220,6 +285,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="hidden" class="kode" name="kode" id="kode" />
                                 <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
                                     <option data-barang_id= "" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>
                                 </select>
@@ -767,7 +833,6 @@
                                     contentType: false,
                                     success: function(response) {
                                         csrf.val(response.token);
-                                        console.log(response)
                                         if (response.status) {
                                             stopLoading()
                                             Swal.fire({
@@ -776,7 +841,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                // window.location.href = "<?= base_url("spp"); ?>"
+                                                window.location.href = "<?= base_url("spp"); ?>" + "/id/" + response.id;
                                             })
                                         } else {
                                             Swal.fire({
@@ -810,6 +875,7 @@
             $(".title-detail-name").text("Tambah");
             $(".id_detail").val('');
             
+            $(".kode").val('')
             $(".nama_barang").val('')
             $(".qty").val('')
             $(".satuan").val('')
@@ -864,19 +930,19 @@
         $(".kode_barang").change(function() {
             if($(".kode_barang option:selected").val())
             {
-                let nama = $(".kode_barang option:selected").data("nama");
-                let satuan = $(".kode_barang option:selected").data("satuan");
-                let stok = $(".kode_barang option:selected").data("stok");
-                let harga = $(".kode_barang option:selected").data("harga");
-                let barang_id = $(".kode_barang option:selected").data("barang_id");
+                let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
+                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
+                let stok = $(".kode_barang option:selected").data("stok") ? $(".kode_barang option:selected").data("stok") : "";
+                let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
+                let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
 
-                console.log(barang_id);
+                $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
                 $(".barang_id").val(barang_id);
                 $(".satuan").val(satuan).change();
                 $(".qty").val(stok);
-                $(".harga").val(harga.toLocaleString());
-                $(".total").val((harga * stok).toLocaleString());
+                $(".harga").val(harga ? harga.toLocaleString() : "");
+                $(".total").val(harga || stok ? (harga * stok).toLocaleString() : "");
             }
         })
 
@@ -952,7 +1018,7 @@
         $(".btn-submit-detail").click(function() {
             let row_detail = $(".id_detail").val();
             let barang_id = $(".barang_id").val()
-            let kode_barang = $(".kode_barang option:selected").val()
+            let kode_barang = $(".kode").val()
             let nama_barang = $(".nama_barang").val()
             let nama_satuan = $(".satuan option:selected").text()
             let satuan = $(".satuan option:selected").val()
@@ -1478,6 +1544,7 @@
         validator_detail.reset();
 
         $(".id_detail").val(rowid)
+        $(".kode").val(kode_barang)
         $(".barang_id").val(barang_id)
         $(".nama_barang").val(nama_barang)
         $(".spesifikasi").val(spesifikasi)
