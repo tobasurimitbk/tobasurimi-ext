@@ -4,8 +4,8 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Surat Permintaan Pembelian</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
+    <h1>Purchase Order Lokal</h1>
+    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
 </div>
@@ -46,12 +46,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>#</th>
-                            <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
-                            <th onclick="changeSort('sppNo')" class="sort">No. SPP</th> 
-                            <th onclick="changeSort('warehouse')" class="sort">Departemen</th> 
-                            <th onclick="changeSort('orderType')" class="sort">Jenis Order</th> 
-                            <th onclick="changeSort('total')" class="sort">Total Harga</th> 
-                            <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th> 
+                            <th>Tanggal Dibuat</th>
+                            <th>No. PO</th> 
+                            <th>Jenis Order</th> 
+                            <th>Supplier</th> 
+                            <th>Total Harga</th> 
+                            <th>Valas</th> 
                             <th>Status</th> 
                         </tr>
                     </thead>
@@ -66,9 +66,6 @@
 </section>
 
 <script>
-    let sort = "spp_type";
-    let sortType = "asc";
-
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
@@ -89,8 +86,6 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
-                data.sort = sort;
-                data.sortType = sortType;
             }
         },
         // scrollX: true,
@@ -120,7 +115,7 @@
             className: "text-center"
         },
         {
-            data: "orderTypeName",
+            data: "order_type",
             className: "text-center"
         },
         {
@@ -194,17 +189,5 @@
             location.replace(`<?= base_url("spp/id"); ?>/${data.id}`);
         })
     })
-
-    const changeSort = function(val) {
-        if(sort !== val)
-        {
-            sortType = "asc";
-            sort = val;
-        }
-        else
-        {
-            sortType = sortType === "asc" ? "desc" : "asc";
-        }
-    }
 </script>
 <?= $this->endSection(); ?>

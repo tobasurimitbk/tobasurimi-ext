@@ -91,7 +91,7 @@ class SPP extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "status" => $this->request->getGet("status"),
+            "requestStatus" => $this->request->getGet("status"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -113,7 +113,7 @@ class SPP extends BaseController
                     "spp_type" => $data->spp_type,
                     "spp_no" => $data->spp_no,
                     "warehouseName" => $data->warehouseName,
-                    "order_type" => $data->order_type,
+                    "orderTypeName" => $data->orderTypeName,
                     "total" => $data->total,
                     "request_date" => $data->request_date,
                     "request_status" => $data->request_status,
@@ -168,36 +168,37 @@ class SPP extends BaseController
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+            $data = [
+                "status"            => false,
+                "message"    => $payload,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
             
-            $response = curl_request("POST", "/purchaseRequest", $token, $payload);
+            // $response = curl_request("POST", "/purchaseRequest", $token, $payload);
 
-            if ($response["code"] === 201) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
-            }
+            // if ($response["code"] === 201) {
+            //     $data = [
+            //         "response" => $response,
+            //         "status"            => true,
+            //         "message"   => "Data Berhasil disimpan",
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash(),
+            //         'code' => $response["code"]
+            //     ];
+            //     echo json_encode($data);
+            // } else {
+            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+            //     $data = [
+            //         "status"            => false,
+            //         "message"    => $message,
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash(),
+            //         'code' => $response["code"]
+            //     ];
+            //     echo json_encode($data);
+            // }
         } else {
             $data = [
                 "status"            => false,
@@ -244,30 +245,71 @@ class SPP extends BaseController
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
-            $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+            $data = [
+                "status"            => false,
+                "message"    => $payload,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
 
-            if ($response["code"] === 201) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            // $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+
+            // if ($response["code"] === 200) {
+            //     $data = [
+            //         "status"            => true,
+            //         "message"   => "Data Berhasil diubah",
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // } else {
+            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            //     $data = [
+            //         "status"            => false,
+            //         "message"    => $message,
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // }
         } else {
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateStatusSPP()
+    {
+        $token = session()->get("login")->token;
+
+        $id = $this->request->getPost("id");
+
+        $payload = json_encode([
+            "is_posted" => true
+        ]);
+        
+        $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Data Berhasil diubah",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
