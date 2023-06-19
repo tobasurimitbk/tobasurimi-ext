@@ -96,7 +96,7 @@ if (!function_exists('formatter')) {
             return !empty($value) ? floatval($value) : "";
             break;
          case "CURR_TO_INT":
-            return intval(str_replace(".", "", $value));
+            return intval(str_replace(",", "", $value));
             break;
          case "NUM_TO_CURR":
             return str_replace(",", ".", number_format($value));

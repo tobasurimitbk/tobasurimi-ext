@@ -159,6 +159,7 @@ $routes->post('/satuan/delete', 'Satuan::deleteSatuan', ['filter' => 'Auth']);
 $routes->get('/spp', 'SPP::spp', ['filter' => 'Auth']);
 $routes->get('/spp/all', 'SPP::allSPP', ['filter' => 'Auth']);
 $routes->get('/spp/id/(:segment)', 'SPP::getByIdSPP/$1', ['filter' => 'Auth']);
+$routes->get('/spp/create', 'SPP::createSPP', ['filter' => 'Auth']);
 $routes->post('/spp/save', 'SPP::saveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update', 'SPP::updateSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'SPP::deleteSPP', ['filter' => 'Auth']);
@@ -194,6 +195,9 @@ $routes->get('/user/dropdown', 'User::dropdownUser', ['filter' => 'Auth']);
 
 // WAREHOUSE
 $routes->get('/warehouse/dropdown', 'Warehouse::dropdownWarehouse', ['filter' => 'Auth']);
+
+// DIVISI
+$routes->get('/divisi/dropdown', 'Divisi::dropdownDivisi', ['filter' => 'Auth']);
 
 // BARANG
 $routes->get('/barang/dropdown', 'Barang::dropdownBarang', ['filter' => 'Auth']);

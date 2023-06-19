@@ -14,6 +14,73 @@ class SPP extends BaseController
         return view('spp/index');
     }
 
+    public function createSPP()
+    {
+        $token = session()->get("login")->token;
+
+        //Get Order Type By Metadata
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $token);
+
+        $dataOrderType = [];
+        if ($responseOrderType["code"] === 200) {
+            $dataOrderType = json_decode($responseOrderType["body"])->data;
+        }
+
+        //Get Warehouse
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+
+        $dataWarehouse = [];
+        if ($responseWarehouse["code"] === 200) {
+            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
+        }
+        
+        $data = [
+            "dataOrderType" => $dataOrderType,
+            "dataWarehouse" => $dataWarehouse
+        ];
+
+        return view('spp/form', $data);
+    }
+
+    public function getByIdSPP($id = null)
+    {
+        $token = session()->get("login")->token;
+
+        //Get Order Type By Metadata
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $token);
+
+        $dataOrderType = [];
+        if ($responseOrderType["code"] === 200) {
+            $dataOrderType = json_decode($responseOrderType["body"])->data;
+        }
+
+        //Get Warehouse
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+
+        $dataWarehouse = [];
+        if ($responseWarehouse["code"] === 200) {
+            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
+        }
+        
+        $data = [
+            "dataOrderType" => $dataOrderType,
+            "dataWarehouse" => $dataWarehouse
+        ];
+
+        if (!empty($id)) {
+            $responseSPP = curl_request("GET", "/purchaseRequest/$id", $token);
+            $dataSPP = [];
+            if ($responseSPP["code"] === 200) {
+                $dataSPP = json_decode($responseSPP["body"])->data;
+            }
+            $data["dataSPP"] = $dataSPP;
+        }
+
+        return view('spp/form', $data);
+        
+        return;
+    }
+
     public function allSPP()
     {
         $token = session()->get("login")->token;
@@ -24,6 +91,7 @@ class SPP extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
+            "status" => $this->request->getGet("status"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -34,7 +102,7 @@ class SPP extends BaseController
 
         if ($response["code"] === 200) {
             $body = json_decode($response["body"])->data;
-            $totalRecords = 1;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
 
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
@@ -45,8 +113,8 @@ class SPP extends BaseController
                     "spp_type" => $data->spp_type,
                     "spp_no" => $data->spp_no,
                     "warehouseName" => $data->warehouseName,
-                    "po_type" => $data->po_type,
-                    "total" => "",
+                    "order_type" => $data->order_type,
+                    "total" => $data->total,
                     "request_date" => $data->request_date,
                     "request_status" => $data->request_status,
                 ]);
@@ -78,7 +146,7 @@ class SPP extends BaseController
             "spp_no" => [
                 "rules" => "required"
             ],
-            "po_type" => [
+            "order_type" => [
                 "rules" => "required"
             ],
             "warehouse_id" => [
@@ -91,11 +159,12 @@ class SPP extends BaseController
 
             $payload = json_encode([
                 "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
+                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
+                "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
                 "spp_type" => $this->request->getPost("spp_type"),
-                "spp_no" => $this->request->getPost("spp_no"),
-                "po_type" => $this->request->getPost("po_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
+                "is_posted" => false,
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
@@ -109,12 +178,13 @@ class SPP extends BaseController
             
             $response = curl_request("POST", "/purchaseRequest", $token, $payload);
 
-            if ($response["code"] === 200) {
+            if ($response["code"] === 201) {
                 $data = [
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
-                    'token' => csrf_hash()
+                    'token' => csrf_hash(),
+                    'code' => $response["code"]
                 ];
                 echo json_encode($data);
             } else {
@@ -123,7 +193,8 @@ class SPP extends BaseController
                     "status"            => false,
                     "message"    => $message,
                     "payload"   => $payload,
-                    'token' => csrf_hash()
+                    'token' => csrf_hash(),
+                    'code' => $response["code"]
                 ];
                 echo json_encode($data);
             }
@@ -150,7 +221,7 @@ class SPP extends BaseController
             "spp_no" => [
                 "rules" => "required"
             ],
-            "po_type" => [
+            "order_type" => [
                 "rules" => "required"
             ],
             "warehouse_id" => [
@@ -165,9 +236,9 @@ class SPP extends BaseController
 
             $payload = json_encode([
                 "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
-                "spp_type" => $this->request->getPost("spp_type"),
+                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
                 "spp_no" => $this->request->getPost("spp_no"),
-                "po_type" => $this->request->getPost("po_type"),
+                "spp_type" => $this->request->getPost("spp_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
@@ -175,7 +246,7 @@ class SPP extends BaseController
 
             $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
 
-            if ($response["code"] === 200) {
+            if ($response["code"] === 201) {
                 $data = [
                     "status"            => true,
                     "message"   => "Data Berhasil diubah",
@@ -198,36 +269,6 @@ class SPP extends BaseController
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
                 'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function getByIdSPP($id = null)
-    {
-        $token = session()->get("login")->token;
-
-        if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseRequest/$id", $token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
             ];
             echo json_encode($data);
         }

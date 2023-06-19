@@ -36,14 +36,20 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="formatNumber(this)" class="form-control harga_barang" name="harga_barang" id="harga_barang" placeholder="Harga Barang">
+                                <label for="floatingInput">Harga Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Kategori</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select hs_id" name="hs_id" id="hs_id">
@@ -52,6 +58,8 @@
                                 <label for="floatingInput">Kode HS</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select ap_id" name="ap_id" id="ap_id">
@@ -60,8 +68,6 @@
                                 <label for="floatingInput">Akun Pembelian</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select ar_id" name="ar_id" id="ar_id">
@@ -70,15 +76,15 @@
                                 <label for="floatingInput">Akun Penjualan</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
                                 <label for="floatingInput">Stok</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
+                        <div class="col-md-6">
                             <div class="mb-3" style="height: 50px;">
                                 <label for="floatingInput">Status</label>
                                 <div>
@@ -156,6 +162,7 @@
                         <tr>
                             <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                             <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                            <th onclick="changeSort('harga_barang')" class="sort">Harga Barang</th>
                             <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
                             <th onclick="changeSort('kategori')" class="sort">Kategori</th>
                             <th onclick="changeSort('code_hs')" class="sort">Kode HS</th>
@@ -218,6 +225,10 @@
         },
         {
             data: "nama_barang",
+            className: "text-center"
+        },
+        {
+            data: "harga_barang",
             className: "text-center"
         },
         {
@@ -465,6 +476,9 @@
                 nama_barang: {
                     required: true
                 },
+                harga_barang: {
+                    required: true
+                },
                 satuan_id: {
                     required: true
                 },
@@ -487,6 +501,9 @@
                 },
                 nama_barang: {
                     required: "Nama wajib diisi"
+                },
+                harga_barang: {
+                    required: "Harga wajib diisi"
                 },
                 satuan_id: {
                     required: "Satuan wajib diisi"
@@ -638,6 +655,7 @@
                         $(".id").val(id);
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".nama_barang").val(res?.data?.nama_barang);
+                        $(".harga_barang").val(res?.data?.harga_barang);
                         
                         validator.resetForm();
                         validator.reset();
