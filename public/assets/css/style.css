@@ -4872,7 +4872,7 @@ div:where(.swal2-icon).swal2-question {
   content: "";
   height: 24px;
   width: 26px;
-  left: 4px;
+  left: 3px;
   bottom: 1px;
   background-color: white;
   -webkit-transition: 0.4s;
