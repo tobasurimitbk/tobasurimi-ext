@@ -41,11 +41,11 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Batal</button>
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Hapus</button>
                 </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Hapus</button>
+                    <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Simpan</button>
                 </div>
             </div>
@@ -93,11 +93,11 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-header">Batal</button>
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-header">Hapus</button>
                 </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Hapus</button>
+                    <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-header">Simpan</button>
                 </div>
             </div>
@@ -169,11 +169,11 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Batal</button>
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Hapus</button>
                 </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
-                    <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Hapus</button>
+                    <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Simpan</button>
                 </div>
             </div>
@@ -203,13 +203,11 @@
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
                 <div class="collapse-kategori-list show" id="collapseKategoriList">
-                    <div>
-                        <button class="btn btn-show-form-kategori btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                    <div class="d-flex float-right mb-3">
+                        <input class="form-control search form-out-search mr-3" placeholder="Search"/>
+                        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
-                    </div>
-                    <div>
-                        <input class="form-control search-kategori float-right" placeholder="Search" style="width: 30%" value="" />
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
@@ -229,13 +227,11 @@
             </div>
             <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
                 <div class="collapse-header-list show" id="collapseHeaderList">
-                    <div>
-                        <button class="btn btn-show-form-header btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                    <div class="d-flex float-right mb-3">
+                        <input class="form-control search form-out-search mr-3" placeholder="Search"/>
+                        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
-                    </div>
-                    <div>
-                        <input class="form-control search-header float-right" placeholder="Search" style="width: 30%" value="" />
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
@@ -255,23 +251,15 @@
             </div>
             <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
                 <div class="collapse-header-list show" id="collapseSubList">
-                    <div>
-                        <button class="btn btn-show-form-sub btn-add btn-block float-right" data-btn="create-modal" style="margin-top: -40px; width: 176px;">
+                    <div class="d-flex float-right mb-3">
+                        <input class="form-control search search-sub form-out-search mr-3" placeholder="Search"/>
+                        <select class="form-select status mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
+                            <option value="Aktif">Aktif</option>
+                            <option value="Void">Void</option>
+                        </select>
+                        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
-                    </div>
-                    <div>
-                        <div class="form-row justify-content-end">
-                            <div class="col-md-3">
-                                <input class="form-control search-sub" placeholder="Search" value="" />
-                            </div>
-                            <div class="col-md-3">
-                                <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                                    <option value="Aktif">Aktif</option>
-                                    <option value="Void">Void</option>
-                                </select>
-                            </div>
-                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
