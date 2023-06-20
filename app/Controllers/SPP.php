@@ -245,34 +245,34 @@ class SPP extends BaseController
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
-            $data = [
-                "status"            => false,
-                "message"    => $payload,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            // $data = [
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
 
-            // $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+            $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
 
-            // if ($response["code"] === 200) {
-            //     $data = [
-            //         "status"            => true,
-            //         "message"   => "Data Berhasil diubah",
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // } else {
-            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-            //     $data = [
-            //         "status"            => false,
-            //         "message"    => $message,
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // }
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
         } else {
             $data = [
                 "status"            => false,

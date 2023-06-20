@@ -205,7 +205,7 @@
                 <div class="collapse-kategori-list show" id="collapseKategoriList">
                     <div class="d-flex float-right mb-3">
                         <input class="form-control search form-out-search mr-3" placeholder="Search"/>
-                        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                        <button class="btn btn-show-form btn-add float-right btn-show-form-kategori" data-btn="create-modal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>
@@ -229,7 +229,7 @@
                 <div class="collapse-header-list show" id="collapseHeaderList">
                     <div class="d-flex float-right mb-3">
                         <input class="form-control search form-out-search mr-3" placeholder="Search"/>
-                        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                        <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>
@@ -257,7 +257,7 @@
                             <option value="Aktif">Aktif</option>
                             <option value="Void">Void</option>
                         </select>
-                        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                        <button class="btn btn-show-form btn-add float-right btn-show-form-sub" data-btn="create-modal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
                     </div>

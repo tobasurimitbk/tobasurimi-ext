@@ -97,7 +97,7 @@
                             if (!empty($dataSupplier)) {
                                 foreach ($dataSupplier as $supplier) {
                             ?>
-                                    <option value="<?= $supplier->id; ?>"><?= $supplier->kode; ?></option>
+                                    <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
                             <?php
                                 }
                             }
@@ -204,7 +204,7 @@
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
             </div>
-            <div class="modal-body" style="height: 380px !important; max-height: 380px !important;">
+            <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row">
@@ -288,6 +288,24 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h5>Data Tax</h5>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">PPN</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">PPH</label>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -456,6 +474,18 @@
 
         $(".btn-hide-detail").click(function() {
             $(".detail-modal").modal("hide")
+        })
+
+        $(".supplier_id").change(function() {
+            if($(".supplier_id option:selected").val())
+            {
+                let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
+                $(".supplier").val(name);
+            }
+            else
+            {
+                $(".supplier").val("");
+            }
         })
     })
 

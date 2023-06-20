@@ -278,7 +278,7 @@
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
             </div>
-            <div class="modal-body" style="height: 380px !important; max-height: 380px !important;">
+            <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
@@ -365,14 +365,24 @@
     var total_harga_barang = 0;
     var total_qty = 0;
     var total_harga = 0;
+    var priceEdit = 0;
+    var totalPriceEdit = 0;
 
     <?php if(!empty($dataSPP)){ 
-        foreach($dataSPP->purchase_request_details as $details){
-        $no = 1;    
+        foreach($dataSPP->purchase_request_details as $details){  
     ?>
+
+    priceEdit = Number('<?= $details->price; ?>'.replaceAll(",", ""));
+    totalPriceEdit = Number('<?= $details->totalPrice; ?>'.replaceAll(",", ""));
+    row = row + 1;
+
+    total_harga_barang = total_harga_barang + priceEdit;
+    total_qty = total_qty + <?= $details->qty; ?>;
+    total_harga = total_harga + totalPriceEdit;
+
     list_items.push({
         id: <?= $details->id; ?>,
-        row: <?= $no; ?>,
+        row: row,
         barang_id: '<?= $details->barang_id; ?>',
         kode_barang: '<?= $details->kodeBarang; ?>',
         nama_barang: '<?= $details->barangName; ?>',
@@ -385,13 +395,19 @@
         keterangan: '<?= $details->note; ?>'
     })
     <?php 
-        $no++;
         }
+    ?>
+    <?php
     } ?>
+
+    console.log(list_items)
     
     var validator_detail = $(".detail-form").validate({
         rules: {
             kode_barang: {
+                required: true
+            },
+            nama_barang: {
                 required: true
             },
             qty: {
@@ -409,7 +425,10 @@
         },
         messages: {
             kode_barang: {
-                required: "Address wajib diisi"
+                required: "Kode wajib diisi"
+            },
+            nama_barang: {
+                required: "Nama wajib diisi"
             },
             qty: {
                 required: "Qty wajib diisi"
@@ -635,7 +654,7 @@
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Simpan',
+                confirmButtonText: 'Posting',
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -937,6 +956,8 @@
                 let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
                 let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
 
+                $(".nama_barang").attr("readonly", nama ? true : false);
+
                 $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
                 $(".barang_id").val(barang_id);
@@ -947,6 +968,7 @@
             }
             else
             {
+                $(".nama_barang").attr("readonly", false)
                 $(".kode").val("");
                 $(".nama_barang").val("");
                 $(".barang_id").val("");
@@ -1164,7 +1186,7 @@
                                     row = row + 1;
 
                                     total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                                    total_qty = total_qty + Number(item.qty.replaceAll(",", ""));
+                                    total_qty = total_qty + Number(item.qty);
                                     total_harga = total_harga + Number(item.total.replaceAll(",", ""));
                                 }
                             })
@@ -1374,7 +1396,7 @@
                         row = row + 1;
 
                         total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                        total_qty = total_qty + Number(item.qty.replaceAll(",", ""));
+                        total_qty = total_qty + Number(item.qty);
                         total_harga = total_harga + Number(item.total.replaceAll(",", ""));
                     }
                     else
@@ -1490,7 +1512,7 @@
                         row = row + 1;
 
                         total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                        total_qty = total_qty + Number(item.qty.replaceAll(",", ""));
+                        total_qty = total_qty + Number(item.qty);
                         total_harga = total_harga + Number(item.total.replaceAll(",", ""));
                     }
                     else
@@ -1554,6 +1576,7 @@
         validator_detail.resetForm();
         validator_detail.reset();
 
+        $(".nama_barang").attr("readonly", true)
         $(".id_detail").val(rowid)
         $(".kode").val(kode_barang)
         $(".barang_id").val(barang_id)

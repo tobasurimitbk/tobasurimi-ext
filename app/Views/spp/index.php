@@ -52,7 +52,9 @@
                             <th onclick="changeSort('orderType')" class="sort">Jenis Order</th> 
                             <th onclick="changeSort('total')" class="sort">Total Harga</th> 
                             <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th> 
-                            <th>Status</th> 
+                            <th>Order Oleh</th> 
+                            <th>Disetujui</th> 
+                            <th>Penerima</th> 
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -132,15 +134,27 @@
             className: "text-center"
         },
         {
-            data: "request_status",
-            className: "text-center",
+            data: "id",
+            className: "text-center actions",
             orderable: false,
             render: function(data, type, row) {
-                return `
-                <label class="text-warning">
-                ${data}
-                </label>
-                `
+                return `<input type="checkbox" class="order_by_${data}"/>`
+            }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            orderable: false,
+            render: function(data, type, row) {
+                return `<input type="checkbox" class="approved_by_${data}"/>`
+            }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            orderable: false,
+            render: function(data, type, row) {
+                return `<input type="checkbox" class="received_by_${data}"/>`
             }
         }],
         columnDefs: [{
