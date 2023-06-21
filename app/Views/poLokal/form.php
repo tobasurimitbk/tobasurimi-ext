@@ -38,6 +38,15 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select purchase_request_id" id="purchase_request_id" name="purchase_request_id" aria-label="Floating label select example">
                             <option value=""></option>
+                            <?php
+                            if (!empty($dataSPP)) {
+                                foreach ($dataSPP as $spp) {
+                            ?>
+                                    <option value="<?= $spp->id; ?>"><?= $spp->spp_no; ?></option>
+                            <?php
+                                }
+                            }
+                            ?>
                         </select>
                         <label for="floatingInput">No. SPP</label>
                     </div>
@@ -341,6 +350,33 @@
             orientation: "bottom auto",
             autoclose: true
         })
+
+        // PURCHASE REQUEST ID
+        $('.purchase_request_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.purchase_request_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.purchase_request_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.purchase_request_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         // SUPPLIER
         $('.supplier_id').select2({

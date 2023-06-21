@@ -21,7 +21,7 @@ class POLokal extends BaseController
         $this_company_id = session()->get("login")->this_company_id;
 
          //Get SPP Number
-         $responseSPP = curl_request("GET", "/penerimaanBarang?statuspenerimaan=LOKAL", $token);
+         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -109,6 +109,9 @@ class POLokal extends BaseController
             "purchase_request_id" => [
                 "rules" => "required"
             ],
+            "po_no" => [
+                "rules" => "required"
+            ],
             "po_date" => [
                 "rules" => "required"
             ],
@@ -131,6 +134,7 @@ class POLokal extends BaseController
 
             $payload = json_encode([
                 "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
+                "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "po_type" => "lokal",
@@ -190,6 +194,9 @@ class POLokal extends BaseController
             "purchase_request_id" => [
                 "rules" => "required"
             ],
+            "po_no" => [
+                "rules" => "required"
+            ],
             "po_date" => [
                 "rules" => "required"
             ],
@@ -214,6 +221,7 @@ class POLokal extends BaseController
 
             $payload = json_encode([
                 "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
+                "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "po_type" => "lokal",

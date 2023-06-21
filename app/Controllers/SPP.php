@@ -238,41 +238,41 @@ class SPP extends BaseController
             $payload = json_encode([
                 "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "spp_no" => $this->request->getPost("spp_no"),
+                "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
                 "spp_type" => $this->request->getPost("spp_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+            $data = [
+                "status"            => false,
+                "message"    => $payload,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
 
-            $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+            // $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            // if ($response["code"] === 200) {
+            //     $data = [
+            //         "status"            => true,
+            //         "message"   => "Data Berhasil diubah",
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // } else {
+            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            //     $data = [
+            //         "status"            => false,
+            //         "message"    => $message,
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // }
         } else {
             $data = [
                 "status"            => false,
