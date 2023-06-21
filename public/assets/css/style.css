@@ -4901,3 +4901,26 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.section .section-header .btn.btn-save {
+  background: #007ae0;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  position: absolute;
+  right: 0;
+  margin-right: 20px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #007ae0 solid;
+  border-radius: 4px;
+  min-width: 120px;
+}
+
+.section .section-header .btn.btn-save:hover,
+.section .section-header .btn.btn-save:focus,
+.section .section-header .btn.btn-save:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
