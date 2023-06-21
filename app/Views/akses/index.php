@@ -5,7 +5,7 @@
 <section class="section">
 <div class="section-header">
     <h1>Manajemen Hak Akses</h1>
-    <button class="btn btn-show-form btn-add float-right" id="submit-btn" onclick="submitForm()" disabled>
+    <button class="btn btn-show-form btn-save float-right" id="submit-btn" onclick="submitForm()" disabled>
         Simpan
     </button>
 </div>
@@ -13,9 +13,9 @@
     <div class="card-body">
         <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
-            <div class="row mb-5">
-                <div class="col-md-4">
-                    <div class="form-floating mb-2" style="height: 50px;">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-floating mb-0" style="height: 50px;">
                         <select class="form-control company_id" name="company_id" id="company_id" onchange="setChanges()">
                             <option value=""></option>
                             <?php
@@ -31,8 +31,8 @@
                         <label for="floatingInput">Company</label>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-2" style="height: 50px;">
+                <div class="col-md-3">
+                    <div class="form-floating mb-0" style="height: 50px;">
                         <select class="form-control role_id" name="role_id" id="role_id" onchange="setChanges()">
                             <option value=""></option>
                             <?php
@@ -49,7 +49,7 @@
                     </div>
                 </div>
             </div>
-            <div class="table-responsive view_access" id="view_access" name="view_access" style="display: none">
+            <div class="table-responsive view_access mt-3" id="view_access" name="view_access" style="display: none">
                 <table style="overflow-x: scroll;" class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>

@@ -1278,6 +1278,7 @@ select.form-control:not([size]):not([multiple]) {
 .table.table-bordered td,
 .table.table-bordered th {
   border-color: #f6f6f6;
+  vertical-align: middle;
 }
 
 .table-links {
@@ -4843,11 +4844,12 @@ div:where(.swal2-icon).swal2-question {
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 58px;
+  height: 26px;
+  margin-bottom: 0px;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -4861,20 +4863,20 @@ div:where(.swal2-icon).swal2-question {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
+  height: 24px;
   width: 26px;
-  left: 4px;
-  bottom: 4px;
+  left: 3px;
+  bottom: 1px;
   background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 input:checked + .slider {
@@ -4898,4 +4900,27 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.section .section-header .btn.btn-save {
+  background: #007ae0;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  position: absolute;
+  right: 0;
+  margin-right: 20px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #007ae0 solid;
+  border-radius: 4px;
+  min-width: 120px;
+}
+
+.section .section-header .btn.btn-save:hover,
+.section .section-header .btn.btn-save:focus,
+.section .section-header .btn.btn-save:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
 }

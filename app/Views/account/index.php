@@ -470,7 +470,7 @@
             render: function(data, type, row) {
                 let id = row?.id;
                 return `
-                <div class="mt-2">
+                <div class="mt-0">
                 <label class="switch">
                 <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
                 <span class="slider round"></span>

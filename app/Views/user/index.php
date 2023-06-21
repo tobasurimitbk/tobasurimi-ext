@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
@@ -113,7 +113,7 @@
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select company_id" name="company_id" id="company_id">
