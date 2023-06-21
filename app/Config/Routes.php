@@ -166,9 +166,14 @@ $routes->post('/spp/update', 'SPP::updateSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update-status', 'SPP::updateStatusSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'SPP::deleteSPP', ['filter' => 'Auth']);
 
-// SPP
+// PO Lokal
 $routes->get('/po-lokal', 'POLokal::poLokal', ['filter' => 'Auth']);
 $routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
+$routes->get('/po-lokal/id/(:segment)', 'POLokal::getByIdPOLokal/$1', ['filter' => 'Auth']);
+$routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
+$routes->post('/po-lokal/save', 'POLokal::savePOLokal', ['filter' => 'Auth']);
+$routes->post('/po-lokal/update', 'POLokal::updatePOLokal', ['filter' => 'Auth']);
+$routes->post('/po-lokal/delete', 'POLokal::deletePOLokal', ['filter' => 'Auth']);
 
 // DROPDOWN
 // CITY

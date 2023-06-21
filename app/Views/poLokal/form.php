@@ -323,6 +323,10 @@
 </div>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
+    let list_items = [];
+    let list_delete = [];
+
     $(document).ready(function() {
         $(".po_date").datepicker({
             todayHighlight: true,
@@ -428,6 +432,69 @@
             $(".payment_date").focus();
         });
 
+        var validator = $(".create-form").validate({
+            rules: {
+                purchase_request_id: {
+                    required: true
+                },
+                po_date: {
+                    required: true
+                },
+                supplier_id: {
+                    required: true
+                },
+                payment_term: {
+                    required: true,
+                },
+                foreign_exchange: {
+                    required: true,
+                },
+                payment_date: {
+                    required: true,
+                }
+            },
+            messages: {
+                purchase_request_id: {
+                    required: "No. SPP wajib diisi"
+                },
+                po_date: {
+                    required: "Tanggal Dibuat wajib diisi"
+                },
+                supplier_id: {
+                    required: "Supplier wajib diisi"
+                },
+                payment_term: {
+                    required: "Termin Pembayaran / Bulan wajib diisi"
+                },
+                foreign_exchange: {
+                    required: "Valas wajib diisi"
+                },
+                payment_date: {
+                    required: "Tanggal Pembayaran wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function (element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');                      
+
+            },
+            unhighlight: function (element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');   
+            },
+        });
+
         $(".btn-show-detail").click(function() {
             $(".delete-detail").css('display', 'none');
 
@@ -485,6 +552,137 @@
             else
             {
                 $(".supplier").val("");
+            }
+        })
+
+        $(".btn-submit-parent").click(function() {
+            $(".detail-modal").modal("hide")
+
+            // CHECK IF NO BARANG
+            if(list_items.length === 0)
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Barang Tidak Boleh Kosong",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+            else
+            {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading()
+                            let data = new FormData(document.querySelector(".create-form"));
+
+                            let update_list_items = [];
+
+                            data.append("items", JSON.stringify(update_list_items))
+
+                            let id = $(".id").val();
+                            // UPDATE
+                            if(id)
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("po-lokal/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("po-lokal"); ?>" + "/id/" + id;
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                            // CREATE
+                            else
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("po-lokal/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("po-lokal"); ?>";
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                        }
+                    })
+                }
             }
         })
     })

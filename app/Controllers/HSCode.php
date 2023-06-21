@@ -63,7 +63,7 @@ class HSCode extends BaseController
     {
         $token = session()->get("login")->token;
 
-        $responseKodeHS = curl_request("GET", "/hscode", $token);
+        $responseKodeHS = curl_request("GET", "/hscode/all", $token);
 
         $dataKodeHS = [];
         if ($responseKodeHS["code"] === 200) {
