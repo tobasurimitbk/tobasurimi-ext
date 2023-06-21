@@ -126,6 +126,9 @@ class POLokal extends BaseController
             ],
             "payment_date" => [
                 "rules" => "required"
+            ],
+            "dpp" => [
+                "rules" => "required"
             ]
         ];
 
@@ -142,7 +145,8 @@ class POLokal extends BaseController
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
                 "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
                 "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                "note" => "",
+                "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                "note" => $this->request->getPost("note"),
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
@@ -211,6 +215,9 @@ class POLokal extends BaseController
             ],
             "payment_date" => [
                 "rules" => "required"
+            ],
+            "dpp" => [
+                "rules" => "required"
             ]
         ];
 
@@ -229,7 +236,8 @@ class POLokal extends BaseController
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
                 "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
                 "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                "note" => "",
+                "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                "note" => $this->request->getPost("note"),
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 

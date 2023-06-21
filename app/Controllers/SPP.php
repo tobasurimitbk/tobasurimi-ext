@@ -81,6 +81,39 @@ class SPP extends BaseController
         return;
     }
 
+    public function getByIdSPPAjax()
+    {
+        $token = session()->get("login")->token;
+
+        $id = $this->request->getGet("id");
+
+        if (!empty($id)) {
+            $response = curl_request("GET", "/purchaseRequest/$id", $token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"  => true,
+                    "data"  => json_decode($response["body"])->data,
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
+            ];
+            echo json_encode($data);
+        }
+        
+        return;
+    }
+
     public function allSPP()
     {
         $token = session()->get("login")->token;
@@ -117,6 +150,9 @@ class SPP extends BaseController
                     "total" => $data->total,
                     "request_date" => $data->request_date,
                     "request_status" => $data->request_status,
+                    "approved_by_headwarehouse" => $data->approved_by_headwarehouse,
+                    "approved_by_head_of_purchasing" => $data->approved_by_head_of_purchasing,
+                    "approved_by_director" => $data->approved_by_director
                 ]);
             }
         }
@@ -245,34 +281,34 @@ class SPP extends BaseController
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
-            $data = [
-                "status"            => false,
-                "message"    => $payload,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            // $data = [
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
 
-            // $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+            $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
 
-            // if ($response["code"] === 200) {
-            //     $data = [
-            //         "status"            => true,
-            //         "message"   => "Data Berhasil diubah",
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // } else {
-            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-            //     $data = [
-            //         "status"            => false,
-            //         "message"    => $message,
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // }
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
         } else {
             $data = [
                 "status"            => false,

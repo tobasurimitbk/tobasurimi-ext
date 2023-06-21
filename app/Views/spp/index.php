@@ -134,27 +134,27 @@
             className: "text-center"
         },
         {
-            data: "id",
+            data: "approved_by_headwarehous",
             className: "text-center actions",
             orderable: false,
             render: function(data, type, row) {
-                return `<input type="checkbox" class="order_by_${data}"/>`
+                return `<input type="checkbox" ${data ? "checked" : ""} class="order_by_${row.id}"/>`
             }
         },
         {
-            data: "id",
+            data: "approved_by_head_of_purchasing",
             className: "text-center actions",
             orderable: false,
             render: function(data, type, row) {
-                return `<input type="checkbox" class="approved_by_${data}"/>`
+                return `<input type="checkbox" ${data ? "checked" : ""} class="approved_by_${row.id}"/>`
             }
         },
         {
-            data: "id",
+            data: "approved_by_director",
             className: "text-center actions",
             orderable: false,
             render: function(data, type, row) {
-                return `<input type="checkbox" class="received_by_${data}"/>`
+                return `<input type="checkbox" ${data ? "checked" : ""} class="received_by_${row.id}"/>`
             }
         }],
         columnDefs: [{
