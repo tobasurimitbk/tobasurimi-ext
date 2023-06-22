@@ -177,11 +177,11 @@
                 </thead>
                 <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
                 <?php 
-                    if(!empty($dataSPP)){ 
                     $no = 1;
                     $total_harga_barang = 0;
                     $total_qty = 0;
                     $total_harga = 0;
+                    if(!empty($dataSPP)){ 
                     foreach($dataSPP->purchase_request_details as $details){  
                         $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $details->price), "STR_TO_INT");
                         $total_qty = $total_qty + $details->qty;
@@ -240,9 +240,6 @@
                 } ?> 
                 </tbody>
                 <tfoot class="foot-detail-table" id="foot-detail-table">
-                <?php 
-                    if(!empty($dataSPP)){   
-                ?> 
                     <tr>
                         <td colspan="4"></td>
                         <td><b>TOTAL</b></td>
@@ -251,20 +248,6 @@
                         <td><b><?= number_format($total_harga); ?></b></td>
                         <td colspan="2"></td>
                     </tr>
-                <?php 
-                    } else {
-                ?> 
-                    <tr>
-                        <td colspan="4"></td>
-                        <td><b>TOTAL</b></td>
-                        <td><b>0</b></td>
-                        <td><b>0</b></td>
-                        <td><b>0</b></td>
-                        <td colspan="2"></td>
-                    </tr>
-                <?php 
-                    } 
-                ?> 
                 </tfoot>
             </table>
         </div>
@@ -784,14 +767,14 @@
                                 list_delete.map(obj => {
                                     update_list_items.push(
                                         {
-                                            id: obj.id,
+                                            id: obj.id ? Number(obj.id) : 0,
                                             category: obj.category ? Number(obj.category) : 0,
                                             item_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                             item_code: obj.kode_barang,
                                             item_name: obj.nama_barang,
-                                            qty: obj.qty,
-                                            unit: obj.satuan,
-                                            price: obj.harga.replaceAll(",", ""),
+                                            qty: obj.qty ? Number(obj.qty) : 0,
+                                            unit: obj.satuan ? Number(obj.satuan) : 0,
+                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
                                             note: obj.keterangan,
                                             spec: obj.spesifikasi,
                                             isDeleted: true
@@ -804,14 +787,14 @@
                                 if (obj.id) {
                                     update_list_items.push(
                                         {
-                                            id: obj.id,
+                                            id: obj.id ? Number(obj.id) : 0,
                                             category: obj.category ? Number(obj.category) : 0,
                                             item_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                             item_code: obj.kode_barang,
                                             item_name: obj.nama_barang,
-                                            qty: obj.qty,
-                                            unit: obj.satuan,
-                                            price: obj.harga.replaceAll(",", ""),
+                                            qty: obj.qty ? Number(obj.qty) : 0,
+                                            unit: obj.satuan ? Number(obj.satuan) : 0,
+                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
                                             note: obj.keterangan,
                                             spec: obj.spesifikasi
                                         }
@@ -825,9 +808,9 @@
                                             item_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                             item_code: obj.kode_barang,
                                             item_name: obj.nama_barang,
-                                            qty: obj.qty,
-                                            unit: obj.satuan,
-                                            price: obj.harga.replaceAll(",", ""),
+                                            qty: obj.qty ? Number(obj.qty) : 0,
+                                            unit: obj.satuan ? Number(obj.satuan) : 0,
+                                            price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
                                             note: obj.keterangan,
                                             spec: obj.spesifikasi
                                         }
@@ -1225,7 +1208,7 @@
                                     row = row + 1;
 
                                     total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
-                                    total_qty = total_qty + Number(qty.replaceAll(",", ""));
+                                    total_qty = total_qty + Number(qty);
                                     total_harga = total_harga + Number(total.replaceAll(",", ""));
                                 }
                                 else
@@ -1339,7 +1322,7 @@
                             })
 
                             total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
-                            total_qty = total_qty + Number(qty.replaceAll(",", ""));
+                            total_qty = total_qty + Number(qty);
                             total_harga = total_harga + Number(total.replaceAll(",", ""));
 
                             let tag_html = "";

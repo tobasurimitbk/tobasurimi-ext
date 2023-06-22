@@ -62,7 +62,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "spp_type";
+    let sort = "sppType";
     let sortType = "asc";
 
     const table = $('.dataTable').DataTable({

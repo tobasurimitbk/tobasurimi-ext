@@ -103,6 +103,58 @@ class POLokal extends BaseController
         return;
     }
 
+    public function allPOLokal()
+    {
+        $token = session()->get("login")->token;
+
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            // "requestStatus" => $this->request->getGet("status"),
+            "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        $response = curl_request("GET", "/purchaseOrder", $token, $payload);
+        $dataPOLokal = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $body = json_decode($response["body"])->data;
+            $totalRecords = 0;
+
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+            foreach ($body as $data) {
+                array_push($dataPOLokal, [
+                    "no" => $no++,
+                    "id" => $data->id,
+                    "po_date" => $data->po_date,
+                    "po_no" => $data->po_no,
+                    "orderTypeName" => "",
+                    "supplierName" => $data->supplierName,
+                    "total" => $data->total,
+                    "foreignExchangeName" => "",
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataPOLokal,
+            "response" => $response,
+            "payload" => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function savePOLokal()
     {
         $rules = [
@@ -140,6 +192,7 @@ class POLokal extends BaseController
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
                 "po_type" => "lokal",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
@@ -162,7 +215,7 @@ class POLokal extends BaseController
 
             if ($response["code"] === 201) {
                 $data = [
-                    "id" => json_decode($response["body"])->createdId,
+                    "id" => "",
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
@@ -231,6 +284,7 @@ class POLokal extends BaseController
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
                 "po_type" => "lokal",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),

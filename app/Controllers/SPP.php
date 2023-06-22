@@ -149,7 +149,6 @@ class SPP extends BaseController
                     "orderTypeName" => $data->orderTypeName,
                     "total" => $data->total,
                     "request_date" => $data->request_date,
-                    "request_status" => $data->request_status,
                     "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
                     "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
                     "approvedByDirectorName" => $data->approvedByDirectorName,

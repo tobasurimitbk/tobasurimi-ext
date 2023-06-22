@@ -11,8 +11,9 @@
 </div>
 <div class="card">
     <div class="card-body">
-        <div class="row justify-content-end mb-3">
-            <div class="col-md-2">
+        <div class="row justify-content-end mb-3 row-col-spp">
+            <div class="col">
+            <?= csrf_field() ?>
                 <div class="input-group input-group-password">
                     <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -20,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col">
                 <div class="input-group input-group-password">
                     <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -28,15 +29,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                    <option value="waiting">Waiting</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="finished">Finished</option>
-                </select>
-            </div>
-            <div class="col-md-2">
+            <div class="col">
                 <input class="form-control search form-out-search" placeholder="Search" value="" />
             </div>
         </div>
@@ -46,13 +39,13 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>#</th>
-                            <th>Tanggal Dibuat</th>
-                            <th>No. PO</th> 
-                            <th>Jenis Order</th> 
-                            <th>Supplier</th> 
-                            <th>Total Harga</th> 
-                            <th>Valas</th> 
-                            <th>Status</th> 
+                            <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
+                            <th onclick="changeSort('poNo')" class="sort">No. PO</th>
+                            <th onclick="changeSort('orderTypeName')" class="sort">Jenis Order</th>
+                            <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
+                            <th onclick="changeSort('total')" class="sort">Total Harga</th>
+                            <th onclick="changeSort('foreignExchangeName')" class="sort">Valas</th>
+                            <th>Order Oleh</th> 
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -66,6 +59,10 @@
 </section>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
+    let sort = "poDate";
+    let sortType = "asc";
+
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
@@ -79,7 +76,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("spp/all"); ?>",
+            url: "<?= base_url("po-lokal/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -103,19 +100,19 @@
             orderable: false
         },
         {
-            data: "spp_type",
+            data: "po_date",
             className: "text-center"
         },
         {
-            data: "spp_no",
+            data: "po_no",
             className: "text-center"
         },
         {
-            data: "warehouseName",
+            data: "orderTypeName",
             className: "text-center"
         },
         {
-            data: "order_type",
+            data: "supplierName",
             className: "text-center"
         },
         {
@@ -123,20 +120,12 @@
             className: "text-center"
         },
         {
-            data: "request_date",
+            data: "foreignExchangeName",
             className: "text-center"
         },
         {
-            data: "request_status",
-            className: "text-center",
-            orderable: false,
-            render: function(data, type, row) {
-                return `
-                <label class="text-warning">
-                ${data}
-                </label>
-                `
-            }
+            data: "po_no",
+            className: "text-center"
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -180,7 +169,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .status").change(function () {
+        $(".dateStart, .dateEnd").change(function () {
             table.ajax.reload();
         })
 

@@ -170,6 +170,7 @@ $routes->post('/spp/delete', 'SPP::deleteSPP', ['filter' => 'Auth']);
 
 // PO Lokal
 $routes->get('/po-lokal', 'POLokal::poLokal', ['filter' => 'Auth']);
+$routes->get('/po-lokal/all', 'POLokal::allPOLokal', ['filter' => 'Auth']);
 $routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
 $routes->get('/po-lokal/id/(:segment)', 'POLokal::getByIdPOLokal/$1', ['filter' => 'Auth']);
 $routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
@@ -211,6 +212,9 @@ $routes->get('/warehouse/dropdown', 'Warehouse::dropdownWarehouse', ['filter' =>
 
 // DIVISI
 $routes->get('/divisi/dropdown', 'Divisi::dropdownDivisi', ['filter' => 'Auth']);
+
+// TAX
+$routes->get('/tax/dropdown', 'Tax::dropdownTax', ['filter' => 'Auth']);
 
 // BARANG
 $routes->get('/barang/dropdown', 'Barang::dropdownBarang', ['filter' => 'Auth']);

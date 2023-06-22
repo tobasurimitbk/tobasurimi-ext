@@ -575,24 +575,33 @@
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
     }
 
-/customers = postal_code, no_npwp, phone, contact_person, email, no_rekening, supplier_buyer (tambah sorting asc desc)
-/customers = ap_name, ar_name (tambah sorting asc desc dan tambah kolom)
 
-/suppliers = postal_code, no_npwp, phone, contact_person, email, no_rekening, supplier_buyer (tambah sorting asc desc)
-/suppliers = ap_name, ar_name (tambah sorting asc desc dan tambah kolom)
+// get all /purchaseOrder
+// 1. response meta belum ada totalData
+// 2. po_date format dd/mm/yyyy
+// 3. tambah kolom orderTypeName
+// 4. tambah kolom foreignExchangeName
+// 5. total masking 50,000
+// 6. sorting asc desc (poDate, poNo, orderTypeName, supplierName, total, foreignExchangeName)
 
-/vendors = postal_code, no_npwp, phone, contact_person, email, no_rekening, supplier_buyer (tambah sorting asc desc)
-/vendors = ap_name, ar_name (tambah sorting asc desc dan tambah kolom)
+// get purchaseRequest/getByType
+// 1. data spp di posting
 
-/employees = phone_no, address, dob, gender, acc_no (tambah sorting asc desc)
+// get by id /purchaseOrder
+// 1. po_date format dd/mm/yyyy
+// 2. payment_date format dd/mm/yyyy
+// 3. tambah orderTypeName
+// 4. tambah supplierName
+// 5. total masking 50,000
+// 6. purchase_request_details (price masking 50,000)
+// 7. purchase_request_details (qty dan disc 2 angka belakang koma dihapus)
+// 8. purchase_request_details (tambah kodeBarang, satuanName, note)
+// 9. purchase_request_details (additional_cost masking 50,000)
+// 10. purchase_request_details (tambah totalPrice dan masking 50,000)
+// 10. purchase_request_details (spec bukan string)
 
-/companies = province_name, city_name, zip_code (tambah sorting asc desc)
-/companies = pic_name (tambah sorting asc desc dan tambah kolom)
-
-/warehouses = province_name, city_name, zip_code (tambah sorting asc desc)
-/warehouses = pic_name (tambah sorting asc desc dan tambah kolom)
-
-/subAkun = akun_coa (tambah sorting asc desc)
+// get by id /purchaseRequest
+// 1. tambah orderTypeName
 
 </script>
 
