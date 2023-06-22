@@ -4924,3 +4924,19 @@ input:checked + .slider:before {
   opacity: 0.72;
   transition: 0.3s ease-in;
 }
+
+.row-col-spp .input-group .form-control {
+  height: 40px;
+  padding: 12px;
+}
+
+.row-col-spp .form-select {
+  height: 40px !important;
+  padding: 12px !important;
+  line-height: 1.2;
+}
+
+.row-col-spp .input-group .input-group-prepend i.fa {
+  position: relative;
+  top: 5px;
+}
