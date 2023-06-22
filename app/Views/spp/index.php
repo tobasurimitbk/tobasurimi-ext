@@ -13,6 +13,7 @@
     <div class="card-body">
         <div class="row justify-content-end mb-3">
             <div class="col-md-2">
+                <?= csrf_field() ?>
                 <div class="input-group input-group-password">
                     <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -27,14 +28,6 @@
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                    <option value="waiting">Waiting</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="finished">Finished</option>
-                </select>
             </div>
             <div class="col-md-2">
                 <input class="form-control search form-out-search" placeholder="Search" value="" />
@@ -68,6 +61,7 @@
 </section>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
     let sort = "spp_type";
     let sortType = "asc";
 
@@ -90,7 +84,6 @@
                 data.search = $(".search").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
-                data.status = $(".status").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -134,27 +127,36 @@
             className: "text-center"
         },
         {
-            data: "approved_by_headwarehous",
+            data: "approvedByHeadwarehouseName",
             className: "text-center actions",
             orderable: false,
             render: function(data, type, row) {
-                return `<input type="checkbox" ${data ? "checked" : ""} class="order_by_${row.id}"/>`
+                if(!row.is_posted)
+                {
+                    return `<input onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
+                }
             }
         },
         {
-            data: "approved_by_head_of_purchasing",
+            data: "approvedByDirectorName",
             className: "text-center actions",
             orderable: false,
             render: function(data, type, row) {
-                return `<input type="checkbox" ${data ? "checked" : ""} class="approved_by_${row.id}"/>`
+                if(!row.is_posted)
+                {
+                    return `<input onchange="approveDirector('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_director_${row.id}"/>`
+                }   
             }
         },
         {
-            data: "approved_by_director",
+            data: "approvedByHeadofPurchasingName",
             className: "text-center actions",
             orderable: false,
             render: function(data, type, row) {
-                return `<input type="checkbox" ${data ? "checked" : ""} class="received_by_${row.id}"/>`
+                if(!row.is_posted)
+                {
+                    return `<input onchange="approveHeadPurchasing('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_head_of_purchasing_${row.id}"/>`
+                }
             }
         }],
         columnDefs: [{
@@ -199,7 +201,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .status").change(function () {
+        $(".dateStart, .dateEnd").change(function () {
             table.ajax.reload();
         })
 
@@ -208,6 +210,88 @@
             location.replace(`<?= base_url("spp/id"); ?>/${data.id}`);
         })
     })
+
+    const approveHeadWarehouse = function(id)
+    {
+        const csrf = $(`[name="${csrfToken}"]`);
+        let value = document.getElementById('approved_by_headwarehouse_' + id).checked ? true : false;
+
+        let data = {
+            id: id
+        }
+
+        if(value)
+        {
+            data["status"] = true;
+        }
+
+        $.ajax({
+            url: "<?= base_url("spp/approve-warehouse"); ?>",
+            data: data,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                    .then(() => {
+                        table.ajax.reload()
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Approve Gagal Diubah, coba Lagi',
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+        });
+    }
+
+    const approveHeadPurchasing = function(id)
+    {
+        const csrf = $(`[name="${csrfToken}"]`);
+        let value = document.getElementById('approved_by_head_of_purchasing_' + id).checked ? true : false;
+
+        let data = {
+            id: id
+        }
+
+        if(value)
+        {
+            data["status"] = true;
+        }
+    }
+
+    const approveDirector = function(id)
+    {
+        const csrf = $(`[name="${csrfToken}"]`);
+        let value = document.getElementById('approved_by_director_' + id).checked ? true : false;
+
+        let data = {
+            id: id
+        }
+
+        if(value)
+        {
+            data["status"] = true;
+        }
+    }
 
     const changeSort = function(val) {
         if(sort !== val)

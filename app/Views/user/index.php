@@ -948,6 +948,7 @@
 
     $(document).on('hide.bs.modal','.detail-modal', function () {
         document.getElementById("add_modal").style = "display: block;";
+        $(".add-modal").css("overflow-y", "auto");
     })
 
     $(document).on('click', '.delete-detail', function() {

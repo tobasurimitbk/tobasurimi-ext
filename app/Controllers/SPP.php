@@ -124,7 +124,7 @@ class SPP extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "requestStatus" => $this->request->getGet("status"),
+            // "requestStatus" => $this->request->getGet("status"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -150,9 +150,10 @@ class SPP extends BaseController
                     "total" => $data->total,
                     "request_date" => $data->request_date,
                     "request_status" => $data->request_status,
-                    "approved_by_headwarehouse" => $data->approved_by_headwarehouse,
-                    "approved_by_head_of_purchasing" => $data->approved_by_head_of_purchasing,
-                    "approved_by_director" => $data->approved_by_director
+                    "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
+                    "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
+                    "approvedByDirectorName" => $data->approvedByDirectorName,
+                    "is_posted" => $data->is_posted
                 ]);
             }
         }
@@ -336,6 +337,40 @@ class SPP extends BaseController
             $data = [
                 "status"            => true,
                 "message"   => "Data Berhasil diposting",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function approveWarehouseSPP()
+    {
+        $token = session()->get("login")->token;
+        $name = session()->get("login")->name;
+
+        $id = $this->request->getPost("id");
+
+        $payload = json_encode([
+            "approvedByHeadwarehouseName" => !empty($this->request->getPost("status")) ? $name : "false"
+        ]);
+        
+        $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Approve Berhasil diubah",
                 "payload"   => $payload,
                 'token' => csrf_hash()
             ];

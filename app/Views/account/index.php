@@ -1630,7 +1630,6 @@
             success: function(response) {
                 csrf.val(response.token);
                 if (response.status) {
-                    stopLoading()
                     Swal.fire({
                         icon: 'success',
                         title: response.message,
@@ -1654,7 +1653,6 @@
                     title: 'Data Gagal Disimpan, coba Lagi',
                     confirmButtonColor: '#4e73df',
                 })
-                stopLoading()
             }
         });
     }
