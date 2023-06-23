@@ -179,6 +179,17 @@ $routes->post('/po-lokal/update', 'POLokal::updatePOLokal', ['filter' => 'Auth']
 $routes->post('/po-lokal/update-status', 'POLokal::updateStatusPOLokal', ['filter' => 'Auth']);
 $routes->post('/po-lokal/delete', 'POLokal::deletePOLokal', ['filter' => 'Auth']);
 
+// PO Import
+$routes->get('/po-import', 'POImport::poImport', ['filter' => 'Auth']);
+$routes->get('/po-import/all', 'POImport::allPOImport', ['filter' => 'Auth']);
+$routes->get('/po-import/create', 'POImport::createPOImport', ['filter' => 'Auth']);
+$routes->get('/po-import/id/(:segment)', 'POImport::getByIdPOImport/$1', ['filter' => 'Auth']);
+$routes->get('/po-import/create', 'POImport::createPOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/save', 'POImport::savePOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/update', 'POImport::updatePOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/update-status', 'POImport::updateStatusPOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/delete', 'POImport::deletePOImport', ['filter' => 'Auth']);
+
 // DROPDOWN
 // CITY
 $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
