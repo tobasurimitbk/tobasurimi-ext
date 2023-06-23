@@ -341,7 +341,7 @@ class SPP extends BaseController
             ];
             echo json_encode($data);
         } else {
-            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
             $data = [
                 "status"            => false,
                 "message"    => $message,
@@ -361,10 +361,10 @@ class SPP extends BaseController
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
-            "approvedByHeadwarehouseName" => !empty($this->request->getPost("status")) ? $name : "false"
+
         ]);
         
-        $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+        $response = curl_request("PATCH", "/purchaseRequest/approved/$id", $token, $payload);
 
         if ($response["code"] === 200) {
             $data = [

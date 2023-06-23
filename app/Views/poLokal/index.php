@@ -45,7 +45,11 @@
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
                             <th onclick="changeSort('foreignExchangeName')" class="sort">Valas</th>
-                            <th>Order Oleh</th> 
+                            <th>Pemesan Order</th>
+                            <th>Pembuat Order</th>
+                            <th>Diketahui Oleh</th>
+                            <th>Diperiksa Oleh</th>
+                            <th>Disetujui Oleh</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -124,8 +128,59 @@
             className: "text-center"
         },
         {
-            data: "po_no",
-            className: "text-center"
+            data: "id",
+            className: "text-center actions",
+            orderable: false,
+            render: function(data, type, row) {
+                if(!row.is_posted)
+                {
+                    return `<input type="checkbox" id="${row.id}"/>`
+                }
+            }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            orderable: false,
+            render: function(data, type, row) {
+                if(!row.is_posted)
+                {
+                    return `<input type="checkbox" id="${row.id}"/>`
+                }
+            }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            orderable: false,
+            render: function(data, type, row) {
+                if(!row.is_posted)
+                {
+                    return `<input type="checkbox" id="${row.id}"/>`
+                }
+            }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            orderable: false,
+            render: function(data, type, row) {
+                if(!row.is_posted)
+                {
+                    return `<input type="checkbox" id="${row.id}"/>`
+                }
+            }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            orderable: false,
+            render: function(data, type, row) {
+                if(!row.is_posted)
+                {
+                    return `<input type="checkbox" id="${row.id}"/>`
+                }
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -175,7 +230,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("spp/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("po-lokal/id"); ?>/${data.id}`);
         })
     })
 </script>

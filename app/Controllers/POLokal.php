@@ -60,7 +60,7 @@ class POLokal extends BaseController
         $this_company_id = session()->get("login")->this_company_id;
 
          //Get SPP Number
-         $responseSPP = curl_request("GET", "/penerimaanBarang?statuspenerimaan=LOKAL", $token);
+         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -96,6 +96,9 @@ class POLokal extends BaseController
                 $dataPOLokal = json_decode($responsePOLokal["body"])->data;
             }
             $data["dataPOLokal"] = $dataPOLokal;
+
+            // var_dump($dataPOLokal);
+            // die;
         }
 
         return view('poLokal/form', $data);
@@ -134,10 +137,10 @@ class POLokal extends BaseController
                     "id" => $data->id,
                     "po_date" => $data->po_date,
                     "po_no" => $data->po_no,
-                    "orderTypeName" => "",
+                    "orderTypeName" => $data->orderTypeName,
                     "supplierName" => $data->supplierName,
                     "total" => $data->total,
-                    "foreignExchangeName" => "",
+                    "foreignExchangeName" => $data->foreignExchangeName,
                 ]);
             }
         }
@@ -200,6 +203,7 @@ class POLokal extends BaseController
                 "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                 "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                 "note" => $this->request->getPost("note"),
+                "isPosted" => false,
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
@@ -327,6 +331,39 @@ class POLokal extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateStatusPOLokal()
+    {
+        $token = session()->get("login")->token;
+
+        $id = $this->request->getPost("id");
+
+        $payload = json_encode([
+            "is_posted" => true
+        ]);
+        
+        $response = curl_request("PATCH", "/purchaseOrder/$id", $token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Data Berhasil diposting",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
