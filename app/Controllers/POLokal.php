@@ -127,7 +127,7 @@ class POLokal extends BaseController
 
         if ($response["code"] === 200) {
             $body = json_decode($response["body"])->data;
-            $totalRecords = 0;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
 
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
