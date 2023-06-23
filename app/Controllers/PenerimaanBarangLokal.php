@@ -14,6 +14,27 @@ class PenerimaanBarangLokal extends BaseController
         return view('penerimaanBarangLokal/index');
     }
 
+    public function createPenerimaanBarangLokal()
+    {
+        $token = session()->get("login")->token;
+
+        $this_company_id = session()->get("login")->this_company_id;
+
+        //Get Supplier
+        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this_company_id", $token);
+
+        $dataSupplier = [];
+        if ($responseSupplier["code"] === 200) {
+            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        }
+
+        $data = [
+            "dataSupplier" => $dataSupplier
+        ];
+
+        return view('penerimaanBarangLokal/form', $data);
+    }
+
     public function allPenerimaanBarangLokal()
     {
         $token = session()->get("login")->token;
@@ -44,7 +65,7 @@ class PenerimaanBarangLokal extends BaseController
                 array_push($dataPenerimaanBarangLokal, [
                     "no" => $no++,
                     "id" => $data->id,
-                    "no_penerimaan_barang" => $data->no_penerimaan_barang,
+                    "invoice_no" => $data->invoice_no,
                     "multiple_po_no" => $data->multiple_po_no,
                     "acceptance_type" => $data->acceptance_type,
                     "aju_document_type" => $data->aju_document_type,

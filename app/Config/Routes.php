@@ -159,7 +159,7 @@ $routes->post('/spp/update-status', 'SPP::updateStatusSPP', ['filter' => 'Auth']
 $routes->post('/spp/approve-warehouse', 'SPP::approveWarehouseSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'SPP::deleteSPP', ['filter' => 'Auth']);
 
-// PO Lokal
+// PO LOKAL
 $routes->get('/po-lokal', 'POLokal::poLokal', ['filter' => 'Auth']);
 $routes->get('/po-lokal/all', 'POLokal::allPOLokal', ['filter' => 'Auth']);
 $routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
@@ -170,7 +170,7 @@ $routes->post('/po-lokal/update', 'POLokal::updatePOLokal', ['filter' => 'Auth']
 $routes->post('/po-lokal/update-status', 'POLokal::updateStatusPOLokal', ['filter' => 'Auth']);
 $routes->post('/po-lokal/delete', 'POLokal::deletePOLokal', ['filter' => 'Auth']);
 
-// PO Import
+// PO IMPORT
 $routes->get('/po-import', 'POImport::poImport', ['filter' => 'Auth']);
 $routes->get('/po-import/all', 'POImport::allPOImport', ['filter' => 'Auth']);
 $routes->get('/po-import/create', 'POImport::createPOImport', ['filter' => 'Auth']);
@@ -182,6 +182,12 @@ $routes->post('/po-import/update-status', 'POImport::updateStatusPOImport', ['fi
 $routes->post('/po-import/delete', 'POImport::deletePOImport', ['filter' => 'Auth']);
 
 // DROPDOWN
+// PO LOKAL
+$routes->get('/po-lokal/dropdown', 'POLokal::dropdownPOLokal/$1', ['filter' => 'Auth']);
+
+// PO IMPORT
+$routes->get('/po-import/dropdown', 'POImport::dropdownPOImport/$1', ['filter' => 'Auth']);
+
 // CITY
 $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
 
@@ -240,6 +246,7 @@ $routes->post('/barang/delete', 'Barang::deleteBarang', ['filter' => 'Auth']);
 // PENERIMAAN BARANG
 $routes->get('/penerimaan-barang-lokal', 'PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal/all', 'PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/create', 'PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

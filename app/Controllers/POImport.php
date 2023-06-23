@@ -402,4 +402,22 @@ class POImport extends BaseController
         }
         return;
     }
+
+    public function dropdownPOImport()
+    {
+        $token = session()->get("login")->token;
+        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
+        $dataPOImport = [];
+        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&supplierid=$id", $token);
+        if ($responsePOImport["code"] === 200) {
+            $dataPOImport = json_decode($responsePOImport["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataPOImport
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

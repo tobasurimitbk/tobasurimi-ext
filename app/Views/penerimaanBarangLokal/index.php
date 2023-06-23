@@ -5,7 +5,7 @@
 <section class="section">
 <div class="section-header">
     <h1>Penerimaan Barang Lokal</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal/create"); ?>">
+    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-lokal/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
 </div>
@@ -106,7 +106,7 @@
             orderable: false
         },
         {
-            data: "no_penerimaan_barang",
+            data: "invoice_no",
             className: "text-center"
         },
         {
@@ -179,7 +179,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd").change(function () {
+        $(".dateStart, .dateEnd, .status").change(function () {
             table.ajax.reload();
         })
 
