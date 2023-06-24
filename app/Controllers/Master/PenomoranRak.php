@@ -17,7 +17,7 @@ class PenomoranRak extends BaseController
 
     public function penomoranrak()
     {
-        return view('penomoranRak/index');
+        return view('Master/penomoranRak/index');
     }
 
     public function allPenomoranRak()

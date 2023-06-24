@@ -17,7 +17,7 @@ class CompanyAccess extends BaseController
 
     public function companyAccess()
     {
-        return view('companyAccess/index');
+        return view('Setting/companyAccess/index');
     }
 
     public function allCompanyAccess()

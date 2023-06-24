@@ -15,7 +15,7 @@ class Role extends BaseController
 
     public function role()
     {
-        return view('role/index');
+        return view('Setting/role/index');
     }
 
     public function allRole()

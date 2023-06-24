@@ -15,7 +15,7 @@ class HSCode extends BaseController
 
     public function hsCode()
     {
-        return view('hsCode/index');
+        return view('Master/hsCode/index');
     }
 
     public function allHSCode()

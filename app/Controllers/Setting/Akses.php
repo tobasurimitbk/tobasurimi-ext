@@ -36,7 +36,7 @@ class Akses extends BaseController
             "dataCompany" => $dataCompany
         ];
 
-        return view('akses/index', $data);
+        return view('Setting/akses/index', $data);
     }
 
     public function getAkses()

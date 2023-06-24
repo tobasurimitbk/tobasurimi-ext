@@ -45,7 +45,7 @@ class Warehouse extends BaseController
             "dataProvinces" => $dataProvinces
         ];
 
-        return view('warehouse/index', $data);
+        return view('Master/warehouse/index', $data);
     }
 
     public function allWarehouse()

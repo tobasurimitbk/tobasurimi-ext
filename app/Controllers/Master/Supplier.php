@@ -29,7 +29,7 @@ class Supplier extends BaseController
             "dataProvinces" => $dataProvinces,
         ];
 
-        return view('supplier/index', $data);
+        return view('Master/supplier/index', $data);
     }
 
     public function allSupplier()

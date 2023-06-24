@@ -17,7 +17,7 @@ class Employee extends BaseController
 
     public function employee()
     {
-        return view('employee/index');
+        return view('Master/employee/index');
     }
 
     public function dropdownEmployee()

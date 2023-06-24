@@ -27,7 +27,7 @@ class Company extends BaseController
             "dataProvinces" => $dataProvinces,
         ];
 
-        return view('company/index', $data);
+        return view('Master/company/index', $data);
     }
 
     public function allCompany()

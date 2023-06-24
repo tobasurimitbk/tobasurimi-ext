@@ -20,7 +20,7 @@ class Auth extends BaseController
             return redirect()->to("/dashboard");
         }
 
-        return view('login/index');
+        return view('Setting/login/index');
     }
 
     public function doLogin()

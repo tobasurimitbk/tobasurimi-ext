@@ -15,7 +15,7 @@ class Account extends BaseController
 
     public function account()
     {
-        return view('account/index');
+        return view('Master/account/index');
     }
 
     public function dropdownKategoriAccount()

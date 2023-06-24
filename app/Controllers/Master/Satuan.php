@@ -15,7 +15,7 @@ class Satuan extends BaseController
 
     public function satuan()
     {
-        return view('satuan/index');
+        return view('Master/satuan/index');
     }
 
     public function allSatuan()

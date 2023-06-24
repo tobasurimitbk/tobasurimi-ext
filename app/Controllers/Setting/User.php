@@ -59,7 +59,7 @@ class User extends BaseController
 
     public function user()
     {
-        return view('user/index');
+        return view('Setting/user/index');
     }
 
     public function allUser()

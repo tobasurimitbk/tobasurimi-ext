@@ -29,7 +29,7 @@ class Divisi extends BaseController
             "dataDivisi" => $dataDivisi,
         ];
 
-        return view('divisi/index', $data);
+        return view('Master/divisi/index', $data);
     }
 
     public function allDivisi()

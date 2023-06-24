@@ -17,7 +17,7 @@ class POLokal extends BaseController
 
     public function poLokal()
     {
-        return view('poLokal/index');
+        return view('Purchase/poLokal/index');
     }
 
     public function createPOLokal()
@@ -52,7 +52,7 @@ class POLokal extends BaseController
             "dataValuta" => $dataValuta
         ];
 
-        return view('poLokal/form', $data);
+        return view('Purchase/poLokal/form', $data);
     }
 
     public function getByIdPOLokal($id = null)
@@ -99,7 +99,7 @@ class POLokal extends BaseController
             // die;
         }
 
-        return view('poLokal/form', $data);
+        return view('Purchase/poLokal/form', $data);
         
         return;
     }

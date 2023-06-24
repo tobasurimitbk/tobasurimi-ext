@@ -237,14 +237,14 @@ $routes->post('/barang/update-status', 'Warehouse\Barang::updateStatusBarang', [
 $routes->post('/barang/delete', 'Warehouse\Barang::deleteBarang', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL
-$routes->get('/penerimaan-barang-lokal', 'Purchase\PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal/all', 'Purchase\PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal/create', 'Purchase\PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal', 'Warehouse\PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/all', 'Warehouse\PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/create', 'Warehouse\PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG IMPORT
-$routes->get('/penerimaan-barang-import', 'Purchase\PenerimaanBarangImport::penerimaanBarangImport', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import/all', 'Purchase\PenerimaanBarangImport::allPenerimaanBarangImport', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import/create', 'Purchase\PenerimaanBarangImport::createPenerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import', 'Warehouse\PenerimaanBarangImport::penerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/all', 'Warehouse\PenerimaanBarangImport::allPenerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/create', 'Warehouse\PenerimaanBarangImport::createPenerimaanBarangImport', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

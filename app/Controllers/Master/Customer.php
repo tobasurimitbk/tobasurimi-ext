@@ -29,7 +29,7 @@ class Customer extends BaseController
             "dataProvinces" => $dataProvinces,
         ];
 
-        return view('customer/index', $data);
+        return view('Master/customer/index', $data);
     }
 
     public function allCustomer()

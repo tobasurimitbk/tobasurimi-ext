@@ -29,7 +29,7 @@ class Vendor extends BaseController
             "dataProvinces" => $dataProvinces,
         ];
 
-        return view('vendors/index', $data);
+        return view('Master/vendors/index', $data);
     }
 
     public function allVendor()

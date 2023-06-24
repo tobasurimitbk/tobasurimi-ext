@@ -17,7 +17,7 @@ class POImport extends BaseController
 
     public function poImport()
     {
-        return view('poImport/index');
+        return view('Purchase/poImport/index');
     }
 
     public function createPOImport()
@@ -52,7 +52,7 @@ class POImport extends BaseController
             "dataValuta" => $dataValuta
         ];
 
-        return view('poImport/form', $data);
+        return view('Purchase/poImport/form', $data);
     }
 
     public function getByIdPOImport($id = null)
@@ -96,7 +96,7 @@ class POImport extends BaseController
             $data["dataPOImport"] = $dataPOImport;
         }
 
-        return view('poImport/form', $data);
+        return view('Purchase/poImport/form', $data);
         
         return;
     }

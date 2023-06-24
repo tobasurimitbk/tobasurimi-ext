@@ -29,7 +29,7 @@ class Barang extends BaseController
             "dataKategori" => $dataKategori
         ];
 
-        return view('barang/index', $data);
+        return view('Warehouse/barang/index', $data);
     }
 
     public function allBarang()

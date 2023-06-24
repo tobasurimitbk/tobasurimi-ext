@@ -17,7 +17,7 @@ class SPP extends BaseController
 
     public function spp()
     {
-        return view('spp/index');
+        return view('Purchase/spp/index');
     }
 
     public function createSPP()
@@ -43,7 +43,7 @@ class SPP extends BaseController
             "dataWarehouse" => $dataWarehouse
         ];
 
-        return view('spp/form', $data);
+        return view('Purchase/spp/form', $data);
     }
 
     public function getByIdSPP($id = null)
@@ -78,7 +78,7 @@ class SPP extends BaseController
             $data["dataSPP"] = $dataSPP;
         }
 
-        return view('spp/form', $data);
+        return view('Purchase/spp/form', $data);
 
         return;
     }

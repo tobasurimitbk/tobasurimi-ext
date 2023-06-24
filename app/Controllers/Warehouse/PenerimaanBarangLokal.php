@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Purchase;
+namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 
@@ -17,7 +17,7 @@ class PenerimaanBarangLokal extends BaseController
 
     public function penerimaanBarangLokal()
     {
-        return view('penerimaanBarangLokal/index');
+        return view('Warehouse/penerimaanBarangLokal/index');
     }
 
     public function createPenerimaanBarangLokal()
@@ -34,7 +34,7 @@ class PenerimaanBarangLokal extends BaseController
             "dataSupplier" => $dataSupplier
         ];
 
-        return view('penerimaanBarangLokal/form', $data);
+        return view('Warehouse/penerimaanBarangLokal/form', $data);
     }
 
     public function allPenerimaanBarangLokal()
