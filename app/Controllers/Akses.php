@@ -4,26 +4,25 @@ namespace App\Controllers;
 
 class Akses extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
-
+        $this->token = session()->get("login")->token;
     }
 
     public function akses()
     {
-        $token = session()->get("login")->token;
+        //Get Role
+        $responseRole = curl_request("GET", "/roles/selectOption", $this->token);
 
-         //Get Role
-         $responseRole = curl_request("GET", "/roles/selectOption", $token);
-
-         $dataRole = [];
-         if ($responseRole["code"] === 200) {
-             $dataRole = json_decode($responseRole["body"])->data;
-         }
+        $dataRole = [];
+        if ($responseRole["code"] === 200) {
+            $dataRole = json_decode($responseRole["body"])->data;
+        }
          
         //Get Company
-        $responseCompany = curl_request("GET", "/companies/all", $token);
+        $responseCompany = curl_request("GET", "/companies/all", $this->token);
 
         $dataCompany = [];
         if ($responseCompany["code"] === 200) {
@@ -40,14 +39,12 @@ class Akses extends BaseController
 
     public function getAkses()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "idCompany" => $this->request->getGet("company_id"),
             "idRole" => $this->request->getGet("role_id")
         ];
 
-        $response = curl_request("GET", "/accessLists", $token, $payload);
+        $response = curl_request("GET", "/accessLists", $this->token, $payload);
         if ($response["code"] === 200) {
             $data = [
                 "status"  => true,
@@ -67,8 +64,6 @@ class Akses extends BaseController
 
     public function saveAkses()
     {
-        $token = session()->get("login")->token;
-
         //Get Menu By Role Id
         $dataAkses = array();
         $role_id = formatter($this->request->getPost("role_id"), "STR_TO_INT");
@@ -79,7 +74,7 @@ class Akses extends BaseController
             "idRole" => $role_id
         ];
 
-        $responseAkses = curl_request("GET", "/accessLists", $token, $payload);
+        $responseAkses = curl_request("GET", "/accessLists", $this->token, $payload);
 
         if ($responseAkses["code"] === 200) {
             $dataAkses = json_decode($responseAkses["body"])->data;
@@ -125,7 +120,7 @@ class Akses extends BaseController
                 "company_id" => $company_id,
             ]);
 
-            $response = curl_request("POST", "/accessLists", $token, $payload);
+            $response = curl_request("POST", "/accessLists", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [

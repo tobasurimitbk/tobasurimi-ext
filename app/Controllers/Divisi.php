@@ -4,18 +4,19 @@ namespace App\Controllers;
 
 class Divisi extends BaseController
 {
-
+    protected $token;
+    protected $this_company_id;
+    
     public function __construct()
     {
-
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function divisi()
     {
-        $token = session()->get("login")->token;
-
         //Get Divisi
-        $responseDivisi = curl_request("GET", "/divisis/all", $token);
+        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
 
         $dataDivisi = [];
         if ($responseDivisi["code"] === 200) {
@@ -31,20 +32,16 @@ class Divisi extends BaseController
 
     public function allDivisi()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/divisis", $token, $payload);
+        $response = curl_request("GET", "/divisis", $this->token, $payload);
         $dataCompany = [];
         $totalRecords = 0;
 
@@ -110,12 +107,8 @@ class Divisi extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
                 "libur" => $this->request->getPost("libur"),
                 "jam_kerja" => $this->request->getPost("jam_kerja"),
@@ -126,7 +119,7 @@ class Divisi extends BaseController
                 "selesai_istirahat" => $this->request->getPost("selesai_istirahat")
             ]);
             
-            $response = curl_request("POST", "/divisis", $token, $payload);
+            $response = curl_request("POST", "/divisis", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -187,13 +180,10 @@ class Divisi extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
                 "libur" => $this->request->getPost("libur"),
                 "jam_kerja" => $this->request->getPost("jam_kerja"),
@@ -204,7 +194,7 @@ class Divisi extends BaseController
                 "selesai_istirahat" => $this->request->getPost("selesai_istirahat")
             ]);
             
-            $response = curl_request("PATCH", "/divisis/$id", $token, $payload);
+            $response = curl_request("PATCH", "/divisis/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -237,12 +227,8 @@ class Divisi extends BaseController
 
     public function getByIdDivisi($id = null)
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/divisis/$id?idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/divisis/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -269,12 +255,10 @@ class Divisi extends BaseController
 
     public function deleteDivisi()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/divisis/$id", $token);
+            $response = curl_request("DELETE", "/divisis/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -304,9 +288,7 @@ class Divisi extends BaseController
 
     public function dropdownDivisi()
     {
-        $token = session()->get("login")->token;
-
-        $responseDivisi = curl_request("GET", "/divisis/all", $token);
+        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
 
         $dataDivisi = [];
         if ($responseDivisi["code"] === 200) {

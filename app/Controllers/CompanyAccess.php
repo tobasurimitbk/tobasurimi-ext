@@ -4,10 +4,13 @@ namespace App\Controllers;
 
 class CompanyAccess extends BaseController
 {
-
+    protected $token;
+    protected $this_company_id;
+    
     public function __construct()
     {
-
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function companyAccess()
@@ -17,20 +20,16 @@ class CompanyAccess extends BaseController
 
     public function allCompanyAccess()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/users/userCompany", $token, $payload);
+        $response = curl_request("GET", "/users/userCompany", $this->token, $payload);
         $dataUser = [];
         $totalRecords = 0;
 

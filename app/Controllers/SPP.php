@@ -4,9 +4,13 @@ namespace App\Controllers;
 
 class SPP extends BaseController
 {
+    protected $token;
+    protected $role_id;
 
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
+        $this->role_id = session()->get("login")->this_role_id;
     }
 
     public function spp()
@@ -16,10 +20,8 @@ class SPP extends BaseController
 
     public function createSPP()
     {
-        $token = session()->get("login")->token;
-
         //Get Order Type By Metadata
-        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $token);
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $this->token);
 
         $dataOrderType = [];
         if ($responseOrderType["code"] === 200) {
@@ -27,7 +29,7 @@ class SPP extends BaseController
         }
 
         //Get Warehouse
-        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
 
         $dataWarehouse = [];
         if ($responseWarehouse["code"] === 200) {
@@ -44,10 +46,8 @@ class SPP extends BaseController
 
     public function getByIdSPP($id = null)
     {
-        $token = session()->get("login")->token;
-
         //Get Order Type By Metadata
-        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $token);
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $this->token);
 
         $dataOrderType = [];
         if ($responseOrderType["code"] === 200) {
@@ -55,7 +55,7 @@ class SPP extends BaseController
         }
 
         //Get Warehouse
-        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
 
         $dataWarehouse = [];
         if ($responseWarehouse["code"] === 200) {
@@ -68,7 +68,7 @@ class SPP extends BaseController
         ];
 
         if (!empty($id)) {
-            $responseSPP = curl_request("GET", "/purchaseRequest/$id", $token);
+            $responseSPP = curl_request("GET", "/purchaseRequest/$id", $this->token);
             $dataSPP = [];
             if ($responseSPP["code"] === 200) {
                 $dataSPP = json_decode($responseSPP["body"])->data;
@@ -83,12 +83,10 @@ class SPP extends BaseController
 
     public function getByIdSPPAjax()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getGet("id");
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseRequest/$id", $token);
+            $response = curl_request("GET", "/purchaseRequest/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -116,9 +114,6 @@ class SPP extends BaseController
 
     public function allSPP()
     {
-        $token = session()->get("login")->token;
-        $role_id = session()->get("login")->this_role_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -130,7 +125,7 @@ class SPP extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/purchaseRequest", $token, $payload);
+        $response = curl_request("GET", "/purchaseRequest", $this->token, $payload);
 
         $dataSPP = [];
         $totalRecords = 0;
@@ -155,9 +150,9 @@ class SPP extends BaseController
                     "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
                     "approvedByDirectorName" => $data->approvedByDirectorName,
                     "is_posted" => $data->is_posted,
-                    "isApproveWarehouse" => ($role_id === 22 && $data->is_posted === false) ? true : false,
-                    "isApprovePurchasing" => ($role_id === 23 && $data->is_posted === false) ? true : false,
-                    "isApproveDirector" => ($role_id === 21 && $data->is_posted === false) ? true : false
+                    "isApproveWarehouse" => ($this->role_id === 22 && $data->is_posted === false) ? true : false,
+                    "isApprovePurchasing" => ($this->role_id === 23 && $data->is_posted === false) ? true : false,
+                    "isApproveDirector" => ($this->role_id === 21 && $data->is_posted === false) ? true : false
                 ]);
             }
         }
@@ -196,8 +191,6 @@ class SPP extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
@@ -217,7 +210,7 @@ class SPP extends BaseController
             // ];
             // echo json_encode($data);
 
-            $response = curl_request("POST", "/purchaseRequest", $token, $payload);
+            $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
@@ -272,8 +265,6 @@ class SPP extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
@@ -294,7 +285,7 @@ class SPP extends BaseController
             // ];
             // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+            $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -327,15 +318,13 @@ class SPP extends BaseController
 
     public function updateStatusSPP()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
             "is_posted" => true
         ]);
 
-        $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
+        $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -360,14 +349,11 @@ class SPP extends BaseController
 
     public function approveSPP()
     {
-        $token = session()->get("login")->token;
-        $name = session()->get("login")->name;
-
         $id = $this->request->getPost("id");
 
         $payload = json_encode([]);
 
-        $response = curl_request("PATCH", "/purchaseRequest/approve/$id", $token, $payload);
+        $response = curl_request("PATCH", "/purchaseRequest/approve/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -392,12 +378,10 @@ class SPP extends BaseController
 
     public function deleteSPP()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/purchaseRequest/$id", $token);
+            $response = curl_request("DELETE", "/purchaseRequest/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,

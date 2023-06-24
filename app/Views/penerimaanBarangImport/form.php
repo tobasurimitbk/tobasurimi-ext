@@ -5,7 +5,7 @@
 <section class="section">
 <div class="section-header">
     <h1 class="title-name">Tambah</h1>
-    <a class="btn btn-hide-form" href="<?= base_url("penerimaan-barang-lokal"); ?>">
+    <a class="btn btn-hide-form" href="<?= base_url("penerimaan-barang-import"); ?>">
         Batal
     </a>
     <button class="btn btn-submit-form btn-submit-parent">
@@ -430,7 +430,7 @@
             if($(".supplier_id option:selected").val())
             {
                 $.ajax({
-                    url: `<?= base_url("po-lokal/dropdown"); ?>`,
+                    url: `<?= base_url("po-import/dropdown"); ?>`,
                     method: "GET",
                     data: {
                         id: $(".supplier_id option:selected").val()

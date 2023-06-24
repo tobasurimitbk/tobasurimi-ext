@@ -4,18 +4,17 @@ namespace App\Controllers;
 
 class Company extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
-
+        $this->token = session()->get("login")->token;
     }
 
     public function company()
     {
-        $token = session()->get("login")->token;
-
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
 
         $dataProvinces = [];
         if ($responseProvinces["code"] === 200) {
@@ -31,8 +30,6 @@ class Company extends BaseController
 
     public function allCompany()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -41,7 +38,7 @@ class Company extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/companies", $token, $payload);
+        $response = curl_request("GET", "/companies", $this->token, $payload);
         $dataCompany = [];
         $totalRecords = 0;
 
@@ -110,7 +107,6 @@ class Company extends BaseController
 
         if ($this->validate($rules)) {
             $payload = '';
-            $token = session()->get("login")->token;
 
             $file = $this->request->getFile("logo");
 
@@ -139,7 +135,7 @@ class Company extends BaseController
 
             if($payload)
             {
-                $response = curl_request("POST", "/companies", $token, $payload);
+                $response = curl_request("POST", "/companies", $this->token, $payload);
     
                 if ($response["code"] === 200) {
                     $data = [
@@ -212,7 +208,6 @@ class Company extends BaseController
 
         if ($this->validate($rules)) {
             $payload = '';
-            $token = session()->get("login")->token;
 
             $id = $this->request->getPost("id");
 
@@ -254,7 +249,7 @@ class Company extends BaseController
 
             if($payload)
             {
-                $response = curl_request("PATCH", "/companies/$id", $token, $payload);
+                $response = curl_request("PATCH", "/companies/$id", $this->token, $payload);
 
                 if ($response["code"] === 200) {
                     $data = [
@@ -298,10 +293,8 @@ class Company extends BaseController
 
     public function getByIdCompany($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/companies/$id", $token);
+            $response = curl_request("GET", "/companies/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -328,12 +321,10 @@ class Company extends BaseController
 
     public function deleteCompany()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/companies/$id", $token);
+            $response = curl_request("DELETE", "/companies/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -363,9 +354,7 @@ class Company extends BaseController
 
     public function dropdownCompany()
     {
-        $token = session()->get("login")->token;
-
-        $responseCompany = curl_request("GET", "/companies/all", $token);
+        $responseCompany = curl_request("GET", "/companies/all", $this->token);
 
         $dataCompany = [];
         if ($responseCompany["code"] === 200) {

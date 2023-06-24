@@ -4,9 +4,13 @@ namespace App\Controllers;
 
 class POImport extends BaseController
 {
-
+    protected $token;
+    protected $this_company_id;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function poImport()
@@ -16,12 +20,8 @@ class POImport extends BaseController
 
     public function createPOImport()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
          //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $token);
+         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -29,7 +29,7 @@ class POImport extends BaseController
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this_company_id", $token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -37,7 +37,7 @@ class POImport extends BaseController
         }
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $token);
+        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
 
         $dataValuta = [];
         if ($responseValuta["code"] === 200) {
@@ -55,12 +55,8 @@ class POImport extends BaseController
 
     public function getByIdPOImport($id = null)
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
          //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $token);
+         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -68,7 +64,7 @@ class POImport extends BaseController
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this_company_id", $token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -76,7 +72,7 @@ class POImport extends BaseController
         }
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $token);
+        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
 
         $dataValuta = [];
         if ($responseValuta["code"] === 200) {
@@ -90,7 +86,7 @@ class POImport extends BaseController
         ];
 
         if (!empty($id)) {
-            $responsePOImport = curl_request("GET", "/purchaseOrder/$id", $token);
+            $responsePOImport = curl_request("GET", "/purchaseOrder/$id", $this->token);
             $dataPOImport = [];
             if ($responsePOImport["code"] === 200) {
                 $dataPOImport = json_decode($responsePOImport["body"])->data;
@@ -105,8 +101,6 @@ class POImport extends BaseController
 
     public function allPOImport()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -118,7 +112,7 @@ class POImport extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/purchaseOrder", $token, $payload);
+        $response = curl_request("GET", "/purchaseOrder", $this->token, $payload);
         $dataPOImport = [];
         $totalRecords = 0;
 
@@ -185,8 +179,6 @@ class POImport extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
@@ -212,7 +204,7 @@ class POImport extends BaseController
             // ];
             // echo json_encode($data);
             
-            $response = curl_request("POST", "/purchaseOrder", $token, $payload);
+            $response = curl_request("POST", "/purchaseOrder", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
@@ -276,8 +268,6 @@ class POImport extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
@@ -304,7 +294,7 @@ class POImport extends BaseController
             // ];
             // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/purchaseOrder/$id", $token, $payload);
+            $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -337,15 +327,13 @@ class POImport extends BaseController
 
     public function updateStatusPOImport()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
             "is_posted" => true
         ]);
         
-        $response = curl_request("PATCH", "/purchaseOrder/$id", $token, $payload);
+        $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -370,12 +358,10 @@ class POImport extends BaseController
 
     public function deletePOImport()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/purchaseOrder/$id", $token);
+            $response = curl_request("DELETE", "/purchaseOrder/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -405,10 +391,9 @@ class POImport extends BaseController
 
     public function dropdownPOImport()
     {
-        $token = session()->get("login")->token;
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
         $dataPOImport = [];
-        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&supplierid=$id", $token);
+        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&supplierid=$id", $this->token);
         if ($responsePOImport["code"] === 200) {
             $dataPOImport = json_decode($responsePOImport["body"])->data;
         }

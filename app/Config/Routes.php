@@ -243,10 +243,15 @@ $routes->post('/barang/update', 'Barang::updateBarang', ['filter' => 'Auth']);
 $routes->post('/barang/update-status', 'Barang::updateStatusBarang', ['filter' => 'Auth']);
 $routes->post('/barang/delete', 'Barang::deleteBarang', ['filter' => 'Auth']);
 
-// PENERIMAAN BARANG
+// PENERIMAAN BARANG LOKAL
 $routes->get('/penerimaan-barang-lokal', 'PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal/all', 'PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal/create', 'PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
+
+// PENERIMAAN BARANG IMPORT
+$routes->get('/penerimaan-barang-import', 'PenerimaanBarangImport::penerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/all', 'PenerimaanBarangImport::allPenerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/create', 'PenerimaanBarangImport::createPenerimaanBarangImport', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

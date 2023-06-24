@@ -4,17 +4,17 @@ namespace App\Controllers;
 
 class ProdukBarangJadi extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
     }
 
     public function produkBarangJadi()
     {
-        $token = session()->get("login")->token;
-
         //Get supplier & category
-        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
 
         $dataProvinces = [];
         if ($responseProvinces["code"] === 200) {
@@ -30,16 +30,13 @@ class ProdukBarangJadi extends BaseController
 
     // public function allProdukBarangJadi()
     // {
-    //     $token = session()->get("login")->token;
-
-
     //     $payload = [
     //         "pageSize" => $this->request->getGet("length"),
     //         "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
     //         "search" => $this->request->getGet("search")
     //     ];
 
-    //     $response = curl_request("GET", "/customers", $token, $payload);
+    //     $response = curl_request("GET", "/customers", $this->token, $payload);
     //     $dataCustomer = [];
     //     $totalRecords = 0;
 
@@ -104,8 +101,6 @@ class ProdukBarangJadi extends BaseController
 
     //     if ($this->validate($rules)) {
     //         $payload = '';
-    //         $token = session()->get("login")->token;
-
 
     //         $payload = json_encode([
     //             "name" => $this->request->getPost("name"),
@@ -117,7 +112,7 @@ class ProdukBarangJadi extends BaseController
     //             "email" => $this->request->getPost("email"),
     //         ]);
 
-    //         $response = curl_request("POST", "/customers", $token, $payload);
+    //         $response = curl_request("POST", "/customers", $this->token, $payload);
 
     //         if ($response["code"] === 200) {
     //             $data = [
@@ -176,8 +171,6 @@ class ProdukBarangJadi extends BaseController
 
     //     if ($this->validate($rules)) {
     //         $payload = '';
-    //         $token = session()->get("login")->token;
-
     //         $id = $this->request->getPost("id");
 
 
@@ -193,7 +186,7 @@ class ProdukBarangJadi extends BaseController
     //     }
 
     //     if ($payload) {
-    //         $response = curl_request("PATCH", "/customers/$id", $token, $payload);
+    //         $response = curl_request("PATCH", "/customers/$id", $this->token, $payload);
 
     //         if ($response["code"] === 200) {
     //             $data = [
@@ -220,10 +213,8 @@ class ProdukBarangJadi extends BaseController
 
     // public function getByIdCustomer($id = null)
     // {
-    //     $token = session()->get("login")->token;
-
     //     if (!empty($id)) {
-    //         $response = curl_request("GET", "/customers/$id", $token);
+    //         $response = curl_request("GET", "/customers/$id", $this->token);
     //         if ($response["code"] === 200) {
     //             $data = [
     //                 "status"  => true,
@@ -250,12 +241,10 @@ class ProdukBarangJadi extends BaseController
 
     // public function deleteCustomer()
     // {
-    //     $token = session()->get("login")->token;
-
     //     $id = $this->request->getPost("id");
 
     //     if (!empty($id)) {
-    //         $response = curl_request("DELETE", "/customers/$id", $token);
+    //         $response = curl_request("DELETE", "/customers/$id", $this->token);
     //         if ($response["code"] === 200) {
     //             $data = [
     //                 "status"            => true,

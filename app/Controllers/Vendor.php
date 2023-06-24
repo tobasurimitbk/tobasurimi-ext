@@ -4,17 +4,19 @@ namespace App\Controllers;
 
 class Vendor extends BaseController
 {
+    protected $token;
+    protected $this_company_id;
 
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function vendor()
     {
-        $token = session()->get("login")->token;
-
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
 
         $dataProvinces = [];
         if ($responseProvinces["code"] === 200) {
@@ -30,19 +32,16 @@ class Vendor extends BaseController
 
     public function allVendor()
     {
-        $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/vendors", $token, $payload);
+        $response = curl_request("GET", "/vendors", $this->token, $payload);
         $dataVendor = [];
         $totalRecords = 0;
 
@@ -129,12 +128,8 @@ class Vendor extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $payload = '';
-            $token = session()->get("login")->token;
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -151,7 +146,7 @@ class Vendor extends BaseController
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
-            $response = curl_request("POST", "/vendors", $token, $payload);
+            $response = curl_request("POST", "/vendors", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -227,15 +222,10 @@ class Vendor extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $payload = '';
-            $token = session()->get("login")->token;
-            $this_company_id = session()->get("login")->this_company_id;
-
             $id = $this->request->getPost("id");
 
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -254,7 +244,7 @@ class Vendor extends BaseController
         }
 
         if ($payload) {
-            $response = curl_request("PATCH", "/vendors/$id", $token, $payload);
+            $response = curl_request("PATCH", "/vendors/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -281,11 +271,8 @@ class Vendor extends BaseController
 
     public function getByIdVendor($id = null)
     {
-        $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/vendors/$id?idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/vendors/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -312,12 +299,10 @@ class Vendor extends BaseController
 
     public function deleteVendor()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/vendors/$id", $token);
+            $response = curl_request("DELETE", "/vendors/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,

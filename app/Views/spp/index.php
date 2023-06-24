@@ -64,7 +64,6 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "sppType";
     let sortType = "asc";
-    let role_id = '<?= session()->get("login")->this_role_id; ?>';
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -135,7 +134,7 @@
                 className: "text-center actions",
                 orderable: false,
                 render: function(data, type, row) {
-                    if (data === "false" && role_id === '22') {
+                    if (row.isApproveWarehouse) {
                         return `<input onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
                     }
                     if (data !== "false") {
@@ -148,7 +147,7 @@
                 className: "text-center actions",
                 orderable: false,
                 render: function(data, type, row) {
-                    if (data === "false" && role_id === '21') {
+                    if (row.isApproveDirector) {
                         return `<input onchange="approveDirector('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_director_${row.id}"/>`
                     }
                     if (data !== "false") {
@@ -161,7 +160,7 @@
                 className: "text-center actions",
                 orderable: false,
                 render: function(data, type, row) {
-                    if (data === "false" && role_id === '23') {
+                    if (row.isApprovePurchasing) {
                         return `<input onchange="approveHeadPurchasing('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_head_of_purchasing_${row.id}"/>`
                     }
                     if (data !== "false") {

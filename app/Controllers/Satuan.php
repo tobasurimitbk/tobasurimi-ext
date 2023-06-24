@@ -4,9 +4,11 @@ namespace App\Controllers;
 
 class Satuan extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
     }
 
     public function satuan()
@@ -16,8 +18,6 @@ class Satuan extends BaseController
 
     public function allSatuan()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -26,7 +26,7 @@ class Satuan extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/satuan", $token, $payload);
+        $response = curl_request("GET", "/satuan", $this->token, $payload);
         $dataSatuan = [];
         $totalRecords = 0;
 
@@ -68,14 +68,12 @@ class Satuan extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "kode_satuan" => $this->request->getPost("kode_satuan"),
                 "nama_satuan" => $this->request->getPost("nama_satuan")
             ]);
 
-            $response = curl_request("POST", "/satuan", $token, $payload);
+            $response = curl_request("POST", "/satuan", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -118,7 +116,6 @@ class Satuan extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
@@ -126,7 +123,7 @@ class Satuan extends BaseController
                 "nama_satuan" => $this->request->getPost("nama_satuan")
             ]);
 
-            $response = curl_request("PATCH", "/satuan/$id", $token, $payload);
+            $response = curl_request("PATCH", "/satuan/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -159,10 +156,8 @@ class Satuan extends BaseController
 
     public function getByIdSatuan($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/satuan/$id", $token);
+            $response = curl_request("GET", "/satuan/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -189,12 +184,10 @@ class Satuan extends BaseController
 
     public function deleteSatuan()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/satuan/$id", $token);
+            $response = curl_request("DELETE", "/satuan/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -224,9 +217,7 @@ class Satuan extends BaseController
 
     public function dropdownSatuan()
     {
-        $token = session()->get("login")->token;
-
-        $responseSatuan = curl_request("GET", "/satuan/all", $token);
+        $responseSatuan = curl_request("GET", "/satuan/all", $this->token);
 
         $dataSatuan = [];
         if ($responseSatuan["code"] === 200) {

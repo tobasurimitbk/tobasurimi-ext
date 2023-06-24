@@ -4,37 +4,32 @@ namespace App\Controllers;
 
 class PenomoranRak extends BaseController
 {
-
+    protected $token;
+    protected $this_company_id;
+    
     public function __construct()
     {
-
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function penomoranrak()
     {
-        // $token = session()->get("login")->token;
-
-        // var_dump($token);
-        // die;
-
         return view('penomoranRak/index');
     }
 
     public function allPenomoranRak()
     {
-        $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/rak", $token, $payload);
+        $response = curl_request("GET", "/rak", $this->token, $payload);
         $dataRole = [];
         $totalRecords = 0;
 
@@ -76,15 +71,12 @@ class PenomoranRak extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "nomor" => $this->request->getPost("nomor"),
                 "rak" => $this->request->getPost("rak"),
             ]);
-                $response = curl_request("POST", "/rak", $token, $payload);
+                $response = curl_request("POST", "/rak", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -127,18 +119,15 @@ class PenomoranRak extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "nomor" => $this->request->getPost("nomor"),
                 "rak" => $this->request->getPost("rak")
             ]);
 
-            $response = curl_request("PATCH", "/rak/$id", $token, $payload);
+            $response = curl_request("PATCH", "/rak/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -171,11 +160,8 @@ class PenomoranRak extends BaseController
 
     public function getByIdPenomoranRak($id = null)
     {
-        $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/rak/$id?idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/rak/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -202,12 +188,10 @@ class PenomoranRak extends BaseController
 
     public function deletePenomoranRak()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/rak/$id", $token);
+            $response = curl_request("DELETE", "/rak/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,

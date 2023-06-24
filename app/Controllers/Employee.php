@@ -4,10 +4,13 @@ namespace App\Controllers;
 
 class Employee extends BaseController
 {
-
+    protected $token;
+    protected $this_company_id;
+    
     public function __construct()
     {
-
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function employee()
@@ -17,9 +20,8 @@ class Employee extends BaseController
 
     public function dropdownEmployee()
     {
-        $token = session()->get("login")->token;
         $dataEmployee = [];
-        $responseEmployee = curl_request("GET", "/employees/selectOption", $token);
+        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
         if ($responseEmployee["code"] === 200) {
             $dataEmployee = json_decode($responseEmployee["body"])->data;
         }
@@ -34,9 +36,8 @@ class Employee extends BaseController
 
     public function dropdownEmployeePIC()
     {
-        $token = session()->get("login")->token;
         $dataEmployee = [];
-        $responseEmployee = curl_request("GET", "/employees/all", $token);
+        $responseEmployee = curl_request("GET", "/employees/all", $this->token);
         if ($responseEmployee["code"] === 200) {
             $dataEmployee = json_decode($responseEmployee["body"])->data;
         }
@@ -51,19 +52,16 @@ class Employee extends BaseController
 
     public function allEmployee()
     {
-        $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/employees", $token, $payload);
+        $response = curl_request("GET", "/employees", $this->token, $payload);
         $dataRole = [];
         $totalRecords = 0;
 
@@ -126,9 +124,6 @@ class Employee extends BaseController
 
         if ($this->validate($rules)) {
             $payload = '';
-            $token = session()->get("login")->token;
-
-            $this_company_id = session()->get("login")->this_company_id;
 
             $file = $this->request->getFile("employeeImg");
 
@@ -139,7 +134,7 @@ class Employee extends BaseController
                     $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
 
                     $payload = json_encode([
-                        "company_id" => $this_company_id,
+                        "company_id" => $this->this_company_id,
                         "employeeImg" => $image,
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
@@ -157,7 +152,7 @@ class Employee extends BaseController
 
             if($payload)
             {
-                $response = curl_request("POST", "/employees", $token, $payload);
+                $response = curl_request("POST", "/employees", $this->token, $payload);
 
                 if ($response["code"] === 200) {
                     $data = [
@@ -224,11 +219,8 @@ class Employee extends BaseController
 
         if ($this->validate($rules)) {
             $payload = '';
-            $token = session()->get("login")->token;
 
             $id = $this->request->getPost("id");
-
-            $this_company_id = session()->get("login")->this_company_id;
 
             $file = $this->request->getFile("employeeImg");
             if (!empty($file->getName())) 
@@ -238,7 +230,7 @@ class Employee extends BaseController
                     $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
 
                     $payload = json_encode([
-                        "company_id" => $this_company_id,
+                        "company_id" => $this->this_company_id,
                         "employeeImg" => $image,
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
@@ -256,7 +248,7 @@ class Employee extends BaseController
             else
             {
                 $payload = json_encode([
-                    "company_id" => $this_company_id,
+                    "company_id" => $this->this_company_id,
                     "nip" => $this->request->getPost("nip"),
                     "name" => $this->request->getPost("name"),
                     "gender" => $this->request->getPost("gender"),
@@ -272,7 +264,7 @@ class Employee extends BaseController
 
             if($payload)
             {
-                $response = curl_request("PATCH", "/employees/$id", $token, $payload);
+                $response = curl_request("PATCH", "/employees/$id", $this->token, $payload);
 
                 if ($response["code"] === 200) {
                     $data = [
@@ -316,12 +308,8 @@ class Employee extends BaseController
 
     public function getByIdEmployee($id = null)
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/employees/$id?idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/employees/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -348,12 +336,10 @@ class Employee extends BaseController
 
     public function deleteEmployee()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/employees/$id", $token);
+            $response = curl_request("DELETE", "/employees/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,

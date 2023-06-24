@@ -4,23 +4,21 @@ namespace App\Controllers;
 
 class Account extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
     }
 
     public function account()
     {
-        $token = session()->get("login")->token;
-
         return view('account/index');
     }
 
     public function dropdownKategoriAccount()
     {
-        $token = session()->get("login")->token;
-
-        $responseKelompokAkunKategori = curl_request("GET", "/kategoriAkun/all", $token);
+        $responseKelompokAkunKategori = curl_request("GET", "/kategoriAkun/all", $this->token);
 
         $dataKelompokAkunKategori = [];
         if ($responseKelompokAkunKategori["code"] === 200) {
@@ -37,9 +35,7 @@ class Account extends BaseController
 
     public function dropdownHeaderAccount()
     {
-        $token = session()->get("login")->token;
-
-        $responseKelompokAkunKategori = curl_request("GET", "/headerAkun/all", $token);
+        $responseKelompokAkunKategori = curl_request("GET", "/headerAkun/all", $this->token);
 
         $dataKelompokAkunKategori = [];
         if ($responseKelompokAkunKategori["code"] === 200) {
@@ -56,9 +52,7 @@ class Account extends BaseController
 
     public function dropdownSubAccount()
     {
-        $token = session()->get("login")->token;
-
-        $responseKelompokAkunSub = curl_request("GET", "/subAkun/all", $token);
+        $responseKelompokAkunSub = curl_request("GET", "/subAkun/all", $this->token);
 
         $dataKelompokAkunSub = [];
         if ($responseKelompokAkunSub["code"] === 200) {
@@ -75,8 +69,6 @@ class Account extends BaseController
 
     public function allKategoriAccount()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -85,7 +77,7 @@ class Account extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/kategoriAkun", $token, $payload);
+        $response = curl_request("GET", "/kategoriAkun", $this->token, $payload);
         $dataKategori = [];
         $totalRecords = 0;
 
@@ -131,15 +123,13 @@ class Account extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "kelompok_id" => formatter($this->request->getPost("kelompok_akun_id_kategori"), "STR_TO_INT"),
                 "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                 "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
             ]);
             
-            $response = curl_request("POST", "/kategoriAkun", $token, $payload);
+            $response = curl_request("POST", "/kategoriAkun", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -185,7 +175,6 @@ class Account extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id_kategori");
 
             $payload = json_encode([
@@ -194,7 +183,7 @@ class Account extends BaseController
                 "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
             ]);
             
-            $response = curl_request("PATCH", "/kategoriAkun/$id", $token, $payload);
+            $response = curl_request("PATCH", "/kategoriAkun/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -227,10 +216,8 @@ class Account extends BaseController
 
     public function getByIdKategoriAccount($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/kategoriAkun/$id", $token);
+            $response = curl_request("GET", "/kategoriAkun/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -257,12 +244,10 @@ class Account extends BaseController
 
     public function deleteKategoriAccount()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/kategoriAkun/$id", $token);
+            $response = curl_request("DELETE", "/kategoriAkun/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -292,8 +277,6 @@ class Account extends BaseController
 
     public function allHeaderAccount()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -302,7 +285,7 @@ class Account extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/headerAkun", $token, $payload);
+        $response = curl_request("GET", "/headerAkun", $this->token, $payload);
         $dataHeader = [];
         $totalRecords = 0;
 
@@ -348,15 +331,13 @@ class Account extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "kategori_id" => formatter($this->request->getPost("category_id_header"), "STR_TO_INT"),
                 "no_header" => $this->request->getPost("kode_akun_header"),
                 "nama_header" => $this->request->getPost("nama_akun_header"),
             ]);
             
-            $response = curl_request("POST", "/headerAkun", $token, $payload);
+            $response = curl_request("POST", "/headerAkun", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -402,7 +383,6 @@ class Account extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id_header");
 
             $payload = json_encode([
@@ -411,7 +391,7 @@ class Account extends BaseController
                 "nama_header" => $this->request->getPost("nama_akun_header"),
             ]);
             
-            $response = curl_request("PATCH", "/headerAkun/$id", $token, $payload);
+            $response = curl_request("PATCH", "/headerAkun/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -444,10 +424,8 @@ class Account extends BaseController
 
     public function getByIdHeaderAccount($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/headerAkun/$id", $token);
+            $response = curl_request("GET", "/headerAkun/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -474,12 +452,10 @@ class Account extends BaseController
 
     public function deleteHeaderAccount()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/headerAkun/$id", $token);
+            $response = curl_request("DELETE", "/headerAkun/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -509,8 +485,6 @@ class Account extends BaseController
 
     public function allSubAccount()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -520,7 +494,7 @@ class Account extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/subAkun", $token, $payload);
+        $response = curl_request("GET", "/subAkun", $this->token, $payload);
         $dataSub = [];
         $totalRecords = 0;
 
@@ -576,8 +550,6 @@ class Account extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "header_id" => formatter($this->request->getPost("header_id_sub"), "STR_TO_INT"),
                 "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
@@ -587,7 +559,7 @@ class Account extends BaseController
                 "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
             ]);
             
-            $response = curl_request("POST", "/subAkun", $token, $payload);
+            $response = curl_request("POST", "/subAkun", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -636,7 +608,6 @@ class Account extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id_sub");
 
             $payload = json_encode([
@@ -648,7 +619,7 @@ class Account extends BaseController
                 "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
             ]);
             
-            $response = curl_request("PATCH", "/subAkun/$id", $token, $payload);
+            $response = curl_request("PATCH", "/subAkun/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -681,15 +652,13 @@ class Account extends BaseController
 
     public function updateStatusSubAccount()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
             "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Void"
         ]);
         
-        $response = curl_request("PATCH", "/subAkun/$id", $token, $payload);
+        $response = curl_request("PATCH", "/subAkun/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -714,10 +683,8 @@ class Account extends BaseController
 
     public function getByIdSubAccount($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/subAkun/$id", $token);
+            $response = curl_request("GET", "/subAkun/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -744,12 +711,10 @@ class Account extends BaseController
 
     public function deleteSubAccount()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/subAkun/$id", $token);
+            $response = curl_request("DELETE", "/subAkun/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,

@@ -4,17 +4,19 @@ namespace App\Controllers;
 
 class Barang extends BaseController
 {
-
+    protected $token;
+    protected $this_company_id;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function barang()
     {
-        $token = session()->get("login")->token;
-
         // Get Kategori
-        $responseKategori = curl_request("GET", "/metadata/all?name=kategori_barang", $token);
+        $responseKategori = curl_request("GET", "/metadata/all?name=kategori_barang", $this->token);
 
         $dataKategori = [];
         if ($responseKategori["code"] === 200) {
@@ -30,10 +32,6 @@ class Barang extends BaseController
 
     public function allBarang()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -42,10 +40,10 @@ class Barang extends BaseController
             "status" => $this->request->getGet("status"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ]; 
 
-        $response = curl_request("GET", "/barang", $token, $payload);
+        $response = curl_request("GET", "/barang", $this->token, $payload);
         $dataUser = [];
         $totalRecords = 0;
 
@@ -116,12 +114,8 @@ class Barang extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "kode_barang" => $this->request->getPost("kode_barang"),
                 "nama_barang" => $this->request->getPost("nama_barang"),
                 "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
@@ -134,7 +128,7 @@ class Barang extends BaseController
                 "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
             ]);
 
-            $response = curl_request("POST", "/barang", $token, $payload);
+            $response = curl_request("POST", "/barang", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -195,14 +189,10 @@ class Barang extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $id = $this->request->getPost("id");
 
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "kode_barang" => $this->request->getPost("kode_barang"),
                 "nama_barang" => $this->request->getPost("nama_barang"),
                 "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
@@ -214,7 +204,7 @@ class Barang extends BaseController
                 "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
             ]);
 
-            $response = curl_request("PATCH", "/barang/$id", $token, $payload);
+            $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -247,18 +237,14 @@ class Barang extends BaseController
 
     public function updateStatusBarang()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = json_encode([
-            "company_id" => $this_company_id,
+            "company_id" => $this->this_company_id,
             "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
         ]);
         
-        $response = curl_request("PATCH", "/barang/$id", $token, $payload);
+        $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -283,10 +269,8 @@ class Barang extends BaseController
 
     public function getByIdBarang($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/barang/$id", $token);
+            $response = curl_request("GET", "/barang/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -313,12 +297,10 @@ class Barang extends BaseController
 
     public function deleteBarang()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/barang/$id", $token);
+            $response = curl_request("DELETE", "/barang/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -348,11 +330,7 @@ class Barang extends BaseController
 
     public function dropdownBarang()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
-        $responseBarang = curl_request("GET", "/barang/all?idCompany=$this_company_id", $token);
+        $responseBarang = curl_request("GET", "/barang/all?idCompany=$this->this_company_id", $this->token);
 
         $dataBarang = [];
         if ($responseBarang["code"] === 200) {

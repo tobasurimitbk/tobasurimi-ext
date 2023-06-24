@@ -4,17 +4,19 @@ namespace App\Controllers;
 
 class Customer extends BaseController
 {
+    protected $token;
+    protected $this_company_id;
 
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function customer()
     {
-        $token = session()->get("login")->token;
-
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
 
         $dataProvinces = [];
         if ($responseProvinces["code"] === 200) {
@@ -30,20 +32,16 @@ class Customer extends BaseController
 
     public function allCustomer()
     {
-        $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
-
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/customers", $token, $payload);
+        $response = curl_request("GET", "/customers", $this->token, $payload);
         $dataCustomer = [];
         $totalRecords = 0;
 
@@ -130,12 +128,8 @@ class Customer extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $payload = '';
-            $token = session()->get("login")->token;
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -152,7 +146,7 @@ class Customer extends BaseController
                 "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
-            $response = curl_request("POST", "/customers", $token, $payload);
+            $response = curl_request("POST", "/customers", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -229,14 +223,12 @@ class Customer extends BaseController
 
         if ($this->validate($rules)) {
             $payload = '';
-            $token = session()->get("login")->token;
-            $this_company_id = session()->get("login")->this_company_id;
 
             $id = $this->request->getPost("id");
 
 
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -255,7 +247,7 @@ class Customer extends BaseController
         }
 
         if ($payload) {
-            $response = curl_request("PATCH", "/customers/$id", $token, $payload);
+            $response = curl_request("PATCH", "/customers/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -282,11 +274,8 @@ class Customer extends BaseController
 
     public function getByIdCustomer($id = null)
     {
-        $token = session()->get("login")->token;
-        $this_company_id = session()->get("login")->this_company_id;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/customers/$id?idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/customers/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -313,12 +302,10 @@ class Customer extends BaseController
 
     public function deleteCustomer()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/customers/$id", $token);
+            $response = curl_request("DELETE", "/customers/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,

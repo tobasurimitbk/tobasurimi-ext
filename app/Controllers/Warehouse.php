@@ -4,16 +4,17 @@ namespace App\Controllers;
 
 class Warehouse extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
     }
 
     public function warehouse()
     {
-        $token = session()->get("login")->token;
         //Get Warehouses
-        $responseWarehouses = curl_request("GET", "/warehouses", $token);
+        $responseWarehouses = curl_request("GET", "/warehouses", $this->token);
 
         $dataWarehouses = [];
         if ($responseWarehouses["code"] === 200) {
@@ -21,7 +22,7 @@ class Warehouse extends BaseController
         }
 
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $token);
+        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
 
         $dataProvinces = [];
         if ($responseProvinces["code"] === 200) {
@@ -29,7 +30,7 @@ class Warehouse extends BaseController
         }
 
         //Get Pic
-        $responsePic = curl_request("GET", "/employees/selectOption", $token);
+        $responsePic = curl_request("GET", "/employees/selectOption", $this->token);
 
         $dataPic = [];
         if ($responsePic["code"] === 200) {
@@ -47,9 +48,6 @@ class Warehouse extends BaseController
 
     public function allWarehouse()
     {
-        $token = session()->get("login")->token;
-
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -58,7 +56,7 @@ class Warehouse extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/warehouses", $token, $payload);
+        $response = curl_request("GET", "/warehouses", $this->token, $payload);
         $dataWarehouse = [];
         $totalRecords = 0;
 
@@ -126,10 +124,6 @@ class Warehouse extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $payload = '';
-            $token = session()->get("login")->token;
-
-
             $payload = json_encode([
                 "warehouse_name" => $this->request->getPost("warehouse_name"),
                 "address" => $this->request->getPost("address"),
@@ -141,7 +135,7 @@ class Warehouse extends BaseController
                 "pic_id" => $this->request->getPost("pic_id"),
             ]);
 
-            $response = curl_request("POST", "/warehouses", $token, $payload);
+            $response = curl_request("POST", "/warehouses", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -202,9 +196,6 @@ class Warehouse extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $payload = '';
-            $token = session()->get("login")->token;
-
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
@@ -220,7 +211,7 @@ class Warehouse extends BaseController
         }
 
         if ($payload) {
-            $response = curl_request("PATCH", "/warehouses/$id", $token, $payload);
+            $response = curl_request("PATCH", "/warehouses/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -247,10 +238,8 @@ class Warehouse extends BaseController
 
     public function getByIdWarehouse($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/warehouses/$id", $token);
+            $response = curl_request("GET", "/warehouses/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -277,12 +266,10 @@ class Warehouse extends BaseController
 
     public function deleteWarehouse()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/warehouses/$id", $token);
+            $response = curl_request("DELETE", "/warehouses/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -312,9 +299,8 @@ class Warehouse extends BaseController
 
     public function dropdownWarehouse()
     {
-        $token = session()->get("login")->token;
         $dataWarehouse = [];
-        $responseWarehouse = curl_request("GET", "/warehouses/all", $token);
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
         if ($responseWarehouse["code"] === 200) {
             $dataWarehouse = json_decode($responseWarehouse["body"])->data;
         }

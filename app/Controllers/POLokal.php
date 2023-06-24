@@ -4,9 +4,13 @@ namespace App\Controllers;
 
 class POLokal extends BaseController
 {
+    protected $token;
+    protected $this_company_id;
 
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
     public function poLokal()
@@ -16,12 +20,8 @@ class POLokal extends BaseController
 
     public function createPOLokal()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
          //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $token);
+         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -29,7 +29,7 @@ class POLokal extends BaseController
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this_company_id", $token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -37,7 +37,7 @@ class POLokal extends BaseController
         }
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $token);
+        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
 
         $dataValuta = [];
         if ($responseValuta["code"] === 200) {
@@ -55,12 +55,8 @@ class POLokal extends BaseController
 
     public function getByIdPOLokal($id = null)
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
-         //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $token);
+        //Get SPP Number
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -68,7 +64,7 @@ class POLokal extends BaseController
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this_company_id", $token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -76,7 +72,7 @@ class POLokal extends BaseController
         }
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $token);
+        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
 
         $dataValuta = [];
         if ($responseValuta["code"] === 200) {
@@ -90,7 +86,7 @@ class POLokal extends BaseController
         ];
 
         if (!empty($id)) {
-            $responsePOLokal = curl_request("GET", "/purchaseOrder/$id", $token);
+            $responsePOLokal = curl_request("GET", "/purchaseOrder/$id", $this->token);
             $dataPOLokal = [];
             if ($responsePOLokal["code"] === 200) {
                 $dataPOLokal = json_decode($responsePOLokal["body"])->data;
@@ -108,8 +104,6 @@ class POLokal extends BaseController
 
     public function allPOLokal()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -121,7 +115,7 @@ class POLokal extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/purchaseOrder", $token, $payload);
+        $response = curl_request("GET", "/purchaseOrder", $this->token, $payload);
         $dataPOLokal = [];
         $totalRecords = 0;
 
@@ -188,8 +182,6 @@ class POLokal extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
@@ -215,7 +207,7 @@ class POLokal extends BaseController
             // ];
             // echo json_encode($data);
             
-            $response = curl_request("POST", "/purchaseOrder", $token, $payload);
+            $response = curl_request("POST", "/purchaseOrder", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
@@ -279,8 +271,6 @@ class POLokal extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
@@ -307,7 +297,7 @@ class POLokal extends BaseController
             // ];
             // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/purchaseOrder/$id", $token, $payload);
+            $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -340,15 +330,13 @@ class POLokal extends BaseController
 
     public function updateStatusPOLokal()
     {
-        $token = session()->get("login")->token;
-
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
             "is_posted" => true
         ]);
         
-        $response = curl_request("PATCH", "/purchaseOrder/$id", $token, $payload);
+        $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -373,12 +361,10 @@ class POLokal extends BaseController
 
     public function deletePOLokal()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/purchaseOrder/$id", $token);
+            $response = curl_request("DELETE", "/purchaseOrder/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -408,10 +394,9 @@ class POLokal extends BaseController
 
     public function dropdownPOLokal()
     {
-        $token = session()->get("login")->token;
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
         $dataPOLokal = [];
-        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&supplierid=$id", $token);
+        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&supplierid=$id", $this->token);
         if ($responsePOLokal["code"] === 200) {
             $dataPOLokal = json_decode($responsePOLokal["body"])->data;
         }

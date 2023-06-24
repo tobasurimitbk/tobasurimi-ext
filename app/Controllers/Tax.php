@@ -4,17 +4,18 @@ namespace App\Controllers;
 
 class Tax extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
     }
 
     public function dropdownTax()
     {
-        $token = session()->get("login")->token;
         $type = $this->request->getGet("type");
 
-        $responseTax = curl_request("GET", "/tax/getByType/$type", $token);
+        $responseTax = curl_request("GET", "/tax/getByType/$type", $this->token);
 
         $dataTax = [];
         if ($responseTax["code"] === 200) {

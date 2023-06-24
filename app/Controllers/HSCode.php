@@ -4,9 +4,11 @@ namespace App\Controllers;
 
 class HSCode extends BaseController
 {
-
+    protected $token;
+    
     public function __construct()
     {
+        $this->token = session()->get("login")->token;
     }
 
     public function hsCode()
@@ -16,8 +18,6 @@ class HSCode extends BaseController
 
     public function allHSCode()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -26,7 +26,7 @@ class HSCode extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ]; 
 
-        $response = curl_request("GET", "/hscode", $token, $payload);
+        $response = curl_request("GET", "/hscode", $this->token, $payload);
         $dataKodeHS = [];
         $totalRecords = 0;
 
@@ -61,9 +61,7 @@ class HSCode extends BaseController
 
     public function dropdownHSCode()
     {
-        $token = session()->get("login")->token;
-
-        $responseKodeHS = curl_request("GET", "/hscode/all", $token);
+        $responseKodeHS = curl_request("GET", "/hscode/all", $this->token);
 
         $dataKodeHS = [];
         if ($responseKodeHS["code"] === 200) {

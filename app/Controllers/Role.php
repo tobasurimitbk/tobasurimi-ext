@@ -4,26 +4,20 @@ namespace App\Controllers;
 
 class Role extends BaseController
 {
+    protected $token;
 
     public function __construct()
     {
-
+        $this->token = session()->get("login")->token;
     }
 
     public function role()
     {
-        // $token = session()->get("login")->token;
-
-        // var_dump($token);
-        // die;
-
         return view('role/index');
     }
 
     public function allRole()
     {
-        $token = session()->get("login")->token;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -32,7 +26,7 @@ class Role extends BaseController
             "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/roles", $token, $payload);
+        $response = curl_request("GET", "/roles", $this->token, $payload);
         $dataRole = [];
         $totalRecords = 0;
 
@@ -70,12 +64,10 @@ class Role extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
             $payload = json_encode([
                 "name" => $this->request->getPost("name")
             ]);
-                $response = curl_request("POST", "/roles", $token, $payload);
+                $response = curl_request("POST", "/roles", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -115,14 +107,13 @@ class Role extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
                 "name" => $this->request->getPost("name")
             ]);
 
-            $response = curl_request("PATCH", "/roles/$id", $token, $payload);
+            $response = curl_request("PATCH", "/roles/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -155,10 +146,8 @@ class Role extends BaseController
 
     public function getByIdRole($id = null)
     {
-        $token = session()->get("login")->token;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/roles/$id", $token);
+            $response = curl_request("GET", "/roles/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -185,12 +174,10 @@ class Role extends BaseController
 
     public function deleteRole()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/roles/$id", $token);
+            $response = curl_request("DELETE", "/roles/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -220,9 +207,7 @@ class Role extends BaseController
 
     public function dropdownRole()
     {
-        $token = session()->get("login")->token;
-
-        $responseRole = curl_request("GET", "/roles/selectOption", $token);
+        $responseRole = curl_request("GET", "/roles/selectOption", $this->token);
 
         $dataRole = [];
         if ($responseRole["code"] === 200) {
