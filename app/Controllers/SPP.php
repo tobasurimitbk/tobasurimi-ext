@@ -353,7 +353,7 @@ class SPP extends BaseController
         return;
     }
 
-    public function approveWarehouseSPP()
+    public function approveSPP()
     {
         $token = session()->get("login")->token;
         $name = session()->get("login")->name;
@@ -364,7 +364,7 @@ class SPP extends BaseController
 
         ]);
         
-        $response = curl_request("PATCH", "/purchaseRequest/approved/$id", $token, $payload);
+        $response = curl_request("PATCH", "/purchaseRequest/approve/$id", $token, $payload);
 
         if ($response["code"] === 200) {
             $data = [

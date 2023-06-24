@@ -156,7 +156,7 @@ $routes->get('/spp/create', 'SPP::createSPP', ['filter' => 'Auth']);
 $routes->post('/spp/save', 'SPP::saveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update', 'SPP::updateSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update-status', 'SPP::updateStatusSPP', ['filter' => 'Auth']);
-$routes->post('/spp/approve-warehouse', 'SPP::approveWarehouseSPP', ['filter' => 'Auth']);
+$routes->post('/spp/approve', 'SPP::approveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'SPP::deleteSPP', ['filter' => 'Auth']);
 
 // PO LOKAL
