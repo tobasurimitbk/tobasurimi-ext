@@ -117,6 +117,7 @@ class SPP extends BaseController
     public function allSPP()
     {
         $token = session()->get("login")->token;
+        $role_id = session()->get("login")->this_role_id;
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -153,7 +154,10 @@ class SPP extends BaseController
                     "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
                     "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
                     "approvedByDirectorName" => $data->approvedByDirectorName,
-                    "is_posted" => $data->is_posted
+                    "is_posted" => $data->is_posted,
+                    "isApproveWarehouse" => ($role_id === 22 && $data->is_posted === false) ? true : false,
+                    "isApprovePurchasing" => ($role_id === 23 && $data->is_posted === false) ? true : false,
+                    "isApproveDirector" => ($role_id === 21 && $data->is_posted === false) ? true : false
                 ]);
             }
         }

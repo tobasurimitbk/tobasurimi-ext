@@ -106,7 +106,7 @@
             orderable: false
         },
         {
-            data: "invoice_no",
+            data: "letter_no",
             className: "text-center"
         },
         {
