@@ -479,6 +479,9 @@
             $(".create-form")[0].reset()
             $(".delete-form").css('display', 'none');
 
+            company_role = [];
+            row = 0;
+
             $.ajax({
                 url: `<?= base_url("employee/dropdown"); ?>`,
                 method: "GET",

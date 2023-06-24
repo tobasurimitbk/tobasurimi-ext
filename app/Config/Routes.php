@@ -81,21 +81,12 @@ $routes->post('/supplier/update', 'Supplier::updateSupplier', ['filter' => 'Auth
 $routes->post('/supplier/delete', 'Supplier::deleteSupplier', ['filter' => 'Auth']);
 
 // PRODUK BARANG JADI
-$routes->get('/produk-barang-jadi', 'ProdukBarangJadi::produkBarangJadi', ['filter' => 'Auth']);
-$routes->get('/produk-barang-jadi/all', 'ProdukBarangJadi::allProdukBarangJadi', ['filter' => 'Auth']);
-$routes->get('/produk-barang-jadi/id/(:segment)', 'ProdukBarangJadi::getByIdProdukBarangJadi/$1', ['filter' => 'Auth']);
-$routes->post('/produk-barang-jadi/save', 'ProdukBarangJadi::saveProdukBarangJadi', ['filter' => 'Auth']);
-$routes->post('/produk-barang-jadi/update', 'ProdukBarangJadi::updateProdukBarangJadi', ['filter' => 'Auth']);
-$routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBarangJadi', ['filter' => 'Auth']);
-
-// BARANG
-$routes->get('/barang', 'Barang::barang', ['filter' => 'Auth']);
-$routes->get('/barang/all', 'Barang::allBarang', ['filter' => 'Auth']);
-$routes->get('/barang/id/(:segment)', 'Barang::getByIdBarang/$1', ['filter' => 'Auth']);
-$routes->post('/barang/save', 'Barang::saveBarang', ['filter' => 'Auth']);
-$routes->post('/barang/update', 'Barang::updateBarang', ['filter' => 'Auth']);
-$routes->post('/barang/update-status', 'Barang::updateStatusBarang', ['filter' => 'Auth']);
-$routes->post('/barang/delete', 'Barang::deleteBarang', ['filter' => 'Auth']);
+// $routes->get('/produk-barang-jadi', 'ProdukBarangJadi::produkBarangJadi', ['filter' => 'Auth']);
+// $routes->get('/produk-barang-jadi/all', 'ProdukBarangJadi::allProdukBarangJadi', ['filter' => 'Auth']);
+// $routes->get('/produk-barang-jadi/id/(:segment)', 'ProdukBarangJadi::getByIdProdukBarangJadi/$1', ['filter' => 'Auth']);
+// $routes->post('/produk-barang-jadi/save', 'ProdukBarangJadi::saveProdukBarangJadi', ['filter' => 'Auth']);
+// $routes->post('/produk-barang-jadi/update', 'ProdukBarangJadi::updateProdukBarangJadi', ['filter' => 'Auth']);
+// $routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBarangJadi', ['filter' => 'Auth']);
 
 // DIVISI
 $routes->get('/divisi', 'Divisi::divisi', ['filter' => 'Auth']);
@@ -165,10 +156,10 @@ $routes->get('/spp/create', 'SPP::createSPP', ['filter' => 'Auth']);
 $routes->post('/spp/save', 'SPP::saveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update', 'SPP::updateSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update-status', 'SPP::updateStatusSPP', ['filter' => 'Auth']);
-$routes->post('/spp/approve-warehouse', 'SPP::approveWarehouseSPP', ['filter' => 'Auth']);
+$routes->post('/spp/approve', 'SPP::approveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'SPP::deleteSPP', ['filter' => 'Auth']);
 
-// PO Lokal
+// PO LOKAL
 $routes->get('/po-lokal', 'POLokal::poLokal', ['filter' => 'Auth']);
 $routes->get('/po-lokal/all', 'POLokal::allPOLokal', ['filter' => 'Auth']);
 $routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
@@ -179,7 +170,24 @@ $routes->post('/po-lokal/update', 'POLokal::updatePOLokal', ['filter' => 'Auth']
 $routes->post('/po-lokal/update-status', 'POLokal::updateStatusPOLokal', ['filter' => 'Auth']);
 $routes->post('/po-lokal/delete', 'POLokal::deletePOLokal', ['filter' => 'Auth']);
 
+// PO IMPORT
+$routes->get('/po-import', 'POImport::poImport', ['filter' => 'Auth']);
+$routes->get('/po-import/all', 'POImport::allPOImport', ['filter' => 'Auth']);
+$routes->get('/po-import/create', 'POImport::createPOImport', ['filter' => 'Auth']);
+$routes->get('/po-import/id/(:segment)', 'POImport::getByIdPOImport/$1', ['filter' => 'Auth']);
+$routes->get('/po-import/create', 'POImport::createPOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/save', 'POImport::savePOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/update', 'POImport::updatePOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/update-status', 'POImport::updateStatusPOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/delete', 'POImport::deletePOImport', ['filter' => 'Auth']);
+
 // DROPDOWN
+// PO LOKAL
+$routes->get('/po-lokal/dropdown', 'POLokal::dropdownPOLokal/$1', ['filter' => 'Auth']);
+
+// PO IMPORT
+$routes->get('/po-import/dropdown', 'POImport::dropdownPOImport/$1', ['filter' => 'Auth']);
+
 // CITY
 $routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
 
@@ -224,6 +232,21 @@ $routes->get('/barang/dropdown', 'Barang::dropdownBarang', ['filter' => 'Auth'])
 $routes->get('/kategori-account/dropdown', 'Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Account::dropdownHeaderAccount', ['filter' => 'Auth']);
 $routes->get('/sub-account/dropdown', 'Account::dropdownSubAccount', ['filter' => 'Auth']);
+
+// WAREHOUSE
+// MASTER BARANG
+$routes->get('/barang', 'Barang::barang', ['filter' => 'Auth']);
+$routes->get('/barang/all', 'Barang::allBarang', ['filter' => 'Auth']);
+$routes->get('/barang/id/(:segment)', 'Barang::getByIdBarang/$1', ['filter' => 'Auth']);
+$routes->post('/barang/save', 'Barang::saveBarang', ['filter' => 'Auth']);
+$routes->post('/barang/update', 'Barang::updateBarang', ['filter' => 'Auth']);
+$routes->post('/barang/update-status', 'Barang::updateStatusBarang', ['filter' => 'Auth']);
+$routes->post('/barang/delete', 'Barang::deleteBarang', ['filter' => 'Auth']);
+
+// PENERIMAAN BARANG
+$routes->get('/penerimaan-barang-lokal', 'PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/all', 'PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/create', 'PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

@@ -45,6 +45,8 @@ class User extends BaseController
                 $this_company_id = $data->company_role[0]->company_id;
                 $this_company = $data->company_role[0]->company_name;
                 $this_access = $data->company_role[0]->access_list;
+                $this_role_id = $data->company_role[0]->role_id;
+                $this_role_name = $data->company_role[0]->role_name;
 
                 // token add bearer
                 $session = (object) [
@@ -52,6 +54,8 @@ class User extends BaseController
                     "token" => $data->token,
                     "name" => $data->name,
                     "username" => $data->username,
+                    "this_role_id" => $this_role_id,
+                    "this_role_name" => $this_role_name,
                     "company_role" => $data->company_role,
                     "this_company_id" => $this_company_id,
                     "this_company" => $this_company,
@@ -75,6 +79,8 @@ class User extends BaseController
     {
         $id = $this->request->getGet("id");
         $name = $this->request->getGet("name");
+        $role_id = $this->request->getGet("role_id");
+        $role_name = $this->request->getGet("role_name");
 
         if ($id) {
 
@@ -93,6 +99,8 @@ class User extends BaseController
 
             $session->this_company_id = $id;
             $session->this_company = $name;
+            $session->this_role_id = $role_id;
+            $session->this_role_name = $role_name;
             $session->this_access = $this_access;
 
             session()->setTempdata("login", $session, 36000);

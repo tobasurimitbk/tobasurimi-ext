@@ -127,7 +127,7 @@ class POLokal extends BaseController
 
         if ($response["code"] === 200) {
             $body = json_decode($response["body"])->data;
-            $totalRecords = 0;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
 
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
@@ -403,6 +403,24 @@ class POLokal extends BaseController
             ];
             echo json_encode($data);
         }
+        return;
+    }
+
+    public function dropdownPOLokal()
+    {
+        $token = session()->get("login")->token;
+        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
+        $dataPOLokal = [];
+        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&supplierid=$id", $token);
+        if ($responsePOLokal["code"] === 200) {
+            $dataPOLokal = json_decode($responsePOLokal["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataPOLokal
+        ];
+
+        echo json_encode($data);
         return;
     }
 }

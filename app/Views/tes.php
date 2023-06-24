@@ -576,32 +576,9 @@
     }
 
 
-// get all /purchaseOrder
-// 1. response meta belum ada totalData
-// 2. po_date format dd/mm/yyyy
-// 3. tambah kolom orderTypeName
-// 4. tambah kolom foreignExchangeName
-// 5. total masking 50,000
-// 6. sorting asc desc (poDate, poNo, orderTypeName, supplierName, total, foreignExchangeName)
-
-// get purchaseRequest/getByType
-// 1. data spp di posting
-
-// get by id /purchaseOrder
-// 1. po_date format dd/mm/yyyy
-// 2. payment_date format dd/mm/yyyy
-// 3. tambah orderTypeName
-// 4. tambah supplierName
-// 5. total masking 50,000
-// 6. purchase_request_details (price masking 50,000)
-// 7. purchase_request_details (qty dan disc 2 angka belakang koma dihapus)
-// 8. purchase_request_details (tambah kodeBarang, satuanName, note)
-// 9. purchase_request_details (additional_cost masking 50,000)
-// 10. purchase_request_details (tambah totalPrice dan masking 50,000)
-// 10. purchase_request_details (spec bukan string)
-
-// get by id /purchaseRequest
-// 1. tambah orderTypeName
+// error di barang/all karena masking total_harga
+// error saat patch purchaseOrder
+// purchaseRequest/approve/15 purchase request not found (username: director password: 123123)
 
 </script>
 

@@ -18,11 +18,17 @@
         <i class="fa fa-print" aria-hidden="true"></i>
     </button>
 
-    <?php if($dataSPP->is_posted === false){ ?> 
+    <?php if($dataSPP->is_posted === false && $dataSPP->approved_by_director !== 0){ 
+        if($dataSPP->approved_by_head_of_purchasing !== 0 && $dataSPP->approved_by_headwarehouse !== 0){ 
+    ?> 
+
     <button class="btn btn-success posting-spp">
         <i class="fa fa-paper-plane" aria-hidden="true"></i>
     </button>
-    <?php } ?> 
+
+    <?php } 
+    }
+    ?> 
 
     <?php } ?> 
 

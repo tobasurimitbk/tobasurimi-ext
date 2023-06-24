@@ -13,7 +13,7 @@
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButton1">
                     <?php foreach (session()->get("login")->company_role as $allCompany) { ?>
-                        <li onclick="tes(<?= $allCompany->company_id; ?>, '<?= $allCompany->company_name; ?>')"><a class="<?= $allCompany->company_id == session()->get("login")->this_company_id ? "dropdown-item active" : "dropdown-item" ?>"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany->company_name; ?></a></li>
+                        <li onclick="changeCompanyAccount(<?= $allCompany->company_id; ?>, '<?= $allCompany->company_name; ?>', '<?= $allCompany->role_id; ?>', '<?= $allCompany->role_name; ?>')"><a class="<?= $allCompany->company_id == session()->get("login")->this_company_id ? "dropdown-item active" : "dropdown-item" ?>"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany->company_name; ?></a></li>
                     <?php } ?>
                 </ul>
             </div>
@@ -103,13 +103,15 @@
         $(".logout-modal").modal("hide")
     }
 
-    const tes = function(dropdownCompanyId, dropdownCompanyName) {
+    const changeCompanyAccount = function(dropdownCompanyId, dropdownCompanyName, dropdownRoleId, dropdownRoleName) {
         console.log(dropdownCompanyId)
         $.ajax({
             url: "<?= base_url("change-company"); ?>",
             data: {
                 id: dropdownCompanyId,
-                name: dropdownCompanyName
+                name: dropdownCompanyName,
+                role_id: dropdownRoleId,
+                role_name: dropdownRoleName
             },
             method: "GET",
             dataType: "json",
