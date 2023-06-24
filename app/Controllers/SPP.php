@@ -33,7 +33,7 @@ class SPP extends BaseController
         if ($responseWarehouse["code"] === 200) {
             $dataWarehouse = json_decode($responseWarehouse["body"])->data;
         }
-        
+
         $data = [
             "dataOrderType" => $dataOrderType,
             "dataWarehouse" => $dataWarehouse
@@ -61,7 +61,7 @@ class SPP extends BaseController
         if ($responseWarehouse["code"] === 200) {
             $dataWarehouse = json_decode($responseWarehouse["body"])->data;
         }
-        
+
         $data = [
             "dataOrderType" => $dataOrderType,
             "dataWarehouse" => $dataWarehouse
@@ -77,7 +77,7 @@ class SPP extends BaseController
         }
 
         return view('spp/form', $data);
-        
+
         return;
     }
 
@@ -110,7 +110,7 @@ class SPP extends BaseController
             ];
             echo json_encode($data);
         }
-        
+
         return;
     }
 
@@ -130,6 +130,7 @@ class SPP extends BaseController
         ];
 
         $response = curl_request("GET", "/purchaseRequest", $token, $payload);
+
         $dataSPP = [];
         $totalRecords = 0;
 
@@ -211,7 +212,7 @@ class SPP extends BaseController
             //     'token' => csrf_hash()
             // ];
             // echo json_encode($data);
-            
+
             $response = curl_request("POST", "/purchaseRequest", $token, $payload);
 
             if ($response["code"] === 201) {
@@ -329,7 +330,7 @@ class SPP extends BaseController
         $payload = json_encode([
             "is_posted" => true
         ]);
-        
+
         $response = curl_request("PATCH", "/purchaseRequest/$id", $token, $payload);
 
         if ($response["code"] === 200) {
@@ -360,10 +361,8 @@ class SPP extends BaseController
 
         $id = $this->request->getPost("id");
 
-        $payload = json_encode([
+        $payload = json_encode([]);
 
-        ]);
-        
         $response = curl_request("PATCH", "/purchaseRequest/approved/$id", $token, $payload);
 
         if ($response["code"] === 200) {
@@ -390,7 +389,7 @@ class SPP extends BaseController
     public function deleteSPP()
     {
         $token = session()->get("login")->token;
-        
+
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
