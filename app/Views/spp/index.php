@@ -3,61 +3,61 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Surat Permintaan Pembelian</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </a>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end mb-3 row-col-spp">
-            <div class="col">
-            <?= csrf_field() ?>
-                <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+    <div class="section-header">
+        <h1>Surat Permintaan Pembelian</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3 row-col-spp">
+                <div class="col">
+                    <?= csrf_field() ?>
+                    <div class="input-group input-group-password">
+                        <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                <div class="col">
+                    <div class="input-group input-group-password">
+                        <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
                     </div>
                 </div>
+                <div class="col">
+                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
             </div>
-            <div class="col">
-                <input class="form-control search form-out-search" placeholder="Search" value="" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>#</th>
-                            <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
-                            <th onclick="changeSort('sppNo')" class="sort">No. SPP</th> 
-                            <th onclick="changeSort('warehouse')" class="sort">Departemen</th> 
-                            <th onclick="changeSort('orderType')" class="sort">Jenis Order</th> 
-                            <th onclick="changeSort('total')" class="sort">Total Harga</th> 
-                            <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th> 
-                            <th>Order Oleh</th> 
-                            <th>Disetujui</th> 
-                            <th>Penerima</th> 
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
+                                <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
+                                <th onclick="changeSort('warehouse')" class="sort">Departemen</th>
+                                <th onclick="changeSort('orderType')" class="sort">Jenis Order</th>
+                                <th onclick="changeSort('total')" class="sort">Total Harga</th>
+                                <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
+                                <th>Order Oleh</th>
+                                <th>Disetujui</th>
+                                <th>Penerima</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -71,7 +71,10 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
+
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -90,88 +93,84 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            orderable: false
-        },
-        {
-            data: "spp_type",
-            className: "text-center"
-        },
-        {
-            data: "spp_no",
-            className: "text-center"
-        },
-        {
-            data: "warehouseName",
-            className: "text-center"
-        },
-        {
-            data: "orderTypeName",
-            className: "text-center"
-        },
-        {
-            data: "total",
-            className: "text-center"
-        },
-        {
-            data: "request_date",
-            className: "text-center"
-        },
-        {
-            data: "approvedByHeadwarehouseName",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(data === "false" && role_id === '22')
-                {
-                    return `<input onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
+                data: "no",
+                className: "text-center",
+                orderable: false
+            },
+            {
+                data: "spp_type",
+                className: "text-center"
+            },
+            {
+                data: "spp_no",
+                className: "text-center"
+            },
+            {
+                data: "warehouseName",
+                className: "text-center"
+            },
+            {
+                data: "orderTypeName",
+                className: "text-center"
+            },
+            {
+                data: "total",
+                className: "text-center"
+            },
+            {
+                data: "request_date",
+                className: "text-center"
+            },
+            {
+                data: "approvedByHeadwarehouseName",
+                className: "text-center actions",
+                orderable: false,
+                render: function(data, type, row) {
+                    console.log(data);
+                    if (data === "false" && role_id === '22') {
+                        return `<input onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
+                    }
+                    if (data !== "false") {
+                        return data;
+                    }
                 }
-                if(data !== "false")
-                {
-                    return data;
+            },
+            {
+                data: "approvedByDirectorName",
+                className: "text-center actions",
+                orderable: false,
+                render: function(data, type, row) {
+                    if (data === "false" && role_id === '21') {
+                        return `<input onchange="approveDirector('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_director_${row.id}"/>`
+                    }
+                    if (data !== "false") {
+                        return data;
+                    }
                 }
-            }
-        },
-        {
-            data: "approvedByDirectorName",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(data === "false" && role_id === '21')
-                {
-                    return `<input onchange="approveDirector('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_director_${row.id}"/>`
-                }  
-                if(data !== "false")
-                {
-                    return data;
-                } 
-            }
-        },
-        {
-            data: "approvedByHeadofPurchasingName",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(data === "false" && role_id === '23')
-                {
-                    return `<input onchange="approveHeadPurchasing('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_head_of_purchasing_${row.id}"/>`
-                }
-                if(data !== "false")
-                {
-                    return data;
+            },
+            {
+                data: "approvedByHeadofPurchasingName",
+                className: "text-center actions",
+                orderable: false,
+                render: function(data, type, row) {
+                    if (data === "false" && role_id === '23') {
+                        return `<input onchange="approveHeadPurchasing('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_head_of_purchasing_${row.id}"/>`
+                    }
+                    if (data !== "false") {
+                        return data;
+                    }
                 }
             }
-        }],
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -210,11 +209,11 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd").change(function () {
+        $(".dateStart, .dateEnd").change(function() {
             table.ajax.reload();
         })
 
@@ -224,8 +223,7 @@
         })
     })
 
-    const approveHeadWarehouse = function(id)
-    {
+    const approveHeadWarehouse = function(id) {
         const csrf = $(`[name="${csrfToken}"]`);
         let value = document.getElementById('approved_by_headwarehouse_' + id).checked ? true : false;
 
@@ -233,8 +231,7 @@
             id: id
         }
 
-        if(value)
-        {
+        if (value) {
             data["status"] = true;
         }
 
@@ -250,13 +247,13 @@
                 csrf.val(response.token);
                 if (response.status) {
                     Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    .then(() => {
-                        table.ajax.reload()
-                    })
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        .then(() => {
+                            table.ajax.reload()
+                        })
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -276,8 +273,7 @@
         });
     }
 
-    const approveHeadPurchasing = function(id)
-    {
+    const approveHeadPurchasing = function(id) {
         const csrf = $(`[name="${csrfToken}"]`);
         let value = document.getElementById('approved_by_head_of_purchasing_' + id).checked ? true : false;
 
@@ -285,8 +281,7 @@
             id: id
         }
 
-        if(value)
-        {
+        if (value) {
             data["status"] = true;
         }
 
@@ -302,13 +297,13 @@
                 csrf.val(response.token);
                 if (response.status) {
                     Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    .then(() => {
-                        table.ajax.reload()
-                    })
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        .then(() => {
+                            table.ajax.reload()
+                        })
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -328,8 +323,7 @@
         });
     }
 
-    const approveDirector = function(id)
-    {
+    const approveDirector = function(id) {
         const csrf = $(`[name="${csrfToken}"]`);
         let value = document.getElementById('approved_by_director_' + id).checked ? true : false;
 
@@ -337,8 +331,7 @@
             id: id
         }
 
-        if(value)
-        {
+        if (value) {
             data["status"] = true;
         }
 
@@ -354,13 +347,13 @@
                 csrf.val(response.token);
                 if (response.status) {
                     Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    .then(() => {
-                        table.ajax.reload()
-                    })
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        .then(() => {
+                            table.ajax.reload()
+                        })
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -381,13 +374,10 @@
     }
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
