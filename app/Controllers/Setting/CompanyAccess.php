@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Setting;
+
+use App\Controllers\BaseController;
 
 class CompanyAccess extends BaseController
 {

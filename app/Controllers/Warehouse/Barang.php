@@ -1,48 +1,52 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Warehouse;
 
-class Supplier extends BaseController
+use App\Controllers\BaseController;
+
+class Barang extends BaseController
 {
     protected $token;
     protected $this_company_id;
-
+    
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function supplier()
+    public function barang()
     {
-        //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
+        // Get Kategori
+        $responseKategori = curl_request("GET", "/metadata/all?name=kategori_barang", $this->token);
 
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
+        $dataKategori = [];
+        if ($responseKategori["code"] === 200) {
+            $dataKategori = json_decode($responseKategori["body"])->data;
         }
-
+         
         $data = [
-            "dataProvinces" => $dataProvinces,
+            "dataKategori" => $dataKategori
         ];
 
-        return view('supplier/index', $data);
+        return view('barang/index', $data);
     }
 
-    public function allSupplier()
+    public function allBarang()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
+            "idCategory" => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
+            "status" => $this->request->getGet("status"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
             "idCompany" => $this->this_company_id
-        ];
+        ]; 
 
-        $response = curl_request("GET", "/suppliers", $this->token, $payload);
-        $dataSupplier = [];
+        $response = curl_request("GET", "/barang", $this->token, $payload);
+        $dataUser = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -50,22 +54,18 @@ class Supplier extends BaseController
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
             foreach ($body as $data) {
-                array_push($dataSupplier, [
+                array_push($dataUser, [
                     "id" => $data->id,
-                    "kode" => $data->kode,
-                    "name" => $data->name,
-                    "address" => $data->address,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
-                    "postal_code" => $data->postal_code, 
-                    "no_npwp" => $data->no_npwp,
-                    "phone" => $data->phone,
-                    "contact_person" => $data->contact_person,
-                    "email" => $data->email,
-                    "no_rekening" => $data->no_rekening,
-                    "supplier_buyer" => $data->supplier_buyer,
-                    "ap_name" => $data->ap_name,
-                    "ar_name" => $data->ar_name
+                    "kode_barang" => $data->kode_barang,
+                    "nama_barang" => $data->nama_barang,
+                    "harga_barang" => $data->harga_barang,
+                    "kode_satuan" => $data->kode_satuan,
+                    "kategori" => $data->kategori,
+                    "code_hs" => $data->code_hs,
+                    "sub_akun_ap" => $data->sub_akun_ap,
+                    "sub_akun_ar" => $data->sub_akun_ar,
+                    "stok" => $data->stok,
+                    "status" => $data->status,
                 ]);
             }
         }
@@ -74,7 +74,7 @@ class Supplier extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataSupplier,
+            "data" => $dataUser,
             "response" => $response,
             "payload" => $payload
         ];
@@ -83,40 +83,25 @@ class Supplier extends BaseController
         return;
     }
 
-    public function saveSupplier()
+    public function saveBarang()
     {
         $rules = [
-            "kode" => [
+            "kode_barang" => [
                 "rules" => "required"
             ],
-            "name" => [
+            "nama_barang" => [
                 "rules" => "required"
             ],
-            "address" => [
+            "harga_barang" => [
                 "rules" => "required"
             ],
-            "no_npwp" => [
+            "satuan_id" => [
                 "rules" => "required"
             ],
-            "phone" => [
+            "kategori_id" => [
                 "rules" => "required"
             ],
-            "contact_person" => [
-                "rules" => "required"
-            ],
-            "email" => [
-                "rules" => "required"
-            ],
-            "no_rekening" => [
-                "rules" => "required"
-            ],
-            "supplier_buyer" => [
-                "rules" => "required"
-            ],
-            "province_parent_id" => [
-                "rules" => "required"
-            ],
-            "city_parent_id" => [
+            "hs_id" => [
                 "rules" => "required"
             ],
             "ap_id" => [
@@ -124,29 +109,28 @@ class Supplier extends BaseController
             ],
             "ar_id" => [
                 "rules" => "required"
+            ],
+            "stok" => [
+                "rules" => "required"
             ]
         ];
 
         if ($this->validate($rules)) {
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
-                "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
-                "no_npwp" => $this->request->getPost("no_npwp"),
-                "phone" => $this->request->getPost("phone"),
-                "contact_person" => $this->request->getPost("contact_person"),
-                "email" => $this->request->getPost("email"),
-                "no_rekening" => $this->request->getPost("no_rekening"),
-                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                "province_id" => $this->request->getPost("province_parent_id"),
-                "city_id" => $this->request->getPost("city_parent_id"),
+                "kode_barang" => $this->request->getPost("kode_barang"),
+                "nama_barang" => $this->request->getPost("nama_barang"),
+                "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
+                "stok" => formatter($this->request->getPost("stok"), "STR_TO_INT"),
+                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
             ]);
 
-            $response = curl_request("POST", "/suppliers", $this->token, $payload);
+            $response = curl_request("POST", "/barang", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -177,40 +161,25 @@ class Supplier extends BaseController
         return;
     }
 
-    public function updateSupplier()
+    public function updateBarang()
     {
         $rules = [
-            "kode" => [
+            "kode_barang" => [
                 "rules" => "required"
             ],
-            "name" => [
+            "nama_barang" => [
                 "rules" => "required"
             ],
-            "address" => [
+            "harga_barang" => [
                 "rules" => "required"
             ],
-            "no_npwp" => [
+            "satuan_id" => [
                 "rules" => "required"
             ],
-            "phone" => [
+            "kategori_id" => [
                 "rules" => "required"
             ],
-            "contact_person" => [
-                "rules" => "required"
-            ],
-            "email" => [
-                "rules" => "required"
-            ],
-            "no_rekening" => [
-                "rules" => "required"
-            ],
-            "supplier_buyer" => [
-                "rules" => "required"
-            ],
-            "province_parent_id" => [
-                "rules" => "required"
-            ],
-            "city_parent_id" => [
+            "hs_id" => [
                 "rules" => "required"
             ],
             "ap_id" => [
@@ -226,25 +195,18 @@ class Supplier extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
-                "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
-                "no_npwp" => $this->request->getPost("no_npwp"),
-                "phone" => $this->request->getPost("phone"),
-                "contact_person" => $this->request->getPost("contact_person"),
-                "email" => $this->request->getPost("email"),
-                "no_rekening" => $this->request->getPost("no_rekening"),
-                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                "province_id" => $this->request->getPost("province_parent_id"),
-                "city_id" => $this->request->getPost("city_parent_id"),
+                "kode_barang" => $this->request->getPost("kode_barang"),
+                "nama_barang" => $this->request->getPost("nama_barang"),
+                "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
+                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
             ]);
-        }
 
-        if ($payload) {
-            $response = curl_request("PATCH", "/suppliers/$id", $this->token, $payload);
+            $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -264,15 +226,53 @@ class Supplier extends BaseController
                 ];
                 echo json_encode($data);
             }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
         }
-
         return;
     }
 
-    public function getByIdSupplier($id = null)
+    public function updateStatusBarang()
+    {
+        $id = $this->request->getPost("id");
+
+        $payload = json_encode([
+            "company_id" => $this->this_company_id,
+            "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
+        ]);
+        
+        $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Data Berhasil diubah",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function getByIdBarang($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
+            $response = curl_request("GET", "/barang/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -280,7 +280,7 @@ class Supplier extends BaseController
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -297,12 +297,12 @@ class Supplier extends BaseController
         return;
     }
 
-    public function deleteSupplier()
+    public function deleteBarang()
     {
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/suppliers/$id", $this->token);
+            $response = curl_request("DELETE", "/barang/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -329,4 +329,22 @@ class Supplier extends BaseController
         }
         return;
     }
+
+    public function dropdownBarang()
+    {
+        $responseBarang = curl_request("GET", "/barang/all?idCompany=$this->this_company_id", $this->token);
+
+        $dataBarang = [];
+        if ($responseBarang["code"] === 200) {
+            $dataBarang = json_decode($responseBarang["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }
+?>

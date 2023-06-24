@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Purchase;
+
+use App\Controllers\BaseController;
 
 class POLokal extends BaseController
 {

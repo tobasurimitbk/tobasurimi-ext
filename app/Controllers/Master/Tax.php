@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Master;
+
+use App\Controllers\BaseController;
 
 class Tax extends BaseController
 {

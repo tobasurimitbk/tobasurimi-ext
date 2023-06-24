@@ -1,105 +1,120 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Purchase;
 
-class POImport extends BaseController
+use App\Controllers\BaseController;
+
+class SPP extends BaseController
 {
     protected $token;
-    protected $this_company_id;
-    
+    protected $role_id;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
-        $this->this_company_id = session()->get("login")->this_company_id;
+        $this->role_id = session()->get("login")->this_role_id;
     }
 
-    public function poImport()
+    public function spp()
     {
-        return view('poImport/index');
+        return view('spp/index');
     }
 
-    public function createPOImport()
+    public function createSPP()
     {
-         //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
+        //Get Order Type By Metadata
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $this->token);
 
-        $dataSPP = [];
-        if ($responseSPP["code"] === 200) {
-            $dataSPP = json_decode($responseSPP["body"])->data;
+        $dataOrderType = [];
+        if ($responseOrderType["code"] === 200) {
+            $dataOrderType = json_decode($responseOrderType["body"])->data;
         }
 
-        //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
+        //Get Warehouse
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        $dataWarehouse = [];
+        if ($responseWarehouse["code"] === 200) {
+            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
         }
 
-        //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
-
-        $dataValuta = [];
-        if ($responseValuta["code"] === 200) {
-            $dataValuta = json_decode($responseValuta["body"])->data;
-        }
-        
         $data = [
-            "dataSPP" => $dataSPP,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataOrderType" => $dataOrderType,
+            "dataWarehouse" => $dataWarehouse
         ];
 
-        return view('poImport/form', $data);
+        return view('spp/form', $data);
     }
 
-    public function getByIdPOImport($id = null)
+    public function getByIdSPP($id = null)
     {
-         //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
+        //Get Order Type By Metadata
+        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $this->token);
 
-        $dataSPP = [];
-        if ($responseSPP["code"] === 200) {
-            $dataSPP = json_decode($responseSPP["body"])->data;
+        $dataOrderType = [];
+        if ($responseOrderType["code"] === 200) {
+            $dataOrderType = json_decode($responseOrderType["body"])->data;
         }
 
-        //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
+        //Get Warehouse
+        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        $dataWarehouse = [];
+        if ($responseWarehouse["code"] === 200) {
+            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
         }
 
-        //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
-
-        $dataValuta = [];
-        if ($responseValuta["code"] === 200) {
-            $dataValuta = json_decode($responseValuta["body"])->data;
-        }
-        
         $data = [
-            "dataSPP" => $dataSPP,
-            "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataOrderType" => $dataOrderType,
+            "dataWarehouse" => $dataWarehouse
         ];
 
         if (!empty($id)) {
-            $responsePOImport = curl_request("GET", "/purchaseOrder/$id", $this->token);
-            $dataPOImport = [];
-            if ($responsePOImport["code"] === 200) {
-                $dataPOImport = json_decode($responsePOImport["body"])->data;
+            $responseSPP = curl_request("GET", "/purchaseRequest/$id", $this->token);
+            $dataSPP = [];
+            if ($responseSPP["code"] === 200) {
+                $dataSPP = json_decode($responseSPP["body"])->data;
             }
-            $data["dataPOImport"] = $dataPOImport;
+            $data["dataSPP"] = $dataSPP;
         }
 
-        return view('poImport/form', $data);
-        
+        return view('spp/form', $data);
+
         return;
     }
 
-    public function allPOImport()
+    public function getByIdSPPAjax()
+    {
+        $id = $this->request->getGet("id");
+
+        if (!empty($id)) {
+            $response = curl_request("GET", "/purchaseRequest/$id", $this->token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"  => true,
+                    "data"  => json_decode($response["body"])->data,
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
+            ];
+            echo json_encode($data);
+        }
+
+        return;
+    }
+
+    public function allSPP()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -112,8 +127,9 @@ class POImport extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/purchaseOrder", $this->token, $payload);
-        $dataPOImport = [];
+        $response = curl_request("GET", "/purchaseRequest", $this->token, $payload);
+
+        $dataSPP = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -123,15 +139,22 @@ class POImport extends BaseController
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
             foreach ($body as $data) {
-                array_push($dataPOImport, [
+                array_push($dataSPP, [
                     "no" => $no++,
                     "id" => $data->id,
-                    "po_date" => $data->po_date,
-                    "po_no" => $data->po_no,
+                    "spp_type" => $data->spp_type,
+                    "spp_no" => $data->spp_no,
+                    "warehouseName" => $data->warehouseName,
                     "orderTypeName" => $data->orderTypeName,
-                    "supplierName" => $data->supplierName,
                     "total" => $data->total,
-                    "foreignExchangeName" => $data->foreignExchangeName,
+                    "request_date" => $data->request_date,
+                    "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
+                    "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
+                    "approvedByDirectorName" => $data->approvedByDirectorName,
+                    "is_posted" => $data->is_posted,
+                    "isApproveWarehouse" => ($this->role_id === 22 && $data->is_posted === false) ? true : false,
+                    "isApprovePurchasing" => ($this->role_id === 23 && $data->is_posted === false) ? true : false,
+                    "isApproveDirector" => ($this->role_id === 21 && $data->is_posted === false) ? true : false
                 ]);
             }
         }
@@ -140,7 +163,7 @@ class POImport extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataPOImport,
+            "data" => $dataSPP,
             "response" => $response,
             "payload" => $payload
         ];
@@ -149,50 +172,35 @@ class POImport extends BaseController
         return;
     }
 
-    public function savePOImport()
+    public function saveSPP()
     {
         $rules = [
-            "purchase_request_id" => [
+            "request_date" => [
                 "rules" => "required"
             ],
-            "po_no" => [
+            "spp_type" => [
                 "rules" => "required"
             ],
-            "po_date" => [
+            "spp_no" => [
                 "rules" => "required"
             ],
-            "supplier_id" => [
+            "order_type" => [
                 "rules" => "required"
             ],
-            "payment_term" => [
-                "rules" => "required"
-            ],
-            "foreign_exchange" => [
-                "rules" => "required"
-            ],
-            "payment_date" => [
-                "rules" => "required"
-            ],
-            "dpp" => [
+            "warehouse_id" => [
                 "rules" => "required"
             ]
         ];
 
         if ($this->validate($rules)) {
             $payload = json_encode([
-                "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
-                "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
-                "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "import",
-                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
-                "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
-                "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
+                "spp_type" => $this->request->getPost("spp_type"),
+                "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
-                "isPosted" => false,
+                "is_posted" => false,
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
@@ -203,12 +211,12 @@ class POImport extends BaseController
             //     'token' => csrf_hash()
             // ];
             // echo json_encode($data);
-            
-            $response = curl_request("POST", "/purchaseOrder", $this->token, $payload);
+
+            $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
-                    "id" => "",
+                    "id" => json_decode($response["body"])->createdId,
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
@@ -238,31 +246,22 @@ class POImport extends BaseController
         return;
     }
 
-    public function updatePOImport()
+    public function updateSPP()
     {
         $rules = [
-            "purchase_request_id" => [
+            "request_date" => [
                 "rules" => "required"
             ],
-            "po_no" => [
+            "spp_type" => [
                 "rules" => "required"
             ],
-            "po_date" => [
+            "spp_no" => [
                 "rules" => "required"
             ],
-            "supplier_id" => [
+            "order_type" => [
                 "rules" => "required"
             ],
-            "payment_term" => [
-                "rules" => "required"
-            ],
-            "foreign_exchange" => [
-                "rules" => "required"
-            ],
-            "payment_date" => [
-                "rules" => "required"
-            ],
-            "dpp" => [
+            "warehouse_id" => [
                 "rules" => "required"
             ]
         ];
@@ -271,17 +270,11 @@ class POImport extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
-                "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
-                "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "import",
-                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
-                "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
-                "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
+                "spp_type" => $this->request->getPost("spp_type"),
+                "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
                 "items" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
@@ -294,7 +287,7 @@ class POImport extends BaseController
             // ];
             // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
+            $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -325,15 +318,15 @@ class POImport extends BaseController
         return;
     }
 
-    public function updateStatusPOImport()
+    public function updateStatusSPP()
     {
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
             "is_posted" => true
         ]);
-        
-        $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
+
+        $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -356,12 +349,41 @@ class POImport extends BaseController
         return;
     }
 
-    public function deletePOImport()
+    public function approveSPP()
+    {
+        $id = $this->request->getPost("id");
+
+        $payload = json_encode([]);
+
+        $response = curl_request("PATCH", "/purchaseRequest/approve/$id", $this->token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Approve Berhasil diubah",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function deleteSPP()
     {
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/purchaseOrder/$id", $this->token);
+            $response = curl_request("DELETE", "/purchaseRequest/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -386,23 +408,6 @@ class POImport extends BaseController
             ];
             echo json_encode($data);
         }
-        return;
-    }
-
-    public function dropdownPOImport()
-    {
-        $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-        $dataPOImport = [];
-        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&supplierid=$id", $this->token);
-        if ($responsePOImport["code"] === 200) {
-            $dataPOImport = json_decode($responsePOImport["body"])->data;
-        }
-
-        $data = [
-            "data" => $dataPOImport
-        ];
-
-        echo json_encode($data);
         return;
     }
 }

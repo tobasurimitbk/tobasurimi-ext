@@ -1,24 +1,26 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Purchase;
 
-class PenerimaanBarangImport extends BaseController
+use App\Controllers\BaseController;
+
+class PenerimaanBarangLokal extends BaseController
 {
     protected $token;
     protected $this_company_id;
-
+    
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function penerimaanBarangImport()
+    public function penerimaanBarangLokal()
     {
-        return view('penerimaanBarangImport/index');
+        return view('penerimaanBarangLokal/index');
     }
 
-    public function createPenerimaanBarangImport()
+    public function createPenerimaanBarangLokal()
     {
         //Get Supplier
         $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
@@ -32,10 +34,10 @@ class PenerimaanBarangImport extends BaseController
             "dataSupplier" => $dataSupplier
         ];
 
-        return view('penerimaanBarangImport/form', $data);
+        return view('penerimaanBarangLokal/form', $data);
     }
 
-    public function allPenerimaanBarangImport()
+    public function allPenerimaanBarangLokal()
     {
         $payload = [
             "pagesize" => $this->request->getGet("length"),
@@ -43,14 +45,14 @@ class PenerimaanBarangImport extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sorttype" => $this->request->getGet("sortType"),
-            "statuspenerimaan" => "IMPORT",
+            "statuspenerimaan" => "LOKAL",
             "status" => $this->request->getGet("status"),
             "startdate" => $this->request->getGet("startdate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("startdate")))) : "",
             "lastdate" => $this->request->getGet("lastdate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("lastdate")))) : "",
         ];
 
         $response = curl_request("GET", "/penerimaanBarang", $this->token, $payload);
-        $dataPenerimaanBarangImport = [];
+        $dataPenerimaanBarangLokal = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -60,7 +62,7 @@ class PenerimaanBarangImport extends BaseController
             $no = ($payload["pagesize"] * ($payload["currentpage"] - 1)) + 1;
 
             foreach ($body as $data) {
-                array_push($dataPenerimaanBarangImport, [
+                array_push($dataPenerimaanBarangLokal, [
                     "no" => $no++,
                     "id" => $data->id,
                     "invoice_no" => $data->invoice_no,
@@ -79,7 +81,7 @@ class PenerimaanBarangImport extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataPenerimaanBarangImport,
+            "data" => $dataPenerimaanBarangLokal,
             "response" => $response,
             "payload" => $payload
         ];

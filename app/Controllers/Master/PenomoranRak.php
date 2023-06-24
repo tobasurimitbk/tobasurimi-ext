@@ -1,32 +1,37 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Master;
 
-class Role extends BaseController
+use App\Controllers\BaseController;
+
+class PenomoranRak extends BaseController
 {
     protected $token;
-
+    protected $this_company_id;
+    
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function role()
+    public function penomoranrak()
     {
-        return view('role/index');
+        return view('penomoranRak/index');
     }
 
-    public function allRole()
+    public function allPenomoranRak()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType")
+            "sortType" => $this->request->getGet("sortType"),
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/roles", $this->token, $payload);
+        $response = curl_request("GET", "/rak", $this->token, $payload);
         $dataRole = [];
         $totalRecords = 0;
 
@@ -37,7 +42,8 @@ class Role extends BaseController
             foreach ($body as $data) {
                 array_push($dataRole, [
                     "id" => $data->id,
-                    "name" => $data->name,
+                    "nomor" => $data->nomor,
+                    "rak" => $data->rak,
                 ]);
             }
         }
@@ -55,19 +61,24 @@ class Role extends BaseController
         return;
     }
 
-    public function saveRole()
+    public function savePenomoranRak()
     {
         $rules = [
-            "name" => [
+            "nomor" => [
+                "rules" => "required"
+            ],
+            "rak" => [
                 "rules" => "required"
             ]
         ];
 
         if ($this->validate($rules)) {
             $payload = json_encode([
-                "name" => $this->request->getPost("name")
+                "company_id" => $this->this_company_id,
+                "nomor" => $this->request->getPost("nomor"),
+                "rak" => $this->request->getPost("rak"),
             ]);
-                $response = curl_request("POST", "/roles", $this->token, $payload);
+                $response = curl_request("POST", "/rak", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -98,10 +109,13 @@ class Role extends BaseController
         return;
     }
 
-    public function updateRole()
+    public function updatePenomoranRak()
     {
         $rules = [
-            "name" => [
+            "nomor" => [
+                "rules" => "required"
+            ],
+            "rak" => [
                 "rules" => "required"
             ]
         ];
@@ -110,10 +124,12 @@ class Role extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "name" => $this->request->getPost("name")
+                "company_id" => $this->this_company_id,
+                "nomor" => $this->request->getPost("nomor"),
+                "rak" => $this->request->getPost("rak")
             ]);
 
-            $response = curl_request("PATCH", "/roles/$id", $this->token, $payload);
+            $response = curl_request("PATCH", "/rak/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -144,10 +160,10 @@ class Role extends BaseController
         return;
     }
 
-    public function getByIdRole($id = null)
+    public function getByIdPenomoranRak($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/roles/$id", $this->token);
+            $response = curl_request("GET", "/rak/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -172,12 +188,12 @@ class Role extends BaseController
         return;
     }
 
-    public function deleteRole()
+    public function deletePenomoranRak()
     {
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/roles/$id", $this->token);
+            $response = curl_request("DELETE", "/rak/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -202,23 +218,6 @@ class Role extends BaseController
             ];
             echo json_encode($data);
         }
-        return;
-    }
-
-    public function dropdownRole()
-    {
-        $responseRole = curl_request("GET", "/roles/selectOption", $this->token);
-
-        $dataRole = [];
-        if ($responseRole["code"] === 200) {
-            $dataRole = json_decode($responseRole["body"])->data;
-        }
-
-        $data = [
-            "data" => $dataRole
-        ];
-
-        echo json_encode($data);
         return;
     }
 }

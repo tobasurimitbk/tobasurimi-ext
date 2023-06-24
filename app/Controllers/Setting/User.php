@@ -1,78 +1,24 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Setting;
+
+use App\Controllers\BaseController;
+
 use DateTime;
 
 class User extends BaseController
 {
+    protected $company_role;
+    protected $token;
+    protected $this_company_id;
+    protected $session;
 
     public function __construct()
     {
-
-    }
-
-    public function login()
-    {
-        if (!empty(is_login())) {
-            return redirect()->to("/dashboard");
-        }
-
-        return view('login/index');
-    }
-
-    public function doLogin()
-    {
-        $rules = [
-            "username" => [
-                "rules" => "required"
-            ],
-            "password" => [
-                "rules" => "required"
-            ]
-        ];
-
-        if ($this->validate($rules)) {
-            $token = "";
-            $data = json_encode([
-                "username" => $this->request->getPost("username"),
-                "password" => $this->request->getPost("password")
-            ]);
-            $response = curl_request("POST", "/auth/login", $token, $data);
-
-            if ($response["code"] === 200) {
-                $data = json_decode($response["body"]);
-
-                $this_company_id = $data->company_role[0]->company_id;
-                $this_company = $data->company_role[0]->company_name;
-                $this_access = $data->company_role[0]->access_list;
-                $this_role_id = $data->company_role[0]->role_id;
-                $this_role_name = $data->company_role[0]->role_name;
-
-                // token add bearer
-                $session = (object) [
-                    "isLogin" => true,
-                    "token" => $data->token,
-                    "name" => $data->name,
-                    "username" => $data->username,
-                    "this_role_id" => $this_role_id,
-                    "this_role_name" => $this_role_name,
-                    "company_role" => $data->company_role,
-                    "this_company_id" => $this_company_id,
-                    "this_company" => $this_company,
-                    "this_access" => $this_access,
-                    "employee_id" => $data->employee_id,
-                    "status" => $data->status
-                ];
-                session()->setTempdata("login", $session, 36000);
-
-                return redirect()->to("/dashboard")->with("success", "Login Berhasil");
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Login Gagal, Coba Lagi';
-                return redirect()->back()->with("errors", $message);
-            }
-        } else {
-            return redirect()->back()->with("errors", "Login Gagal, Coba Lagi");
-        }
+        $this->company_role = session()->get("login")->company_role;
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
+        $this->session = session()->get("login");
     }
 
     public function changeCompany()
@@ -83,11 +29,9 @@ class User extends BaseController
         $role_name = $this->request->getGet("role_name");
 
         if ($id) {
-
-            $company_role = session()->get("login")->company_role;
             $this_access = "";
 
-            foreach($company_role as $item)
+            foreach($this->company_role as $item)
             {
                 if($item->company_id == $id)
                 {
@@ -95,15 +39,13 @@ class User extends BaseController
                 }
             }
 
-            $session = session()->get("login");
+            $this->session->this_company_id = $id;
+            $this->session->this_company = $name;
+            $this->session->this_role_id = $role_id;
+            $this->session->this_role_name = $role_name;
+            $this->session->this_access = $this_access;
 
-            $session->this_company_id = $id;
-            $session->this_company = $name;
-            $session->this_role_id = $role_id;
-            $session->this_role_name = $role_name;
-            $session->this_access = $this_access;
-
-            session()->setTempdata("login", $session, 36000);
+            session()->setTempdata("login", $this->session, 36000);
 
             $data = [
                 "status"            => true
@@ -115,13 +57,6 @@ class User extends BaseController
         return;
     }
 
-    public function doLogout()
-    {
-        session()->destroy();
-
-        return redirect()->to("/");
-    }
-
     public function user()
     {
         return view('user/index');
@@ -129,20 +64,16 @@ class User extends BaseController
 
     public function allUser()
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this_company_id
+            "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/users", $token, $payload);
+        $response = curl_request("GET", "/users", $this->token, $payload);
         $dataUser = [];
         $totalRecords = 0;
 
@@ -192,12 +123,8 @@ class User extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
-
-            $this_company_id = session()->get("login")->this_company_id;
-
             $payload = json_encode([
-                "company_id" => $this_company_id,
+                "company_id" => $this->this_company_id,
                 "name" => $this->request->getPost("name"),
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
@@ -206,7 +133,7 @@ class User extends BaseController
                 "status" => $this->request->getPost("status")
             ]);
             
-            $response = curl_request("POST", "/users", $token, $payload);
+            $response = curl_request("POST", "/users", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -249,14 +176,11 @@ class User extends BaseController
         ];
 
         if ($this->validate($rules)) {
-            $token = session()->get("login")->token;
             $id = $this->request->getPost("id");
-
-            $this_company_id = session()->get("login")->this_company_id;
 
             if($this->request->getPost("employee_id")){
                 $payload = json_encode([
-                    "company_id" => $this_company_id,
+                    "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("name"),
                     "username" => $this->request->getPost("username"),
                     "password" => $this->request->getPost("password"),
@@ -268,7 +192,7 @@ class User extends BaseController
             else
             {
                 $payload = json_encode([
-                    "company_id" => $this_company_id,
+                    "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("name"),
                     "username" => $this->request->getPost("username"),
                     "password" => $this->request->getPost("password"),
@@ -278,7 +202,7 @@ class User extends BaseController
             }
             
             
-            $response = curl_request("PATCH", "/users/$id", $token, $payload);
+            $response = curl_request("PATCH", "/users/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -311,12 +235,8 @@ class User extends BaseController
 
     public function getByIdUser($id = null)
     {
-        $token = session()->get("login")->token;
-
-        $this_company_id = session()->get("login")->this_company_id;
-
         if (!empty($id)) {
-            $response = curl_request("GET", "/users/$id?idCompany=$this_company_id", $token);
+            $response = curl_request("GET", "/users/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -343,12 +263,10 @@ class User extends BaseController
 
     public function deleteUser()
     {
-        $token = session()->get("login")->token;
-        
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/users/$id", $token);
+            $response = curl_request("DELETE", "/users/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -378,9 +296,7 @@ class User extends BaseController
 
     public function dropdownUser()
     {
-        $token = session()->get("login")->token;
-
-        $responseUser = curl_request("GET", "/users/selectOption", $token);
+        $responseUser = curl_request("GET", "/users/selectOption", $this->token);
 
         $dataUser = [];
         if ($responseUser["code"] === 200) {

@@ -31,253 +31,246 @@ $routes->set404Override();
 // route since we don't have to scan directories.
 
 // AUTH
-$routes->get('/', 'User::login');
-$routes->post('/login', 'User::doLogin');
-$routes->get('/change-company', 'User::changeCompany');
-$routes->get('/logout', 'User::doLogout');
+$routes->get('/', 'Setting\Auth::login');
+$routes->post('/login', 'Setting\Auth::doLogin');
+$routes->get('/logout', 'Setting\Auth::doLogout');
+
+$routes->get('/change-company', 'Setting\User::changeCompany');
 
 // DASHBOARD
-$routes->get('/dashboard', 'Dashboard::dashboard', ['filter' => 'Auth']);
+$routes->get('/dashboard', 'Dashboard\Dashboard::dashboard', ['filter' => 'Auth']);
 
 // MASTER DATA
 // EMPLOYEE
-$routes->get('/employee', 'Employee::employee', ['filter' => 'Auth']);
-$routes->get('/employee/all', 'Employee::allEmployee', ['filter' => 'Auth']);
-$routes->get('/employee/id/(:segment)', 'Employee::getByIdEmployee/$1', ['filter' => 'Auth']);
-$routes->post('/employee/save', 'Employee::saveEmployee', ['filter' => 'Auth']);
-$routes->post('/employee/update', 'Employee::updateEmployee', ['filter' => 'Auth']);
-$routes->post('/employee/delete', 'Employee::deleteEmployee', ['filter' => 'Auth']);
+$routes->get('/employee', 'Master\Employee::employee', ['filter' => 'Auth']);
+$routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
+$routes->get('/employee/id/(:segment)', 'Master\Employee::getByIdEmployee/$1', ['filter' => 'Auth']);
+$routes->post('/employee/save', 'Master\Employee::saveEmployee', ['filter' => 'Auth']);
+$routes->post('/employee/update', 'Master\Employee::updateEmployee', ['filter' => 'Auth']);
+$routes->post('/employee/delete', 'Master\Employee::deleteEmployee', ['filter' => 'Auth']);
 
 // CUSTOMER
-$routes->get('/customer', 'Customer::customer', ['filter' => 'Auth']);
-$routes->get('/customer/all', 'Customer::allCustomer', ['filter' => 'Auth']);
-$routes->get('/customer/id/(:segment)', 'Customer::getByIdCustomer/$1', ['filter' => 'Auth']);
-$routes->post('/customer/save', 'Customer::saveCustomer', ['filter' => 'Auth']);
-$routes->post('/customer/update', 'Customer::updateCustomer', ['filter' => 'Auth']);
-$routes->post('/customer/delete', 'Customer::deleteCustomer', ['filter' => 'Auth']);
+$routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
+$routes->get('/customer/all', 'Master\Customer::allCustomer', ['filter' => 'Auth']);
+$routes->get('/customer/id/(:segment)', 'Master\Customer::getByIdCustomer/$1', ['filter' => 'Auth']);
+$routes->post('/customer/save', 'Master\Customer::saveCustomer', ['filter' => 'Auth']);
+$routes->post('/customer/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
+$routes->post('/customer/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
 
 // WAREHOUSE
-$routes->get('/warehouse', 'Warehouse::warehouse', ['filter' => 'Auth']);
-$routes->get('/warehouse/all', 'Warehouse::allWarehouse', ['filter' => 'Auth']);
-$routes->get('/warehouse/id/(:segment)', 'Warehouse::getByIdWarehouse/$1', ['filter' => 'Auth']);
-$routes->post('/warehouse/save', 'Warehouse::saveWarehouse', ['filter' => 'Auth']);
-$routes->post('/warehouse/update', 'Warehouse::updateWarehouse', ['filter' => 'Auth']);
-$routes->post('/warehouse/delete', 'Warehouse::deleteWarehouse', ['filter' => 'Auth']);
+$routes->get('/warehouse', 'Master\Warehouse::warehouse', ['filter' => 'Auth']);
+$routes->get('/warehouse/all', 'Master\Warehouse::allWarehouse', ['filter' => 'Auth']);
+$routes->get('/warehouse/id/(:segment)', 'Master\Warehouse::getByIdWarehouse/$1', ['filter' => 'Auth']);
+$routes->post('/warehouse/save', 'Master\Warehouse::saveWarehouse', ['filter' => 'Auth']);
+$routes->post('/warehouse/update', 'Master\Warehouse::updateWarehouse', ['filter' => 'Auth']);
+$routes->post('/warehouse/delete', 'Master\Warehouse::deleteWarehouse', ['filter' => 'Auth']);
 
 // VENDOR
-$routes->get('/vendor', 'Vendor::vendor', ['filter' => 'Auth']);
-$routes->get('/vendor/all', 'Vendor::allVendor', ['filter' => 'Auth']);
-$routes->get('/vendor/id/(:segment)', 'Vendor::getByIdVendor/$1', ['filter' => 'Auth']);
-$routes->post('/vendor/save', 'Vendor::saveVendor', ['filter' => 'Auth']);
-$routes->post('/vendor/update', 'Vendor::updateVendor', ['filter' => 'Auth']);
-$routes->post('/vendor/delete', 'Vendor::deleteVendor', ['filter' => 'Auth']);
+$routes->get('/vendor', 'Master\Vendor::vendor', ['filter' => 'Auth']);
+$routes->get('/vendor/all', 'Master\Vendor::allVendor', ['filter' => 'Auth']);
+$routes->get('/vendor/id/(:segment)', 'Master\Vendor::getByIdVendor/$1', ['filter' => 'Auth']);
+$routes->post('/vendor/save', 'Master\Vendor::saveVendor', ['filter' => 'Auth']);
+$routes->post('/vendor/update', 'Master\Vendor::updateVendor', ['filter' => 'Auth']);
+$routes->post('/vendor/delete', 'Master\Vendor::deleteVendor', ['filter' => 'Auth']);
 
 // SUPPLIER
-$routes->get('/supplier', 'Supplier::supplier', ['filter' => 'Auth']);
-$routes->get('/supplier/all', 'Supplier::allSupplier', ['filter' => 'Auth']);
-$routes->get('/supplier/id/(:segment)', 'Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
-$routes->post('/supplier/save', 'Supplier::saveSupplier', ['filter' => 'Auth']);
-$routes->post('/supplier/update', 'Supplier::updateSupplier', ['filter' => 'Auth']);
-$routes->post('/supplier/delete', 'Supplier::deleteSupplier', ['filter' => 'Auth']);
-
-// PRODUK BARANG JADI
-// $routes->get('/produk-barang-jadi', 'ProdukBarangJadi::produkBarangJadi', ['filter' => 'Auth']);
-// $routes->get('/produk-barang-jadi/all', 'ProdukBarangJadi::allProdukBarangJadi', ['filter' => 'Auth']);
-// $routes->get('/produk-barang-jadi/id/(:segment)', 'ProdukBarangJadi::getByIdProdukBarangJadi/$1', ['filter' => 'Auth']);
-// $routes->post('/produk-barang-jadi/save', 'ProdukBarangJadi::saveProdukBarangJadi', ['filter' => 'Auth']);
-// $routes->post('/produk-barang-jadi/update', 'ProdukBarangJadi::updateProdukBarangJadi', ['filter' => 'Auth']);
-// $routes->post('/produk-barang-jadi/delete', 'ProdukBarangJadi::deleteProdukBarangJadi', ['filter' => 'Auth']);
+$routes->get('/supplier', 'Master\Supplier::supplier', ['filter' => 'Auth']);
+$routes->get('/supplier/all', 'Master\Supplier::allSupplier', ['filter' => 'Auth']);
+$routes->get('/supplier/id/(:segment)', 'Master\Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
+$routes->post('/supplier/save', 'Master\Supplier::saveSupplier', ['filter' => 'Auth']);
+$routes->post('/supplier/update', 'Master\Supplier::updateSupplier', ['filter' => 'Auth']);
+$routes->post('/supplier/delete', 'Master\Supplier::deleteSupplier', ['filter' => 'Auth']);
 
 // DIVISI
-$routes->get('/divisi', 'Divisi::divisi', ['filter' => 'Auth']);
-$routes->get('/divisi/all', 'Divisi::allDivisi', ['filter' => 'Auth']);
-$routes->get('/divisi/id/(:segment)', 'Divisi::getByIdDivisi/$1', ['filter' => 'Auth']);
-$routes->post('/divisi/save', 'Divisi::saveDivisi', ['filter' => 'Auth']);
-$routes->post('/divisi/update', 'Divisi::updateDivisi', ['filter' => 'Auth']);
-$routes->post('/divisi/delete', 'Divisi::deleteDivisi', ['filter' => 'Auth']);
+$routes->get('/divisi', 'Master\Divisi::divisi', ['filter' => 'Auth']);
+$routes->get('/divisi/all', 'Master\Divisi::allDivisi', ['filter' => 'Auth']);
+$routes->get('/divisi/id/(:segment)', 'Master\Divisi::getByIdDivisi/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/save', 'Master\Divisi::saveDivisi', ['filter' => 'Auth']);
+$routes->post('/divisi/update', 'Master\Divisi::updateDivisi', ['filter' => 'Auth']);
+$routes->post('/divisi/delete', 'Master\Divisi::deleteDivisi', ['filter' => 'Auth']);
 
 // COMPANY
-$routes->get('/company', 'Company::company', ['filter' => 'Auth']);
-$routes->get('/company/all', 'Company::allCompany', ['filter' => 'Auth']);
-$routes->get('/company/id/(:segment)', 'Company::getByIdCompany/$1', ['filter' => 'Auth']);
-$routes->post('/company/save', 'Company::saveCompany', ['filter' => 'Auth']);
-$routes->post('/company/update', 'Company::updateCompany', ['filter' => 'Auth']);
-$routes->post('/company/delete', 'Company::deleteCompany', ['filter' => 'Auth']);
+$routes->get('/company', 'Master\Company::company', ['filter' => 'Auth']);
+$routes->get('/company/all', 'Master\Company::allCompany', ['filter' => 'Auth']);
+$routes->get('/company/id/(:segment)', 'Master\Company::getByIdCompany/$1', ['filter' => 'Auth']);
+$routes->post('/company/save', 'Master\Company::saveCompany', ['filter' => 'Auth']);
+$routes->post('/company/update', 'Master\Company::updateCompany', ['filter' => 'Auth']);
+$routes->post('/company/delete', 'Master\Company::deleteCompany', ['filter' => 'Auth']);
 
 // RAK
-$routes->get('/penomoran-rak', 'PenomoranRak::penomoranRak', ['filter' => 'Auth']);
-$routes->get('/penomoran-rak/all', 'PenomoranRak::allPenomoranRak', ['filter' => 'Auth']);
-$routes->get('/penomoran-rak/id/(:segment)', 'PenomoranRak::getByIdPenomoranRak/$1', ['filter' => 'Auth']);
-$routes->post('/penomoran-rak/save', 'PenomoranRak::savePenomoranRak', ['filter' => 'Auth']);
-$routes->post('/penomoran-rak/update', 'PenomoranRak::updatePenomoranRak', ['filter' => 'Auth']);
-$routes->post('/penomoran-rak/delete', 'PenomoranRak::deletePenomoranRak', ['filter' => 'Auth']);
+$routes->get('/penomoran-rak', 'Master\PenomoranRak::penomoranRak', ['filter' => 'Auth']);
+$routes->get('/penomoran-rak/all', 'Master\PenomoranRak::allPenomoranRak', ['filter' => 'Auth']);
+$routes->get('/penomoran-rak/id/(:segment)', 'Master\PenomoranRak::getByIdPenomoranRak/$1', ['filter' => 'Auth']);
+$routes->post('/penomoran-rak/save', 'Master\PenomoranRak::savePenomoranRak', ['filter' => 'Auth']);
+$routes->post('/penomoran-rak/update', 'Master\PenomoranRak::updatePenomoranRak', ['filter' => 'Auth']);
+$routes->post('/penomoran-rak/delete', 'Master\PenomoranRak::deletePenomoranRak', ['filter' => 'Auth']);
 
 // ACCOUNT
-$routes->get('/account', 'Account::account', ['filter' => 'Auth']);
+$routes->get('/account', 'Master\Account::account', ['filter' => 'Auth']);
 
-$routes->get('/kategori-account/all', 'Account::allKategoriAccount', ['filter' => 'Auth']);
-$routes->get('/kategori-account/id/(:segment)', 'Account::getByIdKategoriAccount/$1', ['filter' => 'Auth']);
-$routes->post('/kategori-account/save', 'Account::saveKategoriAccount', ['filter' => 'Auth']);
-$routes->post('/kategori-account/update', 'Account::updateKategoriAccount', ['filter' => 'Auth']);
-$routes->post('/kategori-account/delete', 'Account::deleteKategoriAccount', ['filter' => 'Auth']);
+$routes->get('/kategori-account/all', 'Master\Account::allKategoriAccount', ['filter' => 'Auth']);
+$routes->get('/kategori-account/id/(:segment)', 'Master\Account::getByIdKategoriAccount/$1', ['filter' => 'Auth']);
+$routes->post('/kategori-account/save', 'Master\Account::saveKategoriAccount', ['filter' => 'Auth']);
+$routes->post('/kategori-account/update', 'Master\Account::updateKategoriAccount', ['filter' => 'Auth']);
+$routes->post('/kategori-account/delete', 'Master\Account::deleteKategoriAccount', ['filter' => 'Auth']);
 
-$routes->get('/header-account/all', 'Account::allHeaderAccount', ['filter' => 'Auth']);
-$routes->get('/header-account/id/(:segment)', 'Account::getByIdHeaderAccount/$1', ['filter' => 'Auth']);
-$routes->post('/header-account/save', 'Account::saveHeaderAccount', ['filter' => 'Auth']);
-$routes->post('/header-account/update', 'Account::updateHeaderAccount', ['filter' => 'Auth']);
-$routes->post('/header-account/delete', 'Account::deleteHeaderAccount', ['filter' => 'Auth']);
+$routes->get('/header-account/all', 'Master\Account::allHeaderAccount', ['filter' => 'Auth']);
+$routes->get('/header-account/id/(:segment)', 'Master\Account::getByIdHeaderAccount/$1', ['filter' => 'Auth']);
+$routes->post('/header-account/save', 'Master\Account::saveHeaderAccount', ['filter' => 'Auth']);
+$routes->post('/header-account/update', 'Master\Account::updateHeaderAccount', ['filter' => 'Auth']);
+$routes->post('/header-account/delete', 'Master\Account::deleteHeaderAccount', ['filter' => 'Auth']);
 
-$routes->get('/sub-account/all', 'Account::allSubAccount', ['filter' => 'Auth']);
-$routes->get('/sub-account/id/(:segment)', 'Account::getByIdSubAccount/$1', ['filter' => 'Auth']);
-$routes->post('/sub-account/save', 'Account::saveSubAccount', ['filter' => 'Auth']);
-$routes->post('/sub-account/update', 'Account::updateSubAccount', ['filter' => 'Auth']);
-$routes->post('/sub-account/update-status', 'Account::updateStatusSubAccount', ['filter' => 'Auth']);
-$routes->post('/sub-account/delete', 'Account::deleteSubAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/all', 'Master\Account::allSubAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/id/(:segment)', 'Master\Account::getByIdSubAccount/$1', ['filter' => 'Auth']);
+$routes->post('/sub-account/save', 'Master\Account::saveSubAccount', ['filter' => 'Auth']);
+$routes->post('/sub-account/update', 'Master\Account::updateSubAccount', ['filter' => 'Auth']);
+$routes->post('/sub-account/update-status', 'Master\Account::updateStatusSubAccount', ['filter' => 'Auth']);
+$routes->post('/sub-account/delete', 'Master\Account::deleteSubAccount', ['filter' => 'Auth']);
 
 // KODE HS
-$routes->get('/hs-code', 'HSCode::hsCode', ['filter' => 'Auth']);
-$routes->get('/hs-code/all', 'HSCode::allHSCode', ['filter' => 'Auth']);
+$routes->get('/hs-code', 'Master\HSCode::hsCode', ['filter' => 'Auth']);
+$routes->get('/hs-code/all', 'Master\HSCode::allHSCode', ['filter' => 'Auth']);
 
 // SATUAN
-$routes->get('/satuan', 'Satuan::satuan', ['filter' => 'Auth']);
-$routes->get('/satuan/all', 'Satuan::allSatuan', ['filter' => 'Auth']);
-$routes->get('/satuan/id/(:segment)', 'Satuan::getByIdSatuan/$1', ['filter' => 'Auth']);
-$routes->post('/satuan/save', 'Satuan::saveSatuan', ['filter' => 'Auth']);
-$routes->post('/satuan/update', 'Satuan::updateSatuan', ['filter' => 'Auth']);
-$routes->post('/satuan/delete', 'Satuan::deleteSatuan', ['filter' => 'Auth']);
+$routes->get('/satuan', 'Master\Satuan::satuan', ['filter' => 'Auth']);
+$routes->get('/satuan/all', 'Master\Satuan::allSatuan', ['filter' => 'Auth']);
+$routes->get('/satuan/id/(:segment)', 'Master\Satuan::getByIdSatuan/$1', ['filter' => 'Auth']);
+$routes->post('/satuan/save', 'Master\Satuan::saveSatuan', ['filter' => 'Auth']);
+$routes->post('/satuan/update', 'Master\Satuan::updateSatuan', ['filter' => 'Auth']);
+$routes->post('/satuan/delete', 'Master\Satuan::deleteSatuan', ['filter' => 'Auth']);
 
 // PURCHASE
 // SPP
-$routes->get('/spp', 'SPP::spp', ['filter' => 'Auth']);
-$routes->get('/spp/all', 'SPP::allSPP', ['filter' => 'Auth']);
-$routes->get('/spp/id/(:segment)', 'SPP::getByIdSPP/$1', ['filter' => 'Auth']);
-$routes->get('/spp/ajax', 'SPP::getByIdSPPAjax', ['filter' => 'Auth']);
-$routes->get('/spp/create', 'SPP::createSPP', ['filter' => 'Auth']);
-$routes->post('/spp/save', 'SPP::saveSPP', ['filter' => 'Auth']);
-$routes->post('/spp/update', 'SPP::updateSPP', ['filter' => 'Auth']);
-$routes->post('/spp/update-status', 'SPP::updateStatusSPP', ['filter' => 'Auth']);
-$routes->post('/spp/approve', 'SPP::approveSPP', ['filter' => 'Auth']);
-$routes->post('/spp/delete', 'SPP::deleteSPP', ['filter' => 'Auth']);
+$routes->get('/spp', 'Purchase\SPP::spp', ['filter' => 'Auth']);
+$routes->get('/spp/all', 'Purchase\SPP::allSPP', ['filter' => 'Auth']);
+$routes->get('/spp/id/(:segment)', 'Purchase\SPP::getByIdSPP/$1', ['filter' => 'Auth']);
+$routes->get('/spp/ajax', 'Purchase\SPP::getByIdSPPAjax', ['filter' => 'Auth']);
+$routes->get('/spp/create', 'Purchase\SPP::createSPP', ['filter' => 'Auth']);
+$routes->post('/spp/save', 'Purchase\SPP::saveSPP', ['filter' => 'Auth']);
+$routes->post('/spp/update', 'Purchase\SPP::updateSPP', ['filter' => 'Auth']);
+$routes->post('/spp/update-status', 'Purchase\SPP::updateStatusSPP', ['filter' => 'Auth']);
+$routes->post('/spp/approve', 'Purchase\SPP::approveSPP', ['filter' => 'Auth']);
+$routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
 
 // PO LOKAL
-$routes->get('/po-lokal', 'POLokal::poLokal', ['filter' => 'Auth']);
-$routes->get('/po-lokal/all', 'POLokal::allPOLokal', ['filter' => 'Auth']);
-$routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
-$routes->get('/po-lokal/id/(:segment)', 'POLokal::getByIdPOLokal/$1', ['filter' => 'Auth']);
-$routes->get('/po-lokal/create', 'POLokal::createPOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/save', 'POLokal::savePOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/update', 'POLokal::updatePOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/update-status', 'POLokal::updateStatusPOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/delete', 'POLokal::deletePOLokal', ['filter' => 'Auth']);
+$routes->get('/po-lokal', 'Purchase\POLokal::poLokal', ['filter' => 'Auth']);
+$routes->get('/po-lokal/all', 'Purchase\POLokal::allPOLokal', ['filter' => 'Auth']);
+$routes->get('/po-lokal/create', 'Purchase\POLokal::createPOLokal', ['filter' => 'Auth']);
+$routes->get('/po-lokal/id/(:segment)', 'Purchase\POLokal::getByIdPOLokal/$1', ['filter' => 'Auth']);
+$routes->get('/po-lokal/create', 'Purchase\POLokal::createPOLokal', ['filter' => 'Auth']);
+$routes->post('/po-lokal/save', 'Purchase\POLokal::savePOLokal', ['filter' => 'Auth']);
+$routes->post('/po-lokal/update', 'Purchase\POLokal::updatePOLokal', ['filter' => 'Auth']);
+$routes->post('/po-lokal/update-status', 'Purchase\POLokal::updateStatusPOLokal', ['filter' => 'Auth']);
+$routes->post('/po-lokal/delete', 'Purchase\POLokal::deletePOLokal', ['filter' => 'Auth']);
 
 // PO IMPORT
-$routes->get('/po-import', 'POImport::poImport', ['filter' => 'Auth']);
-$routes->get('/po-import/all', 'POImport::allPOImport', ['filter' => 'Auth']);
-$routes->get('/po-import/create', 'POImport::createPOImport', ['filter' => 'Auth']);
-$routes->get('/po-import/id/(:segment)', 'POImport::getByIdPOImport/$1', ['filter' => 'Auth']);
-$routes->get('/po-import/create', 'POImport::createPOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/save', 'POImport::savePOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/update', 'POImport::updatePOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/update-status', 'POImport::updateStatusPOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/delete', 'POImport::deletePOImport', ['filter' => 'Auth']);
+$routes->get('/po-import', 'Purchase\POImport::poImport', ['filter' => 'Auth']);
+$routes->get('/po-import/all', 'Purchase\POImport::allPOImport', ['filter' => 'Auth']);
+$routes->get('/po-import/create', 'Purchase\POImport::createPOImport', ['filter' => 'Auth']);
+$routes->get('/po-import/id/(:segment)', 'Purchase\POImport::getByIdPOImport/$1', ['filter' => 'Auth']);
+$routes->get('/po-import/create', 'Purchase\POImport::createPOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/save', 'Purchase\POImport::savePOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/update', 'Purchase\POImport::updatePOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/update-status', 'Purchase\POImport::updateStatusPOImport', ['filter' => 'Auth']);
+$routes->post('/po-import/delete', 'Purchase\POImport::deletePOImport', ['filter' => 'Auth']);
 
 // DROPDOWN
 // PO LOKAL
-$routes->get('/po-lokal/dropdown', 'POLokal::dropdownPOLokal/$1', ['filter' => 'Auth']);
+$routes->get('/po-lokal/dropdown', 'Purchase\POLokal::dropdownPOLokal/$1', ['filter' => 'Auth']);
 
 // PO IMPORT
-$routes->get('/po-import/dropdown', 'POImport::dropdownPOImport/$1', ['filter' => 'Auth']);
+$routes->get('/po-import/dropdown', 'Purchase\POImport::dropdownPOImport/$1', ['filter' => 'Auth']);
 
 // CITY
-$routes->get('/city/(:segment)', 'City::getCityByProvince/$1', ['filter' => 'Auth']);
+$routes->get('/city/(:segment)', 'Master\City::getCityByProvince/$1', ['filter' => 'Auth']);
 
 // EMPLOYEE
-$routes->get('/employee/dropdown', 'Employee::dropdownEmployee', ['filter' => 'Auth']);
-$routes->get('/employee-pic/dropdown', 'Employee::dropdownEmployeePIC', ['filter' => 'Auth']);
+$routes->get('/employee/dropdown', 'Master\Employee::dropdownEmployee', ['filter' => 'Auth']);
+$routes->get('/employee-pic/dropdown', 'Master\Employee::dropdownEmployeePIC', ['filter' => 'Auth']);
 
 // METADATA
-$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
+$routes->get('/metadata/dropdown', 'Master\Metadata::dropdownMetadata', ['filter' => 'Auth']);
 
 // KODE HS
-$routes->get('/hs-code/dropdown', 'HSCode::dropdownHSCode', ['filter' => 'Auth']);
+$routes->get('/hs-code/dropdown', 'Master\HSCode::dropdownHSCode', ['filter' => 'Auth']);
 
 // SATUAN
-$routes->get('/satuan/dropdown', 'Satuan::dropdownSatuan', ['filter' => 'Auth']);
+$routes->get('/satuan/dropdown', 'Master\Satuan::dropdownSatuan', ['filter' => 'Auth']);
 
 // METADATA
-$routes->get('/metadata/dropdown', 'Metadata::dropdownMetadata', ['filter' => 'Auth']);
+$routes->get('/metadata/dropdown', 'Master\Metadata::dropdownMetadata', ['filter' => 'Auth']);
 
 // COMPANY
-$routes->get('/company/dropdown', 'Company::dropdownCompany', ['filter' => 'Auth']);
+$routes->get('/company/dropdown', 'Master\Company::dropdownCompany', ['filter' => 'Auth']);
 
 // ROLE
-$routes->get('/role/dropdown', 'Role::dropdownRole', ['filter' => 'Auth']);
+$routes->get('/role/dropdown', 'Setting\Role::dropdownRole', ['filter' => 'Auth']);
 
 // USER
-$routes->get('/user/dropdown', 'User::dropdownUser', ['filter' => 'Auth']);
+$routes->get('/user/dropdown', 'Setting\User::dropdownUser', ['filter' => 'Auth']);
 
 // WAREHOUSE
-$routes->get('/warehouse/dropdown', 'Warehouse::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/warehouse/dropdown', 'Master\Warehouse::dropdownWarehouse', ['filter' => 'Auth']);
 
 // DIVISI
-$routes->get('/divisi/dropdown', 'Divisi::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/divisi/dropdown', 'Master\Divisi::dropdownDivisi', ['filter' => 'Auth']);
 
 // TAX
-$routes->get('/tax/dropdown', 'Tax::dropdownTax', ['filter' => 'Auth']);
+$routes->get('/tax/dropdown', 'Master\Tax::dropdownTax', ['filter' => 'Auth']);
 
 // BARANG
-$routes->get('/barang/dropdown', 'Barang::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown', 'Warehouse\Barang::dropdownBarang', ['filter' => 'Auth']);
 
 // ACCOUNT
-$routes->get('/kategori-account/dropdown', 'Account::dropdownKategoriAccount', ['filter' => 'Auth']);
-$routes->get('/header-account/dropdown', 'Account::dropdownHeaderAccount', ['filter' => 'Auth']);
-$routes->get('/sub-account/dropdown', 'Account::dropdownSubAccount', ['filter' => 'Auth']);
+$routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
+$routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
+$routes->get('/sub-account/dropdown', 'Master\Account::dropdownSubAccount', ['filter' => 'Auth']);
 
 // WAREHOUSE
 // MASTER BARANG
-$routes->get('/barang', 'Barang::barang', ['filter' => 'Auth']);
-$routes->get('/barang/all', 'Barang::allBarang', ['filter' => 'Auth']);
-$routes->get('/barang/id/(:segment)', 'Barang::getByIdBarang/$1', ['filter' => 'Auth']);
-$routes->post('/barang/save', 'Barang::saveBarang', ['filter' => 'Auth']);
-$routes->post('/barang/update', 'Barang::updateBarang', ['filter' => 'Auth']);
-$routes->post('/barang/update-status', 'Barang::updateStatusBarang', ['filter' => 'Auth']);
-$routes->post('/barang/delete', 'Barang::deleteBarang', ['filter' => 'Auth']);
+$routes->get('/barang', 'Warehouse\Barang::barang', ['filter' => 'Auth']);
+$routes->get('/barang/all', 'Warehouse\Barang::allBarang', ['filter' => 'Auth']);
+$routes->get('/barang/id/(:segment)', 'Warehouse\Barang::getByIdBarang/$1', ['filter' => 'Auth']);
+$routes->post('/barang/save', 'Warehouse\Barang::saveBarang', ['filter' => 'Auth']);
+$routes->post('/barang/update', 'Warehouse\Barang::updateBarang', ['filter' => 'Auth']);
+$routes->post('/barang/update-status', 'Warehouse\Barang::updateStatusBarang', ['filter' => 'Auth']);
+$routes->post('/barang/delete', 'Warehouse\Barang::deleteBarang', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL
-$routes->get('/penerimaan-barang-lokal', 'PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal/all', 'PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal/create', 'PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal', 'Purchase\PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/all', 'Purchase\PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/create', 'Purchase\PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG IMPORT
-$routes->get('/penerimaan-barang-import', 'PenerimaanBarangImport::penerimaanBarangImport', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import/all', 'PenerimaanBarangImport::allPenerimaanBarangImport', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-import/create', 'PenerimaanBarangImport::createPenerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import', 'Purchase\PenerimaanBarangImport::penerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/all', 'Purchase\PenerimaanBarangImport::allPenerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/create', 'Purchase\PenerimaanBarangImport::createPenerimaanBarangImport', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER
-$routes->get('/user', 'User::user', ['filter' => 'Auth']);
-$routes->get('/user/all', 'User::allUser', ['filter' => 'Auth']);
-$routes->get('/user/id/(:segment)', 'User::getByIdUser/$1', ['filter' => 'Auth']);
-$routes->post('/user/save', 'User::saveUser', ['filter' => 'Auth']);
-$routes->post('/user/update', 'User::updateUser', ['filter' => 'Auth']);
-$routes->post('/user/delete', 'User::deleteUser', ['filter' => 'Auth']);
+$routes->get('/user', 'Setting\User::user', ['filter' => 'Auth']);
+$routes->get('/user/all', 'Setting\User::allUser', ['filter' => 'Auth']);
+$routes->get('/user/id/(:segment)', 'Setting\User::getByIdUser/$1', ['filter' => 'Auth']);
+$routes->post('/user/save', 'Setting\User::saveUser', ['filter' => 'Auth']);
+$routes->post('/user/update', 'Setting\User::updateUser', ['filter' => 'Auth']);
+$routes->post('/user/delete', 'Setting\User::deleteUser', ['filter' => 'Auth']);
 
 // ROLE
-$routes->get('/role', 'Role::role', ['filter' => 'Auth']);
-$routes->get('/role/all', 'Role::allRole', ['filter' => 'Auth']);
-$routes->get('/role/id/(:segment)', 'Role::getByIdRole/$1', ['filter' => 'Auth']);
-$routes->post('/role/save', 'Role::saveRole', ['filter' => 'Auth']);
-$routes->post('/role/update', 'Role::updateRole', ['filter' => 'Auth']);
-$routes->post('/role/delete', 'Role::deleteRole', ['filter' => 'Auth']);
+$routes->get('/role', 'Setting\Role::role', ['filter' => 'Auth']);
+$routes->get('/role/all', 'Setting\Role::allRole', ['filter' => 'Auth']);
+$routes->get('/role/id/(:segment)', 'Setting\Role::getByIdRole/$1', ['filter' => 'Auth']);
+$routes->post('/role/save', 'Setting\Role::saveRole', ['filter' => 'Auth']);
+$routes->post('/role/update', 'Setting\Role::updateRole', ['filter' => 'Auth']);
+$routes->post('/role/delete', 'Setting\Role::deleteRole', ['filter' => 'Auth']);
 
 // AKSES
-$routes->get('/akses', 'Akses::akses', ['filter' => 'Auth']);
-$routes->get('/akses/id', 'Akses::getAkses', ['filter' => 'Auth']);
-$routes->post('/akses/save', 'Akses::saveAkses', ['filter' => 'Auth']);
+$routes->get('/akses', 'Setting\Akses::akses', ['filter' => 'Auth']);
+$routes->get('/akses/id', 'Setting\Akses::getAkses', ['filter' => 'Auth']);
+$routes->post('/akses/save', 'Setting\Akses::saveAkses', ['filter' => 'Auth']);
 
 // COMPANY ACCESS
-$routes->get('/company-access', 'CompanyAccess::companyAccess', ['filter' => 'Auth']);
-$routes->get('/company-access/all', 'CompanyAccess::allCompanyAccess', ['filter' => 'Auth']);
+$routes->get('/company-access', 'Setting\CompanyAccess::companyAccess', ['filter' => 'Auth']);
+$routes->get('/company-access/all', 'Setting\CompanyAccess::allCompanyAccess', ['filter' => 'Auth']);
 
 /*
  * --------------------------------------------------------------------

@@ -1,48 +1,35 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Master;
 
-class Divisi extends BaseController
+use App\Controllers\BaseController;
+
+class Satuan extends BaseController
 {
     protected $token;
-    protected $this_company_id;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
-        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function divisi()
+    public function satuan()
     {
-        //Get Divisi
-        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
-
-        $dataDivisi = [];
-        if ($responseDivisi["code"] === 200) {
-            $dataDivisi = json_decode($responseDivisi["body"])->data;
-        }
-
-        $data = [
-            "dataDivisi" => $dataDivisi,
-        ];
-
-        return view('divisi/index', $data);
+        return view('satuan/index');
     }
 
-    public function allDivisi()
+    public function allSatuan()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this->this_company_id
+            "sortType" => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/divisis", $this->token, $payload);
-        $dataCompany = [];
+        $response = curl_request("GET", "/satuan", $this->token, $payload);
+        $dataSatuan = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -50,16 +37,10 @@ class Divisi extends BaseController
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
             foreach ($body as $data) {
-                array_push($dataCompany, [
+                array_push($dataSatuan, [
                     "id" => $data->id,
-                    "divisi" => $data->divisi,
-                    "libur" => $data->libur,
-                    "jam_kerja" => $data->jam_kerja,
-                    "jam_istirahat" => $data->jam_istirahat,
-                    "jam_masuk" => $data->jam_masuk,
-                    "jam_pulang" => $data->jam_pulang,
-                    "mulai_istirahat" => $data->mulai_istirahat,
-                    "selesai_istirahat" => $data->selesai_istirahat,
+                    "kode_satuan" => $data->kode_satuan,
+                    "nama_satuan" => $data->nama_satuan
                 ]);
             }
         }
@@ -68,7 +49,7 @@ class Divisi extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataCompany,
+            "data" => $dataSatuan,
             "response" => $response,
             "payload" => $payload
         ];
@@ -77,49 +58,24 @@ class Divisi extends BaseController
         return;
     }
 
-    public function saveDivisi()
+    public function saveSatuan()
     {
         $rules = [
-            "divisi" => [
+            "kode_satuan" => [
                 "rules" => "required"
             ],
-            "libur" => [
-                "rules" => "required"
-            ],
-            "jam_kerja" => [
-                "rules" => "required"
-            ],
-            "jam_istirahat" => [
-                "rules" => "required"
-            ],
-            "jam_masuk" => [
-                "rules" => "required"
-            ],
-            "jam_pulang" => [
-                "rules" => "required"
-            ],
-            "mulai_istirahat" => [
-                "rules" => "required"
-            ],
-            "selesai_istirahat" => [
+            "nama_satuan" => [
                 "rules" => "required"
             ]
         ];
 
         if ($this->validate($rules)) {
             $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "divisi" => $this->request->getPost("divisi"),
-                "libur" => $this->request->getPost("libur"),
-                "jam_kerja" => $this->request->getPost("jam_kerja"),
-                "jam_istirahat" => $this->request->getPost("jam_istirahat"),
-                "jam_masuk" => $this->request->getPost("jam_masuk"),
-                "jam_pulang" => $this->request->getPost("jam_pulang"),
-                "mulai_istirahat" => $this->request->getPost("mulai_istirahat"),
-                "selesai_istirahat" => $this->request->getPost("selesai_istirahat")
+                "kode_satuan" => $this->request->getPost("kode_satuan"),
+                "nama_satuan" => $this->request->getPost("nama_satuan")
             ]);
-            
-            $response = curl_request("POST", "/divisis", $this->token, $payload);
+
+            $response = curl_request("POST", "/satuan", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -150,31 +106,13 @@ class Divisi extends BaseController
         return;
     }
 
-    public function updateDivisi()
+    public function updateSatuan()
     {
         $rules = [
-            "divisi" => [
+            "kode_satuan" => [
                 "rules" => "required"
             ],
-            "libur" => [
-                "rules" => "required"
-            ],
-            "jam_kerja" => [
-                "rules" => "required"
-            ],
-            "jam_istirahat" => [
-                "rules" => "required"
-            ],
-            "jam_masuk" => [
-                "rules" => "required"
-            ],
-            "jam_pulang" => [
-                "rules" => "required"
-            ],
-            "mulai_istirahat" => [
-                "rules" => "required"
-            ],
-            "selesai_istirahat" => [
+            "nama_satuan" => [
                 "rules" => "required"
             ]
         ];
@@ -183,23 +121,16 @@ class Divisi extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "divisi" => $this->request->getPost("divisi"),
-                "libur" => $this->request->getPost("libur"),
-                "jam_kerja" => $this->request->getPost("jam_kerja"),
-                "jam_istirahat" => $this->request->getPost("jam_istirahat"),
-                "jam_masuk" => $this->request->getPost("jam_masuk"),
-                "jam_pulang" => $this->request->getPost("jam_pulang"),
-                "mulai_istirahat" => $this->request->getPost("mulai_istirahat"),
-                "selesai_istirahat" => $this->request->getPost("selesai_istirahat")
+                "kode_satuan" => $this->request->getPost("kode_satuan"),
+                "nama_satuan" => $this->request->getPost("nama_satuan")
             ]);
-            
-            $response = curl_request("PATCH", "/divisis/$id", $this->token, $payload);
+
+            $response = curl_request("PATCH", "/satuan/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
-                    "message"   => "Data Berhasil diubah",
+                    "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
                     'token' => csrf_hash()
                 ];
@@ -225,10 +156,10 @@ class Divisi extends BaseController
         return;
     }
 
-    public function getByIdDivisi($id = null)
+    public function getByIdSatuan($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/divisis/$id?idCompany=$this->this_company_id", $this->token);
+            $response = curl_request("GET", "/satuan/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -253,12 +184,12 @@ class Divisi extends BaseController
         return;
     }
 
-    public function deleteDivisi()
+    public function deleteSatuan()
     {
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/divisis/$id", $this->token);
+            $response = curl_request("DELETE", "/satuan/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
@@ -286,17 +217,17 @@ class Divisi extends BaseController
         return;
     }
 
-    public function dropdownDivisi()
+    public function dropdownSatuan()
     {
-        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
+        $responseSatuan = curl_request("GET", "/satuan/all", $this->token);
 
-        $dataDivisi = [];
-        if ($responseDivisi["code"] === 200) {
-            $dataDivisi = json_decode($responseDivisi["body"])->data;
+        $dataSatuan = [];
+        if ($responseSatuan["code"] === 200) {
+            $dataSatuan = json_decode($responseSatuan["body"])->data;
         }
 
         $data = [
-            "data" => $dataDivisi
+            "data" => $dataSatuan
         ];
 
         echo json_encode($data);
