@@ -135,7 +135,6 @@
                 className: "text-center actions",
                 orderable: false,
                 render: function(data, type, row) {
-                    console.log(data);
                     if (data === "false" && role_id === '22') {
                         return `<input onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
                     }

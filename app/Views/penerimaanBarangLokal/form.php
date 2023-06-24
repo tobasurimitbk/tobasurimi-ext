@@ -14,20 +14,20 @@
 </div>
 <div class="card">
     <div class="card-body">
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label class="form-label font-weight-bold">Data PO</label>
-            </div>
-        </div>
         <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
             <input type="hidden" class="id" name="id" id="id" />
             <?= csrf_field() ?>
             <div class="row mb-3">
                 <div class="col-md-3">
+                    <label class="form-label font-weight-bold">Data PO</label>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control invoice_no" id="invoice_no" name="invoice_no" placeholder="No. Penerimaan">
+                                <input type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Penerimaan">
                                 <label for="floatingInput">No. Penerimaan</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -64,10 +64,31 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select disabled="true" class="form-select multiple_po_id" id="multiple_po_id[]" name="multiple_po_id[]" aria-label="Floating label select example">
+                        <select disabled="true" multiple class="form-select multiple_po_id" id="multiple_po_id[]" name="multiple_po_id[]" aria-label="Floating label select example">
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">No. PO</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label font-weight-bold">Data Dokumen</label>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
+                            <option value=""></option>
+                        </select>
+                        <label for="floatingInput">Jenis Dokumen</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" class="form-control invoice_no" name="invoice_no" id="invoice_no" placeholder="No. Invoice">
+                        <label for="floatingInput">No. Invoice</label>
                     </div>
                 </div>
             </div>
@@ -91,9 +112,7 @@
         // PO NO
         $('.multiple_po_id').select2({
             placeholder: "",
-            theme: "bootstrap-5",
-            allowClear: true,
-            isMulti: true
+            theme: "bootstrap-5"
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -156,20 +175,23 @@
                     dataType: "json",
                     success: function(res) {
                         console.log(res)
-                        if(res.status)
-                        {
-
-                        }
-                        else
-                        {
-
-                        }
+                        $(".multiple_po_id").attr("disabled", true)
+                        $(".multiple_po_id").empty()
+                        $(".multiple_po_id").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                        })
+                        $(".multiple_po_id").attr("disabled", false)
+                        $(".multiple_po_id").val([]);
                     }
                 })
             }
             else
             {
-
+                $(".multiple_po_id").attr("disabled", true)
+                $(".multiple_po_id").empty()
+                $(".multiple_po_id").append(`<option value=""></option>`)
+                $(".multiple_po_id").val([]);
             }
         })
     })
@@ -180,13 +202,13 @@
 
         if(value)
         {
-            $(".invoice_no").attr("readonly", true);
-            $(".invoice_no").val("AUTO GENERATE");
+            $(".letter_no").attr("readonly", true);
+            $(".letter_no").val("AUTO GENERATE");
         }
         else
         {
-            $(".invoice_no").attr("readonly", false);
-            $(".invoice_no").val("");
+            $(".letter_no").attr("readonly", false);
+            $(".letter_no").val("");
         }
     }
 </script>
