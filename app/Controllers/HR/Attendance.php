@@ -11,6 +11,11 @@ class Attendance extends Controller
 
     public function __construct()
     {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
+        header("Access-Control-Allow-Headers: *");
+        header('Access-Control-Allow-Credentials: *');
+
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
     }
@@ -37,6 +42,26 @@ class Attendance extends Controller
     public function ListAttendance()
     {
         return view('hr/attendance/list-attendance');
+    }
+
+    public function SaveAttendance()
+    {
+        $img = $this->request->getVar("pic");
+        $img = str_replace('data:image/jpeg;base64,', '', $img);
+        $img = str_replace(' ', '+', $img);
+        $data = base64_decode($img);
+        $file = uniqid() . '.png';
+        $success = file_put_contents($file, $data);
+
+        $message = 'Data Berhasil Disimpan';
+        $data = [
+            "status"            => false,
+            "message"    => $message,
+            "payload"   => "",
+            'token' => csrf_hash()
+        ];
+        echo json_encode($data);
+        return;
     }
 
     public function allBarang()
