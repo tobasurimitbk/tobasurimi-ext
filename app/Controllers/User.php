@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers;
+
 use DateTime;
 
 class User extends BaseController
@@ -8,7 +9,6 @@ class User extends BaseController
 
     public function __construct()
     {
-
     }
 
     public function login()
@@ -41,7 +41,6 @@ class User extends BaseController
 
             if ($response["code"] === 200) {
                 $data = json_decode($response["body"]);
-
                 $this_company_id = $data->company_role[0]->company_id;
                 $this_company = $data->company_role[0]->company_name;
                 $this_access = $data->company_role[0]->access_list;
@@ -87,10 +86,8 @@ class User extends BaseController
             $company_role = session()->get("login")->company_role;
             $this_access = "";
 
-            foreach($company_role as $item)
-            {
-                if($item->company_id == $id)
-                {
+            foreach ($company_role as $item) {
+                if ($item->company_id == $id) {
                     $this_access = $item->access_list;
                 }
             }
@@ -205,7 +202,7 @@ class User extends BaseController
                 "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
                 "status" => $this->request->getPost("status")
             ]);
-            
+
             $response = curl_request("POST", "/users", $token, $payload);
 
             if ($response["code"] === 200) {
@@ -254,7 +251,7 @@ class User extends BaseController
 
             $this_company_id = session()->get("login")->this_company_id;
 
-            if($this->request->getPost("employee_id")){
+            if ($this->request->getPost("employee_id")) {
                 $payload = json_encode([
                     "company_id" => $this_company_id,
                     "name" => $this->request->getPost("name"),
@@ -264,9 +261,7 @@ class User extends BaseController
                     "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
                     "status" => $this->request->getPost("status")
                 ]);
-            }
-            else
-            {
+            } else {
                 $payload = json_encode([
                     "company_id" => $this_company_id,
                     "name" => $this->request->getPost("name"),
@@ -276,8 +271,8 @@ class User extends BaseController
                     "status" => $this->request->getPost("status")
                 ]);
             }
-            
-            
+
+
             $response = curl_request("PATCH", "/users/$id", $token, $payload);
 
             if ($response["code"] === 200) {
@@ -344,7 +339,7 @@ class User extends BaseController
     public function deleteUser()
     {
         $token = session()->get("login")->token;
-        
+
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {

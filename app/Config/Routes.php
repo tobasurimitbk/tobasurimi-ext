@@ -248,6 +248,13 @@ $routes->get('/penerimaan-barang-lokal', 'PenerimaanBarangLokal::penerimaanBaran
 $routes->get('/penerimaan-barang-lokal/all', 'PenerimaanBarangLokal::allPenerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal/create', 'PenerimaanBarangLokal::createPenerimaanBarangLokal', ['filter' => 'Auth']);
 
+
+// HUMAN RESOURCE
+// Attendance
+$routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
+$routes->get('/list-attendance', 'HR\Attendance::ListAttendance', ['filter' => 'Auth']);
+
+
 // SETTINGS
 // USER
 $routes->get('/user', 'User::user', ['filter' => 'Auth']);
