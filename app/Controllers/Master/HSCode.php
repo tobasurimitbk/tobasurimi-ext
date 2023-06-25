@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Controllers\Master;
+
+use App\Controllers\BaseController;
+
+class HSCode extends BaseController
+{
+    protected $token;
+    
+    public function __construct()
+    {
+        $this->token = session()->get("login")->token;
+    }
+
+    public function hsCode()
+    {
+        return view('Master/hsCode/index');
+    }
+
+    public function allHSCode()
+    {
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType")
+        ]; 
+
+        $response = curl_request("GET", "/hscode", $this->token, $payload);
+        $dataKodeHS = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
+
+            foreach ($body as $data) {
+                array_push($dataKodeHS, [
+                    "id" => $data->id,
+                    "komoditi" => $data->komoditi,
+                    "code" => $data->code,
+                    "uraian_barang" => $data->uraian_barang,
+                    "satuan_barang" => $data->satuan_barang,
+                    "uraian_satuan" => $data->uraian_satuan
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataKodeHS,
+            "response" => $response,
+            "payload" => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownHSCode()
+    {
+        $responseKodeHS = curl_request("GET", "/hscode/all", $this->token);
+
+        $dataKodeHS = [];
+        if ($responseKodeHS["code"] === 200) {
+            $dataKodeHS = json_decode($responseKodeHS["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataKodeHS
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+}
