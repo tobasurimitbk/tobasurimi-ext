@@ -1,6 +1,83 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<script src="<?= base_url(); ?>assets/js/webcam.js?v=<?= time(); ?>"></script>
+<style type="text/css">
+    .container1 {
+        display: inline-block;
+        width: 100%;
+    }
 
+    #Cam {
+        background: rgb(255, 255, 215);
+    }
+
+    #Prev {
+        background: rgb(255, 255, 155);
+    }
+
+    #Saved {
+        background: rgb(255, 255, 55);
+    }
+</style>
+
+<script language="JavaScript">
+    function take_snapshot() {
+        Webcam.snap(function(data_uri) {
+            document.getElementById('results').innerHTML = '<img id="base64image" src="' + data_uri + '"/><button onclick="SaveSnap();">Save Snap</button>';
+        });
+    }
+
+    function ShowCam() {
+        Webcam.set({
+            width: 420,
+            height: 340,
+            image_format: 'jpeg',
+            jpeg_quality: 100
+        });
+        Webcam.attach('#my_camera');
+    }
+
+    function SaveSnap() {
+        var file = document.getElementById("base64image").src;
+        alert(file);
+        var formdata = new FormData();
+        formdata.append("base64image", file);
+        alert(formdata);
+        var ajax = new XMLHttpRequest();
+        ajax.addEventListener("load", function(event) {
+            uploadcomplete(event);
+        }, false);
+        ajax.open("POST", "/save-attendance");
+        ajax.send(formdata);
+    }
+
+    function uploadcomplete(event) {
+        var image_return = event.target.responseText;
+        //var showup = document.getElementById("uploaded").src = image_return;
+    }
+
+    function GetAbsenIstirahat() {
+        Webcam.snap(function(data_uri) {
+            $.ajax({
+                type: "post",
+                url: "/save-attendance",
+                data: {
+                    pic: data_uri
+                },
+                dataType: "json",
+                success: function(response) {
+                    alert('sukses');
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                }
+
+            });
+        });
+
+    }
+    window.onload = ShowCam;
+</script>
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -12,7 +89,9 @@
             <div class="row justify-content-center mb-3">
                 <div class="row">
                     <div class="col-md-6">
-                        Web Cam
+                        <div class="container1" id="Cam">
+                            <div id="my_camera"></div>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="row">
@@ -99,7 +178,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <button class="btn form-control btn-warning " data-btn="create-modal">
+                        <button class="btn form-control btn-warning " data-btn="create-modal" onClick="GetAbsenIstirahat();">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Absen Istirahat
                         </button>
                     </div>
