@@ -195,7 +195,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
+                                <select class="form-select province_id" name="province_id" id="province_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataProvinces)) {
