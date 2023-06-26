@@ -3196,7 +3196,7 @@ pre {
   border: none;
   position: relative;
   margin-bottom: 30px;
-  padding: 25px 20px;
+  padding: 25px 25px;
   display: flex;
   align-items: center;
 }
@@ -4916,12 +4916,157 @@ input:checked + .slider:before {
   padding: 10px 15px;
   border: 1px #007ae0 solid;
   border-radius: 4px;
-  min-width: 120px;
+  min-width: 100px;
 }
 
 .section .section-header .btn.btn-save:hover,
 .section .section-header .btn.btn-save:focus,
 .section .section-header .btn.btn-save:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.section .section-header .btn.btn-discard {
+  background: #ffffff !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e7323a !important;
+  position: absolute;
+  right: 125px;
+  margin-right: 5px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #e7323a solid !important;
+  border-radius: 4px;
+  min-width: 100px;
+}
+
+.section .section-header .btn.btn-discard:hover,
+.section .section-header .btn.btn-discard:focus,
+.section .section-header .btn.btn-discard:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.section .section-header .col-button-tambah-spp {
+  position: absolute;
+  right: 20px;
+  display: flex;
+}
+
+.section .section-header .col-button-tambah-spp .btn.btn-save {
+  background: #007ae0;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-left: 10px;
+  margin-right: 0px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #007ae0 solid;
+  border-radius: 4px;
+  min-width: 100px;
+  position: relative;
+  right: 0;
+}
+
+.section .section-header .btn.btn-save:hover,
+.section .section-header .btn.btn-save:focus,
+.section .section-header .btn.btn-save:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.section .section-header .col-button-tambah-spp .btn.btn-discard {
+  background: #ffffff !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e7323a !important;
+  margin-right: 0px;
+  margin-left: 10px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #e7323a solid !important;
+  border-radius: 4px;
+  min-width: 100px;
+  position: relative;
+  right: 0;
+}
+
+.section .section-header .btn.btn-discard:hover,
+.section .section-header .btn.btn-discard:focus,
+.section .section-header .btn.btn-discard:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.section .section-header .col-button-tambah-spp .btn.btn-hapus {
+  background: #e7323a !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff !important;
+  margin-right: 0px;
+  margin-left: 10px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #e7323a solid !important;
+  border-radius: 4px;
+  min-width: 100px;
+  position: relative;
+  right: 0;
+}
+
+.section .section-header .btn.btn-hapus:hover,
+.section .section-header .btn.btn-hapus:focus,
+.section .section-header .btn.btn-hapus:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.section .section-header .col-button-tambah-spp .btn.btn-print {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 0px;
+  margin-left: 10px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border-radius: 4px;
+  min-width: 100px;
+  box-shadow: none !important;
+  position: relative;
+  right: 0;
+}
+
+.section .section-header .btn.btn-print:hover,
+.section .section-header .btn.btn-print:focus,
+.section .section-header .btn.btn-print:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.section .section-header .col-button-tambah-spp .btn.btn-success {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 0px;
+  margin-left: 10px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border-radius: 4px;
+  min-width: 100px;
+  box-shadow: none !important;
+  position: relative;
+  right: 0;
+}
+
+.section .section-header .btn.btn-success:hover,
+.section .section-header .btn.btn-success:focus,
+.section .section-header .btn.btn-success:active {
   opacity: 0.72;
   transition: 0.3s ease-in;
 }
@@ -4954,6 +5099,94 @@ input:checked + .slider:before {
   .row
   .col-md-3.mb-3.view-cols-image {
   margin-bottom: 2rem !important;
+}
+
+.card .card-body {
+  font-family: "Poppins", sans-serif !important;
+}
+
+.card .card-body .form-label.lable-title {
+  margin-bottom: 0;
+  font-weight: 600 !important;
+  display: inline-block;
+  font-size: 14px !important;
+  margin-top: 0px;
+  color: #2f4858;
+}
+
+.form-floating > label {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.col-subtitle-modal {
+  border-bottom: 1px #a5ae9d solid;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.col-subtitle-modal .modal-sub-title {
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: #2f4858 !important;
+  margin-bottom: 0px;
+  margin-top: 12px;
+}
+
+.col-subtitle-modal .btn.btn-add {
+  width: 100%;
+  max-width: 120px;
+  min-width: 120px;
+}
+
+table.dataTable tr td b {
+  font-weight: 600 !important;
+}
+
+.card .card-body .form-add-spp .input-group .input-group-prepend i.fa {
+  position: relative;
+  top: -10px;
+  font-size: 13px;
+}
+
+.card
+  .card-body
+  .form-add-spp
+  .input-group
+  .input-group-prepend
+  .auto_generate {
+  position: relative;
+  top: -10px;
+}
+
+tfoot {
+  background: #eeeeee !important;
+}
+
+table.dataTable.nowrap th,
+table.dataTable.nowrap td {
+  vertical-align: middle;
+}
+
+table.dataTable.table-tambah-spp tbody tr td button {
+  background: #e7323a;
+  color: #fff;
+  border: 1px #e7323a solid;
+  border-radius: 2px;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 500;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+}
+
+table.dataTable.table-tambah-spp tbody tr td button:hover,
+table.dataTable.table-tambah-spp tbody tr td button:focus,
+table.dataTable.table-tambah-spp tbody tr td button:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -5101,6 +5334,26 @@ input:checked + .slider:before {
 
   .card .card-body form.create-form.form-manajemen-hak-akses .table-responsive {
     margin-top: 2rem !important;
+  }
+
+  .card .card-body .row-col-spp {
+    display: block;
+  }
+
+  .section .section-header .col-button-tambah-spp {
+    position: relative;
+    right: 0;
+    display: block;
+  }
+
+  .section .section-header .col-button-tambah-spp .btn.btn-save {
+    margin-left: 0;
+  }
+
+  .card .card-body .col-subtitle-modal .btn.btn-add {
+    width: 100%;
+    min-width: 100%;
+    margin-top: 1rem !important;
   }
 }
 
