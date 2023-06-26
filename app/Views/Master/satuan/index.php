@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Satuan</h5>
@@ -11,16 +11,14 @@
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
-                        <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode_satuan" id="kode_satuan" name="kode_satuan" placeholder="Kode Satuan">
                                 <label for="floatingInput">Kode Satuan</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control nama_satuan" id="nama_satuan" name="nama_satuan" placeholder="Nama Satuan">
                                 <label for="floatingInput">Nama Satuan</label>

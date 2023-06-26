@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal-kategori" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title modal-title-kategori"><label class="title-name-kategori"></label> Kategori Akun</h5>
@@ -11,7 +11,7 @@
                 <form class="create-form-kategori" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_kategori" name="id_kategori" id="id_kategori" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select kelompok_akun_id_kategori" name="kelompok_akun_id_kategori" id="kelompok_akun_id_kategori">
@@ -21,7 +21,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode_akun_kategori" id="kode_akun_kategori" name="kode_akun_kategori" placeholder="Kode Akun">
@@ -54,7 +54,7 @@
 </div>
 
 <div class="modal add-modal-header" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title modal-title-header"><label class="title-name-header"></label> Header Akun</h5>
@@ -63,7 +63,7 @@
                 <form class="create-form-header" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_header" name="id_header" id="id_header" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select category_id_header" name="category_id_header" id="category_id_header">
@@ -73,7 +73,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode_akun_header" id="kode_akun_header" name="kode_akun_header" placeholder="Kode Akun">
@@ -106,7 +106,7 @@
 </div>
 
 <div class="modal add-modal-sub" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title modal-title-sub"><label class="title-name-sub"></label> Sub Akun</h5>
@@ -116,7 +116,7 @@
                     <input type="hidden" class="id_sub" name="id_sub" id="id_sub" />
                     <input type="hidden" class="category_id_sub" name="category_id_sub" id="category_id_sub" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select header_id_sub" name="header_id_sub" id="header_id_sub">
@@ -126,7 +126,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode_akun_sub" id="kode_akun_sub" name="kode_akun_sub" placeholder="Kode Akun">
@@ -134,7 +134,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control nama_akun_sub" id="nama_akun_sub" name="nama_akun_sub" placeholder="Nama Akun">
@@ -142,7 +142,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select coa_id_sub" name="coa_id_sub" id="coa_id_sub">
@@ -251,7 +251,7 @@
             </div>
             <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
                 <div class="collapse-header-list show" id="collapseSubList">
-                    <div class="d-flex float-right mb-3">
+                    <div class="d-flex float-right mb-3 col-nav-tabs-contents-input-btn">
                         <input class="form-control search search-sub form-out-search mr-3" placeholder="Search"/>
                         <select class="form-select status mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
                             <option value="Aktif">Aktif</option>
