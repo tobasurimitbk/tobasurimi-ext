@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Divisi</h5>
@@ -11,7 +11,7 @@
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control divisi" id="divisi" name="divisi">
@@ -25,7 +25,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" class="form-control jam_kerja" id="jam_kerja" name="jam_kerja">
@@ -46,7 +46,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
