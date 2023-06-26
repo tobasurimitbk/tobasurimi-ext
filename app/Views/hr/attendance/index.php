@@ -62,6 +62,7 @@
                 type: "post",
                 url: "/save-attendance",
                 data: {
+                    employee_id: document.getElementById("employee_id").value,
                     pic: data_uri
                 },
                 dataType: "json",
@@ -73,6 +74,45 @@
                 }
 
             });
+        });
+
+    }
+
+    function GetAbsenKehadiran() {
+        Webcam.snap(function(data_uri) {
+            $.ajax({
+                type: "post",
+                url: "/save-attendance",
+                data: {
+                    employee_id: document.getElementById("employee_id").value,
+                    pic: data_uri
+                },
+                dataType: "json",
+                success: function(response) {
+                    alert('sukses');
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                }
+
+            });
+        });
+
+    }
+
+    function get_info(data) {
+        $.ajax({
+            type: "get",
+            url: "/get-employee-by-company/" + data.value,
+            data: {},
+            dataType: "json",
+            success: function(response) {
+                alert('sukses');
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+            }
+
         });
 
     }
@@ -101,8 +141,18 @@
 
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <select class="form-select ar_id" name="ar_id" id="ar_id">
+                                    <select class="form-select ar_id" name="employee_id" id="employee_id" onChange="get_info(this)">
                                         <option value=""></option>
+                                        <?php
+                                        if (!empty($dataEmployee)) {
+                                            foreach ($dataEmployee as $employee) {
+                                        ?>
+                                                <option value="<?= $employee->id; ?>"><?= $employee->nip . " - " . $employee->name; ?></option>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+
                                     </select>
                                     <label for="floatingInput">NIP</label>
                                 </div>
@@ -183,7 +233,7 @@
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn form-control btn-primary " data-btn="create-modal">
+                        <button class="btn form-control btn-primary " data-btn="create-modal" onClick="GetAbsenKehadiran();">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Absen Kehadiran
                         </button>
                     </div>
