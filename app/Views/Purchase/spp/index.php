@@ -11,8 +11,8 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end mb-3 row-col-spp">
-                <div class="col">
+            <div class="row justify-content-end row-col-spp">
+                <div class="col mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
                         <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
@@ -21,7 +21,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col">
+                <div class="col mb-3">
                     <div class="input-group input-group-password">
                         <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -29,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col">
+                <div class="col mb-3">
                     <input class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
