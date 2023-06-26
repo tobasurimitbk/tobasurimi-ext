@@ -3205,7 +3205,7 @@ pre {
   margin-bottom: 0;
   font-weight: 600;
   display: inline-block;
-  font-size: 14px;
+  font-size: 14px !important;
   margin-top: 0px;
   color: #2f4858;
 }
@@ -4939,4 +4939,40 @@ input:checked + .slider:before {
 .row-col-spp .input-group .input-group-prepend i.fa {
   position: relative;
   top: 5px;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (min-width: 360px) and (max-width: 767px) {
+  .bg-login-register .card.card-login-register .card-body img {
+    max-width: 100%;
+  }
+
+  .section .section-header {
+    margin-bottom: 30px !important;
+  }
+
+  .main-footer .footer-right {
+    text-align: center;
+    float: none;
+  }
+
+  .navbar .form-inline .search-element {
+    display: block;
+    margin-left: 50px;
+    z-index: 0;
+  }
+
+  .navbar .form-inline .search-element .dropdown .btn.btn-dropdown-company {
+    min-width: 120px;
+    margin-top: 5px;
+  }
+
+  .navbar ul.navbar-nav li.dropdown .nav-link .form-label {
+    display: none;
+  }
+
+  .navbar ul.navbar-nav li.dropdown .dropdown-menu.dropdown-menu-right {
+    width: 100%;
+  }
 }
