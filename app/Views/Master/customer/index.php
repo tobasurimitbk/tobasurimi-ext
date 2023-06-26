@@ -195,7 +195,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
+                                <select class="form-select province_id" name="province_id" id="province_id">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataProvinces)) {
@@ -293,6 +293,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
     let sortType = "asc";
+    let trigger = true;
 
     let list_address = [];
     let list_delete = [];
@@ -795,6 +796,26 @@
 
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
+        })
+
+        $(".province_id").change(function() {
+            const id = $(".province_id option:selected").val()
+
+            if (id && trigger) {
+                $.ajax({
+                    url: `<?= base_url("city"); ?>/${id}`,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        $(".city_id").empty()
+                        $(".city_id").val("").change()
+                        $(".city_id").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                        })
+                    }
+                })
+            }
         })
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
@@ -1457,7 +1478,8 @@
             validator_detail.resetForm();
             validator_detail.reset();
 
-            $(".province_id").val(province_id).change()
+            trigger = false;
+            $(".province_id").val(province_id).trigger('change');
 
             $(".id_detail").val(rowid)
             $(".detail_address").val(address)
@@ -1477,32 +1499,12 @@
 
                     $(".city_id").val(city_id).change()
                     $(".postal_code").val(postal_code)
-
+                    trigger = true;
                     $(".detail-modal").modal("show")
                 }
             })
         // }
     })
-
-    const getCity = function() {
-        const id = $(".province_id option:selected").val()
-
-        if (id) {
-            $.ajax({
-                url: `<?= base_url("city"); ?>/${id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".city_id").empty()
-                    $(".city_id").val("").change()
-                    $(".city_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                    })
-                }
-            })
-        }
-    }
 
     const getCityParent = function() {
         const id = $(".province_parent_id option:selected").val()
