@@ -829,6 +829,7 @@
             console.log($('.multiple_po_id').val())
             let this_value = $('.multiple_po_id').val();
 
+            list_items = []
             let new_list_items = []
             let tag_html = "";
             let tag_total = "";
@@ -914,7 +915,10 @@
         }
         else
         {
+            list_items = []
 
+            row = 0;
+            $(".body-detail-table").empty()
         }
 
         $(".btn-submit-parent").click(function() {

@@ -93,9 +93,6 @@ class PenerimaanBarangLokal extends BaseController
     public function savePenerimaanBarangLokal()
     {
         $rules = [
-            "no_penerimaan_barang" => [
-                "rules" => "required"
-            ],
             "supplier_id" => [
                 "rules" => "required"
             ],
