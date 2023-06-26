@@ -27,7 +27,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Penerimaan">
+                                <input type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                                 <label for="floatingInput">No. Penerimaan</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -80,7 +80,7 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                            <option value=""></option>
+                            <option value="NON PABEAN">NON PABEAN</option>
                         </select>
                         <label for="floatingInput">Jenis Dokumen</label>
                     </div>
@@ -116,7 +116,7 @@
             <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control sj_no" id="sj_no" name="sj_no" placeholder="No. Surat Jalan">
+                        <input type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Surat Jalan">
                         <label for="floatingInput">No. Surat Jalan</label>
                     </div>
                 </div>
@@ -128,13 +128,13 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
+                        <input type="text" class="form-control packaging" id="packaging" name="packaging" placeholder="Kemasan">
                         <label for="floatingInput">Kemasan</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control berat" id="berat" name="berat" placeholder="Berat">
+                        <input type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
                         <label for="floatingInput">Berat</label>
                     </div>
                 </div>
@@ -142,7 +142,7 @@
             <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input onkeyup="formatNumber(this)" type="text" class="form-control ongkos" name="ongkos" id="ongkos" placeholder="Biaya Ongkos Kirim">
+                        <input onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
                         <label for="floatingInput">Biaya Ongkos Kirim</label>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control ppnbm" id="ppnbm" name="ppnbm" placeholder="PPNBM">
+                        <input onkeyup="formatNumber(this)" type="text" class="form-control ppn" id="ppn" name="ppn" placeholder="PPNBM">
                         <label for="floatingInput">PPNBM</label>
                     </div>
                 </div>
@@ -241,7 +241,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control jumlah_order" id="jumlah_order" name="jumlah_order" placeholder="Jumlah Order">
+                                <input type="text" class="form-control jumlah_order" id="jumlah_order" name="jumlah_order" placeholder="Jumlah Order">
                                 <label for="floatingInput">Jumlah Order</label>
                             </div>
                         </div>
@@ -268,7 +268,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control jumlah_di_dokumen" id="jumlah_di_dokumen" name="jumlah_di_dokumen" placeholder="Jumlah di dokumen">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_di_dokumen" id="jumlah_di_dokumen" name="jumlah_di_dokumen" placeholder="Jumlah di dokumen">
                                 <label for="floatingInput">Jumlah di dokumen</label>
                             </div>
                         </div>
@@ -358,7 +358,201 @@
 </div>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
+    let list_items = [];
+    let list_delete = [];
+    var row = 0;
+
+    var validator_detail = $(".detail-form").validate({
+        rules: {
+            kode_barang: {
+                required: true
+            },
+            doc_qty: {
+                required: true
+            },
+            qty: {
+                required: true
+            },
+            selisih: {
+                required: true
+            },
+            konversi: {
+                required: true
+            },
+            harga: {
+                required: true
+            },
+            penyerahan: {
+                required: true
+            },
+        },
+        messages: {
+            kode_barang: {
+                required: "Kode wajib diisi"
+            },
+            doc_qty: {
+                required: "Document Qty wajib diisi"
+            },
+            qty: {
+                required: "Qty wajib diisi"
+            },
+            selisih: {
+                required: "Selisih wajib diisi"
+            },
+            konversi: {
+                required: "Konversi wajib diisi"
+            },
+            harga: {
+                required: "Harga wajib diisi"
+            },
+            penyerahan: {
+                required: "Penyerahan wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
     $(document).ready(function() {
+        var validator = $(".create-form").validate({
+            rules: {
+                supplier_id: {
+                    required: true
+                },
+                acceptance_type: {
+                    required: true
+                },
+                "multiple_po_id[]": {
+                    required: true
+                },
+                aju_document_type: {
+                    required: true
+                },
+                aju_no: {
+                    required: true,
+                },
+                validation_date: {
+                    required: true,
+                },
+                no_registration: {
+                    required: true,
+                },
+                letter_no: {
+                    required: true,
+                },
+                invoice_no: {
+                    required: true,
+                },
+                packaging: {
+                    required: true,
+                },
+                total_weight: {
+                    required: true,
+                },
+                shipping_cost: {
+                    required: true,
+                },
+                biaya_masuk: {
+                    required: true,
+                },
+                ppn: {
+                    required: true,
+                },
+                status_post: {
+                    required: true,
+                },
+                status_penerimaan: {
+                    required: true,
+                }
+            },
+            messages: {
+                supplier_id: {
+                    required: "Supplier wajib diisi"
+                },
+                acceptance: {
+                    required: "Acceptance wajib diisi"
+                },
+                "multiple_po_id[]": {
+                    required: "No. PO wajib diisi"
+                },
+                aju_document_type: {
+                    required: "Jenis Dokumen wajib diisi"
+                },
+                validation_date: {
+                    required: "Tanggal wajib diisi"
+                },
+                no_registration: {
+                    required: "No. Registrasi wajib diisi"
+                },
+                no_letter: {
+                    required: "No. Surat wajib diisi"
+                },
+                invoice_no: {
+                    required: "No. Invoice wajib diisi"
+                },
+                packaging: {
+                    required: "Packaging wajib diisi"
+                },
+                total_weight: {
+                    required: "Weight wajib diisi"
+                },
+                shipping_cost: {
+                    required: "Biaya Pengiriman wajib diisi"
+                },
+                biaya_masuk: {
+                    required: "Biaya Masuk wajib diisi"
+                },
+                ppn: {
+                    required: "PPN wajib diisi"
+                },
+                status_post: {
+                    required: "Status Post wajib diisi"
+                },
+                status_penerimaan: {
+                    required: "Status Penerimaan wajib diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function (element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');                      
+
+            },
+            unhighlight: function (element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');   
+            },
+        });
+
         // PO NO
         $('.multiple_po_id').select2({
             placeholder: "",
@@ -413,17 +607,187 @@
             .find('label')
             .css('z-index', '1');
 
+        // KODE BARANG
+        $('.kode_barang').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            allowClear: true
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.kode_barang')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // PPN
+        $('.ppn').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            allowClear: true
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.ppn')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.ppn')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.ppn')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // PPH
+        $('.pph').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            allowClear: true
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.pph')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.pph')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.pph')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         $(".btn-show-detail").click(function() {
             $(".delete-detail").css('display', 'none');
 
             $(".title-detail-name").text("Tambah");
             $(".id_detail").val('');
 
-            $(".detail-modal").modal("show");
+            $.ajax({
+                url: `<?= base_url("tax/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    type: 'ppn'
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".ppn").empty()
+                    $(".ppn").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                    })
+
+                    $(".ppn").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("tax/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    type: 'pph'
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".pph").empty()
+                    $(".pph").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                    })
+
+                    $(".pph").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("barang/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".kode_barang").empty();
+
+                    $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.nama_satuan}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                    })
+
+                    $(".kode_barang").val("").change();
+                    $(".detail-modal").modal("show");
+                }
+            })
         })
 
         $(".btn-hide-detail").click(function() {
             $(".detail-modal").modal("hide")
+        })
+
+        $(".kode_barang").change(function() {
+            if($(".kode_barang option:selected").val())
+            {
+                let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
+                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
+                let stok = $(".kode_barang option:selected").data("stok") ? $(".kode_barang option:selected").data("stok") : "";
+                let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
+                let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
+
+                $(".kode").val($(".kode_barang option:selected").val());
+                $(".nama_barang").val(nama);
+                $(".barang_id").val(barang_id);
+                $(".satuan_order").val(satuan).change();
+                $(".jumlah_order").val(stok ? stok : 0);
+            }
+            else
+            {
+                $(".new-barang").css("display", "none");
+                $(".category").val("").change();
+                $('.category').rules('remove', 'required');
+                $(".nama_barang").attr("readonly", false)
+                $(".kode").val("");
+                $(".nama_barang").val("");
+                $(".barang_id").val("");
+                $(".satuan").val("").change();
+                $(".qty").val("");
+                $(".harga").val("");
+                $(".total").val("");
+            }
         })
 
         $(".supplier_id").change(function() {
@@ -459,19 +823,257 @@
         })
     })
 
+    $(".multiple_po_id").change(function() {
+        if($('.multiple_po_id option:selected').length !== 0)
+        {
+            console.log($('.multiple_po_id').val())
+            let this_value = $('.multiple_po_id').val();
+
+            list_items = []
+            let new_list_items = []
+            let tag_html = "";
+            let tag_total = "";
+
+            row = 0;
+
+            this_value.forEach(function(item) {
+                $.ajax({
+                    url: `<?= base_url("po-lokal/ajax"); ?>`,
+                    method: "GET",
+                    data: {
+                        id: item
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        console.log(res)
+                        $(".body-detail-table").empty()
+
+                        res?.data?.purchase_order_details.map(item => {
+                            tag_html += `<tr>`;
+                            tag_html += "<td>";
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.kodeBarang;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.barangName;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.spec;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.satuanName;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.totalPrice;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.note;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+
+                            list_items.push({
+                                id: "",
+                                row: row + 1,
+                                barang_id: item.barang_id,
+                                warehouse_id: 0,
+                                doc_qty: 0,
+                                qty: 0,
+                                selisih: 0,
+                                konversi: 0,
+                                harga: 0,
+                                penyerahan: 0,
+                                keterangan: ""
+                            });
+
+                            row = row + 1;
+                        })
+
+                        $(".body-detail-table").append(tag_html)
+                    }
+                })
+            })
+        }
+        else
+        {
+            list_items = []
+
+            row = 0;
+            $(".body-detail-table").empty()
+        }
+
+        $(".btn-submit-parent").click(function() {
+            $(".detail-modal").modal("hide")
+
+            // CHECK IF NO BARANG
+            if(list_items.length === 0)
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Barang Tidak Boleh Kosong",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+            else
+            {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading()
+                            let data = new FormData(document.querySelector(".create-form"));
+
+                            let update_list_items = [];
+                            
+                            list_items.map(obj => {
+                                update_list_items.push(
+                                    {
+
+                                    }
+                                )
+                            })
+
+                            data.append("items", JSON.stringify(update_list_items))
+
+                            let id = $(".id").val();
+                            // UPDATE
+                            if(id)
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("penerimaan-barang-lokal/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("po-lokal"); ?>" + "/id/" + id;
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                            // CREATE
+                            else
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("penerimaan-barang-lokal/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    })
+
     const changeStatus = function()
     {
         let value = document.getElementById('auto_generate').checked ? true : false;
 
         if(value)
         {
-            $(".letter_no").attr("readonly", true);
-            $(".letter_no").val("AUTO GENERATE");
+            $(".no_penerimaan_barang").attr("readonly", true);
+            $(".no_penerimaan_barang").val("AUTO GENERATE");
         }
         else
         {
-            $(".letter_no").attr("readonly", false);
-            $(".letter_no").val("");
+            $(".no_penerimaan_barang").attr("readonly", false);
+            $(".no_penerimaan_barang").val("");
         }
     }
 </script>

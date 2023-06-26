@@ -274,3 +274,35 @@ p.text-footer-login a {
   color: #e7323a;
   text-decoration: none;
 }
+
+/* ===== RESPONSIVE ===== */
+
+@media (min-width: 360px) and (max-width: 767px) {
+  .bg-login-register .card.card-login-register .card-body img {
+    max-width: 100%;
+  }
+
+  .bg-login-register
+    .card.card-login-register
+    .card-body
+    .d-flex.justify-content-center.align-items-center.mb-5 {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .bg-login-register .card.card-login-register .card-body img {
+    max-width: 100%;
+  }
+
+  .bg-login-register .card.card-login-register .card-body {
+    padding: 1.5rem !important;
+  }
+
+  .bg-login-register
+    .card.card-login-register
+    .card-body
+    .d-flex.justify-content-center.align-items-center.mb-5 {
+    margin-bottom: 1.5rem !important;
+  }
+}

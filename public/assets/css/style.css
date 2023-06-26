@@ -3205,7 +3205,7 @@ pre {
   margin-bottom: 0;
   font-weight: 600;
   display: inline-block;
-  font-size: 14px;
+  font-size: 14px !important;
   margin-top: 0px;
   color: #2f4858;
 }
@@ -4172,7 +4172,7 @@ body:not(.sidebar-mini)
 }
 
 .navbar ul.navbar-nav li.dropdown .dropdown-menu.dropdown-menu-right {
-  left: -78px;
+  left: -48px;
   border-radius: 4px;
   padding: 0px;
   border: 0px;
@@ -4180,6 +4180,7 @@ body:not(.sidebar-mini)
   font-size: 13px;
   font-weight: 600;
   color: #2f4858;
+  width: 100%;
 }
 
 .navbar
@@ -4210,7 +4211,7 @@ body:not(.sidebar-mini)
   .dropdown-menu.dropdown-menu-right
   .dropdown-item:active {
   background-color: #f3eed9;
-  color: #e7323a;
+  color: #e7323a !important;
   border-radius: 4px;
 }
 
@@ -4939,4 +4940,195 @@ input:checked + .slider:before {
 .row-col-spp .input-group .input-group-prepend i.fa {
   position: relative;
   top: 5px;
+}
+
+.form-floating.mb-3 {
+  margin-bottom: 2rem !important;
+}
+
+.modal
+  .modal-dialog
+  .modal-content
+  .modal-body
+  form.create-form
+  .row
+  .col-md-3.mb-3.view-cols-image {
+  margin-bottom: 2rem !important;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (min-width: 360px) and (max-width: 767px) {
+  .bg-login-register .card.card-login-register .card-body img {
+    max-width: 100%;
+  }
+
+  .section .section-header {
+    margin-bottom: 30px !important;
+  }
+
+  .main-footer .footer-right {
+    text-align: center;
+    float: none;
+  }
+
+  .navbar .form-inline .search-element {
+    display: block;
+    margin-left: 50px;
+    z-index: 0;
+  }
+
+  .navbar .form-inline .search-element .dropdown .btn.btn-dropdown-company {
+    min-width: 120px;
+    margin-top: 5px;
+  }
+
+  .navbar ul.navbar-nav li.dropdown .nav-link .form-label {
+    display: none;
+  }
+
+  .navbar ul.navbar-nav li.dropdown .dropdown-menu.dropdown-menu-right {
+    width: 100%;
+    left: -95px;
+  }
+
+  .section .section-header .btn.btn-add {
+    position: relative;
+    float: none !important;
+    min-width: 100%;
+  }
+
+  div.dataTables_wrapper div.dataTables_info {
+    margin-top: 0px !important;
+  }
+
+  .modal.show .modal-dialog {
+    min-width: 100% !important;
+    margin: 0px;
+  }
+
+  .modal .modal-dialog .modal-content .modal-footer {
+    margin-top: 15px;
+  }
+
+  .modal
+    .modal-dialog
+    .modal-content
+    .modal-body
+    .col-subtitle-modal
+    .btn.btn-add {
+    margin-top: 15px;
+    min-width: 100%;
+  }
+
+  .modal
+    .modal-dialog
+    .modal-content
+    .modal-body
+    .col-subtitle-modal
+    .row.mt-5 {
+    margin-top: 1rem !important;
+  }
+
+  .modal
+    .modal-dialog
+    .modal-content
+    .modal-body
+    form.create-form
+    .row
+    .col-md-6.col-input-files-img {
+    margin-bottom: 2rem;
+  }
+
+  .section .section-header .nav.nav-tabs {
+    position: relative;
+    right: 0;
+  }
+
+  .section .section-header .nav.nav-tabs li.nav-item {
+    margin-top: 1.5rem;
+  }
+
+  .section .section-header .nav.nav-tabs li.nav-item .nav-link {
+    background-color: #eee;
+    border-color: #eee;
+    color: #2f4858;
+  }
+
+  .card .card-body .tab-content .tab-pane .col-nav-tabs-contents-input-btn {
+    display: block !important;
+  }
+
+  .card
+    .card-body
+    .tab-content
+    .tab-pane
+    .col-nav-tabs-contents-input-btn
+    .form-control.form-out-search {
+    margin-bottom: 1.5rem;
+  }
+
+  .card
+    .card-body
+    .tab-content
+    .tab-pane
+    .col-nav-tabs-contents-input-btn
+    .form-select {
+    margin-bottom: 1.5rem;
+  }
+
+  .card
+    .card-body
+    .tab-content
+    .tab-pane
+    .col-nav-tabs-contents-input-btn
+    .btn.btn-add {
+    min-width: 100%;
+  }
+
+  .section .section-header .btn.btn-save {
+    position: relative;
+    float: none !important;
+    min-width: 100%;
+  }
+
+  .card
+    .card-body
+    form.create-form.form-manajemen-hak-akses
+    .form-floating.mb-0.f-m-3 {
+    margin-bottom: 2rem !important;
+  }
+
+  .card .card-body form.create-form.form-manajemen-hak-akses .table-responsive {
+    margin-top: 2rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .navbar ul.navbar-nav li.dropdown .dropdown-menu.dropdown-menu-right {
+    left: -53px;
+  }
+
+  .modal.show .modal-dialog {
+    min-width: 100% !important;
+    margin: 0px;
+  }
+
+  .modal .modal-dialog .modal-content .modal-footer {
+    margin-top: 15px;
+  }
+
+  .modal
+    .modal-dialog
+    .modal-content
+    .modal-body
+    form.create-form
+    .row
+    .col-md-6.col-input-files-img {
+    margin-bottom: 2rem;
+  }
+
+  div.dataTables_wrapper div.dataTables_info {
+    display: none;
+  }
 }

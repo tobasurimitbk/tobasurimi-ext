@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Company</h5>
@@ -12,12 +12,12 @@
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <img class="preview-photo" id="preview_photo" src="<?= base_url() ?>assets/img/avatar/logo.png" />
+                        <div class="col-md-3 mb-3 view-cols-image">
+                            <img class="preview-photo" id="preview_photo" src="<?= base_url() ?>assets/img/logo-none.png" />
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6" style="height: 50px;">
+                    <div class="row">
+                        <div class="col-md-6 col-input-files-img" style="height: 50px;">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onchange="previewPhoto();" type="file" class="form-control input-image logo" id="logo" name="logo" accept="image/png, image/jpg, image/jpeg">
                             </div>
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control holding_company" id="holding_company" name="holding_company" placeholder="Holding Company">
@@ -43,7 +43,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
@@ -84,7 +84,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="email" class="form-control email" id="email" name="email" placeholder="Email">

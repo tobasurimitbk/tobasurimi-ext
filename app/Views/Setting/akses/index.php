@@ -11,11 +11,11 @@
 </div>
 <div class="card">
     <div class="card-body">
-        <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+        <form class="create-form form-manajemen-hak-akses" role="form" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="form-floating mb-0" style="height: 50px;">
+                    <div class="form-floating mb-0 f-m-3" style="height: 50px;">
                         <select class="form-control company_id" name="company_id" id="company_id" onchange="setChanges()">
                             <option value=""></option>
                             <?php

@@ -23,7 +23,7 @@ class Employee extends BaseController
     public function dropdownEmployee()
     {
         $dataEmployee = [];
-        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
+        $responseEmployee = curl_request("GET", "/employees/selectOption?idCompany=$this->this_company_id", $this->token);
         if ($responseEmployee["code"] === 200) {
             $dataEmployee = json_decode($responseEmployee["body"])->data;
         }
@@ -39,7 +39,7 @@ class Employee extends BaseController
     public function dropdownEmployeePIC()
     {
         $dataEmployee = [];
-        $responseEmployee = curl_request("GET", "/employees/all", $this->token);
+        $responseEmployee = curl_request("GET", "/employees/all?idCompany=$this->this_company_id", $this->token);
         if ($responseEmployee["code"] === 200) {
             $dataEmployee = json_decode($responseEmployee["body"])->data;
         }

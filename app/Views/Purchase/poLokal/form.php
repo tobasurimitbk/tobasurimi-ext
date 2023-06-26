@@ -1136,13 +1136,36 @@
                             $(".order_type").val()
                             $(".order_type_name").val()
 
-                            let new_list_items = []
+                            list_items = []
 
                             row = 0;
+
+                            let tag_total = "";
 
                             $(".body-detail-table").empty()
 
                             $(".foot-detail-table").empty()
+
+                            tag_total += `<tr>`;
+                            tag_total += "<td colspan='4'>";
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += "<b>TOTAL</b>";
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>0</b>`;
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>0</b>`;
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>0</b>`;
+                            tag_total += "</td>";
+                            tag_total += "<td colspan='2'>";
+                            tag_total += "</td>";
+                            tag_total += "</tr>";
+
+                            $(".foot-detail-table").append(tag_total);
 
                             Swal.fire({
                                 icon: 'error',

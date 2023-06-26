@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Vendor</h5>
@@ -11,7 +11,7 @@
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode" id="kode" name="kode" placeholder="Kode">
@@ -25,7 +25,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                      <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
@@ -82,7 +82,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
@@ -96,7 +96,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select ap_id" name="ap_id" id="ap_id">
@@ -186,7 +186,7 @@
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
@@ -293,6 +293,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
     let sortType = "asc";
+    let trigger = true;
 
     let list_address = [];
     let list_delete = [];
@@ -797,6 +798,26 @@
             $(".add-modal").modal("hide")
         })
 
+        $(".province_id").change(function() {
+            const id = $(".province_id option:selected").val()
+
+            if (id && trigger) {
+                $.ajax({
+                    url: `<?= base_url("city"); ?>/${id}`,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        $(".city_id").empty()
+                        $(".city_id").val("").change()
+                        $(".city_id").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                        })
+                    }
+                })
+            }
+        })
+
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $(".create-form")[0].reset()
@@ -846,20 +867,20 @@
                                 main_address: item.main_address
                             })
 
-                            tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += "<td>";
+                            tag_html += `<tr>`;
+                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += index + 1;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.address;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.city_name;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.province_name;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.postal_code;
                             tag_html += "</td>";
                             tag_html += "<td class='actions'>";
@@ -1030,20 +1051,20 @@
                             list_address.map(item => {
                                 if(item.row == row_detail)
                                 {
-                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                                    tag_html += "<td>";
+                                    tag_html += `<tr>`;
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += row + 1;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += address;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += province_name;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += city_name;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += postal_code;
                                     tag_html += "</td>";
                                     tag_html += "<td class='actions'>";
@@ -1075,20 +1096,20 @@
                                 }
                                 else
                                 {
-                                    tag_html += `<tr class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                                    tag_html += "<td>";
+                                    tag_html += `<tr>`;
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += row + 1;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += item.address;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += item.province_name;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += item.city_name;
                                     tag_html += "</td>";
-                                    tag_html += "<td>";
+                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += item.postal_code;
                                     tag_html += "</td>";
                                     tag_html += "<td class='actions'>";
@@ -1148,20 +1169,20 @@
                                 main_address: 0
                             })
                         let tag_html = "";
-                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                            tag_html += "<td>";
+                            tag_html += `<tr>`;
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                             tag_html += row + 1;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                             tag_html += address;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                             tag_html += province_name;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                             tag_html += city_name;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                             tag_html += postal_code;
                             tag_html += "</td>";
                             tag_html += "<td class='actions'>";
@@ -1379,20 +1400,20 @@
                     list_address.map(item => {
                         if(item.row != id)
                         {
-                            tag_html += `<tr class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += "<td>";
+                            tag_html += `<tr>`;
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += row + 1;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.address;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.province_name;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.city_name;
                             tag_html += "</td>";
-                            tag_html += "<td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += item.postal_code;
                             tag_html += "</td>";
                             tag_html += "<td class='actions'>";
@@ -1443,7 +1464,7 @@
     })
 
     $(document).on('click', '.edit-table-detail', function(evt) {
-        if(!$(evt.target).is('.actions')) {
+        // if(!$(evt.target).is('.actions')) {
             $(".title-detail-name").text("Update")
             $(".delete-detail").css('display', '');
             let address = $(this).data('address')
@@ -1455,7 +1476,7 @@
 
             validator_detail.resetForm();
             validator_detail.reset();
-
+            trigger = false;
             $(".province_id").val(province_id).change()
 
             $(".id_detail").val(rowid)
@@ -1476,32 +1497,12 @@
 
                     $(".city_id").val(city_id).change()
                     $(".postal_code").val(postal_code)
-
+                    trigger = true;
                     $(".detail-modal").modal("show")
                 }
             })
-        }
+        // }
     })
-
-    const getCity = function() {
-        const id = $(".province_id option:selected").val()
-
-        if (id) {
-            $.ajax({
-                url: `<?= base_url("city"); ?>/${id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".city_id").empty()
-                    $(".city_id").val("").change()
-                    $(".city_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                    })
-                }
-            })
-        }
-    }
 
     const getCityParent = function() {
         const id = $(".province_parent_id option:selected").val()
