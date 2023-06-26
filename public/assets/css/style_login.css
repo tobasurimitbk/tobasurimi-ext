@@ -282,6 +282,10 @@ p.text-footer-login a {
     max-width: 100%;
   }
 
+  .card-body.p-5 {
+    padding: 2rem !important;
+  }
+
   .bg-login-register
     .card.card-login-register
     .card-body
@@ -295,8 +299,12 @@ p.text-footer-login a {
     max-width: 100%;
   }
 
+  .col-md-5 {
+    width: 50% !important;
+  }
+
   .bg-login-register .card.card-login-register .card-body {
-    padding: 1.5rem !important;
+    padding: 2rem !important;
   }
 
   .bg-login-register
