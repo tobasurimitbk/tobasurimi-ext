@@ -5085,6 +5085,23 @@ input:checked + .slider:before {
     .btn.btn-add {
     min-width: 100%;
   }
+
+  .section .section-header .btn.btn-save {
+    position: relative;
+    float: none !important;
+    min-width: 100%;
+  }
+
+  .card
+    .card-body
+    form.create-form.form-manajemen-hak-akses
+    .form-floating.mb-0.f-m-3 {
+    margin-bottom: 2rem !important;
+  }
+
+  .card .card-body form.create-form.form-manajemen-hak-akses .table-responsive {
+    margin-top: 2rem !important;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {

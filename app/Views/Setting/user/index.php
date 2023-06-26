@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> User</h5>
@@ -12,7 +12,7 @@
                     <input type="hidden" class="id" name="id" id="id" />
                     <!-- <input type="hidden" class="company_role" name="company_role" id="company_role" /> -->
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
@@ -20,7 +20,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control name" id="name" name="name" placeholder="Name" maxlength="30">
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select employee_id" name="employee_id" id="employee_id">
