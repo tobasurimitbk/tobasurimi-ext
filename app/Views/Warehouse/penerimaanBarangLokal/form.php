@@ -27,7 +27,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Penerimaan">
+                                <input type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                                 <label for="floatingInput">No. Penerimaan</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -80,7 +80,7 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                            <option value=""></option>
+                            <option value="NON PABEAN">NON PABEAN</option>
                         </select>
                         <label for="floatingInput">Jenis Dokumen</label>
                     </div>
@@ -116,7 +116,7 @@
             <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control sj_no" id="sj_no" name="sj_no" placeholder="No. Surat Jalan">
+                        <input type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Surat Jalan">
                         <label for="floatingInput">No. Surat Jalan</label>
                     </div>
                 </div>
@@ -128,13 +128,13 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan">
+                        <input type="text" class="form-control packaging" id="packaging" name="packaging" placeholder="Kemasan">
                         <label for="floatingInput">Kemasan</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control berat" id="berat" name="berat" placeholder="Berat">
+                        <input type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
                         <label for="floatingInput">Berat</label>
                     </div>
                 </div>
@@ -142,7 +142,7 @@
             <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input onkeyup="formatNumber(this)" type="text" class="form-control ongkos" name="ongkos" id="ongkos" placeholder="Biaya Ongkos Kirim">
+                        <input onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
                         <label for="floatingInput">Biaya Ongkos Kirim</label>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control ppnbm" id="ppnbm" name="ppnbm" placeholder="PPNBM">
+                        <input onkeyup="formatNumber(this)" type="text" class="form-control ppn" id="ppn" name="ppn" placeholder="PPNBM">
                         <label for="floatingInput">PPNBM</label>
                     </div>
                 </div>
@@ -358,7 +358,132 @@
 </div>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
+    let list_items = [];
+    let list_delete = [];
+    var row = 0;
+
     $(document).ready(function() {
+        var validator = $(".create-form").validate({
+            rules: {
+                supplier_id: {
+                    required: true
+                },
+                acceptance_type: {
+                    required: true
+                },
+                "multiple_po_id[]": {
+                    required: true
+                },
+                aju_document_type: {
+                    required: true
+                },
+                aju_no: {
+                    required: true,
+                },
+                validation_date: {
+                    required: true,
+                },
+                no_registration: {
+                    required: true,
+                },
+                letter_no: {
+                    required: true,
+                },
+                invoice_no: {
+                    required: true,
+                },
+                packaging: {
+                    required: true,
+                },
+                total_weight: {
+                    required: true,
+                },
+                shipping_cost: {
+                    required: true,
+                },
+                biaya_masuk: {
+                    required: true,
+                },
+                ppn: {
+                    required: true,
+                },
+                status_post: {
+                    required: true,
+                },
+                status_penerimaan: {
+                    required: true,
+                }
+            },
+            messages: {
+                supplier_id: {
+                    required: "Supplier wajib diisi"
+                },
+                acceptance: {
+                    required: "Acceptance wajib diisi"
+                },
+                "multiple_po_id[]": {
+                    required: "No. PO wajib diisi"
+                },
+                aju_document_type: {
+                    required: "Jenis Dokumen wajib diisi"
+                },
+                validation_date: {
+                    required: "Tanggal wajib diisi"
+                },
+                no_registration: {
+                    required: "No. Registrasi wajib diisi"
+                },
+                no_letter: {
+                    required: "No. Surat wajib diisi"
+                },
+                invoice_no: {
+                    required: "No. Invoice wajib diisi"
+                },
+                packaging: {
+                    required: "Packaging wajib diisi"
+                },
+                total_weight: {
+                    required: "Weight wajib diisi"
+                },
+                shipping_cost: {
+                    required: "Biaya Pengiriman wajib diisi"
+                },
+                biaya_masuk: {
+                    required: "Biaya Masuk wajib diisi"
+                },
+                ppn: {
+                    required: "PPN wajib diisi"
+                },
+                status_post: {
+                    required: "Status Post wajib diisi"
+                },
+                status_penerimaan: {
+                    required: "Status Penerimaan wajib diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent(); 
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function (element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');                      
+
+            },
+            unhighlight: function (element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');   
+            },
+        });
+
         // PO NO
         $('.multiple_po_id').select2({
             placeholder: "",
@@ -457,6 +582,97 @@
                 $(".multiple_po_id").val([]);
             }
         })
+    })
+
+    $(".multiple_po_id").change(function() {
+        if($('.multiple_po_id option:selected').length !== 0)
+        {
+            console.log($('.multiple_po_id').val())
+            let this_value = $('.multiple_po_id').val();
+
+            let new_list_items = []
+            let tag_html = "";
+            let tag_total = "";
+
+            row = 0;
+
+            this_value.forEach(function(item) {
+                $.ajax({
+                    url: `<?= base_url("po-lokal/ajax"); ?>`,
+                    method: "GET",
+                    data: {
+                        id: item
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        console.log(res)
+                        $(".body-detail-table").empty()
+
+                        res?.data?.purchase_order_details.map(item => {
+                            tag_html += `<tr>`;
+                            tag_html += "<td>";
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.kodeBarang;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.barangName;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.spec;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.satuanName;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.totalPrice;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += 0;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.note;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+
+                            list_items.push({
+                                id: "",
+                                row: row + 1,
+                                barang_id: item.barang_id,
+                                warehouse_id: 0,
+                                doc_qty: 0,
+                                qty: 0,
+                                
+                            });
+
+                            row = row + 1;
+                        })
+
+                        $(".body-detail-table").append(tag_html)
+                    }
+                })
+            })
+        }
+        else
+        {
+
+        }
     })
 
     const changeStatus = function()
