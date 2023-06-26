@@ -8,7 +8,7 @@ class Employee extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -129,8 +129,7 @@ class Employee extends BaseController
 
             $file = $this->request->getFile("employeeImg");
 
-            if (!empty($file->getName())) 
-            {
+            if (!empty($file->getName())) {
                 $mime = $file->getMimeType();
                 if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                     $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
@@ -152,8 +151,7 @@ class Employee extends BaseController
                 }
             }
 
-            if($payload)
-            {
+            if ($payload) {
                 $response = curl_request("POST", "/employees", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -174,9 +172,7 @@ class Employee extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            }
-            else
-            {
+            } else {
                 $data = [
                     "status"            => false,
                     "message"    => "Format gambar harus bertipe png, jpg, jpeg",
@@ -225,8 +221,7 @@ class Employee extends BaseController
             $id = $this->request->getPost("id");
 
             $file = $this->request->getFile("employeeImg");
-            if (!empty($file->getName())) 
-            {
+            if (!empty($file->getName())) {
                 $mime = $file->getMimeType();
                 if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                     $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
@@ -246,9 +241,7 @@ class Employee extends BaseController
                         "status" => $this->request->getPost("status")
                     ]);
                 }
-            }
-            else
-            {
+            } else {
                 $payload = json_encode([
                     "company_id" => $this->this_company_id,
                     "nip" => $this->request->getPost("nip"),
@@ -264,8 +257,7 @@ class Employee extends BaseController
                 ]);
             }
 
-            if($payload)
-            {
+            if ($payload) {
                 $response = curl_request("PATCH", "/employees/$id", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -286,9 +278,7 @@ class Employee extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            }
-            else
-            {
+            } else {
                 $data = [
                     "status"            => false,
                     "message"    => "Format gambar harus bertipe png, jpg, jpeg",
