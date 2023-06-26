@@ -442,4 +442,25 @@ class POLokal extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function dropdownBarangPOLokal()
+    {
+        $payload = json_encode([
+            "multiple_id_po" => json_decode(stripslashes($this->request->getGet("id")))
+        ]);
+
+        $dataPOLokal = [];
+        $responsePOLokal = curl_request("POST", "/penerimaanBarang/list-po", $this->token, $payload);
+        if ($responsePOLokal["code"] === 200) {
+            $dataPOLokal = json_decode($responsePOLokal["body"])->data;
+        }
+
+        $data = [
+            "data" =>  $dataPOLokal,
+            "response" => $responsePOLokal
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

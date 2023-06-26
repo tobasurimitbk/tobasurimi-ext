@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -36,16 +36,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select acceptance_type" id="acceptance_type" name="acceptance_type" aria-label="Floating label select example">
-                            <option value="SINGLE ORDER">Single Order</option>
-                            <option value="MULTIPLE ORDER">Multiple Order</option>
-                        </select>
-                        <label for="floatingInput">Penerimaan</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                             <option value=""></option>
@@ -62,7 +53,7 @@
                         <label for="floatingInput">Supplier</label>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select disabled="true" multiple class="form-select multiple_po_id" id="multiple_po_id[]" name="multiple_po_id[]" aria-label="Floating label select example">
                             <option value=""></option>
@@ -190,10 +181,27 @@
                     </tr>
                 </thead>
                 <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-
+                <?php 
+                    $no = 1;
+                    $total_jml_order = 0;
+                    $total_jml_dokumen = 0;
+                    $total_selisih = 0;
+                    $total_konversi = 0;
+                    $total_harga = 0;
+                    $total_penyerahan = 0;
+                ?>
                 </tbody>
                 <tfoot class="foot-detail-table" id="foot-detail-table">
-
+                    <tr>
+                        <td align="center" colspan="5">TOTAL</td>
+                        <td><b><?= number_format($total_jml_order); ?></b></td>
+                        <td><b><?= $total_jml_dokumen; ?></b></td>
+                        <td><b><?= number_format($total_selisih); ?></b></td>
+                        <td><b><?= number_format($total_konversi); ?></b></td>
+                        <td><b><?= number_format($total_harga); ?></b></td>
+                        <td><b><?= number_format($total_penyerahan); ?></b></td>
+                        <td colspan="2"></td>
+                    </tr>
                 </tfoot>
             </table>
         </div>
@@ -210,6 +218,7 @@
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input type="hidden" class="purchase_order_details_id" name="purchase_order_details_id" id="purchase_order_details_id" />
                     <div class="row">
                         <div class="col-md-6">
                             <h5>Data Barang</h5>
@@ -241,7 +250,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control jumlah_order" id="jumlah_order" name="jumlah_order" placeholder="Jumlah Order">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_order" id="jumlah_order" name="jumlah_order" placeholder="Jumlah Order">
                                 <label for="floatingInput">Jumlah Order</label>
                             </div>
                         </div>
@@ -315,7 +324,7 @@
                             <h5>Aktual Penerimaan</h5>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <!-- <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control jumlah_masuk" id="jumlah_masuk" name="jumlah_masuk" placeholder="Jumlah Masuk">
@@ -342,7 +351,7 @@
                                 <label for="floatingInput">Satuan </label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
@@ -362,6 +371,12 @@
     let list_items = [];
     let list_delete = [];
     var row = 0;
+    let total_jml_order = 0;
+    let total_jml_dokumen = 0;
+    let total_jml_selisih = 0;
+    let total_jml_konversi = 0;
+    let total_jml_harga = 0;
+    let total_jml_penyerahan = 0;
 
     var validator_detail = $(".detail-form").validate({
         rules: {
@@ -438,9 +453,6 @@
                 supplier_id: {
                     required: true
                 },
-                acceptance_type: {
-                    required: true
-                },
                 "multiple_po_id[]": {
                     required: true
                 },
@@ -487,9 +499,6 @@
             messages: {
                 supplier_id: {
                     required: "Supplier wajib diisi"
-                },
-                acceptance: {
-                    required: "Acceptance wajib diisi"
                 },
                 "multiple_po_id[]": {
                     required: "No. PO wajib diisi"
@@ -552,6 +561,13 @@
                 $(element).removeClass('select-class');   
             },
         });
+
+        $(".validation_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
 
         // PO NO
         $('.multiple_po_id').select2({
@@ -694,247 +710,20 @@
             .find('label')
             .css('z-index', '1');
 
-        $(".btn-show-detail").click(function() {
-            $(".delete-detail").css('display', 'none');
-
-            $(".title-detail-name").text("Tambah");
-            $(".id_detail").val('');
-
-            $.ajax({
-                url: `<?= base_url("tax/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    type: 'ppn'
-                },
-                dataType: "json",
-                success: function(res) {
-                    $(".ppn").empty()
-                    $(".ppn").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
-                    })
-
-                    $(".ppn").val("").change();
-                }
-            })
-
-            $.ajax({
-                url: `<?= base_url("tax/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    type: 'pph'
-                },
-                dataType: "json",
-                success: function(res) {
-                    $(".pph").empty()
-                    $(".pph").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
-                    })
-
-                    $(".pph").val("").change();
-                }
-            })
-
-            $.ajax({
-                url: `<?= base_url("barang/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".kode_barang").empty();
-
-                    $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
-
-                    res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.nama_satuan}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
-                    })
-
-                    $(".kode_barang").val("").change();
-                    $(".detail-modal").modal("show");
-                }
-            })
-        })
-
-        $(".btn-hide-detail").click(function() {
-            $(".detail-modal").modal("hide")
-        })
-
-        $(".kode_barang").change(function() {
-            if($(".kode_barang option:selected").val())
-            {
-                let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
-                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
-                let stok = $(".kode_barang option:selected").data("stok") ? $(".kode_barang option:selected").data("stok") : "";
-                let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
-                let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-
-                $(".kode").val($(".kode_barang option:selected").val());
-                $(".nama_barang").val(nama);
-                $(".barang_id").val(barang_id);
-                $(".satuan_order").val(satuan).change();
-                $(".jumlah_order").val(stok ? stok : 0);
-            }
-            else
-            {
-                $(".new-barang").css("display", "none");
-                $(".category").val("").change();
-                $('.category').rules('remove', 'required');
-                $(".nama_barang").attr("readonly", false)
-                $(".kode").val("");
-                $(".nama_barang").val("");
-                $(".barang_id").val("");
-                $(".satuan").val("").change();
-                $(".qty").val("");
-                $(".harga").val("");
-                $(".total").val("");
-            }
-        })
-
-        $(".supplier_id").change(function() {
-            if($(".supplier_id option:selected").val())
-            {
-                $.ajax({
-                    url: `<?= base_url("po-lokal/dropdown"); ?>`,
-                    method: "GET",
-                    data: {
-                        id: $(".supplier_id option:selected").val()
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        console.log(res)
-                        $(".multiple_po_id").attr("disabled", true)
-                        $(".multiple_po_id").empty()
-                        $(".multiple_po_id").append(`<option value=""></option>`)
-                        res.data.forEach(function(item) {
-                            $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-                        })
-                        $(".multiple_po_id").attr("disabled", false)
-                        $(".multiple_po_id").val([]);
-                    }
-                })
-            }
-            else
-            {
-                $(".multiple_po_id").attr("disabled", true)
-                $(".multiple_po_id").empty()
-                $(".multiple_po_id").append(`<option value=""></option>`)
-                $(".multiple_po_id").val([]);
-            }
-        })
-    })
-
-    $(".multiple_po_id").change(function() {
-        if($('.multiple_po_id option:selected').length !== 0)
-        {
-            console.log($('.multiple_po_id').val())
-            let this_value = $('.multiple_po_id').val();
-
-            list_items = []
-            let new_list_items = []
-            let tag_html = "";
-            let tag_total = "";
-
-            row = 0;
-
-            this_value.forEach(function(item) {
-                $.ajax({
-                    url: `<?= base_url("po-lokal/ajax"); ?>`,
-                    method: "GET",
-                    data: {
-                        id: item
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        console.log(res)
-                        $(".body-detail-table").empty()
-
-                        res?.data?.purchase_order_details.map(item => {
-                            tag_html += `<tr>`;
-                            tag_html += "<td>";
-                            tag_html += row + 1;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += item.kodeBarang;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += item.barangName;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += item.spec;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += item.satuanName;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += item.totalPrice;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += 0;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += 0;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += 0;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += 0;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += 0;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += item.note;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                            tag_html += "</td>";
-                            tag_html += "</tr>";
-
-                            list_items.push({
-                                id: "",
-                                row: row + 1,
-                                barang_id: item.barang_id,
-                                warehouse_id: 0,
-                                doc_qty: 0,
-                                qty: 0,
-                                selisih: 0,
-                                konversi: 0,
-                                harga: 0,
-                                penyerahan: 0,
-                                keterangan: ""
-                            });
-
-                            row = row + 1;
-                        })
-
-                        $(".body-detail-table").append(tag_html)
-                    }
-                })
-            })
-        }
-        else
-        {
-            list_items = []
-
-            row = 0;
-            $(".body-detail-table").empty()
-        }
-
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
 
             // CHECK IF NO BARANG
-            if(list_items.length === 0)
-            {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Barang Tidak Boleh Kosong",
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-            else
-            {
+            // if(list_items.length === 0)
+            // {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: "Barang Tidak Boleh Kosong",
+            //         confirmButtonColor: '#4e73df',
+            //     })
+            // }
+            // else
+            // {
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -1057,6 +846,146 @@
                         }
                     })
                 }
+            // }
+        })
+
+        $(".btn-show-detail").click(function() {
+            if($('.multiple_po_id option:selected').length !== 0)
+            {
+            $(".delete-detail").css('display', 'none');
+
+            $(".title-detail-name").text("Tambah");
+            $(".id_detail").val('');
+
+            $.ajax({
+                url: `<?= base_url("po-lokal/multi/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    id: JSON.stringify($('.multiple_po_id').val())
+                },
+                dataType: "json",
+                success: function(res) {
+                    console.log(res)
+                    $(".kode_barang").empty()
+                    $(".kode_barang").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                    })
+
+                    $(".kode_barang").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("tax/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    type: 'ppn'
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".ppn").empty()
+                    $(".ppn").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                    })
+
+                    $(".ppn").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("tax/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    type: 'pph'
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".pph").empty()
+                    $(".pph").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                    })
+
+                    $(".pph").val("").change();
+                    $(".detail-modal").modal("show")
+                }
+            })
+            }
+            else
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: "No. PO Wajib Diisi",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+        })
+
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
+        })
+
+        $(".kode_barang").change(function() {
+            if($(".kode_barang option:selected").val())
+            {
+                let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
+                let barang_id = $(".kode_barang option:selected").val() ? $(".kode_barang option:selected").val() : "";
+                let po_id = $(".kode_barang option:selected").data("id") ? $(".kode_barang option:selected").data("id") : "";
+                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
+                let note = $(".kode_barang option:selected").data("note") ? $(".kode_barang option:selected").data("note") : "";
+                let qty = $(".kode_barang option:selected").data("qty") ? $(".kode_barang option:selected").data("qty") : 0;
+
+                $(".kode").val($(".kode_barang option:selected").val());
+                $(".nama_barang").val(nama);
+                $(".barang_id").val(barang_id);
+                $(".purchase_order_details_id").val(po_id);
+                $(".satuan_order").val(satuan);
+                $(".jumlah_order").val(qty);
+                $(".keterangan").val(note);
+            }
+            else
+            {
+                $(".kode").val("");
+                $(".nama_barang").val("");
+                $(".barang_id").val("");
+                $(".purchase_order_details_id").val("");
+                $(".satuan_order").val("");
+                $(".jumlah_order").val("");
+                $(".keterangan").val("");
+            }
+        })
+
+        $(".supplier_id").change(function() {
+            if($(".supplier_id option:selected").val())
+            {
+                $.ajax({
+                    url: `<?= base_url("po-lokal/dropdown"); ?>`,
+                    method: "GET",
+                    data: {
+                        id: $(".supplier_id option:selected").val()
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        console.log(res)
+                        $(".multiple_po_id").attr("disabled", true)
+                        $(".multiple_po_id").empty()
+                        $(".multiple_po_id").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                        })
+                        $(".multiple_po_id").attr("disabled", false)
+                        $(".multiple_po_id").val([]);
+                    }
+                })
+            }
+            else
+            {
+                $(".multiple_po_id").attr("disabled", true)
+                $(".multiple_po_id").empty()
+                $(".multiple_po_id").append(`<option value=""></option>`)
+                $(".multiple_po_id").val([]);
             }
         })
     })
