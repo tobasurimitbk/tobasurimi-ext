@@ -104,6 +104,38 @@ class POLokal extends BaseController
         return;
     }
 
+    public function getByIdPOLokalAjax()
+    {
+        $id = $this->request->getGet("id");
+
+        if (!empty($id)) {
+            $response = curl_request("GET", "/purchaseOrder/$id", $this->token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"  => true,
+                    "data"  => json_decode($response["body"])->data,
+                    "message" => $response
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
+            ];
+            echo json_encode($data);
+        }
+
+        return;
+    }
+
     public function allPOLokal()
     {
         $payload = [
