@@ -89,4 +89,112 @@ class PenerimaanBarangLokal extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function savePenerimaanBarangLokal()
+    {
+        $rules = [
+            "no_penerimaan_barang" => [
+                "rules" => "required"
+            ],
+            "supplier_id" => [
+                "rules" => "required"
+            ],
+            "acceptance_type" => [
+                "rules" => "required"
+            ],
+            "aju_document_type" => [
+                "rules" => "required"
+            ],
+            "aju_no" => [
+                "rules" => "required"
+            ],
+            "validation_date" => [
+                "rules" => "required"
+            ],
+            "no_registration" => [
+                "rules" => "required"
+            ],
+            "letter_no" => [
+                "rules" => "required"
+            ],
+            "invoice_no" => [
+                "rules" => "required"
+            ],
+            "packaging" => [
+                "rules" => "required"
+            ],
+            "total_weight" => [
+                "rules" => "required"
+            ],
+            "shipping_cost" => [
+                "rules" => "required"
+            ],
+            "biaya_masuk" => [
+                "rules" => "required"
+            ],
+            "ppn" => [
+                "rules" => "required"
+            ]
+        ];
+
+        if ($this->validate($rules)) {
+            $payload = json_encode([
+                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("no_penerimaan_barang"),
+                "acceptance_type" => $this->request->getPost("acceptance_type"),
+                "aju_document_type" => $this->request->getPost("aju_document_type"),
+                "aju_no" => $this->request->getPost("aju_no"),
+                "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
+                "no_registration" => $this->request->getPost("no_registration"),
+                "letter_no" => $this->request->getPost("letter_no"),
+                "invoice_no" => $this->request->getPost("invoice_no"),
+                "packaging" => $this->request->getPost("packaging"),
+                "total_weight" => $this->request->getPost("total_weight"),
+                "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
+                "po_type" => "lokal",
+                "status_post" => "WAITING",
+                "penerimaan_barang_detail" => json_decode(stripslashes($this->request->getPost("items")))
+            ]);
+
+            // $data = 
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
+            
+            $response = curl_request("POST", "/purchaseOrder", $this->token, $payload);
+
+            if ($response["code"] === 201) {
+                $data = [
+                    "id" => "",
+                    "status"            => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => $payload,
+                    'token' => csrf_hash(),
+                    'code' => $response["code"]
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash(),
+                    'code' => $response["code"]
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Disimpan",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
 }
