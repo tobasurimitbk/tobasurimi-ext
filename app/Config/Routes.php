@@ -282,6 +282,11 @@ $routes->post('/akses/save', 'Setting\Akses::saveAkses', ['filter' => 'Auth']);
 $routes->get('/company-access', 'Setting\CompanyAccess::companyAccess', ['filter' => 'Auth']);
 $routes->get('/company-access/all', 'Setting\CompanyAccess::allCompanyAccess', ['filter' => 'Auth']);
 
+
+//api
+$routes->get('/get-employee-by-company/(:segment)', 'HR\Attendance::get_employee_by_company/$1', ['filter' => 'Auth']);
+
+//api
 /*
  * --------------------------------------------------------------------
  * Additional Routing
