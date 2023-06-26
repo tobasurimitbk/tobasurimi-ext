@@ -133,7 +133,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="col-subtitle-modal">
+                <!-- <div class="col-subtitle-modal">
                     <div class="row mt-5">
                         <div class="col-md-6">
                             <h5 class="modal-sub-title">List Alamat Pengiriman</h5>
@@ -144,8 +144,8 @@
                             </button>
                         </div>
                     </div>
-                </div>
-                    <div class="table-responsive mt-2">
+                </div> -->
+                    <!-- <div class="table-responsive mt-2">
                         <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
@@ -161,7 +161,7 @@
 
                             </tbody>
                         </table>
-                    </div>
+                    </div> -->
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
