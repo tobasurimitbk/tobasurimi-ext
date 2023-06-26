@@ -1207,16 +1207,16 @@
 
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
-            if(list_address.length == 0)
-            {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'List Alamat Pengiriman Tidak Boleh Kosong',
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-            else
-            {
+            // if(list_address.length == 0)
+            // {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: 'List Alamat Pengiriman Tidak Boleh Kosong',
+            //         confirmButtonColor: '#4e73df',
+            //     })
+            // }
+            // else
+            // {
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -1235,78 +1235,78 @@
                             let update_list_address = [];
                             let main_address = document.querySelector('input[name="main"]:checked').value;
 
-                            if(list_delete.length !== 0)
-                            {
-                                list_delete.map(obj => {
-                                    update_list_address.push(
-                                        {
-                                            id: obj.id,
-                                            supplier_id: obj.supplier_id,
-                                            address: obj.address,
-                                            province_id: obj.province_id,
-                                            city_id: obj.city_id,
-                                            main_address: 0,
-                                            isDelete: true
-                                        }
-                                    )
-                                })
-                            }
+                            // if(list_delete.length !== 0)
+                            // {
+                            //     list_delete.map(obj => {
+                            //         update_list_address.push(
+                            //             {
+                            //                 id: obj.id,
+                            //                 supplier_id: obj.supplier_id,
+                            //                 address: obj.address,
+                            //                 province_id: obj.province_id,
+                            //                 city_id: obj.city_id,
+                            //                 main_address: 0,
+                            //                 isDelete: true
+                            //             }
+                            //         )
+                            //     })
+                            // }
                             
-                            list_address.map(obj => {
-                                if (main_address == obj.row) {
-                                    if (obj.id) {
-                                        update_list_address.push(
-                                            {
-                                                id: obj.id,
-                                                supplier_id: obj.supplier_id,
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 1
-                                            }
-                                        )
-                                    }
-                                    else
-                                    {
-                                        update_list_address.push(
-                                            {
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 1
-                                            }
-                                        )
-                                    }
-                                }
-                                else
-                                {
-                                    if (obj.id) {
-                                        update_list_address.push(
-                                            {
-                                                id: obj.id,
-                                                supplier_id: obj.supplier_id,
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 0
-                                            }
-                                        )
-                                    }
-                                    else
-                                    {
-                                        update_list_address.push(
-                                            {
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 0
-                                            }
-                                        )
-                                    }
-                                }
-                            })
+                            // list_address.map(obj => {
+                            //     if (main_address == obj.row) {
+                            //         if (obj.id) {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     id: obj.id,
+                            //                     supplier_id: obj.supplier_id,
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 1
+                            //                 }
+                            //             )
+                            //         }
+                            //         else
+                            //         {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 1
+                            //                 }
+                            //             )
+                            //         }
+                            //     }
+                            //     else
+                            //     {
+                            //         if (obj.id) {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     id: obj.id,
+                            //                     supplier_id: obj.supplier_id,
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 0
+                            //                 }
+                            //             )
+                            //         }
+                            //         else
+                            //         {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 0
+                            //                 }
+                            //             )
+                            //         }
+                            //     }
+                            // })
 
-                            data.append("list_address", JSON.stringify(update_list_address))
+                            // data.append("list_address", JSON.stringify(update_list_address))
 
                             let id = $(".id").val();
 
@@ -1355,7 +1355,7 @@
                         }
                     })
                 }
-            }
+            // }
         })
     })
 
