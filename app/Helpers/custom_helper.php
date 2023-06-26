@@ -6,7 +6,6 @@ if (!function_exists('curl_request')) {
    function curl_request($method, $url, $token, $payload = [])
    {
       $api_url = getenv("apiURL") . $url;
-
       $headers = array(
          "Cache-Control: no-cache",
          "Pragma: no-cache",
