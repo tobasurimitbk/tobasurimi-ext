@@ -5,54 +5,56 @@
 <section class="section">
 <div class="section-header">
     <h1 class="title-name">Tambah</h1>
+    <div class="col-button-tambah-spp">
 
     <?php if(!empty($dataPOLokal)){ ?> 
 
     <?php if($dataPOLokal->is_posted === false){ ?> 
-    <button class="btn btn-primary delete-parent">
-        <i class="fa fa-trash" aria-hidden="true"></i>
+    <button class="btn btn-hapus delete-parent float-right">
+        Hapus
     </button>
     <?php } ?> 
 
-    <button class="btn btn-warning">
-        <i class="fa fa-print" aria-hidden="true"></i>
+    <button class="btn btn-warning btn-print float-right">
+        Print
     </button>
 
     <?php if($dataPOLokal->is_posted === false){ ?> 
-    <button class="btn btn-success posting-po">
-        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+    <button class="btn btn-success posting-spp">
+        Posting
     </button>
     <?php } ?> 
 
     <?php } ?> 
 
-    <a class="btn btn-hide-form" href="<?= base_url("po-lokal"); ?>">
+    <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-lokal"); ?>">
         Batal
     </a>
 
     <?php if(!empty($dataPOLokal)){ 
         if($dataPOLokal->is_posted === false){ ?> 
-    <button class="btn btn-submit-form btn-submit-parent">
+    <button class="btn btn-show-form btn-save float-right">
         Simpan
     </button>
     <?php }
     } else { ?> 
-    <button class="btn btn-submit-form btn-submit-parent">
+    <button class="btn btn-show-form btn-save float-right">
         Simpan
     </button>
     <?php } ?> 
+    </div>
 </div>
 <div class="card">
     <div class="card-body">
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label class="form-label font-weight-bold">Data PO</label>
+        <div class="row">
+            <div class="col mb-3">
+                <label class="form-label font-weight-bold lable-title">Data PO</label>
             </div>
         </div>
-        <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+        <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
             <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOLokal) ? $dataPOLokal->id : ""; ?>" />
             <?= csrf_field() ?>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select purchase_request_id" id="purchase_request_id" name="purchase_request_id" aria-label="Floating label select example">
@@ -104,7 +106,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="hidden" value="<?= !empty($dataPOLokal) ? $dataPOLokal->order_type : ""; ?>" class="order_type" id="order_type" name="order_type" placeholder="Jenis Order">
@@ -112,8 +114,6 @@
                         <label for="floatingInput">Jenis Order</label>
                     </div>
                 </div>
-            </div>
-            <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->dpp : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
@@ -121,12 +121,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <label class="form-label font-weight-bold">Data Supplier</label>
+            <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Supplier</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
@@ -151,12 +151,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <label class="form-label font-weight-bold">Data Pembayaran</label>
+            <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Data Pembayaran</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select foreign_exchange" id="foreign_exchange" name="foreign_exchange" aria-label="Floating label select example">
@@ -201,18 +201,21 @@
                 </div>
             </div>
         </form>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label font-weight-bold">List Barang</label>
-            </div>
-            <div class="col-md-6">
-                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                </button>
+        <div class="col-subtitle-modal">
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="table-responsive mt-2">
-            <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+        <div class="row">
+        <div class="table-responsive">
+            <table class="table nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                 <thead class="thead-dark">
                     <tr>
                         <th>#</th>
@@ -267,15 +270,16 @@
                 </tbody>
                 <tfoot class="foot-detail-table" id="foot-detail-table">
                     <tr>
-                        <td colspan="4"></td>
+                        <td colspan="6"></td>
                         <td><b>TOTAL</b></td>
                         <td><b><?= number_format($total_harga_barang); ?></b></td>
                         <td><b><?= $total_qty; ?></b></td>
                         <td><b><?= number_format($total_harga); ?></b></td>
-                        <td colspan="2"></td>
+                        <td colspan="6"></td>
                     </tr>
                 </tfoot>
             </table>
+        </div>
         </div>
     </div>
 </div>
@@ -292,11 +296,11 @@
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
                     <div class="row">
-                        <div class="col-md-6">
-                            <h5>Data Barang</h5>
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Barang</h5>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="hidden" class="kode" name="kode" id="kode" />
@@ -313,7 +317,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control spesifikasi" name="spesifikasi" id="spesifikasi" placeholder="Spesifikasi">
@@ -338,11 +342,11 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <h5>Data Harga</h5>
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Harga</h5>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
@@ -358,7 +362,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
@@ -372,7 +376,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="formatNumber(this)" type="text" class="form-control additional_cost" name="additional_cost" id="additional_cost" placeholder="Biaya Tambahan">
@@ -387,11 +391,11 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <h5>Data Tax</h5>
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Tax</h5>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
@@ -412,7 +416,9 @@
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
+                <div class="d-flex">
                 <button type="button" class="btn btn-discard delete-detail">Hapus</button>
+                </div>
                 <label>&nbsp;</label>
                 <div class="d-flex">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>

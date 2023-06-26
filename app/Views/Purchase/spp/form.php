@@ -23,7 +23,7 @@
             ?> 
 
             <button class="btn btn-success posting-spp">
-                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                Posting
             </button>
 
             <?php } 
