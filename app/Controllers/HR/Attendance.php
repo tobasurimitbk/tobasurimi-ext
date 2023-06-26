@@ -60,13 +60,13 @@ class Attendance extends BaseController
         $img = str_replace(' ', '+', $img);
         $data = base64_decode($img);
 
-        $payload = [
-            "company_id" => $this->this_company_id,
-            "employee_id"   => $this->request->getVar("employee_id"),
+        $payload = json_encode([
+            "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
+            "employee_id"   => formatter($this->request->getVar("employee_id"), "STR_TO_INT"),
             "checkin"   => date("Y-m-d H:i:s"),
             "status"       => "HADIR",
-            "checkin_image" => "",
-        ];
+            "checkin_image" => $img,
+        ]);
         $res_attendance = curl_request("POST", "/attendance", $this->token, $payload);
         $dataAttendance = [];
         print_r($res_attendance);
@@ -97,6 +97,7 @@ class Attendance extends BaseController
     public function get_employee_by_company($employee_id)
     {
         $dataEmployee = [];
+
         $responseEmployee = curl_request("GET", "/attendance/$employee_id", $this->token);
         if ($responseEmployee["code"] === 200) {
             $dataEmployee = json_decode($responseEmployee["body"])->data;
