@@ -121,6 +121,15 @@ class Employee extends BaseController
             ],
             "division_id" => [
                 "rules" => "required"
+            ],
+            "phone_no" => [
+                "rules" => "required"
+            ],
+            "email" => [
+                "rules" => "required"
+            ],
+            "acc_no" => [
+                "rules" => "required"
             ]
         ];
 
@@ -211,6 +220,15 @@ class Employee extends BaseController
                 "rules" => "required"
             ],
             "division_id" => [
+                "rules" => "required"
+            ],
+            "phone_no" => [
+                "rules" => "required"
+            ],
+            "email" => [
+                "rules" => "required"
+            ],
+            "acc_no" => [
                 "rules" => "required"
             ]
         ];

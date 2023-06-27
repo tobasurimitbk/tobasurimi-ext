@@ -267,8 +267,15 @@
                 address: {
                     required: true,
                 },
+                phone_no: {
+                    required: true
+                },
                 email: {
                     email: true,
+                    required: true
+                },
+                acc_no: {
+                    required: true
                 },
                 division_id: {
                     required: true,
@@ -293,8 +300,15 @@
                 address: {
                     required: "Alamat wajib diisi"
                 },
+                phone_no: {
+                    required: "Nomor Telepon wajib diisi"
+                },
                 email: {
-                    email: "Email harus benar"
+                    email: "Email harus benar",
+                    required: "Email harus diisi"
+                },
+                acc_no: {
+                    required: "Nomor Rekening wajib diisi"
                 },
                 division_id: {
                     required: "Divisi wajib diisi"
@@ -574,7 +588,7 @@
                         $(".dob").val(res?.data?.dob);
                         $(".email").val(res?.data?.email);
                         $(".gender").val(res?.data?.gender);
-                        $(".name").val(res?.data?.name);
+                        $(".name").val(res?.data?.employee_name);
                         $(".nip").val(res?.data?.nip);
                         $(".phone_no").val(res?.data?.phone_no);
                         $(".status").val(res?.data?.status);
