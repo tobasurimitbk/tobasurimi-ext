@@ -65,32 +65,70 @@ class Attendance extends BaseController
             "employee_id"   => formatter($this->request->getVar("employee_id"), "STR_TO_INT"),
             "checkin"   => date("Y-m-d H:i:s"),
             "status"       => "HADIR",
+            "checkStatus"   => $this->request->getVar("state"),
             "checkin_image" => $img,
         ]);
-        $res_attendance = curl_request("POST", "/attendance", $this->token, $payload);
+        $response = curl_request("POST", "/attendance", $this->token, $payload);
         $dataAttendance = [];
-        print_r($res_attendance);
-        if ($res_attendance["code"] === 200) {
-            $dataAttendance = json_decode($res_attendance["body"])->data;
+        if ($response["code"] === 200) {
+            $message = json_decode($response["body"]);
+            $data = [
+                "status"    => true,
+                "message"   => $message->message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
         }
-
-        $data1 = [
-            "res_attendance" => $res_attendance,
-        ];
+        echo json_encode($data);
 
 
-
+        /*
         $file = uniqid() . '.png';
         $success = file_put_contents($file, $data);
+*/
+        return;
+    }
 
-        $message = 'Data Berhasil Disimpan';
-        $data = [
-            "status"            => false,
-            "message"    => $message,
-            "payload"   => "",
-            'token' => csrf_hash()
-        ];
-        echo json_encode($data1);
+    public function CheckPinEmployee()
+    {
+        $employee_id = $this->request->getVar("employee_id");
+        $pin = $this->request->getVar("pin");
+
+        $payload = json_encode([
+            "employee_id"   => formatter($this->request->getVar("employee_id"), "STR_TO_INT"),
+            "pin"   => $this->request->getVar("pin"),
+        ]);
+
+        $response = curl_request("POST", "/attendance/pinValidation", $this->token, $payload);
+
+        if ($response["code"] === 200) {
+            $message = json_decode($response["body"]);
+            $data = [
+                "status"    => true,
+                "message"   => $message->message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+        }
+        echo json_encode($data);
+
+
         return;
     }
 
