@@ -85,7 +85,7 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-body mb-1">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
                 <button class="btn btn-discard" onclick="hideLogoutForm()">Cancel</button>
                 <a class="btn btn-logout-form" href="<?= base_url("logout"); ?>">Logout</a>

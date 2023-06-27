@@ -148,7 +148,7 @@
             </div>
         </form>
         <div class="col-subtitle-modal">
-            <div class="row mt-4">
+            <div class="row mt-2">
                 <div class="col-md-6">
                     <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                 </div>
@@ -333,15 +333,10 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
             </div>
         </div>
     </div>
