@@ -5199,6 +5199,63 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   color: #2f4858;
 }
 
+#Cam #my_camera {
+  width: 100% !important;
+  height: auto !important;
+}
+
+#Cam #my_camera video {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 4px;
+}
+
+.col-content-attendance .text-left-content-attendance {
+  font-family: "Poppins", sans-serif !important;
+  font-weight: 600;
+  font-size: 13px !important;
+  margin: 0px;
+  color: #2f4858;
+}
+
+.col-content-attendance .text-right-content-attendance {
+  font-family: "Poppins", sans-serif !important;
+  font-weight: 500;
+  font-size: 13px !important;
+  margin: 0px;
+  color: #798897;
+}
+
+.col-content-attendance .btn.form-control.btn-warning {
+  box-shadow: none !important;
+  padding: 12px !important;
+  color: #ffffff !important;
+  border: 1px #ffa426 solid !important;
+  border-radius: 4px !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.col-content-attendance .btn.form-control.btn-primary {
+  background: #007ae0 !important;
+  box-shadow: none !important;
+  padding: 12px !important;
+  color: #ffffff !important;
+  border: 1px #007ae0 solid !important;
+  border-radius: 4px !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.col-content-attendance .btn.form-control.btn-primary:hover,
+.col-content-attendance .btn.form-control.btn-primary:focus,
+.col-content-attendance .btn.form-control.btn-primary:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
@@ -5410,6 +5467,10 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
     width: 100%;
     min-width: 100%;
     margin-top: 1rem !important;
+  }
+
+  .col-content-attendance .btn.form-control.btn-warning {
+    margin-bottom: 0.75rem;
   }
 }
 
