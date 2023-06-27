@@ -37,6 +37,7 @@ class Filters extends BaseConfig
                 'except' => [
                     'api/contact/save',
                     'save-attendance',
+                    'check-pin-employee',
                     'api/contact/delete'
                 ]
             ]

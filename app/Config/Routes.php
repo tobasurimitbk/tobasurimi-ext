@@ -275,11 +275,19 @@ $routes->post('/penerimaan-barang-import/save', 'Warehouse\PenerimaanBarangImpor
 $routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
 $routes->get('/list-attendance', 'HR\Attendance::ListAttendance', ['filter' => 'Auth']);
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
+$routes->post('/check-pin-employee', 'HR\Attendance::CheckPinEmployee', ['filter' => 'Auth']);
 
 // payroll
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 // $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
 
+// formula payroll
+$routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);
+// $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
+
+// pinjaman karyawan
+$routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::pinjamanKaryawan', ['filter' => 'Auth']);
+// $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

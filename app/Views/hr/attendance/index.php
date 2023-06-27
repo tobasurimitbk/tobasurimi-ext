@@ -20,6 +20,7 @@
     }
 </style>
 
+
 <script language="JavaScript">
     function take_snapshot() {
         Webcam.snap(function(data_uri) {
@@ -63,6 +64,7 @@
                 url: "/save-attendance",
                 data: {
                     employee_id: document.getElementById("employee_id").value,
+                    state: 'ISTIRAHAT',
                     pic: data_uri
                 },
                 dataType: "json",
@@ -85,6 +87,7 @@
                 url: "/save-attendance",
                 data: {
                     employee_id: document.getElementById("employee_id").value,
+                    state: 'KEHADIRAN',
                     pic: data_uri
                 },
                 dataType: "json",
@@ -107,7 +110,15 @@
             data: {},
             dataType: "json",
             success: function(response) {
-                alert('sukses');
+                document.getElementById("dnama").innerHTML = response.data.employeeName;
+                document.getElementById("djabatan").innerHTML = response.data.divisionName;
+                document.getElementById("djam_masuk").innerHTML = response.data.checkin;
+                document.getElementById("distirahat_mulai").innerHTML = response.data.breakin;
+                document.getElementById("distirahat_selesai").innerHTML = response.data.breakout;
+                document.getElementById("djam_pulang").innerHTML = response.data.checkout;
+
+                console.log(response);
+                //alert('sukses');
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
@@ -116,6 +127,92 @@
         });
 
     }
+
+    $(document).ready(function() {
+
+        $(".btn-show-detail").click(function(e) {
+            document.getElementById("pin").value = "";
+            var temp = e.target.getAttribute('data-btn');
+            if (temp == 'kehadiran') {
+                document.getElementById("status_type").value = 'KEHADIRAN';
+            } else {
+                document.getElementById("status_type").value = 'ISTIRAHAT';
+            }
+            $(".detail-modal").modal("show")
+        });
+
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
+        });
+
+        $(".btn-submit-pin").click(function() {
+            $.ajax({
+                type: "post",
+                url: "/check-pin-employee",
+                data: {
+                    employee_id: document.getElementById("employee_id").value,
+                    pin: document.getElementById("pin").value,
+                },
+
+                dataType: "json",
+                success: function(response) {
+                    if (response.message == 'PIN Validate!') {
+                        Webcam.snap(function(data_uri) {
+                            $.ajax({
+                                type: "post",
+                                url: "/save-attendance",
+                                data: {
+                                    employee_id: document.getElementById("employee_id").value,
+                                    state: document.getElementById("status_type").value,
+                                    pic: data_uri
+                                },
+                                dataType: "json",
+                                success: function(response) {
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".detail-modal").modal("hide")
+                                            })
+
+                                    } else {
+                                        Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".detail-modal").modal("hide")
+                                            })
+                                    }
+                                },
+                                error: function(xhr, ajaxOptions, thrownError) {
+                                    //alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                                }
+
+                            });
+                        });
+
+                    } else {
+
+                    }
+                    console.log(response);
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    //csrf.val(response.token);
+                    alert(xhr.status + "\n" + xhr.responseText + "\n" + thrownError);
+                }
+
+            });
+
+            $(".detail-modal").modal("hide")
+        });
+
+
+    })
     window.onload = ShowCam;
 </script>
 
@@ -124,6 +221,7 @@
     <div class="section-header">
         <h1>Attendance</h1>
     </div>
+
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-center mb-3">
@@ -163,7 +261,7 @@
                                 Nama
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="dnama"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -171,23 +269,7 @@
                                 Jabatan
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
-                            </div>
-                        </div>
-                        <div class="row justify-content-center">
-                            <div class="col-md-6" style="height: 50px;">
-                                Jam Kerja
-                            </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                :
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Jam Istirahat
-                            </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="djabatan"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -195,7 +277,7 @@
                                 Jam Masuk
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="djam_masuk"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -203,7 +285,7 @@
                                 Istirahat Mulai
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="distirahat_mulai"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -211,7 +293,7 @@
                                 Istirahat Selesai
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="distirahat_selesai"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -219,7 +301,7 @@
                                 Jam Pulang
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="djam_pulang"></span>
                             </div>
                         </div>
 
@@ -228,12 +310,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <button class="btn form-control btn-warning " data-btn="create-modal" onClick="GetAbsenIstirahat();">
+                        <button class="btn form-control btn-show-detail btn-warning " data-btn="istirahat">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Absen Istirahat
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn form-control btn-primary " data-btn="create-modal" onClick="GetAbsenKehadiran();">
+                        <button class="btn form-control btn-show-detail btn-primary " data-btn="kehadiran">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Absen Kehadiran
                         </button>
                     </div>
@@ -241,39 +323,38 @@
 
             </div>
 
-            <!--
-            <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th onclick="changeSort('nip')" class="sort">NIP</th>
-                                <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
-                                <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
-                                <th onclick="changeSort('email')" class="sort">Email</th>
-                                <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
-                                <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                                <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
-                                <th onclick="changeSort('status')" class="sort">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
--->
         </div>
     </div>
 </section>
 
+<div class="modal detail-modal" tabindex="1">
+    <input type="hidden" name="status_type" id="status_type" value="">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label>PIN</h5>
+            </div>
+            <div class="modal-body">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="password" class="form-control pin" id="pin" name="pin" placeholder="PIN">
+                                <label for="floatingInput">PIN</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <div class="d-flex">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
+                    <button type="submit" class="btn btn-submit-pin btn-submit-detail">Proses</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <?= $this->endSection(); ?>
