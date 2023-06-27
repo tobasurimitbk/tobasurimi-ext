@@ -8,7 +8,9 @@
     }
 
     #Cam {
-        background: rgb(255, 255, 215);
+        background: #eeeeee;
+        border-radius: 4px;
+        padding: 15px 15px 10px 15px;
     }
 
     #Prev {
@@ -145,7 +147,7 @@
             $(".detail-modal").modal("hide")
         });
 
-        $(".btn-submit-pin").click(function() {
+        $(".btn-submit-form").click(function() {
             $.ajax({
                 type: "post",
                 url: "/check-pin-employee",
@@ -197,6 +199,14 @@
                         });
 
                     } else {
+                        Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                $(".detail-modal").modal("hide")
+                            })
 
                     }
                     console.log(response);
@@ -224,21 +234,20 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-center mb-3">
+            <div class="col-content-attendance">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4 mb-3">
                         <div class="container1" id="Cam">
                             <div id="my_camera"></div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8 mb-3">
                         <div class="row">
-                            <div class="col-md-6">
-                                NIP
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-left-content-attendance">NIP</h5>
                             </div>
-
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
+                            <div class="col-md-8 mb-3">
+                                <div class="form-floating">
                                     <select class="form-select ar_id" name="employee_id" id="employee_id" onChange="get_info(this)">
                                         <option value=""></option>
                                         <?php
@@ -257,70 +266,67 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Nama
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-left-content-attendance">Nama</h5>
                             </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                : <span id="dnama"></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Jabatan
-                            </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                : <span id="djabatan"></span>
+                            <div class="col-md-8 mb-3">
+                                : &nbsp; <span class="text-right-content-attendance" id="dnama"></span>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Jam Masuk
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-left-content-attendance">Jabatan</h5>
                             </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                : <span id="djam_masuk"></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Istirahat Mulai
-                            </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                : <span id="distirahat_mulai"></span>
+                            <div class="col-md-8 mb-3">
+                                : &nbsp; <span class="text-right-content-attendance" id="djabatan"></span>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Istirahat Selesai
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-left-content-attendance">Jam Masuk</h5>
                             </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                : <span id="distirahat_selesai"></span>
+                            <div class="col-md-8 mb-3">
+                                : &nbsp; <span class="text-right-content-attendance" id="djam_masuk"></span>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Jam Pulang
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-left-content-attendance">Istirahat Mulai</h5>
                             </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                : <span id="djam_pulang"></span>
+                            <div class="col-md-8 mb-3">
+                                : &nbsp; <span class="text-right-content-attendance" id="distirahat_mulai"></span>
                             </div>
                         </div>
-
-
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-left-content-attendance">Istirahat Selesai</h5>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                : &nbsp; <span class="text-right-content-attendance" id="distirahat_selesai"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <h5 class="text-left-content-attendance">Jam Pulang</h5>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                : &nbsp; <span class="text-right-content-attendance" id="djam_pulang"></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <button class="btn form-control btn-show-detail btn-warning " data-btn="istirahat">
+                                    Absen Istirahat
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn form-control btn-show-detail btn-primary " data-btn="kehadiran">
+                                    Absen Kehadiran
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <button class="btn form-control btn-show-detail btn-warning " data-btn="istirahat">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Absen Istirahat
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <button class="btn form-control btn-show-detail btn-primary " data-btn="kehadiran">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Absen Kehadiran
-                        </button>
-                    </div>
-                </div>
-
             </div>
 
         </div>
@@ -338,23 +344,52 @@
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="col-12">
+                            <div class="form-floating">
                                 <input type="password" class="form-control pin" id="pin" name="pin" placeholder="PIN">
                                 <label for="floatingInput">PIN</label>
                             </div>
                         </div>
                     </div>
-
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-pin btn-submit-detail">Proses</button>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Proses</button>
             </div>
         </div>
     </div>
 </div>
+<script>
+    const csrfToken = '<?= csrf_token() ?>';
+
+    $(document).ready(function() {
+        $('.ar_id').select2({
+            placeholder: "",
+            allowClear: true,
+            theme: "bootstrap-5",
+            //dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.ar_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.ar_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.ar_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1')
+    })
+</script>
 <?= $this->endSection(); ?>
