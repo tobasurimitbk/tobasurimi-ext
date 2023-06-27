@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Purchase Order Lokal</h1>
+    <h1>Purchase Order Lokal Bahan Baku</h1>
     <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
@@ -80,7 +80,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("po-lokal/all"); ?>",
+            url: "<?= base_url("po-lokal-bahan-baku/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -230,7 +230,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("po-lokal/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("po-lokal-bahan-baku/id"); ?>/${data.id}`);
         })
     })
 </script>

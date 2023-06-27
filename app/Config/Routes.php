@@ -170,29 +170,29 @@ $routes->post('/spp/update-status', 'Purchase\SPP::updateStatusSPP', ['filter' =
 $routes->post('/spp/approve', 'Purchase\SPP::approveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
 
-// PO LOKAL
-$routes->get('/po-lokal', 'Purchase\POLokal::poLokal', ['filter' => 'Auth']);
-$routes->get('/po-lokal/all', 'Purchase\POLokal::allPOLokal', ['filter' => 'Auth']);
-$routes->get('/po-lokal/create', 'Purchase\POLokal::createPOLokal', ['filter' => 'Auth']);
-$routes->get('/po-lokal/id/(:segment)', 'Purchase\POLokal::getByIdPOLokal/$1', ['filter' => 'Auth']);
-$routes->get('/po-lokal/ajax', 'Purchase\POLokal::getByIdPOLokalAjax', ['filter' => 'Auth']);
-$routes->get('/po-lokal/create', 'Purchase\POLokal::createPOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/save', 'Purchase\POLokal::savePOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/update', 'Purchase\POLokal::updatePOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/update-status', 'Purchase\POLokal::updateStatusPOLokal', ['filter' => 'Auth']);
-$routes->post('/po-lokal/delete', 'Purchase\POLokal::deletePOLokal', ['filter' => 'Auth']);
+// BAHAN BAKU PO LOKAL
+$routes->get('/po-lokal-bahan-baku', 'Purchase\POLokalBahanBaku::poLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/all', 'Purchase\POLokalBahanBaku::allPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/create', 'Purchase\POLokalBahanBaku::createPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/id/(:segment)', 'Purchase\POLokalBahanBaku::getByIdPOLokalBahanBaku/$1', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/ajax', 'Purchase\POLokalBahanBaku::getByIdPOLokalBahanBakuAjax', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/create', 'Purchase\POLokalBahanBaku::createPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-baku/save', 'Purchase\POLokalBahanBaku::savePOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-baku/update', 'Purchase\POLokalBahanBaku::updatePOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-baku/update-status', 'Purchase\POLokalBahanBaku::updateStatusPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-baku/delete', 'Purchase\POLokalBahanBaku::deletePOLokalBahanBaku', ['filter' => 'Auth']);
 
-// PO IMPORT
-$routes->get('/po-import', 'Purchase\POImport::poImport', ['filter' => 'Auth']);
-$routes->get('/po-import/all', 'Purchase\POImport::allPOImport', ['filter' => 'Auth']);
-$routes->get('/po-import/create', 'Purchase\POImport::createPOImport', ['filter' => 'Auth']);
-$routes->get('/po-import/id/(:segment)', 'Purchase\POImport::getByIdPOImport/$1', ['filter' => 'Auth']);
-$routes->get('/po-import/ajax', 'Purchase\POImport::getByIdPOImportAjax', ['filter' => 'Auth']);
-$routes->get('/po-import/create', 'Purchase\POImport::createPOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/save', 'Purchase\POImport::savePOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/update', 'Purchase\POImport::updatePOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/update-status', 'Purchase\POImport::updateStatusPOImport', ['filter' => 'Auth']);
-$routes->post('/po-import/delete', 'Purchase\POImport::deletePOImport', ['filter' => 'Auth']);
+// BAHAN BAKU PO IMPORT
+$routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/all', 'Purchase\POImportBahanBaku::allPOImportBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/create', 'Purchase\POImportBahanBaku::createPOImportBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/id/(:segment)', 'Purchase\POImportBahanBaku::getByIdPOImportBahanBaku/$1', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/ajax', 'Purchase\POImportBahanBaku::getByIdPOImportBahanBakuAjax', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/create', 'Purchase\POImportBahanBaku::createPOImportBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-import-bahan-baku/save', 'Purchase\POImportBahanBaku::savePOImportBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-import-bahan-baku/update', 'Purchase\POImportBahanBaku::updatePOImportBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-import-bahan-baku/update-status', 'Purchase\POImportBahanBaku::updateStatusPOImportBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-import-bahan-baku/delete', 'Purchase\POImportBahanBaku::deletePOImportBahanBaku', ['filter' => 'Auth']);
 
 // DROPDOWN
 // PO LOKAL

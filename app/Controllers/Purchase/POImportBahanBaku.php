@@ -4,7 +4,7 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 
-class POLokal extends BaseController
+class POImportBahanBaku extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -15,15 +15,15 @@ class POLokal extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function poLokal()
+    public function poImportBahanBaku()
     {
-        return view('Purchase/poLokal/index');
+        return view('Purchase/poImportBahanBaku/index');
     }
 
-    public function createPOLokal()
+    public function createPOImportBahanBaku()
     {
-         //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
+        //Get SPP Number
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -52,10 +52,10 @@ class POLokal extends BaseController
             "dataValuta" => $dataValuta
         ];
 
-        return view('Purchase/poLokal/form', $data);
+        return view('Purchase/poImportBahanBaku/form', $data);
     }
 
-    public function getByIdPOLokal($id = null)
+    public function getByIdPOImportBahanBaku($id = null)
     {
         //Get SPP Number
         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
@@ -99,12 +99,12 @@ class POLokal extends BaseController
             // die;
         }
 
-        return view('Purchase/poLokal/form', $data);
+        return view('Purchase/poImportBahanBaku/form', $data);
         
         return;
     }
 
-    public function getByIdPOLokalAjax()
+    public function getByIdPOImportBahanBakuAjax()
     {
         $id = $this->request->getGet("id");
 
@@ -136,7 +136,7 @@ class POLokal extends BaseController
         return;
     }
 
-    public function allPOLokal()
+    public function allPOImportBahanBaku()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -186,7 +186,7 @@ class POLokal extends BaseController
         return;
     }
 
-    public function savePOLokal()
+    public function savePOImportBahanBaku()
     {
         $rules = [
             "purchase_request_id" => [
@@ -222,7 +222,7 @@ class POLokal extends BaseController
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "lokal",
+                "po_type" => "import",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
                 "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
@@ -275,7 +275,7 @@ class POLokal extends BaseController
         return;
     }
 
-    public function updatePOLokal()
+    public function updatePOImportBahanBaku()
     {
         $rules = [
             "purchase_request_id" => [
@@ -313,7 +313,7 @@ class POLokal extends BaseController
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "lokal",
+                "po_type" => "import",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
                 "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
@@ -362,7 +362,7 @@ class POLokal extends BaseController
         return;
     }
 
-    public function updateStatusPOLokal()
+    public function updateStatusPOImportBahanBaku()
     {
         $id = $this->request->getPost("id");
 
@@ -393,7 +393,7 @@ class POLokal extends BaseController
         return;
     }
 
-    public function deletePOLokal()
+    public function deletePOImportBahanBaku()
     {
         $id = $this->request->getPost("id");
 
@@ -426,38 +426,38 @@ class POLokal extends BaseController
         return;
     }
 
-    public function dropdownPOLokal()
+    public function dropdownPOImportBahanBaku()
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-        $dataPOLokal = [];
-        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&supplierid=$id", $this->token);
-        if ($responsePOLokal["code"] === 200) {
-            $dataPOLokal = json_decode($responsePOLokal["body"])->data;
+        $dataPOImport = [];
+        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&supplierid=$id", $this->token);
+        if ($responsePOImport["code"] === 200) {
+            $dataPOImport = json_decode($responsePOImport["body"])->data;
         }
 
         $data = [
-            "data" => $dataPOLokal
+            "data" => $dataPOImport
         ];
 
         echo json_encode($data);
         return;
     }
 
-    public function dropdownBarangPOLokal()
+    public function dropdownBarangPOImportBahanBaku()
     {
         $payload = json_encode([
             "multiple_id_po" => json_decode(stripslashes($this->request->getGet("id")))
         ]);
 
-        $dataPOLokal = [];
-        $responsePOLokal = curl_request("POST", "/penerimaanBarang/list-po", $this->token, $payload);
-        if ($responsePOLokal["code"] === 200) {
-            $dataPOLokal = json_decode($responsePOLokal["body"])->data;
+        $dataPOImport = [];
+        $responsePOImport = curl_request("POST", "/penerimaanBarang/list-po", $this->token, $payload);
+        if ($responsePOImport["code"] === 200) {
+            $dataPOImport = json_decode($responsePOImport["body"])->data;
         }
 
         $data = [
-            "data" =>  $dataPOLokal,
-            "response" => $responsePOLokal
+            "data" =>  $dataPOImport,
+            "response" => $responsePOImport
         ];
 
         echo json_encode($data);

@@ -4,26 +4,26 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 
-class POImport extends BaseController
+class POLokalBahanBaku extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function poImport()
+    public function poLokalBahanBaku()
     {
-        return view('Purchase/poImport/index');
+        return view('Purchase/poLokalBahanBaku/index');
     }
 
-    public function createPOImport()
+    public function createPOLokalBahanBaku()
     {
-         //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
+        //Get SPP Number
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -52,13 +52,13 @@ class POImport extends BaseController
             "dataValuta" => $dataValuta
         ];
 
-        return view('Purchase/poImport/form', $data);
+        return view('Purchase/poLokalBahanBaku/form', $data);
     }
 
-    public function getByIdPOImport($id = null)
+    public function getByIdPOLokalBahanBaku($id = null)
     {
-         //Get SPP Number
-         $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
+        //Get SPP Number
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -88,20 +88,23 @@ class POImport extends BaseController
         ];
 
         if (!empty($id)) {
-            $responsePOImport = curl_request("GET", "/purchaseOrder/$id", $this->token);
-            $dataPOImport = [];
-            if ($responsePOImport["code"] === 200) {
-                $dataPOImport = json_decode($responsePOImport["body"])->data;
+            $responsePOLokal = curl_request("GET", "/purchaseOrder/$id", $this->token);
+            $dataPOLokal = [];
+            if ($responsePOLokal["code"] === 200) {
+                $dataPOLokal = json_decode($responsePOLokal["body"])->data;
             }
-            $data["dataPOImport"] = $dataPOImport;
+            $data["dataPOLokal"] = $dataPOLokal;
+
+            // var_dump($dataPOLokal);
+            // die;
         }
 
-        return view('Purchase/poImport/form', $data);
+        return view('Purchase/poLokalBahanBaku/form', $data);
         
         return;
     }
 
-    public function getByIdPOImportAjax()
+    public function getByIdPOLokalBahanBakuAjax()
     {
         $id = $this->request->getGet("id");
 
@@ -111,6 +114,7 @@ class POImport extends BaseController
                 $data = [
                     "status"  => true,
                     "data"  => json_decode($response["body"])->data,
+                    "message" => $response
                 ];
                 echo json_encode($data);
             } else {
@@ -132,7 +136,7 @@ class POImport extends BaseController
         return;
     }
 
-    public function allPOImport()
+    public function allPOLokalBahanBaku()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -146,7 +150,7 @@ class POImport extends BaseController
         ];
 
         $response = curl_request("GET", "/purchaseOrder", $this->token, $payload);
-        $dataPOImport = [];
+        $dataPOLokal = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -156,7 +160,7 @@ class POImport extends BaseController
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
             foreach ($body as $data) {
-                array_push($dataPOImport, [
+                array_push($dataPOLokal, [
                     "no" => $no++,
                     "id" => $data->id,
                     "po_date" => $data->po_date,
@@ -173,7 +177,7 @@ class POImport extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataPOImport,
+            "data" => $dataPOLokal,
             "response" => $response,
             "payload" => $payload
         ];
@@ -182,7 +186,7 @@ class POImport extends BaseController
         return;
     }
 
-    public function savePOImport()
+    public function savePOLokalBahanBaku()
     {
         $rules = [
             "purchase_request_id" => [
@@ -218,7 +222,7 @@ class POImport extends BaseController
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "import",
+                "po_type" => "lokal",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
                 "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
@@ -271,7 +275,7 @@ class POImport extends BaseController
         return;
     }
 
-    public function updatePOImport()
+    public function updatePOLokalBahanBaku()
     {
         $rules = [
             "purchase_request_id" => [
@@ -309,7 +313,7 @@ class POImport extends BaseController
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "import",
+                "po_type" => "lokal",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
                 "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
@@ -358,7 +362,7 @@ class POImport extends BaseController
         return;
     }
 
-    public function updateStatusPOImport()
+    public function updateStatusPOLokalBahanBaku()
     {
         $id = $this->request->getPost("id");
 
@@ -389,7 +393,7 @@ class POImport extends BaseController
         return;
     }
 
-    public function deletePOImport()
+    public function deletePOLokalBahanBaku()
     {
         $id = $this->request->getPost("id");
 
@@ -422,24 +426,24 @@ class POImport extends BaseController
         return;
     }
 
-    public function dropdownPOImport()
+    public function dropdownPOLokalBahanBaku()
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-        $dataPOImport = [];
-        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&supplierid=$id", $this->token);
-        if ($responsePOImport["code"] === 200) {
-            $dataPOImport = json_decode($responsePOImport["body"])->data;
+        $dataPOLokal = [];
+        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&supplierid=$id", $this->token);
+        if ($responsePOLokal["code"] === 200) {
+            $dataPOLokal = json_decode($responsePOLokal["body"])->data;
         }
 
         $data = [
-            "data" => $dataPOImport
+            "data" => $dataPOLokal
         ];
 
         echo json_encode($data);
         return;
     }
 
-    public function dropdownBarangPOImport()
+    public function dropdownBarangPOLokalBahanBaku()
     {
         $payload = json_encode([
             "multiple_id_po" => json_decode(stripslashes($this->request->getGet("id")))
@@ -452,7 +456,8 @@ class POImport extends BaseController
         }
 
         $data = [
-            "data" =>  $dataPOLokal
+            "data" =>  $dataPOLokal,
+            "response" => $responsePOLokal
         ];
 
         echo json_encode($data);

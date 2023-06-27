@@ -7,9 +7,9 @@
     <h1 class="title-name">Tambah</h1>
     <div class="col-button-tambah-spp">
 
-    <?php if(!empty($dataPOLokal)){ ?> 
+    <?php if(!empty($dataPOImport)){ ?> 
 
-    <?php if($dataPOLokal->is_posted === false){ ?> 
+    <?php if($dataPOImport->is_posted === false){ ?> 
     <button class="btn btn-hapus delete-parent float-right">
         Hapus
     </button>
@@ -19,7 +19,7 @@
         Print
     </button>
 
-    <?php if($dataPOLokal->is_posted === false){ ?> 
+    <?php if($dataPOImport->is_posted === false){ ?> 
     <button class="btn btn-success posting-spp float-right">
         Posting
     </button>
@@ -27,12 +27,12 @@
 
     <?php } ?> 
 
-    <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-lokal"); ?>">
+    <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-baku"); ?>">
         Batal
     </a>
 
-    <?php if(!empty($dataPOLokal)){ 
-        if($dataPOLokal->is_posted === false){ ?> 
+    <?php if(!empty($dataPOImport)){ 
+        if($dataPOImport->is_posted === false){ ?> 
     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
         Simpan
     </button>
@@ -52,7 +52,7 @@
             </div>
         </div>
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOLokal) ? $dataPOLokal->id : ""; ?>" />
+            <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOImport) ? $dataPOImport->id : ""; ?>" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-3">
@@ -63,7 +63,7 @@
                             if (!empty($dataSPP)) {
                                 foreach ($dataSPP as $spp) {
                             ?>
-                                    <option value="<?= $spp->id; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->purchase_request_id === $spp->id ? "selected" : "") : ""; ?>><?= $spp->spp_no; ?></option>
+                                    <option value="<?= $spp->id; ?>" <?= !empty($dataPOImport) ? ($dataPOImport->purchase_request_id === $spp->id ? "selected" : "") : ""; ?>><?= $spp->spp_no; ?></option>
                             <?php
                                 }
                             }
@@ -76,7 +76,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOLokal) ? $dataPOLokal->po_no : ""; ?>">
+                                <input type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOImport) ? $dataPOImport->po_no : ""; ?>">
                                 <label for="floatingInput">No. PO</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -89,7 +89,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOLokal) ? $dataPOLokal->po_date : ""; ?>">
+                                <input class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? $dataPOImport->po_date : ""; ?>">
                                 <label for="floatingInput">Tanggal Dibuat</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -99,9 +99,9 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <input type="hidden" value="<?= !empty($dataPOLokal) ? $dataPOLokal->warehouse_id : ""; ?>" class="form-control warehouse_id" id="warehouse_id" name="warehouse_id">
+                    <input type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->warehouse_id : ""; ?>" class="form-control warehouse_id" id="warehouse_id" name="warehouse_id">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->warehouseName : ""; ?>" readonly="true" class="form-control warehouse" id="warehouse" name="warehouse" placeholder="Gudang">
+                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->warehouseName : ""; ?>" readonly="true" class="form-control warehouse" id="warehouse" name="warehouse" placeholder="Gudang">
                         <label for="floatingInput">Gudang</label>
                     </div>
                 </div>
@@ -109,14 +109,14 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="hidden" value="<?= !empty($dataPOLokal) ? $dataPOLokal->order_type : ""; ?>" class="order_type" id="order_type" name="order_type" placeholder="Jenis Order">
-                        <input type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->orderTypeName : ""; ?>" readonly="true" class="form-control order_type_name" id="order_type_name" name="order_type_name" placeholder="Jenis Order">
+                        <input type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->order_type : ""; ?>" class="order_type" id="order_type" name="order_type" placeholder="Jenis Order">
+                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->orderTypeName : ""; ?>" readonly="true" class="form-control order_type_name" id="order_type_name" name="order_type_name" placeholder="Jenis Order">
                         <label for="floatingInput">Jenis Order</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->dpp : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
+                        <input value="<?= !empty($dataPOImport) ? $dataPOImport->dpp : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
                         <label for="floatingInput">DPP</label>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
                             if (!empty($dataSupplier)) {
                                 foreach ($dataSupplier as $supplier) {
                             ?>
-                                    <option <?= !empty($dataPOLokal) ? ($dataPOLokal->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
+                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
                             <?php
                                 }
                             }
@@ -146,7 +146,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->supplierName : ""; ?>" readonly="true" class="form-control supplier" id="supplier" name="supplier" placeholder="Nama Supplier">
+                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->supplierName : ""; ?>" readonly="true" class="form-control supplier" id="supplier" name="supplier" placeholder="Nama Supplier">
                         <label for="floatingInput">Nama Supplier</label>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                             if (!empty($dataValuta)) {
                                 foreach ($dataValuta as $valuta) {
                             ?>
-                                    <option <?= !empty($dataPOLokal) ? ($dataPOLokal->foreign_exchange === $valuta->id ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
+                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->foreign_exchange === $valuta->id ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
                             <?php
                                 }
                             }
@@ -176,7 +176,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->payment_term : ""; ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran / Bulan">
+                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran / Bulan">
                         <label for="floatingInput">Termin Pembayaran / Bulan</label>
                     </div>
                 </div>
@@ -184,7 +184,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->payment_date : ""; ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
+                                <input value="<?= !empty($dataPOImport) ? $dataPOImport->payment_date : ""; ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
                                 <label for="floatingInput">Tanggal Pembayaran</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -195,7 +195,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                        <input value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                         <label for="floatingInput">Catatan (Opsional)</label>
                     </div>
                 </div>
@@ -240,8 +240,8 @@
                     $total_harga_barang = 0;
                     $total_qty = 0;
                     $total_harga = 0;
-                    if(!empty($dataPOLokal)){ 
-                    foreach($dataPOLokal->purchase_order_details as $details){  
+                    if(!empty($dataPOImport)){ 
+                    foreach($dataPOImport->purchase_order_details as $details){  
                         $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $details->price), "STR_TO_INT");
                         $total_qty = $total_qty + $details->qty;
                         $total_harga = $total_harga + formatter(str_replace(",", "", $details->totalPrice), "STR_TO_INT");
@@ -270,7 +270,7 @@
                 </tbody>
                 <tfoot class="foot-detail-table" id="foot-detail-table">
                     <tr>
-                        <td colspan="4"></td>
+                        <td colspan="6"></td>
                         <td><b>TOTAL</b></td>
                         <td><b><?= number_format($total_harga_barang); ?></b></td>
                         <td><b><?= $total_qty; ?></b></td>
@@ -435,8 +435,8 @@
     var priceEdit = 0;
     var totalPriceEdit = 0;
 
-    <?php if(!empty($dataPOLokal)){ 
-        foreach($dataPOLokal->purchase_order_details as $details){  
+    <?php if(!empty($dataPOImport)){ 
+        foreach($dataPOImport->purchase_order_details as $details){  
     ?>
 
     priceEdit = Number('<?= $details->price; ?>'.replaceAll(",", ""));
@@ -1124,7 +1124,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='6'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1162,7 +1162,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>0</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='6'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1247,7 +1247,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("po-lokal/delete"); ?>",
+                        url: "<?= base_url("po-import-bahan-baku/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -1266,7 +1266,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("po-lokal"); ?>"
+                                        window.location.href = "<?= base_url("po-import-bahan-baku"); ?>"
                                     })
                             } else {
                                 Swal.fire({
@@ -1495,7 +1495,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='6'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1613,7 +1613,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='6'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1649,7 +1649,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("po-lokal/update-status"); ?>",
+                        url: "<?= base_url("po-import-bahan-baku/update-status"); ?>",
                         data: {
                             id: $(".id").val()
                         },
@@ -1801,7 +1801,7 @@
                             if(id)
                             {
                                 $.ajax({
-                                    url: "<?= base_url("po-lokal/update"); ?>",
+                                    url: "<?= base_url("po-import-bahan-baku/update"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1820,7 +1820,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-lokal"); ?>" + "/id/" + id;
+                                                window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + id;
                                             })
                                         } else {
                                             Swal.fire({
@@ -1846,7 +1846,7 @@
                             else
                             {
                                 $.ajax({
-                                    url: "<?= base_url("po-lokal/save"); ?>",
+                                    url: "<?= base_url("po-import-bahan-baku/save"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1865,7 +1865,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-lokal"); ?>";
+                                                window.location.href = "<?= base_url("po-import-bahan-baku"); ?>";
                                             })
                                         } else {
                                             Swal.fire({
@@ -2010,7 +2010,7 @@
                 tag_total += "<td>";
                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                 tag_total += "</td>";
-                tag_total += "<td colspan='6'>";
+                tag_total += "<td colspan='2'>";
                 tag_total += "</td>";
                 tag_total += "</tr>";
 
