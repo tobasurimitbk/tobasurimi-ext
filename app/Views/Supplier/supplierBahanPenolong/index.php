@@ -1004,196 +1004,196 @@
             })
         })
 
-        $(".btn-submit-detail").click(function() {
-            let row_detail = $(".id_detail").val();
-            let address = $(".detail_address").val()
-            let province_id = $(".province_id option:selected").val()
-            let province_name = $(".province_id option:selected").text()
-            let city_id = $(".city_id option:selected").val()
-            let city_name = $(".city_id option:selected").text()
-            let postal_code = $(".postal_code").val();
+        // $(".btn-submit-detail").click(function() {
+        //     let row_detail = $(".id_detail").val();
+        //     let address = $(".detail_address").val()
+        //     let province_id = $(".province_id option:selected").val()
+        //     let province_name = $(".province_id option:selected").text()
+        //     let city_id = $(".city_id option:selected").val()
+        //     let city_name = $(".city_id option:selected").text()
+        //     let postal_code = $(".postal_code").val();
 
-            // update detail
-            if(row_detail)
-            {
-                let main_address = document.querySelector('input[name="main"]:checked').value;
+        //     // update detail
+        //     if(row_detail)
+        //     {
+        //         let main_address = document.querySelector('input[name="main"]:checked').value;
 
-                if ($(".detail-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            console.log(id)
-                            let new_list_address = []
-                            let tag_html = "";
+        //         if ($(".detail-form").valid()) {
+        //             Swal.fire({
+        //                 icon: 'question',
+        //                 title: 'Simpan Data?',
+        //                 confirmButtonColor: '#4e73df',
+        //                 cancelButtonColor: '#d33',
+        //                 showCancelButton: true,
+        //                 reverseButtons: true,
+        //                 confirmButtonText: 'Simpan',
+        //                 cancelButtonText: 'Batal',
+        //             }).then((result) => {
+        //                 if (result.isConfirmed) {
+        //                     console.log(id)
+        //                     let new_list_address = []
+        //                     let tag_html = "";
 
-                            row = 0;
+        //                     row = 0;
 
-                            $(".body-detail-table").empty()
+        //                     $(".body-detail-table").empty()
 
-                            list_address.map(item => {
-                                if(item.row == row_detail)
-                                {
-                                    tag_html += `<tr>`;
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                                    tag_html += row + 1;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                                    tag_html += address;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                                    tag_html += province_name;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                                    tag_html += city_name;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                                    tag_html += postal_code;
-                                    tag_html += "</td>";
-                                    tag_html += "<td class='actions'>";
-                                    if(item.row == main_address)
-                                    {
-                                        tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                                    }
-                                    else
-                                    {
-                                        tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
-                                    }
-                                    tag_html += "</td>";
-                                    tag_html += "</tr>";
+        //                     list_address.map(item => {
+        //                         if(item.row == row_detail)
+        //                         {
+        //                             tag_html += `<tr>`;
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                             tag_html += row + 1;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                             tag_html += address;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                             tag_html += province_name;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                             tag_html += city_name;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                             tag_html += postal_code;
+        //                             tag_html += "</td>";
+        //                             tag_html += "<td class='actions'>";
+        //                             if(item.row == main_address)
+        //                             {
+        //                                 tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+        //                             }
+        //                             else
+        //                             {
+        //                                 tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+        //                             }
+        //                             tag_html += "</td>";
+        //                             tag_html += "</tr>";
 
-                                    new_list_address.push({
-                                        id: item.id,
-                                        supplier_id: item.supplier_id,
-                                        row: row + 1,
-                                        address: address,
-                                        province_id: province_id,
-                                        province_name: province_name,
-                                        city_id: city_id,
-                                        city_name: city_name,
-                                        postal_code: postal_code,
-                                        main_address: item.main_address
-                                    });
+        //                             new_list_address.push({
+        //                                 id: item.id,
+        //                                 supplier_id: item.supplier_id,
+        //                                 row: row + 1,
+        //                                 address: address,
+        //                                 province_id: province_id,
+        //                                 province_name: province_name,
+        //                                 city_id: city_id,
+        //                                 city_name: city_name,
+        //                                 postal_code: postal_code,
+        //                                 main_address: item.main_address
+        //                             });
 
-                                    row = row + 1;
-                                }
-                                else
-                                {
-                                    tag_html += `<tr>`;
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                                    tag_html += row + 1;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                                    tag_html += item.address;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                                    tag_html += item.province_name;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                                    tag_html += item.city_name;
-                                    tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                                    tag_html += item.postal_code;
-                                    tag_html += "</td>";
-                                    tag_html += "<td class='actions'>";
-                                    if(item.row == main_address)
-                                    {
-                                        tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                                    }
-                                    else
-                                    {
-                                        tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
-                                    }
-                                    tag_html += "</td>";
-                                    tag_html += "</tr>";
+        //                             row = row + 1;
+        //                         }
+        //                         else
+        //                         {
+        //                             tag_html += `<tr>`;
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+        //                             tag_html += row + 1;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+        //                             tag_html += item.address;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+        //                             tag_html += item.province_name;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+        //                             tag_html += item.city_name;
+        //                             tag_html += "</td>";
+        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+        //                             tag_html += item.postal_code;
+        //                             tag_html += "</td>";
+        //                             tag_html += "<td class='actions'>";
+        //                             if(item.row == main_address)
+        //                             {
+        //                                 tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+        //                             }
+        //                             else
+        //                             {
+        //                                 tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+        //                             }
+        //                             tag_html += "</td>";
+        //                             tag_html += "</tr>";
 
-                                    new_list_address.push(item);
+        //                             new_list_address.push(item);
 
-                                    row = row + 1;
-                                }
-                            })
+        //                             row = row + 1;
+        //                         }
+        //                     })
 
-                            list_address = [];
+        //                     list_address = [];
 
-                            list_address = new_list_address;
+        //                     list_address = new_list_address;
 
-                            $(".body-detail-table").append(tag_html)
+        //                     $(".body-detail-table").append(tag_html)
 
-                            $(".detail-modal").modal("hide")
-                        }
-                    })
-                }
-            }
-            // create detail
-            else
-            {
-                if ($(".detail-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            list_address.push({
-                                id: '',
-                                supplier_id: '',
-                                row: row + 1,
-                                address: address,
-                                province_id: province_id,
-                                province_name: province_name,
-                                city_id: city_id,
-                                city_name: city_name,
-                                postal_code: postal_code,
-                                main_address: 0
-                            })
-                        let tag_html = "";
-                            tag_html += `<tr>`;
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                            tag_html += row + 1;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                            tag_html += address;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                            tag_html += province_name;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                            tag_html += city_name;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-                            tag_html += postal_code;
-                            tag_html += "</td>";
-                            tag_html += "<td class='actions'>";
-                            if(row === 0)
-                            {
-                                tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                            }   
-                            else
-                            {
-                                tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
-                            } 
-                            tag_html += "</td>";
-                            tag_html += "</tr>";
-                            $(".body-detail-table").append(tag_html)
-                            $(".detail-modal").modal("hide")
-                            row = row + 1;
-                        }
-                    })
-                }
-            }
-        })
+        //                     $(".detail-modal").modal("hide")
+        //                 }
+        //             })
+        //         }
+        //     }
+        //     // create detail
+        //     else
+        //     {
+        //         if ($(".detail-form").valid()) {
+        //             Swal.fire({
+        //                 icon: 'question',
+        //                 title: 'Simpan Data?',
+        //                 confirmButtonColor: '#4e73df',
+        //                 cancelButtonColor: '#d33',
+        //                 showCancelButton: true,
+        //                 reverseButtons: true,
+        //                 confirmButtonText: 'Simpan',
+        //                 cancelButtonText: 'Batal',
+        //             }).then((result) => {
+        //                 if (result.isConfirmed) {
+        //                     list_address.push({
+        //                         id: '',
+        //                         supplier_id: '',
+        //                         row: row + 1,
+        //                         address: address,
+        //                         province_id: province_id,
+        //                         province_name: province_name,
+        //                         city_id: city_id,
+        //                         city_name: city_name,
+        //                         postal_code: postal_code,
+        //                         main_address: 0
+        //                     })
+        //                 let tag_html = "";
+        //                     tag_html += `<tr>`;
+        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                     tag_html += row + 1;
+        //                     tag_html += "</td>";
+        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                     tag_html += address;
+        //                     tag_html += "</td>";
+        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                     tag_html += province_name;
+        //                     tag_html += "</td>";
+        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                     tag_html += city_name;
+        //                     tag_html += "</td>";
+        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
+        //                     tag_html += postal_code;
+        //                     tag_html += "</td>";
+        //                     tag_html += "<td class='actions'>";
+        //                     if(row === 0)
+        //                     {
+        //                         tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+        //                     }   
+        //                     else
+        //                     {
+        //                         tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+        //                     } 
+        //                     tag_html += "</td>";
+        //                     tag_html += "</tr>";
+        //                     $(".body-detail-table").append(tag_html)
+        //                     $(".detail-modal").modal("hide")
+        //                     row = row + 1;
+        //                 }
+        //             })
+        //         }
+        //     }
+        // })
 
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
@@ -1223,7 +1223,7 @@
                             let data = new FormData(document.querySelector(".create-form"));
 
                             let update_list_address = [];
-                            let main_address = document.querySelector('input[name="main"]:checked').value;
+                            // let main_address = document.querySelector('input[name="main"]:checked').value;
 
                             // if(list_delete.length !== 0)
                             // {
@@ -1349,150 +1349,150 @@
         })
     })
 
-    $(document).on('click', '.delete-detail', function() {
-        let id = $(".id_detail").val()
-        let main_address = document.querySelector('input[name="main"]:checked').value;
+    // $(document).on('click', '.delete-detail', function() {
+    //     let id = $(".id_detail").val()
+    //     let main_address = document.querySelector('input[name="main"]:checked').value;
 
-        console.log(id)
-        console.log(main_address)
+    //     console.log(id)
+    //     console.log(main_address)
 
-        if(id === main_address)
-        {
-            Swal.fire({
-                icon: 'error',
-                title: 'Main Address Tidak Dapat Dihapus',
-                confirmButtonColor: '#4e73df',
-            })
-        }
-        else
-        {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log(id)
-                    let new_list_address = []
-                    let tag_html = "";
+    //     if(id === main_address)
+    //     {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Main Address Tidak Dapat Dihapus',
+    //             confirmButtonColor: '#4e73df',
+    //         })
+    //     }
+    //     else
+    //     {
+    //         Swal.fire({
+    //             icon: 'question',
+    //             title: 'Hapus Data?',
+    //             confirmButtonColor: '#4e73df',
+    //             cancelButtonColor: '#d33',
+    //             showCancelButton: true,
+    //             reverseButtons: true,
+    //             confirmButtonText: 'Hapus',
+    //             cancelButtonText: 'Batal',
+    //         }).then((result) => {
+    //             if (result.isConfirmed) {
+    //                 console.log(id)
+    //                 let new_list_address = []
+    //                 let tag_html = "";
 
-                    $(".body-detail-table").empty()
+    //                 $(".body-detail-table").empty()
 
-                    row = 0;
+    //                 row = 0;
 
-                    console.log(list_address)
+    //                 console.log(list_address)
 
-                    list_address.map(item => {
-                        if(item.row != id)
-                        {
-                            tag_html += `<tr>`;
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += row + 1;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.address;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.province_name;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.city_name;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.postal_code;
-                            tag_html += "</td>";
-                            tag_html += "<td class='actions'>";
-                            if(main_address == item.row)
-                            {
-                                tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                            }   
-                            else
-                            {
-                                tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
-                            } 
-                            tag_html += "</td>";
-                            tag_html += "</tr>";
+    //                 list_address.map(item => {
+    //                     if(item.row != id)
+    //                     {
+    //                         tag_html += `<tr>`;
+    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+    //                         tag_html += row + 1;
+    //                         tag_html += "</td>";
+    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+    //                         tag_html += item.address;
+    //                         tag_html += "</td>";
+    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+    //                         tag_html += item.province_name;
+    //                         tag_html += "</td>";
+    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+    //                         tag_html += item.city_name;
+    //                         tag_html += "</td>";
+    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
+    //                         tag_html += item.postal_code;
+    //                         tag_html += "</td>";
+    //                         tag_html += "<td class='actions'>";
+    //                         if(main_address == item.row)
+    //                         {
+    //                             tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
+    //                         }   
+    //                         else
+    //                         {
+    //                             tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
+    //                         } 
+    //                         tag_html += "</td>";
+    //                         tag_html += "</tr>";
 
-                            new_list_address.push({...item, row: row + 1});
+    //                         new_list_address.push({...item, row: row + 1});
 
-                            row = row + 1;
-                        }
-                        else
-                        {
-                            // sent parameter isDelete if have supplier id and id
-                            if(item.id)
-                            {
-                                list_delete.push(item)
-                            }
-                        }
-                    })
+    //                         row = row + 1;
+    //                     }
+    //                     else
+    //                     {
+    //                         // sent parameter isDelete if have supplier id and id
+    //                         if(item.id)
+    //                         {
+    //                             list_delete.push(item)
+    //                         }
+    //                     }
+    //                 })
 
-                    list_address = [];
+    //                 list_address = [];
 
-                    list_address = new_list_address;
+    //                 list_address = new_list_address;
 
-                    $(".body-detail-table").append(tag_html)
+    //                 $(".body-detail-table").append(tag_html)
 
-                    $(".detail-modal").modal("hide")
-                }
-            })
-        }
-    })
+    //                 $(".detail-modal").modal("hide")
+    //             }
+    //         })
+    //     }
+    // })
 
-    $(document).on('show.bs.modal','.detail-modal', function () {
-       document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
-    })
+    // $(document).on('show.bs.modal','.detail-modal', function () {
+    //    document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
+    // })
 
-    $(document).on('hide.bs.modal','.detail-modal', function () {
-        document.getElementById("add_modal").style = "display: block;";
-        $(".add-modal").css("overflow-y", "auto");
-    })
+    // $(document).on('hide.bs.modal','.detail-modal', function () {
+    //     document.getElementById("add_modal").style = "display: block;";
+    //     $(".add-modal").css("overflow-y", "auto");
+    // })
 
-    $(document).on('click', '.edit-table-detail', function(evt) {
-        // if(!$(evt.target).is('.actions')) {
-            $(".title-detail-name").text("Update")
-            $(".delete-detail").css('display', '');
-            let address = $(this).data('address')
-            let province_id = $(this).data('province')
-            let city_id = $(this).data('city')
-            let postal_code = $(this).data('postalcode')
-            let rowid = $(this).data('row')
-            let id = $(this).data('id')
+    // $(document).on('click', '.edit-table-detail', function(evt) {
+    //     // if(!$(evt.target).is('.actions')) {
+    //         $(".title-detail-name").text("Update")
+    //         $(".delete-detail").css('display', '');
+    //         let address = $(this).data('address')
+    //         let province_id = $(this).data('province')
+    //         let city_id = $(this).data('city')
+    //         let postal_code = $(this).data('postalcode')
+    //         let rowid = $(this).data('row')
+    //         let id = $(this).data('id')
 
-            validator_detail.resetForm();
-            validator_detail.reset();
-            trigger = false;
-            $(".province_id").val(province_id).change()
+    //         validator_detail.resetForm();
+    //         validator_detail.reset();
+    //         trigger = false;
+    //         $(".province_id").val(province_id).change()
 
-            $(".id_detail").val(rowid)
-            $(".detail_address").val(address)
+    //         $(".id_detail").val(rowid)
+    //         $(".detail_address").val(address)
 
-            // AJAX GET CITY
-            $.ajax({
-                url: `<?= base_url("city"); ?>/${province_id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(result) {
-                    $(".city_id").empty()
-                    $(".city_id").val("").change()
-                    $(".city_id").append(`<option value=""></option>`)
-                    result.data.forEach(function(item) {
-                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                    })
+    //         // AJAX GET CITY
+    //         $.ajax({
+    //             url: `<?= base_url("city"); ?>/${province_id}`,
+    //             method: "GET",
+    //             dataType: "json",
+    //             success: function(result) {
+    //                 $(".city_id").empty()
+    //                 $(".city_id").val("").change()
+    //                 $(".city_id").append(`<option value=""></option>`)
+    //                 result.data.forEach(function(item) {
+    //                     $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+    //                 })
 
-                    $(".city_id").val(city_id).change()
-                    $(".postal_code").val(postal_code)
-                    trigger = true;
-                    $(".detail-modal").modal("show")
-                }
-            })
-        // }
-    })
+    //                 $(".city_id").val(city_id).change()
+    //                 $(".postal_code").val(postal_code)
+    //                 trigger = true;
+    //                 $(".detail-modal").modal("show")
+    //             }
+    //         })
+    //     // }
+    // })
 
     const getCityParent = function() {
         const id = $(".province_parent_id option:selected").val()
@@ -1514,9 +1514,9 @@
         }
     }
 
-    const getPostalCode = function() {
-        $(".postal_code").val($(".city_id option:selected").attr("data-code"))
-    }
+    // const getPostalCode = function() {
+    //     $(".postal_code").val($(".city_id option:selected").attr("data-code"))
+    // }
 
     const getPostalCodeParent = function() {
         $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))

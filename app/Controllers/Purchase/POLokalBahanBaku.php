@@ -278,9 +278,6 @@ class POLokalBahanBaku extends BaseController
     public function updatePOLokalBahanBaku()
     {
         $rules = [
-            "purchase_request_id" => [
-                "rules" => "required"
-            ],
             "po_no" => [
                 "rules" => "required"
             ],
@@ -308,7 +305,6 @@ class POLokalBahanBaku extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),

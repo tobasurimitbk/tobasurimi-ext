@@ -40,7 +40,9 @@ class SupplierBahanImport extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this->this_company_id
+            "idCompany" => $this->this_company_id,
+            "kategori" => "IMPORT",
+            "type" => "BAHAN PENOLONG"
         ];
 
         $response = curl_request("GET", "/suppliers", $this->token, $payload);
@@ -67,7 +69,9 @@ class SupplierBahanImport extends BaseController
                     "no_rekening" => $data->no_rekening,
                     "supplier_buyer" => $data->supplier_buyer,
                     "ap_name" => $data->ap_name,
-                    "ar_name" => $data->ar_name
+                    "ar_name" => $data->ar_name,
+                    "kategori" => "IMPORT",
+                    "type" => ""
                 ]);
             }
         }
@@ -145,6 +149,8 @@ class SupplierBahanImport extends BaseController
                 "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                "kategori" => "IMPORT",
+                "type" => "BAHAN PENOLONG"
                 // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
@@ -241,6 +247,8 @@ class SupplierBahanImport extends BaseController
                 "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                "kategori" => "IMPORT",
+                "type" => "BAHAN PENOLONG"
                 // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
         }

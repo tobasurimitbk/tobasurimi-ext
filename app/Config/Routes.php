@@ -194,6 +194,9 @@ $routes->post('/po-import-bahan-baku/update', 'Purchase\POImportBahanBaku::updat
 $routes->post('/po-import-bahan-baku/update-status', 'Purchase\POImportBahanBaku::updateStatusPOImportBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-baku/delete', 'Purchase\POImportBahanBaku::deletePOImportBahanBaku', ['filter' => 'Auth']);
 
+// TERIMA FAKTUR
+$routes->get('/terima-faktur', 'Purchase\TerimaFaktur::terimaFaktur', ['filter' => 'Auth']);
+
 // DROPDOWN
 // PO LOKAL
 $routes->get('/po-lokal/dropdown', 'Purchase\POLokal::dropdownPOLokal/$1', ['filter' => 'Auth']);

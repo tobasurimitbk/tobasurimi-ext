@@ -5,7 +5,7 @@
 <section class="section">
 <div class="section-header">
     <h1>Purchase Order Import Bahan Baku</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-import/create"); ?>">
+    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-import-bahan-baku/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
 </div>
@@ -45,11 +45,6 @@
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
                             <th onclick="changeSort('foreignExchangeName')" class="sort">Valas</th>
-                            <th>Pemesan Order</th>
-                            <th>Pembuat Order</th>
-                            <th>Diketahui Oleh</th>
-                            <th>Diperiksa Oleh</th>
-                            <th>Disetujui Oleh</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -126,61 +121,6 @@
         {
             data: "foreignExchangeName",
             className: "text-center"
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(!row.is_posted)
-                {
-                    return `<input type="checkbox" id="${row.id}"/>`
-                }
-            }
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(!row.is_posted)
-                {
-                    return `<input type="checkbox" id="${row.id}"/>`
-                }
-            }
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(!row.is_posted)
-                {
-                    return `<input type="checkbox" id="${row.id}"/>`
-                }
-            }
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(!row.is_posted)
-                {
-                    return `<input type="checkbox" id="${row.id}"/>`
-                }
-            }
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            orderable: false,
-            render: function(data, type, row) {
-                if(!row.is_posted)
-                {
-                    return `<input type="checkbox" id="${row.id}"/>`
-                }
-            }
         }],
         columnDefs: [{
             defaultContent: "-",

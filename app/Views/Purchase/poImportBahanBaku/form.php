@@ -57,20 +57,46 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select purchase_request_id" id="purchase_request_id" name="purchase_request_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataSPP)) {
-                                foreach ($dataSPP as $spp) {
-                            ?>
-                                    <option value="<?= $spp->id; ?>" <?= !empty($dataPOImport) ? ($dataPOImport->purchase_request_id === $spp->id ? "selected" : "") : ""; ?>><?= $spp->spp_no; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                        <label for="floatingInput">No. SPP</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? $dataPOImport->po_date : ""; ?>">
+                                <label for="floatingInput">Tanggal Dibuat</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" readonly="true" class="form-control" placeholder="Dibuat Oleh" value="<?= !empty($dataPOImport) ? '' : session()->get("login")->name; ?>">
+                        <label for="floatingInput">Dibuat Oleh</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                <?php if(!empty($dataPOImport)){ ?>
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP (Opsional)">
+                        <label for="floatingInput">No. SPP (Opsional)</label>
+                    </div>
+                    <?php } else { ?>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select purchase_request_id" id="purchase_request_id" name="purchase_request_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataSPP)) {
+                                    foreach ($dataSPP as $spp) {
+                                ?>
+                                        <option value="<?= $spp->id; ?>"><?= $spp->spp_no; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput">No. SPP (Opsional)</label>
+                        </div>
+                    <?php } ?>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
@@ -85,19 +111,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? $dataPOImport->po_date : ""; ?>">
-                                <label for="floatingInput">Tanggal Dibuat</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-3">
                     <input type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->warehouse_id : ""; ?>" class="form-control warehouse_id" id="warehouse_id" name="warehouse_id">
                     <div class="form-floating mb-3" style="height: 50px;">
@@ -105,19 +120,11 @@
                         <label for="floatingInput">Gudang</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->order_type : ""; ?>" class="order_type" id="order_type" name="order_type" placeholder="Jenis Order">
                         <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->orderTypeName : ""; ?>" readonly="true" class="form-control order_type_name" id="order_type_name" name="order_type_name" placeholder="Jenis Order">
                         <label for="floatingInput">Jenis Order</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataPOImport) ? $dataPOImport->dpp : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
-                        <label for="floatingInput">DPP</label>
                     </div>
                 </div>
             </div>
@@ -193,6 +200,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input value="<?= !empty($dataPOImport) ? $dataPOImport->dpp : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
+                        <label for="floatingInput">DPP</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">

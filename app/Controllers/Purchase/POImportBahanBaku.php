@@ -23,7 +23,7 @@ class POImportBahanBaku extends BaseController
     public function createPOImportBahanBaku()
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -58,7 +58,7 @@ class POImportBahanBaku extends BaseController
     public function getByIdPOImportBahanBaku($id = null)
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -88,14 +88,14 @@ class POImportBahanBaku extends BaseController
         ];
 
         if (!empty($id)) {
-            $responsePOLokal = curl_request("GET", "/purchaseOrder/$id", $this->token);
-            $dataPOLokal = [];
-            if ($responsePOLokal["code"] === 200) {
-                $dataPOLokal = json_decode($responsePOLokal["body"])->data;
+            $responsePOImport = curl_request("GET", "/purchaseOrder/$id", $this->token);
+            $dataPOImport = [];
+            if ($responsePOImport["code"] === 200) {
+                $dataPOImport = json_decode($responsePOImport["body"])->data;
             }
-            $data["dataPOLokal"] = $dataPOLokal;
+            $data["dataPOImport"] = $dataPOImport;
 
-            // var_dump($dataPOLokal);
+            // var_dump($dataPOImport);
             // die;
         }
 
@@ -150,7 +150,7 @@ class POImportBahanBaku extends BaseController
         ];
 
         $response = curl_request("GET", "/purchaseOrder", $this->token, $payload);
-        $dataPOLokal = [];
+        $dataPOImport = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -160,7 +160,7 @@ class POImportBahanBaku extends BaseController
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
             foreach ($body as $data) {
-                array_push($dataPOLokal, [
+                array_push($dataPOImport, [
                     "no" => $no++,
                     "id" => $data->id,
                     "po_date" => $data->po_date,
@@ -177,7 +177,7 @@ class POImportBahanBaku extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataPOLokal,
+            "data" => $dataPOImport,
             "response" => $response,
             "payload" => $payload
         ];
@@ -278,9 +278,6 @@ class POImportBahanBaku extends BaseController
     public function updatePOImportBahanBaku()
     {
         $rules = [
-            "purchase_request_id" => [
-                "rules" => "required"
-            ],
             "po_no" => [
                 "rules" => "required"
             ],
@@ -308,7 +305,6 @@ class POImportBahanBaku extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
