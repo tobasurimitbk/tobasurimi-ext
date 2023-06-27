@@ -133,8 +133,10 @@ class PenerimaanBarangLokal extends BaseController
 
         if ($this->validate($rules)) {
             $payload = json_encode([
-                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("no_penerimaan_barang"),
+                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                "multiple_po_id" => json_decode(stripslashes($this->request->getPost("multiple_po_id"))),
+                "multiple_po_no" => json_decode(stripslashes($this->request->getPost("multiple_po_no"))),
                 "aju_document_type" => $this->request->getPost("aju_document_type"),
                 "aju_no" => $this->request->getPost("aju_no"),
                 "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
@@ -144,8 +146,10 @@ class PenerimaanBarangLokal extends BaseController
                 "packaging" => $this->request->getPost("packaging"),
                 "total_weight" => $this->request->getPost("total_weight"),
                 "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
-                "po_type" => "lokal",
+                "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
+                "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
                 "status_post" => "WAITING",
+                "status_penerimaan" => "LOKAL",
                 "penerimaan_barang_detail" => json_decode(stripslashes($this->request->getPost("items")))
             ]);
 
