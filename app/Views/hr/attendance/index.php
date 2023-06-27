@@ -110,6 +110,14 @@
             data: {},
             dataType: "json",
             success: function(response) {
+                document.getElementById("dnama").innerHTML = response.data.employeeName;
+                document.getElementById("djabatan").innerHTML = response.data.divisionName;
+                document.getElementById("djam_masuk").innerHTML = response.data.checkin;
+                document.getElementById("distirahat_mulai").innerHTML = response.data.breakin;
+                document.getElementById("distirahat_selesai").innerHTML = response.data.breakout;
+                document.getElementById("djam_pulang").innerHTML = response.data.checkout;
+
+                console.log(response);
                 //alert('sukses');
             },
             error: function(xhr, ajaxOptions, thrownError) {
@@ -253,7 +261,7 @@
                                 Nama
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="dnama"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -261,23 +269,7 @@
                                 Jabatan
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
-                            </div>
-                        </div>
-                        <div class="row justify-content-center">
-                            <div class="col-md-6" style="height: 50px;">
-                                Jam Kerja
-                            </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                :
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6" style="height: 50px;">
-                                Jam Istirahat
-                            </div>
-                            <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="djabatan"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -285,7 +277,7 @@
                                 Jam Masuk
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="djam_masuk"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -293,7 +285,7 @@
                                 Istirahat Mulai
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="distirahat_mulai"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -301,7 +293,7 @@
                                 Istirahat Selesai
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="distirahat_selesai"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -309,7 +301,7 @@
                                 Jam Pulang
                             </div>
                             <div class="col-md-6" style="height: 50px;">
-                                :
+                                : <span id="djam_pulang"></span>
                             </div>
                         </div>
 
