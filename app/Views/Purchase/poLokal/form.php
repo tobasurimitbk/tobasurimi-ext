@@ -270,7 +270,7 @@
                 </tbody>
                 <tfoot class="foot-detail-table" id="foot-detail-table">
                     <tr>
-                        <td colspan="6"></td>
+                        <td colspan="4"></td>
                         <td><b>TOTAL</b></td>
                         <td><b><?= number_format($total_harga_barang); ?></b></td>
                         <td><b><?= $total_qty; ?></b></td>
@@ -1124,7 +1124,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='2'>";
+                            tag_total += "<td colspan='6'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1162,7 +1162,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>0</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='2'>";
+                            tag_total += "<td colspan='6'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1495,7 +1495,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='2'>";
+                            tag_total += "<td colspan='6'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1613,7 +1613,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='2'>";
+                            tag_total += "<td colspan='6'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -2010,7 +2010,7 @@
                 tag_total += "<td>";
                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                 tag_total += "</td>";
-                tag_total += "<td colspan='2'>";
+                tag_total += "<td colspan='6'>";
                 tag_total += "</td>";
                 tag_total += "</tr>";
 
