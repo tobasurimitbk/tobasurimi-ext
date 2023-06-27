@@ -4367,6 +4367,7 @@ div.dataTables_wrapper div.dataTables_info {
   font-family: "Poppins", sans-serif !important;
   font-size: 12px;
   font-weight: 500;
+  line-height: 1.5;
 }
 
 footer.main-footer .footer-right {

@@ -258,6 +258,10 @@ $routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
 $routes->get('/list-attendance', 'HR\Attendance::ListAttendance', ['filter' => 'Auth']);
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
 
+// payroll
+$routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
+// $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
+
 
 // SETTINGS
 // USER
