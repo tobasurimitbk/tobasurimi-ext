@@ -257,6 +257,7 @@ $routes->post('/penerimaan-barang-import/save', 'Warehouse\PenerimaanBarangImpor
 $routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
 $routes->get('/list-attendance', 'HR\Attendance::ListAttendance', ['filter' => 'Auth']);
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
+$routes->post('/check-pin-employee', 'HR\Attendance::CheckPinEmployee', ['filter' => 'Auth']);
 
 
 // SETTINGS
