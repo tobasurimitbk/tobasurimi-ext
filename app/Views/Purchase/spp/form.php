@@ -38,12 +38,12 @@
 
             <?php if(!empty($dataSPP)){ 
                 if($dataSPP->is_posted === false){ ?> 
-            <button class="btn btn-show-form btn-save float-right">
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
             </button>
             <?php }
             } else { ?> 
-            <button class="btn btn-show-form btn-save float-right">
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
             </button>
         <?php } ?> 

@@ -250,7 +250,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_order" id="jumlah_order" name="jumlah_order" placeholder="Jumlah Order">
+                                <input type="text" readonly="true" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_order" id="jumlah_order" name="jumlah_order" placeholder="Jumlah Order">
                                 <label for="floatingInput">Jumlah Order</label>
                             </div>
                         </div>
@@ -258,7 +258,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
+                                <input type="text" readonly="true" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
@@ -319,40 +319,61 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>Aktual Penerimaan</h5>
-                        </div>
-                    </div>
-                    <!-- <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control jumlah_masuk" id="jumlah_masuk" name="jumlah_masuk" placeholder="Jumlah Masuk">
-                                <label for="floatingInput">Jumlah Masuk</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control konversi" id="konversi" name="konversi" placeholder="Konversi">
-                                <label for="floatingInput">Konversi</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control jumlah_penerimaan" name="jumlah_penerimaan" id="jumlah_penerimaan" placeholder="Jumlah Penerimaan">
-                                <label for="floatingInput">Jumlah Penerimaan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control satuan" id="satuan" name="satuan" placeholder="Satuan">
-                                <label for="floatingInput">Satuan </label>
-                            </div>
-                        </div>
-                    </div> -->
                 </form>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-5">
+                        <div class="col-md-6">
+                            <h5 class="modal-sub-title">Aktual Penerimaan</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-add-row btn-add btn-block float-right" style="width: 106px;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive mt-2">
+                    <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Warehouse</th>
+                                <th>Qty</th>
+                                <th>Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control jumlah_masuk" id="jumlah_masuk" name="jumlah_masuk" placeholder="Jumlah Masuk">
+                            <label for="floatingInput">Jumlah Masuk</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control konversi" id="konversi" name="konversi" placeholder="Konversi">
+                            <label for="floatingInput">Konversi</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input onkeyup="formatNumber(this)" type="text" class="form-control jumlah_penerimaan" name="jumlah_penerimaan" id="jumlah_penerimaan" placeholder="Jumlah Penerimaan">
+                            <label for="floatingInput">Jumlah Penerimaan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" readonly="true" class="form-control satuan" id="satuan" name="satuan" placeholder="Satuan">
+                            <label for="floatingInput">Satuan </label>
+                        </div>
+                    </div>
+                </div> -->
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-discard delete-detail">Hapus</button>
@@ -371,6 +392,7 @@
     let list_items = [];
     let list_delete = [];
     var row = 0;
+    var row_detail = 0;
     let total_jml_order = 0;
     let total_jml_dokumen = 0;
     let total_jml_selisih = 0;
@@ -849,6 +871,44 @@
             // }
         })
 
+        $(".btn-add-row").click(function() {
+            row_detail++;
+            let tag_html = "";
+            tag_html += `<tr class="table_${row_detail}">`;
+            tag_html += `<td>`;
+            tag_html += `<select class="warehouse_id_${row_detail} form-select" id="warehouse_id_${row_detail}" name="warehouse_id_${row_detail}">`;
+            tag_html += `</td>`;
+            tag_html += `<td>`;
+            tag_html += `<input oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control">`;
+            tag_html += `</td>`;
+            tag_html += `<td>`;
+            tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
+            tag_html += `</td>`;
+            tag_html += `</tr>`;
+
+            $.ajax({
+                url: `<?= base_url("warehouse/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".warehouse_id_" + row_detail).empty()
+                    $(".warehouse_id_" + row_detail).append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".warehouse_id_" + row_detail).append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                    })
+                }
+            })
+
+            $(".body-detail-table").append(tag_html)
+
+            // WAREHOUSE
+            $(".warehouse_id_" + row_detail).select2({
+                placeholder: "",
+                theme: "bootstrap-5",
+                dropdownParent: $(".detail-modal .modal-content")
+            })
+        })
+
         $(".btn-show-detail").click(function() {
             if($('.multiple_po_id option:selected').length !== 0)
             {
@@ -1004,6 +1064,10 @@
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");
         }
+    }
+
+    const deleteChildRow = function(id) {
+        $(".table_" + id).css("display", "none")
     }
 </script>
 

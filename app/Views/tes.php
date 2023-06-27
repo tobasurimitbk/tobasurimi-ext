@@ -579,7 +579,9 @@
 // error di barang/all karena masking total_harga
 // error saat patch purchaseOrder
 // purchaseRequest/approve/15 purchase request not found (username: director password: 123123)
-
+1. barang/all newData is not defined
+2. purchaseRequest/approve purchase request is not found
+3. patch purchaseOrder hanya mengirim {'is_posted': true} purchaseRequestData is not defined
 </script>
 
 <?= $this->endSection(); ?>

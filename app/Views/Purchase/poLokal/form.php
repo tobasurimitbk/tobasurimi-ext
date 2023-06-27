@@ -33,12 +33,12 @@
 
     <?php if(!empty($dataPOLokal)){ 
         if($dataPOLokal->is_posted === false){ ?> 
-    <button class="btn btn-show-form btn-save float-right">
+    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
         Simpan
     </button>
     <?php }
     } else { ?> 
-    <button class="btn btn-show-form btn-save float-right">
+    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
         Simpan
     </button>
     <?php } ?> 
@@ -1640,7 +1640,7 @@
             $(".total").val(total);
         })
 
-        $(".posting-po").click(function() {
+        $(".posting-spp").click(function() {
             Swal.fire({
                 icon: 'question',
                 title: 'Yakin akan di Posting?',
@@ -1654,7 +1654,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("po/update-status"); ?>",
+                        url: "<?= base_url("po-lokal/update-status"); ?>",
                         data: {
                             id: $(".id").val()
                         },
