@@ -4,10 +4,10 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Payroll</h1>
-        <!-- <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+        <h1>Formula Payroll</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button> -->
+        </button>
     </div>
 
 
