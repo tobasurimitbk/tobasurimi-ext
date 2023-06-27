@@ -39,15 +39,10 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Hapus</button>
             </div>
         </div>
     </div>
@@ -91,15 +86,10 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-header">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-header">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-header">Hapus</button>
             </div>
         </div>
     </div>
@@ -167,15 +157,10 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Hapus</button>
             </div>
         </div>
     </div>
