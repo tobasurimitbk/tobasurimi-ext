@@ -101,6 +101,12 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-6 form-pin">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN">
+                                <label for="floatingInput">PIN</label>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
@@ -312,6 +318,11 @@
                 },
                 division_id: {
                     required: "Divisi wajib diisi"
+                },
+                pin: {
+                    required: "PIN wajib diisi",
+                    minlength: "Minimal dan Maksimal 6 Karakter",
+                    maxlength: "Minimal dan Maksimal 6 Karakter"
                 }
             },
             errorElement: 'span',
@@ -353,8 +364,14 @@
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
+            $(".form-pin").css("display", "");
             $('.employeeImg').rules('add', {
                 required: true
+            });
+            $('.pin').rules('add', {
+                required: true,
+                minlength: 6,
+                maxlength: 6
             });
             $(".title-name").text("Tambah");
             validator.resetForm();
@@ -567,7 +584,11 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+            $(".form-pin").css("display", "none");
             $('.employeeImg').rules('remove', 'required');
+            $('.pin').rules('remove', 'required');
+            $('.pin').rules('remove', 'minlength');
+            $('.pin').rules('remove', 'maxlength');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;
