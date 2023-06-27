@@ -4367,6 +4367,7 @@ div.dataTables_wrapper div.dataTables_info {
   font-family: "Poppins", sans-serif !important;
   font-size: 12px;
   font-weight: 500;
+  line-height: 1.5;
 }
 
 footer.main-footer .footer-right {
@@ -4406,7 +4407,7 @@ footer.main-footer .footer-right a {
 .modal .modal-dialog .modal-content .modal-header {
   border-bottom: 1px #e7323a solid;
   padding: 0px 0px 15px 0px;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
 .modal .modal-dialog .modal-content .modal-body {
@@ -4416,8 +4417,7 @@ footer.main-footer .footer-right a {
 
 .modal .modal-dialog .modal-content .modal-footer {
   padding: 0px;
-  margin-top: 25px;
-  padding-top: 15px;
+  margin-top: 30px;
 }
 
 .modal .modal-dialog .modal-content .modal-footer .btn-discard {
@@ -4429,6 +4429,7 @@ footer.main-footer .footer-right a {
   border: 1px #e7323a solid !important;
   padding: 10px 15px;
   min-width: 100px;
+  margin: 2px !important;
 }
 
 .modal .modal-dialog .modal-content .modal-footer .btn-discard:hover,
@@ -4446,7 +4447,7 @@ footer.main-footer .footer-right a {
   border-radius: 4px;
   border: 1px #e7323a solid !important;
   padding: 10px 15px;
-  margin-right: 0px;
+  margin: 2px;
   min-width: 100px;
 }
 
@@ -4489,7 +4490,7 @@ footer.main-footer .footer-right a {
   border-radius: 4px;
   border: 1px #007ae0 solid !important;
   padding: 10px 15px;
-  margin-right: 0px;
+  margin: 2px;
   min-width: 100px;
 }
 
@@ -5251,6 +5252,30 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
 
   .modal .modal-dialog .modal-content .modal-footer {
     margin-top: 15px;
+    display: block;
+  }
+
+  .modal .modal-dialog .modal-content .modal-footer .btn-discard {
+    min-width: 100%;
+    margin: 0px;
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .modal .modal-dialog .modal-content .modal-footer .btn-logout-form {
+    min-width: 100%;
+    margin: 0px;
+  }
+
+  .modal .modal-dialog .modal-content .modal-footer .btn-discard.delete-btn {
+    min-width: 100%;
+    margin: 0px !important;
+  }
+
+  .modal .modal-dialog .modal-content .modal-footer .btn-submit-form {
+    min-width: 100%;
+    margin: 0px;
+    margin-bottom: 0.75rem !important;
   }
 
   .modal
@@ -5288,7 +5313,7 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   }
 
   .section .section-header .nav.nav-tabs li.nav-item {
-    margin-top: 1.5rem;
+    margin-top: 0.75rem;
   }
 
   .section .section-header .nav.nav-tabs li.nav-item .nav-link {
@@ -5353,10 +5378,32 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
     position: relative;
     right: 0;
     display: block;
+    width: 100%;
+  }
+
+  .section .section-header .col-button-tambah-spp .btn.btn-discard {
+    margin: 0px;
+    margin-top: 0.75rem;
   }
 
   .section .section-header .col-button-tambah-spp .btn.btn-save {
-    margin-left: 0;
+    margin: 0px;
+    margin-top: 0.75rem;
+  }
+
+  .section .section-header .col-button-tambah-spp .btn.btn-print {
+    margin: 0px;
+    margin-top: 0.75rem;
+  }
+
+  .section .section-header .col-button-tambah-spp .btn.btn-hapus {
+    margin: 0px;
+    margin-top: 0.75rem;
+  }
+
+  .section .section-header .col-button-tambah-spp .btn.btn-success {
+    margin: 0px;
+    margin-top: 0.75rem;
   }
 
   .card .card-body .col-subtitle-modal .btn.btn-add {

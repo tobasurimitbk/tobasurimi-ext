@@ -67,7 +67,7 @@
                     </div>
                 </form>
                 <div class="col-subtitle-modal">
-                    <div class="row mt-5">
+                    <div class="row mt-3">
                         <div class="col">
                             <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -75,7 +75,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive mt-2">
+                <div class="table-responsive mt-2 mb-3">
                     <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
@@ -89,15 +89,10 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -133,15 +128,10 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
             </div>
         </div>
     </div>

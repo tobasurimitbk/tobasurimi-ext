@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Supplier</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Supplier Bahan Penolong</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -163,21 +163,16 @@
                         </table>
                     </div> -->
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal detail-modal" tabindex="1">
+<!-- <div class="modal detail-modal" tabindex="1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -229,24 +224,19 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                </div>
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Supplier</h1>
+    <h1>Supplier Bahan Penolong</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
@@ -312,7 +302,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("supplier/all"); ?>",
+            url: "<?= base_url("supplier-bahan-penolong/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -828,7 +818,7 @@
             $(".kode").attr("readonly", true);
 
             $.ajax({
-                url: "<?= base_url("supplier/id"); ?>" + "/" + id,
+                url: "<?= base_url("supplier-bahan-penolong/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -969,7 +959,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("supplier/delete"); ?>",
+                        url: "<?= base_url("supplier-bahan-penolong/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -1311,7 +1301,7 @@
                             let id = $(".id").val();
 
                             $.ajax({
-                                url: id ? "<?= base_url("supplier/update"); ?>" : "<?= base_url("supplier/save"); ?>",
+                                url: id ? "<?= base_url("supplier-bahan-penolong/update"); ?>" : "<?= base_url("supplier-bahan-penolong/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());

@@ -20,7 +20,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" class="form-control libur" id="libur" name="libur">
+                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control libur" id="libur" name="libur">
                                 <label for="floatingInput">Libur</label>
                             </div>
                         </div>
@@ -28,21 +28,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" class="form-control jam_kerja" id="jam_kerja" name="jam_kerja">
+                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_kerja" id="jam_kerja" name="jam_kerja">
                                 <label for="floatingInput">Jam Kerja</label>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input onkeydown="return false" class="form-control input-picker jam_istirahat" id="jam_istirahat" name="jam_istirahat">
-                                    <label for="floatingInput">Jam Istirahat</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock fa-jam-istirahat icon-form"></i>
-                                    </span>
-                                </div>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_istirahat" id="jam_istirahat" name="jam_istirahat">
+                                <label for="floatingInput">Jam Istirahat</label>
                             </div>
                         </div>
                     </div>
@@ -104,15 +97,10 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -240,7 +228,7 @@
     });
     
     $(document).ready(function() {
-        $(".jam_istirahat, .jam_masuk, .jam_pulang, .mulai_istirahat, .selesai_istirahat").datetimepicker({
+        $(".jam_masuk, .jam_pulang, .mulai_istirahat, .selesai_istirahat").datetimepicker({
             format: 'HH:mm',
             useCurrent: false,
             showTodayButton: true,
@@ -255,10 +243,6 @@
                 clear: "fa fa-trash",
                 close: "fa fa-close"
             }
-        });
-
-        $('.fa-jam-istirahat').click(function() {
-            $(".jam_istirahat").focus();
         });
 
         $('.fa-jam-masuk').click(function() {

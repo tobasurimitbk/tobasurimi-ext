@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controllers\Master;
+namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
 
-class Supplier extends BaseController
+class SupplierBahanImport extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -15,7 +15,7 @@ class Supplier extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function supplier()
+    public function supplierBahanImport()
     {
         //Get Provinces
         $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
@@ -29,10 +29,10 @@ class Supplier extends BaseController
             "dataProvinces" => $dataProvinces,
         ];
 
-        return view('Master/supplier/index', $data);
+        return view('Supplier/supplierBahanImport/index', $data);
     }
 
-    public function allSupplier()
+    public function allSupplierBahanImport()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -85,7 +85,7 @@ class Supplier extends BaseController
         return;
     }
 
-    public function saveSupplier()
+    public function saveSupplierBahanImport()
     {
         $rules = [
             "kode" => [
@@ -179,7 +179,7 @@ class Supplier extends BaseController
         return;
     }
 
-    public function updateSupplier()
+    public function updateSupplierBahanImport()
     {
         $rules = [
             "kode" => [
@@ -271,7 +271,7 @@ class Supplier extends BaseController
         return;
     }
 
-    public function getByIdSupplier($id = null)
+    public function getByIdSupplierBahanImport($id = null)
     {
         if (!empty($id)) {
             $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
@@ -299,7 +299,7 @@ class Supplier extends BaseController
         return;
     }
 
-    public function deleteSupplier()
+    public function deleteSupplierBahanImport()
     {
         $id = $this->request->getPost("id");
 

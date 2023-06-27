@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Vendor</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Supplier Bahan Baku</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -133,7 +133,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="col-subtitle-modal">
+                <!-- <div class="col-subtitle-modal">
                     <div class="row mt-5">
                         <div class="col-md-6">
                             <h5 class="modal-sub-title">List Alamat Pengiriman</h5>
@@ -144,8 +144,8 @@
                             </button>
                         </div>
                     </div>
-                </div>
-                    <div class="table-responsive mt-2 mb-3">
+                </div> -->
+                    <!-- <div class="table-responsive mt-2">
                         <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
@@ -161,18 +161,18 @@
 
                             </tbody>
                         </table>
-                    </div>
+                    </div> -->
             </div>
             <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
+                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal detail-modal" tabindex="1">
+<!-- <div class="modal detail-modal" tabindex="1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -185,7 +185,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
+                                <label for="floatingInput">Address</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -225,18 +225,18 @@
                 </form>
             </div>
             <div class="modal-footer">
+                    <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
                     <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn delete-detail">Hapus</button>
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Vendor</h1>
+    <h1>Supplier Bahan Baku</h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
@@ -302,7 +302,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("vendor/all"); ?>",
+            url: "<?= base_url("supplier-bahan-baku/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -818,7 +818,7 @@
             $(".kode").attr("readonly", true);
 
             $.ajax({
-                url: "<?= base_url("vendor/id"); ?>" + "/" + id,
+                url: "<?= base_url("supplier-bahan-baku/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -846,7 +846,7 @@
                         res?.data?.list_address.map((item, index) => {
                             list_address.push({
                                 id: item.id,
-                                vendor_id: item.vendor_id,
+                                supplier_id: item.supplier_id,
                                 row: index + 1,
                                 address: item.address,
                                 province_id: item.province_id,
@@ -959,7 +959,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("vendor/delete"); ?>",
+                        url: "<?= base_url("supplier-bahan-baku/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -1071,7 +1071,7 @@
 
                                     new_list_address.push({
                                         id: item.id,
-                                        vendor_id: item.vendor_id,
+                                        supplier_id: item.supplier_id,
                                         row: row + 1,
                                         address: address,
                                         province_id: province_id,
@@ -1148,7 +1148,7 @@
                         if (result.isConfirmed) {
                             list_address.push({
                                 id: '',
-                                vendor_id: '',
+                                supplier_id: '',
                                 row: row + 1,
                                 address: address,
                                 province_id: province_id,
@@ -1197,16 +1197,16 @@
 
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
-            if(list_address.length == 0)
-            {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'List Alamat Pengiriman Tidak Boleh Kosong',
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-            else
-            {
+            // if(list_address.length == 0)
+            // {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: 'List Alamat Pengiriman Tidak Boleh Kosong',
+            //         confirmButtonColor: '#4e73df',
+            //     })
+            // }
+            // else
+            // {
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -1225,83 +1225,83 @@
                             let update_list_address = [];
                             let main_address = document.querySelector('input[name="main"]:checked').value;
 
-                            if(list_delete.length !== 0)
-                            {
-                                list_delete.map(obj => {
-                                    update_list_address.push(
-                                        {
-                                            id: obj.id,
-                                            vendor_id: obj.vendor_id,
-                                            address: obj.address,
-                                            province_id: obj.province_id,
-                                            city_id: obj.city_id,
-                                            main_address: 0,
-                                            isDelete: true
-                                        }
-                                    )
-                                })
-                            }
+                            // if(list_delete.length !== 0)
+                            // {
+                            //     list_delete.map(obj => {
+                            //         update_list_address.push(
+                            //             {
+                            //                 id: obj.id,
+                            //                 supplier_id: obj.supplier_id,
+                            //                 address: obj.address,
+                            //                 province_id: obj.province_id,
+                            //                 city_id: obj.city_id,
+                            //                 main_address: 0,
+                            //                 isDelete: true
+                            //             }
+                            //         )
+                            //     })
+                            // }
                             
-                            list_address.map(obj => {
-                                if (main_address == obj.row) {
-                                    if (obj.id) {
-                                        update_list_address.push(
-                                            {
-                                                id: obj.id,
-                                                vendor_id: obj.vendor_id,
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 1
-                                            }
-                                        )
-                                    }
-                                    else
-                                    {
-                                        update_list_address.push(
-                                            {
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 1
-                                            }
-                                        )
-                                    }
-                                }
-                                else
-                                {
-                                    if (obj.id) {
-                                        update_list_address.push(
-                                            {
-                                                id: obj.id,
-                                                vendor_id: obj.vendor_id,
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 0
-                                            }
-                                        )
-                                    }
-                                    else
-                                    {
-                                        update_list_address.push(
-                                            {
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 0
-                                            }
-                                        )
-                                    }
-                                }
-                            })
+                            // list_address.map(obj => {
+                            //     if (main_address == obj.row) {
+                            //         if (obj.id) {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     id: obj.id,
+                            //                     supplier_id: obj.supplier_id,
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 1
+                            //                 }
+                            //             )
+                            //         }
+                            //         else
+                            //         {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 1
+                            //                 }
+                            //             )
+                            //         }
+                            //     }
+                            //     else
+                            //     {
+                            //         if (obj.id) {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     id: obj.id,
+                            //                     supplier_id: obj.supplier_id,
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 0
+                            //                 }
+                            //             )
+                            //         }
+                            //         else
+                            //         {
+                            //             update_list_address.push(
+                            //                 {
+                            //                     address: obj.address,
+                            //                     province_id: obj.province_id,
+                            //                     city_id: obj.city_id,
+                            //                     main_address: 0
+                            //                 }
+                            //             )
+                            //         }
+                            //     }
+                            // })
 
-                            data.append("list_address", JSON.stringify(update_list_address))
+                            // data.append("list_address", JSON.stringify(update_list_address))
 
                             let id = $(".id").val();
 
                             $.ajax({
-                                url: id ? "<?= base_url("vendor/update"); ?>" : "<?= base_url("vendor/save"); ?>",
+                                url: id ? "<?= base_url("supplier-bahan-baku/update"); ?>" : "<?= base_url("supplier-bahan-baku/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1345,7 +1345,7 @@
                         }
                     })
                 }
-            }
+            // }
         })
     })
 
@@ -1424,7 +1424,7 @@
                         }
                         else
                         {
-                            // sent parameter isDelete if have vendor id and id
+                            // sent parameter isDelete if have supplier id and id
                             if(item.id)
                             {
                                 list_delete.push(item)

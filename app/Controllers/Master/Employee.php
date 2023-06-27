@@ -130,6 +130,9 @@ class Employee extends BaseController
             ],
             "acc_no" => [
                 "rules" => "required"
+            ],
+            "pin" => [
+                "rules" => "required"
             ]
         ];
 
@@ -155,7 +158,8 @@ class Employee extends BaseController
                         "acc_no" => $this->request->getPost("acc_no"),
                         "email" => $this->request->getPost("email"),
                         "address" => $this->request->getPost("address"),
-                        "status" => $this->request->getPost("status")
+                        "status" => $this->request->getPost("status"),
+                        "pin" => $this->request->getPost("pin")
                     ]);
                 }
             }
@@ -229,6 +233,9 @@ class Employee extends BaseController
                 "rules" => "required"
             ],
             "acc_no" => [
+                "rules" => "required"
+            ],
+            "pin" => [
                 "rules" => "required"
             ]
         ];

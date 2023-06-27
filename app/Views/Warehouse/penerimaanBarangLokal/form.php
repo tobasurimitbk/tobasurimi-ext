@@ -55,7 +55,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select disabled="true" multiple class="form-select multiple_po_id" id="multiple_po_id[]" name="multiple_po_id[]" aria-label="Floating label select example">
+                        <select disabled="true" multiple class="form-select multiple_po_id" name="multiple_po_id[]" aria-label="Floating label select example">
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">No. PO</label>
@@ -250,7 +250,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_order" id="jumlah_order" name="jumlah_order" placeholder="Jumlah Order">
+                                <input type="text" readonly="true" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" id="qty" name="qty" placeholder="Jumlah Order">
                                 <label for="floatingInput">Jumlah Order</label>
                             </div>
                         </div>
@@ -277,7 +277,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jumlah_di_dokumen" id="jumlah_di_dokumen" name="jumlah_di_dokumen" placeholder="Jumlah di dokumen">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control doc_qty" id="doc_qty" name="doc_qty" placeholder="Jumlah di dokumen">
                                 <label for="floatingInput">Jumlah di dokumen</label>
                             </div>
                         </div>
@@ -341,7 +341,7 @@
                                 <th>Hapus</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                        <tbody class="body-detail-warehouse" id="body-detail-warehouse" style="cursor: pointer;">
 
                         </tbody>
                     </table>
@@ -391,6 +391,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     let list_items = [];
     let list_delete = [];
+    let list_warehouse = [];
     var row = 0;
     var row_detail = 0;
     let total_jml_order = 0;
@@ -522,11 +523,11 @@
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },
-                "multiple_po_id[]": {
-                    required: "No. PO wajib diisi"
-                },
                 aju_document_type: {
                     required: "Jenis Dokumen wajib diisi"
+                },
+                aju_no: {
+                    required: "No. AJU wajib diisi"
                 },
                 validation_date: {
                     required: "Tanggal wajib diisi"
@@ -534,7 +535,7 @@
                 no_registration: {
                     required: "No. Registrasi wajib diisi"
                 },
-                no_letter: {
+                letter_no: {
                     required: "No. Surat wajib diisi"
                 },
                 invoice_no: {
@@ -732,6 +733,92 @@
             .find('label')
             .css('z-index', '1');
 
+        $(".btn-submit-detail").click(function() {
+            let row_detail = $(".id_detail").val();
+            let barang_id = $(".barang_id").val()
+            let doc_qty = $(".doc_qty").val()
+            let qty = $(".qty").val()
+            let keterangan = $(".keterangan").val()
+            let ppn = $(".ppn option:selected").val()
+            let pph = $(".pph option:selected").val()
+            let nilai_penyerahan = $(".nilai_penyerahan").val()
+            let purchase_order_details_id = $(".purchase_order_details_id").val()
+
+            // update detail
+            if(row_detail)
+            {
+
+            }
+            // create detail
+            else
+            {
+                if ($(".detail-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let new_list_warehouse = []
+                            list_warehouse.forEach((item) => {
+                                if(item.display !== "none")
+                                {
+                                    new_list_warehouse.push(
+                                        {
+                                            warehouse_id: item.warehouse_id,
+                                            qty: item.qty_warehouse
+                                        }
+                                    )
+                                }
+                            })
+
+                            list_items.push({
+                                id: '',
+                                purchase_order_details_id: purchase_order_details_id,
+                                row: row + 1,
+                                barang_id: barang_id,
+                                doc_qty: 0,
+                                qty: 0,
+                                selisih: 0,
+                                konversi: 0,
+                                harga: 0,
+                                penyerahan: nilai_penyerahan,
+                                keterangan: keterangan,
+                                ppn: ppn,
+                                pph: pph,
+                                warehouse: new_list_warehouse
+                            })
+
+                            let tag_html = "";
+                            let tag_total = "";
+
+                            tag_html += `<tr>`;
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}">`;
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}">`;
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+                            $(".body-detail-table").append(tag_html)
+
+                            $(".foot-detail-table").empty()
+
+                            $(".foot-detail-table").append(tag_total);
+
+                            $(".detail-modal").modal("hide")
+                            row = row + 1;
+                        }
+                    })
+                }
+            }
+        })
+
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
 
@@ -767,11 +854,27 @@
                             list_items.map(obj => {
                                 update_list_items.push(
                                     {
-
+                                        purchase_order_details_id: 0,
+                                        warehouse: obj.warehouse,
+                                        barang_id: obj.barang_id,
+                                        doc_qty: obj.doc_qty,
+                                        qty: obj.qty,
+                                        selisih: obj.selisih,
+                                        konversi: obj.konversi,
+                                        harga: obj.harga,
+                                        penyerahan: obj.penyerahan,
+                                        keterangan: obj.keterangan,
+                                        ppn: obj.ppn,
+                                        pph: obj.pph
                                     }
                                 )
                             })
-
+                            data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
+                            var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
+                                return elem.text 
+                            });
+                            console.log(arr_no)
+                            data.append("multiple_po_no", JSON.stringify(arr_no));
                             data.append("items", JSON.stringify(update_list_items))
 
                             let id = $(".id").val();
@@ -873,13 +976,21 @@
 
         $(".btn-add-row").click(function() {
             row_detail++;
+            list_warehouse.push(
+            {
+                row: row_detail,
+                display: "",
+                warehouse_id: "",
+                qty_warehouse: ""
+            })
+            
             let tag_html = "";
             tag_html += `<tr class="table_${row_detail}">`;
             tag_html += `<td>`;
-            tag_html += `<select class="warehouse_id_${row_detail} form-select" id="warehouse_id_${row_detail}" name="warehouse_id_${row_detail}">`;
+            tag_html += `<select onchange="changeWarehouse(${row_detail})" class="warehouse_id_${row_detail} form-select" id="warehouse_id_${row_detail}" name="warehouse_id_${row_detail}">`;
             tag_html += `</td>`;
             tag_html += `<td>`;
-            tag_html += `<input oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control">`;
+            tag_html += `<input onkeyup="changeWarehouse(${row_detail})" oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control qty_warehouse_${row_detail}" id="qty_warehouse_${row_detail}" name="qty_warehouse_${row_detail}">`;
             tag_html += `</td>`;
             tag_html += `<td>`;
             tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
@@ -899,7 +1010,7 @@
                 }
             })
 
-            $(".body-detail-table").append(tag_html)
+            $(".body-detail-warehouse").append(tag_html)
 
             // WAREHOUSE
             $(".warehouse_id_" + row_detail).select2({
@@ -912,66 +1023,72 @@
         $(".btn-show-detail").click(function() {
             if($('.multiple_po_id option:selected').length !== 0)
             {
-            $(".delete-detail").css('display', 'none');
+                list_warehouse = [];
+                row_detail = 0;
+                $(".delete-detail").css('display', 'none');
 
-            $(".title-detail-name").text("Tambah");
-            $(".id_detail").val('');
+                $(".title-detail-name").text("Tambah");
+                $(".id_detail").val('');
+                $(".nama_barang_dokumen").val('')
+                $(".doc_qty").val('')
+                $(".harga_barang_jasa").val('')
+                $(".nilai_penyerahan").val('')
 
-            $.ajax({
-                url: `<?= base_url("po-lokal/multi/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    id: JSON.stringify($('.multiple_po_id').val())
-                },
-                dataType: "json",
-                success: function(res) {
-                    console.log(res)
-                    $(".kode_barang").empty()
-                    $(".kode_barang").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
-                    })
+                $.ajax({
+                    url: `<?= base_url("po-lokal/multi/dropdown"); ?>`,
+                    method: "GET",
+                    data: {
+                        id: JSON.stringify($('.multiple_po_id').val())
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        console.log(res)
+                        $(".kode_barang").empty()
+                        $(".kode_barang").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                        })
 
-                    $(".kode_barang").val("").change();
-                }
-            })
+                        $(".kode_barang").val("").change();
+                    }
+                })
 
-            $.ajax({
-                url: `<?= base_url("tax/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    type: 'ppn'
-                },
-                dataType: "json",
-                success: function(res) {
-                    $(".ppn").empty()
-                    $(".ppn").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
-                    })
+                $.ajax({
+                    url: `<?= base_url("tax/dropdown"); ?>`,
+                    method: "GET",
+                    data: {
+                        type: 'ppn'
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        $(".ppn").empty()
+                        $(".ppn").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                        })
 
-                    $(".ppn").val("").change();
-                }
-            })
+                        $(".ppn").val("").change();
+                    }
+                })
 
-            $.ajax({
-                url: `<?= base_url("tax/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    type: 'pph'
-                },
-                dataType: "json",
-                success: function(res) {
-                    $(".pph").empty()
-                    $(".pph").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
-                    })
+                $.ajax({
+                    url: `<?= base_url("tax/dropdown"); ?>`,
+                    method: "GET",
+                    data: {
+                        type: 'pph'
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        $(".pph").empty()
+                        $(".pph").append(`<option value=""></option>`)
+                        res.data.forEach(function(item) {
+                            $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                        })
 
-                    $(".pph").val("").change();
-                    $(".detail-modal").modal("show")
-                }
-            })
+                        $(".pph").val("").change();
+                        $(".detail-modal").modal("show")
+                    }
+                })
             }
             else
             {
@@ -1002,7 +1119,7 @@
                 $(".barang_id").val(barang_id);
                 $(".purchase_order_details_id").val(po_id);
                 $(".satuan_order").val(satuan);
-                $(".jumlah_order").val(qty);
+                $(".qty").val(qty);
                 $(".keterangan").val(note);
             }
             else
@@ -1012,7 +1129,7 @@
                 $(".barang_id").val("");
                 $(".purchase_order_details_id").val("");
                 $(".satuan_order").val("");
-                $(".jumlah_order").val("");
+                $(".qty").val("");
                 $(".keterangan").val("");
             }
         })
@@ -1050,6 +1167,40 @@
         })
     })
 
+    const changeWarehouse = function(id)
+    {
+        let new_list_warehouse = []
+        list_warehouse.forEach((item) => {
+            if(item.row !== id)
+            {
+                new_list_warehouse.push(item)
+            }
+            else
+            {
+                new_list_warehouse.push({display: "", warehouse_id: $(".warehouse_id_" + id + " option:selected").val(), qty_warehouse: $(".qty_" + id).val()})
+            }
+        })
+
+        list_warehouse = new_list_warehouse;
+    } 
+
+    const deleteChildRow = function(id) {
+        $(".table_" + id).css("display", "none")
+        let new_list_warehouse = []
+        list_warehouse.forEach((item) => {
+            if(item.row !== id)
+            {
+                new_list_warehouse.push(item)
+            }
+            else
+            {
+                new_list_warehouse.push({warehouse_id: item.warehouse_id, qty_warehouse: item.qty_warehouse, display: "none"})
+            }
+        })
+
+        list_warehouse = new_list_warehouse;
+    }
+
     const changeStatus = function()
     {
         let value = document.getElementById('auto_generate').checked ? true : false;
@@ -1064,10 +1215,6 @@
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");
         }
-    }
-
-    const deleteChildRow = function(id) {
-        $(".table_" + id).css("display", "none")
     }
 </script>
 
