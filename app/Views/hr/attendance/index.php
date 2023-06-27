@@ -147,7 +147,7 @@
             $(".detail-modal").modal("hide")
         });
 
-        $(".btn-submit-pin").click(function() {
+        $(".btn-submit-form").click(function() {
             $.ajax({
                 type: "post",
                 url: "/check-pin-employee",
@@ -199,6 +199,14 @@
                         });
 
                     } else {
+                        Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                $(".detail-modal").modal("hide")
+                            })
 
                     }
                     console.log(response);
@@ -346,15 +354,15 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Proses</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Proses</button>
             </div>
         </div>
     </div>
 </div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    
+
     $(document).ready(function() {
         $('.ar_id').select2({
             placeholder: "",
@@ -364,24 +372,24 @@
         })
 
         $('.ar_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $('.ar_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.ar_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1')
-        })
-    </script>
+            .parent('div')
+            .find('label')
+            .css('z-index', '1')
+    })
+</script>
 <?= $this->endSection(); ?>
