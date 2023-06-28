@@ -4781,7 +4781,7 @@ div:where(.swal2-icon).swal2-question {
 
 .section .section-header .nav.nav-tabs {
   position: absolute;
-  right: 20px;
+  right: 25px;
 }
 
 .section .section-header .nav.nav-tabs {
@@ -5026,6 +5026,20 @@ input:checked + .slider:before {
 .section .section-header .btn.btn-hapus:active {
   opacity: 0.72;
   transition: 0.3s ease-in;
+}
+
+.section .section-header .btn.btn-dropdown-export {
+  background: #ffa426 !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff !important;
+  margin-right: 20px;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #ffa426 solid !important;
+  border-radius: 4px;
+  min-width: 100px;
 }
 
 .section .section-header .col-button-tambah-spp .btn.btn-print {
@@ -5296,6 +5310,19 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
     position: relative;
     float: none !important;
     min-width: 100%;
+    margin: 0;
+    margin-top: 0px;
+    margin-top: 0.75rem;
+  }
+
+  .section .section-header .btn.btn-dropdown-export {
+    position: relative;
+    float: none !important;
+    min-width: 100%;
+    margin: 0;
+    margin-top: 0px;
+    margin-top: 0.75rem;
+    right: 0;
   }
 
   div.dataTables_wrapper div.dataTables_info {
