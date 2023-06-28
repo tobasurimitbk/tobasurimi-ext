@@ -317,7 +317,9 @@ $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 
 // formula payroll
 $routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);
-// $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
+$routes->get('/formula-payroll/create', 'HR\FormulaPayroll::createView', ['filter' => 'Auth']);
+$routes->post('/formula-payroll/save', 'HR\FormulaPayroll::create', ['filter' => 'Auth']);
+$routes->post('/formula-payroll/update', 'HR\FormulaPayroll::update', ['filter' => 'Auth']);
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::pinjamanKaryawan', ['filter' => 'Auth']);

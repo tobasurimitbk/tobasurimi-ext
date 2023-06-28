@@ -5,11 +5,10 @@
 <section class="section">
     <div class="section-header">
         <h1>Formula Payroll</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("formula-payroll/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        </a>
     </div>
-
 
 
     <div class="card">
@@ -26,14 +25,7 @@
                             <tr>
                                 <th onclick="changeSort('nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
-                                <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
-                                <th onclick="changeSort('email')" class="sort">Email</th>
-                                <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
-                                <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                                <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
-                                <th onclick="changeSort('status')" class="sort">Status</th>
+                                <th class="sort">Formula</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
