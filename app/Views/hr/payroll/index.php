@@ -12,6 +12,35 @@
 
     <div class="card">
         <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select formula" id="formula" name="formula" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <option value="ok">ok</option>
+                        </select>
+                        <label for="floatingInput">Formula</label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input class="form-control komponen" placeholder="Search" value="" disabled />
+                        <label for="floatingInput">Komponen</label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-primary mt-2">
+                        Generate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
                     <input class="form-control search form-out-search" placeholder="Search" value="" />
@@ -45,6 +74,36 @@
 </section>
 
 <script>
+    $(document).ready(function() {
+        // WAREHOUSE
+        $('.formula').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.formula')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.formula')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.formula')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+    })
+
+
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";
