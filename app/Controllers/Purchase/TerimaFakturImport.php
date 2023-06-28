@@ -90,6 +90,12 @@ class TerimaFakturImport extends BaseController
                 array_push($dataTerimaFakturImport, [
                     "no" => $no++,
                     "id" => $data->id,
+                    "faktur_no" => $data->faktur_no,
+                    "sender" => $data->sender,
+                    "nominal_faktur" => $data->nominal_faktur,
+                    "due_date" => $data->due_date,
+                    "date_of_receipt" => $data->date_of_receipt,
+                    "recipient" => $data->recipient
                 ]);
             }
         }

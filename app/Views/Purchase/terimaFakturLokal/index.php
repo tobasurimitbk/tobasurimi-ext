@@ -57,6 +57,87 @@
 </section>
 
 <script>
+let sort = "faktur_no";
+let sortType = "asc";
+
+const table = $('.dataTable').DataTable({
+    dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+    processing: true,
+    serverSide: true,
+    ordering: true,
+    order: [
+        [1, 'asc']
+    ],
+
+    fixedHeader: true,
+    lengthMenu: [
+        [25],
+        [25],
+    ],
+    pageLength: 25,
+    ajax: {
+        url: "<?= base_url("terima-faktur-lokal/all"); ?>",
+        dataSrc: "data",
+        data: function(data) {
+            data.search = $(".search").val();
+            data.dateStart = $(".dateStart").val();
+            data.dateEnd = $(".dateEnd").val();
+            data.sort = sort;
+            data.sortType = sortType;
+        }
+    },
+    // scrollX: true,
+    "initComplete": function(settings, json) {
+        $('.dataTables_length').empty();
+        $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+        $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+    },
+    //responsive: true,
+    display: "stripe",
+    searching: false,
+    columns: [{
+        data: "no",
+        className: "text-center",
+        orderable: false
+    },
+    {
+        data: "faktur_no",
+        className: "text-center"
+    },
+    {
+        data: "sender",
+        className: "text-center"
+    },
+    {
+        data: "nominal_faktur",
+        className: "text-center"
+    },
+    {
+        data: "due_date",
+        className: "text-center"
+    },
+    {
+        data: "date_of_receipt",
+        className: "text-center"
+    },
+    {
+        data: "recipient",
+        className: "text-center"
+    }],
+    columnDefs: [{
+        defaultContent: "-",
+        targets: "_all"
+    }],
+    language: {
+        emptyTable: "Tidak Ada Data",
+        lengthMenu: "Show _MENU_ entries",
+        paginate: {
+            previous: '<i class="fa fa-angle-left"></i>',
+            next: '<i class="fa fa-angle-right"></i>'
+        }
+    }
+});
+
 $(document).ready(function() {
     $(".dateStart").datepicker({
         todayHighlight: true,
@@ -79,6 +160,21 @@ $(document).ready(function() {
     $('.icon-dateEnd').click(function() {
         $(".dateEnd").focus();
     });
+
+    $(".dataTable_info").addClass("pt-0");
+
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    })
+
+    $(".dateStart, .dateEnd").change(function() {
+        table.ajax.reload();
+    })
+
+    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        const data = table.row(this).data();
+        location.replace(`<?= base_url("terima-faktur-lokal/id"); ?>/${data.id}`);
+    })
 })
 </script>
 
