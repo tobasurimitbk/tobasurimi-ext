@@ -5,6 +5,14 @@
 <section class="section">
     <div class="section-header">
         <h1>Surat Permintaan Pembelian</h1>
+        <div class="dropdown dropdown-export">
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><a class="dropdown-item">PDF</a></li>
+            </ul>
+        </div>
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>

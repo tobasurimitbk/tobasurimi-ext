@@ -90,6 +90,14 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
+                        <input value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
+                        <label for="floatingInput">Penerima</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
                         <label for="floatingInput">Keterangan</label>
                     </div>
