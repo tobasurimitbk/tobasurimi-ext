@@ -6,7 +6,7 @@
 <div class="section-header">
     <h1 class="title-name">Tambah</h1>
     <div class="col-button-tambah-spp">
-        <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("terima-faktur-lokal"); ?>">
+        <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("terima-faktur-import"); ?>">
             Batal
         </a>
         <button class="btn btn-show-form btn-save float-right btn-submit-form">

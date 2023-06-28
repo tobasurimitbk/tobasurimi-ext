@@ -4,7 +4,7 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 
-class TerimaFakturLokal extends BaseController
+class TerimaFakturImport extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -15,15 +15,15 @@ class TerimaFakturLokal extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function terimaFakturLokal()
+    public function terimaFakturImport()
     {
-        return view('Purchase/terimaFakturLokal/index');
+        return view('Purchase/terimaFakturImport/index');
     }
 
-    public function createTerimaFakturLokal()
+    public function createTerimaFakturImport()
     {   
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&idCompany=$this->this_company_id", $this->token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -34,13 +34,13 @@ class TerimaFakturLokal extends BaseController
             "dataSupplier" => $dataSupplier
         ];
 
-        return view('Purchase/terimaFakturLokal/form', $data);
+        return view('Purchase/terimaFakturImport/form', $data);
     }
 
-    public function getByIdTerimaFakturLokal($id = null)
+    public function getByIdTerimaFakturImport($id = null)
     {
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&idCompany=$this->this_company_id", $this->token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -52,18 +52,18 @@ class TerimaFakturLokal extends BaseController
         ];
 
         if (!empty($id)) {
-            $responseTerimaFakturLokal = curl_request("GET", "/tandaTerimaFaktur/$id", $this->token);
-            $dataTerimaFakturLokal = [];
-            if ($responseTerimaFakturLokal["code"] === 200) {
-                $dataTerimaFakturLokal = json_decode($responseTerimaFakturLokal["body"])->data;
+            $responseTerimaFakturImport = curl_request("GET", "/tandaTerimaFaktur/$id", $this->token);
+            $dataTerimaFakturImport = [];
+            if ($responseTerimaFakturImport["code"] === 200) {
+                $dataTerimaFakturImport = json_decode($responseTerimaFakturImport["body"])->data;
             }
-            $data["dataTerimaFakturLokal"] = $dataTerimaFakturLokal;
+            $data["dataTerimaFakturImport"] = $dataTerimaFakturImport;
         }
 
-        return view('Purchase/terimaFakturLokal/form', $data);
+        return view('Purchase/terimaFakturImport/form', $data);
     }
 
-    public function allTerimaFakturLokal()
+    public function allTerimaFakturImport()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -71,13 +71,13 @@ class TerimaFakturLokal extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "fakturtype" => "LOKAL",
+            "fakturtype" => "IMPORT",
             "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
         $response = curl_request("GET", "/tandaTerimaFaktur", $this->token, $payload);
-        $dataTerimaFakturLokal = [];
+        $dataTerimaFakturImport = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -87,7 +87,7 @@ class TerimaFakturLokal extends BaseController
             $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
             foreach ($body as $data) {
-                array_push($dataTerimaFakturLokal, [
+                array_push($dataTerimaFakturImport, [
                     "no" => $no++,
                     "id" => $data->id,
                 ]);
@@ -98,7 +98,7 @@ class TerimaFakturLokal extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataTerimaFakturLokal,
+            "data" => $dataTerimaFakturImport,
             "response" => $response,
             "payload" => $payload
         ];
@@ -107,7 +107,7 @@ class TerimaFakturLokal extends BaseController
         return;
     }
     
-    public function saveTerimaFakturLokal()
+    public function saveTerimaFakturImport()
     {
         $rules = [
             "supplier_id" => [
@@ -141,7 +141,7 @@ class TerimaFakturLokal extends BaseController
                 "recipient" => $this->request->getPost("recipient"),
                 "sender" => $this->request->getPost("sender"),
                 "information" => $this->request->getPost("information"),
-                "faktur_type" => "LOKAL"
+                "faktur_type" => "IMPORT"
             ]);
 
             // $data = [
@@ -186,7 +186,7 @@ class TerimaFakturLokal extends BaseController
         return;
     }
 
-    public function updateTerimaFakturLokal()
+    public function updateTerimaFakturImport()
     {
         $rules = [
             "supplier_id" => [
@@ -222,7 +222,7 @@ class TerimaFakturLokal extends BaseController
                 "recipient" => $this->request->getPost("recipient"),
                 "sender" => $this->request->getPost("sender"),
                 "information" => $this->request->getPost("information"),
-                "faktur_type" => "LOKAL"
+                "faktur_type" => "IMPORT"
             ]);
 
             // $data = [
@@ -264,7 +264,7 @@ class TerimaFakturLokal extends BaseController
         return;
     }
 
-    public function deleteTerimaFakturLokal()
+    public function deleteTerimaFakturImport()
     {
         $id = $this->request->getPost("id");
 

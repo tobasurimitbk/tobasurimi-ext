@@ -79,8 +79,6 @@ class SPP extends BaseController
         }
 
         return view('Purchase/spp/form', $data);
-
-        return;
     }
 
     public function getByIdSPPAjax()

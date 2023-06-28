@@ -180,7 +180,6 @@ $routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
 // BAHAN BAKU PO LOKAL
 $routes->get('/po-lokal-bahan-baku', 'Purchase\POLokalBahanBaku::poLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/all', 'Purchase\POLokalBahanBaku::allPOLokalBahanBaku', ['filter' => 'Auth']);
-$routes->get('/po-lokal-bahan-baku/create', 'Purchase\POLokalBahanBaku::createPOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/id/(:segment)', 'Purchase\POLokalBahanBaku::getByIdPOLokalBahanBaku/$1', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/ajax', 'Purchase\POLokalBahanBaku::getByIdPOLokalBahanBakuAjax', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/create', 'Purchase\POLokalBahanBaku::createPOLokalBahanBaku', ['filter' => 'Auth']);
@@ -192,7 +191,6 @@ $routes->post('/po-lokal-bahan-baku/delete', 'Purchase\POLokalBahanBaku::deleteP
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/all', 'Purchase\POLokalBahanPenolong::allPOLokalBahanPenolong', ['filter' => 'Auth']);
-$routes->get('/po-lokal-bahan-penolong/create', 'Purchase\POLokalBahanPenolong::createPOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/id/(:segment)', 'Purchase\POLokalBahanPenolong::getByIdPOLokalBahanPenolong/$1', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/ajax', 'Purchase\POLokalBahanPenolong::getByIdPOLokalBahanPenolongAjax', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/create', 'Purchase\POLokalBahanPenolong::createPOLokalBahanPenolong', ['filter' => 'Auth']);
@@ -204,7 +202,6 @@ $routes->post('/po-lokal-bahan-penolong/delete', 'Purchase\POLokalBahanPenolong:
 // BAHAN BAKU PO IMPORT
 $routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/all', 'Purchase\POImportBahanBaku::allPOImportBahanBaku', ['filter' => 'Auth']);
-$routes->get('/po-import-bahan-baku/create', 'Purchase\POImportBahanBaku::createPOImportBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/id/(:segment)', 'Purchase\POImportBahanBaku::getByIdPOImportBahanBaku/$1', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/ajax', 'Purchase\POImportBahanBaku::getByIdPOImportBahanBakuAjax', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/create', 'Purchase\POImportBahanBaku::createPOImportBahanBaku', ['filter' => 'Auth']);
@@ -216,7 +213,6 @@ $routes->post('/po-import-bahan-baku/delete', 'Purchase\POImportBahanBaku::delet
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-import-bahan-penolong', 'Purchase\POImportBahanPenolong::poImportBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/all', 'Purchase\POImportBahanPenolong::allPOImportBahanPenolong', ['filter' => 'Auth']);
-$routes->get('/po-import-bahan-penolong/create', 'Purchase\POImportBahanPenolong::createPOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/id/(:segment)', 'Purchase\POImportBahanPenolong::getByIdPOImportBahanPenolong/$1', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/ajax', 'Purchase\POImportBahanPenolong::getByIdPOImportBahanPenolongAjax', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/create', 'Purchase\POImportBahanPenolong::createPOImportBahanPenolong', ['filter' => 'Auth']);
@@ -227,7 +223,22 @@ $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolon
 
 // TERIMA FAKTUR LOKAL
 $routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimaFakturLokal', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimaFakturLokal', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimaFakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimaFakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/save', 'Purchase\TerimaFakturLokal::saveTerimaFakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/delete', 'Purchase\TerimaFakturLokal::deleteTerimaFakturLokal', ['filter' => 'Auth']);
+
+// TERIMA FAKTUR IMPORT
+$routes->get('/terima-faktur-import', 'Purchase\TerimaFakturImport::terimaFakturImport', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import/all', 'Purchase\TerimaFakturImport::allTerimaFakturImport', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import/id/(:segment)', 'Purchase\TerimaFakturImport::getByIdTerimaFakturImport/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import/create', 'Purchase\TerimaFakturImport::createTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/save', 'Purchase\TerimaFakturImport::saveTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/update', 'Purchase\TerimaFakturImport::updateTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/delete', 'Purchase\TerimaFakturImport::deleteTerimaFakturImport', ['filter' => 'Auth']);
+
 
 // DROPDOWN
 // PO LOKAL
