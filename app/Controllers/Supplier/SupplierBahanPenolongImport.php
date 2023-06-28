@@ -4,7 +4,7 @@ namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
 
-class SupplierBahanImport extends BaseController
+class SupplierBahanPenolongImport extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -15,7 +15,7 @@ class SupplierBahanImport extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function supplierBahanImport()
+    public function supplierBahanPenolongImport()
     {
         //Get Provinces
         $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
@@ -29,10 +29,10 @@ class SupplierBahanImport extends BaseController
             "dataProvinces" => $dataProvinces,
         ];
 
-        return view('Supplier/supplierBahanImport/index', $data);
+        return view('Supplier/supplierBahanPenolongImport/index', $data);
     }
 
-    public function allSupplierBahanImport()
+    public function allSupplierBahanPenolongImport()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -89,7 +89,7 @@ class SupplierBahanImport extends BaseController
         return;
     }
 
-    public function saveSupplierBahanImport()
+    public function saveSupplierBahanPenolongImport()
     {
         $rules = [
             "kode" => [
@@ -185,7 +185,7 @@ class SupplierBahanImport extends BaseController
         return;
     }
 
-    public function updateSupplierBahanImport()
+    public function updateSupplierBahanPenolongImport()
     {
         $rules = [
             "kode" => [
@@ -279,7 +279,7 @@ class SupplierBahanImport extends BaseController
         return;
     }
 
-    public function getByIdSupplierBahanImport($id = null)
+    public function getByIdSupplierBahanPenolongImport($id = null)
     {
         if (!empty($id)) {
             $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
@@ -307,7 +307,7 @@ class SupplierBahanImport extends BaseController
         return;
     }
 
-    public function deleteSupplierBahanImport()
+    public function deleteSupplierBahanPenolongImport()
     {
         $id = $this->request->getPost("id");
 
