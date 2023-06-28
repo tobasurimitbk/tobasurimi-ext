@@ -1016,7 +1016,7 @@
                 $(".satuan").val(satuan).change();
                 $(".qty").val(stok);
                 $(".harga").val(harga ? harga.toLocaleString() : "");
-                $(".total").val(harga || stok ? (harga * stok).toLocaleString() : "");
+                $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
             }
             else
             {

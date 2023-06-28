@@ -196,7 +196,9 @@
                     </tbody>
                     <tfoot class="foot-detail-table" id="foot-detail-table">
                         <tr>
-                            <td align="center" colspan="5">TOTAL</td>
+                            <td colspan="2"></td>
+                            <td>TOTAL</td>
+                            <td colspan="2"></td>
                             <td><b><?= number_format($total_jml_order); ?></b></td>
                             <td><b><?= $total_jml_dokumen; ?></b></td>
                             <td><b><?= number_format($total_selisih); ?></b></td>
