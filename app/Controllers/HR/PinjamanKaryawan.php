@@ -22,9 +22,19 @@ class PinjamanKaryawan extends BaseController
 
     public function createView()
     {
+        //Get Employee
+        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
 
+        $dataEmployee = [];
+        if ($responseEmployee["code"] === 200) {
+            $dataEmployee = json_decode($responseEmployee["body"])->data;
+        }
 
-        return view('hr/pinjamanKaryawan/form');
+        $data = [
+            "dataEmployee" => $dataEmployee,
+        ];
+
+        return view('hr/pinjamanKaryawan/form', $data);
     }
 
     public function allPinjamanKaryawan()
@@ -80,9 +90,6 @@ class PinjamanKaryawan extends BaseController
             "nama_karyawan" => [
                 "rules" => "required"
             ],
-            "tanggal_peminjaman" => [
-                "rules" => "required"
-            ],
             "total_pinjaman" => [
                 "rules" => "required"
             ],
@@ -94,19 +101,17 @@ class PinjamanKaryawan extends BaseController
 
         if ($this->validate($rules)) {
             $payload = json_encode([
-                "nama_karyawan" => $this->request->getPost("nama_karyawan"),
-                "tanggal_peminjaman" => $this->request->getPost("tanggal_peminjaman"),
-                "total_pinjaman" => $this->request->getPost("total_pinjaman"),
-                "termin_pembayaran" => $this->request->getPost("termin_pembayaran"),
+                "employee_id" => $this->request->getPost("nama_karyawan"),
+                "amount" => $this->request->getPost("total_pinjaman"),
+                "term" => $this->request->getPost("termin_pembayaran"),
             ]);
 
             $response = curl_request("POST", "/employeeLoan", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
-                    "id" => json_decode($response["body"])->createdId,
                     "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
+                    "message"   => $response["message"],
                     "payload"   => $payload,
                     'token' => csrf_hash(),
                     'code' => $response["code"]

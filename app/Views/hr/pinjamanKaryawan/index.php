@@ -79,7 +79,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("pinjamanKaryawan/all"); ?>",
+            url: "<?= base_url("pinjaman-karyawan/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -125,9 +125,6 @@
             className: "text-center"
         }, {
             data: "nip",
-            className: "text-center"
-        }, {
-            data: "employeeName",
             className: "text-center"
         }],
         columnDefs: [{
