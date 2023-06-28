@@ -22,7 +22,56 @@ class PinjamanKaryawan extends BaseController
 
     public function createView()
     {
+
+
         return view('hr/pinjamanKaryawan/form');
+    }
+
+    public function allPinjamanKaryawan()
+    {
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+        ];
+
+        $response = curl_request("GET", "/employeeLoan", $this->token, $payload);
+        $dataPinjamanKaryawan = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $body = json_decode($response["body"])->data;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
+
+            foreach ($body as $data) {
+                array_push($dataPinjamanKaryawan, [
+                    "id" => $data->id,
+                    "amount" => $data->amount,
+                    "installment_month" => $data->installment_month,
+                    "remaining_amount" => $data->remaining_amount,
+                    "loan_date" => $data->loan_date,
+                    "term" => $data->term,
+                    "status" => $data->status,
+                    "approve_by" => $data->approve_by,
+                    "nip" => $data->nip,
+                    "employeeName" => $data->employeeName,
+                ]);
+            }
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalRecords,
+            "recordsFiltered" => $totalRecords,
+            "data" => $dataPinjamanKaryawan,
+            "response" => $response,
+            "payload" => $payload
+        ];
+
+        echo json_encode($data);
+        return;
     }
 
     public function create()
