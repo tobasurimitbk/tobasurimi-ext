@@ -5,12 +5,14 @@
 <section class="section">
 <div class="section-header">
     <h1 class="title-name">Tambah</h1>
-    <a class="btn btn-hide-form" href="<?= base_url("penerimaan-barang-lokal"); ?>">
-        Batal
-    </a>
-    <button class="btn btn-submit-form btn-submit-parent">
-        Simpan
-    </button>
+    <div class="col-button-tambah-spp">
+        <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-lokal"); ?>">
+            Batal
+        </a>
+        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+            Simpan
+        </button>
+    </div>
 </div>
 <div class="card">
     <div class="card-body">
@@ -55,7 +57,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select disabled="true" multiple class="form-select multiple_po_id" name="multiple_po_id[]" aria-label="Floating label select example">
+                        <select disabled="true" readonly="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">No. PO</label>
@@ -161,49 +163,51 @@
                 </button>
             </div>
         </div>
-        <div class="table-responsive mt-2">
-            <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Kode Barang</th>
-                        <th>Nama Barang</th>
-                        <th>Spesifikasi</th>
-                        <th>Satuan</th>
-                        <th>Jml. Order</th>
-                        <th>Jml. Dokumen</th>
-                        <th>Selisih</th>
-                        <th>Konversi</th>
-                        <th>Harga</th>
-                        <th>Penyerahan</th>
-                        <th>Keterangan</th>
-                        <th>Hapus</th>
-                    </tr>
-                </thead>
-                <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                <?php 
-                    $no = 1;
-                    $total_jml_order = 0;
-                    $total_jml_dokumen = 0;
-                    $total_selisih = 0;
-                    $total_konversi = 0;
-                    $total_harga = 0;
-                    $total_penyerahan = 0;
-                ?>
-                </tbody>
-                <tfoot class="foot-detail-table" id="foot-detail-table">
-                    <tr>
-                        <td align="center" colspan="5">TOTAL</td>
-                        <td><b><?= number_format($total_jml_order); ?></b></td>
-                        <td><b><?= $total_jml_dokumen; ?></b></td>
-                        <td><b><?= number_format($total_selisih); ?></b></td>
-                        <td><b><?= number_format($total_konversi); ?></b></td>
-                        <td><b><?= number_format($total_harga); ?></b></td>
-                        <td><b><?= number_format($total_penyerahan); ?></b></td>
-                        <td colspan="2"></td>
-                    </tr>
-                </tfoot>
-            </table>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Kode Barang</th>
+                            <th>Nama Barang</th>
+                            <th>Spesifikasi</th>
+                            <th>Satuan</th>
+                            <th>Jml. Order</th>
+                            <th>Jml. Dokumen</th>
+                            <th>Selisih</th>
+                            <th>Konversi</th>
+                            <th>Harga</th>
+                            <th>Penyerahan</th>
+                            <th>Keterangan</th>
+                            <th>Hapus</th>
+                        </tr>
+                    </thead>
+                    <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                    <?php 
+                        $no = 1;
+                        $total_jml_order = 0;
+                        $total_jml_dokumen = 0;
+                        $total_selisih = 0;
+                        $total_konversi = 0;
+                        $total_harga = 0;
+                        $total_penyerahan = 0;
+                    ?>
+                    </tbody>
+                    <tfoot class="foot-detail-table" id="foot-detail-table">
+                        <tr>
+                            <td align="center" colspan="5">TOTAL</td>
+                            <td><b><?= number_format($total_jml_order); ?></b></td>
+                            <td><b><?= $total_jml_dokumen; ?></b></td>
+                            <td><b><?= number_format($total_selisih); ?></b></td>
+                            <td><b><?= number_format($total_konversi); ?></b></td>
+                            <td><b><?= number_format($total_harga); ?></b></td>
+                            <td><b><?= number_format($total_penyerahan); ?></b></td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -523,6 +527,9 @@
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },
+                "multiple_po_id[]": {
+                    required: "No. PO wajib diisi"
+                },
                 aju_document_type: {
                     required: "Jenis Dokumen wajib diisi"
                 },
@@ -567,21 +574,25 @@
             errorClass: 'text-danger',
             errorPlacement: function(error, element) {
                 var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
+                console.log(elem);
+                if (elem.hasClass("multiple_po_id")) {
+                    element = $(".select2-selection--multiple").parent();
+                    error.insertAfter(element);
+                } else if (elem.hasClass("select2-hidden-accessible")) {
                     element = $("#select2-" + elem.attr("id") + "-container").parent(); 
                     error.insertAfter(element);
                 } else {
                     error.insertAfter(element);
                 }
             },
-            highlight: function (element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');                      
+            highlight: function(element) {
+                $(element).closest('.col-md-6').addClass('has-error');
+                $(element).addClass('select-class');
 
             },
-            unhighlight: function (element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');   
+            unhighlight: function(element) {
+                $(element).closest('.col-md-6').removeClass('has-error');
+                $(element).removeClass('select-class');
             },
         });
 
@@ -595,7 +606,7 @@
         // PO NO
         $('.multiple_po_id').select2({
             placeholder: "",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -613,6 +624,11 @@
             .children('span')
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.multiple_po_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $('.multiple_po_id')
             .parent('div')

@@ -13,7 +13,6 @@
     <div class="card-body">
         <div class="row justify-content-end row-col-spp">
             <div class="col mb-3">
-            <?= csrf_field() ?>
                 <div class="input-group input-group-password">
                     <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -58,7 +57,6 @@
 </section>
 
 <script>
-    const csrfToken = '<?= csrf_token() ?>';
     let sort = "poDate";
     let sortType = "asc";
 
