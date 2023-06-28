@@ -5,7 +5,7 @@
 <section class="section">
 <div class="section-header">
     <h1>Tanda Terima Faktur Lokal</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("terima-faktur-lokal/create"); ?>"
+    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("terima-faktur-lokal/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
 </div>

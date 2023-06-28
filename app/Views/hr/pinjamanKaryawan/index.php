@@ -126,9 +126,6 @@
         }, {
             data: "nip",
             className: "text-center"
-        }, {
-            data: "employeeName",
-            className: "text-center"
         }],
         columnDefs: [{
             defaultContent: "-",

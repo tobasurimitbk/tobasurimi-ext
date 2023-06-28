@@ -10,7 +10,7 @@
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><a class="dropdown-item">PDF</a></li>
+                <li><button class="dropdown-item" onclick="pdf()">PDF</button></li>
             </ul>
         
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
@@ -73,6 +73,9 @@
     let sort = "sppType";
     let sortType = "asc";
 
+    let search = $('.search').val();
+    let currentPage = 1;
+
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
@@ -98,6 +101,10 @@
                 data.sort = sort;
                 data.sortType = sortType;
             }
+        },
+        "drawCallback": function(settings) {
+            //for set current page print
+            currentPage = settings.json.currentPage;
         },
         // scrollX: true,
         "initComplete": function(settings, json) {
@@ -377,6 +384,11 @@
                 })
             }
         });
+    }
+
+    const pdf = function() 
+    {
+        window.open(`<?= getenv('apiURL'); ?>/purchaseRequest/print/all?search=${search}&currentPage=${currentPage}&pageSize=25&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 
     const changeSort = function(val) {

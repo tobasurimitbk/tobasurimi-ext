@@ -163,7 +163,8 @@ class SPP extends BaseController
             "recordsFiltered" => $totalRecords,
             "data" => $dataSPP,
             "response" => $response,
-            "payload" => $payload
+            "payload" => $payload,
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1
         ];
 
         echo json_encode($data);
