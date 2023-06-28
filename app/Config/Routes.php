@@ -227,6 +227,7 @@ $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolon
 
 // TERIMA FAKTUR LOKAL
 $routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimaFakturLokal', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimaFakturLokal', ['filter' => 'Auth']);
 
 // DROPDOWN
 // PO LOKAL
