@@ -75,7 +75,7 @@
 
 <script>
     $(document).ready(function() {
-        // WAREHOUSE
+        // FORMULA
         $('.formula').select2({
             placeholder: "",
             theme: "bootstrap-5"

@@ -26,14 +26,25 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control nama_karyawan" id="nama_karyawan" name="nama_karyawan" placeholder="Nama Karyawan">
+                            <select class="form-select nama_karyawan" name="nama_karyawan" id="nama_karyawan">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataEmployee)) {
+                                    foreach ($dataEmployee as $employee) {
+                                ?>
+                                        <option value="<?= $employee->id; ?>"><?= $employee->name; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
                             <label for="floatingInput">Nama Karyawan</label>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control total_pinjaman" id="total_pinjaman" name="total_pinjaman" placeholder="Total Pinjaman">
+                            <input type="number" class="form-control total_pinjaman" id="total_pinjaman" name="total_pinjaman" placeholder="Total Pinjaman">
                             <label for="floatingInput">Total Pinjaman</label>
                         </div>
                     </div>
@@ -42,14 +53,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control tanggal_peminjaman" id="tanggal_peminjaman" name="tanggal_peminjaman" placeholder="Tanggal Peminjaman">
-                            <label for="floatingInput">Tanggal Peminjaman</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control termin_pembayaran" id="termin_pembayaran" name="termin_pembayaran" placeholder="Termin Pembayaran">
+                            <input type="number" class="form-control termin_pembayaran" id="termin_pembayaran" name="termin_pembayaran" placeholder="Termin Pembayaran">
                             <label for="floatingInput">Termin Pembayaran</label>
                         </div>
                     </div>
@@ -64,15 +68,41 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
 
+    $(document).ready(function() {
+        // FORMULA
+        $('.employee_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.employee_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.employee_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.employee_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+    })
+
     var validator = $(".create-form").validate({
         rules: {
             nama_karyawan: {
                 required: true
             },
             total_pinjaman: {
-                required: true
-            },
-            tanggal_peminjaman: {
                 required: true
             },
             termin_pembayaran: {
@@ -85,9 +115,6 @@
             },
             total_pinjaman: {
                 required: "Total Pinjaman wajib diisi"
-            },
-            tanggal_peminjaman: {
-                required: "Tanggal Peminjaman wajib diisi"
             },
             termin_pembayaran: {
                 required: "Termin Pembayaran wajib diisi"
@@ -157,7 +184,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("formula-payroll"); ?>";
+                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({
@@ -201,7 +228,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("formula-payroll"); ?>";
+                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({

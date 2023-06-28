@@ -79,7 +79,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("pinjamanKaryawan/all"); ?>",
+            url: "<?= base_url("pinjaman-karyawan/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
