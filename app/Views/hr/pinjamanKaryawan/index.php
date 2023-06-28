@@ -5,9 +5,9 @@
 <section class="section">
     <div class="section-header">
         <h1>Pinjaman Karyawan</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pinjaman-karyawan/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        </a>
     </div>
 
     <div class="card">
@@ -22,15 +22,12 @@
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th onclick="changeSort('nip')" class="sort">NIP</th>
+                                <th class="sort">ID</th>
+
                                 <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
-                                <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
-                                <th onclick="changeSort('email')" class="sort">Email</th>
-                                <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
-                                <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                                <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
+
+                                <th onclick="changeSort('total_pinjaman')" class="sort">Total Pinjaman</th>
+
                                 <th onclick="changeSort('status')" class="sort">Status</th>
                             </tr>
                         </thead>
