@@ -87,26 +87,31 @@
                     <table class="table table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
                         <thead>
                             <tr>
-                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;User</th>
-                                    <?php
-                                    $last_date = date("t", strtotime($year . "-" . $month . "-01"));
-                                    for ($i = 1; $i <= $last_date; $i++) {
-                                        $temp = mktime(0, 0, 0, $month, $i, $year);
-                                        $no = (strlen($i) == 1) ? ("0" . $i) : $i;
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;User</td>
+                                <?php
+                                $last_date = date("t", strtotime($year . "-" . $month . "-01"));
+                                for ($i = 1; $i <= $last_date; $i++) {
+                                    $temp = mktime(0, 0, 0, $month, $i, $year);
+                                    $no = (strlen($i) == 1) ? ("0" . $i) : $i;
 
-                                        if (date("N", $temp) == 6 || date("N", $temp) == 7) {
-                                            echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Masuk " . $i . "</font></th>";
-                                            echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></th>";
-                                        } else {
-                                            echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Masuk " . $i . "</th>";
-                                            echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</th>";
-                                        }
-                                    ?>
-
-                                    <?php
+                                    if (date("N", $temp) == 7) {
+                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Masuk " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
+                                    } else {
+                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Masuk " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</td>";
                                     }
-                                    ?>
-                                </td>
+                                ?>
+
+                                <?php
+                                }
+                                ?>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Hadir</td>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Alpha</td>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Sakit</td>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Ijin</td>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Cuti</td>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Libur</td>
                             </tr>
                         </thead>
 
@@ -158,6 +163,14 @@
                                     }
                                 }
                                 ?>
+
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["hadir"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["alpha"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["sakit"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["ijin"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["cuti"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["libur"]; ?></td>
+
                             </tr>
 
                         <?php
