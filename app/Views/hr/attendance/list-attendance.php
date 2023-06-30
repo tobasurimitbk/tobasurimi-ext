@@ -62,7 +62,7 @@
                     th:first-child,
                     td:first-child {
                         position: sticky;
-                        left: 0px;
+                        left: -12px;
 
                     }
 
