@@ -21,7 +21,7 @@ class Attendance extends BaseController
             "idCompany" => $this->this_company_id
         ];
 
-        $res_employee = curl_request("GET", "/employees", $this->token, $payload);
+        $res_employee = curl_request("GET", "/employees/all?idCompany=" . $this->this_company_id, $this->token);
         $dataEmployee = [];
         if ($res_employee["code"] === 200) {
             $dataEmployee = json_decode($res_employee["body"])->data;
@@ -50,7 +50,26 @@ class Attendance extends BaseController
 
     public function ListAttendance()
     {
-        return view('hr/attendance/list-attendance');
+        $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
+        $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
+
+        //https: //tobasurimi-api.lyrid.id/attendance/report?year=2023&month=06&idCompany=1
+        $response = curl_request("GET", "/attendance/report?year=$year&month=$month&idCompany=" . $this->this_company_id, $this->token);
+
+        $data_response = [];
+        if ($response["code"] === 200) {
+            //$data_response  = json_decode($response["body"])->data;
+            $data_response  = json_decode($response["body"], true);
+        }
+        //print_r($data_response);
+
+        $data = [
+            'year' => $year,
+            'month' => $month,
+            'res_user'  => $data_response["data"]
+
+        ];
+        return view('hr/attendance/list-attendance', $data);
     }
 
     public function SaveAttendance()
