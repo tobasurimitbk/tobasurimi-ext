@@ -346,44 +346,44 @@
 
         if (value) {
             data["status"] = true;
-        }
 
-        $.ajax({
-            url: "<?= base_url("spp/approve"); ?>",
-            data: data,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            success: function(response) {
-                csrf.val(response.token);
-                if (response.status) {
-                    Swal.fire({
-                            icon: 'success',
+            $.ajax({
+                url: "<?= base_url("spp/approve"); ?>",
+                data: data,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                method: "POST",
+                dataType: "json",
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                table.ajax.reload()
+                            })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
                             title: response.message,
                             confirmButtonColor: '#4e73df',
                         })
-                        .then(() => {
-                            table.ajax.reload()
-                        })
-                } else {
+                    }
+                },
+                onError: function(response) {
+                    csrf.val(response.token);
                     Swal.fire({
                         icon: 'error',
-                        title: response.message,
+                        title: 'Approve Gagal Diubah, coba Lagi',
                         confirmButtonColor: '#4e73df',
                     })
                 }
-            },
-            onError: function(response) {
-                csrf.val(response.token);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Approve Gagal Diubah, coba Lagi',
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-        });
+            });
+        }
     }
 
     const pdf = function() 

@@ -127,8 +127,17 @@ class Barang extends BaseController
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "stok" => formatter($this->request->getPost("stok"), "STR_TO_INT"),
-                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
+                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                "spek" => json_decode(stripslashes($this->request->getPost("spek")))
             ]);
+
+            // $data = [
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
 
             $response = curl_request("POST", "/barang", $this->token, $payload);
 
@@ -203,29 +212,38 @@ class Barang extends BaseController
                 "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
+                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                "spek" => json_decode(stripslashes($this->request->getPost("spek")))
             ]);
 
-            $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
+            $data = [
+                "status"            => false,
+                "message"    => $payload,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            // $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
+
+            // if ($response["code"] === 200) {
+            //     $data = [
+            //         "status"            => true,
+            //         "message"   => "Data Berhasil diubah",
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // } else {
+            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+            //     $data = [
+            //         "status"            => false,
+            //         "message"    => $message,
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash()
+            //     ];
+            //     echo json_encode($data);
+            // }
         } else {
             $data = [
                 "status"            => false,
@@ -333,6 +351,24 @@ class Barang extends BaseController
     public function dropdownBarang()
     {
         $responseBarang = curl_request("GET", "/barang/all?idCompany=$this->this_company_id", $this->token);
+
+        $dataBarang = [];
+        if ($responseBarang["code"] === 200) {
+            $dataBarang = json_decode($responseBarang["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownBarangKategori()
+    {
+        $kategori = $this->request->getGet("kategori");
+        $responseBarang = curl_request("GET", "/barang/getByCategory/$kategori", $this->token);
 
         $dataBarang = [];
         if ($responseBarang["code"] === 200) {

@@ -97,6 +97,31 @@
                         </div>
                     </div>
                 </form>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-5">
+                        <div class="col-md-6">
+                            <h5 class="modal-sub-title">Spesifikasi</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-add-row btn-add btn-block float-right" style="width: 106px;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive mt-2">
+                    <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Spesifikasi</th>
+                                <th>Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-spek" id="body-detail-spek" style="cursor: pointer;">
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer justify-content-between">
                 <div class="d-flex">
@@ -122,7 +147,7 @@
 </div>
 <div class="card">
     <div class="card-body">
-        <div class="row justify-content-end mb-3">
+        <div class="row justify-content-end row-col-spp">
             <div class="col-md-2">
                 <input class="form-control search form-out-search" placeholder="Search" value="" />
             </div>
@@ -145,14 +170,6 @@
                     <option value="Aktif">Status: Aktif</option>
                     <option value="Tidak Aktif">Status: Tidak Aktif</option>
                 </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-export btn-dropdown-export dropdown-toggle" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                    Export
-                </button>
-                <ul class="dropdown-menu list-dropdown-export" aria-labelledby="dropdownMenuButtonExport">
-
-                </ul>
             </div>
         </div>
         <div class="row">
@@ -186,6 +203,8 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode_barang";
     let sortType = "asc";
+    let list_spek = [];
+    var row_detail = 0;
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -547,6 +566,8 @@
         });
 
         $(".btn-show-form").click(function() {
+            list_spek = [];
+            row_detail = 0;
             $('.stok').rules('add', {
                 required: true
             });
@@ -645,6 +666,8 @@
             $(".title-name").text("Update");
             $(".stok").attr("readonly", true);
             $(".kode_barang").attr("readonly", true);
+            row_detail = 0;
+            list_spek = [];
 
             $.ajax({
                 url: "<?= base_url("barang/id"); ?>" + "/" + id,
@@ -652,6 +675,28 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
+                        let new_spek = res?.data?.spek;
+                        let tag_html = "";
+
+                        new_spek.forEach((item) => {
+                            row_detail++;
+                            list_spek.push(
+                            {
+                                row: row_detail,
+                                display: "",
+                            })
+                            tag_html += `<tr class="table_${row_detail}">`;
+                            tag_html += `<td>`;
+                            tag_html += `<input type="text" value="${item}" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
+                            tag_html += `</td>`;
+                            tag_html += `<td>`;
+                            tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
+                            tag_html += `</td>`;
+                            tag_html += `</tr>`;
+                        })
+
+                        $(".body-detail-spek").append(tag_html)
+
                         $(".id").val(id);
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".nama_barang").val(res?.data?.nama_barang);
@@ -766,6 +811,18 @@
                         let data = new FormData(document.querySelector(".create-form"));
 
                         let id = $(".id").val();
+
+                        let update_list_spek = [];
+                        console.log(list_spek)
+                        list_spek.forEach((item) => {
+                            if(item.display != "none")
+                            {
+                                update_list_spek.push($(".spek_" + item.row).val());
+                            }
+                        })
+
+                        data.append("spek", JSON.stringify(update_list_spek));
+
                         // UPDATE
                         if(id)
                         {
@@ -977,6 +1034,44 @@
                 stopLoading()
             }
         });
+    }
+
+    $(".btn-add-row").click(function() {
+        row_detail++;
+        list_spek.push(
+        {
+            row: row_detail,
+            display: "",
+        })
+        
+        let tag_html = "";
+        tag_html += `<tr class="table_${row_detail}">`;
+        tag_html += `<td>`;
+        tag_html += `<input type="text" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
+        tag_html += `</td>`;
+        tag_html += `<td>`;
+        tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
+        tag_html += `</td>`;
+        tag_html += `</tr>`;
+
+        $(".body-detail-spek").append(tag_html)
+    })
+
+    const deleteChildRow = function(id) {
+        $(".table_" + id).css("display", "none")
+        let new_list_spek = []
+        list_spek.forEach((item) => {
+            if(item.row !== id)
+            {
+                new_list_spek.push(item)
+            }
+            else
+            {
+                new_list_spek.push({row: id, display: "none"})
+            }
+        })
+
+        list_spek = new_list_spek;
     }
 
     const changeSort = function(val) {
