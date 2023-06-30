@@ -234,9 +234,6 @@ class Employee extends BaseController
             ],
             "acc_no" => [
                 "rules" => "required"
-            ],
-            "pin" => [
-                "rules" => "required"
             ]
         ];
 

@@ -4,8 +4,8 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Purchase Order Lokal Bahan Baku</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal-bahan-baku/create"); ?>">
+    <h1>Penawaran</h1>
+    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penawaran/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
 </div>
@@ -38,12 +38,11 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>#</th>
-                            <th>Tanggal Dibuat</th>
-                            <th>No. PO</th>
-                            <th>Jenis Order</th>
-                            <th>Supplier</th>
-                            <th>Total Harga</th>
+                            <th>No. Penawaran</th>
+                            <th>Nama Customer</th>
                             <th>Valas</th>
+                            <th>Expired Date</th>
+                            <th>Tanggal Pembuatan</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -56,4 +55,29 @@
 </div>
 </section>
 
+<script>
+    $(document).ready(function() {
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
+    })
+</script>
 <?= $this->endSection(); ?>

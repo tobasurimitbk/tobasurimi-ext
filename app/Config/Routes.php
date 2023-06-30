@@ -258,6 +258,10 @@ $routes->post('/pembayaran-po-import/save', 'Pembayaran\PembayaranPOImport::save
 $routes->post('/pembayaran-po-import/update', 'Pembayaran\PembayaranPOImport::updatePembayaranPOImport', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/delete', 'Pembayaran\PembayaranPOImport::deletePembayaranPOImport', ['filter' => 'Auth']);
 
+// SALES
+// PENAWARAN
+$routes->get('/penawaran', 'Sales\Penawaran::penawaran', ['filter' => 'Auth']);
+
 // DROPDOWN
 // PO LOKAL
 $routes->get('/po-lokal/dropdown', 'Purchase\POLokal::dropdownPOLokal/$1', ['filter' => 'Auth']);
