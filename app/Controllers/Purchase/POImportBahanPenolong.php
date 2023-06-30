@@ -88,7 +88,7 @@ class POImportBahanPenolong extends BaseController
         ];
 
         if (!empty($id)) {
-            $responsePOImport = curl_request("GET", "/purchaseOrder/$id", $this->token);
+            $responsePOImport = curl_request("GET", "/auxiliaryMaterialPO/import/$id", $this->token);
             $dataPOImport = [];
             if ($responsePOImport["code"] === 200) {
                 $dataPOImport = json_decode($responsePOImport["body"])->data;
@@ -109,7 +109,7 @@ class POImportBahanPenolong extends BaseController
         $id = $this->request->getGet("id");
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseOrder/$id", $this->token);
+            $response = curl_request("GET", "/auxiliaryMaterialPO/import/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -149,7 +149,7 @@ class POImportBahanPenolong extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/purchaseOrder", $this->token, $payload);
+        $response = curl_request("GET", "/auxiliaryMaterialPO/import", $this->token, $payload);
         $dataPOImport = [];
         $totalRecords = 0;
 
@@ -241,7 +241,7 @@ class POImportBahanPenolong extends BaseController
             // ];
             // echo json_encode($data);
             
-            $response = curl_request("POST", "/purchaseOrder", $this->token, $payload);
+            $response = curl_request("POST", "/auxiliaryMaterialPO/import", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
@@ -327,7 +327,7 @@ class POImportBahanPenolong extends BaseController
             // ];
             // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
+            $response = curl_request("PATCH", "/auxiliaryMaterialPO/import/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -366,7 +366,7 @@ class POImportBahanPenolong extends BaseController
             "is_posted" => true
         ]);
         
-        $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
+        $response = curl_request("PATCH", "/auxiliaryMaterialPO/import/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -394,7 +394,7 @@ class POImportBahanPenolong extends BaseController
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/purchaseOrder/$id", $this->token);
+            $response = curl_request("DELETE", "/auxiliaryMaterialPO/import/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,

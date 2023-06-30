@@ -907,6 +907,8 @@
             }
             else
             {
+                $(".spesifikasi").empty()
+                $(".spesifikasi").val("").change()
                 $(".new-barang").css("display", "none");
                 $(".category").val("").change();
                 $('.category').rules('remove', 'required');

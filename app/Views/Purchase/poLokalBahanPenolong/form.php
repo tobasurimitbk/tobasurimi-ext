@@ -335,7 +335,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control spesifikasi" name="spesifikasi" id="spesifikasi" placeholder="Spesifikasi">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
+                                            <option value=""></option>
+                                        </select>
+                                        <label for="floatingInput">Spesitifikasi</label>
+                                    </div>
+                                </div>
                                 <label for="floatingInput">Spesitifikasi</label>
                             </div>
                         </div>
@@ -707,6 +714,34 @@
             .find('label')
             .css('z-index', '1');
 
+        // SPESIFIKASI
+        $('.spesifikasi').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.spesifikasi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.spesifikasi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.spesifikasi')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         // SATUAN
         $('.satuan').select2({
             placeholder: "",
@@ -882,7 +917,7 @@
             $(".nama_barang").val('')
             $(".qty").val('')
             $(".satuan").val('')
-            $(".spesifikasi").val('')
+            $(".spesifikasi").val('').change()
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
@@ -1224,6 +1259,21 @@
                     });
                 }
 
+                $.ajax({
+                    url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        $(".spesifikasi").empty()
+                        $(".spesifikasi").append(`<option value=""></option>`)
+                        res.data.spek.forEach(function(item) {
+                            $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
+                        })
+
+                        $(".spesifikasi").val("").change();
+                    }
+                })
+
                 $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
                 $(".barang_id").val(barang_id);
@@ -1234,6 +1284,8 @@
             }
             else
             {
+                $(".spesifikasi").empty()
+                $(".spesifikasi").val("").change()
                 $(".new-barang").css("display", "none");
                 $(".category").val("").change();
                 $('.category').rules('remove', 'required');
@@ -1317,7 +1369,7 @@
             let nama_barang = $(".nama_barang").val()
             let nama_satuan = $(".satuan option:selected").text()
             let satuan = $(".satuan option:selected").val()
-            let spesifikasi = $(".spesifikasi").val()
+            let spesifikasi = $(".spesifikasi option:selected").val()
             let keterangan = $(".keterangan").val()
             let harga = $(".harga").val()
             let qty = $(".qty").val()
@@ -2065,8 +2117,22 @@
 
         $(".id_detail").val(rowid)
         $(".kode").val(kode_barang)
-        $(".spesifikasi").val(spesifikasi)
         $(".keterangan").val(keterangan)
+
+        $.ajax({
+            url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".spesifikasi").empty()
+                $(".spesifikasi").append(`<option value=""></option>`)
+                res.data.spek.forEach(function(item) {
+                    $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
+                })
+
+                $(".spesifikasi").val(spesifikasi).change();
+            }
+        })
 
         $.ajax({
                 url: `<?= base_url("tax/dropdown"); ?>`,

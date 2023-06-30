@@ -88,7 +88,7 @@ class POLokalBahanPenolong extends BaseController
         ];
 
         if (!empty($id)) {
-            $responsePOLokal = curl_request("GET", "/purchaseOrder/$id", $this->token);
+            $responsePOLokal = curl_request("GET", "/auxiliaryMaterialPO/lokal/$id", $this->token);
             $dataPOLokal = [];
             if ($responsePOLokal["code"] === 200) {
                 $dataPOLokal = json_decode($responsePOLokal["body"])->data;
@@ -109,7 +109,7 @@ class POLokalBahanPenolong extends BaseController
         $id = $this->request->getGet("id");
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseOrder/$id", $this->token);
+            $response = curl_request("GET", "/auxiliaryMaterialPO/lokal/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"  => true,
@@ -149,7 +149,7 @@ class POLokalBahanPenolong extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/purchaseOrder", $this->token, $payload);
+        $response = curl_request("GET", "/auxiliaryMaterialPO/lokal", $this->token, $payload);
         $dataPOLokal = [];
         $totalRecords = 0;
 
@@ -241,7 +241,7 @@ class POLokalBahanPenolong extends BaseController
             // ];
             // echo json_encode($data);
             
-            $response = curl_request("POST", "/purchaseOrder", $this->token, $payload);
+            $response = curl_request("POST", "/auxiliaryMaterialPO/lokal", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
@@ -327,7 +327,7 @@ class POLokalBahanPenolong extends BaseController
             // ];
             // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
+            $response = curl_request("PATCH", "/auxiliaryMaterialPO/lokal/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
@@ -366,7 +366,7 @@ class POLokalBahanPenolong extends BaseController
             "is_posted" => true
         ]);
         
-        $response = curl_request("PATCH", "/purchaseOrder/$id", $this->token, $payload);
+        $response = curl_request("PATCH", "/auxiliaryMaterialPO/lokal/$id", $this->token, $payload);
 
         if ($response["code"] === 200) {
             $data = [
@@ -394,7 +394,7 @@ class POLokalBahanPenolong extends BaseController
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
-            $response = curl_request("DELETE", "/purchaseOrder/$id", $this->token);
+            $response = curl_request("DELETE", "/auxiliaryMaterialPO/lokal/$id", $this->token);
             if ($response["code"] === 200) {
                 $data = [
                     "status"            => true,
