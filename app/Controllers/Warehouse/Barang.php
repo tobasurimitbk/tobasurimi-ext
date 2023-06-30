@@ -126,9 +126,9 @@ class Barang extends BaseController
                 "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "stok" => formatter($this->request->getPost("stok"), "STR_TO_INT"),
+                "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
                 "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                "spek" => json_decode(stripslashes($this->request->getPost("spek")))
+                "spek" => json_decode($this->request->getPost("spek"))
             ]);
 
             // $data = [
@@ -213,37 +213,37 @@ class Barang extends BaseController
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                "spek" => json_decode(stripslashes($this->request->getPost("spek")))
+                "spek" => json_decode($this->request->getPost("spek"))
             ]);
 
-            $data = [
-                "status"            => false,
-                "message"    => $payload,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            // $data = [
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
 
-            // $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
+            $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
 
-            // if ($response["code"] === 200) {
-            //     $data = [
-            //         "status"            => true,
-            //         "message"   => "Data Berhasil diubah",
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // } else {
-            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-            //     $data = [
-            //         "status"            => false,
-            //         "message"    => $message,
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // }
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
         } else {
             $data = [
                 "status"            => false,

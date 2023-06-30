@@ -166,7 +166,7 @@ class POLokalBahanBaku extends BaseController
                 "pph" => $this->request->getPost("pph"),
                 "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
                 "is_posted" => false,
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" => json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [
@@ -230,7 +230,7 @@ class POLokalBahanBaku extends BaseController
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "pph" => $this->request->getPost("pph"),
                 "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" => json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [
@@ -356,7 +356,7 @@ class POLokalBahanBaku extends BaseController
     public function dropdownBarangPOLokalBahanBaku()
     {
         $payload = json_encode([
-            "multiple_id_po" => json_decode(stripslashes($this->request->getGet("id")))
+            "multiple_id_po" => json_decode($this->request->getGet("id"))
         ]);
 
         $dataPOLokal = [];
