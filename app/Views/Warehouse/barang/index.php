@@ -566,6 +566,7 @@
         });
 
         $(".btn-show-form").click(function() {
+            $(".body-detail-spek").empty()
             list_spek = [];
             row_detail = 0;
             $('.stok').rules('add', {

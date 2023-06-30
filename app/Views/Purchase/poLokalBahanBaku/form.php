@@ -275,7 +275,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
-                                <label for="floatingInput">Harga Satuan</label>
+                                <label for="floatingInput">Harga Umum</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -428,6 +428,18 @@
             },
             harga: {
                 required: true
+            },
+            peti: {
+                required: true
+            },
+            quality: {
+                required: true
+            },
+            daily_price: {
+                required: true
+            },
+            monthly_price: {
+                required: true
             }
         },
         messages: {
@@ -449,8 +461,26 @@
             spesifikasi: {
                 required: "Spesifikasi wajib diisi"
             },
+            cong_sebenarnya: {
+                required: "Cong Sebenarnya wajib diisi"
+            },
+            cong_batasan: {
+                required: "Cong Batasan wajib diisi"
+            },
             harga: {
                 required: "Harga wajib diisi"
+            },
+            peti: {
+                required: "Peti/Tong wajib diisi"
+            },
+            quality: {
+                required: "Kualitas wajib diisi"
+            },
+            daily_price: {
+                required: "Harga Harian wajib diisi"
+            },
+            monthly_price: {
+                required: "Harga Bulanan wajib diisi"
             }
         },
         errorElement: 'span',
@@ -730,9 +760,12 @@
             })
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown"); ?>`,
+                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
                 method: "GET",
                 dataType: "json",
+                data: {
+                    kategori: "bahan-baku"
+                },
                 success: function(res) {
                     $(".kode_barang").empty();
 
