@@ -40,10 +40,9 @@
                             <th>#</th>
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
-                            <th onclick="changeSort('orderTypeName')" class="sort">Jenis Order</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
-                            <th onclick="changeSort('foreignExchangeName')" class="sort">Valas</th>
+                            <th onclick="changeSort('currency')" class="sort">Valas</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -105,10 +104,6 @@
             className: "text-center"
         },
         {
-            data: "orderTypeName",
-            className: "text-center"
-        },
-        {
             data: "supplierName",
             className: "text-center"
         },
@@ -117,7 +112,7 @@
             className: "text-center"
         },
         {
-            data: "foreignExchangeName",
+            data: "currency",
             className: "text-center"
         }],
         columnDefs: [{

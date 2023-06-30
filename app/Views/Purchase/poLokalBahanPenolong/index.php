@@ -43,7 +43,7 @@
                             <th onclick="changeSort('orderTypeName')" class="sort">Jenis Order</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
-                            <th onclick="changeSort('foreignExchangeName')" class="sort">Valas</th>
+                            <th onclick="changeSort('currency')" class="sort">Valas</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -117,7 +117,7 @@
             className: "text-center"
         },
         {
-            data: "foreignExchangeName",
+            data: "currency",
             className: "text-center"
         }],
         columnDefs: [{

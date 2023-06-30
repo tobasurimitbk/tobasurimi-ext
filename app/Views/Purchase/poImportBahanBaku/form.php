@@ -69,12 +69,6 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" readonly="true" class="form-control" placeholder="Dibuat Oleh" value="<?= !empty($dataPOImport) ? '' : session()->get("login")->name; ?>">
-                        <label for="floatingInput">Dibuat Oleh</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
                 <?php if(!empty($dataPOImport)){ ?>
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP (Opsional)">
@@ -111,20 +105,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-3">
                     <input type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->warehouse_id : ""; ?>" class="form-control warehouse_id" id="warehouse_id" name="warehouse_id">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->warehouseName : ""; ?>" readonly="true" class="form-control warehouse" id="warehouse" name="warehouse" placeholder="Gudang">
                         <label for="floatingInput">Gudang</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->order_type : ""; ?>" class="order_type" id="order_type" name="order_type" placeholder="Jenis Order">
-                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->orderTypeName : ""; ?>" readonly="true" class="form-control order_type_name" id="order_type_name" name="order_type_name" placeholder="Jenis Order">
-                        <label for="floatingInput">Jenis Order</label>
                     </div>
                 </div>
             </div>
@@ -166,13 +151,13 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select foreign_exchange" id="foreign_exchange" name="foreign_exchange" aria-label="Floating label select example">
+                        <select class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php
                             if (!empty($dataValuta)) {
                                 foreach ($dataValuta as $valuta) {
                             ?>
-                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->foreign_exchange === $valuta->id ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
+                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->currency === $valuta->id ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
                             <?php
                                 }
                             }
@@ -256,7 +241,7 @@
                     $total_qty = 0;
                     $total_harga = 0;
                     if(!empty($dataPOImport)){ 
-                    foreach($dataPOImport->purchase_order_details as $details){  
+                    foreach($dataPOImport->rm_import_po_details as $details){  
                         $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $details->price), "STR_TO_INT");
                         $total_qty = $total_qty + $details->qty;
                         $total_harga = $total_harga + formatter(str_replace(",", "", $details->totalPrice), "STR_TO_INT");
@@ -453,7 +438,7 @@
     var totalPriceEdit = 0;
 
     <?php if(!empty($dataPOImport)){ 
-        foreach($dataPOImport->purchase_order_details as $details){  
+        foreach($dataPOImport->rm_import_po_details as $details){  
     ?>
 
     priceEdit = Number('<?= $details->price; ?>'.replaceAll(",", ""));
@@ -625,20 +610,20 @@
             .css('z-index', '1');
 
         // FOREIGN EXHANGE
-        $('.foreign_exchange').select2({
+        $('.currency').select2({
             placeholder: "",
             theme: "bootstrap-5"
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.foreign_exchange')
+        $('.currency')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.foreign_exchange')
+        $('.currency')
             .parent('div')
             .children('span')
             .children('span')
@@ -646,7 +631,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.foreign_exchange')
+        $('.currency')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -845,7 +830,7 @@
                 payment_term: {
                     required: true,
                 },
-                foreign_exchange: {
+                currency: {
                     required: true,
                 },
                 payment_date: {
@@ -868,7 +853,7 @@
                 payment_term: {
                     required: "Termin Pembayaran / Bulan wajib diisi"
                 },
-                foreign_exchange: {
+                currency: {
                     required: "Valas wajib diisi"
                 },
                 payment_date: {
@@ -1068,8 +1053,6 @@
                         {
                             $(".warehouse_id").val(res?.data?.warehouse_id)
                             $(".warehouse").val(res?.data?.warehouseName)
-                            $(".order_type").val(res?.data?.order_type)
-                            $(".order_type_name").val(res?.data?.orderTypeName)
 
                             let new_list_items = []
                             let tag_html = "";
@@ -1079,7 +1062,7 @@
 
                             $(".body-detail-table").empty()
 
-                            res?.data?.purchase_request_details.map(item => {
+                            res?.data?.rm_import_po_details.map(item => {
                                 tag_html += `<tr>`;
                                 tag_html += `<td class="edit-table-detail" data-ppn="" data-pph="" data-total="${item.totalPrice}" data-additional_cost="" data-disc="" data-category="" data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += row + 1;
@@ -1183,8 +1166,6 @@
                         {
                             $(".warehouse_id").val()
                             $(".warehouse").val()
-                            $(".order_type").val()
-                            $(".order_type_name").val()
 
                             list_items = []
 

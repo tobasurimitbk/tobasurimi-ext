@@ -31,7 +31,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -66,7 +66,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id", $this->token);
+        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
 
         $dataSupplier = [];
         if ($responseSupplier["code"] === 200) {
@@ -165,10 +165,9 @@ class POLokalBahanPenolong extends BaseController
                     "id" => $data->id,
                     "po_date" => $data->po_date,
                     "po_no" => $data->po_no,
-                    "orderTypeName" => $data->orderTypeName,
                     "supplierName" => $data->supplierName,
                     "total" => $data->total,
-                    "foreignExchangeName" => $data->foreignExchangeName,
+                    "currency" => $data->currency,
                 ]);
             }
         }
@@ -204,7 +203,7 @@ class POLokalBahanPenolong extends BaseController
             "payment_term" => [
                 "rules" => "required"
             ],
-            "foreign_exchange" => [
+            "currency" => [
                 "rules" => "required"
             ],
             "payment_date" => [
@@ -221,11 +220,9 @@ class POLokalBahanPenolong extends BaseController
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "lokal",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
-                "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
+                "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                 "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                 "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                 "note" => $this->request->getPost("note"),
@@ -290,7 +287,7 @@ class POLokalBahanPenolong extends BaseController
             "payment_term" => [
                 "rules" => "required"
             ],
-            "foreign_exchange" => [
+            "currency" => [
                 "rules" => "required"
             ],
             "payment_date" => [
@@ -308,11 +305,9 @@ class POLokalBahanPenolong extends BaseController
                 "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                 "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
-                "po_type" => "lokal",
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "payment_term" => formatter($this->request->getPost("payment_term"), "STR_TO_INT"),
-                "foreign_exchange" => formatter($this->request->getPost("foreign_exchange"), "STR_TO_INT"),
+                "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                 "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                 "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                 "note" => $this->request->getPost("note"),
