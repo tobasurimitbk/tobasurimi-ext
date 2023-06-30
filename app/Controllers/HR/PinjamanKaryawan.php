@@ -104,6 +104,7 @@ class PinjamanKaryawan extends BaseController
                 "employee_id" => $this->request->getPost("nama_karyawan"),
                 "amount" => $this->request->getPost("total_pinjaman"),
                 "term" => $this->request->getPost("termin_pembayaran"),
+                "is_posted" => $this->request->getPost("is_posted"),
             ]);
 
             $response = curl_request("POST", "/employeeLoan", $this->token, $payload);
@@ -139,6 +140,33 @@ class PinjamanKaryawan extends BaseController
         return;
     }
 
+    public function getById($id = null)
+    {
+        //Get Employee
+        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
+
+        $dataEmployee = [];
+        if ($responseEmployee["code"] === 200) {
+            $dataEmployee = json_decode($responseEmployee["body"])->data;
+        }
+
+        $data = [
+            "dataEmployee" => $dataEmployee,
+        ];
+
+        if (!empty($id)) {
+            $responsePinjamanKaryawan = curl_request("GET", "/employeeLoan/$id", $this->token);
+            $dataPinjamanKaryawan = [];
+            if ($responsePinjamanKaryawan["code"] === 200) {
+                $dataPinjamanKaryawan = json_decode($responsePinjamanKaryawan["body"])->data;
+            }
+
+            $data["data"] = $dataPinjamanKaryawan;
+        }
+
+        return view('hr/pinjamanKaryawan/form', $data);
+    }
+
     public function update()
     {
         $rules = [
@@ -164,6 +192,7 @@ class PinjamanKaryawan extends BaseController
                 "tanggal_peminjaman" => $this->request->getPost("tanggal_peminjaman"),
                 "total_pinjaman" => $this->request->getPost("total_pinjaman"),
                 "termin_pembayaran" => $this->request->getPost("termin_pembayaran"),
+                "is_posted" => $this->request->getPost("is_posted"),
             ]);
 
             $response = curl_request("PATCH", "/employeeLoan/$id", $this->token, $payload);

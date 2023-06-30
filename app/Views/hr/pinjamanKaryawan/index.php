@@ -26,21 +26,23 @@
 
                                 <th onclick="changeSort('employeeName')" class="sort">Employee Name</th>
 
-                                <th onclick="changeSort('amount')" class="sort">amount</th>
+                                <th onclick="changeSort('amount')" class="sort">Amount</th>
 
-                                <th onclick="changeSort('installment_month')" class="sort">installment_month</th>
+                                <th onclick="changeSort('installment_month')" class="sort">Installment Month</th>
 
-                                <th onclick="changeSort('remaining_amount')" class="sort">remaining_amount</th>
+                                <th onclick="changeSort('remaining_amount')" class="sort">Remaining Amount</th>
 
-                                <th onclick="changeSort('loan_date')" class="sort">loan_date</th>
+                                <th onclick="changeSort('loan_date')" class="sort">Loan Date</th>
 
-                                <th onclick="changeSort('term')" class="sort">term</th>
+                                <th onclick="changeSort('term')" class="sort">Term</th>
 
-                                <th onclick="changeSort('status')" class="sort">status</th>
+                                <th onclick="changeSort('status')" class="sort">Status</th>
 
-                                <th onclick="changeSort('approve_by')" class="sort">approve_by</th>
+                                <th onclick="changeSort('approve_by')" class="sort">Approve By</th>
 
-                                <th onclick="changeSort('nip')" class="sort">nip</th>
+                                <th onclick="changeSort('nip')" class="sort">NIP</th>
+
+                                <th onclick="changeSort('is_posting')" class="sort">Posting</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -62,6 +64,17 @@
     let list_address = [];
     let list_delete = [];
     var row = 0;
+
+    $(document).ready(function() {
+        $(".search").keyup(function() {
+            table.ajax.reload();
+        })
+
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            location.replace(`<?= base_url("pinjaman-karyawan/id"); ?>/${data.id}`);
+        })
+    })
 
 
     const table = $('.dataTable').DataTable({
@@ -125,6 +138,9 @@
             className: "text-center"
         }, {
             data: "nip",
+            className: "text-center"
+        }, {
+            data: "is_posting",
             className: "text-center"
         }],
         columnDefs: [{

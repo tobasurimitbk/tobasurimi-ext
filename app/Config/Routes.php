@@ -357,6 +357,7 @@ $routes->post('/formula-payroll/update', 'HR\FormulaPayroll::update', ['filter' 
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::pinjamanKaryawan', ['filter' => 'Auth']);
+$routes->get('/pinjaman-karyawan/id/(:segment)', 'HR\PinjamanKaryawan::getById/$1', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/create', 'HR\PinjamanKaryawan::createView', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/all', 'HR\PinjamanKaryawan::allPinjamanKaryawan', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/save', 'HR\PinjamanKaryawan::create', ['filter' => 'Auth']);
