@@ -21,7 +21,7 @@ class Attendance extends BaseController
             "idCompany" => $this->this_company_id
         ];
 
-        $res_employee = curl_request("GET", "/employees", $this->token, $payload);
+        $res_employee = curl_request("GET", "/employees/all?idCompany=" . $this->this_company_id, $this->token);
         $dataEmployee = [];
         if ($res_employee["code"] === 200) {
             $dataEmployee = json_decode($res_employee["body"])->data;
