@@ -140,7 +140,7 @@
             data: "nip",
             className: "text-center"
         }, {
-            data: "is_posting",
+            data: "is_posted",
             className: "text-center"
         }],
         columnDefs: [{

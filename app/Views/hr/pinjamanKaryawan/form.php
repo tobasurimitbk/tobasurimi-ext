@@ -63,7 +63,7 @@
                             <label for="floatingInput">Posting</label>
                             <div>
                                 <label class="switch">
-                                    <input class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" checked value="<?= !empty($data) ? $data->is_posted : ""; ?>">
+                                    <input class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>
