@@ -364,6 +364,9 @@ $routes->get('/pinjaman-karyawan/all', 'HR\PinjamanKaryawan::allPinjamanKaryawan
 $routes->post('/pinjaman-karyawan/save', 'HR\PinjamanKaryawan::create', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/update', 'HR\PinjamanKaryawan::update', ['filter' => 'Auth']);
 
+// cuti
+$routes->get('/cuti', 'HR\Cuti::cuti', ['filter' => 'Auth']);
+
 
 // SETTINGS
 // USER
