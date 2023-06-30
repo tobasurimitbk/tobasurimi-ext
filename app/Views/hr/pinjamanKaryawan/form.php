@@ -26,13 +26,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select nama_karyawan" name="nama_karyawan" id="nama_karyawan">
+                            <select class="form-select nama_karyawan" name="nama_karyawan" id="nama_karyawan" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataEmployee)) {
                                     foreach ($dataEmployee as $employee) {
                                 ?>
-                                        <option value="<?= $employee->id; ?>"><?= $employee->name; ?></option>
+                                        <option value="<?= $employee->id; ?>" <?= !empty($data) ? ($data->employee_id === $employee->id ? "selected" : "") : ""; ?>><?= $employee->name; ?></option>
                                 <?php
                                     }
                                 }
@@ -44,7 +44,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="number" class="form-control total_pinjaman" id="total_pinjaman" name="total_pinjaman" placeholder="Total Pinjaman">
+                            <input type="number" class="form-control total_pinjaman" id="total_pinjaman" name="total_pinjaman" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->amount : ""; ?>" placeholder="Total Pinjaman">
                             <label for="floatingInput">Total Pinjaman</label>
                         </div>
                     </div>
@@ -53,8 +53,20 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="number" class="form-control termin_pembayaran" id="termin_pembayaran" name="termin_pembayaran" placeholder="Termin Pembayaran">
+                            <input type="number" class="form-control termin_pembayaran" id="termin_pembayaran" name="termin_pembayaran" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> placeholder="Termin Pembayaran" value="<?= !empty($data) ? $data->term : ""; ?>">
                             <label for="floatingInput">Termin Pembayaran</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3" style="height: 50px;">
+                            <label for="floatingInput">Posting</label>
+                            <div>
+                                <label class="switch">
+                                    <input class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" checked value="<?= !empty($data) ? $data->is_posted : ""; ?>">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,20 +82,20 @@
 
     $(document).ready(function() {
         // FORMULA
-        $('.employee_id').select2({
+        $('.nama_karyawan').select2({
             placeholder: "",
             theme: "bootstrap-5"
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.employee_id')
+        $('.nama_karyawan')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.employee_id')
+        $('.nama_karyawan')
             .parent('div')
             .children('span')
             .children('span')
@@ -91,7 +103,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.employee_id')
+        $('.nama_karyawan')
             .parent('div')
             .find('label')
             .css('z-index', '1');
