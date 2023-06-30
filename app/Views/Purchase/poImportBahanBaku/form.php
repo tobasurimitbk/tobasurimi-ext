@@ -950,9 +950,12 @@
             })
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown"); ?>`,
+                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
                 method: "GET",
                 dataType: "json",
+                data: {
+                    kategori: "bahan-baku"
+                },
                 success: function(res) {
                     $(".kode_barang").empty();
 
@@ -2102,9 +2105,12 @@
             })
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown"); ?>`,
+            url: `<?= base_url("barang/dropdown/kategori"); ?>`,
             method: "GET",
             dataType: "json",
+            data: {
+                kategori: "bahan-baku"
+            },
             success: function(res) {
                 $(".kode_barang").empty();
 
