@@ -213,7 +213,7 @@
             <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
                 <div class="collapse-header-list show" id="collapseHeaderList">
                     <div class="d-flex float-right mb-3">
-                        <input class="form-control search search-header form-out-search mr-3" placeholder="Search"/>
+                        <input class="form-control search cari-header form-out-search mr-3" placeholder="Search"/>
                         <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </button>
@@ -352,7 +352,7 @@
             url: "<?= base_url("header-account/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search-header").val();
+                data.search = $(".cari-header").val();
                 data.sort = sortHeader;
                 data.sortType = sortTypeHeader;
             }
@@ -893,7 +893,7 @@
             kategoriTable.ajax.reload();
         })
 
-        $(".search-header").keyup(function () {
+        $(".cari-header").keyup(function () {
             headerTable.ajax.reload();
         })
 
