@@ -67,6 +67,7 @@ class PinjamanKaryawan extends BaseController
                     "approve_by" => $data->approve_by,
                     "nip" => $data->nip,
                     "employeeName" => $data->employeeName,
+                    "is_posted" => $data->is_posted,
                 ]);
             }
         }
@@ -173,9 +174,6 @@ class PinjamanKaryawan extends BaseController
             "nama_karyawan" => [
                 "rules" => "required"
             ],
-            "tanggal_peminjaman" => [
-                "rules" => "required"
-            ],
             "total_pinjaman" => [
                 "rules" => "required"
             ],
@@ -189,10 +187,9 @@ class PinjamanKaryawan extends BaseController
 
             $payload = json_encode([
                 "nama_karyawan" => $this->request->getPost("nama_karyawan"),
-                "tanggal_peminjaman" => $this->request->getPost("tanggal_peminjaman"),
                 "total_pinjaman" => $this->request->getPost("total_pinjaman"),
                 "termin_pembayaran" => $this->request->getPost("termin_pembayaran"),
-                "is_posted" => $this->request->getPost("is_posted"),
+                "is_posted" => $this->request->getPost("is_posted") === null ? false : true,
             ]);
 
             $response = curl_request("PATCH", "/employeeLoan/$id", $this->token, $payload);
