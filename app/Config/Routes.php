@@ -263,13 +263,15 @@ $routes->post('/pembayaran-po-import/delete', 'Pembayaran\PembayaranPOImport::de
 $routes->get('/penawaran', 'Sales\Penawaran::penawaran', ['filter' => 'Auth']);
 
 // DROPDOWN
-// PO LOKAL
-$routes->get('/po-lokal/dropdown', 'Purchase\POLokal::dropdownPOLokal/$1', ['filter' => 'Auth']);
-$routes->get('/po-lokal/multi/dropdown', 'Purchase\POLokal::dropdownBarangPOLokal/$1', ['filter' => 'Auth']);
+// SUPPLIER 
+$routes->get('/supplier-bahan-baku/dropdown', 'Supplier\SupplierBahanBaku::dropdownSupplier', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-penolong/dropdown', 'Supplier\SupplierBahanPenolong::dropdownSupplier', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku-import/dropdown', 'Supplier\SupplierBahanBakuImport::dropdownSupplier', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-penolong-import/dropdown', 'Supplier\SupplierBahanPenolongImport::dropdownSupplier', ['filter' => 'Auth']);
 
-// PO IMPORT
-$routes->get('/po-import/dropdown', 'Purchase\POImport::dropdownPOImport/$1', ['filter' => 'Auth']);
-$routes->get('/po-import/multi/dropdown', 'Purchase\POImport::dropdownBarangPOImport/$1', ['filter' => 'Auth']);
+// PO
+$routes->get('/po-lokal-bahan-baku/dropdown', 'Purchase\POLokalBahanBaku::dropdownPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-penolong/dropdown', 'Purchase\POLokalBahanPenolong::dropdownPOLokalBahanPenolong', ['filter' => 'Auth']);
 
 // CITY
 $routes->get('/city/(:segment)', 'Master\City::getCityByProvince/$1', ['filter' => 'Auth']);

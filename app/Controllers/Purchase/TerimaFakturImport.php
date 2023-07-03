@@ -139,8 +139,8 @@ class TerimaFakturImport extends BaseController
         if ($this->validate($rules)) {
             $payload = json_encode([
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "multiple_po_id" => json_decode(stripslashes($this->request->getPost("multiple_po_id"))),
-                "multiple_po_no" => json_decode(stripslashes($this->request->getPost("multiple_po_no"))),
+                "multiple_po_id" => json_decode($this->request->getPost("multiple_po_id")),
+                "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
                 "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
                 "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
                 "date_of_receipt" => $this->request->getPost("date_of_receipt") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("date_of_receipt")))) : "",
@@ -220,8 +220,8 @@ class TerimaFakturImport extends BaseController
 
             $payload = json_encode([
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "multiple_po_id" => json_decode(stripslashes($this->request->getPost("multiple_po_id"))),
-                "multiple_po_no" => json_decode(stripslashes($this->request->getPost("multiple_po_no"))),
+                "multiple_po_id" => json_decode($this->request->getPost("multiple_po_id")),
+                "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
                 "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
                 "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
                 "date_of_receipt" => $this->request->getPost("date_of_receipt") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("date_of_receipt")))) : "",

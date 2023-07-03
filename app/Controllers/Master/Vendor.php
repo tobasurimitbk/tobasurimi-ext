@@ -145,7 +145,7 @@ class Vendor extends BaseController
                 "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
+                "list_address" => json_decode($this->request->getPost("list_address"))
             ]);
 
             $response = curl_request("POST", "/vendors", $this->token, $payload);
@@ -241,7 +241,7 @@ class Vendor extends BaseController
                 "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
+                "list_address" => json_decode($this->request->getPost("list_address"))
             ]);
         }
 

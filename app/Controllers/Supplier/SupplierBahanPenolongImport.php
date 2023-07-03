@@ -339,4 +339,21 @@ class SupplierBahanPenolongImport extends BaseController
         }
         return;
     }
+
+    public function dropdownSupplier()
+    {
+        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
+
+        $dataSupplier = [];
+        if ($responseSupplier["code"] === 200) {
+            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataSupplier
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

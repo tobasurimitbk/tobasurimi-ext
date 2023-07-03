@@ -127,7 +127,7 @@ class User extends BaseController
                 "username" => $this->request->getPost("username"),
                 "password" => $this->request->getPost("password"),
                 "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
+                "company_role" => json_decode($this->request->getPost("company_role")),
                 "status" => $this->request->getPost("status")
             ]);
 
@@ -183,7 +183,7 @@ class User extends BaseController
                     "username" => $this->request->getPost("username"),
                     "password" => $this->request->getPost("password"),
                     "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                    "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
+                    "company_role" => json_decode($this->request->getPost("company_role")),
                     "status" => $this->request->getPost("status")
                 ]);
             } else {
@@ -192,7 +192,7 @@ class User extends BaseController
                     "name" => $this->request->getPost("name"),
                     "username" => $this->request->getPost("username"),
                     "password" => $this->request->getPost("password"),
-                    "company_role" => json_decode(stripslashes($this->request->getPost("company_role"))),
+                    "company_role" => json_decode($this->request->getPost("company_role")),
                     "status" => $this->request->getPost("status")
                 ]);
             }

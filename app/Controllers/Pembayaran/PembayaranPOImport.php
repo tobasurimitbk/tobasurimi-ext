@@ -101,8 +101,8 @@ class PembayaranPOImport extends BaseController
 
         if ($this->validate($rules)) {
             $payload = json_encode([
-                "multiple_faktur_id" => json_decode(stripslashes($this->request->getPost("multiple_faktur_id"))),
-                "multiple_faktur_no" => json_decode(stripslashes($this->request->getPost("multiple_faktur_no"))),
+                "multiple_faktur_id" => json_decode($this->request->getPost("multiple_faktur_id")),
+                "multiple_faktur_no" => json_decode($this->request->getPost("multiple_faktur_no")),
                 "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
                 "payment_type" => "IMPORT"
             ]);
@@ -161,8 +161,8 @@ class PembayaranPOImport extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "multiple_faktur_id" => json_decode(stripslashes($this->request->getPost("multiple_faktur_id"))),
-                "multiple_faktur_no" => json_decode(stripslashes($this->request->getPost("multiple_faktur_no"))),
+                "multiple_faktur_id" => json_decode($this->request->getPost("multiple_faktur_id")),
+                "multiple_faktur_no" => json_decode($this->request->getPost("multiple_faktur_no")),
                 "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
                 "payment_type" => "IMPORT"
             ]);

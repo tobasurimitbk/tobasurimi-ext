@@ -22,7 +22,17 @@ class PenerimaanBarangLokal extends BaseController
 
     public function createPenerimaanBarangLokal()
     {
-        return view('Warehouse/penerimaanBarangLokal/form');
+        //Get Supplier
+        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+
+        $dataSupplier = [];
+        if ($responseSupplier["code"] === 200) {
+            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        }
+
+        $data = [];
+
+        return view('Warehouse/penerimaanBarangLokal/form', $data);
     }
 
     public function allPenerimaanBarangLokal()
@@ -123,8 +133,8 @@ class PenerimaanBarangLokal extends BaseController
             $payload = json_encode([
                 "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("no_penerimaan_barang"),
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "multiple_po_id" => json_decode(stripslashes($this->request->getPost("multiple_po_id"))),
-                "multiple_po_no" => json_decode(stripslashes($this->request->getPost("multiple_po_no"))),
+                "multiple_po_id" => json_decode($this->request->getPost("multiple_po_id")),
+                "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
                 "aju_document_type" => $this->request->getPost("aju_document_type"),
                 "aju_no" => $this->request->getPost("aju_no"),
                 "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
@@ -138,7 +148,7 @@ class PenerimaanBarangLokal extends BaseController
                 "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
                 "status_post" => "WAITING",
                 "status_penerimaan" => "LOKAL",
-                "penerimaan_barang_detail" => json_decode(stripslashes($this->request->getPost("items")))
+                "penerimaan_barang_detail" => json_decode($this->request->getPost("items"))
             ]);
 
             $data = [

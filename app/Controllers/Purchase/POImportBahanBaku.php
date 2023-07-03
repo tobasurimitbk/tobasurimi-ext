@@ -311,7 +311,7 @@ class POImportBahanBaku extends BaseController
                 "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                 "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                 "note" => $this->request->getPost("note"),
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" => json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [
@@ -437,7 +437,7 @@ class POImportBahanBaku extends BaseController
     public function dropdownBarangPOImportBahanBaku()
     {
         $payload = json_encode([
-            "multiple_id_po" => json_decode(stripslashes($this->request->getGet("id")))
+            "multiple_id_po" => json_decode($this->request->getGet("id"))
         ]);
 
         $dataPOImport = [];

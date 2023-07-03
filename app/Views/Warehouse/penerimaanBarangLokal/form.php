@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -38,7 +38,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
+                            <option value="BAKU">Bahan Baku</option>
+                            <option value="PENOLONG">Bahan Penolong</option>
+                        </select>
+                        <label for="floatingInput">Tipe</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                             <option value=""></option>
@@ -55,7 +64,7 @@
                         <label for="floatingInput">Supplier</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select disabled="true" readonly="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                             <option value=""></option>
@@ -1052,24 +1061,24 @@
                 $(".harga_barang_jasa").val('')
                 $(".nilai_penyerahan").val('')
 
-                $.ajax({
-                    url: `<?= base_url("po-lokal/multi/dropdown"); ?>`,
-                    method: "GET",
-                    data: {
-                        id: JSON.stringify($('.multiple_po_id').val())
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        console.log(res)
-                        $(".kode_barang").empty()
-                        $(".kode_barang").append(`<option value=""></option>`)
-                        res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
-                        })
+                // $.ajax({
+                //     url: `<?= base_url("po-lokal/multi/dropdown"); ?>`,
+                //     method: "GET",
+                //     data: {
+                //         id: JSON.stringify($('.multiple_po_id').val())
+                //     },
+                //     dataType: "json",
+                //     success: function(res) {
+                //         console.log(res)
+                //         $(".kode_barang").empty()
+                //         $(".kode_barang").append(`<option value=""></option>`)
+                //         res.data.forEach(function(item) {
+                //             $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                //         })
 
-                        $(".kode_barang").val("").change();
-                    }
-                })
+                //         $(".kode_barang").val("").change();
+                //     }
+                // })
 
                 $.ajax({
                     url: `<?= base_url("tax/dropdown"); ?>`,
@@ -1155,25 +1164,50 @@
         $(".supplier_id").change(function() {
             if($(".supplier_id option:selected").val())
             {
-                $.ajax({
-                    url: `<?= base_url("po-lokal/dropdown"); ?>`,
-                    method: "GET",
-                    data: {
-                        id: $(".supplier_id option:selected").val()
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        console.log(res)
-                        $(".multiple_po_id").attr("disabled", true)
-                        $(".multiple_po_id").empty()
-                        $(".multiple_po_id").append(`<option value=""></option>`)
-                        res.data.forEach(function(item) {
-                            $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-                        })
-                        $(".multiple_po_id").attr("disabled", false)
-                        $(".multiple_po_id").val([]);
-                    }
-                })
+                if($(".tipe_bahan").val() === "BAKU")
+                {
+                    $.ajax({
+                        url: `<?= base_url("po-lokal-bahan-baku/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            id: $(".supplier_id option:selected").val()
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            console.log(res)
+                            $(".multiple_po_id").attr("disabled", true)
+                            $(".multiple_po_id").empty()
+                            $(".multiple_po_id").append(`<option value=""></option>`)
+                            res.data.forEach(function(item) {
+                                $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                            })
+                            $(".multiple_po_id").attr("disabled", false)
+                            $(".multiple_po_id").val([]);
+                        }
+                    })
+                }
+                if($(".tipe_bahan").val() === "PENOLONG")
+                {
+                    $.ajax({
+                        url: `<?= base_url("po-lokal-bahan-penolong/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            id: $(".supplier_id option:selected").val()
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            console.log(res)
+                            $(".multiple_po_id").attr("disabled", true)
+                            $(".multiple_po_id").empty()
+                            $(".multiple_po_id").append(`<option value=""></option>`)
+                            res.data.forEach(function(item) {
+                                $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                            })
+                            $(".multiple_po_id").attr("disabled", false)
+                            $(".multiple_po_id").val([]);
+                        }
+                    })
+                }
             }
             else
             {
@@ -1232,6 +1266,48 @@
         {
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");
+        }
+    }
+
+    const changeTipeBahan = function()
+    {
+        if($(".tipe_bahan").val() === "BAKU")
+        {
+            $.ajax({
+                url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".supplier_id").empty();
+
+                    $(".supplier_id").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
+                    })
+
+                    $(".supplier_id").val("").change();
+                }
+            })
+        }
+        if($(".tipe_bahan").val() === "PENOLONG")
+        {
+            $.ajax({
+                url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".supplier_id").empty();
+
+                    $(".supplier_id").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
+                    })
+
+                    $(".supplier_id").val("").change();
+                }
+            })
         }
     }
 </script>

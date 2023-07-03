@@ -427,7 +427,8 @@ class POLokalBahanPenolong extends BaseController
         }
 
         $data = [
-            "data" => $dataPOLokal
+            "data" => $dataPOLokal,
+            "response" => $responsePOLokal
         ];
 
         echo json_encode($data);
@@ -437,7 +438,7 @@ class POLokalBahanPenolong extends BaseController
     public function dropdownBarangPOLokalBahanPenolong()
     {
         $payload = json_encode([
-            "multiple_id_po" => json_decode(stripslashes($this->request->getGet("id")))
+            "multiple_id_po" => json_decode($this->request->getGet("id"))
         ]);
 
         $dataPOLokal = [];
