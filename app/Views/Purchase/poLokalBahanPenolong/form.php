@@ -477,9 +477,6 @@
             satuan: {
                 required: true
             },
-            spesifikasi: {
-                required: true
-            },
             harga: {
                 required: true
             }
@@ -496,9 +493,6 @@
             },
             satuan: {
                 required: "Satuan wajib diisi"
-            },
-            spesifikasi: {
-                required: "Spesifikasi wajib diisi"
             },
             harga: {
                 required: "Harga wajib diisi"
