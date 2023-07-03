@@ -131,6 +131,15 @@ $routes->post('/satuan/save', 'Master\Satuan::saveSatuan', ['filter' => 'Auth'])
 $routes->post('/satuan/update', 'Master\Satuan::updateSatuan', ['filter' => 'Auth']);
 $routes->post('/satuan/delete', 'Master\Satuan::deleteSatuan', ['filter' => 'Auth']);
 
+// SHIFT
+$routes->get('/shift', 'Master\Shift::shift', ['filter' => 'Auth']);
+$routes->get('/shift/create', 'Master\Shift::createView', ['filter' => 'Auth']);
+$routes->get('/shift/all', 'Master\Shift::allshift', ['filter' => 'Auth']);
+$routes->get('/shift/id/(:segment)', 'Master\Shift::getById/$1', ['filter' => 'Auth']);
+$routes->post('/shift/save', 'Master\Shift::save', ['filter' => 'Auth']);
+$routes->post('/shift/update', 'Master\Shift::update', ['filter' => 'Auth']);
+// $routes->post('/shift/delete', 'Master\Shift::delete', ['filter' => 'Auth']);
+
 // SUPPLIER
 // BAHAN BAKU LOKAL
 $routes->get('/supplier-bahan-baku', 'Supplier\SupplierBahanBaku::supplierBahanBaku', ['filter' => 'Auth']);
@@ -366,7 +375,10 @@ $routes->post('/pinjaman-karyawan/update', 'HR\PinjamanKaryawan::update', ['filt
 
 // cuti
 $routes->get('/cuti', 'HR\Cuti::cuti', ['filter' => 'Auth']);
-
+$routes->get('/cuti/id/(:segment)', 'HR\Cuti::getById/$1', ['filter' => 'Auth']);
+$routes->get('/cuti/create', 'HR\Cuti::createView', ['filter' => 'Auth']);
+$routes->get('/cuti/all', 'HR\Cuti::allCuti', ['filter' => 'Auth']);
+$routes->post('/cuti/save', 'HR\Cuti::create', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER
