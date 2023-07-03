@@ -157,7 +157,7 @@
                             if (!empty($dataValuta)) {
                                 foreach ($dataValuta as $valuta) {
                             ?>
-                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->currency === $valuta->id ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
+                                    <option <?= !empty($dataPOImport) ? ($dataPOImport->currency === $valuta->value ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
                             <?php
                                 }
                             }
