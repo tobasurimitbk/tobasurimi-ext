@@ -1131,7 +1131,7 @@
         })
 
         $(".btn-submit-detail").click(function() {
-            let row_detail = $(".id_detail").val();
+            let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
             let barang_id = $(".barang_id").val()
             let kode_barang = $(".kode").val()
             let nama_barang = $(".nama_barang").val()
@@ -1145,7 +1145,37 @@
             let disc = $(".disc").val()
             let total = $(".total").val()
 
-            // update detail
+            let validate_same = false;
+
+            list_items.map(item => {
+                if(barang_id !== '')
+                {
+                    if(item.barang_id == barang_id)
+                    {
+                        // kalau edit barang, barang tidak ganti tidak kena validasi
+                        if(row_detail === item.row)
+                        {
+                            validate_same = false;
+                        }
+                        else
+                        {
+                            validate_same = true;
+                        }
+                    }
+                }
+            })
+
+            if(validate_same)
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Barang Sudah Ada",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+            else
+            {
+                // update detail
             if(row_detail)
             {
                 if ($(".detail-form").valid()) {
@@ -1430,6 +1460,7 @@
                         }
                     })
                 }
+            }   
             }
         })
 
