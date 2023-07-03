@@ -23,7 +23,7 @@ class POLokalBahanPenolong extends BaseController
     public function createPOLokalBahanPenolong()
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Penolong%20Lokal", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -58,7 +58,7 @@ class POLokalBahanPenolong extends BaseController
     public function getByIdPOLokalBahanPenolong($id = null)
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Lokal", $this->token);
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Penolong%20Lokal", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -227,7 +227,7 @@ class POLokalBahanPenolong extends BaseController
                 "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                 "note" => $this->request->getPost("note"),
                 "isPosted" => false,
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [
@@ -242,7 +242,7 @@ class POLokalBahanPenolong extends BaseController
 
             if ($response["code"] === 201) {
                 $data = [
-                    "id" => "",
+                    "id" => json_decode($response["body"])->createdId,
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
@@ -311,7 +311,7 @@ class POLokalBahanPenolong extends BaseController
                 "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                 "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                 "note" => $this->request->getPost("note"),
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [

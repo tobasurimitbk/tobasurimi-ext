@@ -1610,7 +1610,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
+                                                window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>" + "/id/" + + response.id;
                                             })
                                         } else {
                                             Swal.fire({

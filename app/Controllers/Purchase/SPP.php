@@ -200,7 +200,7 @@ class SPP extends BaseController
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
                 "is_posted" => false,
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [
@@ -275,7 +275,7 @@ class SPP extends BaseController
                 "spp_type" => $this->request->getPost("spp_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                 "note" => $this->request->getPost("note"),
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" => json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [

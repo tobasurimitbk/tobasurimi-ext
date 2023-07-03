@@ -1860,7 +1860,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-lokal-bahan-penolong"); ?>";
+                                                window.location.href = "<?= base_url("po-lokal-bahan-penolong"); ?>" + "/id/" + + response.id;
                                             })
                                         } else {
                                             Swal.fire({

@@ -23,7 +23,7 @@ class POImportBahanPenolong extends BaseController
     public function createPOImportBahanPenolong()
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Penolong%20Import", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -58,7 +58,7 @@ class POImportBahanPenolong extends BaseController
     public function getByIdPOImportBahanPenolong($id = null)
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Import", $this->token);
+        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Penolong%20Import", $this->token);
 
         $dataSPP = [];
         if ($responseSPP["code"] === 200) {
@@ -227,7 +227,7 @@ class POImportBahanPenolong extends BaseController
                 "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                 "note" => $this->request->getPost("note"),
                 "isPosted" => false,
-                "items" => json_decode(stripslashes($this->request->getPost("items")))
+                "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [
@@ -242,7 +242,7 @@ class POImportBahanPenolong extends BaseController
 
             if ($response["code"] === 201) {
                 $data = [
-                    "id" => "",
+                    "id" => json_decode($response["body"])->createdId,
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
