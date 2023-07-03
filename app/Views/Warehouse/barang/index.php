@@ -790,6 +790,10 @@
             })
         })
 
+        $(".search").keyup(function () {
+            table.ajax.reload();
+        })
+
         $(".kategori, .filter_status").change(function () {
             table.ajax.reload();
         })
@@ -1015,7 +1019,7 @@
                         confirmButtonColor: '#4e73df',
                     })
                     .then(() => {
-                        subTable.ajax.reload()
+                        table.ajax.reload()
                     })
                 } else {
                     Swal.fire({
