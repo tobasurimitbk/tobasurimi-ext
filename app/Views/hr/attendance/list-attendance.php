@@ -5,12 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>List Attendance</h1>
-
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end mb-3">
-                <div class="col-md-12">
+            <div class="row justify-content-end row-col-page-list-attendance">
+                <div class="col-6 mb-4">
                     <form id="search_form" name="search_form" class="kt-form kt-form--fit kt-margin-b-20" method="POST">
 
                         <?php echo "Attendance " . date("F Y", strtotime($year . "-" . $month . "-01")); ?>
@@ -44,45 +43,47 @@
 
                     </form>
                 </div>
+                <div class="col-6 mb-4">
+                    <!--begin: Datatable -->
+                    <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
+                    <table class="tops-table">
+                        <tr>
+                            <td nowrap><img src='<?= base_url() ?>/assets/img/blue.png' width='25' height='25'>&nbsp;Hadir&nbsp;&nbsp;</td>
+                            <td></td>
+                            <td nowrap><img src='<?= base_url() ?>/assets/img/red.png' width='25' height='25'>&nbsp;Tidak Hadir</td>
+                        </tr>
+                    </table>
+                    <style>
+                        th {
+                            background-color: white;
+                        }
+
+                        th:first-child,
+                        td:first-child {
+                            position: sticky;
+                            left: -12px;
+
+                        }
+
+                        td:first-child {
+                            border: 1px solid #f2f2f2;
+                            box-sizing: border-box;
+                        }
+
+                        td:first-child::after {
+                            content: '';
+                            position: absolute;
+                            width: 100%;
+                            height: 100%;
+                            background: #fff;
+                            left: 0;
+                            top: 0;
+                            z-index: -1;
+                        }
+                    </style>
+                </div>
             </div>
-            <div class="row">
-                <!--begin: Datatable -->
-                <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
-                <table>
-                    <tr>
-                        <td nowrap><img src='<?= base_url() ?>/assets/img/blue.png' width='25' height='25'>&nbsp;Hadir&nbsp;&nbsp;</td>
-                        <td></td>
-                        <td nowrap><img src='<?= base_url() ?>/assets/img/red.png' width='25' height='25'>&nbsp;Tidak Hadir</td>
-                </table>
-                <style>
-                    th {
-                        background-color: white;
-                    }
-
-                    th:first-child,
-                    td:first-child {
-                        position: sticky;
-                        left: -12px;
-
-                    }
-
-                    td:first-child {
-                        border: 1px solid #f2f2f2;
-                        box-sizing: border-box;
-                    }
-
-                    td:first-child::after {
-                        content: '';
-                        position: absolute;
-                        width: 100%;
-                        height: 100%;
-                        background: #fff;
-                        left: 0;
-                        top: 0;
-                        z-index: -1;
-                    }
-                </style>
-
+            <div class="row row-col-page-list-attendance">
                 <div class="table-responsive">
                     <table class="table table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
                         <thead>
