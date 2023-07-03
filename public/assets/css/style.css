@@ -5349,6 +5349,67 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   transition: 0.3s ease-in;
 }
 
+.row-col-page-list-attendance .kt-form select {
+  margin-left: 5px;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #2f4858 !important;
+  height: 40px;
+  padding: 5px 15px 2px 15px;
+}
+
+.row-col-page-list-attendance .kt-form .btn.btn-primary {
+  background: #007ae0 !important;
+  margin-left: 5px;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  height: 40px;
+  box-shadow: none !important;
+  padding: 8px 15px;
+  position: relative;
+  top: -2px;
+}
+
+.row-col-page-list-attendance table.tops-table tbody td {
+  padding: 0px 7px;
+  border: 0px;
+}
+
+.row-col-page-list-attendance table.tops-table tbody td img {
+  border-radius: 2px;
+  margin-right: 5px;
+  width: 40px;
+  height: 40px;
+}
+
+.row-col-page-list-attendance .table-responsive .table {
+  margin-bottom: 1.5rem;
+}
+
+.row-col-page-list-attendance .table-responsive .table thead tr td {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #2f4858;
+}
+
+.row-col-page-list-attendance .table-responsive .table tbody tr td {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  height: 40px !important;
+}
+
+.row-col-page-list-attendance .table-responsive .table tbody tr td img {
+  width: 100%;
+  max-width: 20px;
+  height: auto;
+  position: relative;
+  top: -1px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
@@ -5578,6 +5639,28 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   .col-content-attendance .btn.form-control.btn-warning {
     margin-bottom: 0.75rem;
   }
+
+  .row-col-page-list-attendance .col-6 {
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .row-col-page-list-attendance table.tops-table tbody td {
+    padding-left: 0px;
+  }
+
+  .row-col-page-list-attendance .kt-form select {
+    display: block;
+    margin: 15px 0px;
+    width: 100%;
+  }
+
+  .row-col-page-list-attendance .kt-form .btn.btn-primary {
+    display: block;
+    width: 100%;
+    margin: 0;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
@@ -5606,5 +5689,15 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
 
   div.dataTables_wrapper div.dataTables_info {
     display: none;
+  }
+
+  .row-col-page-list-attendance .col-6 {
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .row-col-page-list-attendance table.tops-table tbody td {
+    padding-left: 0px;
   }
 }
