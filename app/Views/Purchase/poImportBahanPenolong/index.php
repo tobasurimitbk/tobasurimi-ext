@@ -40,7 +40,6 @@
                             <th>#</th>
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
-                            <th onclick="changeSort('orderTypeName')" class="sort">Jenis Order</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
                             <th onclick="changeSort('currency')" class="sort">Valas</th>
@@ -102,10 +101,6 @@
         },
         {
             data: "po_no",
-            className: "text-center"
-        },
-        {
-            data: "orderTypeName",
             className: "text-center"
         },
         {

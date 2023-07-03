@@ -157,7 +157,7 @@
                             if (!empty($dataValuta)) {
                                 foreach ($dataValuta as $valuta) {
                             ?>
-                                    <option <?= !empty($dataPOLokal) ? ($dataPOLokal->currency === $valuta->value ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
+                                    <option <?= !empty($dataPOLokal) ? (formatter($dataPOLokal->currency, "STR_TO_INT") === $valuta->id ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
                             <?php
                                 }
                             }
@@ -1177,7 +1177,7 @@
                 $(".satuan").val(satuan).change();
                 $(".qty").val(stok);
                 $(".harga").val(harga ? harga.toLocaleString() : "");
-                $(".total").val(harga || stok ? (harga * stok).toLocaleString() : "");
+                $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
             }
             else
             {
