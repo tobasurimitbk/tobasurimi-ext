@@ -2043,6 +2043,11 @@
             }
         })
 
+        $(".peti").val(peti)
+        $(".quality").val(quality)
+        $(".daily_price").val(daily_price)
+        $(".monthly_price").val(monthly_price)
+
         $.ajax({
             url: `<?= base_url("warehouse/dropdown"); ?>`,
             method: "GET",
@@ -2055,13 +2060,9 @@
                 })
 
                 $(".bagian").val(bagian).change()
+                $(".detail-modal").modal("show");
             }
         })
-
-        $(".peti").val(peti)
-        $(".quality").val(quality)
-        $(".daily_price").val(daily_price)
-        $(".monthly_price").val(monthly_price)
     })
 </script>
 <?= $this->endSection(); ?>
