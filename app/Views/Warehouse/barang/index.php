@@ -662,6 +662,7 @@
             $(".title-name").text("Update");
             $(".stok").attr("readonly", true);
             $(".kode_barang").attr("readonly", true);
+            $(".body-detail-spek").empty()
             row_detail = 0;
             list_spek = [];
 
@@ -783,6 +784,10 @@
                     }
                 }
             })
+        })
+
+        $(".search").keyup(function () {
+            table.ajax.reload();
         })
 
         $(".kategori, .filter_status").change(function () {
@@ -1010,7 +1015,7 @@
                         confirmButtonColor: '#4e73df',
                     })
                     .then(() => {
-                        subTable.ajax.reload()
+                        table.ajax.reload()
                     })
                 } else {
                     Swal.fire({
