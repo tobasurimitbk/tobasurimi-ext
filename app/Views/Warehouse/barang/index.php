@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px !important;">
+    <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Barang</h5>
@@ -11,7 +11,7 @@
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode_barang" name="kode_barang" id="kode_barang" placeholder="Kode Barang">
@@ -25,7 +25,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
@@ -41,7 +41,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
@@ -59,7 +59,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select ap_id" name="ap_id" id="ap_id">
@@ -77,7 +77,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
@@ -86,7 +86,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3" style="height: 50px;">
-                                <label for="floatingInput">Status</label>
+                                <label for="floatingInput" class="label-modal-master-barang">Status</label>
                                 <div>
                                     <label class="switch">
                                     <input class="status" name="status" id="status" type="checkbox" checked>
@@ -98,7 +98,7 @@
                     </div>
                 </form>
                 <div class="col-subtitle-modal">
-                    <div class="row mt-5">
+                    <div class="row mt-3">
                         <div class="col-md-6">
                             <h5 class="modal-sub-title">Spesifikasi</h5>
                         </div>
@@ -110,7 +110,7 @@
                     </div>
                 </div>
                 <div class="table-responsive mt-2">
-                    <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                    <table class="table-inside nowrap table-hover-tobasurimi table-add-modal-master-barang" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>Spesifikasi</th>
@@ -123,15 +123,10 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer justify-content-between">
-                <div class="d-flex">
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
-                </div>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                     <button type="submit" class="btn btn-submit-form">Simpan</button>
-                </div>
+                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -147,11 +142,11 @@
 </div>
 <div class="card">
     <div class="card-body">
-        <div class="row justify-content-end row-col-spp">
-            <div class="col-md-2">
+        <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
+            <div class="col mb-3">
                 <input class="form-control search form-out-search" placeholder="Search" value="" />
             </div>
-            <div class="col-md-3">
+            <div class="col mb-3">
                 <select class="form-select kategori form-out-search" name="kategori" id="kategori" aria-label="Floating label select example">
                     <option value="">Kategori: All</option>
                     <?php
@@ -165,7 +160,7 @@
                     ?>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col mb-3">
                 <select class="form-select filter_status" name="filter_status" id="filter_status" aria-label="Floating label select example">
                     <option value="Aktif">Status: Aktif</option>
                     <option value="Tidak Aktif">Status: Tidak Aktif</option>
