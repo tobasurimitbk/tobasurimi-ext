@@ -4,8 +4,8 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Cuti</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("cuti/create"); ?>">
+        <h1>Form Perijinan</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("form-perijinan/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>

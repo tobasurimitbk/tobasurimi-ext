@@ -382,12 +382,12 @@ $routes->get('/pinjaman-karyawan/all', 'HR\PinjamanKaryawan::allPinjamanKaryawan
 $routes->post('/pinjaman-karyawan/save', 'HR\PinjamanKaryawan::create', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/update', 'HR\PinjamanKaryawan::update', ['filter' => 'Auth']);
 
-// cuti
-$routes->get('/cuti', 'HR\Cuti::cuti', ['filter' => 'Auth']);
-$routes->get('/cuti/id/(:segment)', 'HR\Cuti::getById/$1', ['filter' => 'Auth']);
-$routes->get('/cuti/create', 'HR\Cuti::createView', ['filter' => 'Auth']);
-$routes->get('/cuti/all', 'HR\Cuti::allCuti', ['filter' => 'Auth']);
-$routes->post('/cuti/save', 'HR\Cuti::create', ['filter' => 'Auth']);
+// Perijinan
+$routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);
+$routes->get('/form-perijinan/id/(:segment)', 'HR\Perijinan::getById/$1', ['filter' => 'Auth']);
+$routes->get('/form-perijinan/create', 'HR\Perijinan::createView', ['filter' => 'Auth']);
+$routes->get('/form-perijinan/all', 'HR\Perijinan::allPerijinan', ['filter' => 'Auth']);
+$routes->post('/form-perijinan/save', 'HR\Perijinan::save', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER
