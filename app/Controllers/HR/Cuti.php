@@ -19,4 +19,20 @@ class Cuti extends BaseController
     {
         return view('hr/cuti/index');
     }
+
+    public function getById()
+    {
+    }
+
+    public function createView()
+    {
+    }
+
+    public function allCuti()
+    {
+    }
+
+    public function create()
+    {
+    }
 }
