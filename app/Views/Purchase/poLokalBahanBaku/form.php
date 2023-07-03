@@ -1120,7 +1120,7 @@
                             $(".foot-detail-table").empty()
 
                             tag_total += `<tr>`;
-                            tag_total += "<td colspan='4'>";
+                            tag_total += "<td colspan='3'>";
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
@@ -1247,7 +1247,7 @@
                             $(".foot-detail-table").empty()
 
                             tag_total += `<tr>`;
-                            tag_total += "<td colspan='4'>";
+                            tag_total += "<td colspan='3'>";
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
@@ -1664,7 +1664,7 @@
                 $(".foot-detail-table").empty()
 
                 tag_total += `<tr>`;
-                tag_total += "<td colspan='4'>";
+                tag_total += "<td colspan='3'>";
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
@@ -1801,7 +1801,7 @@
                 $(".foot-detail-table").empty()
 
                 tag_total += `<tr>`;
-                tag_total += "<td colspan='4'>";
+                tag_total += "<td colspan='3'>";
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
