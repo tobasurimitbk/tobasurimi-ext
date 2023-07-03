@@ -667,6 +667,7 @@
             $(".title-name").text("Update");
             $(".stok").attr("readonly", true);
             $(".kode_barang").attr("readonly", true);
+            $(".body-detail-spek").empty()
             row_detail = 0;
             list_spek = [];
 
