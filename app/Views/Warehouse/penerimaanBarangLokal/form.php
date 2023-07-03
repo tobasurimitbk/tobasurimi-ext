@@ -66,7 +66,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select disabled="true" readonly="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                        <select multiple disabled="true" readonly="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">No. PO</label>
@@ -1061,24 +1061,48 @@
                 $(".harga_barang_jasa").val('')
                 $(".nilai_penyerahan").val('')
 
-                // $.ajax({
-                //     url: `<?= base_url("po-lokal/multi/dropdown"); ?>`,
-                //     method: "GET",
-                //     data: {
-                //         id: JSON.stringify($('.multiple_po_id').val())
-                //     },
-                //     dataType: "json",
-                //     success: function(res) {
-                //         console.log(res)
-                //         $(".kode_barang").empty()
-                //         $(".kode_barang").append(`<option value=""></option>`)
-                //         res.data.forEach(function(item) {
-                //             $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
-                //         })
+                if($(".tipe_bahan").val() === "BAKU")
+                {
+                    $.ajax({
+                        url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            id: JSON.stringify($('.multiple_po_id').val())
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            console.log(res)
+                            $(".kode_barang").empty()
+                            $(".kode_barang").append(`<option value=""></option>`)
+                            res.data.forEach(function(item) {
+                                $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                            })
 
-                //         $(".kode_barang").val("").change();
-                //     }
-                // })
+                            $(".kode_barang").val("").change();
+                        }
+                    })
+                }
+                if($(".tipe_bahan").val() === "PENOLONG")
+                {
+                    $.ajax({
+                        url: `<?= base_url("po-lokal-bahan-penolong/multi/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            id: JSON.stringify($('.multiple_po_id').val())
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            console.log(res)
+                            $(".kode_barang").empty()
+                            $(".kode_barang").append(`<option value=""></option>`)
+                            res.data.forEach(function(item) {
+                                $(".kode_barang").append(`<option data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.barang.nama_satuan}" value="${item.barang.id}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                            })
+
+                            $(".kode_barang").val("").change();
+                        }
+                    })
+                }
 
                 $.ajax({
                     url: `<?= base_url("tax/dropdown"); ?>`,

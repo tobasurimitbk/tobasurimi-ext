@@ -421,7 +421,7 @@ class POImportBahanBaku extends BaseController
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
         $dataPOImport = [];
-        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&supplierid=$id", $this->token);
+        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=BAKU&supplierid=$id", $this->token);
         if ($responsePOImport["code"] === 200) {
             $dataPOImport = json_decode($responsePOImport["body"])->data;
         }
@@ -437,7 +437,9 @@ class POImportBahanBaku extends BaseController
     public function dropdownBarangPOImportBahanBaku()
     {
         $payload = json_encode([
-            "multiple_id_po" => json_decode($this->request->getGet("id"))
+            "multiple_id_po" => json_decode($this->request->getGet("id")),
+            "po_type" => "IMPORT",
+            "tipe_bahan" => "BAKU"
         ]);
 
         $dataPOImport = [];

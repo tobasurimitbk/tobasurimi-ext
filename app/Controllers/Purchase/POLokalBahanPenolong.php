@@ -421,7 +421,7 @@ class POLokalBahanPenolong extends BaseController
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
         $dataPOLokal = [];
-        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&supplierid=$id", $this->token);
+        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=PENOLONG&supplierid=$id", $this->token);
         if ($responsePOLokal["code"] === 200) {
             $dataPOLokal = json_decode($responsePOLokal["body"])->data;
         }
@@ -438,7 +438,9 @@ class POLokalBahanPenolong extends BaseController
     public function dropdownBarangPOLokalBahanPenolong()
     {
         $payload = json_encode([
-            "multiple_id_po" => json_decode($this->request->getGet("id"))
+            "multiple_id_po" => json_decode($this->request->getGet("id")),
+            "po_type" => "LOKAL",
+            "tipe_bahan" => "PENOLONG"
         ]);
 
         $dataPOLokal = [];
@@ -449,7 +451,8 @@ class POLokalBahanPenolong extends BaseController
 
         $data = [
             "data" =>  $dataPOLokal,
-            "response" => $responsePOLokal
+            "response" => $responsePOLokal,
+            "payload" => $payload
         ];
 
         echo json_encode($data);

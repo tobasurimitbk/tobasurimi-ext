@@ -108,23 +108,6 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select order_type" id="order_type" name="order_type" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataOrderType)) {
-                                foreach ($dataOrderType as $orderType) {
-                            ?>
-                                    <option value="<?= $orderType->id; ?>" <?= !empty($dataSPP) ? ($dataSPP->order_type === $orderType->id ? "selected" : "") : "" ?>><?= $orderType->value; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                        <label for="floatingInput">Jenis Order</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php
@@ -473,33 +456,6 @@
             .find('label')
             .css('z-index', '1');
 
-        // SPP TYPE
-        $('.order_type').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.order_type')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.order_type')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.order_type')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         // WAREHOUSE
         $('.warehouse_id').select2({
             placeholder: "",
@@ -594,13 +550,7 @@
                 request_date: {
                     required: true
                 },
-                order_type: {
-                    required: true
-                },
                 spp_no: {
-                    required: true
-                },
-                order_type: {
                     required: true
                 },
                 warehouse_id: {
@@ -611,14 +561,8 @@
                 request_date: {
                     required: "Tanggal Order wajib diisi"
                 },
-                order_type: {
-                    required: "Jenis Order wajib diisi"
-                },
                 spp_no: {
                     required: "No. SPP wajib diisi"
-                },
-                order_type: {
-                    required: "Tipe SPP wajib diisi"
                 },
                 warehouse_id: {
                     required: "Departemen wajib diisi"

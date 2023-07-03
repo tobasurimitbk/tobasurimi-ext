@@ -143,7 +143,6 @@ class SPP extends BaseController
                     "spp_type" => $data->spp_type,
                     "spp_no" => $data->spp_no,
                     "warehouseName" => $data->warehouseName,
-                    "orderTypeName" => $data->orderTypeName,
                     "total" => $data->total,
                     "request_date" => $data->request_date,
                     "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
@@ -183,9 +182,6 @@ class SPP extends BaseController
             "spp_no" => [
                 "rules" => "required"
             ],
-            "order_type" => [
-                "rules" => "required"
-            ],
             "warehouse_id" => [
                 "rules" => "required"
             ]
@@ -194,7 +190,6 @@ class SPP extends BaseController
         if ($this->validate($rules)) {
             $payload = json_encode([
                 "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
-                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
                 "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
                 "spp_type" => $this->request->getPost("spp_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
@@ -257,9 +252,6 @@ class SPP extends BaseController
             "spp_no" => [
                 "rules" => "required"
             ],
-            "order_type" => [
-                "rules" => "required"
-            ],
             "warehouse_id" => [
                 "rules" => "required"
             ]
@@ -270,7 +262,6 @@ class SPP extends BaseController
 
             $payload = json_encode([
                 "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
-                "order_type" => formatter($this->request->getPost("order_type"), "STR_TO_INT"),
                 "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
                 "spp_type" => $this->request->getPost("spp_type"),
                 "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
