@@ -1151,7 +1151,7 @@
             let nama_barang = $(".nama_barang").val()
             let nama_satuan = $(".satuan option:selected").text()
             let satuan = $(".satuan option:selected").val()
-            let spesifikasi = $(".spesifikasi option:selected").val()
+            let spesifikasi = $(".spesifikasi option:selected").val() ? $(".spesifikasi option:selected").val() : ""
             let harga = $(".harga").val()
             let qty = $(".qty").val()
             let total = $(".total").val()

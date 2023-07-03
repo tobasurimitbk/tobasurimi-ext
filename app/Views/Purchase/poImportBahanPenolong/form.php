@@ -71,8 +71,8 @@
                 <div class="col-md-3">
                 <?php if(!empty($dataPOImport)){ ?>
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP (Opsional)">
-                        <label for="floatingInput">No. SPP (Opsional)</label>
+                        <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
+                        <label for="floatingInput">No. SPP</label>
                     </div>
                     <?php } else { ?>
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -88,7 +88,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">No. SPP (Opsional)</label>
+                            <label for="floatingInput">No. SPP</label>
                         </div>
                     <?php } ?>
                 </div>
@@ -936,7 +936,7 @@
 
                             $(".body-detail-table").empty()
 
-                            res?.data?.am_import_po_details.map(item => {
+                            res?.data?.purchase_request_details.map(item => {
                                 tag_html += `<tr>`;
                                 tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc="" data-category="" data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += row + 1;
