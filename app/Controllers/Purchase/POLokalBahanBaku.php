@@ -166,7 +166,7 @@ class POLokalBahanBaku extends BaseController
                 "pph" => $this->request->getPost("pph"),
                 "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
                 "is_posted" => false,
-                "items" => json_decode($this->request->getPost("items"))
+                "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [
@@ -181,7 +181,7 @@ class POLokalBahanBaku extends BaseController
 
             if ($response["code"] === 201) {
                 $data = [
-                    "id" => "",
+                    "id" => json_decode($response["body"])->createdId,
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
@@ -230,7 +230,7 @@ class POLokalBahanBaku extends BaseController
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "pph" => $this->request->getPost("pph"),
                 "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
-                "items" => json_decode($this->request->getPost("items"))
+                "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
             // $data = [

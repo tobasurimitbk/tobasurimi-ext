@@ -22,19 +22,7 @@ class PenerimaanBarangLokal extends BaseController
 
     public function createPenerimaanBarangLokal()
     {
-        //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&idCompany=$this->this_company_id", $this->token);
-
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
-
-        $data = [
-            "dataSupplier" => $dataSupplier
-        ];
-
-        return view('Warehouse/penerimaanBarangLokal/form', $data);
+        return view('Warehouse/penerimaanBarangLokal/form');
     }
 
     public function allPenerimaanBarangLokal()

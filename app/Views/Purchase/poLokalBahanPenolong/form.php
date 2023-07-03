@@ -157,7 +157,7 @@
                             if (!empty($dataValuta)) {
                                 foreach ($dataValuta as $valuta) {
                             ?>
-                                    <option <?= !empty($dataPOLokal) ? ($dataPOLokal->currency === $valuta->id ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
+                                    <option <?= !empty($dataPOLokal) ? ($dataPOLokal->currency === $valuta->value ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
                             <?php
                                 }
                             }
@@ -477,9 +477,6 @@
             satuan: {
                 required: true
             },
-            spesifikasi: {
-                required: true
-            },
             harga: {
                 required: true
             }
@@ -496,9 +493,6 @@
             },
             satuan: {
                 required: "Satuan wajib diisi"
-            },
-            spesifikasi: {
-                required: "Spesifikasi wajib diisi"
             },
             harga: {
                 required: "Harga wajib diisi"
@@ -1860,7 +1854,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-lokal-bahan-penolong"); ?>";
+                                                window.location.href = "<?= base_url("po-lokal-bahan-penolong"); ?>" + "/id/" + + response.id;
                                             })
                                         } else {
                                             Swal.fire({
