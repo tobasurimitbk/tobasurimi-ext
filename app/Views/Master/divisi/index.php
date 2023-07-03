@@ -20,20 +20,6 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control libur" id="libur" name="libur">
-                                <label for="floatingInput">Libur</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_kerja" id="jam_kerja" name="jam_kerja">
-                                <label for="floatingInput">Jam Kerja</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_istirahat" id="jam_istirahat" name="jam_istirahat">
                                 <label for="floatingInput">Jam Istirahat</label>
                             </div>
@@ -127,8 +113,6 @@
                 <thead class="thead-dark">
                     <tr>
                         <th onclick="changeSort('divisi')" class="sort">Divisi</th>
-                        <th onclick="changeSort('libur')" class="sort">Libur</th>
-                        <th onclick="changeSort('jam_kerja')" class="sort">Jam Kerja</th>
                         <th onclick="changeSort('jam_istirahat')" class="sort">Jam Istirahat</th>
                         <th onclick="changeSort('jam_masuk')" class="sort">Jam Masuk</th>
                         <th onclick="changeSort('jam_pulang')" class="sort">Jam Pulang</th>
@@ -183,14 +167,6 @@
         searching: false,
         columns: [{
             data: "divisi",
-            className: "text-center"
-        },
-        {
-            data: "libur",
-            className: "text-center"
-        },
-        {
-            data: "jam_kerja",
             className: "text-center"
         },
         {
@@ -266,12 +242,6 @@
                 divisi: {
                     required: true
                 },
-                libur: {
-                    required: true
-                },
-                jam_kerja: {
-                    required: true
-                },
                 jam_istirahat: {
                     required: true
                 },
@@ -291,12 +261,6 @@
             messages: {
                 divisi: {
                     required: "Divisi wajib diisi"
-                },
-                libur: {
-                    required: "Libur wajib diisi"
-                },
-                jam_kerja: {
-                    required: "Jam Kerja wajib diisi"
                 },
                 jam_istirahat: {
                     required: "Jam Istirahat wajib diisi"
@@ -369,8 +333,6 @@
                     if (res.status) {
                         $(".id").val(id);
                         $(".divisi").val(res?.data?.divisi);
-                        $(".libur").val(res?.data?.libur);
-                        $(".jam_kerja").val(res?.data?.jam_kerja);
                         $(".jam_istirahat").val(res?.data?.jam_istirahat);
                         $(".jam_masuk").val(res?.data?.jam_masuk);
                         $(".jam_pulang").val(res?.data?.jam_pulang);

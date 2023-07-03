@@ -55,8 +55,6 @@ class Divisi extends BaseController
                 array_push($dataCompany, [
                     "id" => $data->id,
                     "divisi" => $data->divisi,
-                    "libur" => $data->libur,
-                    "jam_kerja" => $data->jam_kerja,
                     "jam_istirahat" => $data->jam_istirahat,
                     "jam_masuk" => $data->jam_masuk,
                     "jam_pulang" => $data->jam_pulang,
@@ -85,12 +83,6 @@ class Divisi extends BaseController
             "divisi" => [
                 "rules" => "required"
             ],
-            "libur" => [
-                "rules" => "required"
-            ],
-            "jam_kerja" => [
-                "rules" => "required"
-            ],
             "jam_istirahat" => [
                 "rules" => "required"
             ],
@@ -112,8 +104,6 @@ class Divisi extends BaseController
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
-                "libur" => $this->request->getPost("libur"),
-                "jam_kerja" => $this->request->getPost("jam_kerja"),
                 "jam_istirahat" => $this->request->getPost("jam_istirahat"),
                 "jam_masuk" => $this->request->getPost("jam_masuk"),
                 "jam_pulang" => $this->request->getPost("jam_pulang"),
@@ -158,12 +148,6 @@ class Divisi extends BaseController
             "divisi" => [
                 "rules" => "required"
             ],
-            "libur" => [
-                "rules" => "required"
-            ],
-            "jam_kerja" => [
-                "rules" => "required"
-            ],
             "jam_istirahat" => [
                 "rules" => "required"
             ],
@@ -187,8 +171,6 @@ class Divisi extends BaseController
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
-                "libur" => $this->request->getPost("libur"),
-                "jam_kerja" => $this->request->getPost("jam_kerja"),
                 "jam_istirahat" => $this->request->getPost("jam_istirahat"),
                 "jam_masuk" => $this->request->getPost("jam_masuk"),
                 "jam_pulang" => $this->request->getPost("jam_pulang"),
