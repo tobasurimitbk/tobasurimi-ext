@@ -20,64 +20,16 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_kerja" id="jam_kerja" name="jam_kerja">
+                                <label for="floatingInput">Jam Kerja</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_istirahat" id="jam_istirahat" name="jam_istirahat">
                                 <label for="floatingInput">Jam Istirahat</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input onkeydown="return false" class="form-control input-picker jam_masuk" id="jam_masuk" name="jam_masuk">
-                                    <label for="floatingInput">Jam Masuk</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock fa-jam-masuk icon-form"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input onkeydown="return false" class="form-control input-picker jam_pulang" id="jam_pulang" name="jam_pulang">
-                                    <label for="floatingInput">Jam Keluar</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock fa-jam-pulang icon-form"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input onkeydown="return false" class="form-control input-picker mulai_istirahat" id="mulai_istirahat" name="mulai_istirahat">
-                                    <label for="floatingInput">Jam Mulai Istirahat</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock fa-mulai-istirahat icon-form"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input onkeydown="return false" class="form-control input-picker selesai_istirahat" id="selesai_istirahat" name="selesai_istirahat">
-                                    <label for="floatingInput">Jam Selesai Istirahat</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                        <i class="fa fa-clock fa-selesai-istirahat icon-form"></i>
-                                    </span>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -113,11 +65,8 @@
                 <thead class="thead-dark">
                     <tr>
                         <th onclick="changeSort('divisi')" class="sort">Divisi</th>
+                        <th onclick="changeSort('jam_kerja')" class="sort">Jam Kerja</th>
                         <th onclick="changeSort('jam_istirahat')" class="sort">Jam Istirahat</th>
-                        <th onclick="changeSort('jam_masuk')" class="sort">Jam Masuk</th>
-                        <th onclick="changeSort('jam_pulang')" class="sort">Jam Pulang</th>
-                        <th onclick="changeSort('mulai_istirahat')" class="sort">Jam Mulai Istirahat</th>
-                        <th onclick="changeSort('selesai_istirahat')" class="sort">Jam Selesai Istirahat</th>
                     </tr>
                 </thead>
                 <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -170,23 +119,11 @@
             className: "text-center"
         },
         {
+            data: "jam_kerja",
+            className: "text-center"
+        },
+        {
             data: "jam_istirahat",
-            className: "text-center"
-        },
-        {
-            data: "jam_masuk",
-            className: "text-center"
-        },
-        {
-            data: "jam_pulang",
-            className: "text-center"
-        },
-        {
-            data: "mulai_istirahat",
-            className: "text-center"
-        },
-        {
-            data: "selesai_istirahat",
             className: "text-center"
         }],
         columnDefs: [{
@@ -204,57 +141,16 @@
     });
     
     $(document).ready(function() {
-        $(".jam_masuk, .jam_pulang, .mulai_istirahat, .selesai_istirahat").datetimepicker({
-            format: 'HH:mm',
-            useCurrent: false,
-            showTodayButton: true,
-            showClear: true,
-            toolbarPlacement: 'bottom',
-            sideBySide: true,
-            showClose: true,
-            icons: {
-                up: "fa fa-arrow-up",
-                down: "fa fa-arrow-down",
-                today: "fa fa-clock",
-                clear: "fa fa-trash",
-                close: "fa fa-close"
-            }
-        });
-
-        $('.fa-jam-masuk').click(function() {
-            $(".jam_masuk").focus();
-        });
-
-        $('.fa-jam-pulang').click(function() {
-            $(".jam_pulang").focus();
-        });
-
-        $('.fa-mulai-istirahat').click(function() {
-            $(".mulai_istirahat").focus();
-        });
-
-        $('.fa-selesai-istirahat').click(function() {
-            $(".selesai_istirahat").focus();
-        });
 
         var validator = $(".create-form").validate({
             rules: {
                 divisi: {
                     required: true
                 },
+                jam_kerja: {
+                    required: true
+                },
                 jam_istirahat: {
-                    required: true
-                },
-                jam_masuk: {
-                    required: true
-                },
-                jam_pulang: {
-                    required: true
-                },
-                mulai_istirahat: {
-                    required: true
-                },
-                selesai_istirahat: {
                     required: true
                 }
             },
@@ -262,20 +158,11 @@
                 divisi: {
                     required: "Divisi wajib diisi"
                 },
+                jam_kerja: {
+                    required: "Jam Kerja wajib diisi"
+                },
                 jam_istirahat: {
                     required: "Jam Istirahat wajib diisi"
-                },
-                jam_masuk: {
-                    required: "Jam Masuk wajib diisi"
-                },
-                jam_pulang: {
-                    required: "Jam Pulang wajib diisi"
-                },
-                mulai_istirahat: {
-                    required: "Mulai Istirahat wajib diisi"
-                },
-                selesai_istirahat: {
-                    required: "Selesai Istirahat wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -333,11 +220,8 @@
                     if (res.status) {
                         $(".id").val(id);
                         $(".divisi").val(res?.data?.divisi);
+                        $(".jam_kerja").val(res?.data?.jam_kerja);
                         $(".jam_istirahat").val(res?.data?.jam_istirahat);
-                        $(".jam_masuk").val(res?.data?.jam_masuk);
-                        $(".jam_pulang").val(res?.data?.jam_pulang);
-                        $(".mulai_istirahat").val(res?.data?.mulai_istirahat);
-                        $(".selesai_istirahat").val(res?.data?.selesai_istirahat);
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")

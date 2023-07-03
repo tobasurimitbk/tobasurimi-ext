@@ -55,11 +55,8 @@ class Divisi extends BaseController
                 array_push($dataCompany, [
                     "id" => $data->id,
                     "divisi" => $data->divisi,
+                    "jam_kerja" => $data->jam_kerja,
                     "jam_istirahat" => $data->jam_istirahat,
-                    "jam_masuk" => $data->jam_masuk,
-                    "jam_pulang" => $data->jam_pulang,
-                    "mulai_istirahat" => $data->mulai_istirahat,
-                    "selesai_istirahat" => $data->selesai_istirahat,
                 ]);
             }
         }
@@ -83,19 +80,10 @@ class Divisi extends BaseController
             "divisi" => [
                 "rules" => "required"
             ],
+            "jam_kerja" => [
+                "rules" => "required"
+            ],
             "jam_istirahat" => [
-                "rules" => "required"
-            ],
-            "jam_masuk" => [
-                "rules" => "required"
-            ],
-            "jam_pulang" => [
-                "rules" => "required"
-            ],
-            "mulai_istirahat" => [
-                "rules" => "required"
-            ],
-            "selesai_istirahat" => [
                 "rules" => "required"
             ]
         ];
@@ -104,11 +92,8 @@ class Divisi extends BaseController
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
+                "jam_kerja" => $this->request->getPost("jam_kerja"),
                 "jam_istirahat" => $this->request->getPost("jam_istirahat"),
-                "jam_masuk" => $this->request->getPost("jam_masuk"),
-                "jam_pulang" => $this->request->getPost("jam_pulang"),
-                "mulai_istirahat" => $this->request->getPost("mulai_istirahat"),
-                "selesai_istirahat" => $this->request->getPost("selesai_istirahat")
             ]);
             
             $response = curl_request("POST", "/divisis", $this->token, $payload);
@@ -148,19 +133,10 @@ class Divisi extends BaseController
             "divisi" => [
                 "rules" => "required"
             ],
+            "jam_kerja" => [
+                "rules" => "required"
+            ],
             "jam_istirahat" => [
-                "rules" => "required"
-            ],
-            "jam_masuk" => [
-                "rules" => "required"
-            ],
-            "jam_pulang" => [
-                "rules" => "required"
-            ],
-            "mulai_istirahat" => [
-                "rules" => "required"
-            ],
-            "selesai_istirahat" => [
                 "rules" => "required"
             ]
         ];
@@ -171,11 +147,8 @@ class Divisi extends BaseController
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
+                "jam_kerja" => $this->request->getPost("jam_kerja"),
                 "jam_istirahat" => $this->request->getPost("jam_istirahat"),
-                "jam_masuk" => $this->request->getPost("jam_masuk"),
-                "jam_pulang" => $this->request->getPost("jam_pulang"),
-                "mulai_istirahat" => $this->request->getPost("mulai_istirahat"),
-                "selesai_istirahat" => $this->request->getPost("selesai_istirahat")
             ]);
             
             $response = curl_request("PATCH", "/divisis/$id", $this->token, $payload);
