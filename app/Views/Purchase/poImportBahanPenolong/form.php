@@ -113,7 +113,7 @@
                     </div>
                 </div>
             </div>
-            <div class=row">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOImport) ? $dataPOImport->createdBy : session()->get("login")->name; ?>">
@@ -317,7 +317,7 @@
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="max-width: 1200px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>

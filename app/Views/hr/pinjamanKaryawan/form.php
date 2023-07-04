@@ -18,8 +18,6 @@
     </div>
     <div class="card">
         <div class="card-body">
-
-
             <form class="create-form form-add-pinjaman-karyawan" role="form" method="POST" enctype="multipart/form-data">
                 <input type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
@@ -61,7 +59,7 @@
                     <div class="col-md-6">
                         <div class="mb-3" style="height: 50px;">
                             <label for="floatingInput">Posting</label>
-                            <div>
+                            <div class="switch-form-pinjaman-karyawan">
                                 <label class="switch">
                                     <input class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
                                     <span class="slider round"></span>
