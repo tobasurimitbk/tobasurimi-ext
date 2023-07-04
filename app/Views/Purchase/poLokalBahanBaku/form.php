@@ -223,9 +223,9 @@
                     <tr>
                         <td colspan="3"></td>
                         <td><b>TOTAL</b></td>
-                        <!-- <td><b><?php // number_format($total_harga_barang); ?></b></td> -->
+                        <td><b><?= number_format($total_harga_barang); ?></b></td>
                         <td><b><?= $total_qty; ?></b></td>
-                        <td><b><?= number_format($total_harga); ?></b></td>
+                        <!-- <td><b><?php // number_format($total_harga); ?></b></td> -->
                         <td colspan="11"></td>
                     </tr>
                 </tfoot>
@@ -1123,15 +1123,15 @@
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
                             tag_total += "</td>";
-                            // tag_total += "<td>";
-                            // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                            // tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                            tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_qty}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                            tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                            // tag_total += "</td>";
                             tag_total += "<td colspan='11'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
@@ -1250,15 +1250,15 @@
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
                             tag_total += "</td>";
-                            // tag_total += "<td>";
-                            // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                            // tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                            tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_qty}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                            tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                            // tag_total += "</td>";
                             tag_total += "<td colspan='11'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
@@ -1667,15 +1667,15 @@
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
                 tag_total += "</td>";
-                // tag_total += "<td>";
-                // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                // tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_qty}</b>`;
                 tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                tag_total += "</td>";
+                // tag_total += "<td>";
+                // tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                // tag_total += "</td>";
                 tag_total += "<td colspan='11'>";
                 tag_total += "</td>";
                 tag_total += "</tr>";
@@ -1804,15 +1804,15 @@
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
                 tag_total += "</td>";
-                // tag_total += "<td>";
-                // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                // tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_qty}</b>`;
                 tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                tag_total += "</td>";
+                // tag_total += "<td>";
+                // tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                // tag_total += "</td>";
                 tag_total += "<td colspan='11'>";
                 tag_total += "</td>";
                 tag_total += "</tr>";
