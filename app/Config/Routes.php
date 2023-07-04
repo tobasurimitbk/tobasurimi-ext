@@ -371,6 +371,11 @@ $routes->get('/form-perijinan/id/(:segment)', 'HR\Perijinan::getById/$1', ['filt
 $routes->get('/form-perijinan/create', 'HR\Perijinan::createView', ['filter' => 'Auth']);
 $routes->get('/form-perijinan/all', 'HR\Perijinan::allPerijinan', ['filter' => 'Auth']);
 $routes->post('/form-perijinan/save', 'HR\Perijinan::save', ['filter' => 'Auth']);
+$routes->post('/form-perijinan/delete', 'HR\Perijinan::delete', ['filter' => 'Auth']);
+
+// jam kerja
+$routes->get('/jam-kerja', 'HR\JamKerja::jamKerja', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/all', 'HR\JamKerja::all', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

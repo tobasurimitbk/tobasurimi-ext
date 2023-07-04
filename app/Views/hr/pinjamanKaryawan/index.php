@@ -23,27 +23,21 @@
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th onclick="changeSort('id')" class="sort">ID</th>
-
-                                <th onclick="changeSort('employeeName')" class="sort">Employee Name</th>
-
-                                <th onclick="changeSort('amount')" class="sort">Amount</th>
-
-                                <th onclick="changeSort('installment_month')" class="sort">Installment Month</th>
-
-                                <th onclick="changeSort('remaining_amount')" class="sort">Remaining Amount</th>
-
-                                <th onclick="changeSort('loan_date')" class="sort">Loan Date</th>
-
-                                <th onclick="changeSort('term')" class="sort">Term</th>
-
-                                <th onclick="changeSort('status')" class="sort">Status</th>
-
-                                <th onclick="changeSort('approve_by')" class="sort">Approve By</th>
-
                                 <th onclick="changeSort('nip')" class="sort">NIP</th>
 
-                                <th onclick="changeSort('is_posting')" class="sort">Posting</th>
+                                <th onclick="changeSort('employeeName')" class="sort">Nama Karyawan</th>
+
+                                <th onclick="changeSort('amount')" class="sort">Jumlah Pinjaman</th>
+
+                                <th onclick="changeSort('installment_month')" class="sort">Jumlah Cicilan</th>
+
+                                <th onclick="changeSort('remaining_amount')" class="sort">Sisa Pinjaman</th>
+
+                                <th onclick="changeSort('loan_date')" class="sort">Tanggal Pinjam</th>
+
+                                <th onclick="changeSort('term')" class="sort">Termin</th>
+
+                                <th onclick="changeSort('status')" class="sort">Status</th>
 
                                 <th class="sort">Action</th>
                             </tr>
@@ -112,7 +106,7 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "id",
+            data: "nip",
             className: "text-center"
         }, {
             data: "employeeName",
@@ -135,15 +129,10 @@
         }, {
             data: "status",
             className: "text-center"
-        }, {
-            data: "approve_by",
-            className: "text-center"
-        }, {
-            data: "nip",
-            className: "text-center"
-        }, {
-            data: "is_posted",
-            className: "text-center"
+
+            // }, {
+            //     data: "is_posted",
+            //     className: "text-center"
         }, {
             data: "id",
             className: "text-center actions",
@@ -151,7 +140,7 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
+                return row.is_posted ? "-" : `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
                 `
             }
         }],
@@ -184,7 +173,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
 
-                // setLoading()
+                setLoading()
                 $.ajax({
                     url: "<?= base_url("pinjaman-karyawan/delete"); ?>",
                     data: {

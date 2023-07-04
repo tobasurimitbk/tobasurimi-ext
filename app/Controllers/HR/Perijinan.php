@@ -151,6 +151,7 @@ class Perijinan extends BaseController
                 "end_date" => $this->request->getPost("end_date"),
                 "status" => $this->request->getPost("status"),
                 "reason" => $this->request->getPost("reason"),
+                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
             ]);
 
             $response = curl_request("POST", "/attendance/setAttendance", $this->token, $payload);
@@ -189,21 +190,21 @@ class Perijinan extends BaseController
     public function update()
     {
         $rules = [
-            // "nama_shift" => [
-            //     "rules" => "required"
-            // ],
-            // "SOT" => [
-            //     "rules" => "required"
-            // ],
-            // "EOT" => [
-            //     "rules" => "required"
-            // ],
-            // "BSOT" => [
-            //     "rules" => "required"
-            // ],
-            // "BEOT" => [
-            //     "rules" => "required"
-            // ],
+            "employee_id" => [
+                "rules" => "required"
+            ],
+            "start_date" => [
+                "rules" => "required"
+            ],
+            "end_date" => [
+                "rules" => "required"
+            ],
+            "status" => [
+                "rules" => "required"
+            ],
+            "reason" => [
+                "rules" => "required"
+            ],
         ];
 
 
@@ -211,11 +212,13 @@ class Perijinan extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                // "nama_shift" => $this->request->getPost("nama_shift"),
-                // "SOT" => $this->request->getPost("SOT"),
-                // "EOT" => $this->request->getPost("EOT"),
-                // "BSOT" => $this->request->getPost("BSOT"),
-                // "BEOT" => $this->request->getPost("BEOT"),
+                "company_id" => $this->this_company_id,
+                "employee_id" => $this->request->getPost("employee_id"),
+                "start_date" => $this->request->getPost("start_date"),
+                "end_date" => $this->request->getPost("end_date"),
+                "status" => $this->request->getPost("status"),
+                "reason" => $this->request->getPost("reason"),
+                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
             ]);
 
             $response = curl_request("PATCH", "/perijinan/$id", $this->token, $payload);
@@ -245,6 +248,40 @@ class Perijinan extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function delete()
+    {
+        $id = $this->request->getPost("id");
+
+        if (!empty($id)) {
+            $response = curl_request("DELETE", "/perijinan/$id", $this->token);
+
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Dihapus",
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
