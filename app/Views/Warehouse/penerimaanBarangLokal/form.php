@@ -1336,62 +1336,62 @@
             }
         })
 
-        $(".supplier_id").change(function() {
-            if($(".supplier_id option:selected").val())
-            {
-                if($(".tipe_bahan").val() === "BAKU")
-                {
-                    $.ajax({
-                        url: `<?= base_url("po-lokal-bahan-baku/dropdown"); ?>`,
-                        method: "GET",
-                        data: {
-                            id: $(".supplier_id option:selected").val()
-                        },
-                        dataType: "json",
-                        success: function(res) {
-                            console.log(res)
-                            $(".multiple_po_id").attr("disabled", true)
-                            $(".multiple_po_id").empty()
-                            $(".multiple_po_id").append(`<option value=""></option>`)
-                            res.data.forEach(function(item) {
-                                $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-                            })
-                            $(".multiple_po_id").attr("disabled", false)
-                            $(".multiple_po_id").val([]);
-                        }
-                    })
-                }
-                if($(".tipe_bahan").val() === "PENOLONG")
-                {
-                    $.ajax({
-                        url: `<?= base_url("po-lokal-bahan-penolong/dropdown"); ?>`,
-                        method: "GET",
-                        data: {
-                            id: $(".supplier_id option:selected").val()
-                        },
-                        dataType: "json",
-                        success: function(res) {
-                            console.log(res)
-                            $(".multiple_po_id").attr("disabled", true)
-                            $(".multiple_po_id").empty()
-                            $(".multiple_po_id").append(`<option value=""></option>`)
-                            res.data.forEach(function(item) {
-                                $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-                            })
-                            $(".multiple_po_id").attr("disabled", false)
-                            $(".multiple_po_id").val([]);
-                        }
-                    })
-                }
-            }
-            else
-            {
-                $(".multiple_po_id").attr("disabled", true)
-                $(".multiple_po_id").empty()
-                $(".multiple_po_id").append(`<option value=""></option>`)
-                $(".multiple_po_id").val([]);
-            }
-        })
+        // $(".supplier_id").change(function() {
+        //     if($(".supplier_id option:selected").val())
+        //     {
+        //         if($(".tipe_bahan").val() === "BAKU")
+        //         {
+        //             $.ajax({
+        //                 url: `<?= base_url("po-lokal-bahan-baku/dropdown"); ?>`,
+        //                 method: "GET",
+        //                 data: {
+        //                     id: $(".supplier_id option:selected").val()
+        //                 },
+        //                 dataType: "json",
+        //                 success: function(res) {
+        //                     console.log(res)
+        //                     $(".multiple_po_id").attr("disabled", true)
+        //                     $(".multiple_po_id").empty()
+        //                     $(".multiple_po_id").append(`<option value=""></option>`)
+        //                     res.data.forEach(function(item) {
+        //                         $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+        //                     })
+        //                     $(".multiple_po_id").attr("disabled", false)
+        //                     $(".multiple_po_id").val([]);
+        //                 }
+        //             })
+        //         }
+        //         if($(".tipe_bahan").val() === "PENOLONG")
+        //         {
+        //             $.ajax({
+        //                 url: `<?= base_url("po-lokal-bahan-penolong/dropdown"); ?>`,
+        //                 method: "GET",
+        //                 data: {
+        //                     id: $(".supplier_id option:selected").val()
+        //                 },
+        //                 dataType: "json",
+        //                 success: function(res) {
+        //                     console.log(res)
+        //                     $(".multiple_po_id").attr("disabled", true)
+        //                     $(".multiple_po_id").empty()
+        //                     $(".multiple_po_id").append(`<option value=""></option>`)
+        //                     res.data.forEach(function(item) {
+        //                         $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+        //                     })
+        //                     $(".multiple_po_id").attr("disabled", false)
+        //                     $(".multiple_po_id").val([]);
+        //                 }
+        //             })
+        //         }
+        //     }
+        //     else
+        //     {
+        //         $(".multiple_po_id").attr("disabled", true)
+        //         $(".multiple_po_id").empty()
+        //         $(".multiple_po_id").append(`<option value=""></option>`)
+        //         $(".multiple_po_id").val([]);
+        //     }
+        // })
     })
 
     const changeWarehouse = function(id)

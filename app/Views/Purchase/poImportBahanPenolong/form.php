@@ -1520,7 +1520,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    window.location.href = "<?= base_url("po"); ?>" + "/id/" + $(".id").val()
+                                    window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>" + "/id/" + $(".id").val()
                                 })
                             } else {
                                 Swal.fire({
