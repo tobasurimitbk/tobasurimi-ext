@@ -30,7 +30,9 @@ class PenerimaanBarangLokal extends BaseController
             $dataSupplier = json_decode($responseSupplier["body"])->data;
         }
 
-        $data = [];
+        $data = [
+            "dataSupplier" => $dataSupplier
+        ];
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);
     }

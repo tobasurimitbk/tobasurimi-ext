@@ -144,7 +144,7 @@
                         <th>Spesifikasi</th>
                         <th>Harga Umum</th>
                         <th>Qty</th>
-                        <th>Total Harga</th>
+                        <!-- <th>Total Harga</th> -->
                         <th>Cong Sebenarnya</th>
                         <th>Cong Batasan</th>
                         <th>Subsidi Langsung</th>
@@ -179,7 +179,7 @@
                                     <td class="edit-table-detail"  data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->spec; ?></td>
                                     <td class="edit-table-detail"  data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->general_price; ?></td>
                                     <td class="edit-table-detail"  data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->qty; ?></td>
-                                    <td class="edit-table-detail"  data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?></td>
+                                    <!-- <td class="edit-table-detail"  data-total="<?php // number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?></td> -->
                                     <td class="edit-table-detail"  data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->cong_sebenarnya; ?></td>
                                     <td class="edit-table-detail"  data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->cong_batasan; ?></td>
                                     <td class="edit-table-detail"  data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-cong_sebenarnya="<?= $details->cong_sebenarnya; ?>" data-cong_batasan="<?= $details->cong_batasan; ?>" data-subsidi_langsung="<?= $details->subsidi_langsung; ?>"  data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->subsidi_langsung; ?></td>
@@ -199,7 +199,7 @@
                                     <td><?= $details->spec; ?></td>
                                     <td><?= $details->general_price; ?></td>
                                     <td><?= $details->qty; ?></td>
-                                    <td><?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?></td>
+                                    <!-- <td><?php // number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?></td> -->
                                     <td><?= $details->cong_sebenarnya; ?></td>
                                     <td><?= $details->cong_batasan; ?></td>
                                     <td><?= $details->subsidi_langsung; ?></td>
@@ -223,10 +223,10 @@
                     <tr>
                         <td colspan="3"></td>
                         <td><b>TOTAL</b></td>
-                        <td><b><?= number_format($total_harga_barang); ?></b></td>
+                        <!-- <td><b><?php // number_format($total_harga_barang); ?></b></td> -->
                         <td><b><?= $total_qty; ?></b></td>
                         <td><b><?= number_format($total_harga); ?></b></td>
-                        <td colspan="12"></td>
+                        <td colspan="11"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -320,7 +320,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="display: none;">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
                                 <label for="floatingInput">Total</label>
@@ -332,18 +332,27 @@
                                 <label for="floatingInput">Cong Sebenarnya</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan">
                                 <label for="floatingInput">Cong Batasan</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung">
                                 <label for="floatingInput">Subsidi Langsung</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select quality" name="quality" id="quality" aria-label="Floating label select example">
+                                    <option value="Baik">Baik</option>
+                                    <option value="Jelek">Jelek</option>
+                                </select>
+                                <label for="floatingInput">Kualitas</label>
                             </div>
                         </div>
                     </div>
@@ -360,17 +369,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control peti" name="peti" id="peti" placeholder="Peti">
                                 <label for="floatingInput">Peti/Tong</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select quality" name="quality" id="quality" aria-label="Floating label select example">
-                                    <option value="Baik">Baik</option>
-                                    <option value="Jelek">Jelek</option>
-                                </select>
-                                <label for="floatingInput">Kualitas</label>
                             </div>
                         </div>
                     </div>
@@ -982,9 +980,9 @@
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                                     tag_html += qty;
                                     tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                                    tag_html += total;
-                                    tag_html += "</td>";
+                                    // tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                    // tag_html += total;
+                                    // tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                                     tag_html += cong_sebenarnya;
                                     tag_html += "</td>";
@@ -1066,9 +1064,9 @@
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                                     tag_html += item.qty;
                                     tag_html += "</td>";
-                                    tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                                    tag_html += item.total;
-                                    tag_html += "</td>";
+                                    // tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                    // tag_html += item.total;
+                                    // tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                                     tag_html += item.cong_sebenarnya;
                                     tag_html += "</td>";
@@ -1125,16 +1123,16 @@
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
                             tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                            tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                            // tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_qty}</b>`;
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='12'>";
+                            tag_total += "<td colspan='11'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1208,9 +1206,9 @@
                             tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="" data-row="${row + 1}">`;
                             tag_html += qty;
                             tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="" data-row="${row + 1}">`;
-                            tag_html += total;
-                            tag_html += "</td>";
+                            // tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="" data-row="${row + 1}">`;
+                            // tag_html += total;
+                            // tag_html += "</td>";
                             tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}" data-cong_sebenarnya="${cong_sebenarnya}" data-cong_batasan="${cong_batasan}" data-subsidi_langsung="${subsidi_langsung}" data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="" data-row="${row + 1}">`;
                             tag_html += cong_sebenarnya;
                             tag_html += "</td>";
@@ -1252,16 +1250,16 @@
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
                             tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                            tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                            // tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_qty}</b>`;
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='12'>";
+                            tag_total += "<td colspan='11'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1602,9 +1600,9 @@
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
                         tag_html += item.qty;
                         tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
-                        tag_html += item.total;
-                        tag_html += "</td>";
+                        // tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
+                        // tag_html += item.total;
+                        // tag_html += "</td>";
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
                         tag_html += item.keterangan;
                         tag_html += "</td>";
@@ -1669,16 +1667,16 @@
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
                 tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                tag_total += "</td>";
+                // tag_total += "<td>";
+                // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                // tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_qty}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                 tag_total += "</td>";
-                tag_total += "<td colspan='12'>";
+                tag_total += "<td colspan='11'>";
                 tag_total += "</td>";
                 tag_total += "</tr>";
 
@@ -1739,9 +1737,9 @@
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
                         tag_html += item.qty;
                         tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
-                        tag_html += item.total;
-                        tag_html += "</td>";
+                        // tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
+                        // tag_html += item.total;
+                        // tag_html += "</td>";
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}" data-cong_sebenarnya="${item.cong_sebenarnya}" data-cong_batasan="${item.cong_batasan}" data-subsidi_langsung="${item.subsidi_langsung}" data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
                         tag_html += item.keterangan;
                         tag_html += "</td>";
@@ -1806,16 +1804,16 @@
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
                 tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                tag_total += "</td>";
+                // tag_total += "<td>";
+                // tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                // tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_qty}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                 tag_total += "</td>";
-                tag_total += "<td colspan='12'>";
+                tag_total += "<td colspan='11'>";
                 tag_total += "</td>";
                 tag_total += "</tr>";
 

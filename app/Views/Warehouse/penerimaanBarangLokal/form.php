@@ -352,6 +352,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>Warehouse</th>
+                                <th>Unit</th>
                                 <th>Qty</th>
                                 <th>Hapus</th>
                             </tr>
@@ -1008,13 +1009,17 @@
                 row: row_detail,
                 display: "",
                 warehouse_id: "",
-                qty_warehouse: ""
+                qty_warehouse: "",
+                unit: ""
             })
             
             let tag_html = "";
             tag_html += `<tr class="table_${row_detail}">`;
             tag_html += `<td>`;
             tag_html += `<select onchange="changeWarehouse(${row_detail})" class="warehouse_id_${row_detail} form-select" id="warehouse_id_${row_detail}" name="warehouse_id_${row_detail}">`;
+            tag_html += `</td>`;
+            tag_html += `<td>`;
+            tag_html += `<select onchange="changeUnit(${row_detail})" class="unit_${row_detail} form-select" id="unit_${row_detail}" name="unit_${row_detail}">`;
             tag_html += `</td>`;
             tag_html += `<td>`;
             tag_html += `<input onkeyup="changeWarehouse(${row_detail})" oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control qty_warehouse_${row_detail}" id="qty_warehouse_${row_detail}" name="qty_warehouse_${row_detail}">`;
@@ -1037,6 +1042,20 @@
                 }
             })
 
+            $.ajax({
+                url: `<?= base_url("satuan/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".unit_" + row_detail).empty()
+                    $(".unit_" + row_detail).append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".unit_" + row_detail).append(`<option value="${item.id}">${item.nama_satuan}</option>`)
+                    })
+                }
+            })
+
+
             $(".body-detail-warehouse").append(tag_html)
 
             // WAREHOUSE
@@ -1045,158 +1064,165 @@
                 theme: "bootstrap-5",
                 dropdownParent: $(".detail-modal .modal-content")
             })
+
+            // UNIT
+            $(".unit_" + row_detail).select2({
+                placeholder: "",
+                theme: "bootstrap-5",
+                dropdownParent: $(".detail-modal .modal-content")
+            })
         })
 
-        $(".multiple_po_id").change(function() {
-            if($('.multiple_po_id option:selected').length !== 0)
-            {
-                list_items = [];
-                row = 0;
-                let tag_html = ""
-                $(".body-detail-warehouse").empty()
+        // $(".multiple_po_id").change(function() {
+        //     if($('.multiple_po_id option:selected').length !== 0)
+        //     {
+        //         list_items = [];
+        //         row = 0;
+        //         let tag_html = ""
+        //         $(".body-detail-warehouse").empty()
 
-                if($(".tipe_bahan").val() === "BAKU")
-                {
-                    $.ajax({
-                        url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
-                        method: "GET",
-                        data: {
-                            id: JSON.stringify($('.multiple_po_id').val())
-                        },
-                        dataType: "json",
-                        success: function(res) {
-                            console.log(res)
-                            res.data.forEach(function(item) {
-                              tag_html += `<tr>`;
-                                tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}">`;
-                                tag_html += row + 1;
-                                tag_html += "</td>";
-                                tag_html += item.barang.kode_barang;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.barang.nama_barang;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.spec;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.barang.nama_satuan;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.qty;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.price;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.note;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                                tag_html += "</td>";
-                                tag_html += "</tr>";
+        //         if($(".tipe_bahan").val() === "BAKU")
+        //         {
+        //             $.ajax({
+        //                 url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
+        //                 method: "GET",
+        //                 data: {
+        //                     id: JSON.stringify($('.multiple_po_id').val())
+        //                 },
+        //                 dataType: "json",
+        //                 success: function(res) {
+        //                     console.log(res)
+        //                     res.data.forEach(function(item) {
+        //                       tag_html += `<tr>`;
+        //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}">`;
+        //                         tag_html += row + 1;
+        //                         tag_html += "</td>";
+        //                         tag_html += item.barang.kode_barang;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.barang.nama_barang;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.spec;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.barang.nama_satuan;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.qty;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.price;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.note;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</tr>";
 
-                                list_items.push({
-                                    id: '',
-                                    row: row,
-                                    kode_barang: item.barang.kode_barang,
-                                    nama_barang: item.barang.nama_barang,
-                                    spec: item.spec,
-                                    nama_satuan: item.barang.nama_satuan,
-                                    qty: item.qty,
-                                    price: item.price,
-                                    note: item.note
-                                })
-                            })
-                        }
-                    })
-                    console.log(list_items)
-                    $(".body-detail-table").append(tag_html)
-                }
-                if($(".tipe_bahan").val() === "PENOLONG")
-                {
-                    $.ajax({
-                        url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
-                        method: "GET",
-                        data: {
-                            id: JSON.stringify($('.multiple_po_id').val())
-                        },
-                        dataType: "json",
-                        success: function(res) {
-                            console.log(res)
-                            res.data.forEach(function(item) {
-                              tag_html += `<tr>`;
-                                tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}">`;
-                                tag_html += row + 1;
-                                tag_html += "</td>";
-                                tag_html += item.barang.kode_barang;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.barang.nama_barang;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.spec;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.barang.nama_satuan;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.qty;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.price;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += item.note;
-                                tag_html += "</td>";
-                                tag_html += "</td>";
-                                tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                                tag_html += "</td>";
-                                tag_html += "</tr>";
+        //                         list_items.push({
+        //                             id: '',
+        //                             row: row,
+        //                             kode_barang: item.barang.kode_barang,
+        //                             nama_barang: item.barang.nama_barang,
+        //                             spec: item.spec,
+        //                             nama_satuan: item.barang.nama_satuan,
+        //                             qty: item.qty,
+        //                             price: item.price,
+        //                             note: item.note
+        //                         })
+        //                     })
+        //                 }
+        //             })
+        //             console.log(list_items)
+        //             $(".body-detail-table").append(tag_html)
+        //         }
+        //         if($(".tipe_bahan").val() === "PENOLONG")
+        //         {
+        //             $.ajax({
+        //                 url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
+        //                 method: "GET",
+        //                 data: {
+        //                     id: JSON.stringify($('.multiple_po_id').val())
+        //                 },
+        //                 dataType: "json",
+        //                 success: function(res) {
+        //                     console.log(res)
+        //                     res.data.forEach(function(item) {
+        //                       tag_html += `<tr>`;
+        //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}">`;
+        //                         tag_html += row + 1;
+        //                         tag_html += "</td>";
+        //                         tag_html += item.barang.kode_barang;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.barang.nama_barang;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.spec;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.barang.nama_satuan;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.qty;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.price;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += 0;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += item.note;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</td>";
+        //                         tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+        //                         tag_html += "</td>";
+        //                         tag_html += "</tr>";
 
-                                list_items.push({
-                                    id: '',
-                                    row: row,
-                                    kode_barang: item.barang.kode_barang,
-                                    nama_barang: item.barang.nama_barang,
-                                    spec: item.spec,
-                                    nama_satuan: item.barang.nama_satuan,
-                                    qty: item.qty,
-                                    price: item.price,
-                                    note: item.note
-                                })
-                            })
-                        }
-                    })
-                    console.log(list_items)
-                    $(".body-detail-table").append(tag_html)
-                }
-            }
-        })
+        //                         list_items.push({
+        //                             id: '',
+        //                             row: row,
+        //                             kode_barang: item.barang.kode_barang,
+        //                             nama_barang: item.barang.nama_barang,
+        //                             spec: item.spec,
+        //                             nama_satuan: item.barang.nama_satuan,
+        //                             qty: item.qty,
+        //                             price: item.price,
+        //                             note: item.note
+        //                         })
+        //                     })
+        //                 }
+        //             })
+        //             console.log(list_items)
+        //             $(".body-detail-table").append(tag_html)
+        //         }
+        //     }
+        // })
 
         $(".btn-show-detail").click(function() {
             if($('.multiple_po_id option:selected').length !== 0)
@@ -1336,62 +1362,62 @@
             }
         })
 
-        // $(".supplier_id").change(function() {
-        //     if($(".supplier_id option:selected").val())
-        //     {
-        //         if($(".tipe_bahan").val() === "BAKU")
-        //         {
-        //             $.ajax({
-        //                 url: `<?= base_url("po-lokal-bahan-baku/dropdown"); ?>`,
-        //                 method: "GET",
-        //                 data: {
-        //                     id: $(".supplier_id option:selected").val()
-        //                 },
-        //                 dataType: "json",
-        //                 success: function(res) {
-        //                     console.log(res)
-        //                     $(".multiple_po_id").attr("disabled", true)
-        //                     $(".multiple_po_id").empty()
-        //                     $(".multiple_po_id").append(`<option value=""></option>`)
-        //                     res.data.forEach(function(item) {
-        //                         $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-        //                     })
-        //                     $(".multiple_po_id").attr("disabled", false)
-        //                     $(".multiple_po_id").val([]);
-        //                 }
-        //             })
-        //         }
-        //         if($(".tipe_bahan").val() === "PENOLONG")
-        //         {
-        //             $.ajax({
-        //                 url: `<?= base_url("po-lokal-bahan-penolong/dropdown"); ?>`,
-        //                 method: "GET",
-        //                 data: {
-        //                     id: $(".supplier_id option:selected").val()
-        //                 },
-        //                 dataType: "json",
-        //                 success: function(res) {
-        //                     console.log(res)
-        //                     $(".multiple_po_id").attr("disabled", true)
-        //                     $(".multiple_po_id").empty()
-        //                     $(".multiple_po_id").append(`<option value=""></option>`)
-        //                     res.data.forEach(function(item) {
-        //                         $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-        //                     })
-        //                     $(".multiple_po_id").attr("disabled", false)
-        //                     $(".multiple_po_id").val([]);
-        //                 }
-        //             })
-        //         }
-        //     }
-        //     else
-        //     {
-        //         $(".multiple_po_id").attr("disabled", true)
-        //         $(".multiple_po_id").empty()
-        //         $(".multiple_po_id").append(`<option value=""></option>`)
-        //         $(".multiple_po_id").val([]);
-        //     }
-        // })
+        $(".supplier_id").change(function() {
+            if($(".supplier_id option:selected").val())
+            {
+                if($(".tipe_bahan").val() === "BAKU")
+                {
+                    $.ajax({
+                        url: `<?= base_url("po-lokal-bahan-baku/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            id: $(".supplier_id option:selected").val()
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            console.log(res)
+                            $(".multiple_po_id").attr("disabled", true)
+                            $(".multiple_po_id").empty()
+                            $(".multiple_po_id").append(`<option value=""></option>`)
+                            res.data.forEach(function(item) {
+                                $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                            })
+                            $(".multiple_po_id").attr("disabled", false)
+                            $(".multiple_po_id").val([]);
+                        }
+                    })
+                }
+                if($(".tipe_bahan").val() === "PENOLONG")
+                {
+                    $.ajax({
+                        url: `<?= base_url("po-lokal-bahan-penolong/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            id: $(".supplier_id option:selected").val()
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            console.log(res)
+                            $(".multiple_po_id").attr("disabled", true)
+                            $(".multiple_po_id").empty()
+                            $(".multiple_po_id").append(`<option value=""></option>`)
+                            res.data.forEach(function(item) {
+                                $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
+                            })
+                            $(".multiple_po_id").attr("disabled", false)
+                            $(".multiple_po_id").val([]);
+                        }
+                    })
+                }
+            }
+            else
+            {
+                $(".multiple_po_id").attr("disabled", true)
+                $(".multiple_po_id").empty()
+                $(".multiple_po_id").append(`<option value=""></option>`)
+                $(".multiple_po_id").val([]);
+            }
+        })
     })
 
     const changeWarehouse = function(id)
@@ -1404,7 +1430,24 @@
             }
             else
             {
-                new_list_warehouse.push({display: "", warehouse_id: $(".warehouse_id_" + id + " option:selected").val(), qty_warehouse: $(".qty_" + id).val()})
+                new_list_warehouse.push({display: "", unit: $(".unit_" + id + " option:selected").val(), warehouse_id: $(".warehouse_id_" + id + " option:selected").val(), qty_warehouse: $(".qty_" + id).val()})
+            }
+        })
+
+        list_warehouse = new_list_warehouse;
+    } 
+
+    const changeUnit = function(id)
+    {
+        let new_list_warehouse = []
+        list_warehouse.forEach((item) => {
+            if(item.row !== id)
+            {
+                new_list_warehouse.push(item)
+            }
+            else
+            {
+                new_list_warehouse.push({display: "", unit: $(".unit_" + id + " option:selected").val(), warehouse_id: $(".warehouse_id_" + id + " option:selected").val(), qty_warehouse: $(".qty_" + id).val()})
             }
         })
 
@@ -1421,7 +1464,7 @@
             }
             else
             {
-                new_list_warehouse.push({warehouse_id: item.warehouse_id, qty_warehouse: item.qty_warehouse, display: "none"})
+                new_list_warehouse.push({unit: item.unit, warehouse_id: item.warehouse_id, qty_warehouse: item.qty_warehouse, display: "none"})
             }
         })
 
