@@ -363,6 +363,7 @@ $routes->get('/pinjaman-karyawan/create', 'HR\PinjamanKaryawan::createView', ['f
 $routes->get('/pinjaman-karyawan/all', 'HR\PinjamanKaryawan::allPinjamanKaryawan', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/save', 'HR\PinjamanKaryawan::create', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/update', 'HR\PinjamanKaryawan::update', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/delete', 'HR\PinjamanKaryawan::delete', ['filter' => 'Auth']);
 
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);

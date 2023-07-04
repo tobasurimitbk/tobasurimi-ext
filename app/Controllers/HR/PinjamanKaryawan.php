@@ -105,7 +105,7 @@ class PinjamanKaryawan extends BaseController
                 "employee_id" => $this->request->getPost("nama_karyawan"),
                 "amount" => $this->request->getPost("total_pinjaman"),
                 "term" => $this->request->getPost("termin_pembayaran"),
-                "is_posted" => $this->request->getPost("is_posted"),
+                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
             ]);
 
             $response = curl_request("POST", "/employeeLoan", $this->token, $payload);
@@ -182,21 +182,25 @@ class PinjamanKaryawan extends BaseController
             ],
         ];
 
+
+
         if ($this->validate($rules)) {
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                "nama_karyawan" => $this->request->getPost("nama_karyawan"),
-                "total_pinjaman" => $this->request->getPost("total_pinjaman"),
-                "termin_pembayaran" => $this->request->getPost("termin_pembayaran"),
-                "is_posted" => $this->request->getPost("is_posted") === null ? false : true,
+                "employee_id" => $this->request->getPost("nama_karyawan"),
+                "amount" => $this->request->getPost("total_pinjaman"),
+                "term" => $this->request->getPost("termin_pembayaran"),
+                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
             ]);
+
 
             $response = curl_request("PATCH", "/employeeLoan/$id", $this->token, $payload);
 
-            if ($response["code"] === 201) {
+
+            if ($response["code"] === 200) {
                 $data = [
-                    "id" => json_decode($response["body"])->createdId,
+                    // "id" => json_decode($response["body"])->createdId,
                     "status"            => true,
                     "message"   => "Data Berhasil diubah",
                     "payload"   => $payload,
@@ -219,6 +223,40 @@ class PinjamanKaryawan extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function delete()
+    {
+        $id = $this->request->getPost("id");
+
+        if (!empty($id)) {
+            $response = curl_request("DELETE", "/employeeLoan/$id", $this->token);
+
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Dihapus",
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

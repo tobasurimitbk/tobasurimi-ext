@@ -63,14 +63,14 @@ class Perijinan extends BaseController
             $id = $this->encrypter->decrypt(hex2bin($id));
 
             $resShift = curl_request("GET", "/perijinan/$id", $this->token);
-            $dataShift = [];
+            $dataDetail = [];
 
             if ($resShift["code"] === 200) {
-                $dataShift = json_decode($resShift["body"])->data;
+                $dataDetail = json_decode($resShift["body"])->data;
             }
 
-            $data["data"] = $dataShift;
-        }
+            $data["data"] = $dataDetail;
+        };
 
         return view('hr/perijinan/form', $data);
     }
@@ -83,10 +83,14 @@ class Perijinan extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
+            "year" => $this->request->getGet("year"),
+            "month" => $this->request->getGet("month"),
+            "date" => $this->request->getGet("date"),
+            "idCompany" => $this->this_company_id,
         ];
 
-        $response = curl_request("GET", "/perijinan", $this->token, $payload);
-        $dataShift = [];
+        $response = curl_request("GET", "/attendance/allAbsence", $this->token, $payload);
+        $dataEmployee = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -94,13 +98,13 @@ class Perijinan extends BaseController
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
             foreach ($body as $data) {
-                array_push($dataShift, [
-                    // "id" =>  bin2hex($this->encrypter->encrypt($data->id)),
-                    // "nama_shift" => $data->nama_shift,
-                    // "sot" => $data->SOT,
-                    // "eot" => $data->EOT,
-                    // "bsot" => $data->BSOT,
-                    // "beot" => $data->BEOT,
+                array_push($dataEmployee, [
+                    "id" =>  bin2hex($this->encrypter->encrypt($data->employee_id)),
+                    "employeeName" => $data->employeeName,
+                    "employeeNip" => $data->employeeNip,
+                    "divisionName" => $data->divisionName,
+                    "periode" => $data->periode,
+                    "status" => $data->status,
                 ]);
             }
         }
@@ -109,7 +113,7 @@ class Perijinan extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataShift,
+            "data" => $dataEmployee,
             "response" => $response,
             "payload" => $payload
         ];

@@ -19,6 +19,7 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
+                    <?= csrf_field() ?>
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
@@ -43,6 +44,8 @@
                                 <th onclick="changeSort('nip')" class="sort">NIP</th>
 
                                 <th onclick="changeSort('is_posting')" class="sort">Posting</th>
+
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -75,7 +78,6 @@
             location.replace(`<?= base_url("pinjaman-karyawan/id"); ?>/${data.id}`);
         })
     })
-
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -142,6 +144,16 @@
         }, {
             data: "is_posted",
             className: "text-center"
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
+                `
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -156,6 +168,67 @@
             }
         }
     });
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                // setLoading()
+                $.ajax({
+                    url: "<?= base_url("pinjaman-karyawan/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {
