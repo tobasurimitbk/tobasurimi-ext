@@ -106,6 +106,12 @@
             console.log(el.value)
             return true
         }
+
+        const lettersOnly = function(event)
+        {
+            if (String.fromCharCode(event.keyCode).match(/[^0-9A-Za-z ]/g)) return false;
+            // if (String.fromCharCode(event.keyCode).match(/[^0-9A-Za-z,-_/.() ]/g)) return false;
+        }
     </script>
     <!-- General JS Scripts -->
     <script src="<?= base_url(); ?>assets/js/popper.min.js?v=<?= time(); ?>"></script>

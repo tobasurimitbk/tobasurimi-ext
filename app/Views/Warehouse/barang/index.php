@@ -684,7 +684,7 @@
                             })
                             tag_html += `<tr class="table_${row_detail}">`;
                             tag_html += `<td>`;
-                            tag_html += `<input type="text" value="${item}" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
+                            tag_html += `<input type="text" onkeypress="return lettersOnly(event)" value="${item}" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
                             tag_html += `</td>`;
                             tag_html += `<td>`;
                             tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
@@ -1048,7 +1048,7 @@
         let tag_html = "";
         tag_html += `<tr class="table_${row_detail}">`;
         tag_html += `<td>`;
-        tag_html += `<input type="text" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
+        tag_html += `<input type="text" onkeypress="return lettersOnly(event)" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
         tag_html += `</td>`;
         tag_html += `<td>`;
         tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
