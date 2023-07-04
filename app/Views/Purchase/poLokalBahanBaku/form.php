@@ -104,7 +104,7 @@
                     </div>
                 </div>
                 <div class="col md-4">
-                    <div class="mb-3" style="height: 50px;">
+                    <div class="ffloat mb-3" style="height: 50px;">
                         <label for="floatingInput">Potong KG</label>
                         <div>
                             <input <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> <?= !empty($dataPOLokal) ? ($dataPOLokal->potong_kg ? "checked" : "") : ""; ?> class="potong_kg" name="potong_kg" id="potong_kg" type="checkbox">
@@ -243,7 +243,7 @@
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="max-width: 1200px !important;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
@@ -283,8 +283,6 @@
                                 <label for="floatingInput">Spesitifikasi</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">

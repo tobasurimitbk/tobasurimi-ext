@@ -3208,6 +3208,7 @@ pre {
   font-size: 14px !important;
   margin-top: 0px;
   color: #2f4858;
+  line-height: 1.8em;
 }
 .section .section-header .section-header-back {
   margin-right: 15px;
@@ -5420,6 +5421,10 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   font-weight: 600 !important;
   color: #2f4858;
   padding: 0.5rem 1.5rem;
+}
+
+.ffloat.mb-3 {
+  margin-bottom: 2rem !important;
 }
 
 /* ===== RESPONSIVE ===== */
