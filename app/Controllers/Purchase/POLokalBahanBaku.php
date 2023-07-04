@@ -340,7 +340,7 @@ class POLokalBahanBaku extends BaseController
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
         $dataPOLokal = [];
-        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=PENOLONG&supplierid=$id", $this->token);
+        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=BAKU&supplierid=$id", $this->token);
         if ($responsePOLokal["code"] === 200) {
             $dataPOLokal = json_decode($responsePOLokal["body"])->data;
         }

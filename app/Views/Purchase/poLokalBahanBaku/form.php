@@ -111,6 +111,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOLokal) ? $dataPOLokal->createdBy : session()->get("login")->name; ?>">
+                        <label for="floatingInput">Order Oleh</label>
+                    </div>
+                </div>
             </div>
         </form>
         <div class="col-subtitle-modal">
