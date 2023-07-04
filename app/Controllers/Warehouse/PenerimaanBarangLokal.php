@@ -47,8 +47,8 @@ class PenerimaanBarangLokal extends BaseController
             "sorttype" => $this->request->getGet("sortType"),
             "statuspenerimaan" => "LOKAL",
             "status" => $this->request->getGet("status"),
-            "startdate" => $this->request->getGet("startdate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("startdate")))) : "",
-            "lastdate" => $this->request->getGet("lastdate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("lastdate")))) : "",
+            "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
         $response = curl_request("GET", "/penerimaanBarang", $this->token, $payload);
@@ -57,7 +57,7 @@ class PenerimaanBarangLokal extends BaseController
 
         if ($response["code"] === 200) {
             $body = json_decode($response["body"])->data;
-            $totalRecords = 0;
+            $totalRecords = json_decode($response["body"])->meta->totalData;
 
             $no = ($payload["pagesize"] * ($payload["currentpage"] - 1)) + 1;
 
@@ -65,14 +65,15 @@ class PenerimaanBarangLokal extends BaseController
                 array_push($dataPenerimaanBarangLokal, [
                     "no" => $no++,
                     "id" => $data->id,
+                    "no_penerimaan_barang" => $data->no_penerimaan_barang,
                     "invoice_no" => $data->invoice_no,
                     "multiple_po_no" => $data->multiple_po_no,
                     "acceptance_type" => $data->acceptance_type,
                     "aju_document_type" => $data->aju_document_type,
                     "aju_no" => $data->aju_no,
                     "validation_date" => $data->validation_date,
-                    "packaging" => $data->packaging,
-                    "status_penerimaan" => $data->status_penerimaan
+                    "sender_name" => $data->sender_name,
+                    "status_post" => $data->status_post
                 ]);
             }
         }
@@ -97,6 +98,9 @@ class PenerimaanBarangLokal extends BaseController
                 "rules" => "required"
             ],
             "aju_document_type" => [
+                "rules" => "required"
+            ],
+            "tipe_bahan" => [
                 "rules" => "required"
             ],
             "aju_no" => [
@@ -126,7 +130,7 @@ class PenerimaanBarangLokal extends BaseController
             "biaya_masuk" => [
                 "rules" => "required"
             ],
-            "ppn" => [
+            "ppnbm" => [
                 "rules" => "required"
             ]
         ];
@@ -137,6 +141,7 @@ class PenerimaanBarangLokal extends BaseController
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "multiple_po_id" => json_decode($this->request->getPost("multiple_po_id")),
                 "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
+                "tipe_bahan" => $this->request->getPost("tipe_bahan"),
                 "aju_document_type" => $this->request->getPost("aju_document_type"),
                 "aju_no" => $this->request->getPost("aju_no"),
                 "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
@@ -153,37 +158,37 @@ class PenerimaanBarangLokal extends BaseController
                 "penerimaan_barang_detail" => json_decode($this->request->getPost("items"))
             ]);
 
-            $data = [
-                "status"            => false,
-                "message"    => $payload,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            // $data = [
+            //     "status"            => false,
+            //     "message"    => $payload,
+            //     "payload"   => $payload,
+            //     'token' => csrf_hash()
+            // ];
+            // echo json_encode($data);
             
-            // $response = curl_request("POST", "/penerimaanBarang", $this->token, $payload);
+            $response = curl_request("POST", "/penerimaanBarang", $this->token, $payload);
 
-            // if ($response["code"] === 201) {
-            //     $data = [
-            //         "id" => "",
-            //         "status"            => true,
-            //         "message"   => "Data Berhasil disimpan",
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash(),
-            //         'code' => $response["code"]
-            //     ];
-            //     echo json_encode($data);
-            // } else {
-            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-            //     $data = [
-            //         "status"            => false,
-            //         "message"    => $message,
-            //         "payload"   => $payload,
-            //         'token' => csrf_hash(),
-            //         'code' => $response["code"]
-            //     ];
-            //     echo json_encode($data);
-            // }
+            if ($response["code"] === 200) {
+                $data = [
+                    "id" => "",
+                    "status"            => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => $payload,
+                    'token' => csrf_hash(),
+                    'code' => $response["code"]
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash(),
+                    'code' => $response["code"]
+                ];
+                echo json_encode($data);
+            }
         } else {
             $data = [
                 "status"            => false,
