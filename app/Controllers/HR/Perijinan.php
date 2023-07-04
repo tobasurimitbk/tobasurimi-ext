@@ -63,14 +63,14 @@ class Perijinan extends BaseController
             $id = $this->encrypter->decrypt(hex2bin($id));
 
             $resShift = curl_request("GET", "/perijinan/$id", $this->token);
-            $dataShift = [];
+            $dataDetail = [];
 
             if ($resShift["code"] === 200) {
-                $dataShift = json_decode($resShift["body"])->data;
+                $dataDetail = json_decode($resShift["body"])->data;
             }
 
-            $data["data"] = $dataShift;
-        }
+            $data["data"] = $dataDetail;
+        };
 
         return view('hr/perijinan/form', $data);
     }
@@ -83,10 +83,14 @@ class Perijinan extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
+            "year" => $this->request->getGet("year"),
+            "month" => $this->request->getGet("month"),
+            "date" => $this->request->getGet("date"),
+            "idCompany" => $this->this_company_id,
         ];
 
-        $response = curl_request("GET", "/perijinan", $this->token, $payload);
-        $dataShift = [];
+        $response = curl_request("GET", "/attendance/allAbsence", $this->token, $payload);
+        $dataEmployee = [];
         $totalRecords = 0;
 
         if ($response["code"] === 200) {
@@ -94,13 +98,13 @@ class Perijinan extends BaseController
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
             foreach ($body as $data) {
-                array_push($dataShift, [
-                    // "id" =>  bin2hex($this->encrypter->encrypt($data->id)),
-                    // "nama_shift" => $data->nama_shift,
-                    // "sot" => $data->SOT,
-                    // "eot" => $data->EOT,
-                    // "bsot" => $data->BSOT,
-                    // "beot" => $data->BEOT,
+                array_push($dataEmployee, [
+                    "id" =>  bin2hex($this->encrypter->encrypt($data->employee_id)),
+                    "employeeName" => $data->employeeName,
+                    "employeeNip" => $data->employeeNip,
+                    "divisionName" => $data->divisionName,
+                    "periode" => $data->periode,
+                    "status" => $data->status,
                 ]);
             }
         }
@@ -109,7 +113,7 @@ class Perijinan extends BaseController
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataShift,
+            "data" => $dataEmployee,
             "response" => $response,
             "payload" => $payload
         ];
@@ -147,6 +151,7 @@ class Perijinan extends BaseController
                 "end_date" => $this->request->getPost("end_date"),
                 "status" => $this->request->getPost("status"),
                 "reason" => $this->request->getPost("reason"),
+                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
             ]);
 
             $response = curl_request("POST", "/attendance/setAttendance", $this->token, $payload);
@@ -185,21 +190,21 @@ class Perijinan extends BaseController
     public function update()
     {
         $rules = [
-            // "nama_shift" => [
-            //     "rules" => "required"
-            // ],
-            // "SOT" => [
-            //     "rules" => "required"
-            // ],
-            // "EOT" => [
-            //     "rules" => "required"
-            // ],
-            // "BSOT" => [
-            //     "rules" => "required"
-            // ],
-            // "BEOT" => [
-            //     "rules" => "required"
-            // ],
+            "employee_id" => [
+                "rules" => "required"
+            ],
+            "start_date" => [
+                "rules" => "required"
+            ],
+            "end_date" => [
+                "rules" => "required"
+            ],
+            "status" => [
+                "rules" => "required"
+            ],
+            "reason" => [
+                "rules" => "required"
+            ],
         ];
 
 
@@ -207,11 +212,13 @@ class Perijinan extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
-                // "nama_shift" => $this->request->getPost("nama_shift"),
-                // "SOT" => $this->request->getPost("SOT"),
-                // "EOT" => $this->request->getPost("EOT"),
-                // "BSOT" => $this->request->getPost("BSOT"),
-                // "BEOT" => $this->request->getPost("BEOT"),
+                "company_id" => $this->this_company_id,
+                "employee_id" => $this->request->getPost("employee_id"),
+                "start_date" => $this->request->getPost("start_date"),
+                "end_date" => $this->request->getPost("end_date"),
+                "status" => $this->request->getPost("status"),
+                "reason" => $this->request->getPost("reason"),
+                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
             ]);
 
             $response = curl_request("PATCH", "/perijinan/$id", $this->token, $payload);
@@ -241,6 +248,40 @@ class Perijinan extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function delete()
+    {
+        $id = $this->request->getPost("id");
+
+        if (!empty($id)) {
+            $response = curl_request("DELETE", "/perijinan/$id", $this->token);
+
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Dihapus",
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

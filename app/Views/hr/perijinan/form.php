@@ -81,6 +81,20 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3" style="height: 50px;">
+                            <label for="floatingInput">Posting</label>
+                            <div class="switch-form-form-perijinan">
+                                <label class="switch">
+                                    <input class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div>
         </form>
     </div>
