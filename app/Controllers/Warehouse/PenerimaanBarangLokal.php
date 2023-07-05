@@ -42,6 +42,10 @@ class PenerimaanBarangLokal extends BaseController
 
         if (!empty($id)) {
             $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/$id", $this->token);
+
+            // var_dump($responsePenerimaanBarang);
+            // die;
+
             $dataPenerimaanBarang = [];
             if ($responsePenerimaanBarang["code"] === 200) {
                 $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
@@ -89,14 +93,9 @@ class PenerimaanBarangLokal extends BaseController
                 }
             }
             $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
-
-            // var_dump($responsePenerimaanBarang);
-            // die;
         }
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);
-        
-        return;
     }
 
     public function allPenerimaanBarangLokal()

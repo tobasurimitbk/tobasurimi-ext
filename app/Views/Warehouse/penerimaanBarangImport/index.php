@@ -32,6 +32,7 @@
             <div class="col">
                 <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                     <option value="waiting">Waiting</option>
+                    <option value="finish">Finish</option>
                 </select>
             </div>
             <div class="col">
@@ -44,13 +45,13 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>#</th>
-                            <th>No. Penerimaan</th>
-                            <th>No. PO</th>
-                            <th>Single/Multiple</th>
-                            <th>Jenis Dokumen</th>
-                            <th>No. AJU</th>
-                            <th>Tanggal Daftar</th>
-                            <th>Pengirim</th>
+                            <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
+                            <th onclick="changeSort('no_po')" class="sort">No. PO</th>
+                            <th onclick="changeSort('acceptance_type')" class="sort">Single/Multiple</th>
+                            <th onclick="changeSort('aju_document_type')" class="sort">Jenis Dokumen</th>
+                            <th onclick="changeSort('aju_no')" class="sort">No. AJU</th>
+                            <th onclick="changeSort('validation_date')" class="sort">Tanggal Daftar</th>
+                            <th onclick="changeSort('sender_name')" class="sort">Pengirim</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -66,7 +67,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "";
+    let sort = "no_penerimaan_barang";
     let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
@@ -106,7 +107,7 @@
             orderable: false
         },
         {
-            data: "letter_no",
+            data: "no_penerimaan_barang",
             className: "text-center"
         },
         {
@@ -130,12 +131,14 @@
             className: "text-center"
         },
         {
-            data: "packaging",
+            data: "sender_name",
             className: "text-center"
         },
         {
-            data: "status_penerimaan",
-            className: "text-center"
+            data: "status_post",
+            className: "text-center",
+            searchable: false,
+            sortable: false
         }],
         columnDefs: [{
             defaultContent: "-",
