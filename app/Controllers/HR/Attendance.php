@@ -74,6 +74,7 @@ class Attendance extends BaseController
 
     public function SaveAttendance()
     {
+        try{
         $img = $this->request->getVar("pic");
         //$img = str_replace('data:image/jpeg;base64,', '', $img);
         $img = str_replace(' ', '+', $img);
@@ -107,7 +108,16 @@ class Attendance extends BaseController
             ];
         }
         echo json_encode($data);
-
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
 
         /*
         $file = uniqid() . '.png';
@@ -118,6 +128,7 @@ class Attendance extends BaseController
 
     public function CheckPinEmployee()
     {
+        try{
         $employee_id = $this->request->getVar("employee_id");
         $pin = $this->request->getVar("pin");
 
@@ -146,7 +157,16 @@ class Attendance extends BaseController
             ];
         }
         echo json_encode($data);
-
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
 
         return;
     }

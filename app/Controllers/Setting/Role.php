@@ -59,6 +59,7 @@ class Role extends BaseController
 
     public function saveRole()
     {
+        try{
         $rules = [
             "name" => [
                 "rules" => "required"
@@ -97,11 +98,22 @@ class Role extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateRole()
     {
+        try{
         $rules = [
             "name" => [
                 "rules" => "required"
@@ -143,6 +155,16 @@ class Role extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -176,6 +198,7 @@ class Role extends BaseController
 
     public function deleteRole()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -200,6 +223,16 @@ class Role extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

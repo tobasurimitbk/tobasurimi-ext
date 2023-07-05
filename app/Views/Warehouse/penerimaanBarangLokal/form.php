@@ -162,14 +162,16 @@
                 </div>
             </div>
         </form>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label font-weight-bold">List Barang</label>
-            </div>
-            <div class="col-md-6">
-                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                </button>
+        <div class="col-subtitle-modal">
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                    </button>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -223,7 +225,7 @@
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="max-width: 1200px !important;">
+    <div class="modal-dialog" style="max-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
@@ -348,11 +350,11 @@
                     </div>
                 </div>
                 <div class="table-responsive mt-2">
-                    <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                    <table class="table-inside nowrap table-hover-tobasurimi table-add-modal-master-barang" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>Warehouse</th>
-                                <th>satuan</th>
+                                <th>Satuan</th>
                                 <th>Qty</th>
                                 <th>Hapus</th>
                             </tr>
@@ -382,6 +384,7 @@
     let list_warehouse = [];
     var row = 0;
     var row_detail = 0;
+    let trigger = true;
     let total_jml_order = 0;
     let total_jml_dokumen = 0;
     let total_jml_selisih = 0;
@@ -831,16 +834,16 @@
                     }
                     else
                     {
-                        if(all_qty > doc_qty)
-                        {
-                            Swal.fire({
-                                icon: 'error',
-                                title: "Qty Aktual Penerimaan Tidak Bisa Lebih Besar Dari Dokumen Qty",
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                        else
-                        {
+                        // if(all_qty > doc_qty)
+                        // {
+                        //     Swal.fire({
+                        //         icon: 'error',
+                        //         title: "Qty Aktual Penerimaan Tidak Bisa Lebih Besar Dari Dokumen Qty",
+                        //         confirmButtonColor: '#4e73df',
+                        //     })
+                        // }
+                        // else
+                        // {
                             // update detail
                             if(row_detail)
                             {
@@ -1156,7 +1159,7 @@
                                     })
                                 }
                             }
-                        }
+                        // }
                     }
                 }
             }
@@ -1505,50 +1508,52 @@
         })
 
         $(".kode_barang").change(function() {
-            list_warehouse = [];
-            row_detail = 0;
-            $(".body-detail-warehouse").empty()
+            if(trigger) {
+                list_warehouse = [];
+                row_detail = 0;
+                $(".body-detail-warehouse").empty()
 
-            if($(".kode_barang option:selected").val())
-            {
-                let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
-                let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-                let po_id = $(".kode_barang option:selected").data("id") ? $(".kode_barang option:selected").data("id") : "";
-                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
-                let note = $(".kode_barang option:selected").data("note") ? $(".kode_barang option:selected").data("note") : "";
-                let qty = $(".kode_barang option:selected").data("qty") ? $(".kode_barang option:selected").data("qty") : 0;
-                let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
-                let unit = $(".kode_barang option:selected").data("unit") ? $(".kode_barang option:selected").data("unit") : 0;
+                if($(".kode_barang option:selected").val())
+                {
+                    let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
+                    let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
+                    let po_id = $(".kode_barang option:selected").data("id") ? $(".kode_barang option:selected").data("id") : "";
+                    let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
+                    let note = $(".kode_barang option:selected").data("note") ? $(".kode_barang option:selected").data("note") : "";
+                    let qty = $(".kode_barang option:selected").data("qty") ? $(".kode_barang option:selected").data("qty") : 0;
+                    let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
+                    let unit = $(".kode_barang option:selected").data("unit") ? $(".kode_barang option:selected").data("unit") : 0;
 
 
-                console.log(barang_id)
-                $(".kode").val($(".kode_barang option:selected").val());
-                $(".nama_barang").val(nama);
-                $(".unit").val(unit);
-                $(".barang_id").val(barang_id);
-                $(".purchase_order_details_id").val(po_id);
-                $(".satuan_order").val(satuan);
-                $(".qty").val(qty);
-                $(".keterangan").val(note);
-                
-                $(".nama_barang_dokumen").val(nama);
-                $(".doc_qty").val(qty);
-                $(".harga_barang_jasa").val(harga);
-            }
-            else
-            {
-                $(".kode").val("");
-                $(".nama_barang").val("");
-                $(".unit").val("");
-                $(".barang_id").val("");
-                $(".purchase_order_details_id").val("");
-                $(".satuan_order").val("");
-                $(".qty").val("");
-                $(".keterangan").val("");
+                    console.log(barang_id)
+                    $(".kode").val($(".kode_barang option:selected").val());
+                    $(".nama_barang").val(nama);
+                    $(".unit").val(unit);
+                    $(".barang_id").val(barang_id);
+                    $(".purchase_order_details_id").val(po_id);
+                    $(".satuan_order").val(satuan);
+                    $(".qty").val(qty);
+                    $(".keterangan").val(note);
+                    
+                    $(".nama_barang_dokumen").val(nama);
+                    $(".doc_qty").val(qty);
+                    $(".harga_barang_jasa").val(harga);
+                }
+                else
+                {
+                    $(".kode").val("");
+                    $(".nama_barang").val("");
+                    $(".unit").val("");
+                    $(".barang_id").val("");
+                    $(".purchase_order_details_id").val("");
+                    $(".satuan_order").val("");
+                    $(".qty").val("");
+                    $(".keterangan").val("");
 
-                $(".nama_barang_dokumen").val("");
-                $(".doc_qty").val("");
-                $(".harga_barang_jasa").val("");
+                    $(".nama_barang_dokumen").val("");
+                    $(".doc_qty").val("");
+                    $(".harga_barang_jasa").val("");
+                }
             }
         })
 
@@ -1807,9 +1812,7 @@
         $(".id_detail").val(rowid)
         $(".kode").val(kode)
         $(".unit").val(unit)
-        $(".ppn").val(ppn).change()
-        $(".pph").val(pph).change()
-        $(".kode_barang").val(kode).change()
+        trigger = false;
 
         $(".body-detail-warehouse").empty()
 
@@ -1904,7 +1907,86 @@
         $(".nama_barang").val(nama_barang)
         $(".purchase_order_details_id").val(purchase_order_details_id)
 
-        $(".detail-modal").modal("show");
+        if($(".tipe_bahan").val() === "BAKU")
+        {
+            $.ajax({
+                url: `<?= base_url("po-lokal-bahan-baku/multi/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    id: JSON.stringify($('.multiple_po_id').val())
+                },
+                dataType: "json",
+                success: function(res) {
+                    console.log(res)
+                    $(".kode_barang").empty()
+                    $(".kode_barang").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".kode_barang").append(`<option data-unit="${item.id_satuan}" data-harga="${item.general_price}" data-nama="${item.barang.nama_barang}" data-barang_id="${item.barang_id}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                    })
+
+                    $(".kode_barang").val(kode).trigger('change');
+                }
+            })
+        }
+        if($(".tipe_bahan").val() === "PENOLONG")
+        {
+            $.ajax({
+                url: `<?= base_url("po-lokal-bahan-penolong/multi/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    id: JSON.stringify($('.multiple_po_id').val())
+                },
+                dataType: "json",
+                success: function(res) {
+                    console.log(res)
+                    $(".kode_barang").empty()
+                    $(".kode_barang").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".kode_barang").append(`<option data-harga="${item.general_price}" data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                    })
+
+                    $(".kode_barang").val(kode).trigger('change');
+                }
+            })
+        }
+
+        $.ajax({
+            url: `<?= base_url("tax/dropdown"); ?>`,
+            method: "GET",
+            data: {
+                type: 'ppn'
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".ppn").empty()
+                $(".ppn").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                })
+
+                $(".ppn").val(ppn).change();
+            }
+        })
+
+        $.ajax({
+            url: `<?= base_url("tax/dropdown"); ?>`,
+            method: "GET",
+            data: {
+                type: 'pph'
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".pph").empty()
+                $(".pph").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
+                })
+
+                $(".pph").val(pph).change();
+                trigger = true;
+                $(".detail-modal").modal("show")
+            }
+        })
     })
 
     $(document).on('click', '.delete-detail', function() {

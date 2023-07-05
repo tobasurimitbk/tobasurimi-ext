@@ -25,6 +25,7 @@ class Auth extends BaseController
 
     public function doLogin()
     {
+        try{
         $rules = [
             "username" => [
                 "rules" => "required"
@@ -75,6 +76,11 @@ class Auth extends BaseController
             }
         } else {
             return redirect()->back()->with("errors", "Login Gagal, Coba Lagi");
+        }
+        }
+        catch(\Exception $e)
+        {
+            return redirect()->back()->with("errors",  $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
         }
     }
 

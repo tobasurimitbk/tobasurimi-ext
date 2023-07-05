@@ -98,6 +98,7 @@ class Warehouse extends BaseController
 
     public function saveWarehouse()
     {
+        try{
         $rules = [
             "warehouse_name" => [
                 "rules" => "required"
@@ -165,11 +166,22 @@ class Warehouse extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateWarehouse()
     {
+        try{
         $rules = [
             "warehouse_name" => [
                 "rules" => "required"
@@ -234,7 +246,16 @@ class Warehouse extends BaseController
                 echo json_encode($data);
             }
         }
-
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -268,6 +289,7 @@ class Warehouse extends BaseController
 
     public function deleteWarehouse()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -292,6 +314,16 @@ class Warehouse extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

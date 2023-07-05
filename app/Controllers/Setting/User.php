@@ -105,6 +105,7 @@ class User extends BaseController
 
     public function saveUser()
     {
+        try{
         $rules = [
             "name" => [
                 "rules" => "required"
@@ -159,11 +160,22 @@ class User extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateUser()
     {
+        try{
         $rules = [
             "name" => [
                 "rules" => "required"
@@ -226,6 +238,16 @@ class User extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -259,6 +281,7 @@ class User extends BaseController
 
     public function deleteUser()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -283,6 +306,16 @@ class User extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

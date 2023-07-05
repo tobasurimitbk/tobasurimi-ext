@@ -103,6 +103,7 @@ class Employee extends BaseController
 
     public function saveEmployee()
     {
+        try{
         $rules = [
             "nip" => [
                 "rules" => "required"
@@ -202,11 +203,22 @@ class Employee extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateEmployee()
     {
+        try{
         $rules = [
             "nip" => [
                 "rules" => "required"
@@ -317,6 +329,16 @@ class Employee extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -350,6 +372,7 @@ class Employee extends BaseController
 
     public function deleteEmployee()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -374,6 +397,16 @@ class Employee extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

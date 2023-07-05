@@ -76,6 +76,7 @@ class Divisi extends BaseController
 
     public function saveDivisi()
     {
+        try{
         $rules = [
             "divisi" => [
                 "rules" => "required"
@@ -124,11 +125,22 @@ class Divisi extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateDivisi()
     {
+        try{
         $rules = [
             "divisi" => [
                 "rules" => "required"
@@ -179,6 +191,16 @@ class Divisi extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -212,6 +234,7 @@ class Divisi extends BaseController
 
     public function deleteDivisi()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -236,6 +259,16 @@ class Divisi extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

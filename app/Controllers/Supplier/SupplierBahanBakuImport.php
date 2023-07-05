@@ -91,6 +91,7 @@ class SupplierBahanBakuImport extends BaseController
 
     public function saveSupplierBahanBakuImport()
     {
+        try{
         $rules = [
             "kode" => [
                 "rules" => "required"
@@ -182,11 +183,22 @@ class SupplierBahanBakuImport extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateSupplierBahanBakuImport()
     {
+        try{
         $rules = [
             "kode" => [
                 "rules" => "required"
@@ -275,7 +287,16 @@ class SupplierBahanBakuImport extends BaseController
                 echo json_encode($data);
             }
         }
-
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -309,6 +330,7 @@ class SupplierBahanBakuImport extends BaseController
 
     public function deleteSupplierBahanBakuImport()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -333,6 +355,16 @@ class SupplierBahanBakuImport extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

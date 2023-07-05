@@ -87,6 +87,7 @@ class Customer extends BaseController
 
     public function saveCustomer()
     {
+        try{
         $rules = [
             "kode" => [
                 "rules" => "required"
@@ -176,11 +177,22 @@ class Customer extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateCustomer()
     {
+        try{
         $rules = [
             "kode" => [
                 "rules" => "required"
@@ -271,6 +283,17 @@ class Customer extends BaseController
             }
         }
 
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+
         return;
     }
 
@@ -304,6 +327,7 @@ class Customer extends BaseController
 
     public function deleteCustomer()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -328,6 +352,16 @@ class Customer extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

@@ -172,67 +172,78 @@ class SPP extends BaseController
 
     public function saveSPP()
     {
-        $rules = [
-            "request_date" => [
-                "rules" => "required"
-            ],
-            "spp_type" => [
-                "rules" => "required"
-            ],
-            "spp_no" => [
-                "rules" => "required"
-            ],
-            "warehouse_id" => [
-                "rules" => "required"
-            ]
-        ];
+        try { 
+            $rules = [
+                "request_date" => [
+                    "rules" => "required"
+                ],
+                "spp_type" => [
+                    "rules" => "required"
+                ],
+                "spp_no" => [
+                    "rules" => "required"
+                ],
+                "warehouse_id" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
-                "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
-                "spp_type" => $this->request->getPost("spp_type"),
-                "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                "note" => $this->request->getPost("note"),
-                "is_posted" => false,
-                "items" =>  json_decode($this->request->getPost("items"))
-            ]);
+            if ($this->validate($rules)) {
+                $payload = json_encode([
+                    "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
+                    "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
+                    "spp_type" => $this->request->getPost("spp_type"),
+                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                    "note" => $this->request->getPost("note"),
+                    "is_posted" => false,
+                    "items" =>  json_decode($this->request->getPost("items"))
+                ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
 
-            $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
+                $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
 
-            if ($response["code"] === 201) {
-                $data = [
-                    "id" => json_decode($response["body"])->createdId,
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 201) {
+                    $data = [
+                        "id" => json_decode($response["body"])->createdId,
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
+                    "message"    => "Data Gagal Disimpan",
+                    'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
+        }
+        catch(\Exception $e)
+        {
             $data = [
                 "status"            => false,
-                "message"    => "Data Gagal Disimpan",
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
@@ -242,6 +253,7 @@ class SPP extends BaseController
 
     public function updateSPP()
     {
+        try{
         $rules = [
             "request_date" => [
                 "rules" => "required"
@@ -305,11 +317,22 @@ class SPP extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateStatusSPP()
     {
+        try{
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
@@ -336,11 +359,21 @@ class SPP extends BaseController
             ];
             echo json_encode($data);
         }
-        return;
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
     }
 
     public function approveSPP()
     {
+        try{
         $id = $this->request->getPost("id");
 
         $payload = json_encode([]);
@@ -365,11 +398,22 @@ class SPP extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function deleteSPP()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -394,6 +438,16 @@ class SPP extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

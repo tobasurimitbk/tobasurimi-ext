@@ -27,6 +27,7 @@ class FormulaPayroll extends BaseController
 
     public function create()
     {
+        try{
         $rules = [
             "nama_formula" => [
                 "rules" => "required"
@@ -74,11 +75,22 @@ class FormulaPayroll extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function update()
     {
+        try{
         $rules = [
             "nama_formula" => [
                 "rules" => "required"
@@ -124,6 +136,16 @@ class FormulaPayroll extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

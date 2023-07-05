@@ -187,6 +187,7 @@ class POLokalBahanPenolong extends BaseController
 
     public function savePOLokalBahanPenolong()
     {
+        try{
         $rules = [
             "purchase_request_id" => [
                 "rules" => "required"
@@ -269,11 +270,22 @@ class POLokalBahanPenolong extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updatePOLokalBahanPenolong()
     {
+        try{
         $rules = [
             "po_no" => [
                 "rules" => "required"
@@ -350,11 +362,22 @@ class POLokalBahanPenolong extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateStatusPOLokalBahanPenolong()
     {
+        try{
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
@@ -381,11 +404,22 @@ class POLokalBahanPenolong extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function deletePOLokalBahanPenolong()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -410,6 +444,16 @@ class POLokalBahanPenolong extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

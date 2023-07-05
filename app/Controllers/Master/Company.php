@@ -77,6 +77,7 @@ class Company extends BaseController
 
     public function saveCompany()
     {
+        try{
         $rules = [
             "holding_company" => [
                 "rules" => "required"
@@ -176,11 +177,22 @@ class Company extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateCompany()
     {
+        try{
         $rules = [
             "holding_company" => [
                 "rules" => "required"
@@ -290,6 +302,17 @@ class Company extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+
         return;
     }
 
@@ -323,6 +346,7 @@ class Company extends BaseController
 
     public function deleteCompany()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -347,6 +371,16 @@ class Company extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

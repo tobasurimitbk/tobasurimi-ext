@@ -93,6 +93,7 @@ class PenerimaanBarangLokal extends BaseController
 
     public function savePenerimaanBarangLokal()
     {
+        try{
         $rules = [
             "supplier_id" => [
                 "rules" => "required"
@@ -193,6 +194,16 @@ class PenerimaanBarangLokal extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

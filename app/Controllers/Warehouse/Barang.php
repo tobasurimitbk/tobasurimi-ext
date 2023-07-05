@@ -85,6 +85,7 @@ class Barang extends BaseController
 
     public function saveBarang()
     {
+        try{
         $rules = [
             "kode_barang" => [
                 "rules" => "required"
@@ -167,11 +168,22 @@ class Barang extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateBarang()
     {
+        try{
         $rules = [
             "kode_barang" => [
                 "rules" => "required"
@@ -252,11 +264,22 @@ class Barang extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateStatusBarang()
     {
+        try{
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
@@ -280,6 +303,16 @@ class Barang extends BaseController
                 "status"            => false,
                 "message"    => $message,
                 "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
@@ -317,6 +350,7 @@ class Barang extends BaseController
 
     public function deleteBarang()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -341,6 +375,16 @@ class Barang extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

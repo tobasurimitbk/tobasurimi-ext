@@ -112,6 +112,7 @@ class Account extends BaseController
 
     public function saveKategoriAccount()
     {
+        try{
         $rules = [
             "kelompok_akun_id_kategori" => [
                 "rules" => "required"
@@ -159,11 +160,22 @@ class Account extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateKategoriAccount()
     {
+        try{
         $rules = [
             "kelompok_akun_id_kategori" => [
                 "rules" => "required"
@@ -213,6 +225,16 @@ class Account extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -246,6 +268,7 @@ class Account extends BaseController
 
     public function deleteKategoriAccount()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -270,6 +293,16 @@ class Account extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
@@ -320,6 +353,7 @@ class Account extends BaseController
 
     public function saveHeaderAccount()
     {
+        try{
         $rules = [
             "category_id_header" => [
                 "rules" => "required"
@@ -367,11 +401,22 @@ class Account extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateHeaderAccount()
     {
+        try{
         $rules = [
             "category_id_header" => [
                 "rules" => "required"
@@ -421,6 +466,16 @@ class Account extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -454,6 +509,7 @@ class Account extends BaseController
 
     public function deleteHeaderAccount()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -478,6 +534,16 @@ class Account extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
@@ -536,6 +602,7 @@ class Account extends BaseController
 
     public function saveSubAccount()
     {
+        try{
         $rules = [
             "header_id_sub" => [
                 "rules" => "required"
@@ -589,11 +656,22 @@ class Account extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateSubAccount()
     {
+        try{
         $rules = [
             "header_id_sub" => [
                 "rules" => "required"
@@ -649,11 +727,22 @@ class Account extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updateStatusSubAccount()
     {
+        try{
         $id = $this->request->getPost("id");
 
         $payload = json_encode([
@@ -676,6 +765,16 @@ class Account extends BaseController
                 "status"            => false,
                 "message"    => $message,
                 "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
@@ -713,6 +812,7 @@ class Account extends BaseController
 
     public function deleteSubAccount()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -737,6 +837,16 @@ class Account extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

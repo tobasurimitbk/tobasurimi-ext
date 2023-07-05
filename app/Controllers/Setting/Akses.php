@@ -66,6 +66,7 @@ class Akses extends BaseController
 
     public function saveAkses()
     {
+        try{
         //Get Menu By Role Id
         $dataAkses = array();
         $role_id = formatter($this->request->getPost("role_id"), "STR_TO_INT");
@@ -150,6 +151,16 @@ class Akses extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => $message,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

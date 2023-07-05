@@ -73,6 +73,7 @@ class Shift extends BaseController
 
     public function save()
     {
+        try{
         $rules = [
             "nama_shift" => [
                 "rules" => "required"
@@ -131,6 +132,16 @@ class Shift extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
@@ -156,6 +167,7 @@ class Shift extends BaseController
 
     public function update()
     {
+        try{
         $rules = [
             "nama_shift" => [
                 "rules" => "required"
@@ -213,6 +225,16 @@ class Shift extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Diubah",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);

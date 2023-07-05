@@ -93,6 +93,7 @@ class PembayaranPOLokal extends BaseController
     
     public function savePembayaranPOLokal()
     {
+        try{
         $rules = [
             "nominal_faktur" => [
                 "rules" => "required"
@@ -146,11 +147,22 @@ class PembayaranPOLokal extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function updatePembayaranPOLokal()
     {
+        try{
         $rules = [
             "nominal_faktur" => [
                 "rules" => "required"
@@ -203,11 +215,22 @@ class PembayaranPOLokal extends BaseController
             ];
             echo json_encode($data);
         }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 
     public function deletePembayaranPOLokal()
     {
+        try{
         $id = $this->request->getPost("id");
 
         if (!empty($id)) {
@@ -232,6 +255,16 @@ class PembayaranPOLokal extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Dihapus",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
