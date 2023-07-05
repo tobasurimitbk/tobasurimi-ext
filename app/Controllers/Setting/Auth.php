@@ -69,19 +69,40 @@ class Auth extends BaseController
                 ];
                 session()->setTempdata("login", $session, 36000);
 
-                return redirect()->to("/dashboard")->with("success", "Login Berhasil");
+                $data = [
+                    "status"            => true,
+                    "message"   => "Berhasil Login",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
             } else {
                 $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Login Gagal, Coba Lagi';
-                return redirect()->back()->with("errors", $message);
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
             }
         } else {
-            return redirect()->back()->with("errors", "Login Gagal, Coba Lagi");
+            $data = [
+                "status"            => false,
+                "message"    => "Gagal Login, Coba Lagi",
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
         }
         }
         catch(\Exception $e)
         {
-            return redirect()->back()->with("errors",  $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
         }
+        return;
     }
 
     public function doLogout()

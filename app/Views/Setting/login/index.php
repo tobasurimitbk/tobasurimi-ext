@@ -16,7 +16,7 @@
                                 <div class="d-flex justify-content-center align-items-center mb-5">
                                     <img src="<?= base_url("assets/img/logo.png"); ?>">
                                 </div>
-                                <form class="user" method="POST" action="<?= base_url("login"); ?>" enctype="multipart/form-data">
+                                <form class="user" role="form" method="POST" enctype="multipart/form-data">
                                     <?= csrf_field() ?>
                                     <div class="input-group input-group-login-register">
                                         <div class="input-group-prepend group-prepend-login-register align-items-center">
@@ -74,6 +74,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
     <?php
     if (session()->getFlashData("errors")) {
     ?>
@@ -132,14 +133,94 @@
         if(key == 13)  // the enter key code
         {
             if ($(".user").valid()) {
-                $(".user").submit()
+                const csrf = $(`[name="${csrfToken}"]`);
+                setLoading()
+                let data = new FormData(document.querySelector(".user"));
+
+                $.ajax({
+                    url: "<?= base_url("login"); ?>",
+                    data: data,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                window.location.href = "<?= base_url("dashboard"); ?>";
+                            })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Login, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
             }
         }
     })
 
     const submitForm = function() {
         if ($(".user").valid()) {
-            $(".user").submit()
+            const csrf = $(`[name="${csrfToken}"]`);
+            setLoading()
+            let data = new FormData(document.querySelector(".user"));
+
+            $.ajax({
+                url: "<?= base_url("login"); ?>",
+                data: data,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        window.location.href = "<?= base_url("dashboard"); ?>";
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                },
+                onError: function(response) {
+                    csrf.val(response.token);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Login, coba Lagi',
+                        confirmButtonColor: '#4e73df',
+                    })
+                    stopLoading()
+                }
+            });
         }
     }
 

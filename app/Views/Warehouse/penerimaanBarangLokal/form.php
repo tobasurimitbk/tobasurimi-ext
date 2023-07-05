@@ -210,7 +210,7 @@
                 </div>
                 <div class="col-md-6">
                 <?php if(!empty($dataPenerimaanBarang)){ 
-                    if($dataPenerimaanBarang->status_post === "FINISH"){ ?> 
+                    if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
                 <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                 </button>
@@ -263,7 +263,7 @@
                         ?> 
     
                             <tr>
-                                <?php if($dataPenerimaanBarang->status_post === "FINISH"){ ?> 
+                                <?php if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
 
                                         <td class="edit-table-detail" data-unit="" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $no; ?></td>
                                         <td class="edit-table-detail" data-unit="" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->kode_barang; ?></td>
@@ -502,10 +502,10 @@
 
     total_jml_order = total_jml_order + <?= $details->qty; ?>;
     total_jml_dokumen = total_jml_dokumen + <?= $details->doc_qty; ?>;
-    total_selisih = total_selisih + <?= $details->selisih; ?>;
-    total_jml_konversi = total_konversi + <?= $details->konversi; ?>;
-    total_harga = total_harga + priceEdit;
-    total_penyerahan = total_penyerahan + penyerahanEdit;
+    total_jml_selisih = total_jml_selisih + <?= $details->selisih; ?>;
+    total_jml_konversi = total_jml_konversi + <?= $details->konversi; ?>;
+    total_jml_harga = total_jml_harga + priceEdit;
+    total_jml_penyerahan = total_jml_penyerahan + penyerahanEdit;
 
     list_items.push({
         id: <?= $details->id; ?>,
@@ -514,20 +514,20 @@
         barang_id: <?= $details->barang_id; ?>,
         doc_qty: <?= $details->doc_qty; ?>,
         unit: "",
-        kode_barang: <?= $details->kode_barang; ?>,
-        nama_barang: <?= $details->nama_barang; ?>,
-        nama_barang_dokumen: <?= $details->nama_barang_dok; ?>,
+        kode_barang: '<?= $details->kode_barang; ?>',
+        nama_barang: '<?= $details->nama_barang; ?>',
+        nama_barang_dokumen: '<?= $details->nama_barang_dok; ?>',
         qty: <?= $details->qty; ?>,
         selisih: <?= $details->selisih; ?>,
         satuan: "",
         konversi: <?= $details->konversi; ?>,
-        harga: <?= $details->harga; ?>,
-        penyerahan: <?= $details->penyerahan; ?>,
-        keterangan: <?= $details->keterangan; ?>,
-        ppn: <?= $details->ppn; ?>,
-        nilai_ppn: <?= $details->datappn ? $details->datappn->name : ""; ?>,
-        pph: <?= $details->pph; ?>,
-        nilai_pph: <?= $details->datapph ? $details->datapph->name : ""; ?>,
+        harga: '<?= $details->harga ? $details->harga : 0; ?>',
+        penyerahan: '<?= $details->penyerahan ? $details->penyerahan : 0; ?>',
+        keterangan: '<?= $details->keterangan; ?>',
+        ppn: <?= $details->datappn ? $details->datappn->id : 0; ?>,
+        nilai_ppn: '<?= $details->ppn; ?>',
+        pph: <?= $details->datapph ? $details->datapph->id : 0; ?>,
+        nilai_pph: '<?= $details->pph; ?>',
         warehouse: <?= json_encode($details->warehouse); ?>,
     })
     <?php 

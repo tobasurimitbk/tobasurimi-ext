@@ -35,4 +35,15 @@
     <?= $this->renderSection('content'); ?>
 </body>
 
+<script>
+//Function Set Spinner Button
+const setLoading = function() {
+    $(".btn-login-register").attr("disabled", true)
+}
+
+const stopLoading = function() {
+    $(".btn-login-register").attr("disabled", false)
+}
+</script>
+
 </html>
