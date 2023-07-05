@@ -43,8 +43,8 @@ class PenerimaanBarangImport extends BaseController
         if (!empty($id)) {
             $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/$id", $this->token);
 
-            // var_dump($responsePenerimaanBarang);
-            // die;
+            var_dump($responsePenerimaanBarang);
+            die;
 
             $dataPenerimaanBarang = [];
             if ($responsePenerimaanBarang["code"] === 200) {
@@ -220,38 +220,38 @@ class PenerimaanBarangImport extends BaseController
                 "penerimaan_barang_detail" => json_decode($this->request->getPost("items"))
             ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+            $data = [
+                "status"            => false,
+                "message"    => $payload,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
             
-            $response = curl_request("POST", "/penerimaanBarang", $this->token, $payload);
+            // $response = curl_request("POST", "/penerimaanBarang", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "id" => json_decode($response["body"])->data->id,
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    "response" => $response,
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
-            }
+            // if ($response["code"] === 200) {
+            //     $data = [
+            //         "id" => json_decode($response["body"])->data->id,
+            //         "status"            => true,
+            //         "message"   => "Data Berhasil disimpan",
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash(),
+            //         "response" => $response,
+            //         'code' => $response["code"]
+            //     ];
+            //     echo json_encode($data);
+            // } else {
+            //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+            //     $data = [
+            //         "status"            => false,
+            //         "message"    => $message,
+            //         "payload"   => $payload,
+            //         'token' => csrf_hash(),
+            //         'code' => $response["code"]
+            //     ];
+            //     echo json_encode($data);
+            // }
         } else {
             $data = [
                 "status"            => false,
