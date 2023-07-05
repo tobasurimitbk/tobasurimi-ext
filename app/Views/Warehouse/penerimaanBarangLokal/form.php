@@ -2333,7 +2333,6 @@
                 total_jml_harga = 0;
                 total_jml_penyerahan = 0;
 
-
                 list_items.map(item => {
                     if(item.row != id)
                     {
@@ -2472,6 +2471,9 @@
         tag_total += `TOTAL`;
         tag_total += "</td>";
         tag_total += `<td colspan='2'>`;
+        tag_total += "</td>";
+        tag_total += `<td>`;
+        tag_total += 0;
         tag_total += "</td>";
         tag_total += `<td>`;
         tag_total += 0;
