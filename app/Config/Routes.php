@@ -249,9 +249,54 @@ $routes->post('/pembayaran-po-import/save', 'Pembayaran\PembayaranPOImport::save
 $routes->post('/pembayaran-po-import/update', 'Pembayaran\PembayaranPOImport::updatePembayaranPOImport', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/delete', 'Pembayaran\PembayaranPOImport::deletePembayaranPOImport', ['filter' => 'Auth']);
 
-// SALES
-// PENAWARAN
-$routes->get('/penawaran', 'Sales\Penawaran::penawaran', ['filter' => 'Auth']);
+// SALES LOKAL
+// Order Form Lokal
+$routes->get('/order-form-lokal', 'SalesLokal\OrderForm::index', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/id/(:segment)', 'SalesLokal\OrderForm::getById/$1', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/create', 'SalesLokal\OrderForm::createView', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/all', 'SalesLokal\OrderForm::all', ['filter' => 'Auth']);
+$routes->post('/order-form-lokal/save', 'SalesLokal\OrderForm::create', ['filter' => 'Auth']);
+$routes->post('/order-form-lokal/update', 'SalesLokal\OrderForm::update', ['filter' => 'Auth']);
+$routes->post('/order-form-lokal/delete', 'SalesLokal\OrderForm::delete', ['filter' => 'Auth']);
+
+// Invoice Lokal
+$routes->get('/invoice-penjualan-lokal', 'SalesLokal\Invoice::index', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/id/(:segment)', 'SalesLokal\Invoice::getById/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/create', 'SalesLokal\Invoice::createView', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/all', 'SalesLokal\Invoice::all', ['filter' => 'Auth']);
+$routes->post('/invoice-penjualan-lokal/save', 'SalesLokal\Invoice::create', ['filter' => 'Auth']);
+$routes->post('/invoice-penjualan-lokal/update', 'SalesLokal\Invoice::update', ['filter' => 'Auth']);
+$routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', ['filter' => 'Auth']);
+
+// Surat Jalan
+$routes->get('/surat-jalan', 'SalesLokal\SuratJalan::index', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/id/(:segment)', 'SalesLokal\SuratJalan::getById/$1', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/create', 'SalesLokal\SuratJalan::createView', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/all', 'SalesLokal\SuratJalan::all', ['filter' => 'Auth']);
+$routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::create', ['filter' => 'Auth']);
+$routes->post('/surat-jalan/update', 'SalesLokal\SuratJalan::update', ['filter' => 'Auth']);
+$routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' => 'Auth']);
+
+// Retur
+$routes->get('/retur', 'SalesLokal\Retur::index', ['filter' => 'Auth']);
+$routes->get('/retur/id/(:segment)', 'SalesLokal\Retur::getById/$1', ['filter' => 'Auth']);
+$routes->get('/retur/create', 'SalesLokal\Retur::createView', ['filter' => 'Auth']);
+$routes->get('/retur/all', 'SalesLokal\Retur::all', ['filter' => 'Auth']);
+$routes->post('/retur/save', 'SalesLokal\Retur::create', ['filter' => 'Auth']);
+$routes->post('/retur/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
+$routes->post('/retur/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
+
+
+// SALES INTERNASIONAL
+// Order Form Internasional
+$routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);
+$routes->get('/order-form-internasional/id/(:segment)', 'SalesInternasional\OrderForm::getById/$1', ['filter' => 'Auth']);
+$routes->get('/order-form-internasional/create', 'SalesInternasional\OrderForm::createView', ['filter' => 'Auth']);
+$routes->get('/order-form-internasional/all', 'SalesInternasional\OrderForm::all', ['filter' => 'Auth']);
+$routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::create', ['filter' => 'Auth']);
+$routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
+$routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm::delete', ['filter' => 'Auth']);
+
 
 // DROPDOWN
 // SUPPLIER 
