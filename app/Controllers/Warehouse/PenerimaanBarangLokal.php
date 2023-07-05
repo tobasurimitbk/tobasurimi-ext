@@ -404,7 +404,7 @@ class PenerimaanBarangLokal extends BaseController
                 "status_post" => "FINISH"
             ]);
             
-            $response = curl_request("PATCH", "/penerimaanBarang/$id", $this->token, $payload);
+            $response = curl_request("PATCH", "/penerimaanBarang/status/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
                 $data = [
