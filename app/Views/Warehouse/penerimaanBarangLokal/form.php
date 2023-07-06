@@ -240,7 +240,16 @@
                             <th>Harga</th>
                             <th>Penyerahan</th>
                             <th>Keterangan</th>
+                            <?php if(!empty($dataPenerimaanBarang)){ 
+                            if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
                             <th>Hapus</th>
+                            <?php }
+                            if($dataPenerimaanBarang->status_post === "FINISH"){ ?> 
+                            <th>Aktual Penerimaan</th>
+                            <?php }
+                            } else { ?> 
+                            <th>Hapus</th>
+                            <?php } ?> 
                         </tr>
                     </thead>
                     <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -296,7 +305,7 @@
                                         <td><?= $details->harga ? $details->harga : 0; ?></td>
                                         <td><?= $details->penyerahan ? $details->penyerahan : 0; ?></td>
                                         <td><?= $details->keterangan; ?></td>
-                                        <td></td> 
+                                        <td><button onclick='view("<?= $no; ?>")'>View</button></td>
     
                                 <?php } ?>
                             
@@ -328,131 +337,13 @@
 </div>
 </section>
 
-<div class="modal detail-modal" tabindex="1">
+<div class="modal view-modal" tabindex="1">
     <div class="modal-dialog" style="max-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+                <h5 class="modal-title title-secondary">Aktual Penerimaan Barang</h5>
             </div>
             <div class="modal-body">
-                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <input type="hidden" class="purchase_order_details_id" name="purchase_order_details_id" id="purchase_order_details_id" />
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>Data Barang</h5>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="hidden" class="kode" name="kode" id="kode" />
-                                <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
-                                <input type="hidden" class="unit" name="unit" id="unit" />
-                                <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
-                                    <option data-barang_id= "" data-nama="" data-satuan="" data-unit="" data-stok="" data-harga="" value=""></option>
-                                </select>
-                                <label for="floatingInput">Kode Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
-                                <label for="floatingInput">Nama Barang</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control satuan_order" id="satuan_order" name="satuan_order" placeholder="Satuan Order">
-                                <label for="floatingInput">Satuan Order</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" id="qty" name="qty" placeholder="Jumlah Order">
-                                <label for="floatingInput">Jumlah Order</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
-                                <label for="floatingInput">Keterangan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>Detail Barang di Dokumen</h5>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nama_barang_dokumen" id="nama_barang_dokumen" name="nama_barang_dokumen" placeholder="Nama Barang di dokumen">
-                                <label for="floatingInput">Nama Barang di dokumen</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control doc_qty" id="doc_qty" name="doc_qty" placeholder="Jumlah di dokumen">
-                                <label for="floatingInput">Jumlah di dokumen</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-6">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control harga_barang_jasa" name="harga_barang_jasa" id="harga_barang_jasa" placeholder="Harga barang/jasa">
-                                <label for="floatingInput">Harga barang/jasa</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control nilai_penyerahan" name="nilai_penyerahan" id="nilai_penyerahan" placeholder="Nilai Penyerahan">
-                                <label for="floatingInput">Nilai Penyerahan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>Data Tax</h5>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">PPN</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">PPH</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-5">
-                        <div class="col-md-6">
-                            <h5 class="modal-sub-title">Aktual Penerimaan</h5>
-                        </div>
-                        <div class="col-md-6">
-                            <button class="btn btn-add-row btn-add btn-block float-right" style="width: 106px;">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                            </button>
-                        </div>
-                    </div>
-                </div>
                 <div class="table-responsive mt-2">
                     <table class="table-inside nowrap table-hover-tobasurimi table-add-modal-master-barang" width="100%" cellspacing="0">
                         <thead class="thead-dark">
@@ -460,22 +351,16 @@
                                 <th>Warehouse</th>
                                 <th>Satuan</th>
                                 <th>Qty</th>
-                                <th>Hapus</th>
                             </tr>
                         </thead>
-                        <tbody class="body-detail-warehouse" id="body-detail-warehouse" style="cursor: pointer;">
+                        <tbody class="body-view-warehouse" id="body-view-warehouse" style="cursor: pointer;">
 
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
-                <label>&nbsp;</label>
-                <div class="d-flex">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                </div>
+                <button type="button" class="btn btn-discard hide-view-detail">Batal</button>
             </div>
         </div>
     </div>
@@ -944,9 +829,11 @@
                     jml_masuk = jml_masuk + Number($(".qty_warehouse_" + item.row).val() ? $(".qty_warehouse_" + item.row).val() : 0)
                     new_list_warehouse.push(
                         {
-                            warehouse_id: $(".warehouse_id_" + item.row + " option:selected").val(),
+                            warehouse_name: $(".warehouse_id_" + item.row + " option:selected").text(),
+                            warehouse_id: $(".warehouse_id_" + item.row + " option:selected").val() ? Number($(".warehouse_id_" + item.row + " option:selected").val()) : 0,
                             qty: $(".qty_warehouse_" + item.row).val(),
-                            satuan: $(".satuan_" + item.row + " option:selected").val()
+                            satuan: $(".satuan_" + item.row + " option:selected").val() ? Number($(".satuan_" + item.row + " option:selected").val()) : 0,
+                            satuan_name: $(".satuan_" + item.row + " option:selected").text()
                         }
                     )
 
@@ -1595,7 +1482,9 @@
                 display: "",
                 warehouse_id: "",
                 qty_warehouse: "",
-                satuan: ""
+                satuan: "",
+                warehouse_name: "",
+                satuan_name: ""
             })
             
             let tag_html = "";
@@ -1753,6 +1642,10 @@
 
         $(".btn-hide-detail").click(function() {
             $(".detail-modal").modal("hide")
+        })
+
+        $(".hide-view-detail").click(function() {
+            $(".view-modal").modal("hide")
         })
 
         $(".kode_barang").change(function() {
@@ -1931,7 +1824,7 @@
             }
             else
             {
-                new_list_warehouse.push({satuan: item.satuan, warehouse_id: item.warehouse_id, qty_warehouse: item.qty_warehouse, display: "none"})
+                new_list_warehouse.push({warehouse_name: item.warehouse_name, satuan_name: item.satuan_name, satuan: item.satuan, warehouse_id: item.warehouse_id, qty_warehouse: item.qty_warehouse, display: "none"})
             }
         })
 
@@ -2150,7 +2043,9 @@
                 display: "",
                 warehouse_id: item.warehouse_id,
                 qty_warehouse: item.qty,
-                satuan: item.satuan
+                satuan: item.satuan,
+                warehouse_name: item.warehouse_name,
+                satuan_name: item.satuan_name
             })
             
             let tag_html = "";
@@ -2542,6 +2437,39 @@
     const print = function(url) 
     {
         window.open(url, "_blank");
+    }
+
+    const view = function(row)
+    {
+        let tag_html = ""
+        $(".body-view-warehouse").empty()
+        let last_warehouse = [];
+        // get warehouse list by row
+        list_items.forEach((item) => {
+            console.log(item.row)
+            console.log(Number(row))
+            if(item.row === Number(row))
+            {
+                last_warehouse = item.warehouse;
+                console.log(last_warehouse)
+            }
+        })
+
+        last_warehouse.forEach((item) => {
+            tag_html += `<tr>`;
+            tag_html += `<td>`;
+            tag_html += item.warehouse_id;
+            tag_html += `</td>`;
+            tag_html += `<td>`; 
+            tag_html += item.satuan;
+            tag_html += `<td>`;
+            tag_html += item.qty;
+            tag_html += `</td>`;
+            tag_html += `</tr>`;
+        })
+
+        $(".body-view-warehouse").append(tag_html)
+        $(".view-modal").modal("show")
     }
 </script>
 

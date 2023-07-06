@@ -240,7 +240,16 @@
                             <th>Harga</th>
                             <th>Penyerahan</th>
                             <th>Keterangan</th>
+                            <?php if(!empty($dataPenerimaanBarang)){ 
+                            if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
                             <th>Hapus</th>
+                            <?php }
+                            if($dataPenerimaanBarang->status_post === "FINISH"){ ?> 
+                            <th>Aktual Penerimaan</th>
+                            <?php }
+                            } else { ?> 
+                            <th>Hapus</th>
+                            <?php } ?> 
                         </tr>
                     </thead>
                     <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -296,8 +305,7 @@
                                         <td><?= $details->harga ? $details->harga : 0; ?></td>
                                         <td><?= $details->penyerahan ? $details->penyerahan : 0; ?></td>
                                         <td><?= $details->keterangan; ?></td>
-                                        <td></td> 
-    
+                                        <td><button class="btn-warning" onclick='view("<?= $no; ?>")'>View</button></td>
                                 <?php } ?>
                             
                             </tr>
@@ -476,6 +484,35 @@
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal view-modal" tabindex="1">
+    <div class="modal-dialog" style="max-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Aktual Penerimaan Barang</h5>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive mt-2">
+                    <table class="table-inside nowrap table-hover-tobasurimi table-add-modal-master-barang" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Warehouse</th>
+                                <th>Satuan</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-view-warehouse" id="body-view-warehouse" style="cursor: pointer;">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-discard hide-view-detail">Batal</button>
             </div>
         </div>
     </div>
@@ -944,9 +981,11 @@
                     konversi = konversi + Number($(".qty_warehouse_" + item.row).val() ? $(".qty_warehouse_" + item.row).val() : 0)
                     new_list_warehouse.push(
                         {
-                            warehouse_id: $(".warehouse_id_" + item.row + " option:selected").val(),
+                            warehouse_name: $(".warehouse_id_" + item.row + " option:selected").text(),
+                            warehouse_id: $(".warehouse_id_" + item.row + " option:selected").val() ? Number($(".warehouse_id_" + item.row + " option:selected").val()) : 0,
                             qty: $(".qty_warehouse_" + item.row).val(),
-                            satuan: $(".satuan_" + item.row + " option:selected").val()
+                            satuan: $(".satuan_" + item.row + " option:selected").val() ? Number($(".satuan_" + item.row + " option:selected").val()) : 0,
+                            satuan_name: $(".satuan_" + item.row + " option:selected").text()
                         }
                     )
 
@@ -1593,7 +1632,9 @@
                 display: "",
                 warehouse_id: "",
                 qty_warehouse: "",
-                satuan: ""
+                satuan: "",
+                warehouse_name: "",
+                satuan_name: ""
             })
 
             let tag_html = "";
@@ -1751,6 +1792,10 @@
 
         $(".btn-hide-detail").click(function() {
             $(".detail-modal").modal("hide")
+        })
+
+        $(".hide-view-detail").click(function() {
+            $(".view-modal").modal("hide")
         })
 
         $(".kode_barang").change(function() {
@@ -1929,7 +1974,7 @@
             }
             else
             {
-                new_list_warehouse.push({satuan: item.satuan, warehouse_id: item.warehouse_id, qty_warehouse: item.qty_warehouse, display: "none"})
+                new_list_warehouse.push({warehouse_name: item.warehouse_name, satuan_name: item.satuan_name, satuan: item.satuan, warehouse_id: item.warehouse_id, qty_warehouse: item.qty_warehouse, display: "none"})
             }
         })
 
@@ -2148,7 +2193,9 @@
                 display: "",
                 warehouse_id: item.warehouse_id,
                 qty_warehouse: item.qty,
-                satuan: item.satuan
+                satuan: item.satuan,
+                warehouse_name: item.warehouse_name,
+                satuan_name: item.satuan_name
             })
             
             let tag_html = "";
@@ -2542,6 +2589,36 @@
     const print = function(url) 
     {
         window.open(url, "_blank");
+    }
+
+    const view = function(row)
+    {
+        let tag_html = ""
+        $(".body-view-warehouse").empty()
+        let last_warehouse = [];
+        // get warehouse list by row
+        list_items.forEach((item) => {
+            if(item.row === Number(row))
+            {
+                last_warehouse = item.warehouse;
+            }
+        })
+
+        last_warehouse.forEach((item) => {
+            tag_html += `<tr>`;
+            tag_html += `<td>`;
+            tag_html += item.warehouse_id;
+            tag_html += `</td>`;
+            tag_html += `<td>`; 
+            tag_html += item.satuan;
+            tag_html += `<td>`;
+            tag_html += item.qty;
+            tag_html += `</td>`;
+            tag_html += `</tr>`;
+        })
+
+        $(".body-view-warehouse").append(tag_html)
+        $(".view-modal").modal("show")
     }
 </script>
 
