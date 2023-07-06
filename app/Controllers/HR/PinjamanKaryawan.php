@@ -23,7 +23,7 @@ class PinjamanKaryawan extends BaseController
     public function createView()
     {
         //Get Employee
-        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
+        $responseEmployee = curl_request("GET", "/employees/all?idCompany=$this->this_company_id", $this->token);
 
         $dataEmployee = [];
         if ($responseEmployee["code"] === 200) {
@@ -87,61 +87,59 @@ class PinjamanKaryawan extends BaseController
 
     public function create()
     {
-        try{
-        $rules = [
-            "nama_karyawan" => [
-                "rules" => "required"
-            ],
-            "total_pinjaman" => [
-                "rules" => "required"
-            ],
-            "termin_pembayaran" => [
-                "rules" => "required"
-            ],
-        ];
+        try {
+            $rules = [
+                "nama_karyawan" => [
+                    "rules" => "required"
+                ],
+                "total_pinjaman" => [
+                    "rules" => "required"
+                ],
+                "termin_pembayaran" => [
+                    "rules" => "required"
+                ],
+            ];
 
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "employee_id" => $this->request->getPost("nama_karyawan"),
-                "amount" => $this->request->getPost("total_pinjaman"),
-                "term" => $this->request->getPost("termin_pembayaran"),
-                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
-            ]);
+            if ($this->validate($rules)) {
+                $payload = json_encode([
+                    "employee_id" => $this->request->getPost("nama_karyawan"),
+                    "amount" => $this->request->getPost("total_pinjaman"),
+                    "term" => $this->request->getPost("termin_pembayaran"),
+                    "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
+                ]);
 
-            $response = curl_request("POST", "/employeeLoan", $this->token, $payload);
+                $response = curl_request("POST", "/employeeLoan", $this->token, $payload);
 
-            if ($response["code"] === 201) {
-                $data = [
-                    "status"            => true,
-                    "message"   => $response["message"],
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 201) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => $response["message"],
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
+                    "message"    => "Data Gagal Disimpan",
+                    'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -155,7 +153,7 @@ class PinjamanKaryawan extends BaseController
     public function getById($id = null)
     {
         //Get Employee
-        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
+        $responseEmployee = curl_request("GET", "/employees/all?idCompany=$this->this_company_id", $this->token);
 
         $dataEmployee = [];
         if ($responseEmployee["code"] === 200) {
@@ -181,67 +179,65 @@ class PinjamanKaryawan extends BaseController
 
     public function update()
     {
-        try{
-        $rules = [
-            "nama_karyawan" => [
-                "rules" => "required"
-            ],
-            "total_pinjaman" => [
-                "rules" => "required"
-            ],
-            "termin_pembayaran" => [
-                "rules" => "required"
-            ],
-        ];
+        try {
+            $rules = [
+                "nama_karyawan" => [
+                    "rules" => "required"
+                ],
+                "total_pinjaman" => [
+                    "rules" => "required"
+                ],
+                "termin_pembayaran" => [
+                    "rules" => "required"
+                ],
+            ];
 
 
 
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "employee_id" => $this->request->getPost("nama_karyawan"),
-                "amount" => $this->request->getPost("total_pinjaman"),
-                "term" => $this->request->getPost("termin_pembayaran"),
-                "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
-            ]);
-
-
-            $response = curl_request("PATCH", "/employeeLoan/$id", $this->token, $payload);
+                $payload = json_encode([
+                    "employee_id" => $this->request->getPost("nama_karyawan"),
+                    "amount" => $this->request->getPost("total_pinjaman"),
+                    "term" => $this->request->getPost("termin_pembayaran"),
+                    "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
+                ]);
 
 
-            if ($response["code"] === 200) {
-                $data = [
-                    // "id" => json_decode($response["body"])->createdId,
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
+                $response = curl_request("PATCH", "/employeeLoan/$id", $this->token, $payload);
+
+
+                if ($response["code"] === 200) {
+                    $data = [
+                        // "id" => json_decode($response["body"])->createdId,
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
+                    "message"    => "Data Gagal Diubah",
+                    'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -254,39 +250,37 @@ class PinjamanKaryawan extends BaseController
 
     public function delete()
     {
-        try{
-        $id = $this->request->getPost("id");
+        try {
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/employeeLoan/$id", $this->token);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/employeeLoan/$id", $this->token);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

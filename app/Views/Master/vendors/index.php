@@ -134,7 +134,7 @@
                     </div>
                 </form>
                 <div class="col-subtitle-modal">
-                    <div class="row mt-5">
+                    <div class="row mt-3">
                         <div class="col-md-6">
                             <h5 class="modal-sub-title">List Alamat Pengiriman</h5>
                         </div>
