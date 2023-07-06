@@ -16,11 +16,11 @@
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>Kode Pelanggan</th>
                                 <th>Nama Pelanggan</th>
-                                <th>No So</th>
-                                <th>No Surat Jalan</th>
-                                <th>Shipping Date</th>
+                                <th>Kode Pelanggan</th>
+                                <th>No Faktur</th>
+                                <th>Total Invoice</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -57,7 +57,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("surat-jalan/all"); ?>",
+            url: "<?= base_url("invoice-penjualan-lokal/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -75,19 +75,19 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "kode_pelanggan",
-            className: "text-center"
-        }, {
             data: "nama_pelanggan",
             className: "text-center"
         }, {
-            data: "multiple_no_so",
+            data: "kode_pelanggan",
             className: "text-center"
         }, {
-            data: "no_surat_jalan",
+            data: "no_faktur",
             className: "text-center"
         }, {
-            data: "shipping_date",
+            data: "total_invoice",
+            className: "text-center"
+        }, {
+            data: "keterangan",
             className: "text-center"
             // }, {
             //     data: "id",
