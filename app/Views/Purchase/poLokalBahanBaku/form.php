@@ -96,9 +96,9 @@
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select pph" id="pph" name="pph" aria-label="Floating label select example">
-                            <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "none" ? "selected" : "") : ""; ?> value="none">Pph tidak ditanggung</option>
-                            <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "supplier" ? "selected" : "") : ""; ?> value="supplier">Pph ditanggung supplier</option>
-                            <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "company" ? "selected" : "") : ""; ?> value="company">Pph ditanggung perusahaan</option>
+                            <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "None" ? "selected" : "") : ""; ?> value="None">Pph tidak ditanggung</option>
+                            <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "Supplier" ? "selected" : "") : ""; ?> value="Supplier">Pph ditanggung supplier</option>
+                            <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "Company" ? "selected" : "") : ""; ?> value="Company">Pph ditanggung perusahaan</option>
                         </select>
                         <label for="floatingInput">PPH</label>
                     </div>
@@ -120,21 +120,21 @@
             </div>
             <div class="row">
                 <div class="col md-4">
-                    <div class="ffloat mb-3" style="height: 50px;">
-                        <label for="floatingInput">Cong Sebenarnya</label>
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya">
+                        <label for="floatingInput">Cong Sebenarnya</label>
                     </div>
                 </div>
                 <div class="col md-4">
-                    <div class="ffloat mb-3" style="height: 50px;">
-                        <label for="floatingInput">Cong Batasan</label>
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan">
+                        <label for="floatingInput">Cong Batasan</label>
                     </div>
                 </div>
                 <div class="col md-4">
-                    <div class="ffloat mb-3" style="height: 50px;">
-                        <label for="floatingInput">Subsidi Langsung</label>
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung">
+                        <label for="floatingInput">Subsidi Langsung</label>
                     </div>
                 </div>
             </div>
@@ -334,6 +334,22 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Bagian</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control peti" name="peti" id="peti" placeholder="Peti">
+                                <label for="floatingInput">Peti/Tong</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6" style="display: none;">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
@@ -347,22 +363,6 @@
                                     <option value="Jelek">Jelek</option>
                                 </select>
                                 <label for="floatingInput">Kualitas</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Bagian</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control peti" name="peti" id="peti" placeholder="Peti">
-                                <label for="floatingInput">Peti/Tong</label>
                             </div>
                         </div>
                     </div>
@@ -412,6 +412,7 @@
         total: '<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>',
         keterangan: '<?= $details->note; ?>',
         bagian: '<?= $details->bagian; ?>',
+        bagianName: '<?= $details->bagian; ?>',
         peti: '<?= $details->peti; ?>',
         quality: '<?= $details->quality; ?>',
         daily_price: '<?= $details->daily_price; ?>',
@@ -847,7 +848,8 @@
             let qty = $(".qty").val()
             let total = $(".total").val()
 
-            let bagian = $(".bagian").val()
+            let bagian = $(".bagian option:selected").val()
+            let bagianName = $(".bagian option:selected").text()
             let peti = $(".peti").val()
             let quality = $(".quality").val()
             let daily_price = $(".daily_price").val()
@@ -941,7 +943,7 @@
                                     // tag_html += total;
                                     // tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price"=${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                                    tag_html += bagian;
+                                    tag_html += bagianName;
                                     tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                                     tag_html += peti;
@@ -976,6 +978,7 @@
                                         keterangan: keterangan,
 
                                         bagian: bagian,
+                                        bagianName: bagianName,
                                         peti: peti,
                                         quality: quality,
                                         daily_price: daily_price,
@@ -1013,7 +1016,7 @@
                                     // tag_html += item.total;
                                     // tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                                    tag_html += item.bagian;
+                                    tag_html += item.bagianName;
                                     tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                                     tag_html += item.peti;
@@ -1107,6 +1110,7 @@
                                 keterangan: keterangan,
 
                                 bagian: bagian,
+                                bagianName: bagianName,
                                 peti: peti,
                                 quality: quality,
                                 daily_price: daily_price,
@@ -1143,7 +1147,7 @@
                             // tag_html += total;
                             // tag_html += "</td>";
                             tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="" data-row="${row + 1}">`;
-                            tag_html += bagian;
+                            tag_html += bagianName;
                             tag_html += "</td>";
                             tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${total}"  data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}"  data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan"${keterangan}" data-id="" data-row="${row + 1}">`;
                             tag_html += peti;
@@ -1311,7 +1315,7 @@
                                             note: obj.keterangan,
                                             spec: obj.spesifikasi,
 
-                                            bagian: obj.subsidi_langsung ? Number(obj.bagian) : 0,
+                                            bagian: obj.bagian ? Number(obj.bagian) : 0,
                                             peti: obj.peti,
                                             quality: obj.quality,
                                             daily_price: obj.daily_price ? Number(obj.daily_price.replaceAll(",", "")) : 0,
@@ -1336,7 +1340,7 @@
                                             note: obj.keterangan,
                                             spec: obj.spesifikasi,
 
-                                            bagian: obj.subsidi_langsung ? Number(obj.bagian) : 0,
+                                            bagian: obj.bagian ? Number(obj.bagian) : 0,
                                             peti: obj.peti,
                                             quality: obj.quality,
                                             daily_price: obj.daily_price ? Number(obj.daily_price.replaceAll(",", "")) : 0,
@@ -1356,7 +1360,7 @@
                                             note: obj.keterangan,
                                             spec: obj.spesifikasi,
 
-                                            bagian: obj.subsidi_langsung ? Number(obj.bagian) : 0,
+                                            bagian: obj.bagian ? Number(obj.bagian) : 0,
                                             peti: obj.peti,
                                             quality: obj.quality,
                                             daily_price: obj.daily_price ? Number(obj.daily_price.replaceAll(",", "")) : 0,
@@ -1522,7 +1526,7 @@
                         tag_html += item.keterangan;
                         tag_html += "</td>";
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
-                        tag_html += item.bagian;
+                        tag_html += item.bagianName;
                         tag_html += "</td>";
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
                         tag_html += item.peti;
@@ -1650,7 +1654,7 @@
                         tag_html += item.keterangan;
                         tag_html += "</td>";
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
-                        tag_html += item.bagian;
+                        tag_html += item.bagianName;
                         tag_html += "</td>";
                         tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan"${item.keterangan}" data-id="" data-row="${row + 1}">`;
                         tag_html += item.peti;

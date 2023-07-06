@@ -40,8 +40,8 @@
                             <th>#</th>
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
-                            <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
-                            <th onclick="changeSort('itemCount')" class="sort">Banyak Barang</th>
+                            <th onclick="changeSort('supplier')" class="sort">Supplier</th>
+                            <th>Banyak Barang</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -108,7 +108,8 @@
         },
         {
             data: "itemCount",
-            className: "text-center"
+            className: "text-center",
+            orderable: false
         }],
         columnDefs: [{
             defaultContent: "-",
