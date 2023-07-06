@@ -421,7 +421,7 @@ $(document).ready(function() {
                                 })
                                 .then(() => {
                                     window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + response.id, "_blank");
-                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + response.id;
+                                    window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
                                 })
                             } else {
                                 Swal.fire({
