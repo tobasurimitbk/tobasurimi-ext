@@ -79,6 +79,10 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fab {
   margin-left: 0px;
 }
 
+label {
+  font-size: 13px;
+}
+
 .bg-primary {
   background-color: #007ae0 !important;
 }
@@ -5094,7 +5098,7 @@ input:checked + .slider:before {
 
 .row-col-spp .form-select {
   height: 40px !important;
-  padding: 12px !important;
+  padding: 8px 12px !important;
   line-height: 1.2;
 }
 
@@ -5430,6 +5434,34 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
 .switch-form-pinjaman-karyawan {
   position: relative;
   top: -5px;
+}
+
+.create-form.form-wpb .select2 .selection .select2-selection {
+  height: 50px !important;
+}
+
+.create-form.form-wpb .input-generate .auto_generate {
+  position: relative;
+  top: -10px;
+}
+
+.select2-selection__choice__display {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #2f4858;
+}
+
+.create-form.form-wpb
+  .form-floating
+  .select2
+  .selection
+  .select2-selection
+  .select2-selection__rendered
+  .select2-selection__choice {
+  border: 0px;
+  padding-left: 0;
+  margin-top: 5px;
 }
 
 /* ===== RESPONSIVE ===== */
