@@ -167,6 +167,9 @@ class POLokalBahanBaku extends BaseController
                 "pph" => $this->request->getPost("pph"),
                 "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
                 "is_posted" => false,
+                "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
+                "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
+                "subsidi_langsung" => $this->request->getPost("subsidi_langsung") ? formatter($this->request->getPost("subsidi_langsung"), "STR_TO_INT") : 0,
                 "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
@@ -242,6 +245,9 @@ class POLokalBahanBaku extends BaseController
                 "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                 "pph" => $this->request->getPost("pph"),
                 "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
+                "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
+                "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
+                "subsidi_langsung" => $this->request->getPost("subsidi_langsung") ? formatter($this->request->getPost("subsidi_langsung"), "STR_TO_INT") : 0,
                 "items" =>  json_decode($this->request->getPost("items"))
             ]);
 
