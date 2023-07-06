@@ -43,6 +43,15 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
+                        <select onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
+                            <option value="BAKU">Bahan Baku</option>
+                            <option value="PENOLONG">Bahan Penolong</option>
+                        </select>
+                        <label for="floatingInput">Tipe</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
                             <option value=""></option>
                             <?php
@@ -58,6 +67,8 @@
                         <label for="floatingInput">Supplier</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                     <select multiple disabled="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
@@ -66,36 +77,34 @@
                         <label for="floatingInput">No. PO</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
                         <label for="floatingInput">Nominal Faktur</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" class="form-control sender" name="sender" id="sender" placeholder="Sender">
                         <label for="floatingInput">Dari</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
@@ -372,6 +381,48 @@ $(document).ready(function() {
         }
     })
 })
+
+const changeTipeBahan = function()
+{
+    if($(".tipe_bahan").val() === "BAKU")
+    {
+        $.ajax({
+            url: `<?= base_url("supplier-bahan-baku-lokal/dropdown"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".supplier_id").empty();
+
+                $(".supplier_id").append(`<option value=""></option>`);
+
+                res.data.forEach(function(item) {
+                    $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
+                })
+
+                $(".supplier_id").val("").change();
+            }
+        })
+    }
+    if($(".tipe_bahan").val() === "PENOLONG")
+    {
+        $.ajax({
+            url: `<?= base_url("supplier-bahan-penolong-lokal/dropdown"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".supplier_id").empty();
+
+                $(".supplier_id").append(`<option value=""></option>`);
+
+                res.data.forEach(function(item) {
+                    $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
+                })
+
+                $(".supplier_id").val("").change();
+            }
+        })
+    }
+}
 
 const changeStatus = function()
 {
