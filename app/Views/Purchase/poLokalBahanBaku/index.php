@@ -78,6 +78,8 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
+                data.sort = sort;
+                data.sortType = sortType;
             }
         },
         // scrollX: true,
