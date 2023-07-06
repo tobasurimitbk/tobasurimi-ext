@@ -30,8 +30,17 @@ class TerimaFakturLokal extends BaseController
             $dataSupplier = json_decode($responseSupplier["body"])->data;
         }
 
+        //Get Customer
+        $responseCustomer = curl_request("GET", "/customers/all?idCompany=$this->this_company_id", $this->token);
+
+        $dataCustomer = [];
+        if ($responseCustomer["code"] === 200) {
+            $dataCustomer = json_decode($responseCustomer["body"])->data;
+        }
+
         $data = [
-            "dataSupplier" => $dataSupplier
+            "dataSupplier" => $dataSupplier,
+            "dataCustomer" => $dataCustomer
         ];
 
         return view('Purchase/terimaFakturLokal/form', $data);
@@ -39,25 +48,67 @@ class TerimaFakturLokal extends BaseController
 
     public function getByIdTerimaFakturLokal($id = null)
     {
-        //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+        //Get Customer
+        $responseCustomer = curl_request("GET", "/customers/all?idCompany=$this->this_company_id", $this->token);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        $dataCustomer = [];
+        if ($responseCustomer["code"] === 200) {
+            $dataCustomer = json_decode($responseCustomer["body"])->data;
         }
 
         $data = [
-            "dataSupplier" => $dataSupplier
+            "dataCustomer" => $dataCustomer
         ];
 
         if (!empty($id)) {
-            $responseTerimaFakturLokal = curl_request("GET", "/tandaTerimaFaktur/$id", $this->token);
-            $dataTerimaFakturLokal = [];
-            if ($responseTerimaFakturLokal["code"] === 200) {
-                $dataTerimaFakturLokal = json_decode($responseTerimaFakturLokal["body"])->data;
+            $responseTerimaFaktur = curl_request("GET", "/tandaTerimaFaktur/$id", $this->token);
+            $dataTerimaFaktur = [];
+            if ($responseTerimaFaktur["code"] === 200) {
+                $dataTerimaFaktur = json_decode($responseTerimaFaktur["body"])->data;
+
+                $tipe_bahan = json_decode($responseTerimaFaktur["body"])->data->tipe_bahan;
+                if($tipe_bahan === "BAKU")
+                {
+                    $dataNo = [];
+                    $arr = json_decode($responseTerimaFaktur["body"])->data->supplier_id;
+                    $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=BAKU&supplierid=$arr", $this->token);
+                    if ($responseNo["code"] === 200) {
+                        $dataNo = json_decode($responseNo["body"])->data;
+                    }
+
+                    //Get Supplier
+                    $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+
+                    $dataSupplier = [];
+                    if ($responseSupplier["code"] === 200) {
+                        $dataSupplier = json_decode($responseSupplier["body"])->data;
+                    }
+                    
+                    $data["dataNo"] = $dataNo;
+                    $data["dataSupplier"] = $dataSupplier;
+                }
+                if($tipe_bahan === "PENOLONG")
+                {
+                    $dataNo = [];
+                    $arr = json_decode($responseTerimaFaktur["body"])->data->supplier_id;
+                    $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=PENOLONG&supplierid=$arr", $this->token);
+                    if ($responseNo["code"] === 200) {
+                        $dataNo = json_decode($responseNo["body"])->data;
+                    }
+
+                    //Get Supplier
+                    $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
+
+                    $dataSupplier = [];
+                    if ($responseSupplier["code"] === 200) {
+                        $dataSupplier = json_decode($responseSupplier["body"])->data;
+                    }
+
+                    $data["dataNo"] = $dataNo;
+                    $data["dataSupplier"] = $dataSupplier;
+                }
             }
-            $data["dataTerimaFakturLokal"] = $dataTerimaFakturLokal;
+            $data["dataTerimaFaktur"] = $dataTerimaFaktur;
         }
 
         return view('Purchase/terimaFakturLokal/form', $data);
@@ -117,6 +168,9 @@ class TerimaFakturLokal extends BaseController
     {
         try{
             $rules = [
+                "customer_id" => [
+                    "rules" => "required"
+                ],
                 "supplier_id" => [
                     "rules" => "required"
                 ],
@@ -129,16 +183,11 @@ class TerimaFakturLokal extends BaseController
                 "date_of_receipt" => [
                     "rules" => "required"
                 ],
-                "recipient" => [
-                    "rules" => "required"
-                ],
-                "sender" => [
-                    "rules" => "required"
-                ],
             ];
     
             if ($this->validate($rules)) {
                 $payload = json_encode([
+                    "customer_id" => formatter($this->request->getPost("customer_id"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
                     "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
@@ -148,40 +197,41 @@ class TerimaFakturLokal extends BaseController
                     "recipient" => $this->request->getPost("recipient"),
                     "sender" => $this->request->getPost("sender"),
                     "information" => $this->request->getPost("information"),
-                    "faktur_type" => "LOKAL"
+                    "faktur_type" => "LOKAL",
+                    "tipe_bahan" => $this->request->getPost("tipe_bahan")
                 ]);
     
-                $data = [
-                    "status"            => false,
-                    "message"    => $payload,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
                 
-                // $response = curl_request("POST", "/tandaTerimaFaktur", $this->token, $payload);
+                $response = curl_request("POST", "/tandaTerimaFaktur", $this->token, $payload);
     
-                // if ($response["code"] === 201) {
-                //     $data = [
-                //         "id" => "",
-                //         "status"            => true,
-                //         "message"   => "Data Berhasil disimpan",
-                //         "payload"   => $payload,
-                //         'token' => csrf_hash(),
-                //         'code' => $response["code"]
-                //     ];
-                //     echo json_encode($data);
-                // } else {
-                //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                //     $data = [
-                //         "status"            => false,
-                //         "message"    => $message,
-                //         "payload"   => $payload,
-                //         'token' => csrf_hash(),
-                //         'code' => $response["code"]
-                //     ];
-                //     echo json_encode($data);
-                // }
+                if ($response["code"] === 200) {
+                    $data = [
+                        "id" => json_decode($response["body"])->data->id,
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                }
             } else {
                 $data = [
                     "status"            => false,
@@ -202,117 +252,5 @@ class TerimaFakturLokal extends BaseController
         }
         return;
     }
-
-    public function updateTerimaFakturLokal()
-    {
-        $rules = [
-            "supplier_id" => [
-                "rules" => "required"
-            ],
-            "nominal_faktur" => [
-                "rules" => "required"
-            ],
-            "due_date" => [
-                "rules" => "required"
-            ],
-            "date_of_receipt" => [
-                "rules" => "required"
-            ],
-            "recipient" => [
-                "rules" => "required"
-            ],
-            "sender" => [
-                "rules" => "required"
-            ],
-        ];
-
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
-
-            $payload = json_encode([
-                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "multiple_po_id" => json_decode($this->request->getPost("multiple_po_id")),
-                "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
-                "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
-                "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
-                "date_of_receipt" => $this->request->getPost("date_of_receipt") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("date_of_receipt")))) : "",
-                "recipient" => $this->request->getPost("recipient"),
-                "sender" => $this->request->getPost("sender"),
-                "information" => $this->request->getPost("information"),
-                "faktur_type" => "LOKAL"
-            ]);
-
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
-
-            $response = curl_request("PATCH", "/tandaTerimaFaktur/$id", $this->token, $payload);
-
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function deleteTerimaFakturLokal()
-    {
-        $id = $this->request->getPost("id");
-
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/tandaTerimaFaktur/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
 }
-
 ?>

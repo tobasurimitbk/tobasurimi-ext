@@ -236,8 +236,6 @@ $routes->get('/terima-faktur-lokal/all', 'Purchase\TerimafakturLokal::allTerimaf
 $routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimafakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimafakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/save', 'Purchase\TerimafakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-lokal/update', 'Purchase\TerimafakturLokal::updateTerimafakturLokal', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-lokal/delete', 'Purchase\TerimafakturLokal::deleteTerimafakturLokal', ['filter' => 'Auth']);
 
 // TERIMA FAKTUR IMPORT
 $routes->get('/terima-faktur-import', 'Purchase\TerimafakturImport::terimafakturImport', ['filter' => 'Auth']);
@@ -245,8 +243,6 @@ $routes->get('/terima-faktur-import/all', 'Purchase\TerimafakturImportl::allTeri
 $routes->get('/terima-faktur-import/id/(:segment)', 'Purchase\TerimafakturImport::getByIdTerimafakturImport/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-import/create', 'Purchase\TerimafakturImport::createTerimafakturImport', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-import/save', 'Purchase\TerimafakturImport::saveTerimafakturImport', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-import/update', 'Purchase\TerimafakturImport::updateTerimafakturImport', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-import/delete', 'Purchase\TerimafakturImport::deleteTerimafakturImport', ['filter' => 'Auth']);
 
 // PEMBAYARAN
 // PEMBAYARAN PO LOKAL
