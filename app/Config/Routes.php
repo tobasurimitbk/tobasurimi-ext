@@ -239,7 +239,7 @@ $routes->post('/terima-faktur-lokal/save', 'Purchase\TerimafakturLokal::saveTeri
 
 // TERIMA FAKTUR IMPORT
 $routes->get('/terima-faktur-import', 'Purchase\TerimafakturImport::terimafakturImport', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-import/all', 'Purchase\TerimafakturImportl::allTerimafakturImport', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import/all', 'Purchase\TerimafakturImport::allTerimafakturImport', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-import/id/(:segment)', 'Purchase\TerimafakturImport::getByIdTerimafakturImport/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-import/create', 'Purchase\TerimafakturImport::createTerimafakturImport', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-import/save', 'Purchase\TerimafakturImport::saveTerimafakturImport', ['filter' => 'Auth']);
