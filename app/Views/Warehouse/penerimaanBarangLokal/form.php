@@ -270,8 +270,8 @@
                                 $total_jml_masuk = $total_jml_masuk + $details->jml_masuk;
                                 $total_selisih = $total_selisih + $details->selisih;
                                 $total_konversi = $total_konversi + $details->konversi;
-                                $total_harga = $total_harga + formatter(str_replace(",", "", $details->harga ? $details->harga : 0), "STR_TO_INT");
-                                $total_penyerahan = $total_penyerahan + formatter(str_replace(",", "", $details->penyerahan ? $details->penyerahan : 0), "STR_TO_INT");
+                                $total_harga = $total_harga + ($details->harga ? formatter(str_replace(",", "", $details->harga), "STR_TO_INT") : 0);
+                                $total_penyerahan = $total_penyerahan + ($details->penyerahan ? formatter(str_replace(",", "", $details->penyerahan), "STR_TO_INT") : 0);
                         ?> 
     
                             <tr>
