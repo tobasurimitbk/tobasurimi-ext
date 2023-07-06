@@ -23,7 +23,7 @@
                 <input type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
@@ -40,21 +40,14 @@
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-
-
-                    <div class="col-md-6">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true>
                             <label for="floatingInput">Nama Sales</label>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -70,75 +63,79 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="time" class="form-control order_date" id="order_date" name="order_date" <?= !empty($data) ? ($data->order_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->order_date : ""; ?>" placeholder="Tanggal Pemesanan">
-                            <label for="floatingInput">Tanggal Pemesanan</label>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="time" class="form-control order_date" id="order_date" name="order_date" <?= !empty($data) ? ($data->order_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->order_date : ""; ?>" placeholder="Tanggal Pemesanan">
+                                    <label for="floatingInput">Tanggal Pemesanan</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="time" class="form-control shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
+                                    <label for="floatingInput">Tanggal Pengiriman</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="time" class="form-control shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
-                            <label for="floatingInput">Tanggal Pengiriman</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->term : ""; ?>">
                             <label for="floatingInput">Estimated Freight</label>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control terms" id="terms" name="terms" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->term : ""; ?>">
                             <label for="floatingInput">Terms</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->term : ""; ?>">
                             <label for="floatingInput">PPN</label>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control description" id="description" name="description" <?= !empty($data) ? ($data->description === true ? 'disabled=true' : '') : ''; ?> placeholder="description" value="<?= !empty($data) ? $data->term : ""; ?>">
                             <label for="floatingInput">Deskripsi</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3" style="height: 50px;">
+                                    <label for="floatingInput">Pajak</label>
+                                    <div class="switch-form-pinjaman-karyawan">
+                                        <label class="switch">
+                                            <input class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status === true ? 'checked' : '') : ''; ?>>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="col-md-3">
-                        <div class="mb-3" style="height: 50px;">
-                            <label for="floatingInput">Pajak</label>
-                            <div class="switch-form-pinjaman-karyawan">
-                                <label class="switch">
-                                    <input class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status === true ? 'checked' : '') : ''; ?>>
-                                    <span class="slider round"></span>
-                                </label>
+                            <div class="col-md-6">
+                                <div class="mb-3" style="height: 50px;">
+                                    <label for="floatingInput">Include pa</label>
+                                    <div class="switch-form-pinjaman-karyawan">
+                                        <label class="switch">
+                                            <input class="include_pa" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : ''; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->include_pa === true ? 'checked' : '') : ''; ?>>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="mb-3" style="height: 50px;">
-                            <label for="floatingInput">Include pa</label>
-                            <div class="switch-form-pinjaman-karyawan">
-                                <label class="switch">
-                                    <input class="include_pa" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : ''; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->include_pa === true ? 'checked' : '') : ''; ?>>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
             </form>
@@ -205,7 +202,7 @@
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
                                     <option value=""></option>
