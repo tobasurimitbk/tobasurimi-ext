@@ -2608,10 +2608,10 @@
         last_warehouse.forEach((item) => {
             tag_html += `<tr>`;
             tag_html += `<td>`;
-            tag_html += item.warehouse_id;
+            tag_html += item.warehouse_name;
             tag_html += `</td>`;
             tag_html += `<td>`; 
-            tag_html += item.satuan;
+            tag_html += item.satuan_name;
             tag_html += `<td>`;
             tag_html += item.qty;
             tag_html += `</td>`;
