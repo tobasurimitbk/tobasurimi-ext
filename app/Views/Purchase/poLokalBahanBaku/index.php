@@ -41,7 +41,7 @@
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplier')" class="sort">Supplier</th>
-                            <th>Banyak Barang</th>
+                            <th onclick="changeSort('itemCount')">Banyak Barang</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -108,8 +108,7 @@
         },
         {
             data: "itemCount",
-            className: "text-center",
-            orderable: false
+            className: "text-center"
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -163,6 +162,15 @@
             location.replace(`<?= base_url("po-lokal-bahan-baku/id"); ?>/${data.id}`);
         })
     })
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

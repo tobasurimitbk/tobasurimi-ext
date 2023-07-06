@@ -166,5 +166,14 @@
             location.replace(`<?= base_url("po-import-bahan-penolong/id"); ?>/${data.id}`);
         })
     })
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 <?= $this->endSection(); ?>
