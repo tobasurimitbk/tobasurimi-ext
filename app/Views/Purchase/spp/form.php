@@ -1050,23 +1050,23 @@
             
             let validate_same = false;
 
-            list_items.map(item => {
-                if(barang_id !== '')
-                {
-                    if(item.barang_id == barang_id)
-                    {
-                        // kalau edit barang, barang tidak ganti tidak kena validasi
-                        if(row_detail === item.row)
-                        {
-                            validate_same = false;
-                        }
-                        else
-                        {
-                            validate_same = true;
-                        }
-                    }
-                }
-            })
+            // list_items.map(item => {
+            //     if(barang_id !== '')
+            //     {
+            //         if(item.barang_id == barang_id)
+            //         {
+            //             // kalau edit barang, barang tidak ganti tidak kena validasi
+            //             if(row_detail === item.row)
+            //             {
+            //                 validate_same = false;
+            //             }
+            //             else
+            //             {
+            //                 validate_same = true;
+            //             }
+            //         }
+            //     }
+            // })
 
             if(validate_same)
             {

@@ -948,6 +948,66 @@
             }
         })
 
+        // delete
+        $(".delete-parent").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $(".id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("penerimaan-barang-import/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("penerimaan-barang-import"); ?>"
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+        })
+
         $(".btn-submit-detail").click(function() {
             let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
             let kode_barang = $(".kode").val()
@@ -1012,23 +1072,23 @@
             {
                 let validate_same = false;
 
-                list_items.map(item => {
-                    if(barang_id !== '')
-                    {
-                        if(item.barang_id == barang_id)
-                        {
-                            // kalau edit barang, barang tidak ganti tidak kena validasi
-                            if(row_detail === item.row)
-                            {
-                                validate_same = false;
-                            }
-                            else
-                            {
-                                validate_same = true;
-                            }
-                        }
-                    }
-                })
+                // list_items.map(item => {
+                //     if(barang_id !== '')
+                //     {
+                //         if(item.barang_id == barang_id)
+                //         {
+                //             // kalau edit barang, barang tidak ganti tidak kena validasi
+                //             if(row_detail === item.row)
+                //             {
+                //                 validate_same = false;
+                //             }
+                //             else
+                //             {
+                //                 validate_same = true;
+                //             }
+                //         }
+                //     }
+                // })
 
                 if(validate_same)
                 {
@@ -1544,7 +1604,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1589,7 +1648,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1874,7 +1932,6 @@
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                     icon: 'success',
                                     title: response.message,

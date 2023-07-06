@@ -60,7 +60,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select disabled="true" readonly="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                    <select multiple disabled="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                             <option value=""></option>
                         </select>
                         <label for="floatingInput">No. PO</label>
@@ -110,8 +110,13 @@
 
 <script>
 $(document).ready(function() {
+    const csrfToken = '<?= csrf_token() ?>';
+
     var validator = $(".create-form").validate({
         rules: {
+            no: {
+                required: true
+            },
             supplier_id: {
                 required: true
             },
@@ -132,6 +137,9 @@ $(document).ready(function() {
             }
         },
         messages: {
+            no: {
+                required: "No. Terima Faktur wajib diisi"
+            },
             supplier_id: {
                 required: "Supplier wajib diisi"
             },
@@ -258,7 +266,56 @@ $(document).ready(function() {
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
-                
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    setLoading()
+                    let data = new FormData(document.querySelector(".create-form"));
+
+                    data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
+                    var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
+                        return elem.text 
+                    });
+                    data.append("multiple_po_no", JSON.stringify(arr_no));
+
+                    $.ajax({
+                        url: "<?= base_url("terima-faktur-lokal/save"); ?>",
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
                 }
             })
         }
@@ -287,7 +344,7 @@ $(document).ready(function() {
         if($(".supplier_id option:selected").val())
         {
             $.ajax({
-                url: `<?= base_url("po-import/dropdown"); ?>`,
+                url: `<?= base_url("po-lokal-bahan-baku/dropdown"); ?>`,
                 method: "GET",
                 data: {
                     id: $(".supplier_id option:selected").val()
