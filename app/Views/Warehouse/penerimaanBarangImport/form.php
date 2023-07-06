@@ -1694,7 +1694,7 @@
                             $(".kode_barang").empty()
                             $(".kode_barang").append(`<option value=""></option>`)
                             res.data.forEach(function(item) {
-                                $(".kode_barang").append(`<option data-harga="${item.price}" data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                                $(".kode_barang").append(`<option data-unit="${item.id_satuan}" data-harga="${item.price}" data-harga="${item.price}" data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
                             })
 
                             $(".kode_barang").val("").change();
@@ -2232,7 +2232,7 @@
                     $(".kode_barang").empty()
                     $(".kode_barang").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-unit="${item.id_satuan}" data-harga="${item.price}" data-nama="${item.barang.nama_barang}" data-barang_id="${item.barang_id}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                        $(".kode_barang").append(`<option data-unit="${item.unit}" data-harga="${item.price}" data-nama="${item.barang.nama_barang}" data-barang_id="${item.barang_id}" data-note="${item.note}" data-id="${item.id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
                     })
 
                     $(".kode_barang").val(kode).trigger('change');
@@ -2253,7 +2253,7 @@
                     $(".kode_barang").empty()
                     $(".kode_barang").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-harga="${item.price}" data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
+                        $(".kode_barang").append(`<option data-unit="${item.unit}" data-harga="${item.price}" data-nama="${item.barang.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${item.qty}" data-satuan="${item.nama_satuan}" value="${item.barang.kode_barang}">${item.barang.kode_barang} - ${item.barang.nama_barang}</option>`)
                     })
 
                     $(".kode_barang").val(kode).trigger('change');
