@@ -15,7 +15,7 @@
     </button>
     <?php } ?> 
 
-    <button class="btn btn-warning btn-print float-right">
+    <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/rawMaterialImportPO/print/<?= $dataPOLokal->id ?>')">
         Print
     </button>
 
@@ -2094,6 +2094,11 @@
             }
         })
     })
+
+    const print = function(url) 
+    {
+        window.open(url, "_blank");
+    }
 
     const changeStatus = function()
     {
