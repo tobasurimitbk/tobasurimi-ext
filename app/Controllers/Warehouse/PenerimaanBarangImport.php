@@ -43,8 +43,8 @@ class PenerimaanBarangImport extends BaseController
         if (!empty($id)) {
             $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/$id", $this->token);
 
-            var_dump($responsePenerimaanBarang);
-            die;
+            // var_dump($responsePenerimaanBarang);
+            // die;
 
             $dataPenerimaanBarang = [];
             if ($responsePenerimaanBarang["code"] === 200) {

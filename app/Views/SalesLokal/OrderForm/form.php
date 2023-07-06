@@ -372,8 +372,6 @@
             method: "GET",
             dataType: "json",
             success: function(res) {
-                console.log(res)
-
                 $(".id_barang").empty();
 
                 $(".id_barang").append(`<option data-satuan="" data-warehouse="" value=""></option>`);
