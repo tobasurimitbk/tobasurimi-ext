@@ -16,6 +16,7 @@
             </button>
         </div>
     </div>
+
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-order-form-lokal" role="form" method="POST" enctype="multipart/form-data">
@@ -42,21 +43,6 @@
 
 
                     <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_barang" name="id_barang" id="id_barang" <?= !empty($data) ? ($data->id_barang === true ? 'disabled=true' : '') : ''; ?>>
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataBarang)) {
-                                    foreach ($dataBarang as $barang) {
-                                ?>
-                                        <option value="<?= $barang->id; ?>" <?= !empty($data) ? ($data->barang_id === $barang->id ? "selected" : "") : ""; ?>><?= $barang->nama_barang; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Nama Barang</label>
-                        </div>
                     </div>
                 </div>
 
@@ -154,13 +140,118 @@
                         </div>
                     </div>
                 </div>
-        </div>
 
-    </div>
-    </form>
-    </div>
+            </form>
+
+            <!-- list barang -->
+            <div class="col-subtitle-modal">
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                    </div>
+
+                    <div class="col-md-6">
+                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Satuan</th>
+                                <th>Spesifikasi</th>
+                                <th>Harga Barang</th>
+                                <th>Qty</th>
+                                <th>Total Harga</th>
+                                <th>Keterangan</th>
+                                <th>Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+
+                        </tbody>
+                        <tfoot class="foot-detail-table" id="foot-detail-table">
+                            <tr>
+                                <td colspan="4"></td>
+                                <td colspan="4"></td>
+                                <td><b>TOTAL</b></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
+
+<!-- modal barang -->
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+            </div>
+            <div class="modal-body">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <label for="floatingInput">Harga Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">Qty</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga">
+                                <label for="floatingInput">Total Harga</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
+                                <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -172,7 +263,6 @@
             placeholder: "",
             theme: "bootstrap-5"
         })
-
         //CSS SELECT2 FLOATING LABEL
         $('.id_customer')
             .parent('div')
@@ -194,10 +284,15 @@
             .find('label')
             .css('z-index', '1');
 
-        // Barang
+
+
+        // BARANG
         $('.id_barang').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
+            placeholder: "Pilih Barang",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            tags: true,
+            allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -267,117 +362,37 @@
         },
     });
 
+    // MODAL
+    $(".btn-hide-detail").click(function() {
+        $(".detail-modal").modal("hide")
+    })
+
+    $(".btn-show-detail").click(function() {
+        $(".id_barang").val('')
+
+        $.ajax({
+            url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                console.log(res)
+
+                $(".id_barang").empty();
+
+                $(".id_barang").append(`<option data-satuan="" data-warehouse="" value=""></option>`);
+
+                res.dataBarang.forEach(function(item) {
+                    $(".id_barang").append(`<option data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" value="${item.id}">${item.nama_barang}</option>`);
+                })
+
+                $(".id_barang").val("").change();
+                $(".detail-modal").modal("show");
+            }
+        })
+    })
 
     $(".btn-submit").click(function() {
-        if ($(".create-form").valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    setLoading()
-                    let data = new FormData(document.querySelector(".create-form"));
-
-                    let id = $(".id").val();
-
-                    // UPDATE
-                    if (id) {
-                        $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                    // CREATE
-                    else {
-                        $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                }
-            })
-        }
+        console.log("Submit")
     })
 
     const changeStatus = function() {

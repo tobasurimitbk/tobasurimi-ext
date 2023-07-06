@@ -33,17 +33,8 @@ class OrderForm extends BaseController
             $dataCustomers = json_decode($responseEmployee["body"])->data;
         }
 
-        //Get Barang
-        $responseBarang = curl_request("GET", "/barang/all?idCompany=$this->this_company_id", $this->token);
-
-        $dataBarang = [];
-        if ($responseBarang["code"] === 200) {
-            $dataBarang = json_decode($responseBarang["body"])->data;
-        }
-
         $data = [
             "dataCustomers" => $dataCustomers,
-            "dataBarang" => $dataBarang,
         ];
 
         return view('SalesLokal/OrderForm/form', $data);
@@ -106,5 +97,25 @@ class OrderForm extends BaseController
 
     public function delete()
     {
+    }
+
+
+    public function getAllBarang()
+    {
+        //Get Barang
+        $responseBarang = curl_request("GET", "/barang/all?idCompany=$this->this_company_id", $this->token);
+
+        $dataBarang = [];
+        if ($responseBarang["code"] === 200) {
+            $dataBarang = json_decode($responseBarang["body"])->data;
+        }
+
+        $data = [
+            "dataBarang" => $dataBarang,
+        ];
+
+
+        echo json_encode($data);
+        return;
     }
 }
