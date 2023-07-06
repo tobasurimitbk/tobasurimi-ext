@@ -858,17 +858,21 @@
             list_items.map(item => {
                 if(barang_id !== '')
                 {
-                    if(item.barang_id == barang_id)
+                    // if(item.barang_id == barang_id)
+                    // {
+                    //     // kalau edit barang, barang tidak ganti tidak kena validasi
+                    //     if(row_detail === item.row)
+                    //     {
+                    //         validate_same = false;
+                    //     }
+                    //     else
+                    //     {
+                    //         validate_same = true;
+                    //     }
+                    // }
+                    if(item.barang_id !== barang_id)
                     {
-                        // kalau edit barang, barang tidak ganti tidak kena validasi
-                        if(row_detail === item.row)
-                        {
-                            validate_same = false;
-                        }
-                        else
-                        {
-                            validate_same = true;
-                        }
+                        validate_same = true;
                     }
                 }
             })
@@ -877,7 +881,7 @@
             {
                 Swal.fire({
                     icon: 'error',
-                    title: "Barang Sudah Ada",
+                    title: "Barang Tidak Boleh Berbeda",
                     confirmButtonColor: '#4e73df',
                 })
             }
