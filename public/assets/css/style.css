@@ -5464,6 +5464,27 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   margin-top: 5px;
 }
 
+.btn.btn-discard.delete-btn.btn-trash {
+  background: #e7323a !important;
+  color: #fff;
+}
+
+.btn.btn-discard.delete-btn.btn-trash:hover,
+.btn.btn-discard.delete-btn.btn-trash:focus,
+.btn.btn-discard.delete-btn.btn-trash:active {
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.create-form.form-add-order-form-lokal
+  .form-floating
+  .input-group
+  .input-generate
+  .auto_generate {
+  position: relative;
+  top: -10px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {

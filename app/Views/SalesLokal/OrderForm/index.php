@@ -114,7 +114,7 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-                return row.is_posted ? "-" : `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
+                return row.is_posted ? "-" : `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
                 `
             }
         }],
