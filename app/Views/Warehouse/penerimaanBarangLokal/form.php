@@ -1072,6 +1072,8 @@
             else
             {
                 let validate_same = false;
+                let validate_jml_masuk = false;
+                var total_masuk_sementara = 0;
 
                 // list_items.map(item => {
                 //     if(barang_id !== '')
@@ -1091,11 +1093,34 @@
                 //     }
                 // })
 
-                if(validate_same)
+                list_items.map(item => {
+                    if(barang_id !== '')
+                    {
+                        if(item.barang_id == barang_id)
+                        {
+                            total_sementara = total_sementara + item.qty;
+                        }
+                    }
+                })
+
+                if(total_sementara > doc_qty)
+                {
+                    validate_jml_masuk = true;
+                }
+
+                // if(validate_same)
+                // {
+                //     Swal.fire({
+                //         icon: 'error',
+                //         title: "Barang Sudah Ada",
+                //         confirmButtonColor: '#4e73df',
+                //     })
+                // }
+                if(validate_jml_masuk)
                 {
                     Swal.fire({
                         icon: 'error',
-                        title: "Barang Sudah Ada",
+                        title: "Qty sudah melebihi jumlah dokumen",
                         confirmButtonColor: '#4e73df',
                     })
                 }
