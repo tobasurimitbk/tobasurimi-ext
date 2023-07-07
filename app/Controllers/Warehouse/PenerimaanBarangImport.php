@@ -480,4 +480,28 @@ class PenerimaanBarangImport extends BaseController
         }
         return;
     }
+
+    public function dropdownPenerimaanBarangImport()
+    {
+        $payload = json_encode([
+            "idsupplier" => $this->request->getGet("id"),
+            "statuspenerimaan" => "IMPORT",
+            "tipebahan" => $this->request->getGet("tipe")
+        ]);
+
+        $dataPenerimaanBarang = [];
+        $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/dropdown-tandaTerimaFaktur", $this->token, $payload);
+        if ($responsePenerimaanBarang["code"] === 200) {
+            $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
+        }
+
+        $data = [
+            "data" =>  $dataPenerimaanBarang,
+            "response" => $responsePenerimaanBarang,
+            "payload" => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

@@ -460,10 +460,11 @@ $(document).ready(function() {
             if($(".tipe_bahan").val() === "BAKU")
             {
                 $.ajax({
-                    url: `<?= base_url("po-lokal-bahan-baku/dropdown"); ?>`,
+                    url: `<?= base_url("penerimaan-barang-import/dropdown"); ?>`,
                     method: "GET",
                     data: {
-                        id: $(".supplier_id option:selected").val()
+                        id: $(".supplier_id option:selected").val(),
+                        tipe: "BAKU"
                     },
                     dataType: "json",
                     success: function(res) {
@@ -482,10 +483,11 @@ $(document).ready(function() {
             if($(".tipe_bahan").val() === "PENOLONG")
             {
                 $.ajax({
-                    url: `<?= base_url("po-lokal-bahan-penolong/dropdown"); ?>`,
+                    url: `<?= base_url("penerimaan-barang-import/dropdown"); ?>`,
                     method: "GET",
                     data: {
-                        id: $(".supplier_id option:selected").val()
+                        id: $(".supplier_id option:selected").val(),
+                        tipe: "PENOLONG"
                     },
                     dataType: "json",
                     success: function(res) {
