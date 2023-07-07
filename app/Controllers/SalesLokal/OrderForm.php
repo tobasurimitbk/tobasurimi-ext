@@ -87,8 +87,38 @@ class OrderForm extends BaseController
     {
     }
 
-    public function getById()
+    public function getById($id = null)
     {
+        //Get Customers
+        $responseEmployee = curl_request("GET", "/customers/all?idCompany=$this->this_company_id", $this->token);
+
+        $dataCustomers = [];
+        if ($responseEmployee["code"] === 200) {
+            $dataCustomers = json_decode($responseEmployee["body"])->data;
+        }
+
+        $data = [
+            "dataCustomers" => $dataCustomers,
+        ];
+
+        //Get Detail
+        if (!empty($id)) {
+            $id = $this->encrypter->decrypt(hex2bin($id));
+            $responseDetail = curl_request("GET", "/salesOrderLokal/$id", $this->token);
+
+            $dataDetail = [];
+            if ($responseDetail["code"] === 200) {
+                $dataDetail = json_decode($responseDetail["body"])->data;
+            }
+
+            $data["data"] = $dataDetail;
+        }
+
+        // var_dump($data);
+        // exit;
+
+
+        return view('SalesLokal/OrderForm/form', $data);
     }
 
     public function update()
@@ -102,7 +132,8 @@ class OrderForm extends BaseController
 
 
             if (!empty($id)) {
-                // $id = $this->encrypter->decrypt(hex2bin($id));
+                $id = $this->encrypter->decrypt(hex2bin($id));
+
 
                 $response = curl_request("DELETE", "/salesOrderLokal/$id", $this->token);
 
