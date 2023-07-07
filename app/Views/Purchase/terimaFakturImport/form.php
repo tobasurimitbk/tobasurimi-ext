@@ -460,7 +460,7 @@ $(document).ready(function() {
             if($(".tipe_bahan").val() === "BAKU")
             {
                 $.ajax({
-                    url: `<?= base_url("penerimaan-barang-lokal/dropdown"); ?>`,
+                    url: `<?= base_url("penerimaan-barang-import/dropdown"); ?>`,
                     method: "GET",
                     data: {
                         id: $(".supplier_id option:selected").val(),
@@ -483,7 +483,7 @@ $(document).ready(function() {
             if($(".tipe_bahan").val() === "PENOLONG")
             {
                 $.ajax({
-                    url: `<?= base_url("penerimaan-barang-lokal/dropdown"); ?>`,
+                    url: `<?= base_url("penerimaan-barang-import/dropdown"); ?>`,
                     method: "GET",
                     data: {
                         id: $(".supplier_id option:selected").val(),

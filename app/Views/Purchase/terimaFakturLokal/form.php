@@ -460,7 +460,7 @@ $(document).ready(function() {
             if($(".tipe_bahan").val() === "BAKU")
             {
                 $.ajax({
-                    url: `<?= base_url("penerimaan-barang-import/dropdown"); ?>`,
+                    url: `<?= base_url("penerimaan-barang-lokal/dropdown"); ?>`,
                     method: "GET",
                     data: {
                         id: $(".supplier_id option:selected").val(),
@@ -468,7 +468,7 @@ $(document).ready(function() {
                     },
                     dataType: "json",
                     success: function(res) {
-                        console.log(res)
+                        console.log(res.data)
                         $(".multiple_po_id").attr("disabled", true)
                         $(".multiple_po_id").empty()
                         $(".multiple_po_id").append(`<option value=""></option>`)
@@ -483,7 +483,7 @@ $(document).ready(function() {
             if($(".tipe_bahan").val() === "PENOLONG")
             {
                 $.ajax({
-                    url: `<?= base_url("penerimaan-barang-import/dropdown"); ?>`,
+                    url: `<?= base_url("penerimaan-barang-lokal/dropdown"); ?>`,
                     method: "GET",
                     data: {
                         id: $(".supplier_id option:selected").val(),
