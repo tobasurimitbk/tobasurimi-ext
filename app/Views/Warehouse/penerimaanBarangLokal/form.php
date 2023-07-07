@@ -123,7 +123,16 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                            <option value="NON PABEAN" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->aju_document_type === "NON PABEAN" ? "selected" : "") : ""; ?>>NON PABEAN</option>
+                            <option value=""></option>
+                            <?php
+                            if (!empty($dataAJU)) {
+                                foreach ($dataAJU as $aju) {
+                            ?>
+                                    <option value="<?= $aju->id; ?>" <?= (!empty($dataPenerimaanBarang) ? ($no->id === $dataPenerimaanBarang->aju_type ? "selected" : "") : ""); ?>><?= $aju->value; ?></option>
+                            <?php
+                                }
+                            }
+                            ?>
                         </select>
                         <label for="floatingInput">Jenis Dokumen</label>
                     </div>
@@ -784,6 +793,38 @@
             orientation: "bottom auto",
             autoclose: true
         })
+
+        // AJU DOCUMENT TYPE
+        $('.aju_document_type').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.aju_document_type')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.aju_document_type')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.aju_document_type')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        $('.aju_document_type')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         // PO NO
         $('.multiple_po_id').select2({
