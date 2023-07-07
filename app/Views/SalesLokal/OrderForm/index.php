@@ -13,6 +13,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="table-responsive">
+                    <?= csrf_field() ?>
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
@@ -41,7 +42,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "loan_date";
+    let sort = "";
     let sortType = "asc";
     let trigger = true;
 
@@ -114,7 +115,7 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-                return row.is_posted ? "-" : `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
                 `
             }
         }],
@@ -149,7 +150,7 @@
 
                 setLoading()
                 $.ajax({
-                    url: "<?= base_url("pinjaman-karyawan/delete"); ?>",
+                    url: "<?= base_url("order-form-lokal/delete"); ?>",
                     data: {
                         id: id
                     },

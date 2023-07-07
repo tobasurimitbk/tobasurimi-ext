@@ -277,94 +277,96 @@
 
                     let id = $(".id").val();
 
-                    // UPDATE
-                    if (id) {
-                        $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                    // CREATE
-                    else {
-                        $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
+                    console.log(data.entries());
+
+                    // // UPDATE
+                    // if (id) {
+                    //     $.ajax({
+                    //         url: "<?= base_url("pinjaman-karyawan/update"); ?>",
+                    //         data: data,
+                    //         beforeSend: function(xhr) {
+                    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    //         },
+                    //         method: "POST",
+                    //         dataType: "json",
+                    //         processData: false,
+                    //         contentType: false,
+                    //         success: function(response) {
+                    //             csrf.val(response.token);
+                    //             if (response.status) {
+                    //                 stopLoading()
+                    //                 Swal.fire({
+                    //                         icon: 'success',
+                    //                         title: response.message,
+                    //                         confirmButtonColor: '#4e73df',
+                    //                     })
+                    //                     .then(() => {
+                    //                         window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                    //                     })
+                    //             } else {
+                    //                 Swal.fire({
+                    //                     icon: 'error',
+                    //                     title: response.message,
+                    //                     confirmButtonColor: '#4e73df',
+                    //                 })
+                    //                 stopLoading()
+                    //             }
+                    //         },
+                    //         onError: function(response) {
+                    //             csrf.val(response.token);
+                    //             Swal.fire({
+                    //                 icon: 'error',
+                    //                 title: 'Data Gagal Disimpan, coba Lagi',
+                    //                 confirmButtonColor: '#4e73df',
+                    //             })
+                    //             stopLoading()
+                    //         }
+                    //     });
+                    // }
+                    // // CREATE
+                    // else {
+                    //     $.ajax({
+                    //         url: "<?= base_url("pinjaman-karyawan/save"); ?>",
+                    //         data: data,
+                    //         beforeSend: function(xhr) {
+                    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    //         },
+                    //         method: "POST",
+                    //         dataType: "json",
+                    //         processData: false,
+                    //         contentType: false,
+                    //         success: function(response) {
+                    //             csrf.val(response.token);
+                    //             if (response.status) {
+                    //                 stopLoading()
+                    //                 Swal.fire({
+                    //                         icon: 'success',
+                    //                         title: response.message,
+                    //                         confirmButtonColor: '#4e73df',
+                    //                     })
+                    //                     .then(() => {
+                    //                         window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                    //                     })
+                    //             } else {
+                    //                 Swal.fire({
+                    //                     icon: 'error',
+                    //                     title: response.message,
+                    //                     confirmButtonColor: '#4e73df',
+                    //                 })
+                    //                 stopLoading()
+                    //             }
+                    //         },
+                    //         onError: function(response) {
+                    //             csrf.val(response.token);
+                    //             Swal.fire({
+                    //                 icon: 'error',
+                    //                 title: 'Data Gagal Disimpan, coba Lagi',
+                    //                 confirmButtonColor: '#4e73df',
+                    //             })
+                    //             stopLoading()
+                    //         }
+                    //     });
+                    // }
                 }
             })
         }
