@@ -14,62 +14,36 @@
             <button class="btn btn-hapus delete-parent float-right">
                 Hapus
             </button>
-            <?php } ?> 
-
             <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/tandaTerimaFaktur/print/<?= $dataTerimaFaktur->id ?>')">
                 Print
             </button>
-
-            <?php if($dataSPP->is_posted === false && $dataSPP->approved_by_director !== 0){ 
-                if($dataSPP->approved_by_head_of_purchasing !== 0 && $dataSPP->approved_by_headwarehouse !== 0){ 
-            ?> 
-
-            <button class="btn btn-success posting-spp">
-                Posting
-            </button>
-
-            <?php } 
-            }
-            ?> 
-
             <?php } ?> 
 
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("spp"); ?>">
-                Batal
-            </a>
-
-            <?php if(!empty($dataSPP)){ 
-                if($dataSPP->is_posted === false){ ?> 
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan
-            </button>
-            <?php }
-            } else { ?> 
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan
-            </button>
-        <?php } ?> 
-
-        <?php if(!empty($dataTerimaFaktur)){ ?> 
-
-            
-
-        <?php } else { ?> 
+            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
             <button class="btn btn-show-form btn-save float-right btn-submit-cetak">
                 Simpan dan Cetak
             </button>
-        <?php } ?> 
+            <?php
+            }
+            ?> 
+
+            <?php } else { ?> 
+            <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                Simpan
+            </button>
+            <button class="btn btn-show-form btn-save float-right btn-submit-cetak">
+                Simpan dan Cetak
+            </button>
+            <?php } ?> 
     </div>
 </div>
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
             <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->id : ""; ?>" type="hidden" class="id" name="id" id="id" />
-            <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->sender : ""; ?>" type="hidden" class="sender" name="sender" id="sender" placeholder="Sender">
-            <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : ""; ?>" type="hidden" class="recipient" name="recipient" id="recipient" placeholder="Penerima">
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
@@ -148,29 +122,24 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
-                        <label for="floatingInput">Nominal Faktur</label>
+                    <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->sender : ""; ?>" type="text" class="form-control sender" name="sender" id="sender" placeholder="Sender">
+                        <label for="floatingInput">Dari</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?>class="form-select customer_id" name="customer_id" id="customer_id">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataCustomer)) {
-                                foreach ($dataCustomer as $customer) {
-                            ?>
-                                    <option value="<?= $customer->id; ?>" data-name="<?= $customer->name; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
+                        <input readonly="true" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
             </div>
             <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
+                        <label for="floatingInput">Nominal Faktur</label>
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
@@ -322,33 +291,6 @@ $(document).ready(function() {
         .find('label')
         .css('z-index', '1');
 
-    // CUSTOMER ID
-    $('.customer_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5"
-    })
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.customer_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.customer_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.customer_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
     $(".btn-submit-form").click(function() {
         if ($(".create-form").valid()) {
             Swal.fire({
@@ -372,46 +314,94 @@ $(document).ready(function() {
                     });
                     data.append("multiple_po_no", JSON.stringify(arr_no));
 
-                    $.ajax({
-                        url: "<?= base_url("terima-faktur-lokal/save"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
-                                })
-                            } else {
+                    let id = $(".id").val();
+                    // UPDATE
+                    if(id)
+                    {
+                        $.ajax({
+                            url: "<?= base_url("terima-faktur-lokal/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + id;
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
                                 Swal.fire({
                                     icon: 'error',
-                                    title: response.message,
+                                    title: 'Data Gagal Disimpan, coba Lagi',
                                     confirmButtonColor: '#4e73df',
                                 })
                                 stopLoading()
                             }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
+                        });
+                    }
+                    else
+                    {
+                        $.ajax({
+                            url: "<?= base_url("terima-faktur-lokal/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
                 }
             })
         }
@@ -440,60 +430,164 @@ $(document).ready(function() {
                     });
                     data.append("multiple_po_no", JSON.stringify(arr_no));
 
-                    $.ajax({
-                        url: "<?= base_url("terima-faktur-lokal/save"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + response.id, "_blank");
-                                    window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
-                                })
-                            } else {
+                    let id = $(".id").val();
+                    // UPDATE
+                    if(id)
+                    {
+                        $.ajax({
+                            url: "<?= base_url("terima-faktur-lokal/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + id, "_blank");
+                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + id;
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
                                 Swal.fire({
                                     icon: 'error',
-                                    title: response.message,
+                                    title: 'Data Gagal Disimpan, coba Lagi',
                                     confirmButtonColor: '#4e73df',
                                 })
                                 stopLoading()
                             }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
+                        });
+                    }
+                    else
+                    {
+                        $.ajax({
+                            url: "<?= base_url("terima-faktur-lokal/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + response.id, "_blank");
+                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
                 }
             })
         }
     })
 
-    $(".customer_id").change(function() {
-        let name = $(".customer_id option:selected").data("name") ? $(".customer_id option:selected").data("name") : "";
-        $(".recipient").val(name);
+    // delete
+    $(".delete-parent").click(function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                let id = $(".id").val();
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("terima-faktur-lokal/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = "<?= base_url("terima-faktur-lokal"); ?>"
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
     })
 
     $(".supplier_id").change(function() {
         let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
-        $(".sender").val(name);
         if($(".supplier_id option:selected").val())
         {
             if($(".tipe_bahan").val() === "BAKU")
@@ -555,7 +649,6 @@ $(document).ready(function() {
 
 const changeTipeBahan = function()
 {
-    $(".sender").val("");
     if($(".tipe_bahan").val() === "BAKU")
     {
         $.ajax({
