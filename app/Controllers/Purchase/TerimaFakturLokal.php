@@ -114,6 +114,24 @@ class TerimaFakturLokal extends BaseController
         return view('Purchase/terimaFakturLokal/form', $data);
     }
 
+    public function getBySupplierId($supplierId = null)
+    {
+        //Get Faktur
+        $responseFaktur = curl_request("GET", "/tandaTerimaFaktur/getBySupplier/$supplierId", $this->token);
+
+        $dataFaktur = [];
+        if ($responseFaktur["code"] === 200) {
+            $dataFaktur = json_decode($responseFaktur["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataFaktur
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function allTerimaFakturLokal()
     {
         $payload = [
