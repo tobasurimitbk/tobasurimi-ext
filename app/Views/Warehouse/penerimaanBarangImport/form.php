@@ -1097,12 +1097,12 @@
                     {
                         if(item.barang_id == barang_id)
                         {
-                            total_sementara = total_sementara + item.qty;
+                            total_masuk_sementara = total_masuk_sementara + item.qty;
                         }
                     }
                 })
 
-                if(total_sementara > doc_qty)
+                if(total_masuk_sementara > doc_qty)
                 {
                     validate_jml_masuk = true;
                 }
