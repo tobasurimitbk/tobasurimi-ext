@@ -31,7 +31,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php
                                     }
                                 }
@@ -51,10 +51,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($data) ? ($data->no_order === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control no_order" id="no_order" name="no_order" placeholder="No. Order" value="<?= !empty($data) ? $data->no_order : ""; ?>">
+                                    <input <?= !empty($data) ? ($data->no_po === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control no_order" id="no_order" name="no_order" placeholder="No. Order" value="<?= !empty($data) ? $data->no_po : ""; ?>">
                                     <label for="floatingInput">No. SPP</label>
                                 </div>
-                                <div style="<?= !empty($data) ? ($data->no_order === true ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($data) ? ($data->no_po === true ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -83,13 +83,13 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->estimated_freight : ""; ?>">
                             <label for="floatingInput">Estimated Freight</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control terms" id="terms" name="terms" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?= !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->payment_terms : ""; ?>">
                             <label for="floatingInput">Terms</label>
                         </div>
                     </div>
@@ -98,13 +98,13 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->ppn : ""; ?>">
                             <label for="floatingInput">PPN</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control description" id="description" name="description" <?= !empty($data) ? ($data->description === true ? 'disabled=true' : '') : ''; ?> placeholder="description" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="text" class="form-control keterangan" id="keterangan" name="keterangan" <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> placeholder="keterangan" value="<?= !empty($data) ? $data->keterangan : ""; ?>">
                             <label for="floatingInput">Deskripsi</label>
                         </div>
                     </div>
@@ -172,7 +172,23 @@
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                            <?php
+                            $no = 1;
+                            $total_harga_barang = 0;
+                            $total_qty = 0;
+                            $total_harga = 0;
+                            if (!empty($data)) {
+                                foreach ($data->detail as $d) {
+                                    $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $d->harga_barang), "STR_TO_INT");
+                                    $total_qty = $total_qty + $d->qty;
+                                    $total_harga = $total_harga + formatter(str_replace(",", "", $d->amount), "STR_TO_INT");
+                            ?>
 
+
+                            <?php
+                                    $no++;
+                                }
+                            } ?>
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
