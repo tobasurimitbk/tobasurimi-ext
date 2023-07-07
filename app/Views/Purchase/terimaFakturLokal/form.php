@@ -10,10 +10,49 @@
             Batal
         </a>
         <?php if(!empty($dataTerimaFaktur)){ ?> 
+            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
+            <button class="btn btn-hapus delete-parent float-right">
+                Hapus
+            </button>
+            <?php } ?> 
 
             <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/tandaTerimaFaktur/print/<?= $dataTerimaFaktur->id ?>')">
                 Print
             </button>
+
+            <?php if($dataSPP->is_posted === false && $dataSPP->approved_by_director !== 0){ 
+                if($dataSPP->approved_by_head_of_purchasing !== 0 && $dataSPP->approved_by_headwarehouse !== 0){ 
+            ?> 
+
+            <button class="btn btn-success posting-spp">
+                Posting
+            </button>
+
+            <?php } 
+            }
+            ?> 
+
+            <?php } ?> 
+
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("spp"); ?>">
+                Batal
+            </a>
+
+            <?php if(!empty($dataSPP)){ 
+                if($dataSPP->is_posted === false){ ?> 
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan
+            </button>
+            <?php }
+            } else { ?> 
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan
+            </button>
+        <?php } ?> 
+
+        <?php if(!empty($dataTerimaFaktur)){ ?> 
+
+            
 
         <?php } else { ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
@@ -35,7 +74,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->date_of_receipt : ""; ?>" class="form-control input-picker date_of_receipt" id="date_of_receipt" name="date_of_receipt" placeholder="Tanggal Penerimaan">
+                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->date_of_receipt : ""; ?>" class="form-control input-picker date_of_receipt" id="date_of_receipt" name="date_of_receipt" placeholder="Tanggal Penerimaan">
                         <label for="floatingInput">Tanggal Penerimaan</label>
                     </div>
                 </div>
@@ -43,7 +82,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->faktur_no : ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur">
+                                <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->faktur_no : ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur">
                                 <label for="floatingInput">No. Terima Faktur</label>
                             </div>
                             <div style="<?= !empty($dataTerimaFaktur) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -56,7 +95,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
+                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
                             <option value="BAKU" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "BAKU" ? "selected" : "") : ""; ?>>Bahan Baku</option>
                             <option value="PENOLONG" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "PENOLONG" ? "selected" : "") : ""; ?>>Bahan Penolong</option>
                         </select>
@@ -65,7 +104,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
                             <option value=""></option>
                             <?php
                             if (!empty($dataSupplier)) {
@@ -84,7 +123,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select multiple disabled="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                        <select multiple <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : "disabled=true"; ?> class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                             <option value=""></option>
                             <?php
                             if (!empty($dataNo)) {
@@ -101,7 +140,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->due_date : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
+                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->due_date : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
@@ -109,13 +148,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
+                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
                         <label for="floatingInput">Nominal Faktur</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> class="form-select customer_id" name="customer_id" id="customer_id">
+                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?>class="form-select customer_id" name="customer_id" id="customer_id">
                             <option value=""></option>
                             <?php
                             if (!empty($dataCustomer)) {
@@ -134,7 +173,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? "disabled=true" : ""; ?> type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
+                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>

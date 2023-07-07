@@ -241,4 +241,21 @@ class Shift extends BaseController
         }
         return;
     }
+
+    public function dropdownShift()
+    {
+        $responseShift = curl_request("GET", "/shift/all", $this->token);
+
+        $dataShift = [];
+        if ($responseShift["code"] === 200) {
+            $dataShift = json_decode($responseShift["body"])->data;
+        }
+
+        $data = [
+            "data" => $dataShift
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

@@ -201,37 +201,37 @@ class TerimaFakturLokal extends BaseController
                     "tipe_bahan" => $this->request->getPost("tipe_bahan")
                 ]);
     
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
+                $data = [
+                    "status"            => false,
+                    "message"    => $payload,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
                 
-                $response = curl_request("POST", "/tandaTerimaFaktur", $this->token, $payload);
+                // $response = curl_request("POST", "/tandaTerimaFaktur", $this->token, $payload);
     
-                if ($response["code"] === 200) {
-                    $data = [
-                        "id" => json_decode($response["body"])->data->id,
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
-                    ];
-                    echo json_encode($data);
-                }
+                // if ($response["code"] === 200) {
+                //     $data = [
+                //         "id" => json_decode($response["body"])->data->id,
+                //         "status"            => true,
+                //         "message"   => "Data Berhasil disimpan",
+                //         "payload"   => $payload,
+                //         'token' => csrf_hash(),
+                //         'code' => $response["code"]
+                //     ];
+                //     echo json_encode($data);
+                // } else {
+                //     $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                //     $data = [
+                //         "status"            => false,
+                //         "message"    => $message,
+                //         "payload"   => $payload,
+                //         'token' => csrf_hash(),
+                //         'code' => $response["code"]
+                //     ];
+                //     echo json_encode($data);
+                // }
             } else {
                 $data = [
                     "status"            => false,

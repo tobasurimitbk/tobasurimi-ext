@@ -1409,7 +1409,7 @@
                                         cancelButtonText: 'Batal',
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            selisih = doc_qty - konversi;
+                                            selisih = konversi - doc_qty;
                                             total_jml_order = total_jml_order + qty;
                                             total_jml_dokumen = total_jml_dokumen + doc_qty;
                                             total_jml_masuk = total_jml_masuk + jml_masuk;

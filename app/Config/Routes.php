@@ -236,6 +236,8 @@ $routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimaf
 $routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/save', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/delete', 'Purchase\TerimaFakturLokal::deleteTerimaFakturLokal', ['filter' => 'Auth']);
 
 // TERIMA FAKTUR IMPORT
 $routes->get('/terima-faktur-import', 'Purchase\TerimaFakturImport::terimaFakturImport', ['filter' => 'Auth']);
@@ -243,6 +245,8 @@ $routes->get('/terima-faktur-import/all', 'Purchase\TerimaFakturImport::allTerim
 $routes->get('/terima-faktur-import/id/(:segment)', 'Purchase\TerimaFakturImport::getByIdTerimaFakturImport/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-import/create', 'Purchase\TerimaFakturImport::createTerimaFakturImport', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-import/save', 'Purchase\TerimaFakturImport::saveTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/update', 'Purchase\TerimaFakturImport::updateTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/delete', 'Purchase\TerimaFakturImport::deleteTerimaFakturImport', ['filter' => 'Auth']);
 
 // PEMBAYARAN
 // PEMBAYARAN PO LOKAL
@@ -315,6 +319,7 @@ $routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm:
 
 
 // DROPDOWN
+
 // TERIMA FAKTUR
 $routes->get('/penerimaan-barang-lokal/dropdown', 'Warehouse\PenerimaanBarangLokal::dropdownpenerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/dropdown', 'Warehouse\PenerimaanBarangImport::dropdownpenerimaanBarangImport', ['filter' => 'Auth']);
@@ -343,6 +348,8 @@ $routes->get('/city/(:segment)', 'Master\City::getCityByProvince/$1', ['filter' 
 $routes->get('/employee/dropdown', 'Master\Employee::dropdownEmployee', ['filter' => 'Auth']);
 $routes->get('/employee-pic/dropdown', 'Master\Employee::dropdownEmployeePIC', ['filter' => 'Auth']);
 
+// SHIFT
+$routes->get('/shift/dropdown', 'Master\Shift::dropdownShift', ['filter' => 'Auth']);
 // METADATA
 $routes->get('/metadata/dropdown', 'Master\Metadata::dropdownMetadata', ['filter' => 'Auth']);
 
