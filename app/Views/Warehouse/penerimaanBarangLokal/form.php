@@ -128,7 +128,7 @@
                             if (!empty($dataAJU)) {
                                 foreach ($dataAJU as $aju) {
                             ?>
-                                    <option value="<?= $aju->id; ?>" <?= (!empty($dataPenerimaanBarang) ? ($aju->id === $dataPenerimaanBarang->aju_type ? "selected" : "") : ""); ?>><?= $aju->value; ?></option>
+                                    <option value="<?= $aju->id; ?>" <?= (!empty($dataPenerimaanBarang) ? ($aju->id === $dataPenerimaanBarang->aju_document_type ? "selected" : "") : ""); ?>><?= $aju->value; ?></option>
                             <?php
                                 }
                             }
