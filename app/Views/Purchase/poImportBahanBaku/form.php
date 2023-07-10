@@ -15,7 +15,7 @@
     </button>
     <?php } ?> 
 
-    <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/rawMaterialImportPO/print/<?= $dataPOLokal->id ?>')">
+    <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/rawMaterialImportPO/print/<?= $dataPOImport->id ?>')">
         Print
     </button>
 
@@ -1120,7 +1120,6 @@
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -1169,23 +1168,23 @@
 
             let validate_same = false;
 
-            list_items.map(item => {
-                if(barang_id !== '')
-                {
-                    if(item.barang_id == barang_id)
-                    {
-                        // kalau edit barang, barang tidak ganti tidak kena validasi
-                        if(row_detail === item.row)
-                        {
-                            validate_same = false;
-                        }
-                        else
-                        {
-                            validate_same = true;
-                        }
-                    }
-                }
-            })
+            // list_items.map(item => {
+            //     if(barang_id !== '')
+            //     {
+            //         if(item.barang_id == barang_id)
+            //         {
+            //             // kalau edit barang, barang tidak ganti tidak kena validasi
+            //             if(row_detail === item.row)
+            //             {
+            //                 validate_same = false;
+            //             }
+            //             else
+            //             {
+            //                 validate_same = true;
+            //             }
+            //         }
+            //     }
+            // })
 
             if(validate_same)
             {
@@ -1520,7 +1519,6 @@
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                     icon: 'success',
                                     title: response.message,
@@ -1663,7 +1661,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1708,7 +1705,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,

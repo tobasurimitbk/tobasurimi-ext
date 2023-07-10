@@ -231,22 +231,23 @@ $routes->post('/po-import-bahan-penolong/update-status', 'Purchase\POImportBahan
 $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolong::deletePOImportBahanPenolong', ['filter' => 'Auth']);
 
 // TERIMA FAKTUR LOKAL
-$routes->get('/terima-faktur-lokal', 'Purchase\TerimafakturLokal::terimafakturLokal', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-lokal/all', 'Purchase\TerimafakturLokal::allTerimafakturLokal', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimafakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-lokal/create', 'Purchase\TerimafakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-lokal/save', 'Purchase\TerimafakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-lokal/update', 'Purchase\TerimafakturLokal::updateTerimafakturLokal', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-lokal/delete', 'Purchase\TerimafakturLokal::deleteTerimafakturLokal', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/getBySupplier/(:num)', 'Purchase\TerimaFakturLokal::getBySupplierId/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimafakturLokal', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimafakturLokal', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/save', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/delete', 'Purchase\TerimaFakturLokal::deleteTerimaFakturLokal', ['filter' => 'Auth']);
 
 // TERIMA FAKTUR IMPORT
-$routes->get('/terima-faktur-import', 'Purchase\TerimafakturImport::terimafakturImport', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-import/all', 'Purchase\TerimafakturImportl::allTerimafakturImport', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-import/id/(:segment)', 'Purchase\TerimafakturImport::getByIdTerimafakturImport/$1', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-import/create', 'Purchase\TerimafakturImport::createTerimafakturImport', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-import/save', 'Purchase\TerimafakturImport::saveTerimafakturImport', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-import/update', 'Purchase\TerimafakturImport::updateTerimafakturImport', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-import/delete', 'Purchase\TerimafakturImport::deleteTerimafakturImport', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import', 'Purchase\TerimaFakturImport::terimaFakturImport', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import/all', 'Purchase\TerimaFakturImport::allTerimaFakturImport', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import/id/(:segment)', 'Purchase\TerimaFakturImport::getByIdTerimaFakturImport/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-import/create', 'Purchase\TerimaFakturImport::createTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/save', 'Purchase\TerimaFakturImport::saveTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/update', 'Purchase\TerimaFakturImport::updateTerimaFakturImport', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-import/delete', 'Purchase\TerimaFakturImport::deleteTerimaFakturImport', ['filter' => 'Auth']);
 
 // PEMBAYARAN
 // PEMBAYARAN PO LOKAL
@@ -319,6 +320,11 @@ $routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm:
 
 
 // DROPDOWN
+
+// TERIMA FAKTUR
+$routes->get('/penerimaan-barang-lokal/dropdown', 'Warehouse\PenerimaanBarangLokal::dropdownpenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/dropdown', 'Warehouse\PenerimaanBarangImport::dropdownpenerimaanBarangImport', ['filter' => 'Auth']);
+
 // SUPPLIER 
 $routes->get('/supplier-bahan-baku/dropdown', 'Supplier\SupplierBahanBaku::dropdownSupplier', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-penolong/dropdown', 'Supplier\SupplierBahanPenolong::dropdownSupplier', ['filter' => 'Auth']);
@@ -343,6 +349,8 @@ $routes->get('/city/(:segment)', 'Master\City::getCityByProvince/$1', ['filter' 
 $routes->get('/employee/dropdown', 'Master\Employee::dropdownEmployee', ['filter' => 'Auth']);
 $routes->get('/employee-pic/dropdown', 'Master\Employee::dropdownEmployeePIC', ['filter' => 'Auth']);
 
+// SHIFT
+$routes->get('/shift/dropdown', 'Master\Shift::dropdownShift', ['filter' => 'Auth']);
 // METADATA
 $routes->get('/metadata/dropdown', 'Master\Metadata::dropdownMetadata', ['filter' => 'Auth']);
 

@@ -123,7 +123,16 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
-                            <option value="NON PABEAN" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->aju_document_type === "NON PABEAN" ? "selected" : "") : ""; ?>>NON PABEAN</option>
+                            <option value=""></option>
+                            <?php
+                            if (!empty($dataAJU)) {
+                                foreach ($dataAJU as $aju) {
+                            ?>
+                                    <option value="<?= $aju->id; ?>" <?= (!empty($dataPenerimaanBarang) ? ($aju->id === $dataPenerimaanBarang->aju_document_type ? "selected" : "") : ""); ?>><?= $aju->value; ?></option>
+                            <?php
+                                }
+                            }
+                            ?>
                         </select>
                         <label for="floatingInput">Jenis Dokumen</label>
                     </div>
@@ -270,8 +279,8 @@
                                 $total_jml_masuk = $total_jml_masuk + $details->jml_masuk;
                                 $total_selisih = $total_selisih + $details->selisih;
                                 $total_konversi = $total_konversi + $details->konversi;
-                                $total_harga = $total_harga + formatter(str_replace(",", "", $details->harga ? $details->harga : 0), "STR_TO_INT");
-                                $total_penyerahan = $total_penyerahan + formatter(str_replace(",", "", $details->penyerahan ? $details->penyerahan : 0), "STR_TO_INT");
+                                $total_harga = $total_harga + ($details->harga ? formatter(str_replace(",", "", $details->harga), "STR_TO_INT") : 0);
+                                $total_penyerahan = $total_penyerahan + ($details->penyerahan ? formatter(str_replace(",", "", $details->penyerahan), "STR_TO_INT") : 0);
                         ?> 
     
                             <tr>
@@ -784,6 +793,39 @@
             autoclose: true
         })
 
+
+        // AJU DOCUMENT TYPE
+        $('.aju_document_type').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.aju_document_type')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.aju_document_type')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.aju_document_type')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        $('.aju_document_type')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         // PO NO
         $('.multiple_po_id').select2({
             placeholder: "",
@@ -948,6 +990,66 @@
             }
         })
 
+        // delete
+        $(".delete-parent").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $(".id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("penerimaan-barang-import/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("penerimaan-barang-import"); ?>"
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+        })
+
         $(".btn-submit-detail").click(function() {
             let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
             let kode_barang = $(".kode").val()
@@ -1011,30 +1113,55 @@
             else
             {
                 let validate_same = false;
+                let validate_jml_masuk = false;
+                var total_masuk_sementara = 0;
+
+                // list_items.map(item => {
+                //     if(barang_id !== '')
+                //     {
+                //         if(item.barang_id == barang_id)
+                //         {
+                //             // kalau edit barang, barang tidak ganti tidak kena validasi
+                //             if(row_detail === item.row)
+                //             {
+                //                 validate_same = false;
+                //             }
+                //             else
+                //             {
+                //                 validate_same = true;
+                //             }
+                //         }
+                //     }
+                // })
 
                 list_items.map(item => {
                     if(barang_id !== '')
                     {
                         if(item.barang_id == barang_id)
                         {
-                            // kalau edit barang, barang tidak ganti tidak kena validasi
-                            if(row_detail === item.row)
-                            {
-                                validate_same = false;
-                            }
-                            else
-                            {
-                                validate_same = true;
-                            }
+                            total_masuk_sementara = total_masuk_sementara + item.qty;
                         }
                     }
                 })
 
-                if(validate_same)
+                if(total_masuk_sementara > doc_qty)
+                {
+                    validate_jml_masuk = true;
+                }
+
+                // if(validate_same)
+                // {
+                //     Swal.fire({
+                //         icon: 'error',
+                //         title: "Barang Sudah Ada",
+                //         confirmButtonColor: '#4e73df',
+                //     })
+                // }
+                if(validate_jml_masuk)
                 {
                     Swal.fire({
                         icon: 'error',
-                        title: "Barang Sudah Ada",
+                        title: "Qty sudah melebihi jumlah dokumen",
                         confirmButtonColor: '#4e73df',
                     })
                 }
@@ -1281,7 +1408,7 @@
                                         cancelButtonText: 'Batal',
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            selisih = doc_qty - konversi;
+                                            selisih = konversi - doc_qty;
                                             total_jml_order = total_jml_order + qty;
                                             total_jml_dokumen = total_jml_dokumen + doc_qty;
                                             total_jml_masuk = total_jml_masuk + jml_masuk;
@@ -1544,7 +1671,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1589,7 +1715,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1874,7 +1999,6 @@
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                     icon: 'success',
                                     title: response.message,

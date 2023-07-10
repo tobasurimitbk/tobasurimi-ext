@@ -805,7 +805,6 @@
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -1236,7 +1235,6 @@
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                     icon: 'success',
                                     title: response.message,
@@ -1389,7 +1387,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1434,7 +1431,6 @@
                                     success: function(response) {
                                         csrf.val(response.token);
                                         if (response.status) {
-                                            stopLoading()
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,

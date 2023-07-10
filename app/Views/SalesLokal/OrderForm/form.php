@@ -31,7 +31,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php
                                     }
                                 }
@@ -51,10 +51,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($data) ? ($data->no_order === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control no_order" id="no_order" name="no_order" placeholder="No. Order" value="<?= !empty($data) ? $data->no_order : ""; ?>">
+                                    <input <?= !empty($data) ? ($data->no_po === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control no_order" id="no_order" name="no_order" placeholder="No. Order" value="<?= !empty($data) ? $data->no_po : ""; ?>">
                                     <label for="floatingInput">No. SPP</label>
                                 </div>
-                                <div style="<?= !empty($data) ? ($data->no_order === true ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($data) ? ($data->no_po === true ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -83,13 +83,13 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->estimated_freight : ""; ?>">
                             <label for="floatingInput">Estimated Freight</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control terms" id="terms" name="terms" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?= !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->payment_terms : ""; ?>">
                             <label for="floatingInput">Terms</label>
                         </div>
                     </div>
@@ -98,13 +98,13 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->ppn : ""; ?>">
                             <label for="floatingInput">PPN</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control description" id="description" name="description" <?= !empty($data) ? ($data->description === true ? 'disabled=true' : '') : ''; ?> placeholder="description" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input type="text" class="form-control keterangan" id="keterangan" name="keterangan" <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> placeholder="keterangan" value="<?= !empty($data) ? $data->keterangan : ""; ?>">
                             <label for="floatingInput">Deskripsi</label>
                         </div>
                     </div>
@@ -163,8 +163,7 @@
                                 <th>#</th>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
-                                <th>Satuan</th>
-                                <th>Spesifikasi</th>
+                                <th>Qty</th>
                                 <th>Harga Barang</th>
                                 <th>Qty</th>
                                 <th>Total Harga</th>
@@ -173,13 +172,31 @@
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                            <?php
+                            $no = 1;
+                            $total_harga_barang = 0;
+                            $total_qty = 0;
+                            $total_harga = 0;
+                            if (!empty($data)) {
+                                foreach ($data->detail as $d) {
+                                    $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $d->harga_barang), "STR_TO_INT");
+                                    $total_qty = $total_qty + $d->qty;
+                                    $total_harga = $total_harga + formatter(str_replace(",", "", $d->amount), "STR_TO_INT");
+                            ?>
 
+
+                            <?php
+                                    $no++;
+                                }
+                            } ?>
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
                                 <td colspan="4"></td>
-                                <td colspan="4"></td>
                                 <td><b>TOTAL</b></td>
+                                <td><b><?= number_format($total_harga_barang); ?></b></td>
+                                <td><b><?= $total_qty; ?></b></td>
+                                <td><b><?= number_format($total_harga); ?></b></td>
                                 <td colspan="2"></td>
                             </tr>
                         </tfoot>
@@ -200,7 +217,8 @@
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
+                    <input type="hidden" class="id_barang" name="id_barang" id="id_barang" />
+
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -228,7 +246,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga">
+                                <input type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga" disabled>
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
@@ -253,6 +271,15 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+
+    let list_items = [];
+    let list_delete = [];
+    var row = 0;
+    var total_harga_barang = 0;
+    var total_qty = 0;
+    var total_harga = 0;
+    var priceEdit = 0;
+    var totalPriceEdit = 0;
 
     $(document).ready(function() {
         // Customer
@@ -316,7 +343,7 @@
 
     var validator = $(".create-form").validate({
         rules: {
-            nama_karyawan: {
+            id_customer: {
                 required: true
             },
             total_pinjaman: {
@@ -327,8 +354,8 @@
             },
         },
         messages: {
-            nama_karyawan: {
-                required: "Nama Karyawan wajib diisi"
+            id_customer: {
+                required: "Nama Customer wajib diisi"
             },
             total_pinjaman: {
                 required: "Total Pinjaman wajib diisi"
@@ -360,11 +387,76 @@
     });
 
     // MODAL
+    var validator_detail = $(".detail-form").validate({
+        rules: {
+            id_barang: {
+                required: true
+            },
+            harga: {
+                required: true
+            },
+            qty: {
+                required: true
+            },
+            // amount: {
+            //     required: true
+            // },
+            harga: {
+                required: true
+            }
+        },
+        messages: {
+            id_barang: {
+                required: "Nama barang wajib diisi"
+            },
+            harga: {
+                required: "Harga wajib diisi"
+            },
+            qty: {
+                required: "Qty wajib diisi"
+            },
+            // amount: {
+            //     required: "Satuan wajib diisi"
+            // },
+            harga: {
+                required: "Harga wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
     $(".btn-hide-detail").click(function() {
         $(".detail-modal").modal("hide")
     })
 
     $(".btn-show-detail").click(function() {
+        $(".id_detail").val('')
+        $(".id_barang").empty('')
+        $(".id_barang").val('').change()
+        $(".harga").val('')
+        $(".qty").val('')
+        $(".amount").val('')
+        $(".Keterangan").val('')
+
         $(".id_barang").val('')
 
         $.ajax({
@@ -386,8 +478,179 @@
         })
     })
 
+    $(".harga, .qty").keyup(function() {
+        let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
+        let qty = $(".qty").val() ? parseInt($(".qty").val()) : 0;
+
+        let amount = (harga * qty).toLocaleString();
+        $(".amount").val(amount);
+    })
+
+    $(".btn-submit-detail").click(function() {
+        let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
+        let id_barang = $(".id_barang option:selected").val()
+        let harga = $(".harga").val()
+        let qty = $(".qty").val()
+        let amount = $(".amount").val()
+        let Keterangan = $(".keterangan").val()
+
+        let validate_same = false;
+
+        if ($(".detail-form").valid()) {
+
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then(result => {
+                console.log(id)
+                let new_list_items = []
+                let tag_html = "";
+                let tag_total = "";
+
+                row = 0;
+
+                $(".body-detail-table").empty()
+
+                total_harga_barang = 0;
+                total_qty = 0;
+                total_harga = 0;
+
+                list_items.map(item => {
+                    if (item.row == row_detail) {
+                        tag_html += `<tr>`;
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += row + 1;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += kode_barang;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += nama_barang;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += nama_satuan;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += spesifikasi;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += harga;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += qty;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += total;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += keterangan;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_list_items.push({
+                            id: item.id,
+                            row: row + 1,
+                            barang_id: barang_id,
+                            kode_barang: kode_barang,
+                            nama_barang: nama_barang,
+                            harga: harga,
+                            qty: qty,
+                            total: total,
+                            keterangan: keterangan
+                        });
+
+                        row = row + 1;
+
+                        total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
+                        total_qty = total_qty + Number(qty);
+                        total_harga = total_harga + Number(total.replaceAll(",", ""));
+                    } else {
+                        tag_html += `<tr>`;
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += row + 1;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.kode_barang;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.nama_barang;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.nama_satuan;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.spesifikasi;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.harga;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.qty;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.total;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail">`;
+                        tag_html += item.keterangan;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_list_items.push(item);
+
+                        row = row + 1;
+
+                        total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
+                        total_qty = total_qty + Number(item.qty);
+                        total_harga = total_harga + Number(item.total.replaceAll(",", ""));
+                    }
+                })
+
+                $(".body-detail-table").append(tag_html)
+
+                $(".foot-detail-table").empty()
+
+                tag_total += `<tr>`;
+                tag_total += "<td colspan='4'>";
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += "<b>TOTAL</b>";
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_qty}</b>`;
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                tag_total += "</td>";
+                tag_total += "<td colspan='2'>";
+                tag_total += "</td>";
+                tag_total += "</tr>";
+
+                $(".foot-detail-table").append(tag_total);
+
+                $(".detail-modal").modal("hide")
+            })
+        }
+    })
+
     $(".btn-submit").click(function() {
-        console.log("Submit")
+        if ($(".create-form").valid()) {
+            console.log("Submit")
+        }
     })
 
     const changeStatus = function() {

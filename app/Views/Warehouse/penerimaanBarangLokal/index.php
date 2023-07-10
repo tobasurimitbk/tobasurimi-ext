@@ -48,7 +48,7 @@
                             <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                             <th onclick="changeSort('no_po')" class="sort">No. PO</th>
                             <th onclick="changeSort('acceptance_type')" class="sort">Single/Multiple</th>
-                            <th onclick="changeSort('aju_document_type')" class="sort">Jenis Dokumen</th>
+                            <th onclick="changeSort('aju_type')" class="sort">Jenis Dokumen</th>
                             <th onclick="changeSort('aju_no')" class="sort">No. AJU</th>
                             <th onclick="changeSort('validation_date')" class="sort">Tanggal Daftar</th>
                             <th onclick="changeSort('sender_name')" class="sort">Pengirim</th>
@@ -90,6 +90,8 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
+                data.sort = sort;
+                data.sortType = sortType;
             }
         },
         // scrollX: true,
@@ -119,7 +121,7 @@
             className: "text-center"
         },
         {
-            data: "aju_document_type",
+            data: "aju_type",
             className: "text-center"
         },
         {
@@ -191,5 +193,14 @@
             location.replace(`<?= base_url("penerimaan-barang-lokal/id"); ?>/${data.id}`);
         })
     })
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 <?= $this->endSection(); ?>

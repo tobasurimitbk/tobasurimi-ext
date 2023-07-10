@@ -87,8 +87,38 @@ class OrderForm extends BaseController
     {
     }
 
-    public function getById()
+    public function getById($id = null)
     {
+        //Get Customers
+        $responseEmployee = curl_request("GET", "/customers/all?idCompany=$this->this_company_id", $this->token);
+
+        $dataCustomers = [];
+        if ($responseEmployee["code"] === 200) {
+            $dataCustomers = json_decode($responseEmployee["body"])->data;
+        }
+
+        $data = [
+            "dataCustomers" => $dataCustomers,
+        ];
+
+        //Get Detail
+        if (!empty($id)) {
+            $id = $this->encrypter->decrypt(hex2bin($id));
+            $responseDetail = curl_request("GET", "/salesOrderLokal/$id", $this->token);
+
+            $dataDetail = [];
+            if ($responseDetail["code"] === 200) {
+                $dataDetail = json_decode($responseDetail["body"])->data;
+            }
+
+            $data["data"] = $dataDetail;
+        }
+
+        // var_dump($data);
+        // exit;
+
+
+        return view('SalesLokal/OrderForm/form', $data);
     }
 
     public function update()
@@ -97,6 +127,49 @@ class OrderForm extends BaseController
 
     public function delete()
     {
+        try {
+            $id = $this->request->getPost("id");
+
+
+            if (!empty($id)) {
+                $id = $this->encrypter->decrypt(hex2bin($id));
+
+
+                $response = curl_request("DELETE", "/salesOrderLokal/$id", $this->token);
+
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            } else {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 
 

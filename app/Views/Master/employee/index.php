@@ -10,6 +10,10 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
+                    <input type="hidden" class="sot" name="sot" id="sot" />
+                    <input type="hidden" class="eot" name="eot" id="eot" />
+                    <input type="hidden" class="bsot" name="bsot" id="bsot" />
+                    <input type="hidden" class="beot" name="beot" id="beot" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-3 mb-3 view-cols-image">
@@ -24,8 +28,83 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nip" id="nip" name="nip" placeholder="Nip" maxlength="30">
+                                <input type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
                                 <label for="floatingInput">NIP</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK" maxlength="30">
+                                <label for="floatingInput">NIK</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select shift_id" name="shift_id" id="shift_id" aria-label="Floating label select example">
+                                    <option value="" data-sot="" data-eot="" data-bsot="" data-beot=""></option>
+                                </select>
+                                <label for="floatingInput">Shift</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select onchange="getCity()" class="form-select province_id" name="province_id" id="province_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataProvinces)) {
+                                        foreach ($dataProvinces as $province) {
+                                    ?>
+                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Provinsi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select city_id" name="city_id" id="city_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Kota</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Agama</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select marriage_id" name="marriage_id" id="marriage_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Status Kawin</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Anak">
+                                <label for="floatingInput">Anak</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
+                                <label for="floatingInput">Jabatan</label>
                             </div>
                         </div>
                     </div>
@@ -251,10 +330,180 @@
     });
 
     $(document).ready(function() {
+        $('.province_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.city_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.religion_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.marriage_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.shift_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $(".nik").mask("AAAAAAAAAAAAAAAA", {
+            translation: {
+                "A": {
+                    pattern: /[0-9]/,
+                }
+            }
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.province_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.province_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.province_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.city_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.city_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.city_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.religion_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.religion_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.religion_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.marriage_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.marriage_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.marriage_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.shift_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.shift_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.shift_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        $(".shift_id").change(function() {
+            if($(".shift_id option:selected").val())
+            {
+                let sot = $(".shift_id option:selected").data("sot") ? $(".shift_id option:selected").data("sot")  : "";
+                let eot = $(".shift_id option:selected").data("sot") ? $(".shift_id option:selected").data("sot")  : "";
+                let bsot = $(".shift_id option:selected").data("bsot") ? $(".shift_id option:selected").data("bsot")  : "";
+                let beot = $(".shift_id option:selected").data("beot") ? $(".shift_id option:selected").data("beot")  : "";
+
+                $(".sot").val(sot);
+                $(".eot").val(eot);
+                $(".bsot").val(bsot);
+                $(".beot").val(beot);
+            }
+            else
+            {
+                $(".sot").val('');
+                $(".eot").val('');
+                $(".bsot").val('');
+                $(".beot").val('');
+            }
+        })
+
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
                     required: true
+                },
+                nik: {
+                    required: true,
+                    minlength: 16,
+                    maxlength: 16
                 },
                 name: {
                     required: true
@@ -280,6 +529,27 @@
                 },
                 division_id: {
                     required: true,
+                },
+                province_id: {
+                    required: true,
+                },
+                city_id: {
+                    required: true,
+                },
+                religion_id: {
+                    required: true,
+                },
+                marriage_id: {
+                    required: true,
+                },
+                shift_id: {
+                    required: true,
+                },
+                child: {
+                    required: true,
+                },
+                jabatan: {
+                    required: true,
                 }
             },
             messages: {
@@ -288,6 +558,11 @@
                 },
                 nip: {
                     required: "NIP wajib diisi"
+                },
+                nik: {
+                    required: "NIK wajib diisi",
+                    minlength: "NIK Minimal 16 Digit",
+                    maxlength: "NIK Maksimal 16 Digit"
                 },
                 name: {
                     required: "Nama Lengkap wajib diisi"
@@ -314,10 +589,31 @@
                 division_id: {
                     required: "Divisi wajib diisi"
                 },
+                province_id: {
+                    required: "Provinsi wajib diisi"
+                },
+                city_id: {
+                    required: "Kota wajib diisi"
+                },
+                religion_id: {
+                    required: "Agama wajib diisi"
+                },
+                marriage_id: {
+                    required: "Status Kawin wajib diisi"
+                },
+                shift_id: {
+                    required: "Shift wajib diisi"
+                },
+                child: {
+                    required: "Anak wajib diisi"
+                },
                 pin: {
                     required: "PIN wajib diisi",
                     minlength: "Minimal dan Maksimal 6 Karakter",
                     maxlength: "Minimal dan Maksimal 6 Karakter"
+                },
+                jabatan: {
+                    required: "Jabatan wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -325,19 +621,19 @@
             errorPlacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $(".select2-container").parent();
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
                     error.insertAfter(element);
                 } else {
                     error.insertAfter(element);
                 }
             },
             highlight: function(element) {
-                $(element).closest('.col-md-6').addClass('has-error');
+                $(element).closest('.form-group').addClass('has-error');
                 $(element).addClass('select-class');
 
             },
             unhighlight: function(element) {
-                $(element).closest('.col-md-6').removeClass('has-error');
+                $(element).closest('.form-group').removeClass('has-error');
                 $(element).removeClass('select-class');
             },
         });
@@ -355,8 +651,6 @@
 
         $(".phone_no").mask("0000000000000")
 
-        $(".acc_no").mask("000000000000000")
-
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".form-pin").css("display", "");
@@ -368,6 +662,12 @@
                 minlength: 6,
                 maxlength: 6
             });
+
+            $(".province_id").val('').change()
+            $(".city_id").val('').change()
+            $(".city_id").empty()
+            $(".city_id").append(`<option value=""></option>`)
+            
             $(".title-name").text("Tambah");
             validator.resetForm();
             validator.reset();
@@ -376,13 +676,65 @@
             $(".delete-btn").css('display', 'none');
 
             $.ajax({
+                url: `<?= base_url("shift/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".shift_id").empty()
+                    $(".shift_id").val("").change()
+                    $(".shift_id").append(`<option data-sot="" data-eot="" data-bsot="" data-beot="" value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".shift_id").append(`<option data-sot="${item.sot}" data-eot="${item.eot}" data-bsot="${item.bsot}" data-beot="${item.beot}" value="${item.id}">${item.nama_shift}</option>`)
+                    })
+
+                    $(".shift_id").val('').change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'status_pernikahan'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".marriage_id").empty()
+                    $(".marriage_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".marriage_id").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".marriage_id").val('').change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'religion'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".religion_id").empty()
+                    $(".religion_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".religion_id").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".religion_id").val('').change();
+                }
+            })
+
+            $.ajax({
                 url: `<?= base_url("divisi/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     $(".division_id").empty()
                     $(".division_id").val("").change()
-                    $(".divisionid").append(`<option value=""></option>`)
+                    $(".division_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
                         $(".division_id").append(`<option value="${item.id}">${item.divisi}</option>`)
                     })
@@ -604,11 +956,88 @@
                         $(".dob").val(res?.data?.dob);
                         $(".email").val(res?.data?.email);
                         $(".gender").val(res?.data?.gender);
-                        $(".name").val(res?.data?.employee_name);
+                        $(".name").val(res?.data?.name);
                         $(".nip").val(res?.data?.nip);
+                        $(".nik").val(res?.data?.nik);
                         $(".phone_no").val(res?.data?.phone_no);
                         $(".status").val(res?.data?.status);
+                        $(".jabatan").val(res?.data?.jabatan);
+                        $(".province_id").val(res?.data?.province_id).change();
+                        $(".child").val(res?.data?.child).change();
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
+
+                        // AJAX GET CITY
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_id").empty()
+                                $(".city_id").val("").change()
+                                $(".city_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                                })
+
+                                $(".city_id").val(res?.data?.city_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("shift/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".shift_id").empty()
+                                $(".shift_id").val("").change()
+                                $(".shift_id").append(`<option data-sot="" data-eot="" data-bsot="" data-beot="" value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".shift_id").append(`<option data-sot="${item.sot}" data-eot="${item.eot}" data-bsot="${item.bsot}" data-beot="${item.beot}" value="${item.id}">${item.nama_shift}</option>`)
+                                })
+
+                                $(".shift_id").val(res?.data?.shift_id).change();
+                                $(".sot").val(res?.data?.SOT);
+                                $(".eot").val(res?.data?.EOT);
+                                $(".bsot").val(res?.data?.BSOT);
+                                $(".beot").val(res?.data?.BEOT);
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'status_pernikahan'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".marriage_id").empty()
+                                $(".marriage_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".marriage_id").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".marriage_id").val(res?.data?.marriage_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'religion'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".religion_id").empty()
+                                $(".religion_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".religion_id").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".religion_id").val(res?.data?.religion_id).change();
+                            }
+                        })
 
                         $.ajax({
                             url: `<?= base_url("divisi/dropdown"); ?>`,
@@ -642,6 +1071,26 @@
     const previewPhoto = function() {
         let file = document.getElementById("employeeImg").files[0];
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
+    }
+
+    const getCity = function() {
+        const id = $(".province_id option:selected").val()
+
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+                }
+            })
+        }
     }
 
     const changeSort = function(val) {

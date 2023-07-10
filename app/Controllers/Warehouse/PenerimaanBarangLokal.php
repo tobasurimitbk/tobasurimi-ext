@@ -22,6 +22,13 @@ class PenerimaanBarangLokal extends BaseController
 
     public function createPenerimaanBarangLokal()
     {
+        //Get AJU
+        $responseAJU = curl_request("GET", "/penerimaanBarang/drop-down-aju", $this->token);
+
+        $dataAJU = [];
+        if ($responseAJU["code"] === 200) {
+            $dataAJU = json_decode($responseAJU["body"])->data;
+        }
         //Get Supplier
         $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
 
@@ -31,7 +38,8 @@ class PenerimaanBarangLokal extends BaseController
         }
 
         $data = [
-            "dataSupplier" => $dataSupplier
+            "dataSupplier" => $dataSupplier,
+            "dataAJU" => $dataAJU
         ];
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);
@@ -39,15 +47,22 @@ class PenerimaanBarangLokal extends BaseController
 
     public function getByIdPenerimaanBarangLokal($id = null)
     {
+        //Get AJU
+        $responseAJU = curl_request("GET", "/penerimaanBarang/drop-down-aju", $this->token);
+
+        $dataAJU = [];
+        if ($responseAJU["code"] === 200) {
+            $dataAJU = json_decode($responseAJU["body"])->data;
+        }
+
+        $data["dataAJU"] = $dataAJU;
 
         if (!empty($id)) {
             $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/$id", $this->token);
-
-            // var_dump($responsePenerimaanBarang);
-            // die;
-
-            $dataPenerimaanBarang = [];
-            if ($responsePenerimaanBarang["code"] === 200) {
+            $status_penerimaan = json_decode($responsePenerimaanBarang["body"])->data->status_penerimaan;
+            
+            if($status_penerimaan === "LOKAL")
+            {
                 $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
 
                 $tipe_bahan = json_decode($responsePenerimaanBarang["body"])->data->tipe_bahan;
@@ -70,6 +85,7 @@ class PenerimaanBarangLokal extends BaseController
                     
                     $data["dataNo"] = $dataNo;
                     $data["dataSupplier"] = $dataSupplier;
+                    $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
                 }
                 if($tipe_bahan === "PENOLONG")
                 {
@@ -91,8 +107,7 @@ class PenerimaanBarangLokal extends BaseController
                     $data["dataNo"] = $dataNo;
                     $data["dataSupplier"] = $dataSupplier;
                 }
-            }
-            $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
+            } 
         }
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);
@@ -130,7 +145,7 @@ class PenerimaanBarangLokal extends BaseController
                     "invoice_no" => $data->invoice_no,
                     "multiple_po_no" => $data->multiple_po_no,
                     "acceptance_type" => $data->acceptance_type,
-                    "aju_document_type" => $data->aju_document_type,
+                    "aju_type" => $data->aju_type,
                     "aju_no" => $data->aju_no,
                     "validation_date" => $data->validation_date,
                     "sender_name" => $data->sender_name,
@@ -204,7 +219,7 @@ class PenerimaanBarangLokal extends BaseController
                 "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
                 "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
                 "tipe_bahan" => $this->request->getPost("tipe_bahan"),
-                "aju_document_type" => $this->request->getPost("aju_document_type"),
+                "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
                 "aju_no" => $this->request->getPost("aju_no"),
                 "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
                 "no_registration" => $this->request->getPost("no_registration"),
@@ -327,7 +342,7 @@ class PenerimaanBarangLokal extends BaseController
                 "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
                 "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
                 "tipe_bahan" => $this->request->getPost("tipe_bahan"),
-                "aju_document_type" => $this->request->getPost("aju_document_type"),
+                "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
                 "aju_no" => $this->request->getPost("aju_no"),
                 "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
                 "no_registration" => $this->request->getPost("no_registration"),
@@ -478,6 +493,30 @@ class PenerimaanBarangLokal extends BaseController
             ];
             echo json_encode($data);
         }
+        return;
+    }
+
+    public function dropdownPenerimaanBarangLokal()
+    {
+        $payload = [
+            "idsupplier" => $this->request->getGet("id"),
+            "statuspenerimaan" => "LOKAL",
+            "tipebahan" => $this->request->getGet("tipe")
+        ];
+
+        $dataPenerimaanBarang = [];
+        $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/dropdown-tandaTerimaFaktur", $this->token, $payload);
+        if ($responsePenerimaanBarang["code"] === 200) {
+            $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
+        }
+
+        $data = [
+            "data" =>  $dataPenerimaanBarang,
+            "response" => $responsePenerimaanBarang,
+            "payload" => $payload
+        ];
+
+        echo json_encode($data);
         return;
     }
 }
