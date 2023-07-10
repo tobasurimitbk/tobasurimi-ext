@@ -36,11 +36,17 @@
                                 <label for="floatingInput">Holding Company</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)">
+                                <label for="floatingInput">Email (Optional)</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <textarea class="form-control address" id="address" name="address" placeholder="Address"></textarea>
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control address text-area-address-company" id="address" name="address" placeholder="Address"></textarea>
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
@@ -86,14 +92,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)">
-                                <label for="floatingInput">Email (Optional)</label>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </form>
             </div>
             <div class="modal-footer">
