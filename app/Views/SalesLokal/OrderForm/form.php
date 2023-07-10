@@ -496,154 +496,110 @@
 
         let validate_same = false;
 
-        if ($(".detail-form").valid()) {
-
+        if (validate_same) {
             Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
+                icon: 'error',
+                title: "Barang Sudah Ada",
                 confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then(result => {
-                console.log(id)
-                let new_list_items = []
-                let tag_html = "";
-                let tag_total = "";
-
-                row = 0;
-
-                $(".body-detail-table").empty()
-
-                total_harga_barang = 0;
-                total_qty = 0;
-                total_harga = 0;
-
-                list_items.map(item => {
-                    if (item.row == row_detail) {
-                        tag_html += `<tr>`;
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += row + 1;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += kode_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += nama_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += nama_satuan;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += spesifikasi;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += harga;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += qty;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += total;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += keterangan;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
-
-                        new_list_items.push({
-                            id: item.id,
-                            row: row + 1,
-                            barang_id: barang_id,
-                            kode_barang: kode_barang,
-                            nama_barang: nama_barang,
-                            harga: harga,
-                            qty: qty,
-                            total: total,
-                            keterangan: keterangan
-                        });
-
-                        row = row + 1;
-
-                        total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
-                        total_qty = total_qty + Number(qty);
-                        total_harga = total_harga + Number(total.replaceAll(",", ""));
-                    } else {
-                        tag_html += `<tr>`;
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += row + 1;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.kode_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.nama_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.nama_satuan;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.spesifikasi;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.harga;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.qty;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.total;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail">`;
-                        tag_html += item.keterangan;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
-
-                        new_list_items.push(item);
-
-                        row = row + 1;
-
-                        total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                        total_qty = total_qty + Number(item.qty);
-                        total_harga = total_harga + Number(item.total.replaceAll(",", ""));
-                    }
-                })
-
-                $(".body-detail-table").append(tag_html)
-
-                $(".foot-detail-table").empty()
-
-                tag_total += `<tr>`;
-                tag_total += "<td colspan='4'>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += "<b>TOTAL</b>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_qty}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td colspan='2'>";
-                tag_total += "</td>";
-                tag_total += "</tr>";
-
-                $(".foot-detail-table").append(tag_total);
-
-                $(".detail-modal").modal("hide")
             })
+        } else {
+            // update detail
+            if (row_detail) {
+
+                // create
+            } else {
+                if ($(".detail-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            list_items.push({
+                                id: "",
+                                row: row + 1,
+                                id_barang: id_barang,
+                                harga: harga,
+                                qty: qty,
+                                amount: amount,
+                                keterangan: keterangan
+                            });
+
+                            total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
+                            total_qty = total_qty + Number(qty);
+                            total_harga = total_harga + Number(amount.replaceAll(",", ""));
+
+                            let tag_html = "";
+                            let tag_total = "";
+
+                            tag_html += `<tr>`;
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += row + 1;
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += id_barang;
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += ""
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += ""
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += ""
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += harga;
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += qty;
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += amount;
+                            tag_html += "</td>";
+                            tag_html += `<td class="edit-table-detail">`;
+                            tag_html += keterangan;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+                            $(".body-detail-table").append(tag_html)
+
+                            $(".foot-detail-table").empty()
+
+                            tag_total += `<tr>`;
+                            tag_total += "<td colspan='4'>";
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += "<b>TOTAL</b>";
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>${total_qty}</b>`;
+                            tag_total += "</td>";
+                            tag_total += "<td>";
+                            tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                            tag_total += "</td>";
+                            tag_total += "<td colspan='2'>";
+                            tag_total += "</td>";
+                            tag_total += "</tr>";
+
+                            $(".foot-detail-table").append(tag_total);
+
+                            $(".detail-modal").modal("hide")
+                            row = row + 1;
+                        }
+                    })
+                }
+            }
         }
     })
 
