@@ -48,15 +48,15 @@
 </div>
 <div class="card">
     <div class="card-body">
-        <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+        <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
             <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->id : ""; ?>" />
             <?= csrf_field() ?>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">Data PO</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
@@ -114,12 +114,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">Data Dokumen</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
@@ -160,12 +160,12 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">No. Surat Jalan</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->letter_no : ""; ?>" type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Surat Jalan">
@@ -191,7 +191,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->shipping_cost : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
@@ -213,7 +213,7 @@
             </div>
         </form>
         <div class="col-subtitle-modal">
-            <div class="row mt-2">
+            <div class="row mt-3">
                 <div class="col-md-6">
                     <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                 </div>
@@ -314,7 +314,7 @@
                                         <td><?= $details->harga ? $details->harga : 0; ?></td>
                                         <td><?= $details->penyerahan ? $details->penyerahan : 0; ?></td>
                                         <td><?= $details->keterangan; ?></td>
-                                        <td><button class="btn-warning" onclick='view("<?= $no; ?>")'>View</button></td>
+                                        <td><button class="btn-view" onclick='view("<?= $no; ?>")'>View</button></td>
                                 <?php } ?>
                             
                             </tr>
@@ -346,7 +346,7 @@
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="max-width: 900px;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
@@ -356,11 +356,11 @@
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <input type="hidden" class="purchase_order_details_id" name="purchase_order_details_id" id="purchase_order_details_id" />
                     <div class="row">
-                        <div class="col-md-6">
-                            <h5>Data Barang</h5>
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Barang</h5>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="hidden" class="kode" name="kode" id="kode" />
@@ -379,7 +379,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control satuan_order" id="satuan_order" name="satuan_order" placeholder="Satuan Order">
@@ -393,20 +393,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
+                                <textarea readonly="true" class="form-control keterangan text-area-address-company" id="keterangan" name="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <h5>Detail Barang di Dokumen</h5>
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Detail Barang di Dokumen</h5>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control nama_barang_dokumen" id="nama_barang_dokumen" name="nama_barang_dokumen" placeholder="Nama Barang di dokumen">
@@ -420,7 +420,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-6">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="formatNumber(this)" type="text" class="form-control harga_barang_jasa" name="harga_barang_jasa" id="harga_barang_jasa" placeholder="Harga barang/jasa">
@@ -435,11 +435,11 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <h5>Data Tax</h5>
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Tax</h5>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
@@ -459,7 +459,7 @@
                     </div>
                 </form>
                 <div class="col-subtitle-modal">
-                    <div class="row mt-5">
+                    <div class="row mt-3">
                         <div class="col-md-6">
                             <h5 class="modal-sub-title">Aktual Penerimaan</h5>
                         </div>
@@ -486,13 +486,10 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
-                <label>&nbsp;</label>
-                <div class="d-flex">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                </div>
+                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
             </div>
         </div>
     </div>

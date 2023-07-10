@@ -24,8 +24,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
-                                <label for="floatingInput">NIP</label>
+                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
+                                <label for="floatingInput">Nama Lengkap</label>
                             </div>
                         </div>
                     </div>
@@ -38,8 +38,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Nama Lengkap</label>
+                                <input type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
+                                <label for="floatingInput">NIP</label>
                             </div>
                         </div>
                     </div>
@@ -96,14 +96,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Nomor Telepon</label>
+                                <input type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone (Optional)" maxlength="30">
+                                <label for="floatingInput">Nomor Telepon (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email" maxlength="30">
-                                <label for="floatingInput">Email</label>
+                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)" maxlength="30">
+                                <label for="floatingInput">Email (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -138,8 +138,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Anak">
-                                <label for="floatingInput">Anak</label>
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Jumlah Anak">
+                                <label for="floatingInput">Jumlah Anak</label>
                             </div>
                         </div>
                     </div>
@@ -205,8 +205,8 @@
                     <div class="row">
                         <div class="col-md-6 form-pin">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN">
-                                <label for="floatingInput">PIN</label>
+                                <input type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN (Optional)">
+                                <label for="floatingInput">PIN (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -485,12 +485,8 @@
                 address: {
                     required: true,
                 },
-                phone_no: {
-                    required: true
-                },
                 email: {
-                    email: true,
-                    required: true
+                    email: true
                 },
                 acc_no: {
                     required: true
@@ -527,9 +523,6 @@
                 }
             },
             messages: {
-                employeeImg: {
-                    required: "Foto wajib diisi"
-                },
                 nip: {
                     required: "NIP wajib diisi"
                 },
@@ -550,12 +543,8 @@
                 address: {
                     required: "Alamat wajib diisi"
                 },
-                phone_no: {
-                    required: "Nomor Telepon wajib diisi"
-                },
                 email: {
-                    email: "Email harus benar",
-                    required: "Email harus diisi"
+                    email: "Email harus benar"
                 },
                 acc_no: {
                     required: "Nomor Rekening wajib diisi"
@@ -579,7 +568,6 @@
                     required: "Anak wajib diisi"
                 },
                 pin: {
-                    required: "PIN wajib diisi",
                     minlength: "Minimal dan Maksimal 6 Karakter",
                     maxlength: "Minimal dan Maksimal 6 Karakter"
                 },
@@ -645,11 +633,7 @@
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".form-pin").css("display", "");
-            $('.employeeImg').rules('add', {
-                required: true
-            });
             $('.pin').rules('add', {
-                required: true,
                 minlength: 6,
                 maxlength: 6
             });
@@ -907,8 +891,6 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $(".form-pin").css("display", "none");
-            $('.employeeImg').rules('remove', 'required');
-            $('.pin').rules('remove', 'required');
             $('.pin').rules('remove', 'minlength');
             $('.pin').rules('remove', 'maxlength');
             $(".create-form")[0].reset()

@@ -134,16 +134,7 @@ class Employee extends BaseController
             "division_id" => [
                 "rules" => "required"
             ],
-            "phone_no" => [
-                "rules" => "required"
-            ],
-            "email" => [
-                "rules" => "required"
-            ],
             "acc_no" => [
-                "rules" => "required"
-            ],
-            "pin" => [
                 "rules" => "required"
             ],
             "nik" => [
@@ -202,7 +193,6 @@ class Employee extends BaseController
                         "email" => $this->request->getPost("email"),
                         "address" => $this->request->getPost("address"),
                         "status" => $this->request->getPost("status"),
-                        "pin" => $this->request->getPost("pin"),
                         "nik" => $this->request->getPost("nik"),
                         "child" => $this->request->getPost("child"),
                         "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
@@ -212,8 +202,34 @@ class Employee extends BaseController
                         "jabatan" => $this->request->getPost("jabatan"),
                         "bank_name" => $this->request->getPost("bank_name"),
                         "owner_name" => $this->request->getPost("owner_name"),
+                        "pin"  => $this->request->getPost("pin")
                     ]);
                 }
+            } else {
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "nip" => $this->request->getPost("nip"),
+                    "name" => $this->request->getPost("name"),
+                    "gender" => $this->request->getPost("gender"),
+                    "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
+                    "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
+                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                    "phone_no" => $this->request->getPost("phone_no"),
+                    "acc_no" => $this->request->getPost("acc_no"),
+                    "email" => $this->request->getPost("email"),
+                    "address" => $this->request->getPost("address"),
+                    "status" => $this->request->getPost("status"),
+                    "nik" => $this->request->getPost("nik"),
+                    "child" => $this->request->getPost("child"),
+                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                    "jabatan" => $this->request->getPost("jabatan"),
+                    "bank_name" => $this->request->getPost("bank_name"),
+                    "owner_name" => $this->request->getPost("owner_name"),
+                    "pin"  => $this->request->getPost("pin")
+                ]);
             }
 
             if ($payload) {
@@ -287,12 +303,6 @@ class Employee extends BaseController
                 "rules" => "required"
             ],
             "division_id" => [
-                "rules" => "required"
-            ],
-            "phone_no" => [
-                "rules" => "required"
-            ],
-            "email" => [
                 "rules" => "required"
             ],
             "acc_no" => [

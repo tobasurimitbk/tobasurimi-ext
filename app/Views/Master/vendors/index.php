@@ -26,13 +26,15 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">

@@ -54,8 +54,7 @@ class Divisi extends BaseController
             foreach ($body as $data) {
                 array_push($dataCompany, [
                     "id" => $data->id,
-                    "divisi" => $data->divisi,
-                    "jam_istirahat" => $data->jam_istirahat,
+                    "divisi" => $data->divisi
                 ]);
             }
         }
@@ -79,17 +78,13 @@ class Divisi extends BaseController
         $rules = [
             "divisi" => [
                 "rules" => "required"
-            ],
-            "jam_istirahat" => [
-                "rules" => "required"
             ]
         ];
 
         if ($this->validate($rules)) {
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
-                "divisi" => $this->request->getPost("divisi"),
-                "jam_istirahat" => $this->request->getPost("jam_istirahat"),
+                "divisi" => $this->request->getPost("divisi")
             ]);
             
             $response = curl_request("POST", "/divisis", $this->token, $payload);
@@ -139,9 +134,6 @@ class Divisi extends BaseController
         $rules = [
             "divisi" => [
                 "rules" => "required"
-            ],
-            "jam_istirahat" => [
-                "rules" => "required"
             ]
         ];
 
@@ -150,8 +142,7 @@ class Divisi extends BaseController
 
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
-                "divisi" => $this->request->getPost("divisi"),
-                "jam_istirahat" => $this->request->getPost("jam_istirahat"),
+                "divisi" => $this->request->getPost("divisi")
             ]);
             
             $response = curl_request("PATCH", "/divisis/$id", $this->token, $payload);

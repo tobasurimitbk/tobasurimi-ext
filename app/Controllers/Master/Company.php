@@ -58,8 +58,7 @@ class Company extends BaseController
                     "email" => $data->email,
                     "province_name" => $data->province_name,
                     "city_name" => $data->city_name,
-                    "zip_code" => $data->zip_code,
-                    "pic_name" => $data->pic_name
+                    "zip_code" => $data->zip_code
                 ]);
             }
         }
@@ -91,9 +90,6 @@ class Company extends BaseController
             "phone" => [
                 "rules" => "required"
             ],
-            "email" => [
-                "rules" => "required"
-            ],
             "zip_code" => [
                 "rules" => "required"
             ],
@@ -101,9 +97,6 @@ class Company extends BaseController
                 "rules" => "required"
             ],
             "city_id" => [
-                "rules" => "required"
-            ],
-            "pic_id" => [
                 "rules" => "required"
             ]
         ];
@@ -128,7 +121,6 @@ class Company extends BaseController
                         "address" => $this->request->getPost("address"),
                         "phone" => $this->request->getPost("phone"),
                         "email" => $this->request->getPost("email"),
-                        "pic_id" => formatter($this->request->getPost("pic_id"), "STR_TO_INT"),
                         "zip_code" => $this->request->getPost("zip_code"),
                         "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
                         "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
@@ -206,9 +198,6 @@ class Company extends BaseController
             "phone" => [
                 "rules" => "required"
             ],
-            "email" => [
-                "rules" => "required"
-            ],
             "zip_code" => [
                 "rules" => "required"
             ],
@@ -239,7 +228,6 @@ class Company extends BaseController
                         "address" => $this->request->getPost("address"),
                         "phone" => $this->request->getPost("phone"),
                         "email" => $this->request->getPost("email"),
-                        "pic_id" => formatter($this->request->getPost("pic_id"), "STR_TO_INT"),
                         "zip_code" => $this->request->getPost("zip_code"),
                         "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
                         "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
@@ -254,7 +242,6 @@ class Company extends BaseController
                     "address" => $this->request->getPost("address"),
                     "phone" => $this->request->getPost("phone"),
                     "email" => $this->request->getPost("email"),
-                    "pic_id" => formatter($this->request->getPost("pic_id"), "STR_TO_INT"),
                     "zip_code" => $this->request->getPost("zip_code"),
                     "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
                     "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")

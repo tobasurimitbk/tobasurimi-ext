@@ -51,7 +51,7 @@
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
             <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->id : ""; ?>" />
             <?= csrf_field() ?>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">Data PO</label>
                 </div>
@@ -114,7 +114,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">Data Dokumen</label>
                 </div>
@@ -160,7 +160,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">No. Surat Jalan</label>
                 </div>
@@ -347,7 +347,7 @@
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="max-width: 900px;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
@@ -397,7 +397,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan">
+                                <textarea readonly="true" class="form-control keterangan text-area-address-company" id="keterangan" name="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
@@ -1437,6 +1437,7 @@
                                             let tag_html = "";
                                             let tag_total = "";
 
+                                            console.log(keterangan);
                                             tag_html += `<tr>`;
                                             tag_html += `<td class="edit-table-detail" data-unit="${unit}" data-keterangan="${keterangan}" data-ppn="${ppn}" data-pph="${pph}" data-penyerahan="${nilai_penyerahan}" data-harga="${harga}" data-doc_qty="${doc_qty}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="" data-row="${row + 1}">`;
                                             tag_html += row + 1;

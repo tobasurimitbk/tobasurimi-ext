@@ -14,11 +14,19 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse Name" maxlength="30">
-                                <label for="floatingInput">Nama Warehouse</label>
+                                <input type="text" class="form-control code_warehouse" id="code_warehouse" name="code_warehouse" placeholder="Kode Gudang" maxlength="30">
+                                <label for="floatingInput">Kode Gudang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse Name" maxlength="30">
+                                <label for="floatingInput">Nama Gudang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Alamat</label>
@@ -113,6 +121,7 @@
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
+                            <th onclick="changeSort('code_warehouse')" class="sort">Kode Warehouse</th>
                             <th onclick="changeSort('warehouse_name')" class="sort">Nama Warehouse</th>
                             <th onclick="changeSort('address')" class="sort">Alamat</th>
                             <th onclick="changeSort('phone')" class="sort">Nomor Telepon</th>
@@ -135,7 +144,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "warehouse_name";
+    let sort = "code_warehouse";
     let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
@@ -169,6 +178,9 @@
             display: "stripe",
             searching: false,
             columns: [{
+                data: "code_warehouse",
+                className: "text-center"
+            }, {
                 data: "warehouse_name",
                 className: "text-center"
             }, {
@@ -210,6 +222,9 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
+                code_warehouse: {
+                    required: true
+                },
                 warehouse_name: {
                     required: true
                 },
@@ -237,8 +252,11 @@
                 },
             },
             messages: {
+                code_warehouse: {
+                    required: "Kode wajib diisi"
+                },
                 warehouse_name: {
-                    required: "Name wajib diisi"
+                    required: "Nama wajib diisi"
                 },
                 address: {
                     required: "Address wajib diisi"
@@ -407,7 +425,7 @@
                     $(".pic_id").val("").change()
                     $(".pic_id").append(`<option value=""></option>`)
                     result.data.forEach(function(item) {
-                        $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                        $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
                     })
 
                     $(".pic_id").val('').change();
@@ -437,6 +455,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
+                        $(".code_warehouse").val(res?.data?.code_warehouse);
                         $(".warehouse_name").val(res?.data?.warehouse_name);
                         $(".address").val(res?.data?.address);
                         $(".phone").val(res?.data?.phone);
@@ -452,7 +471,7 @@
                                 $(".pic_id").val("").change()
                                 $(".pic_id").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                    $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
                                 })
 
                                 $(".pic_id").val(res?.data?.pic_id).change();

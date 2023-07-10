@@ -23,7 +23,7 @@
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak">
+            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
                 Simpan dan Cetak
             </button>
             <?php
@@ -34,7 +34,7 @@
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak">
+            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
                 Simpan dan Cetak
             </button>
             <?php } ?> 
@@ -137,7 +137,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->information : ""; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
+                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-address-company" name="information" id="information" placeholder="Keterangan"><?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->information : ""; ?></textarea>
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
