@@ -52,6 +52,7 @@
                                 <th onclick="changeSort('warehouse')" class="sort">Departemen</th>
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
+                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
                                 <th>Order Oleh</th>
                                 <th>Disetujui</th>
                                 <th>Penerima</th>
@@ -69,8 +70,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "sppType";
-    let sortType = "asc";
+    let sort = "createdAt";
+    let sortType = "desc";
 
     let search = $('.search').val();
     let currentPage = 1;
@@ -81,7 +82,7 @@
         serverSide: true,
         ordering: true,
         order: [
-            [1, 'asc']
+            [6, 'desc']
         ],
 
         fixedHeader: true,
@@ -137,6 +138,10 @@
             },
             {
                 data: "request_date",
+                className: "text-center"
+            },
+            {
+                data: "createdAt",
                 className: "text-center"
             },
             {
