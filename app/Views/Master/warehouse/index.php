@@ -14,11 +14,19 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse Name" maxlength="30">
-                                <label for="floatingInput">Nama Warehouse</label>
+                                <input type="text" class="form-control warehouse_code" id="warehouse_code" name="warehouse_code" placeholder="Kode Gudang" maxlength="30">
+                                <label for="floatingInput">Kode Gudang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control warehouse_name" id="warehouse_name" name="warehouse_name" placeholder="Warehouse Name" maxlength="30">
+                                <label for="floatingInput">Nama Gudang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Alamat</label>

@@ -5610,6 +5610,11 @@ table.dataTable td .label-finish {
   padding-left: 0px;
 }
 
+.card .card-body form .form-label {
+  font-weight: 600 !important;
+  color: #2f4858 !important;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {

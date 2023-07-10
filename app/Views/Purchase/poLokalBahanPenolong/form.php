@@ -210,7 +210,7 @@
             </div>
         </form>
         <div class="col-subtitle-modal">
-            <div class="row mt-2">
+            <div class="row mt-3">
                 <div class="col-md-6">
                     <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                 </div>

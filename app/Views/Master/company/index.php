@@ -36,7 +36,9 @@
                                 <label for="floatingInput">Holding Company</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <textarea class="form-control address" id="address" name="address" placeholder="Address"></textarea>
                                 <label for="floatingInput">Alamat</label>

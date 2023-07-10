@@ -249,9 +249,12 @@ $routes->post('/terima-faktur-import/save', 'Purchase\TerimaFakturImport::saveTe
 $routes->post('/terima-faktur-import/update', 'Purchase\TerimaFakturImport::updateTerimaFakturImport', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-import/delete', 'Purchase\TerimaFakturImport::deleteTerimaFakturImport', ['filter' => 'Auth']);
 
-// RETUR PEMBELIAN
-$routes->get('/retur-pembelian', 'Purchase\ReturPembelian::returPembelian', ['filter' => 'Auth']);
-$routes->get('/retur-pembelian/create', 'Purchase\ReturPembelian::createReturPembelian', ['filter' => 'Auth']);
+// REKAP FAKTUR
+$routes->get('/rekap-faktur', 'Purchase\RekapFaktur', ['filter' => 'Auth']);
+$routes->get('/rekap-faktur/all', 'Purchase\RekapFaktur::getRekapFakturList', ['filter' => 'Auth']);
+$routes->get('/rekap-faktur/(:num)', 'Purchase\RekapFaktur::getRekapFakturById/$1', ['filter' => 'Auth']);
+$routes->get('/rekap-faktur/create', 'Purchase\RekapFaktur::createRekapFaktur', ['filter' => 'Auth']);
+$routes->post('/rekap-faktur/create', 'Purchase\RekapFaktur::saveRekapFaktur', ['filter' => 'Auth']);
 
 // PEMBAYARAN
 // PEMBAYARAN PO LOKAL

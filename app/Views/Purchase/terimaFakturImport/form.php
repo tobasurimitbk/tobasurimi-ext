@@ -23,7 +23,7 @@
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak">
+            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
                 Simpan dan Cetak
             </button>
             <?php
@@ -34,7 +34,7 @@
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak">
+            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
                 Simpan dan Cetak
             </button>
             <?php } ?> 
