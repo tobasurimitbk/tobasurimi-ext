@@ -38,8 +38,31 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
-                                <label for="floatingInput">Jabatan</label>
+                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
+                                <label for="floatingInput">Nama Lengkap</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <label for="floatingInput">Alamat</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
+                                        <label for="floatingInput">Tanggal Lahir</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar icon-dob icon-form"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -73,35 +96,44 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Agama</label>
+                                <input type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone" maxlength="30">
+                                <label for="floatingInput">Nomor Telepon</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select marriage_id" name="marriage_id" id="marriage_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Status Kawin</label>
+                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email" maxlength="30">
+                                <label for="floatingInput">Email</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <div class="input-group input-group-password">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
-                                        <label for="floatingInput">Tanggal Bergabung</label>
-                                    </div>
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                            <i class="fa fa-calendar icon-join-date icon-form"></i>
-                                        </span>
-                                    </div>
-                                </div>
+                                <select class="form-select gender" name="gender" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="Pria">Pria</option>
+                                    <option value="Wanita">Wanita</option>
+                                </select>
+                                <label for="floatingInput">Jenis Kelamin</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Agama</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select marriage_id" name="marriage_id" id="marriage_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Status Kawin</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -122,42 +154,22 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Nama Lengkap</label>
+                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
+                                <label for="floatingInput">Jabatan</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Nomor Telepon</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email" maxlength="30">
-                                <label for="floatingInput">Email</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
-                                        <label for="floatingInput">Tanggal Lahir</label>
+                                        <input class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
+                                        <label for="floatingInput">Tanggal Bergabung</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                            <i class="fa fa-calendar icon-dob icon-form"></i>
+                                            <i class="fa fa-calendar icon-join-date icon-form"></i>
                                         </span>
                                     </div>
                                 </div>
@@ -167,17 +179,19 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select gender" name="gender" id="floatingSelect" aria-label="Floating label select example">
+                                <select class="form-select bank_name" name="bank_name" id="floatingSelect" aria-label="Floating label select example">
                                     <option value=""></option>
-                                    <option value="Pria">Pria</option>
-                                    <option value="Wanita">Wanita</option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="BNI">BNI</option>
+                                    <option value="BRI">BRI</option>
+                                    <option value="MANDIRI">MANDIRI</option>
                                 </select>
-                                <label for="floatingInput">Jenis Kelamin</label>
+                                <label for="floatingInput">Nama Bank</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
                                 <label for="floatingInput">No. Rekening</label>
                             </div>
                         </div>
@@ -185,17 +199,27 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
-                                    <option value="Aktif">Aktif</option>
-                                    <option value="Non Aktif">Non Aktif</option>
-                                </select>
-                                <label for="floatingInput">Status</label>
+                            <input type="text" class="form-control owner_name" id="owner_name" name="owner_name" placeholder="Nama Pemilik Rekening" maxlength="100">
+                                <label for="floatingInput">Nama Pemilik Rekening</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 form-pin">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN">
                                 <label for="floatingInput">PIN</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                    <option value="Resign">Resign</option>
+                                    <option value="Pensiun">Pensiun</option>
+                                </select>
+                                <label for="floatingInput">Status</label>
                             </div>
                         </div>
                     </div>
@@ -496,6 +520,12 @@
                 },
                 join_date: {
                     required: true,
+                },
+                owner_name: {
+                    required: true,
+                },
+                bank_name: {
+                    required: true,
                 }
             },
             messages: {
@@ -560,6 +590,12 @@
                 },
                 join_date: {
                     required: "Tanggal Bergabung wajib diisi"
+                },
+                owner_name: {
+                    required: "Nama Pemilik Rekening wajib diisi"
+                },
+                bank_name: {
+                    required: "Bank wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -895,6 +931,8 @@
                         $(".join_date").val(res?.data?.join_date);
                         $(".address").val(res?.data?.address);
                         $(".acc_no").val(res?.data?.acc_no);
+                        $(".bank_name").val(res?.data?.bank_name);
+                        $(".owner_name").val(res?.data?.owner_name);
                         $(".dob").val(res?.data?.dob);
                         $(".email").val(res?.data?.email);
                         $(".gender").val(res?.data?.gender);

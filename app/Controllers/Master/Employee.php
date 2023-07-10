@@ -169,6 +169,12 @@ class Employee extends BaseController
             ],
             "join_date" => [
                 "rules" => "required"
+            ],
+            "bank_name" => [
+                "rules" => "required"
+            ],
+            "owner_name" => [
+                "rules" => "required"
             ]
         ];
 
@@ -204,6 +210,8 @@ class Employee extends BaseController
                         "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                         "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
                         "jabatan" => $this->request->getPost("jabatan"),
+                        "bank_name" => $this->request->getPost("bank_name"),
+                        "owner_name" => $this->request->getPost("owner_name"),
                     ]);
                 }
             }
@@ -313,6 +321,12 @@ class Employee extends BaseController
             ],
             "join_date" => [
                 "rules" => "required"
+            ],
+            "bank_name" => [
+                "rules" => "required"
+            ],
+            "owner_name" => [
+                "rules" => "required"
             ]
         ];
 
@@ -348,6 +362,8 @@ class Employee extends BaseController
                         "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                         "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
                         "jabatan" => $this->request->getPost("jabatan"),
+                        "bank_name" => $this->request->getPost("bank_name"),
+                        "owner_name" => $this->request->getPost("owner_name"),
                     ]);
                 }
             } else {
@@ -370,6 +386,8 @@ class Employee extends BaseController
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
                     "jabatan" => $this->request->getPost("jabatan"),
+                    "bank_name" => $this->request->getPost("bank_name"),
+                    "owner_name" => $this->request->getPost("owner_name"),
                 ]);
             }
 
