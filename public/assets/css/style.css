@@ -4422,7 +4422,7 @@ footer.main-footer .footer-right a {
 
 .modal .modal-dialog .modal-content .modal-footer {
   padding: 0px;
-  margin-top: 30px;
+  margin-top: 15px;
 }
 
 .modal .modal-dialog .modal-content .modal-footer .btn-discard {
@@ -4546,8 +4546,8 @@ footer.main-footer .footer-right a {
 }
 
 .form-floating span.text-danger {
-  font-size: 11px;
-  margin-top: 7px;
+  font-size: 10px;
+  margin-top: 5px;
   display: block;
   margin-left: 12px;
 }
@@ -5113,7 +5113,7 @@ input:checked + .slider:before {
 }
 
 .form-floating.mb-3 {
-  margin-bottom: 2rem !important;
+  margin-bottom: 1.5rem !important;
 }
 
 .modal
@@ -5123,7 +5123,7 @@ input:checked + .slider:before {
   form.create-form
   .row
   .col-md-3.mb-3.view-cols-image {
-  margin-bottom: 2rem !important;
+  margin-bottom: 1.5rem !important;
 }
 
 .card .card-body {
