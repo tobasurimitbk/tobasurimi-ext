@@ -45,49 +45,53 @@ class TerimaFakturImport extends BaseController
             $responseTerimaFaktur = curl_request("GET", "/tandaTerimaFaktur/$id", $this->token);
             $dataTerimaFaktur = [];
             if ($responseTerimaFaktur["code"] === 200) {
-                $dataTerimaFaktur = json_decode($responseTerimaFaktur["body"])->data;
-
-                $tipe_bahan = json_decode($responseTerimaFaktur["body"])->data->tipe_bahan;
-                if($tipe_bahan === "BAKU")
+                $status_penerimaan = json_decode($responseTerimaFaktur["body"])->data->faktur_type;
+                if($status_penerimaan === "IMPORT")
                 {
-                    $dataNo = [];
-                    $arr = json_decode($responseTerimaFaktur["body"])->data->supplier_id;
-                    $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=BAKU&supplierid=$arr", $this->token);
-                    if ($responseNo["code"] === 200) {
-                        $dataNo = json_decode($responseNo["body"])->data;
+                    $dataTerimaFaktur = json_decode($responseTerimaFaktur["body"])->data;
+
+                    $tipe_bahan = json_decode($responseTerimaFaktur["body"])->data->tipe_bahan;
+                    if($tipe_bahan === "BAKU")
+                    {
+                        $dataNo = [];
+                        $arr = json_decode($responseTerimaFaktur["body"])->data->supplier_id;
+                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=BAKU&supplierid=$arr", $this->token);
+                        if ($responseNo["code"] === 200) {
+                            $dataNo = json_decode($responseNo["body"])->data;
+                        }
+
+                        //Get Supplier
+                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+
+                        $dataSupplier = [];
+                        if ($responseSupplier["code"] === 200) {
+                            $dataSupplier = json_decode($responseSupplier["body"])->data;
+                        }
+                        
+                        $data["dataNo"] = $dataNo;
+                        $data["dataSupplier"] = $dataSupplier;
                     }
+                    if($tipe_bahan === "PENOLONG")
+                    {
+                        $dataNo = [];
+                        $arr = json_decode($responseTerimaFaktur["body"])->data->supplier_id;
+                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=PENOLONG&supplierid=$arr", $this->token);
+                        if ($responseNo["code"] === 200) {
+                            $dataNo = json_decode($responseNo["body"])->data;
+                        }
 
-                    //Get Supplier
-                    $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+                        //Get Supplier
+                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
 
-                    $dataSupplier = [];
-                    if ($responseSupplier["code"] === 200) {
-                        $dataSupplier = json_decode($responseSupplier["body"])->data;
+                        $dataSupplier = [];
+                        if ($responseSupplier["code"] === 200) {
+                            $dataSupplier = json_decode($responseSupplier["body"])->data;
+                        }
+
+                        $data["dataNo"] = $dataNo;
+                        $data["dataSupplier"] = $dataSupplier;
                     }
-                    
-                    $data["dataNo"] = $dataNo;
-                    $data["dataSupplier"] = $dataSupplier;
-                }
-                if($tipe_bahan === "PENOLONG")
-                {
-                    $dataNo = [];
-                    $arr = json_decode($responseTerimaFaktur["body"])->data->supplier_id;
-                    $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=PENOLONG&supplierid=$arr", $this->token);
-                    if ($responseNo["code"] === 200) {
-                        $dataNo = json_decode($responseNo["body"])->data;
-                    }
-
-                    //Get Supplier
-                    $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
-
-                    $dataSupplier = [];
-                    if ($responseSupplier["code"] === 200) {
-                        $dataSupplier = json_decode($responseSupplier["body"])->data;
-                    }
-
-                    $data["dataNo"] = $dataNo;
-                    $data["dataSupplier"] = $dataSupplier;
-                }
+                }   
             }
             $data["dataTerimaFaktur"] = $dataTerimaFaktur;
         }
