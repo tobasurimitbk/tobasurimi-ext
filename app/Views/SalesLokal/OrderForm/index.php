@@ -115,11 +115,7 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-<<<<<<< HEAD
-                return row.is_posted ? "-" : `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">X</button>
-=======
                 return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
->>>>>>> e656b37f73283f1e5507ff2e759c25c88ff7043e
                 `
             }
         }],
