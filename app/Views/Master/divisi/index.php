@@ -20,14 +20,6 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_kerja" id="jam_kerja" name="jam_kerja">
-                                <label for="floatingInput">Jam Kerja</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control jam_istirahat" id="jam_istirahat" name="jam_istirahat">
                                 <label for="floatingInput">Jam Istirahat</label>
                             </div>
@@ -65,7 +57,6 @@
                 <thead class="thead-dark">
                     <tr>
                         <th onclick="changeSort('divisi')" class="sort">Divisi</th>
-                        <th onclick="changeSort('jam_kerja')" class="sort">Jam Kerja</th>
                         <th onclick="changeSort('jam_istirahat')" class="sort">Jam Istirahat</th>
                     </tr>
                 </thead>
@@ -119,10 +110,6 @@
             className: "text-center"
         },
         {
-            data: "jam_kerja",
-            className: "text-center"
-        },
-        {
             data: "jam_istirahat",
             className: "text-center"
         }],
@@ -147,9 +134,6 @@
                 divisi: {
                     required: true
                 },
-                jam_kerja: {
-                    required: true
-                },
                 jam_istirahat: {
                     required: true
                 }
@@ -157,9 +141,6 @@
             messages: {
                 divisi: {
                     required: "Divisi wajib diisi"
-                },
-                jam_kerja: {
-                    required: "Jam Kerja wajib diisi"
                 },
                 jam_istirahat: {
                     required: "Jam Istirahat wajib diisi"
@@ -220,7 +201,6 @@
                     if (res.status) {
                         $(".id").val(id);
                         $(".divisi").val(res?.data?.divisi);
-                        $(".jam_kerja").val(res?.data?.jam_kerja);
                         $(".jam_istirahat").val(res?.data?.jam_istirahat);
                         validator.resetForm();
                         validator.reset();
