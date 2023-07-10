@@ -42,10 +42,39 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
+                                <label for="floatingInput">Nama Lengkap</label>
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select shift_id" name="shift_id" id="shift_id" aria-label="Floating label select example">
                                     <option value="" data-sot="" data-eot="" data-bsot="" data-beot=""></option>
                                 </select>
                                 <label for="floatingInput">Shift</label>
+                            </div>
+                        </div> -->
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <label for="floatingInput">Alamat</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
+                                        <label for="floatingInput">Tanggal Lahir</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar icon-form"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -79,54 +108,6 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Agama</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select marriage_id" name="marriage_id" id="marriage_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Status Kawin</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Anak">
-                                <label for="floatingInput">Anak</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
-                                <label for="floatingInput">Jabatan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Divisi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Nama Lengkap</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone" maxlength="30">
                                 <label for="floatingInput">Nomor Telepon</label>
                             </div>
@@ -138,29 +119,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <div class="input-group input-group-password">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
-                                        <label for="floatingInput">Tanggal Lahir</label>
-                                    </div>
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                            <i class="fa fa-calendar icon-form"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -174,11 +133,74 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Agama</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select marriage_id" name="marriage_id" id="marriage_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Status Kawin</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" maxlength="1" class="form-control child" id="child" name="child" placeholder="Anak">
+                                <label for="floatingInput">Anak</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Divisi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
+                                <label for="floatingInput">Jabatan</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select bank" name="bank" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="BNI">BNI</option>
+                                    <option value="BRI">BRI</option>
+                                    <option value="MANDIRI">MANDIRI</option>
+                                </select>
+                                <label for="floatingInput">Nama Bank</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
                                 <label for="floatingInput">No. Rekening</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control acc_name" id="acc_name" name="acc_name" placeholder="Nama Pemilik Rekening" maxlength="100">
+                                <label for="floatingInput">Nama Pemilik Rekening</label>
+                            </div>
+                        </div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-6 form-pin">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -190,7 +212,9 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
                                     <option value="Aktif">Aktif</option>
-                                    <option value="Non Aktif">Non Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                    <option value="Resign">Resign</option>
+                                    <option value="Pensiun">Pensiun</option>
                                 </select>
                                 <label for="floatingInput">Status</label>
                             </div>
@@ -232,10 +256,10 @@
                             <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
                             <th onclick="changeSort('email')" class="sort">Email</th>
                             <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
-                            <th onclick="changeSort('address')" class="sort">Alamat</th>
+                            <!-- <th onclick="changeSort('address')" class="sort">Alamat</th> -->
                             <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
                             <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                            <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
+                            <!-- <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th> -->
                             <th onclick="changeSort('status')" class="sort">Status</th>
                         </tr>
                     </thead>
@@ -299,19 +323,23 @@
         }, {
             data: "phone_no",
             className: "text-center"
-        }, {
-            data: "address",
-            className: "text-center"
-        }, {
+        },
+        // {
+        //     data: "address",
+        //     className: "text-center"
+        // },
+        {
             data: "dob",
             className: "text-center"
         }, {
             data: "gender",
             className: "text-center"
-        }, {
-            data: "acc_no",
-            className: "text-center"
-        }, {
+        },
+        // {
+        //     data: "acc_no",
+        //     className: "text-center"
+        // },
+        {
             data: "status",
             className: "text-center"
         }],
@@ -542,9 +570,9 @@
                 marriage_id: {
                     required: true,
                 },
-                shift_id: {
-                    required: true,
-                },
+                // shift_id: {
+                //     required: true,
+                // },
                 child: {
                     required: true,
                 },
