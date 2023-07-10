@@ -4985,6 +4985,11 @@ input:checked + .slider:before {
   transition: 0.3s ease-in;
 }
 
+.section .section-header .col-button-tambah-spp .btn.btn-save.bsc {
+  background: #4e8a00;
+  border: 1px #4e8a00 solid;
+}
+
 .section .section-header .col-button-tambah-spp .btn.btn-discard {
   background: #ffffff !important;
   font-family: "Poppins", sans-serif !important;
@@ -5477,6 +5482,10 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   transition: 0.3s ease-in;
 }
 
+.btn.btn-discard.delete-btn.btn-trash i.fa {
+  font-size: 11px;
+}
+
 .create-form.form-add-order-form-lokal
   .form-floating
   .input-group
@@ -5484,6 +5493,44 @@ table.dataTable.table-tambah-spp tbody tr td button:active {
   .auto_generate {
   position: relative;
   top: -10px;
+}
+
+.form-add-spp .form-floating .select2 .selection .select2-selection {
+  height: 50px !important;
+}
+
+.form-add-spp
+  .form-floating
+  .select2
+  .selection
+  .select2-selection
+  ul.select2-selection__rendered {
+  display: flex;
+}
+
+.form-add-spp
+  .form-floating
+  .select2
+  .selection
+  .select2-selection
+  ul.select2-selection__rendered
+  li.select2-selection__choice {
+  border: 0px;
+  padding: 0px;
+  position: relative;
+  top: 10px;
+  display: flex;
+}
+
+.form-add-spp
+  .form-floating
+  .select2
+  .selection
+  .select2-selection
+  ul.select2-selection__rendered
+  li.select2-selection__choice
+  .select2-selection__choice__remove {
+  margin-right: 5px;
 }
 
 /* ===== RESPONSIVE ===== */
