@@ -1073,6 +1073,7 @@
             var selisih = 0;
             var all_qty = 0;
             let validate_required = false;
+            var total_masuk_sementara = 0;
 
             let new_list_warehouse = []
             list_warehouse.forEach((item) => {
@@ -1099,6 +1100,8 @@
                     {
                         validate_required = true;
                     }
+
+                    total_masuk_sementara = total_masuk_sementara + ($(".qty_warehouse_" + item.row).val() ? Number($(".qty_warehouse_" + item.row).val()) : 0);
                 }
             })
 
@@ -1114,7 +1117,6 @@
             {
                 let validate_same = false;
                 let validate_jml_masuk = false;
-                var total_masuk_sementara = 0;
 
                 // list_items.map(item => {
                 //     if(barang_id !== '')
@@ -1133,16 +1135,6 @@
                 //         }
                 //     }
                 // })
-
-                list_items.map(item => {
-                    if(barang_id !== '')
-                    {
-                        if(item.barang_id == barang_id)
-                        {
-                            total_masuk_sementara = total_masuk_sementara + item.qty;
-                        }
-                    }
-                })
 
                 if(total_masuk_sementara > doc_qty)
                 {
