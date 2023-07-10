@@ -523,9 +523,6 @@
                 }
             },
             messages: {
-                employeeImg: {
-                    required: "Foto wajib diisi"
-                },
                 nip: {
                     required: "NIP wajib diisi"
                 },
@@ -636,9 +633,6 @@
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".form-pin").css("display", "");
-            $('.employeeImg').rules('add', {
-                required: true
-            });
             $('.pin').rules('add', {
                 minlength: 6,
                 maxlength: 6
@@ -897,7 +891,6 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $(".form-pin").css("display", "none");
-            $('.employeeImg').rules('remove', 'required');
             $('.pin').rules('remove', 'minlength');
             $('.pin').rules('remove', 'maxlength');
             $(".create-form")[0].reset()

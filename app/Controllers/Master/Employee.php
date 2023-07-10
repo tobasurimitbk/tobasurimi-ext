@@ -211,6 +211,7 @@ class Employee extends BaseController
                     "nip" => $this->request->getPost("nip"),
                     "name" => $this->request->getPost("name"),
                     "gender" => $this->request->getPost("gender"),
+                    "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
                     "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
                     "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
                     "phone_no" => $this->request->getPost("phone_no"),
