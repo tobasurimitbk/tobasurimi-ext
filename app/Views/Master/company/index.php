@@ -40,7 +40,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <textarea class="form-control address" id="address" name="address" placeholder="Address"></textarea>
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
@@ -89,16 +89,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select pic_id" name="pic_id" id="pic_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">PIC</label>
+                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)">
+                                <label for="floatingInput">Email (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -141,7 +133,6 @@
                             <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
                             <th onclick="changeSort('city_name')" class="sort">Kota</th>
                             <th onclick="changeSort('zip_code')" class="sort">Kode Pos</th>
-                            <th onclick="changeSort('pic_name')" class="sort">PIC</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -220,10 +211,6 @@
         {
             data: "zip_code",
             className: "text-center"
-        },
-        {
-            data: "pic_name",
-            className: "text-center"
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -300,34 +287,6 @@
             .find('label')
             .css('z-index', '1');
 
-        // PIC
-        $('.pic_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".pic_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".pic_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".pic_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         var validator = $(".create-form").validate({
             rules: {
                 company: {
@@ -352,7 +311,6 @@
                     required: true
                 },
                 email: {
-                    required: true,
                     email: true,
                 },
             },
@@ -381,11 +339,7 @@
                 city_id: {
                     required: "City wajib diisi"
                 },
-                pic_id: {
-                    required: "PIC wajib diisi"
-                },
                 email: {
-                    required: "Email wajib diisi",
                     email: "Email must be valid",
                 },
             },
@@ -416,9 +370,6 @@
             $('.logo').rules('add', {
                 required: true
             });
-            $('.pic_id').rules('add', {
-                required: true
-            });
             $(".title-name").text("Tambah");
             $(".province_id").val('').change();
             $(".city_id").val('').change();
@@ -433,22 +384,7 @@
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
 
-            $.ajax({
-                url: `<?= base_url("employee-pic/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".pic_id").empty()
-                    $(".pic_id").val("").change()
-                    $(".pic_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
-                    })
-
-                    $(".pic_id").val('').change();
-                    $(".add-modal").modal("show")
-                }
-            })
+            $(".add-modal").modal("show")
         })
 
         $(".btn-hide-form").click(function() {
@@ -460,7 +396,6 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $('.logo').rules('remove', 'required');
-            $('.pic_id').rules('remove', 'required');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
             let id = data.id;
@@ -499,23 +434,6 @@
 
                                 $(".city_id").val(res?.data?.city_id).change();
                                 $(".zip_code").val(res?.data?.zip_code);
-                            }
-                        })
-
-                        $.ajax({
-                            url: `<?= base_url("employee-pic/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".pic_id").empty()
-                                $(".pic_id").val("").change()
-                                $(".pic_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
-                                })
-
-                                $(".pic_id").val(res?.data?.pic_id).change();
-
                                 $(".add-modal").modal("show")
                             }
                         })

@@ -583,5 +583,14 @@
 2. purchaseRequest/approve purchase request is not found
 3. patch purchaseOrder hanya mengirim {'is_posted': true} purchaseRequestData is not defined
 </script>
-
+- Divisi jam kerja ditakeout
+- Karyawan form Label anak diganti jadi jumlah anak
+- Karyawan form nama lengkap ditaro diatas
+- Karyawan foto dibuat optional
+- Karyawan form email dibuat optional
+- Karyawan form pin dibuat optional
+- Karyawan form notlpn dibuat optional
+- Company form alamat field diubah jadi text area
+- Company form Email dibuat optional
+- Company PIC di takeout
 <?= $this->endSection(); ?>
