@@ -76,7 +76,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control reason" id="reason" name="reason" <?= !empty($data) ? ($data->reason === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->reason : ""; ?>" placeholder="Keterangan">
+                            <textarea class="form-control reason" id="reason" name="reason" <?= !empty($data) ? ($data->reason === true ? 'disabled=true' : '') : ''; ?> placeholder="Keterangan"><?= !empty($data) ? $data->reason : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>

@@ -302,7 +302,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
+                                <textarea class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>

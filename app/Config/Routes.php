@@ -249,6 +249,10 @@ $routes->post('/terima-faktur-import/save', 'Purchase\TerimaFakturImport::saveTe
 $routes->post('/terima-faktur-import/update', 'Purchase\TerimaFakturImport::updateTerimaFakturImport', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-import/delete', 'Purchase\TerimaFakturImport::deleteTerimaFakturImport', ['filter' => 'Auth']);
 
+// RETUR PEMBELIAN
+$routes->get('/retur-pembelian', 'Purchase\ReturPembelian::returPembelian', ['filter' => 'Auth']);
+$routes->get('/retur-pembelian/create', 'Purchase\ReturPembelian::createReturPembelian', ['filter' => 'Auth']);
+
 // PEMBAYARAN
 // PEMBAYARAN PO LOKAL
 $routes->get('/pembayaran-po-lokal', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokal', ['filter' => 'Auth']);
