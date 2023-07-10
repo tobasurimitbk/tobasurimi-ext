@@ -44,6 +44,7 @@
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
             <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->id : ""; ?>" type="hidden" class="id" name="id" id="id" />
+            <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->sender : ""; ?>" type="hidden" class="sender" name="sender" id="sender" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
@@ -122,27 +123,21 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                    <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->sender : ""; ?>" type="text" class="form-control sender" name="sender" id="sender" placeholder="Sender">
-                        <label for="floatingInput">Dari</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly="true" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
                         <label for="floatingInput">Nominal Faktur</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
+                        <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->information : ""; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> type="text" class="form-control information" name="information" id="information" placeholder="Keterangan">
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
@@ -589,6 +584,7 @@ $(document).ready(function() {
 
     $(".supplier_id").change(function() {
         let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
+        $(".sender").val(name);
         if($(".supplier_id option:selected").val())
         {
             if($(".tipe_bahan").val() === "BAKU")
@@ -650,6 +646,7 @@ $(document).ready(function() {
 
 const changeTipeBahan = function()
 {
+    $(".sender").val("");
     if($(".tipe_bahan").val() === "BAKU")
     {
         $.ajax({
