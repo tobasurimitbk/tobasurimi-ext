@@ -396,7 +396,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <textarea readonly="true" class="form-control Keterangan" id="Keterangan" name="Keterangan" placeholder="Keterangan"></textarea>
+                                <textarea readonly="true" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
