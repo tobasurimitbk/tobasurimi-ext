@@ -111,7 +111,6 @@ class PenerimaanBarangImport extends BaseController
 
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
-                        $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
                     }
                 } 
             }
