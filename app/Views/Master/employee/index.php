@@ -237,7 +237,6 @@
                             <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
                             <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
                             <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                            <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
                             <th onclick="changeSort('status')" class="sort">Status</th>
                         </tr>
                     </thead>
@@ -306,9 +305,6 @@
             className: "text-center"
         }, {
             data: "gender",
-            className: "text-center"
-        }, {
-            data: "acc_no",
             className: "text-center"
         }, {
             data: "status",
