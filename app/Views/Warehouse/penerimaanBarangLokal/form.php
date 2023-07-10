@@ -51,7 +51,7 @@
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
             <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->id : ""; ?>" />
             <?= csrf_field() ?>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">Data PO</label>
                 </div>
@@ -114,7 +114,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">Data Dokumen</label>
                 </div>
@@ -160,7 +160,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-md-3">
                     <label class="form-label font-weight-bold">No. Surat Jalan</label>
                 </div>
