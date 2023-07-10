@@ -347,7 +347,7 @@
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="max-width: 900px;">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
