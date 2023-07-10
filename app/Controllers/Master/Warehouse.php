@@ -69,6 +69,7 @@ class Warehouse extends BaseController
             foreach ($body as $data) {
                 array_push($dataWarehouse, [
                     "id" => $data->id,
+                    "code_warehouse" => $data->code_warehouse,
                     "warehouse_name" => $data->warehouse_name,
                     "address" => $data->address,
                     "province_id" => $data->province_id,
