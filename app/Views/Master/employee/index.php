@@ -138,8 +138,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Anak">
-                                <label for="floatingInput">Anak</label>
+                                <input type="text" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Jumlah Anak">
+                                <label for="floatingInput">Jumlah Anak</label>
                             </div>
                         </div>
                     </div>
