@@ -137,7 +137,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="information" id="information" placeholder="Keterangan"><?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->information : ""; ?></textarea>
+                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-address-company" name="information" id="information" placeholder="Keterangan"><?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->information : ""; ?></textarea>
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
