@@ -56,7 +56,7 @@
                     <label class="form-label font-weight-bold">Data PO</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
@@ -119,7 +119,7 @@
                     <label class="form-label font-weight-bold">Data Dokumen</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
@@ -165,7 +165,7 @@
                     <label class="form-label font-weight-bold">No. Surat Jalan</label>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->letter_no : ""; ?>" type="text" class="form-control letter_no" id="letter_no" name="letter_no" placeholder="No. Surat Jalan">
@@ -191,7 +191,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->shipping_cost : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
@@ -213,7 +213,7 @@
             </div>
         </form>
         <div class="col-subtitle-modal">
-            <div class="row mt-2">
+            <div class="row mt-3">
                 <div class="col-md-6">
                     <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                 </div>
@@ -314,7 +314,7 @@
                                         <td><?= $details->harga ? $details->harga : 0; ?></td>
                                         <td><?= $details->penyerahan ? $details->penyerahan : 0; ?></td>
                                         <td><?= $details->keterangan; ?></td>
-                                        <td><button class="btn-warning" onclick='view("<?= $no; ?>")'>View</button></td>
+                                        <td><button class="btn-view" onclick='view("<?= $no; ?>")'>View</button></td>
     
                                 <?php } ?>
                             
