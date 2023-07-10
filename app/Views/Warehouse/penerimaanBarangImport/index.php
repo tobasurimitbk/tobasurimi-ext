@@ -140,7 +140,25 @@
             data: "status_post",
             className: "text-center",
             searchable: false,
-            sortable: false
+            sortable: false,
+            render: function(data, type, row) {
+                if(data === "WAITING")
+                {
+                    return `
+                    <label class="label-waiting">
+                    ${data}
+                    </label>
+                    `
+                }
+                if(data === "FINISH")
+                {
+                    return `
+                    <label class="label-finish">
+                    ${data}
+                    </label>
+                    `
+                }
+            }
         }],
         columnDefs: [{
             defaultContent: "-",

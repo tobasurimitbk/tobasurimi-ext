@@ -24,7 +24,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nip" id="nip" name="nip" placeholder="Nip" maxlength="30">
+                                <input type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
                                 <label for="floatingInput">NIP</label>
                             </div>
                         </div>
@@ -32,16 +32,64 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Divisi</label>
+                                <input type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK" maxlength="30">
+                                <label for="floatingInput">NIK</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
                                 <label for="floatingInput">Nama Lengkap</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <label for="floatingInput">Alamat</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
+                                        <label for="floatingInput">Tanggal Lahir</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar icon-dob icon-form"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select onchange="getCity()" class="form-select province_id" name="province_id" id="province_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataProvinces)) {
+                                        foreach ($dataProvinces as $province) {
+                                    ?>
+                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Provinsi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select city_id" name="city_id" id="city_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Kota</label>
                             </div>
                         </div>
                     </div>
@@ -62,29 +110,6 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <div class="input-group input-group-password">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
-                                        <label for="floatingInput">Tanggal Lahir</label>
-                                    </div>
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                            <i class="fa fa-calendar icon-form"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select gender" name="gender" id="floatingSelect" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <option value="Pria">Pria</option>
@@ -95,8 +120,85 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
+                                <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Agama</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select marriage_id" name="marriage_id" id="marriage_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Status Kawin</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Anak">
+                                <label for="floatingInput">Anak</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Divisi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
+                                <label for="floatingInput">Jabatan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
+                                        <label for="floatingInput">Tanggal Bergabung</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar icon-join-date icon-form"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select bank_name" name="bank_name" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="BNI">BNI</option>
+                                    <option value="BRI">BRI</option>
+                                    <option value="MANDIRI">MANDIRI</option>
+                                </select>
+                                <label for="floatingInput">Nama Bank</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
                                 <label for="floatingInput">No. Rekening</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control owner_name" id="owner_name" name="owner_name" placeholder="Nama Pemilik Rekening" maxlength="100">
+                                <label for="floatingInput">Nama Pemilik Rekening</label>
                             </div>
                         </div>
                     </div>
@@ -111,7 +213,9 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
                                     <option value="Aktif">Aktif</option>
-                                    <option value="Non Aktif">Non Aktif</option>
+                                    <option value="Tidak Aktif">Tidak Aktif</option>
+                                    <option value="Resign">Resign</option>
+                                    <option value="Pensiun">Pensiun</option>
                                 </select>
                                 <label for="floatingInput">Status</label>
                             </div>
@@ -153,10 +257,8 @@
                             <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
                             <th onclick="changeSort('email')" class="sort">Email</th>
                             <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
-                            <th onclick="changeSort('address')" class="sort">Alamat</th>
                             <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
                             <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                            <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
                             <th onclick="changeSort('status')" class="sort">Status</th>
                         </tr>
                     </thead>
@@ -221,16 +323,10 @@
             data: "phone_no",
             className: "text-center"
         }, {
-            data: "address",
-            className: "text-center"
-        }, {
             data: "dob",
             className: "text-center"
         }, {
             data: "gender",
-            className: "text-center"
-        }, {
-            data: "acc_no",
             className: "text-center"
         }, {
             data: "status",
@@ -251,10 +347,131 @@
     });
 
     $(document).ready(function() {
+        $('.province_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.city_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.religion_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.marriage_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $(".nik").mask("AAAAAAAAAAAAAAAA", {
+            translation: {
+                "A": {
+                    pattern: /[0-9]/,
+                }
+            }
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.province_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.province_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.province_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.city_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.city_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.city_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.religion_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.religion_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.religion_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.marriage_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+        $('.marriage_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.marriage_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
                     required: true
+                },
+                nik: {
+                    required: true,
+                    minlength: 16,
+                    maxlength: 16
                 },
                 name: {
                     required: true
@@ -280,6 +497,33 @@
                 },
                 division_id: {
                     required: true,
+                },
+                province_id: {
+                    required: true,
+                },
+                city_id: {
+                    required: true,
+                },
+                religion_id: {
+                    required: true,
+                },
+                marriage_id: {
+                    required: true,
+                },
+                child: {
+                    required: true,
+                },
+                jabatan: {
+                    required: true,
+                },
+                join_date: {
+                    required: true,
+                },
+                owner_name: {
+                    required: true,
+                },
+                bank_name: {
+                    required: true,
                 }
             },
             messages: {
@@ -288,6 +532,11 @@
                 },
                 nip: {
                     required: "NIP wajib diisi"
+                },
+                nik: {
+                    required: "NIK wajib diisi",
+                    minlength: "NIK Minimal 16 Digit",
+                    maxlength: "NIK Maksimal 16 Digit"
                 },
                 name: {
                     required: "Nama Lengkap wajib diisi"
@@ -314,10 +563,37 @@
                 division_id: {
                     required: "Divisi wajib diisi"
                 },
+                province_id: {
+                    required: "Provinsi wajib diisi"
+                },
+                city_id: {
+                    required: "Kota wajib diisi"
+                },
+                religion_id: {
+                    required: "Agama wajib diisi"
+                },
+                marriage_id: {
+                    required: "Status Kawin wajib diisi"
+                },
+                child: {
+                    required: "Anak wajib diisi"
+                },
                 pin: {
                     required: "PIN wajib diisi",
                     minlength: "Minimal dan Maksimal 6 Karakter",
                     maxlength: "Minimal dan Maksimal 6 Karakter"
+                },
+                jabatan: {
+                    required: "Jabatan wajib diisi"
+                },
+                join_date: {
+                    required: "Tanggal Bergabung wajib diisi"
+                },
+                owner_name: {
+                    required: "Nama Pemilik Rekening wajib diisi"
+                },
+                bank_name: {
+                    required: "Bank wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -325,19 +601,19 @@
             errorPlacement: function(error, element) {
                 var elem = $(element);
                 if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $(".select2-container").parent();
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
                     error.insertAfter(element);
                 } else {
                     error.insertAfter(element);
                 }
             },
             highlight: function(element) {
-                $(element).closest('.col-md-6').addClass('has-error');
+                $(element).closest('.form-group').addClass('has-error');
                 $(element).addClass('select-class');
 
             },
             unhighlight: function(element) {
-                $(element).closest('.col-md-6').removeClass('has-error');
+                $(element).closest('.form-group').removeClass('has-error');
                 $(element).removeClass('select-class');
             },
         });
@@ -349,13 +625,22 @@
             autoclose: true
         })
 
-        $('.fa-calendar').click(function() {
+        $(".join_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dob').click(function() {
+            $(".dob").focus();
+        });
+
+        $('.icon-join-date').click(function() {
             $(".dob").focus();
         });
 
         $(".phone_no").mask("0000000000000")
-
-        $(".acc_no").mask("000000000000000")
 
         $(".btn-show-form").click(function() {
             $(".id").val("");
@@ -368,6 +653,12 @@
                 minlength: 6,
                 maxlength: 6
             });
+
+            $(".province_id").val('').change()
+            $(".city_id").val('').change()
+            $(".city_id").empty()
+            $(".city_id").append(`<option value=""></option>`)
+            
             $(".title-name").text("Tambah");
             validator.resetForm();
             validator.reset();
@@ -376,13 +667,49 @@
             $(".delete-btn").css('display', 'none');
 
             $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'status_pernikahan'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".marriage_id").empty()
+                    $(".marriage_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".marriage_id").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".marriage_id").val('').change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'religion'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".religion_id").empty()
+                    $(".religion_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".religion_id").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".religion_id").val('').change();
+                }
+            })
+
+            $.ajax({
                 url: `<?= base_url("divisi/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     $(".division_id").empty()
                     $(".division_id").val("").change()
-                    $(".divisionid").append(`<option value=""></option>`)
+                    $(".division_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
                         $(".division_id").append(`<option value="${item.id}">${item.divisi}</option>`)
                     })
@@ -599,16 +926,76 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
+                        $(".join_date").val(res?.data?.join_date);
                         $(".address").val(res?.data?.address);
                         $(".acc_no").val(res?.data?.acc_no);
+                        $(".bank_name").val(res?.data?.bank_name);
+                        $(".owner_name").val(res?.data?.owner_name);
                         $(".dob").val(res?.data?.dob);
                         $(".email").val(res?.data?.email);
                         $(".gender").val(res?.data?.gender);
-                        $(".name").val(res?.data?.employee_name);
+                        $(".name").val(res?.data?.name);
                         $(".nip").val(res?.data?.nip);
+                        $(".nik").val(res?.data?.nik);
                         $(".phone_no").val(res?.data?.phone_no);
                         $(".status").val(res?.data?.status);
+                        $(".jabatan").val(res?.data?.jabatan);
+                        $(".province_id").val(res?.data?.province_id).change();
+                        $(".child").val(res?.data?.child).change();
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
+
+                        // AJAX GET CITY
+                        $.ajax({
+                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".city_id").empty()
+                                $(".city_id").val("").change()
+                                $(".city_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                                })
+
+                                $(".city_id").val(res?.data?.city_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'status_pernikahan'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".marriage_id").empty()
+                                $(".marriage_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".marriage_id").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".marriage_id").val(res?.data?.marriage_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'religion'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".religion_id").empty()
+                                $(".religion_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".religion_id").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".religion_id").val(res?.data?.religion_id).change();
+                            }
+                        })
 
                         $.ajax({
                             url: `<?= base_url("divisi/dropdown"); ?>`,
@@ -642,6 +1029,26 @@
     const previewPhoto = function() {
         let file = document.getElementById("employeeImg").files[0];
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
+    }
+
+    const getCity = function() {
+        const id = $(".province_id option:selected").val()
+
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
+                }
+            })
+        }
     }
 
     const changeSort = function(val) {

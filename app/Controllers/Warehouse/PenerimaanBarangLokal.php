@@ -59,55 +59,58 @@ class PenerimaanBarangLokal extends BaseController
 
         if (!empty($id)) {
             $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/$id", $this->token);
-            $status_penerimaan = json_decode($responsePenerimaanBarang["body"])->data->status_penerimaan;
-            
-            if($status_penerimaan === "LOKAL")
-            {
-                $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
 
-                $tipe_bahan = json_decode($responsePenerimaanBarang["body"])->data->tipe_bahan;
-                if($tipe_bahan === "BAKU")
+            $dataPenerimaanBarang = [];
+            if ($responsePenerimaanBarang["code"] === 200) {
+                $status_penerimaan = json_decode($responsePenerimaanBarang["body"])->data->status_penerimaan;
+                if($status_penerimaan === "LOKAL")
                 {
-                    $dataNo = [];
-                    $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
-                    $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=BAKU&supplierid=$arr", $this->token);
-                    if ($responseNo["code"] === 200) {
-                        $dataNo = json_decode($responseNo["body"])->data;
+                    $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
+
+                    $tipe_bahan = json_decode($responsePenerimaanBarang["body"])->data->tipe_bahan;
+                    if($tipe_bahan === "BAKU")
+                    {
+                        $dataNo = [];
+                        $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
+                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=BAKU&supplierid=$arr", $this->token);
+                        if ($responseNo["code"] === 200) {
+                            $dataNo = json_decode($responseNo["body"])->data;
+                        }
+
+                        //Get Supplier
+                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+
+                        $dataSupplier = [];
+                        if ($responseSupplier["code"] === 200) {
+                            $dataSupplier = json_decode($responseSupplier["body"])->data;
+                        }
+                        
+                        $data["dataNo"] = $dataNo;
+                        $data["dataSupplier"] = $dataSupplier;
                     }
+                    if($tipe_bahan === "PENOLONG")
+                    {
+                        $dataNo = [];
+                        $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
+                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=PENOLONG&supplierid=$arr", $this->token);
+                        if ($responseNo["code"] === 200) {
+                            $dataNo = json_decode($responseNo["body"])->data;
+                        }
 
-                    //Get Supplier
-                    $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+                        //Get Supplier
+                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
 
-                    $dataSupplier = [];
-                    if ($responseSupplier["code"] === 200) {
-                        $dataSupplier = json_decode($responseSupplier["body"])->data;
+                        $dataSupplier = [];
+                        if ($responseSupplier["code"] === 200) {
+                            $dataSupplier = json_decode($responseSupplier["body"])->data;
+                        }
+
+                        $data["dataNo"] = $dataNo;
+                        $data["dataSupplier"] = $dataSupplier;
                     }
-                    
-                    $data["dataNo"] = $dataNo;
-                    $data["dataSupplier"] = $dataSupplier;
-                    $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
-                }
-                if($tipe_bahan === "PENOLONG")
-                {
-                    $dataNo = [];
-                    $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
-                    $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=PENOLONG&supplierid=$arr", $this->token);
-                    if ($responseNo["code"] === 200) {
-                        $dataNo = json_decode($responseNo["body"])->data;
-                    }
-
-                    //Get Supplier
-                    $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
-
-                    $dataSupplier = [];
-                    if ($responseSupplier["code"] === 200) {
-                        $dataSupplier = json_decode($responseSupplier["body"])->data;
-                    }
-
-                    $data["dataNo"] = $dataNo;
-                    $data["dataSupplier"] = $dataSupplier;
-                }
-            } 
+                } 
+            }
+            $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
         }
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);

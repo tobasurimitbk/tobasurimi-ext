@@ -38,12 +38,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>#</th>
-                            <th>No. Terima Faktur</th>
-                            <th>Dari</th>
-                            <th>Nominal Faktur</th>
-                            <th>Tanggal Jatuh Tempo</th>
-                            <th>Tanggal Penerimaan</th>
-                            <th>Penerima</th>
+                            <th onclick="changeSort('faktur_no')" class="sort">No. Terima Faktur</th>
+                            <th onclick="changeSort('sender')" class="sort">Supplier</th>
+                            <th onclick="changeSort('nominal_faktur')" class="sort">Nominal Faktur</th>
+                            <th onclick="changeSort('due_date')" class="sort">Jatuh Tempo</th>
+                            <th onclick="changeSort('date_of')" class="sort">Tanggal Penerimaan</th>
+                            <th onclick="changeSort('recipient')" class="sort">Penerima</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">

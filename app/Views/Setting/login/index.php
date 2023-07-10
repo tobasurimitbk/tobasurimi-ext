@@ -150,15 +150,7 @@
                     success: function(response) {
                         csrf.val(response.token);
                         if (response.status) {
-                            stopLoading()
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                            .then(() => {
-                                window.location.href = "<?= base_url("dashboard"); ?>";
-                            })
+                            window.location.href = "<?= base_url("dashboard"); ?>";
                         } else {
                             Swal.fire({
                                 icon: 'error',

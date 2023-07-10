@@ -85,7 +85,7 @@
   form.user
   .form-floating
   .text-danger {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: #e7323a !important;
 }
@@ -179,7 +179,7 @@
     rgba(231, 50, 58, 1) 35%,
     rgba(221, 39, 51, 1) 100%
   );
-  margin-top: 15px;
+  margin-top: 0px;
   text-transform: uppercase;
 }
 

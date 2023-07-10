@@ -64,6 +64,7 @@ class Auth extends BaseController
                     "this_company_id" => $this_company_id,
                     "this_company" => $this_company,
                     "this_access" => $this_access,
+                    "user_id" => $data->id,
                     "employee_id" => $data->employee_id,
                     "status" => $data->status
                 ];

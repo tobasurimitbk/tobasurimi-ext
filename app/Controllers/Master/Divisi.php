@@ -55,7 +55,6 @@ class Divisi extends BaseController
                 array_push($dataCompany, [
                     "id" => $data->id,
                     "divisi" => $data->divisi,
-                    "jam_kerja" => $data->jam_kerja,
                     "jam_istirahat" => $data->jam_istirahat,
                 ]);
             }
@@ -81,9 +80,6 @@ class Divisi extends BaseController
             "divisi" => [
                 "rules" => "required"
             ],
-            "jam_kerja" => [
-                "rules" => "required"
-            ],
             "jam_istirahat" => [
                 "rules" => "required"
             ]
@@ -93,7 +89,6 @@ class Divisi extends BaseController
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
-                "jam_kerja" => $this->request->getPost("jam_kerja"),
                 "jam_istirahat" => $this->request->getPost("jam_istirahat"),
             ]);
             
@@ -145,9 +140,6 @@ class Divisi extends BaseController
             "divisi" => [
                 "rules" => "required"
             ],
-            "jam_kerja" => [
-                "rules" => "required"
-            ],
             "jam_istirahat" => [
                 "rules" => "required"
             ]
@@ -159,7 +151,6 @@ class Divisi extends BaseController
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
                 "divisi" => $this->request->getPost("divisi"),
-                "jam_kerja" => $this->request->getPost("jam_kerja"),
                 "jam_istirahat" => $this->request->getPost("jam_istirahat"),
             ]);
             

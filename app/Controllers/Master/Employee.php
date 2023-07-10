@@ -17,7 +17,19 @@ class Employee extends BaseController
 
     public function employee()
     {
-        return view('Master/employee/index');
+        //Get Provinces
+        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
+
+        $dataProvinces = [];
+        if ($responseProvinces["code"] === 200) {
+            $dataProvinces = json_decode($responseProvinces["body"])->data;
+        }
+
+        $data = [
+            "dataProvinces" => $dataProvinces,
+        ];
+
+        return view('Master/employee/index', $data);
     }
 
     public function dropdownEmployee()
@@ -79,7 +91,6 @@ class Employee extends BaseController
                     "divisionName" => $data->divisionName,
                     "email" => $data->email,
                     "phone_no" => $data->phone_no,
-                    "address" => $data->address,
                     "dob" => $data->dob,
                     "gender" => $data->gender,
                     "acc_no" => $data->acc_no,
@@ -134,6 +145,36 @@ class Employee extends BaseController
             ],
             "pin" => [
                 "rules" => "required"
+            ],
+            "nik" => [
+                "rules" => "required"
+            ],
+            "child" => [
+                "rules" => "required"
+            ],
+            "religion_id" => [
+                "rules" => "required"
+            ],
+            "marriage_id" => [
+                "rules" => "required"
+            ],
+            "child" => [
+                "rules" => "required"
+            ],
+            "province_id" => [
+                "rules" => "required"
+            ],
+            "city_id" => [
+                "rules" => "required"
+            ],
+            "join_date" => [
+                "rules" => "required"
+            ],
+            "bank_name" => [
+                "rules" => "required"
+            ],
+            "owner_name" => [
+                "rules" => "required"
             ]
         ];
 
@@ -153,6 +194,7 @@ class Employee extends BaseController
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
                         "gender" => $this->request->getPost("gender"),
+                        "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
                         "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
                         "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
                         "phone_no" => $this->request->getPost("phone_no"),
@@ -160,7 +202,16 @@ class Employee extends BaseController
                         "email" => $this->request->getPost("email"),
                         "address" => $this->request->getPost("address"),
                         "status" => $this->request->getPost("status"),
-                        "pin" => $this->request->getPost("pin")
+                        "pin" => $this->request->getPost("pin"),
+                        "nik" => $this->request->getPost("nik"),
+                        "child" => $this->request->getPost("child"),
+                        "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                        "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                        "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                        "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                        "jabatan" => $this->request->getPost("jabatan"),
+                        "bank_name" => $this->request->getPost("bank_name"),
+                        "owner_name" => $this->request->getPost("owner_name"),
                     ]);
                 }
             }
@@ -246,6 +297,36 @@ class Employee extends BaseController
             ],
             "acc_no" => [
                 "rules" => "required"
+            ],
+            "nik" => [
+                "rules" => "required"
+            ],
+            "child" => [
+                "rules" => "required"
+            ],
+            "religion_id" => [
+                "rules" => "required"
+            ],
+            "marriage_id" => [
+                "rules" => "required"
+            ],
+            "child" => [
+                "rules" => "required"
+            ],
+            "province_id" => [
+                "rules" => "required"
+            ],
+            "city_id" => [
+                "rules" => "required"
+            ],
+            "join_date" => [
+                "rules" => "required"
+            ],
+            "bank_name" => [
+                "rules" => "required"
+            ],
+            "owner_name" => [
+                "rules" => "required"
             ]
         ];
 
@@ -266,13 +347,23 @@ class Employee extends BaseController
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
                         "gender" => $this->request->getPost("gender"),
+                        "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
                         "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
                         "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
                         "phone_no" => $this->request->getPost("phone_no"),
                         "acc_no" => $this->request->getPost("acc_no"),
                         "email" => $this->request->getPost("email"),
                         "address" => $this->request->getPost("address"),
-                        "status" => $this->request->getPost("status")
+                        "status" => $this->request->getPost("status"),
+                        "nik" => $this->request->getPost("nik"),
+                        "child" => $this->request->getPost("child"),
+                        "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                        "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                        "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                        "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                        "jabatan" => $this->request->getPost("jabatan"),
+                        "bank_name" => $this->request->getPost("bank_name"),
+                        "owner_name" => $this->request->getPost("owner_name"),
                     ]);
                 }
             } else {
@@ -287,7 +378,16 @@ class Employee extends BaseController
                     "acc_no" => $this->request->getPost("acc_no"),
                     "email" => $this->request->getPost("email"),
                     "address" => $this->request->getPost("address"),
-                    "status" => $this->request->getPost("status")
+                    "status" => $this->request->getPost("status"),
+                    "nik" => $this->request->getPost("nik"),
+                    "child" => $this->request->getPost("child"),
+                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                    "jabatan" => $this->request->getPost("jabatan"),
+                    "bank_name" => $this->request->getPost("bank_name"),
+                    "owner_name" => $this->request->getPost("owner_name"),
                 ]);
             }
 
