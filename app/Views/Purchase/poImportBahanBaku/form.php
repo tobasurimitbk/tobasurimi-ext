@@ -353,7 +353,7 @@
                                 <select class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Spesitifikasi</label>
+                                <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
                         <div class="col-md-6">
