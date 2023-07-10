@@ -10,10 +10,6 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
-                    <input type="hidden" class="sot" name="sot" id="sot" />
-                    <input type="hidden" class="eot" name="eot" id="eot" />
-                    <input type="hidden" class="bsot" name="bsot" id="bsot" />
-                    <input type="hidden" class="beot" name="beot" id="beot" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-3 mb-3 view-cols-image">
@@ -42,10 +38,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select shift_id" name="shift_id" id="shift_id" aria-label="Floating label select example">
-                                    <option value="" data-sot="" data-eot="" data-bsot="" data-beot=""></option>
-                                </select>
-                                <label for="floatingInput">Shift</label>
+                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
+                                <label for="floatingInput">Jabatan</label>
                             </div>
                         </div>
                     </div>
@@ -97,14 +91,23 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Anak">
-                                <label for="floatingInput">Anak</label>
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
+                                        <label for="floatingInput">Tanggal Bergabung</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar icon-join-date icon-form"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
-                                <label for="floatingInput">Jabatan</label>
+                                <input type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Anak">
+                                <label for="floatingInput">Anak</label>
                             </div>
                         </div>
                     </div>
@@ -154,7 +157,7 @@
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                            <i class="fa fa-calendar icon-form"></i>
+                                            <i class="fa fa-calendar icon-dob icon-form"></i>
                                         </span>
                                     </div>
                                 </div>
@@ -180,12 +183,6 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 form-pin">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN">
-                                <label for="floatingInput">PIN</label>
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select status" name="status" id="floatingSelect" aria-label="Floating label select example">
@@ -193,6 +190,12 @@
                                     <option value="Non Aktif">Non Aktif</option>
                                 </select>
                                 <label for="floatingInput">Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 form-pin">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN">
+                                <label for="floatingInput">PIN</label>
                             </div>
                         </div>
                     </div>
@@ -232,10 +235,8 @@
                             <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
                             <th onclick="changeSort('email')" class="sort">Email</th>
                             <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
-                            <th onclick="changeSort('address')" class="sort">Alamat</th>
                             <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
                             <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                            <th onclick="changeSort('acc_no')" class="sort">No. Rekening</th>
                             <th onclick="changeSort('status')" class="sort">Status</th>
                         </tr>
                     </thead>
@@ -300,16 +301,10 @@
             data: "phone_no",
             className: "text-center"
         }, {
-            data: "address",
-            className: "text-center"
-        }, {
             data: "dob",
             className: "text-center"
         }, {
             data: "gender",
-            className: "text-center"
-        }, {
-            data: "acc_no",
             className: "text-center"
         }, {
             data: "status",
@@ -349,12 +344,6 @@
         })
 
         $('.marriage_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        $('.shift_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
@@ -452,49 +441,6 @@
         .find('label')
         .css('z-index', '1');
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.shift_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-        $('.shift_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.shift_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
-        $(".shift_id").change(function() {
-            if($(".shift_id option:selected").val())
-            {
-                let sot = $(".shift_id option:selected").data("sot") ? $(".shift_id option:selected").data("sot")  : "";
-                let eot = $(".shift_id option:selected").data("sot") ? $(".shift_id option:selected").data("sot")  : "";
-                let bsot = $(".shift_id option:selected").data("bsot") ? $(".shift_id option:selected").data("bsot")  : "";
-                let beot = $(".shift_id option:selected").data("beot") ? $(".shift_id option:selected").data("beot")  : "";
-
-                $(".sot").val(sot);
-                $(".eot").val(eot);
-                $(".bsot").val(bsot);
-                $(".beot").val(beot);
-            }
-            else
-            {
-                $(".sot").val('');
-                $(".eot").val('');
-                $(".bsot").val('');
-                $(".beot").val('');
-            }
-        })
-
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
@@ -542,13 +488,13 @@
                 marriage_id: {
                     required: true,
                 },
-                shift_id: {
-                    required: true,
-                },
                 child: {
                     required: true,
                 },
                 jabatan: {
+                    required: true,
+                },
+                join_date: {
                     required: true,
                 }
             },
@@ -601,9 +547,6 @@
                 marriage_id: {
                     required: "Status Kawin wajib diisi"
                 },
-                shift_id: {
-                    required: "Shift wajib diisi"
-                },
                 child: {
                     required: "Anak wajib diisi"
                 },
@@ -614,6 +557,9 @@
                 },
                 jabatan: {
                     required: "Jabatan wajib diisi"
+                },
+                join_date: {
+                    required: "Tanggal Bergabung wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -645,7 +591,18 @@
             autoclose: true
         })
 
-        $('.fa-calendar').click(function() {
+        $(".join_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dob').click(function() {
+            $(".dob").focus();
+        });
+
+        $('.icon-join-date').click(function() {
             $(".dob").focus();
         });
 
@@ -674,22 +631,6 @@
             document.getElementById("preview_photo").src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAMAAAC93eDPAAAAMFBMVEXk5ueutLfn6eqyt7qrsbTh4+TDx8q2u77Z3N3Jzc/U19nO0dPq7Oy8wcSnrrHd4OEuWFw9AAADAUlEQVR4nO2a23LjIAxAjQAbsIH//9vFTjpNUhckRyI7u5ynTF84lSVuYpoGg8FgMBgMBoPB4H8DYNs2gE+NvkEOfo4xzj7YD2jAFKIy3+jZ9bUA67Ux6hFjlnXqJwH+Zfy7hQ5bJwF3KrCTou0SCP+bwBEIJ+8Ac/rdYJcI0g6wVGJw+xirrAPElkGJg6gDzG0D2W8BK8agOIgZTBlnoNQiFQZYkAZiKQmhXo5PWBGFSeMNzCwRBmwu3h0kwoDPhEPBC4TBUYJQ4F80cbPSN4l/vdpoMZBISEuoyIOF24BWDwfsNTFTDZLjVohkBfZJmjA13uDPR7KCYlcgG6jIrUAuiH9SgWzAr/D5iqAt1YcC+3JNn5q4t/JQO0meK2ReA9re9UAzGxSoCpHdYCPmo8TJkrhhSOwCZdtECwL7xDRR968m8BsQDrU7MgdbShgEtvAHFq0gkgk7+F10EjpY73MDzkHyxgtXmCYKXsIC5mxr2M9RZActfAkMoeFgBFbIVwenahJi5fjkYCt1IXK5csLm07lEUrlXUwTKNu7nDiZ164jcJCa/mIdYGKNi6NgXukvkNepbh0wtc8gfaRXCBpPN2drjV+/BYf+fc3YuFJxz2d7/1mf0MnbwcdFafTUqjzlxieVr2EncA8D5qFM6bxKmpEtWCFrAZp/L4JziIdO5BcheN4f/LlF2C4C9Q40b/8tiWRlXTID1tUONslAz02QF00oLwINEmjkiAUFfFLhFwr8bCciI3miVsni95bCdvxIgSsTrgYCM3LS3uNy+hXA1DX86XLt928i3SzWHK8fc1jsFqoOmJ8S7lfAT4r4S806BiKEdcQQMFO0aEDxrHnxBOGw2D22XHdBHrSwjoPCXkdiLjCvgbiPpF94UFtSBS9IA1SKgduipIKqCdMF5gXZGSgehTFDNLyEsUMLQaqdLzUoPCo29g8zi8OJQr0uQN2g9bMgi69Mz9SuxC89FLlBtnMmX5E5939AhGxvPISHqDtTf+kAXqh9iMBgMBn8LfwAfLCKVi1nppAAAAABJRU5ErkJggg==";
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
-
-            $.ajax({
-                url: `<?= base_url("shift/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".shift_id").empty()
-                    $(".shift_id").val("").change()
-                    $(".shift_id").append(`<option data-sot="" data-eot="" data-bsot="" data-beot="" value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".shift_id").append(`<option data-sot="${item.sot}" data-eot="${item.eot}" data-bsot="${item.bsot}" data-beot="${item.beot}" value="${item.id}">${item.nama_shift}</option>`)
-                    })
-
-                    $(".shift_id").val('').change();
-                }
-            })
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -951,6 +892,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
+                        $(".join_date").val(res?.data?.join_date);
                         $(".address").val(res?.data?.address);
                         $(".acc_no").val(res?.data?.acc_no);
                         $(".dob").val(res?.data?.dob);
@@ -980,26 +922,6 @@
                                 })
 
                                 $(".city_id").val(res?.data?.city_id).change();
-                            }
-                        })
-
-                        $.ajax({
-                            url: `<?= base_url("shift/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".shift_id").empty()
-                                $(".shift_id").val("").change()
-                                $(".shift_id").append(`<option data-sot="" data-eot="" data-bsot="" data-beot="" value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".shift_id").append(`<option data-sot="${item.sot}" data-eot="${item.eot}" data-bsot="${item.bsot}" data-beot="${item.beot}" value="${item.id}">${item.nama_shift}</option>`)
-                                })
-
-                                $(".shift_id").val(res?.data?.shift_id).change();
-                                $(".sot").val(res?.data?.SOT);
-                                $(".eot").val(res?.data?.EOT);
-                                $(".bsot").val(res?.data?.BSOT);
-                                $(".beot").val(res?.data?.BEOT);
                             }
                         })
 
