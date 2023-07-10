@@ -100,6 +100,9 @@ class Warehouse extends BaseController
     {
         try{
         $rules = [
+            "code_warehouse" => [
+                "rules" => "required"
+            ],
             "warehouse_name" => [
                 "rules" => "required"
             ],
@@ -128,6 +131,7 @@ class Warehouse extends BaseController
 
         if ($this->validate($rules)) {
             $payload = json_encode([
+                "code_warehouse" => $this->request->getPost("code_warehouse"),
                 "warehouse_name" => $this->request->getPost("warehouse_name"),
                 "address" => $this->request->getPost("address"),
                 "province_id" => $this->request->getPost("province_id"),
@@ -183,6 +187,9 @@ class Warehouse extends BaseController
     {
         try{
         $rules = [
+            "code_warehouse" => [
+                "rules" => "required"
+            ],
             "warehouse_name" => [
                 "rules" => "required"
             ],
@@ -213,6 +220,7 @@ class Warehouse extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
+                "code_warehouse" => $this->request->getPost("code_warehouse"),
                 "warehouse_name" => $this->request->getPost("warehouse_name"),
                 "address" => $this->request->getPost("address"),
                 "province_id" => $this->request->getPost("province_id"),

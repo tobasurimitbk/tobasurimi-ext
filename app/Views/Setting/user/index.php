@@ -481,7 +481,7 @@
                     $(".employee_id").val("").change()
                     $(".employee_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".employee_id").append(`<option value="${item.id}">${item.name}</option>`)
+                        $(".employee_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
                     })
                     $(".add-modal").modal("show")
                 }
@@ -914,7 +914,7 @@
                                 $(".employee_id").empty()
                                 $(".employee_id").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".employee_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                    $(".employee_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
                                 })
                                 console.log("tes", res?.data?.employee_id)
                                 $(".employee_id").val(res?.data?.employee_id).change();

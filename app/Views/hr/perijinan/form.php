@@ -30,7 +30,7 @@
                                 if (!empty($dataEmployee)) {
                                     foreach ($dataEmployee as $employee) {
                                 ?>
-                                        <option value="<?= $employee->id; ?>" <?= !empty($data) ? ($data->employee_id === $employee->id ? "selected" : "") : ""; ?>><?= $employee->name; ?></option>
+                                        <option value="<?= $employee->id; ?>" <?= !empty($data) ? ($data->employee_id === $employee->id ? "selected" : "") : ""; ?>><?= $employee->nip; ?> - <?= $employee->name; ?></option>
                                 <?php
                                     }
                                 }

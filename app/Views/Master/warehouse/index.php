@@ -218,6 +218,9 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
+                warehouse_code: {
+                    required: true
+                },
                 warehouse_name: {
                     required: true
                 },
@@ -245,8 +248,11 @@
                 },
             },
             messages: {
+                warehouse_code: {
+                    required: "Kode wajib diisi"
+                },
                 warehouse_name: {
-                    required: "Name wajib diisi"
+                    required: "Nama wajib diisi"
                 },
                 address: {
                     required: "Address wajib diisi"
@@ -415,7 +421,7 @@
                     $(".pic_id").val("").change()
                     $(".pic_id").append(`<option value=""></option>`)
                     result.data.forEach(function(item) {
-                        $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                        $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
                     })
 
                     $(".pic_id").val('').change();
@@ -445,6 +451,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
+                        $(".warehouse_code").val(res?.data?.warehouse_code);
                         $(".warehouse_name").val(res?.data?.warehouse_name);
                         $(".address").val(res?.data?.address);
                         $(".phone").val(res?.data?.phone);
@@ -460,7 +467,7 @@
                                 $(".pic_id").val("").change()
                                 $(".pic_id").append(`<option value=""></option>`)
                                 result.data.forEach(function(item) {
-                                    $(".pic_id").append(`<option value="${item.id}">${item.name}</option>`)
+                                    $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
                                 })
 
                                 $(".pic_id").val(res?.data?.pic_id).change();
