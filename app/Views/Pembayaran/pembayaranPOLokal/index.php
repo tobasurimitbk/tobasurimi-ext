@@ -39,10 +39,11 @@
                         <tr>
                             <th>#</th>
                             <th>No. Pembayaran</th>
-                            <th>No. Terima Faktur</th>
-                            <th>Nominal Faktur</th>
+                            <th>Tanggal Jatuh Tempo</th>
                             <th>Tanggal Pembayaran</th>
-                            <th>Pembayaran Oleh</th>
+                            <th>Metode Pembayaran</th>
+                            <th>Jumlah</th>
+                            <th>Status Pembayaran</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -104,11 +105,7 @@
             className: "text-center"
         },
         {
-            data: "multiple_faktur_no",
-            className: "text-center"
-        },
-        {
-            data: "nominal_faktur",
+            data: "due_date",
             className: "text-center"
         },
         {
@@ -116,7 +113,15 @@
             className: "text-center"
         },
         {
-            data: "createdBy",
+            data: "payment_method",
+            className: "text-center"
+        },
+        {
+            data: "amount",
+            className: "text-center"
+        },
+        {
+            data: "payment_status",
             className: "text-center"
         }],
         columnDefs: [{
@@ -168,7 +173,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-po-lokal/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("pembayaran-po-lokal/"); ?>${data.id}`);
         })
     })
 </script>

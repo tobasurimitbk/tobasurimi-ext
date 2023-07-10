@@ -155,6 +155,25 @@ class RekapFaktur extends BaseController
         return;
     }
 
+    public function getRekapFakturBySupplier($supplierId)
+    {
+        $response = curl_request("GET", "/localPOInvSummary/supplier/$supplierId", $this->token);
+
+        $fakturList = [];
+        $totalRecords = 0;
+
+        if ($response["code"] === 200) {
+            $fakturList = json_decode($response["body"])->data;
+        }
+
+        $data = [
+            'data'=> $fakturList
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function getRekapFakturById($id)
     {
         $rekapResponse = curl_request("GET", "/localPOInvSummary/$id", $this->token);
