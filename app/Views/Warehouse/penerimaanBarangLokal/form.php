@@ -402,7 +402,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-5">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Detail Barang di Dokumen</h5>
                         </div>

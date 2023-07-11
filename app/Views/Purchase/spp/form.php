@@ -309,7 +309,7 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer mt-3">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
                     <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button>

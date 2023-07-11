@@ -363,7 +363,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Harga</h5>
                         </div>
