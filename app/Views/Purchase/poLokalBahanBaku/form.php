@@ -164,7 +164,7 @@
             <table class="table nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                 <thead class="thead-dark">
                     <tr>
-                        <th>#</th>
+                        <th>No.</th>
                         <th>Kode Barang</th>
                         <th>Nama Barang</th>
                         <th>Spesifikasi</th>
@@ -188,9 +188,9 @@
                     $total_harga = 0;
                     if(!empty($dataPOLokal)){ 
                     foreach($dataPOLokal->rm_purchase_order_details as $details){  
-                        $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $details->general_price), "STR_TO_INT");
+                        $total_harga_barang = $total_harga_barang + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_INT") : 0);
                         $total_qty = $total_qty + $details->qty;
-                        $total_harga = $total_harga + formatter(str_replace(",", "", $details->general_price), "STR_TO_INT") * $details->qty;
+                        $total_harga = $total_harga + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_INT") : 0) * $details->qty;
                 ?> 
 
 <tr>
@@ -295,7 +295,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <textarea class="form-control keterangan text-area-address-company" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
+                                <textarea class="form-control keterangan text-area-company" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
