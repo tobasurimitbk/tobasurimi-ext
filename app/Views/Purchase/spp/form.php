@@ -293,7 +293,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-5">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total Harga">
@@ -309,7 +309,7 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer mt-3">
+            <div class="modal-footer">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
                     <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
                     <button type="button" class="btn btn-discard delete-btn delete-detail delete-form">Hapus</button>
