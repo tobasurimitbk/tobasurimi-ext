@@ -5634,6 +5634,11 @@ table.dataTable td .label-finish {
   padding: 25px 12px;
 }
 
+.form-floating .form-control.information.text-area-address-company {
+  height: 100px;
+  padding: 25px 12px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
