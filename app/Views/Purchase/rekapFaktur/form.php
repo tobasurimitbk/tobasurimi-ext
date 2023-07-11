@@ -9,15 +9,18 @@
         <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("rekap-faktur"); ?>">
             Batal
         </a>
-        <button class="btn btn-show-form btn-save float-right btn-submit-form">
-            Simpan
-        </button>
+        <?php if(!empty($rekapData) && $rekapData->is_posted === false): ?> 
+            <button class="btn btn-success posting-rekap">Posting</button>
+            <button class="btn btn-hapus delete-parent float-right">Hapus</button>
+            <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
+        <?php endif; ?>
+
     </div>
 </div>
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" class="id" name="id" id="id" />
+            <input type="hidden" class="id" name="id" id="id" value="<?= $rekapData->id ?? '' ?>"/>
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
@@ -180,6 +183,129 @@ $(document).ready(function() {
         .find('label')
         .css('z-index', '1');
 
+    // posting button action
+    $(".posting-rekap").click(function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di Posting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("rekap-faktur/update-status"); ?>",
+                    data: {
+                        id: $(".id").val()
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                window.location.reload()
+                            })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
+
+    });
+    // posting button action end
+
+    // delete rekap
+    $(".delete-parent").click(function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                let id = $(".id").val();
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("rekap-faktur/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                window.location.href = "<?= base_url("rekap-faktur"); ?>"
+                            })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
+    });
+    // delete rekap end
+
     $(".btn-submit-form").click(function() {
         if ($(".create-form").valid()) {
             Swal.fire({
@@ -193,8 +319,10 @@ $(document).ready(function() {
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const id = $(".id").val();
+                    let ajaxUrl = id ? `<?= base_url("rekap-faktur/update"); ?>` : '<?= base_url("rekap-faktur/create"); ?>';
                     $.ajax({
-                        url: "<?= base_url("rekap-faktur/create"); ?>",
+                        url: ajaxUrl,
                         data: $(".create-form").serialize(),
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());

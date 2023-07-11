@@ -256,6 +256,9 @@ $routes->get('/rekap-faktur/supplier/(:num)', 'Purchase\RekapFaktur::getRekapFak
 $routes->get('/rekap-faktur/(:num)', 'Purchase\RekapFaktur::getRekapFakturById/$1', ['filter' => 'Auth']);
 $routes->get('/rekap-faktur/create', 'Purchase\RekapFaktur::createRekapFaktur', ['filter' => 'Auth']);
 $routes->post('/rekap-faktur/create', 'Purchase\RekapFaktur::saveRekapFaktur', ['filter' => 'Auth']);
+$routes->post('/rekap-faktur/update-status', 'Purchase\RekapFaktur::updateStatusRekap', ['filter' => 'Auth']);
+$routes->post('/rekap-faktur/update', 'Purchase\RekapFaktur::updateRekap', ['filter' => 'Auth']);
+$routes->post('/rekap-faktur/delete', 'Purchase\RekapFaktur::deleteRekap', ['filter' => 'Auth']);
 
 // PEMBAYARAN
 // PEMBAYARAN PO LOKAL

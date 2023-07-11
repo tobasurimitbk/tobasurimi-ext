@@ -41,6 +41,8 @@
                             <th>No. Rekap Faktur</th>
                             <th>Tanggal Jatuh Tempo</th>
                             <th>Total</th>
+                            <th>Status Rekap</th>
+                            <th>Posted</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -107,6 +109,14 @@
         },
         {
             data: "total",
+            className: "text-center"
+        },
+        {
+            data: "summary_status",
+            className: "text-center"
+        },
+        {
+            data: "is_posted",
             className: "text-center"
         },
         /* {

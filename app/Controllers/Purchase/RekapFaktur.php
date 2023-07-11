@@ -131,12 +131,13 @@ class RekapFaktur extends BaseController
 
             foreach ($body as $data) {
                 array_push($dataSPP, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "summary_no" => $data->summary_no,
-                    "total" => number_format($data->total),
-                    "due_date" => $data->due_date,
-                    // "is_posted" => $data->is_posted,
+                    "no"                => $no++,
+                    "id"                => $data->id,
+                    "summary_no"        => $data->summary_no,
+                    "total"             => number_format($data->total),
+                    "due_date"          => $data->due_date,
+                    "summary_status"    => $data->summary_status,
+                    "is_posted"         => $data->is_posted,
                 ]);
             }
         }
@@ -180,6 +181,8 @@ class RekapFaktur extends BaseController
         $rekapData = [];
         if ($rekapResponse["code"] === 200) {
             $rekapData = json_decode($rekapResponse["body"])->data;
+        } else {
+            return view('errors/html/error_404', ['message' => 'Not Found!']);
         }
         $selectedFaktur = array_column($rekapData->local_po_inv_sum_details, 'tanda_terima_faktur_id');
 
@@ -203,5 +206,180 @@ class RekapFaktur extends BaseController
         ];
 
         return view('Purchase/rekapFaktur/form', $data);
+    }
+
+    public function updateRekap()
+    {
+        try{
+            $rules = [
+                "id" => [
+                    "rules" => "required|is_natural_no_zero"
+                ],
+                "supplier_id" => [
+                    "rules" => "is_natural_no_zero"
+                ],
+                "invoices.*" => [
+                    "rules" => "is_natural_no_zero"
+                ],
+                "due_date" => [
+                    "rules" => "valid_date[d/m/Y]"
+                ]
+            ];
+
+            if (!$this->validate($rules)) {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Diubah",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+            
+            $id = $this->request->getPost("id");
+            $supplierId = $this->request->getPost("supplier_id");
+            $invoices = $this->request->getPost("invoices");
+            $due_date = $this->request->getPost("due_date");
+
+            $arrData = [
+                "supplier_id"   => (int)$supplierId ?: null,
+                "invoices"      => $invoices ?: null,
+                "due_date"      => $due_date ? date("Y-m-d", strtotime(str_replace("/", "-", $due_date))) : null,
+            ];
+            $filteredData = array_filter($arrData, fn($value) => !empty($value));
+
+            if (empty($filteredData)) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Tidak ada Data yang diubah",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $payload = json_encode($filteredData);
+
+            $response = curl_request("PATCH", "/localPOInvSummary/$id", $this->token, $payload);
+
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"    => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token'     => csrf_hash(),
+                    'id'        => $id
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+            
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateStatusRekap()
+    {
+        try{
+        $id = $this->request->getPost("id");
+
+        $payload = json_encode([
+            "is_posted" => true
+        ]);
+
+        $response = curl_request("PATCH", "/localPOInvSummary/$id", $this->token, $payload);
+
+        if ($response["code"] === 200) {
+            $data = [
+                "status"            => true,
+                "message"   => "Data Berhasil diposting",
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        } else {
+            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
+            $data = [
+                "status"            => false,
+                "message"    => $message,
+                "payload"   => $payload,
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+    }
+
+    public function deleteRekap()
+    {
+        try{
+            $id = $this->request->getPost("id");
+
+            if (empty($id)) {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+        
+            $response = curl_request("DELETE", "/localPOInvSummary/$id", $this->token);
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 }
