@@ -22,25 +22,51 @@ class PembayaranPOLokal extends BaseController
 
     public function createPembayaranPOLokal()
     {   
-        $data = [];
+        $supplierList = [];
+        $responseSupplierList = curl_request("GET", "/suppliers/all?kategori=lokal", $this->token);
+        
+        if ($responseSupplierList['code'] === 200) {
+            $supplierList = json_decode($responseSupplierList['body'])->data;
+        }
+
+        $data = [
+            "suppliers"=> $supplierList
+        ];
         
         return view('Pembayaran/pembayaranPOLokal/form', $data);
     }
 
-    public function getByIdPembayaranPOLokal($id = null)
+    public function getByIdPembayaranPOLokal($id)
     {   
         $data = [];
 
-        if (!empty($id)) {
-            $responsePembayaranPOLokal = curl_request("GET", "/buktiPembayaran/$id", $this->token);
-            $dataPembayaranPOLokal = [];
-            if ($responsePembayaranPOLokal["code"] === 200) {
-                $dataPembayaranPOLokal = json_decode($responsePembayaranPOLokal["body"])->data;
-            }
-            $data["dataPembayaranPOLokal"] = $dataPembayaranPOLokal;
+        $responsePembayaranPOLokal = curl_request("GET", "/localPOPayment/$id", $this->token);
+        $dataPembayaranPOLokal = [];
+        if ($responsePembayaranPOLokal["code"] === 200) {
+            $dataPembayaranPOLokal = json_decode($responsePembayaranPOLokal["body"])->data;
+        }
+        $selectedFaktur = array_column($dataPembayaranPOLokal->local_po_payment_details, 'local_po_inv_summary_id');
+
+        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id&kategori=lokal", $this->token);
+        $supplierList = [];
+        if ($responseSupplier["code"] === 200) {
+            $supplierList = json_decode($responseSupplier["body"])->data;
         }
 
-        return view('Purchase/terimaFakturLokal/form', $data);
+        $summaryResponse = curl_request("GET", "/localPOInvSummary/supplier/$dataPembayaranPOLokal->supplier_id", $this->token);
+        $summaryList = [];
+        if ($summaryResponse["code"] === 200) {
+            $summaryList = json_decode($summaryResponse["body"])->data;
+        }
+
+        $data = [
+            'dataPembayaranPOLokal' => $dataPembayaranPOLokal,
+            'suppliers'             => $supplierList,
+            'summaryList'           => $summaryList,
+            "selectedFaktur"        => $selectedFaktur
+        ];
+
+        return view('Pembayaran/pembayaranPOLokal/form', $data);
     }
 
     public function allPembayaranPOLokal()
@@ -55,7 +81,7 @@ class PembayaranPOLokal extends BaseController
             "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/buktiPembayaran", $this->token, $payload);
+        $response = curl_request("GET", "/localPOPayment", $this->token, $payload);
         $dataPembayaranPOLokal = [];
         $totalRecords = 0;
 
@@ -67,13 +93,14 @@ class PembayaranPOLokal extends BaseController
 
             foreach ($body as $data) {
                 array_push($dataPembayaranPOLokal, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "payment_no" => $data->payment_no,
-                    "multiple_faktur_no" => $data->multiple_faktur_no,
-                    "nominal_faktur" => $data->nominal_faktur,
-                    "payment_date" => $data->payment_date,
-                    "createdBy" => ""
+                    "no"                => $no++,
+                    "id"                => $data->id,
+                    "payment_no"        => $data->payment_no,
+                    "due_date"          => $data->due_date,
+                    "payment_date"      => $data->payment_date,
+                    "payment_method"    => $data->payment_method,
+                    "payment_status"    => $data->payment_status,
+                    "amount"            => $data->amount
                 ]);
             }
         }
@@ -93,34 +120,53 @@ class PembayaranPOLokal extends BaseController
     
     public function savePembayaranPOLokal()
     {
-        try{
-        $rules = [
-            "nominal_faktur" => [
-                "rules" => "required"
-            ]
-        ];
+        try { 
+            $rules = [
+                "supplier_id" => [
+                    "rules" => "required|is_natural_no_zero"
+                ],
+                "summaries.*" => [
+                    "rules" => "required|is_natural_no_zero"
+                ],
+                "due_date" => [
+                    "rules" => "required|valid_date[d/m/Y]"
+                ],
+                "payment_date" => [
+                    "rules" => "required|valid_date[d/m/Y]"
+                ],
+                "payment_method" => [
+                    "rules" => "required"
+                ],
+                "payment_status" => [
+                    "rules" => "required|in_list[Unpaid,Paid]"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             $payload = json_encode([
-                "multiple_faktur_id" => json_decode($this->request->getPost("multiple_faktur_id")),
-                "multiple_faktur_no" => json_decode($this->request->getPost("multiple_faktur_no")),
-                "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
-                "payment_type" => "LOKAL"
+                "supplier_id"   => (int)$this->request->getPost("supplier_id"),
+                "summaries"     => $this->request->getPost("summaries"),
+                "payment_date"  => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
+                "due_date"      => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
+                "payment_method"=> $this->request->getPost("payment_method"),
+                "payment_status"=> $this->request->getPost("payment_status"),
             ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
-            
-            $response = curl_request("POST", "/buktiPembayaran", $this->token, $payload);
+            $response = curl_request("POST", "/localPOPayment", $this->token, $payload);
 
             if ($response["code"] === 201) {
                 $data = [
-                    "id" => "",
+                    "id" => json_decode($response["body"])->createdId,
                     "status"            => true,
                     "message"   => "Data Berhasil disimpan",
                     "payload"   => $payload,
@@ -139,14 +185,6 @@ class PembayaranPOLokal extends BaseController
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {

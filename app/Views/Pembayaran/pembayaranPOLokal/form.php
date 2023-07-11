@@ -24,34 +24,56 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran">
+                                <input type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" value="<?= $dataPembayaranPOLokal->payment_no ?? '' ?>" <?= (!empty($dataPembayaranPOLokal)) ? 'disabled' : '' ?>>
                                 <label for="floatingInput">No. Pembayaran</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()" <?= (!empty($dataPembayaranPOLokal)) ? 'disabled' : '' ?>>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select disabled="true" readonly="true" class="form-select multiple_faktur_id" name="multiple_faktur_id[]" id="multiple_faktur_id[]">
-                            <option value=""></option>
-                        </select>
-                        <label for="floatingInput">No. Terima Faktur</label>
+                        <input class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->payment_date ?? '' ?>">
+                        <label for="floatingInput">Tanggal Pembayaran</label>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
-                        <label for="floatingInput">Nominal Faktur</label>
+                        <select class="form-select " name="supplier_id" id="supplier">
+                            <option disabled selected value=""></option>
+                            <?php foreach ($suppliers as $supplier): ?>
+                            <option value="<?= $supplier->id ?>" <?= (!empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->supplier_id == $supplier->id) ? 'selected' : '' ?>><?= $supplier->name ?></option>
+                            <?php endforeach ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Supplier</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select" name="summaries[]" id="supplier-faktur">
+                            <?php foreach ($summaryList ?? [] as $summary): ?>
+                            <option value="<?= $summary->id ?>" data-amount="<?= floatval($summary->amount) ?>" <?= (in_array($summary->id, $selectedFaktur)) ? 'selected' : '' ?>><?= $summary->summary_no ?></option>
+                            <?php endforeach ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Rekap Faktur</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input onkeyup="formatNumber(this)" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" value="0" readonly disabled>
+                        <label for="floatingInput">Nominal Pembayaran</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
+                        <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->due_date ?? '' ?>">
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
@@ -59,8 +81,30 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select " name="payment_method" id="payment_method">
+                            <option disabled selected value=""></option>
+                            <option value="Cash" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_method == 'Cash' ? 'selected' : '' ?>>Cash</option>
+                            <option value="Debit" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_method == 'Debit' ? 'selected' : '' ?>>Debit</option>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
                         <label for="floatingInput">Pembayaran Oleh</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select " name="payment_status" id="payment_status">
+                            <option disabled selected value=""></option>
+                            <option value="Unpaid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Unpaid' ? 'selected' : '' ?>>Unpaid</option>
+                            <option value="Paid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Paid' ? 'selected' : '' ?>>Paid</option>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                     </div>
                 </div>
             </div>
@@ -71,6 +115,8 @@
 
 <script>
 $(document).ready(function() {
+    const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
     var validator = $(".create-form").validate({
         rules: {
             no_bukti_pembayaran: {
@@ -134,10 +180,47 @@ $(document).ready(function() {
     })
 
     // MULTIPLE PO ID
-    $('.multiple_faktur_id').select2({
+    $('#supplier').select2({
         placeholder: "",
         theme: "bootstrap-5"
-    })
+    }).change(function(e) {
+        $("#supplier-faktur").empty();
+        $("#supplier-faktur").select2({
+            multiple: true,
+            placeholder: "Pilih Bro",
+            theme: "bootstrap-5",
+            ajax: {
+                url: '<?= base_url() . 'rekap-faktur/supplier/' ?>' + $(this).val(),
+                dataType: 'json',
+                processResults: function (res) {
+                    return {
+                        results: $.map(res.data, function (item) {
+                            return {
+                                id: item.id,
+                                text: item.summary_no,
+                                amount: +item.amount
+                            }
+                        })
+                    };
+                }
+            },
+            templateSelection: function(container) {
+                // console.log('goblokkkkkkkkkkkkkkkkkk')
+                $(container.element).attr("data-amount", container.amount);
+                return container.text;
+            }
+        });
+    });
+
+    $("#supplier-faktur").change(function(e) {
+        let total = 0;
+        
+        $(this).select2('data').map(function(data) {
+            total += data.amount;
+        });
+        
+        $('#nominal_pembayaran').val(total);
+    });
 
     //CSS SELECT2 FLOATING LABEL
     $('.multiple_faktur_id')
@@ -173,7 +256,45 @@ $(document).ready(function() {
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
-                
+                    $.ajax({
+                        url: "<?= base_url("pembayaran-po-lokal/create"); ?>",
+                        data: $(".create-form").serialize(),
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = `<?= base_url("pembayaran-po-lokal"); ?>/${response.id}`;
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
                 }
             })
         }

@@ -252,6 +252,7 @@ $routes->post('/terima-faktur-import/delete', 'Purchase\TerimaFakturImport::dele
 // REKAP FAKTUR
 $routes->get('/rekap-faktur', 'Purchase\RekapFaktur', ['filter' => 'Auth']);
 $routes->get('/rekap-faktur/all', 'Purchase\RekapFaktur::getRekapFakturList', ['filter' => 'Auth']);
+$routes->get('/rekap-faktur/supplier/(:num)', 'Purchase\RekapFaktur::getRekapFakturBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('/rekap-faktur/(:num)', 'Purchase\RekapFaktur::getRekapFakturById/$1', ['filter' => 'Auth']);
 $routes->get('/rekap-faktur/create', 'Purchase\RekapFaktur::createRekapFaktur', ['filter' => 'Auth']);
 $routes->post('/rekap-faktur/create', 'Purchase\RekapFaktur::saveRekapFaktur', ['filter' => 'Auth']);
@@ -260,14 +261,14 @@ $routes->post('/rekap-faktur/create', 'Purchase\RekapFaktur::saveRekapFaktur', [
 // PEMBAYARAN PO LOKAL
 $routes->get('/pembayaran-po-lokal', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal/all', 'Pembayaran\PembayaranPOLokal::allPembayaranPOLokal', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-lokal/id/(:segment)', 'Pembayaran\PembayaranPOLokal::getByIdPembayaranPOLokal/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal/(:num)', 'Pembayaran\PembayaranPOLokal::getByIdPembayaranPOLokal/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokal', ['filter' => 'Auth']);
-$routes->post('/pembayaran-po-lokal/save', 'Pembayaran\PembayaranPOLokal::savePembayaranPOLokal', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-lokal/create', 'Pembayaran\PembayaranPOLokal::savePembayaranPOLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::deletePembayaranPOLokal', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO IMPORT
-$routes->get('/pembayaran-po-import', 'Pembayaran\PembayaranPOImport::pembayaranPOImport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import', 'Pembayaran\PembayarzanPOImport::pembayaranPOImport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all', 'Pembayaran\PembayaranPOImport::allPembayaranPOImport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/id/(:segment)', 'Pembayaran\PembayaranPOImport::getByIdPembayaranPOImport/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::createPembayaranPOImport', ['filter' => 'Auth']);
