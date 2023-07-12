@@ -364,13 +364,8 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-<<<<<<< HEAD
                             <div class="form-floating mb-3">
-                                <textarea class="form-control keterangan text-area-address-company" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
-=======
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <textarea class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
->>>>>>> 0f56e55d547629671080d0f2353bd07896033a6b
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
