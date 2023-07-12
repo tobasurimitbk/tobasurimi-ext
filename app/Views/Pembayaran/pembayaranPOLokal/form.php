@@ -104,7 +104,7 @@
                             <option value="Unpaid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Unpaid' ? 'selected' : '' ?>>Unpaid</option>
                             <option value="Paid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Paid' ? 'selected' : '' ?>>Paid</option>
                         </select>
-                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                        <label for="floatingInput" style="z-index: 1;">Status Pembayaran</label>
                     </div>
                 </div>
             </div>
