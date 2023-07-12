@@ -3,15 +3,26 @@
 namespace App\Controllers\Setting;
 
 use App\Controllers\BaseController;
+use App\Models\UserModel;
+use App\Models\CompaniesModel;
+use App\Models\RolesModel;
+use App\Models\AccessListsModel;
 
 use DateTime;
 
 class Auth extends BaseController
 {
+    protected $userModel;
+    protected $CompaniesModel;
+    protected $RolesModel;
+    protected $AccessListsModel;
 
     public function __construct()
     {
-
+        $this->userModel = new UserModel();
+        $this->CompaniesModel = new CompaniesModel();
+        $this->RolesModel = new RolesModel();
+        $this->AccessListsModel = new AccessListsModel();
     }
 
     public function login()
@@ -25,7 +36,7 @@ class Auth extends BaseController
 
     public function doLogin()
     {
-        try{
+        try {
             $rules = [
                 "username" => [
                     "rules" => "required"
@@ -93,9 +104,7 @@ class Auth extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
