@@ -39,8 +39,11 @@ class PenomoranRak extends BaseController
             $body = json_decode($response["body"])->data;
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($body as $data) {
                 array_push($dataRole, [
+                    "no" => $no++,
                     "id" => $data->id,
                     "nomor" => $data->nomor,
                     "rak" => $data->rak,
@@ -64,49 +67,49 @@ class PenomoranRak extends BaseController
     public function savePenomoranRak()
     {
         try{
-        $rules = [
-            "nomor" => [
-                "rules" => "required"
-            ],
-            "rak" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "nomor" => [
+                    "rules" => "required"
+                ],
+                "rak" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "nomor" => $this->request->getPost("nomor"),
-                "rak" => $this->request->getPost("rak"),
-            ]);
-                $response = curl_request("POST", "/rak", $this->token, $payload);
+            if ($this->validate($rules)) {
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "nomor" => $this->request->getPost("nomor"),
+                    "rak" => $this->request->getPost("rak"),
+                ]);
+                    $response = curl_request("POST", "/rak", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Disimpan",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -123,52 +126,52 @@ class PenomoranRak extends BaseController
     public function updatePenomoranRak()
     {
         try{
-        $rules = [
-            "nomor" => [
-                "rules" => "required"
-            ],
-            "rak" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "nomor" => [
+                    "rules" => "required"
+                ],
+                "rak" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "nomor" => $this->request->getPost("nomor"),
-                "rak" => $this->request->getPost("rak")
-            ]);
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "nomor" => $this->request->getPost("nomor"),
+                    "rak" => $this->request->getPost("rak")
+                ]);
 
-            $response = curl_request("PATCH", "/rak/$id", $this->token, $payload);
+                $response = curl_request("PATCH", "/rak/$id", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Diubah",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -213,34 +216,34 @@ class PenomoranRak extends BaseController
     public function deletePenomoranRak()
     {
         try{
-        $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/rak/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/rak/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {

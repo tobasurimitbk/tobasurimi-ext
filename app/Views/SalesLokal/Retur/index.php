@@ -16,7 +16,7 @@
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>#</th>
+                                <th>No.</th>
                                 <th>Nama Customer</th>
                                 <th>Destination</th>
                                 <th>Tipe</th>

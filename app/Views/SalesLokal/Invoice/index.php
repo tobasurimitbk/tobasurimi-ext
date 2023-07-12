@@ -16,6 +16,7 @@
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
+                                <th>No.</th>
                                 <th>Nama Pelanggan</th>
                                 <th>Kode Pelanggan</th>
                                 <th>No Faktur</th>
@@ -48,7 +49,7 @@
         serverSide: true,
         ordering: true,
         order: [
-            [0, 'asc']
+            [1, 'asc']
         ],
         fixedHeader: true,
         lengthMenu: [
@@ -75,6 +76,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
             data: "nama_pelanggan",
             className: "text-center"
         }, {

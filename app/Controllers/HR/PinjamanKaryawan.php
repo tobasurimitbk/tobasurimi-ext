@@ -55,8 +55,11 @@ class PinjamanKaryawan extends BaseController
             $body = json_decode($response["body"])->data;
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($body as $data) {
                 array_push($dataPinjamanKaryawan, [
+                    "no" => $no++,
                     "id" => $data->id,
                     "amount" => $data->amount,
                     "installment_month" => $data->installment_month,

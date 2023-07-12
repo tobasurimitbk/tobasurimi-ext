@@ -46,8 +46,11 @@ class Invoice extends BaseController
             $body = json_decode($response["body"])->data;
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($body as $data) {
                 array_push($dataInvoice, [
+                    "no" => $no++,
                     "id" =>  bin2hex($this->encrypter->encrypt($data->id)),
                     "no_faktur" => $data->no_faktur,
                     "ship_via" => $data->ship_via,

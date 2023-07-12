@@ -122,6 +122,10 @@ $routes->post('/sub-account/delete', 'Master\Account::deleteSubAccount', ['filte
 // KODE HS
 $routes->get('/hs-code', 'Master\HSCode::hsCode', ['filter' => 'Auth']);
 $routes->get('/hs-code/all', 'Master\HSCode::allHSCode', ['filter' => 'Auth']);
+$routes->get('/hs-code/id/(:segment)', 'Master\HSCode::getByIdHSCode/$1', ['filter' => 'Auth']);
+$routes->post('/hs-code/save', 'Master\HSCode::saveHSCode', ['filter' => 'Auth']);
+$routes->post('/hs-code/update', 'Master\HSCode::updateHSCode', ['filter' => 'Auth']);
+$routes->post('/hs-code/delete', 'Master\HSCode::deleteHSCode', ['filter' => 'Auth']);
 
 // SATUAN
 $routes->get('/satuan', 'Master\Satuan::satuan', ['filter' => 'Auth']);

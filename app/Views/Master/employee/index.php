@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select onchange="getCity()" class="form-select province_id" name="province_id" id="province_id" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -84,12 +84,18 @@
                                 <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id" aria-label="Floating label select example">
+                                <select class="form-select city_id" name="city_id" id="city_id" aria-label="Floating label select example" onchange="getZipCode()">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Kota</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
                     </div>
@@ -252,6 +258,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
+                            <th>No.</th>
                             <th onclick="changeSort('nip')" class="sort">NIP</th>
                             <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
                             <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
@@ -282,7 +289,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[0, 'asc']],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -308,6 +315,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
             data: "nip",
             className: "text-center"
         }, {
@@ -940,6 +951,7 @@
                                 })
 
                                 $(".city_id").val(res?.data?.city_id).change();
+                                $(".zip_code").val(res?.data?.postalCode);
                             }
                         })
 
@@ -1031,6 +1043,10 @@
                 }
             })
         }
+    }
+
+    const getZipCode = function() {
+        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
     }
 
     const changeSort = function(val) {

@@ -17,6 +17,8 @@
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
+                                <th>No.</th>
+
                                 <th onclick="changeSort('no_sales_order')" class="sort">No SO</th>
 
                                 <th onclick="changeSort('destination')" class="sort">Destinasi</th>
@@ -67,7 +69,7 @@
         serverSide: true,
         ordering: true,
         order: [
-            [0, 'asc']
+            [1, 'asc']
         ],
         fixedHeader: true,
         lengthMenu: [
@@ -94,6 +96,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
             data: "no_sales_order",
             className: "text-center"
         }, {

@@ -37,7 +37,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th>#</th>
+                            <th>No.</th>
                             <th onclick="changeSort('faktur_no')" class="sort">No. Terima Faktur</th>
                             <th onclick="changeSort('sender')" class="sort">Supplier</th>
                             <th onclick="changeSort('nominal_faktur')" class="sort">Nominal Faktur</th>

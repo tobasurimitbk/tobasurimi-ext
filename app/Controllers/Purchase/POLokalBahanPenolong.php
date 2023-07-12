@@ -188,88 +188,88 @@ class POLokalBahanPenolong extends BaseController
     public function savePOLokalBahanPenolong()
     {
         try{
-        $rules = [
-            "purchase_request_id" => [
-                "rules" => "required"
-            ],
-            "po_no" => [
-                "rules" => "required"
-            ],
-            "po_date" => [
-                "rules" => "required"
-            ],
-            "supplier_id" => [
-                "rules" => "required"
-            ],
-            "payment_term" => [
-                "rules" => "required"
-            ],
-            "currency" => [
-                "rules" => "required"
-            ],
-            "payment_date" => [
-                "rules" => "required"
-            ],
-            "dpp" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "purchase_request_id" => [
+                    "rules" => "required"
+                ],
+                "po_no" => [
+                    "rules" => "required"
+                ],
+                "po_date" => [
+                    "rules" => "required"
+                ],
+                "supplier_id" => [
+                    "rules" => "required"
+                ],
+                "payment_term" => [
+                    "rules" => "required"
+                ],
+                "currency" => [
+                    "rules" => "required"
+                ],
+                "payment_date" => [
+                    "rules" => "required"
+                ],
+                "dpp" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
-                "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
-                "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                "note" => $this->request->getPost("note"),
-                "isPosted" => false,
-                "items" =>  json_decode($this->request->getPost("items"))
-            ]);
+            if ($this->validate($rules)) {
+                $payload = json_encode([
+                    "purchase_request_id" => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
+                    "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
+                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                    "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
+                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
+                    "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                    "note" => $this->request->getPost("note"),
+                    "isPosted" => false,
+                    "items" =>  json_decode($this->request->getPost("items"))
+                ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
-            
-            $response = curl_request("POST", "/auxiliaryMaterialPO/lokal", $this->token, $payload);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
+                
+                $response = curl_request("POST", "/auxiliaryMaterialPO/lokal", $this->token, $payload);
 
-            if ($response["code"] === 201) {
-                $data = [
-                    "id" => json_decode($response["body"])->createdId,
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 201) {
+                    $data = [
+                        "id" => json_decode($response["body"])->createdId,
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                        'code' => $response["code"]
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
+                    "message"    => "Data Gagal Disimpan",
+                    'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -286,82 +286,82 @@ class POLokalBahanPenolong extends BaseController
     public function updatePOLokalBahanPenolong()
     {
         try{
-        $rules = [
-            "po_no" => [
-                "rules" => "required"
-            ],
-            "po_date" => [
-                "rules" => "required"
-            ],
-            "supplier_id" => [
-                "rules" => "required"
-            ],
-            "payment_term" => [
-                "rules" => "required"
-            ],
-            "currency" => [
-                "rules" => "required"
-            ],
-            "payment_date" => [
-                "rules" => "required"
-            ],
-            "dpp" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "po_no" => [
+                    "rules" => "required"
+                ],
+                "po_date" => [
+                    "rules" => "required"
+                ],
+                "supplier_id" => [
+                    "rules" => "required"
+                ],
+                "payment_term" => [
+                    "rules" => "required"
+                ],
+                "currency" => [
+                    "rules" => "required"
+                ],
+                "payment_date" => [
+                    "rules" => "required"
+                ],
+                "dpp" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
-                "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                "note" => $this->request->getPost("note"),
-                "items" =>  json_decode($this->request->getPost("items"))
-            ]);
+                $payload = json_encode([
+                    "po_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
+                    "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                    "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
+                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
+                    "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                    "note" => $this->request->getPost("note"),
+                    "items" =>  json_decode($this->request->getPost("items"))
+                ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/auxiliaryMaterialPO/lokal/$id", $this->token, $payload);
+                $response = curl_request("PATCH", "/auxiliaryMaterialPO/lokal/$id", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Diubah",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -378,32 +378,32 @@ class POLokalBahanPenolong extends BaseController
     public function updateStatusPOLokalBahanPenolong()
     {
         try{
-        $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-        $payload = json_encode([
-            "is_posted" => true
-        ]);
-        
-        $response = curl_request("PATCH", "/auxiliaryMaterialPO/lokal/$id", $this->token, $payload);
+            $payload = json_encode([
+                "is_posted" => true
+            ]);
+            
+            $response = curl_request("PATCH", "/auxiliaryMaterialPO/lokal/$id", $this->token, $payload);
 
-        if ($response["code"] === 200) {
-            $data = [
-                "status"            => true,
-                "message"   => "Data Berhasil diposting",
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        } else {
-            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
-            $data = [
-                "status"            => false,
-                "message"    => $message,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
+            if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diposting",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
         }
         catch(\Exception $e)
         {
@@ -420,34 +420,34 @@ class POLokalBahanPenolong extends BaseController
     public function deletePOLokalBahanPenolong()
     {
         try{
-        $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/auxiliaryMaterialPO/lokal/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/auxiliaryMaterialPO/lokal/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {

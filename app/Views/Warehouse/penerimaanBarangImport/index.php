@@ -44,7 +44,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th>#</th>
+                            <th>No.</th>
                             <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                             <th onclick="changeSort('no_po')" class="sort">No. PO</th>
                             <th onclick="changeSort('acceptance_type')" class="sort">Single/Multiple</th>
