@@ -4,6 +4,7 @@ namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
 
+use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
 
 class SupplierBahanBaku extends BaseController
@@ -19,16 +20,12 @@ class SupplierBahanBaku extends BaseController
 
     public function supplierBahanBaku()
     {
+        $provinceModel = new ProvinceModel();
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
+        $provinceData = $provinceModel->asObject()->findAll();
 
         $data = [
-            "dataProvinces" => $dataProvinces,
+            "dataProvinces" => $provinceData,
         ];
 
         return view('Supplier/supplierBahanBaku/index', $data);
@@ -311,65 +308,73 @@ class SupplierBahanBaku extends BaseController
         return;
     }
 
-    public function getByIdSupplierBahanBaku($id = null)
+    public function getByIdSupplierBahanBaku($id)
     {
-        if (!empty($id)) {
-            $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
+        $supplierModel = new SupplierModel();
+        $supplierData = $supplierModel->asObject()->find($id);
+
+        if (!$supplierData) {
             $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
+                "status"    => false,
+                "message"   => 'Not Found!'
             ];
             echo json_encode($data);
+            return;
         }
+        
+        // $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
+
+        $supplierData->list_address = []; // cek nanti
+        $data = [
+            "status"    => true,
+            "data"      => $supplierData,
+        ];
+        echo json_encode($data);
+        
         return;
     }
 
     public function deleteSupplierBahanBaku()
     {
         try{
+            $supplierModel = new SupplierModel();
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/suppliers/$id", $this->token);
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
+                    "status"    => false,
+                    "message"   => "Data Gagal Dihapus",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $supplierModel->delete($id);
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil dihapus",
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+            // $response = curl_request("DELETE", "/suppliers/$id", $this->token);
+            /* if ($response["code"] === 200) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
-            }
+            } else {
+                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } */
         }
         catch(\Exception $e)
         {
