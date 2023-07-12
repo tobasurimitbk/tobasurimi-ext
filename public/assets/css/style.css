@@ -4572,6 +4572,12 @@ footer.main-footer .footer-right a {
   font-size: 13px;
   font-weight: 500;
   color: #2f4858 !important;
+}
+
+.ff-supplier
+  .select2-container
+  .select2-selection--single
+  .select2-selection__rendered {
   padding-left: 0px !important;
 }
 
@@ -5650,6 +5656,10 @@ table.dataTable td .label-finish {
 .form-floating .form-control.information.text-area-all {
   height: 100px;
   padding: 25px 12px;
+}
+
+.form-floating.ff-ket .form-control {
+  padding-top: 22px;
 }
 
 /* ===== RESPONSIVE ===== */
