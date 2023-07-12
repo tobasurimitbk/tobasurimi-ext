@@ -3853,11 +3853,12 @@ body.layout-3 .main-footer {
 }
 .main-sidebar .sidebar-menu li a i {
   width: 28px;
-  margin-right: 20px;
+  /* margin-right: 20px; */
   text-align: center;
 }
 .main-sidebar .sidebar-menu li a span {
   margin-top: 3px;
+  margin-left: 20px;
   width: 100%;
 }
 .main-sidebar .sidebar-menu li a:hover {
@@ -4016,6 +4017,10 @@ body:not(.sidebar-mini)
   a {
   padding-left: 62px;
   background-color: #fff;
+}
+
+.main-sidebar .sidebar-menu li ul.dropdown-menu li a.nav-link {
+  padding-left: 62px !important;
 }
 
 @media (max-width: 1024px) {
@@ -4370,9 +4375,16 @@ div.dataTables_wrapper div.dataTables_info {
 
 .main-sidebar .sidebar-menu li.active ul.dropdown-menu .nav-link {
   font-family: "Poppins", sans-serif !important;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.5;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+}
+
+.main-sidebar .sidebar-menu li ul.dropdown-menu .nav-link {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
 }
 
 footer.main-footer .footer-right {
