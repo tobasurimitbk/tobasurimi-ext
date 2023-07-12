@@ -12,7 +12,7 @@
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control divisi" id="divisi" name="divisi">
                                 <label for="floatingInput">Divisi</label>
