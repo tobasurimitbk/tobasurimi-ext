@@ -340,34 +340,34 @@ class TerimaFakturImport extends BaseController
     public function deleteTerimafakturImport()
     {
         try{
-        $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/tandaTerimaFaktur/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/tandaTerimaFaktur/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {

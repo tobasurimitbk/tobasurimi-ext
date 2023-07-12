@@ -255,6 +255,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
+                            <th>No.</th>
                             <th onclick="changeSort('kode')" class="sort">Kode</th>
                             <th onclick="changeSort('name')" class="sort">Nama</th>
                             <th onclick="changeSort('address')" class="sort">Alamat</th>
@@ -296,7 +297,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[0, 'asc']],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -322,6 +323,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
             data: "kode",
             className: "text-center"
         }, {

@@ -237,7 +237,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th>#</th>
+                            <th>No.</th>
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
                             <th>Satuan</th>
@@ -396,7 +396,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <textarea readonly="true" class="form-control keterangan text-area-address-company" id="keterangan" name="keterangan" placeholder="Keterangan"></textarea>
+                                <textarea readonly="true" class="form-control keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>

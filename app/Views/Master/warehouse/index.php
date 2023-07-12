@@ -26,15 +26,21 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
+                                <label for="floatingInput">Nomor Telepon</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
                                     <option value=""></option>
@@ -51,7 +57,7 @@
                                 <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select city_id" name="city_id" id="city_id" onchange="getZipCode()">
                                     <option value=""></option>
@@ -59,18 +65,10 @@
                                 <label for="floatingInput">Kota</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">kode Pos</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Nomor Telepon</label>
                             </div>
                         </div>
                     </div>
@@ -121,6 +119,7 @@
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
+                            <th>No.</th>
                             <th onclick="changeSort('code_warehouse')" class="sort">Kode Warehouse</th>
                             <th onclick="changeSort('warehouse_name')" class="sort">Nama Warehouse</th>
                             <th onclick="changeSort('address')" class="sort">Alamat</th>
@@ -152,7 +151,7 @@
             processing: true,
             serverSide: true,
             ordering: true,
-            order: [[0, 'asc']],
+            order: [[1, 'asc']],
             fixedHeader: true,
             lengthMenu: [
                 [25],
@@ -178,6 +177,10 @@
             display: "stripe",
             searching: false,
             columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
                 data: "code_warehouse",
                 className: "text-center"
             }, {

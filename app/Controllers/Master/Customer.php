@@ -51,8 +51,11 @@ class Customer extends BaseController
             $body = json_decode($response["body"])->data;
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($body as $data) {
                 array_push($dataCustomer, [
+                    "no" => $no++,
                     "id" => $data->id,
                     "kode" => $data->kode,
                     "name" => $data->name,
@@ -88,95 +91,95 @@ class Customer extends BaseController
     public function saveCustomer()
     {
         try{
-        $rules = [
-            "kode" => [
-                "rules" => "required"
-            ],
-            "name" => [
-                "rules" => "required"
-            ],
-            "address" => [
-                "rules" => "required"
-            ],
-            "no_npwp" => [
-                "rules" => "required"
-            ],
-            "phone" => [
-                "rules" => "required"
-            ],
-            "contact_person" => [
-                "rules" => "required"
-            ],
-            "email" => [
-                "rules" => "required"
-            ],
-            "no_rekening" => [
-                "rules" => "required"
-            ],
-            "supplier_buyer" => [
-                "rules" => "required"
-            ],
-            "province_parent_id" => [
-                "rules" => "required"
-            ],
-            "city_parent_id" => [
-                "rules" => "required"
-            ],
-            "ap_id" => [
-                "rules" => "required"
-            ],
-            "ar_id" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "kode" => [
+                    "rules" => "required"
+                ],
+                "name" => [
+                    "rules" => "required"
+                ],
+                "address" => [
+                    "rules" => "required"
+                ],
+                "no_npwp" => [
+                    "rules" => "required"
+                ],
+                "phone" => [
+                    "rules" => "required"
+                ],
+                "contact_person" => [
+                    "rules" => "required"
+                ],
+                "email" => [
+                    "rules" => "required"
+                ],
+                "no_rekening" => [
+                    "rules" => "required"
+                ],
+                "supplier_buyer" => [
+                    "rules" => "required"
+                ],
+                "province_parent_id" => [
+                    "rules" => "required"
+                ],
+                "city_parent_id" => [
+                    "rules" => "required"
+                ],
+                "ap_id" => [
+                    "rules" => "required"
+                ],
+                "ar_id" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
-                "no_npwp" => $this->request->getPost("no_npwp"),
-                "phone" => $this->request->getPost("phone"),
-                "contact_person" => $this->request->getPost("contact_person"),
-                "email" => $this->request->getPost("email"),
-                "no_rekening" => $this->request->getPost("no_rekening"),
-                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                "province_id" => $this->request->getPost("province_parent_id"),
-                "city_id" => $this->request->getPost("city_parent_id"),
-                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "list_address" => json_decode($this->request->getPost("list_address"))
-            ]);
+            if ($this->validate($rules)) {
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "kode" => $this->request->getPost("kode"),
+                    "name" => $this->request->getPost("name"),
+                    "address" => $this->request->getPost("address"),
+                    "no_npwp" => $this->request->getPost("no_npwp"),
+                    "phone" => $this->request->getPost("phone"),
+                    "contact_person" => $this->request->getPost("contact_person"),
+                    "email" => $this->request->getPost("email"),
+                    "no_rekening" => $this->request->getPost("no_rekening"),
+                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                    "province_id" => $this->request->getPost("province_parent_id"),
+                    "city_id" => $this->request->getPost("city_parent_id"),
+                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "list_address" => json_decode($this->request->getPost("list_address"))
+                ]);
 
-            $response = curl_request("POST", "/customers", $this->token, $payload);
+                $response = curl_request("POST", "/customers", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Disimpan",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -193,96 +196,95 @@ class Customer extends BaseController
     public function updateCustomer()
     {
         try{
-        $rules = [
-            "kode" => [
-                "rules" => "required"
-            ],
-            "name" => [
-                "rules" => "required"
-            ],
-            "address" => [
-                "rules" => "required"
-            ],
-            "no_npwp" => [
-                "rules" => "required"
-            ],
-            "phone" => [
-                "rules" => "required"
-            ],
-            "contact_person" => [
-                "rules" => "required"
-            ],
-            "email" => [
-                "rules" => "required"
-            ],
-            "no_rekening" => [
-                "rules" => "required"
-            ],
-            "supplier_buyer" => [
-                "rules" => "required"
-            ],
-            "province_parent_id" => [
-                "rules" => "required"
-            ],
-            "city_parent_id" => [
-                "rules" => "required"
-            ],
-            "ap_id" => [
-                "rules" => "required"
-            ],
-            "ar_id" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "kode" => [
+                    "rules" => "required"
+                ],
+                "name" => [
+                    "rules" => "required"
+                ],
+                "address" => [
+                    "rules" => "required"
+                ],
+                "no_npwp" => [
+                    "rules" => "required"
+                ],
+                "phone" => [
+                    "rules" => "required"
+                ],
+                "contact_person" => [
+                    "rules" => "required"
+                ],
+                "email" => [
+                    "rules" => "required"
+                ],
+                "no_rekening" => [
+                    "rules" => "required"
+                ],
+                "supplier_buyer" => [
+                    "rules" => "required"
+                ],
+                "province_parent_id" => [
+                    "rules" => "required"
+                ],
+                "city_parent_id" => [
+                    "rules" => "required"
+                ],
+                "ap_id" => [
+                    "rules" => "required"
+                ],
+                "ar_id" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = '';
+            if ($this->validate($rules)) {
+                $payload = '';
 
-            $id = $this->request->getPost("id");
+                $id = $this->request->getPost("id");
 
 
-            $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
-                "no_npwp" => $this->request->getPost("no_npwp"),
-                "phone" => $this->request->getPost("phone"),
-                "contact_person" => $this->request->getPost("contact_person"),
-                "email" => $this->request->getPost("email"),
-                "no_rekening" => $this->request->getPost("no_rekening"),
-                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                "province_id" => $this->request->getPost("province_parent_id"),
-                "city_id" => $this->request->getPost("city_parent_id"),
-                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "list_address" => json_decode($this->request->getPost("list_address"))
-            ]);
-        }
-
-        if ($payload) {
-            $response = curl_request("PATCH", "/customers/$id", $this->token, $payload);
-
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "kode" => $this->request->getPost("kode"),
+                    "name" => $this->request->getPost("name"),
+                    "address" => $this->request->getPost("address"),
+                    "no_npwp" => $this->request->getPost("no_npwp"),
+                    "phone" => $this->request->getPost("phone"),
+                    "contact_person" => $this->request->getPost("contact_person"),
+                    "email" => $this->request->getPost("email"),
+                    "no_rekening" => $this->request->getPost("no_rekening"),
+                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                    "province_id" => $this->request->getPost("province_parent_id"),
+                    "city_id" => $this->request->getPost("city_parent_id"),
+                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "list_address" => json_decode($this->request->getPost("list_address"))
+                ]);
             }
-        }
 
+            if ($payload) {
+                $response = curl_request("PATCH", "/customers/$id", $this->token, $payload);
+
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            }
         }
         catch(\Exception $e)
         {
@@ -328,34 +330,34 @@ class Customer extends BaseController
     public function deleteCustomer()
     {
         try{
-        $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/customers/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/customers/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {

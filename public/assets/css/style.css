@@ -5632,7 +5632,7 @@ table.dataTable td .label-finish {
   .modal-content
   .modal-body
   .form-floating
-  .form-control.text-area-address-company {
+  .form-control.text-area-all {
   height: 100px;
 }
 
@@ -5641,12 +5641,12 @@ table.dataTable td .label-finish {
   .modal-content
   .modal-body
   .form-floating
-  .form-control.text-area-address-company {
+  .form-control.text-area-all {
   height: 100px;
   padding: 25px 12px;
 }
 
-.form-floating .form-control.information.text-area-address-company {
+.form-floating .form-control.information.text-area-all {
   height: 100px;
   padding: 25px 12px;
 }

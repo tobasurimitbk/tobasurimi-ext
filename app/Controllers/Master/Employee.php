@@ -83,8 +83,11 @@ class Employee extends BaseController
             $body = json_decode($response["body"])->data;
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($body as $data) {
                 array_push($dataRole, [
+                    "no" => $no++,
                     "id" => $data->id,
                     "nip" => $data->nip,
                     "name" => $data->name,
@@ -115,73 +118,99 @@ class Employee extends BaseController
     public function saveEmployee()
     {
         try{
-        $rules = [
-            "nip" => [
-                "rules" => "required"
-            ],
-            "name" => [
-                "rules" => "required"
-            ],
-            "gender" => [
-                "rules" => "required"
-            ],
-            "dob" => [
-                "rules" => "required"
-            ],
-            "address" => [
-                "rules" => "required"
-            ],
-            "division_id" => [
-                "rules" => "required"
-            ],
-            "acc_no" => [
-                "rules" => "required"
-            ],
-            "nik" => [
-                "rules" => "required"
-            ],
-            "child" => [
-                "rules" => "required"
-            ],
-            "religion_id" => [
-                "rules" => "required"
-            ],
-            "marriage_id" => [
-                "rules" => "required"
-            ],
-            "child" => [
-                "rules" => "required"
-            ],
-            "province_id" => [
-                "rules" => "required"
-            ],
-            "city_id" => [
-                "rules" => "required"
-            ],
-            "join_date" => [
-                "rules" => "required"
-            ],
-            "bank_name" => [
-                "rules" => "required"
-            ],
-            "owner_name" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "nip" => [
+                    "rules" => "required"
+                ],
+                "name" => [
+                    "rules" => "required"
+                ],
+                "gender" => [
+                    "rules" => "required"
+                ],
+                "dob" => [
+                    "rules" => "required"
+                ],
+                "address" => [
+                    "rules" => "required"
+                ],
+                "division_id" => [
+                    "rules" => "required"
+                ],
+                "acc_no" => [
+                    "rules" => "required"
+                ],
+                "nik" => [
+                    "rules" => "required"
+                ],
+                "child" => [
+                    "rules" => "required"
+                ],
+                "religion_id" => [
+                    "rules" => "required"
+                ],
+                "marriage_id" => [
+                    "rules" => "required"
+                ],
+                "child" => [
+                    "rules" => "required"
+                ],
+                "province_id" => [
+                    "rules" => "required"
+                ],
+                "city_id" => [
+                    "rules" => "required"
+                ],
+                "join_date" => [
+                    "rules" => "required"
+                ],
+                "bank_name" => [
+                    "rules" => "required"
+                ],
+                "owner_name" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = '';
+            if ($this->validate($rules)) {
+                $payload = '';
 
-            $file = $this->request->getFile("employeeImg");
+                $file = $this->request->getFile("employeeImg");
 
-            if (!empty($file->getName())) {
-                $mime = $file->getMimeType();
-                if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
-                    $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
+                if (!empty($file->getName())) {
+                    $mime = $file->getMimeType();
+                    if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
+                        $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
 
+                        $payload = json_encode([
+                            "company_id" => $this->this_company_id,
+                            "employeeImg" => $image,
+                            "nip" => $this->request->getPost("nip"),
+                            "name" => $this->request->getPost("name"),
+                            "gender" => $this->request->getPost("gender"),
+                            "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
+                            "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
+                            "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                            "phone_no" => $this->request->getPost("phone_no"),
+                            "acc_no" => $this->request->getPost("acc_no"),
+                            "email" => $this->request->getPost("email"),
+                            "address" => $this->request->getPost("address"),
+                            "status" => $this->request->getPost("status"),
+                            "nik" => $this->request->getPost("nik"),
+                            "child" => $this->request->getPost("child"),
+                            "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                            "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                            "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                            "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                            "jabatan" => $this->request->getPost("jabatan"),
+                            "bank_name" => $this->request->getPost("bank_name"),
+                            "owner_name" => $this->request->getPost("owner_name"),
+                            "pin"  => $this->request->getPost("pin")
+                        ]);
+                    }
+                } else {
                     $payload = json_encode([
                         "company_id" => $this->this_company_id,
-                        "employeeImg" => $image,
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
                         "gender" => $this->request->getPost("gender"),
@@ -205,50 +234,33 @@ class Employee extends BaseController
                         "pin"  => $this->request->getPost("pin")
                     ]);
                 }
-            } else {
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "nip" => $this->request->getPost("nip"),
-                    "name" => $this->request->getPost("name"),
-                    "gender" => $this->request->getPost("gender"),
-                    "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
-                    "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                    "phone_no" => $this->request->getPost("phone_no"),
-                    "acc_no" => $this->request->getPost("acc_no"),
-                    "email" => $this->request->getPost("email"),
-                    "address" => $this->request->getPost("address"),
-                    "status" => $this->request->getPost("status"),
-                    "nik" => $this->request->getPost("nik"),
-                    "child" => $this->request->getPost("child"),
-                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
-                    "bank_name" => $this->request->getPost("bank_name"),
-                    "owner_name" => $this->request->getPost("owner_name"),
-                    "pin"  => $this->request->getPost("pin")
-                ]);
-            }
 
-            if ($payload) {
-                $response = curl_request("POST", "/employees", $this->token, $payload);
+                if ($payload) {
+                    $response = curl_request("POST", "/employees", $this->token, $payload);
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                    if ($response["code"] === 200) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil disimpan",
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
+                        "message"    => "Format gambar harus bertipe png, jpg, jpeg",
+                        "payload"   => '',
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -256,20 +268,11 @@ class Employee extends BaseController
             } else {
                 $data = [
                     "status"            => false,
-                    "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                    "payload"   => '',
+                    "message"    => "Data Gagal Disimpan",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -286,78 +289,102 @@ class Employee extends BaseController
     public function updateEmployee()
     {
         try{
-        $rules = [
-            "nip" => [
-                "rules" => "required"
-            ],
-            "name" => [
-                "rules" => "required"
-            ],
-            "gender" => [
-                "rules" => "required"
-            ],
-            "dob" => [
-                "rules" => "required"
-            ],
-            "address" => [
-                "rules" => "required"
-            ],
-            "division_id" => [
-                "rules" => "required"
-            ],
-            "acc_no" => [
-                "rules" => "required"
-            ],
-            "nik" => [
-                "rules" => "required"
-            ],
-            "child" => [
-                "rules" => "required"
-            ],
-            "religion_id" => [
-                "rules" => "required"
-            ],
-            "marriage_id" => [
-                "rules" => "required"
-            ],
-            "child" => [
-                "rules" => "required"
-            ],
-            "province_id" => [
-                "rules" => "required"
-            ],
-            "city_id" => [
-                "rules" => "required"
-            ],
-            "join_date" => [
-                "rules" => "required"
-            ],
-            "bank_name" => [
-                "rules" => "required"
-            ],
-            "owner_name" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "nip" => [
+                    "rules" => "required"
+                ],
+                "name" => [
+                    "rules" => "required"
+                ],
+                "gender" => [
+                    "rules" => "required"
+                ],
+                "dob" => [
+                    "rules" => "required"
+                ],
+                "address" => [
+                    "rules" => "required"
+                ],
+                "division_id" => [
+                    "rules" => "required"
+                ],
+                "acc_no" => [
+                    "rules" => "required"
+                ],
+                "nik" => [
+                    "rules" => "required"
+                ],
+                "child" => [
+                    "rules" => "required"
+                ],
+                "religion_id" => [
+                    "rules" => "required"
+                ],
+                "marriage_id" => [
+                    "rules" => "required"
+                ],
+                "child" => [
+                    "rules" => "required"
+                ],
+                "province_id" => [
+                    "rules" => "required"
+                ],
+                "city_id" => [
+                    "rules" => "required"
+                ],
+                "join_date" => [
+                    "rules" => "required"
+                ],
+                "bank_name" => [
+                    "rules" => "required"
+                ],
+                "owner_name" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = '';
+            if ($this->validate($rules)) {
+                $payload = '';
 
-            $id = $this->request->getPost("id");
+                $id = $this->request->getPost("id");
 
-            $file = $this->request->getFile("employeeImg");
-            if (!empty($file->getName())) {
-                $mime = $file->getMimeType();
-                if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
-                    $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
+                $file = $this->request->getFile("employeeImg");
+                if (!empty($file->getName())) {
+                    $mime = $file->getMimeType();
+                    if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
+                        $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
 
+                        $payload = json_encode([
+                            "company_id" => $this->this_company_id,
+                            "employeeImg" => $image,
+                            "nip" => $this->request->getPost("nip"),
+                            "name" => $this->request->getPost("name"),
+                            "gender" => $this->request->getPost("gender"),
+                            "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
+                            "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
+                            "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                            "phone_no" => $this->request->getPost("phone_no"),
+                            "acc_no" => $this->request->getPost("acc_no"),
+                            "email" => $this->request->getPost("email"),
+                            "address" => $this->request->getPost("address"),
+                            "status" => $this->request->getPost("status"),
+                            "nik" => $this->request->getPost("nik"),
+                            "child" => $this->request->getPost("child"),
+                            "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                            "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                            "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                            "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                            "jabatan" => $this->request->getPost("jabatan"),
+                            "bank_name" => $this->request->getPost("bank_name"),
+                            "owner_name" => $this->request->getPost("owner_name"),
+                        ]);
+                    }
+                } else {
                     $payload = json_encode([
                         "company_id" => $this->this_company_id,
-                        "employeeImg" => $image,
                         "nip" => $this->request->getPost("nip"),
                         "name" => $this->request->getPost("name"),
                         "gender" => $this->request->getPost("gender"),
-                        "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
                         "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
                         "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
                         "phone_no" => $this->request->getPost("phone_no"),
@@ -376,48 +403,33 @@ class Employee extends BaseController
                         "owner_name" => $this->request->getPost("owner_name"),
                     ]);
                 }
-            } else {
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "nip" => $this->request->getPost("nip"),
-                    "name" => $this->request->getPost("name"),
-                    "gender" => $this->request->getPost("gender"),
-                    "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                    "phone_no" => $this->request->getPost("phone_no"),
-                    "acc_no" => $this->request->getPost("acc_no"),
-                    "email" => $this->request->getPost("email"),
-                    "address" => $this->request->getPost("address"),
-                    "status" => $this->request->getPost("status"),
-                    "nik" => $this->request->getPost("nik"),
-                    "child" => $this->request->getPost("child"),
-                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
-                    "bank_name" => $this->request->getPost("bank_name"),
-                    "owner_name" => $this->request->getPost("owner_name"),
-                ]);
-            }
 
-            if ($payload) {
-                $response = curl_request("PATCH", "/employees/$id", $this->token, $payload);
+                if ($payload) {
+                    $response = curl_request("PATCH", "/employees/$id", $this->token, $payload);
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                    if ($response["code"] === 200) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil diubah",
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
+                        "message"    => "Format gambar harus bertipe png, jpg, jpeg",
+                        "payload"   => '',
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -425,20 +437,11 @@ class Employee extends BaseController
             } else {
                 $data = [
                     "status"            => false,
-                    "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                    "payload"   => '',
+                    "message"    => "Data Gagal Diubah",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -483,34 +486,34 @@ class Employee extends BaseController
     public function deleteEmployee()
     {
         try{
-        $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/employees/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/employees/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {

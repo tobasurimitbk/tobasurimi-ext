@@ -198,6 +198,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
+                                    <th>No.</th>
                                     <th onclick="changeSortKategori('kelompok_akun')" class="sort">Kelompok Akun</th>
                                     <th onclick="changeSortKategori('no_kategori')" class="sort">No. Kategori Akun</th>
                                     <th onclick="changeSortKategori('nama_kategori')" class="sort">Nama Kategori Akun</th>
@@ -222,6 +223,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
+                                    <th>No.</th>
                                     <th onclick="changeSortHeader('nama_kategori')" class="sort">Kategori Akun</th>
                                     <th onclick="changeSortHeader('no_header')" class="sort">No. Header Akun</th>
                                     <th onclick="changeSortHeader('nama_header')" class="sort">Nama Header Akun</th>
@@ -250,6 +252,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
+                                    <th>No.</th>
                                     <th onclick="changeSortSub('nama_kategori')" class="sort">Kategori Akun</th>
                                     <th onclick="changeSortSub('no_header')" class="sort">No. Header Akun</th>
                                     <th onclick="changeSortSub('nama_header')" class="sort">Header Akun</th>
@@ -285,7 +288,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[0, 'asc']],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -311,6 +314,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        },{
             data: "kelompok_akun",
             className: "text-center"
         },
@@ -341,7 +348,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[0, 'asc']],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -367,6 +374,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        },{
             data: "nama_kategori",
             className: "text-center"
         },
@@ -397,7 +408,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[0, 'asc']],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -424,6 +435,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        },{
             data: "nama_kategori",
             className: "text-center"
         },

@@ -44,15 +44,21 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <textarea class="form-control address text-area-address-company" id="address" name="address" placeholder="Address"></textarea>
+                                <textarea class="form-control address text-area-all" id="address" name="address" placeholder="Address"></textarea>
                                 <label for="floatingInput">Alamat</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
+                                <label for="floatingInput">Nomor Telepon</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
                                     <option value=""></option>
@@ -69,7 +75,7 @@
                                 <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select city_id" name="city_id" id="city_id" onchange="getZipCode()">
                                     <option value=""></option>
@@ -77,22 +83,13 @@
                                 <label for="floatingInput">Kota</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Nomor Telepon</label>
-                            </div>
-                        </div>
                     </div>
-                    
                 </form>
             </div>
             <div class="modal-footer">
@@ -124,6 +121,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
+                            <th>No.</th>
                             <th onclick="changeSort('company')" class="sort">Company</th>
                             <th onclick="changeSort('holding_company')" class="sort">Holding Company</th>
                             <th onclick="changeSort('address')" class="sort">Alamat</th>
@@ -154,7 +152,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[0, 'asc']],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -180,6 +178,11 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        },
+        {
             data: "company",
             className: "text-center"
         },
@@ -324,22 +327,22 @@
                     required: "Holding Company wajib diisi"
                 },
                 address: {
-                    required: "Address wajib diisi"
+                    required: "Alamat wajib diisi"
                 },
                 phone: {
-                    required: "Phone wajib diisi"
+                    required: "No. Telepon wajib diisi"
                 },
                 zip_code: {
-                    required: "Zip Code wajib diisi"
+                    required: "Kode Pos wajib diisi"
                 },
                 province_id: {
-                    required: "Province wajib diisi"
+                    required: "Provinsi wajib diisi"
                 },
                 city_id: {
-                    required: "City wajib diisi"
+                    required: "Kota wajib diisi"
                 },
                 email: {
-                    email: "Email must be valid",
+                    email: "Email harus benar",
                 },
             },
             errorElement: 'span',

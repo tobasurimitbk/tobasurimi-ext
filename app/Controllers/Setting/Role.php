@@ -36,8 +36,11 @@ class Role extends BaseController
             $body = json_decode($response["body"])->data;
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($body as $data) {
                 array_push($dataRole, [
+                    "no" => $no++,
                     "id" => $data->id,
                     "name" => $data->name,
                 ]);

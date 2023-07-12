@@ -37,7 +37,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
-                            <th>#</th>
+                            <th>No.</th>
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>

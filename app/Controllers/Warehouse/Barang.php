@@ -53,8 +53,11 @@ class Barang extends BaseController
             $body = json_decode($response["body"])->data;
             $totalRecords = json_decode($response["body"])->meta->totalData;
 
+            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
             foreach ($body as $data) {
                 array_push($dataUser, [
+                    "no" => $no++,
                     "id" => $data->id,
                     "kode_barang" => $data->kode_barang,
                     "nama_barang" => $data->nama_barang,
@@ -86,88 +89,88 @@ class Barang extends BaseController
     public function saveBarang()
     {
         try{
-        $rules = [
-            "kode_barang" => [
-                "rules" => "required"
-            ],
-            "nama_barang" => [
-                "rules" => "required"
-            ],
-            "harga_barang" => [
-                "rules" => "required"
-            ],
-            "satuan_id" => [
-                "rules" => "required"
-            ],
-            "kategori_id" => [
-                "rules" => "required"
-            ],
-            "hs_id" => [
-                "rules" => "required"
-            ],
-            "ap_id" => [
-                "rules" => "required"
-            ],
-            "ar_id" => [
-                "rules" => "required"
-            ],
-            "stok" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "kode_barang" => [
+                    "rules" => "required"
+                ],
+                "nama_barang" => [
+                    "rules" => "required"
+                ],
+                "harga_barang" => [
+                    "rules" => "required"
+                ],
+                "satuan_id" => [
+                    "rules" => "required"
+                ],
+                "kategori_id" => [
+                    "rules" => "required"
+                ],
+                "hs_id" => [
+                    "rules" => "required"
+                ],
+                "ap_id" => [
+                    "rules" => "required"
+                ],
+                "ar_id" => [
+                    "rules" => "required"
+                ],
+                "stok" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "kode_barang" => $this->request->getPost("kode_barang"),
-                "nama_barang" => $this->request->getPost("nama_barang"),
-                "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                "spek" => json_decode($this->request->getPost("spek"))
-            ]);
+            if ($this->validate($rules)) {
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "kode_barang" => $this->request->getPost("kode_barang"),
+                    "nama_barang" => $this->request->getPost("nama_barang"),
+                    "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                    "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                    "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
+                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                    "spek" => json_decode($this->request->getPost("spek"))
+                ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
 
-            $response = curl_request("POST", "/barang", $this->token, $payload);
+                $response = curl_request("POST", "/barang", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Disimpan",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -184,58 +187,109 @@ class Barang extends BaseController
     public function updateBarang()
     {
         try{
-        $rules = [
-            "kode_barang" => [
-                "rules" => "required"
-            ],
-            "nama_barang" => [
-                "rules" => "required"
-            ],
-            "harga_barang" => [
-                "rules" => "required"
-            ],
-            "satuan_id" => [
-                "rules" => "required"
-            ],
-            "kategori_id" => [
-                "rules" => "required"
-            ],
-            "hs_id" => [
-                "rules" => "required"
-            ],
-            "ap_id" => [
-                "rules" => "required"
-            ],
-            "ar_id" => [
-                "rules" => "required"
-            ]
-        ];
+            $rules = [
+                "kode_barang" => [
+                    "rules" => "required"
+                ],
+                "nama_barang" => [
+                    "rules" => "required"
+                ],
+                "harga_barang" => [
+                    "rules" => "required"
+                ],
+                "satuan_id" => [
+                    "rules" => "required"
+                ],
+                "kategori_id" => [
+                    "rules" => "required"
+                ],
+                "hs_id" => [
+                    "rules" => "required"
+                ],
+                "ap_id" => [
+                    "rules" => "required"
+                ],
+                "ar_id" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
+
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "kode_barang" => $this->request->getPost("kode_barang"),
+                    "nama_barang" => $this->request->getPost("nama_barang"),
+                    "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                    "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                    "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
+                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                    "spek" => json_decode($this->request->getPost("spek"))
+                ]);
+
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
+
+                $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
+
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            } else {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Diubah",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function updateStatusBarang()
+    {
+        try{
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
                 "company_id" => $this->this_company_id,
-                "kode_barang" => $this->request->getPost("kode_barang"),
-                "nama_barang" => $this->request->getPost("nama_barang"),
-                "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                "spek" => json_decode($this->request->getPost("spek"))
+                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
             ]);
-
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
-
+            
             $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
@@ -256,57 +310,6 @@ class Barang extends BaseController
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function updateStatusBarang()
-    {
-        try{
-        $id = $this->request->getPost("id");
-
-        $payload = json_encode([
-            "company_id" => $this->this_company_id,
-            "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
-        ]);
-        
-        $response = curl_request("PATCH", "/barang/$id", $this->token, $payload);
-
-        if ($response["code"] === 200) {
-            $data = [
-                "status"            => true,
-                "message"   => "Data Berhasil diubah",
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        } else {
-            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-            $data = [
-                "status"            => false,
-                "message"    => $message,
-                "payload"   => $payload,
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {
@@ -351,34 +354,34 @@ class Barang extends BaseController
     public function deleteBarang()
     {
         try{
-        $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/barang/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/barang/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
         }
         catch(\Exception $e)
         {

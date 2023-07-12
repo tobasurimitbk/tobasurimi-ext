@@ -184,13 +184,15 @@
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select province_id" name="province_id" id="province_id">
                                     <option value=""></option>
@@ -207,9 +209,7 @@
                                 <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select city_id" name="city_id" id="city_id" onchange="getPostalCode()">
                                     <option value="" data-code=""></option>
@@ -217,7 +217,7 @@
                                 <label for="floatingInput">Kota</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
                                 <label for="floatingInput">Kode Pos</label>
@@ -255,6 +255,7 @@
                 <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
+                            <th>No.</th>
                             <th onclick="changeSort('kode')" class="sort">Kode</th>
                             <th onclick="changeSort('name')" class="sort">Nama</th>
                             <th onclick="changeSort('address')" class="sort">Alamat</th>
@@ -296,7 +297,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[0, 'asc']],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -322,6 +323,10 @@
         display: "stripe",
         searching: false,
         columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
             data: "kode",
             className: "text-center"
         }, {
