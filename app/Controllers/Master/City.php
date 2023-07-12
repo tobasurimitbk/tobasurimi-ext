@@ -3,26 +3,28 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\cities;
+use App\Models\CitiesModel;
 
 class City extends BaseController
 {
     protected $token;
-    
+    protected $CitiesModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->CitiesModel = new CitiesModel();
     }
 
     public function getCityByProvince($id = null)
     {
         $dataCity = [];
-        $responseCity = curl_request("GET", "/cities/all?idProvince=$id", $this->token);
-        if ($responseCity["code"] === 200) {
-            $dataCity = json_decode($responseCity["body"])->data;
-        }
+
+        $res = $this->CitiesModel->get_by_province_id($id);
 
         $data = [
-            "data" => $dataCity
+            "data" => $res
         ];
 
         echo json_encode($data);

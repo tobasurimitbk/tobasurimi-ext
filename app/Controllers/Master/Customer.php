@@ -3,27 +3,28 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\ProvincesModel;
+use App\Models\CustomerModel;
 
 class Customer extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $ProvincesModel;
+    protected $CustomerModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->ProvincesModel = new ProvincesModel();
+        $this->CustomerModel = new CustomerModel();
     }
 
     public function customer()
     {
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
 
         $data = [
             "dataProvinces" => $dataProvinces,
@@ -34,6 +35,80 @@ class Customer extends BaseController
 
     public function allCustomer()
     {
+
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
+
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
+
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
+
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
+
+        $values = [
+            "company_id"    => $this->this_company_id,
+            "search"        => $search
+        ];
+
+        $totalRecords = $this->CustomerModel->total_list(array());
+        $totalRecordwithFilter = $this->CustomerModel->total_list($values);
+
+        $res = $this->CustomerModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+
+        $number = $row * $rowperpage;
+
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "number" => ($row + $i + 1),
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "kode" => $res[$i]["kode"],
+                "name" => $res[$i]["name"],
+                "address" => $res[$i]["address"],
+                "province_name" => $res[$i]["province_name"],
+                "city_name" => $res[$i]["city_name"],
+                "postal_code" => $res[$i]["postal_code"],
+                "no_npwp" => $res[$i]["no_npwp"],
+                "phone" => $res[$i]["phone"],
+                "contact_person" => $res[$i]["contact_person"],
+                "email" => $res[$i]["email"],
+                "no_rekening" => $res[$i]["no_rekening"],
+                "supplier_buyer" => $res[$i]["supplier_buyer"],
+                "ap_name" => $res[$i]["ap_name"],
+                "ar_name" => $res[$i]["ar_name"]
+            );
+        }
+
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
+
+        // header('Access-Control-Allow-Origin: *');
+        // header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS");
+        // header('Access-Control-Max-Age: 86400');
+        // header("Access-Control-Expose-Headers: Content-Length, X-JSON");
+        // header("Access-Control-Allow-Headers: *");
+
+        //echo json_encode($response);
+        //return;
+        return $this->response->setJSON($response);
+
+        /*
+        print_r($this->request);
+        exit;
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -62,7 +137,7 @@ class Customer extends BaseController
                     "address" => $data->address,
                     "province_name" => $data->province_name,
                     "city_name" => $data->city_name,
-                    "postal_code" => $data->postal_code, 
+                    "postal_code" => $data->postal_code,
                     "no_npwp" => $data->no_npwp,
                     "phone" => $data->phone,
                     "contact_person" => $data->contact_person,
@@ -86,11 +161,12 @@ class Customer extends BaseController
 
         echo json_encode($data);
         return;
+        */
     }
 
     public function saveCustomer()
     {
-        try{
+        try {
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -134,6 +210,7 @@ class Customer extends BaseController
             ];
 
             if ($this->validate($rules)) {
+                /*
                 $payload = json_encode([
                     "company_id" => $this->this_company_id,
                     "kode" => $this->request->getPost("kode"),
@@ -153,7 +230,24 @@ class Customer extends BaseController
                 ]);
 
                 $response = curl_request("POST", "/customers", $this->token, $payload);
-
+                */
+                $values = [
+                    "company_id" => $this->this_company_id,
+                    "kode" => $this->request->getPost("kode"),
+                    "name" => $this->request->getPost("name"),
+                    "address" => $this->request->getPost("address"),
+                    "no_npwp" => $this->request->getPost("no_npwp"),
+                    "phone" => $this->request->getPost("phone"),
+                    "contact_person" => $this->request->getPost("contact_person"),
+                    "email" => $this->request->getPost("email"),
+                    "no_rekening" => $this->request->getPost("no_rekening"),
+                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                    "province_id" => $this->request->getPost("province_parent_id"),
+                    "city_id" => $this->request->getPost("city_parent_id"),
+                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "list_address" => json_decode($this->request->getPost("list_address"))
+                ];
                 if ($response["code"] === 200) {
                     $data = [
                         "status"            => true,
@@ -180,9 +274,7 @@ class Customer extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -195,7 +287,7 @@ class Customer extends BaseController
 
     public function updateCustomer()
     {
-        try{
+        try {
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -285,9 +377,7 @@ class Customer extends BaseController
                     echo json_encode($data);
                 }
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -329,7 +419,7 @@ class Customer extends BaseController
 
     public function deleteCustomer()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -358,9 +448,7 @@ class Customer extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

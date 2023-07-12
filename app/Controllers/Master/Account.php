@@ -3,14 +3,17 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\Sub_AkunsModel;
 
 class Account extends BaseController
 {
     protected $token;
-    
+    protected $Sub_AkunsModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->Sub_AkunsModel = new Sub_AkunsModel();
     }
 
     public function account()
@@ -54,15 +57,12 @@ class Account extends BaseController
 
     public function dropdownSubAccount()
     {
-        $responseKelompokAkunSub = curl_request("GET", "/subAkun/all", $this->token);
 
-        $dataKelompokAkunSub = [];
-        if ($responseKelompokAkunSub["code"] === 200) {
-            $dataKelompokAkunSub = json_decode($responseKelompokAkunSub["body"])->data;
-        }
+        $res = $this->Sub_AkunsModel->search_list(array(), 'nama_sub');
+
 
         $data = [
-            "data" => $dataKelompokAkunSub
+            "data" => $res
         ];
 
         echo json_encode($data);
@@ -115,7 +115,7 @@ class Account extends BaseController
 
     public function saveKategoriAccount()
     {
-        try{
+        try {
             $rules = [
                 "kelompok_akun_id_kategori" => [
                     "rules" => "required"
@@ -134,7 +134,7 @@ class Account extends BaseController
                     "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                     "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
                 ]);
-                
+
                 $response = curl_request("POST", "/kategoriAkun", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -163,9 +163,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -178,7 +176,7 @@ class Account extends BaseController
 
     public function updateKategoriAccount()
     {
-        try{
+        try {
             $rules = [
                 "kelompok_akun_id_kategori" => [
                     "rules" => "required"
@@ -199,7 +197,7 @@ class Account extends BaseController
                     "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                     "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
                 ]);
-                
+
                 $response = curl_request("PATCH", "/kategoriAkun/$id", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -228,9 +226,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -271,7 +267,7 @@ class Account extends BaseController
 
     public function deleteKategoriAccount()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -300,9 +296,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -359,7 +353,7 @@ class Account extends BaseController
 
     public function saveHeaderAccount()
     {
-        try{
+        try {
             $rules = [
                 "category_id_header" => [
                     "rules" => "required"
@@ -378,7 +372,7 @@ class Account extends BaseController
                     "no_header" => $this->request->getPost("kode_akun_header"),
                     "nama_header" => $this->request->getPost("nama_akun_header"),
                 ]);
-                
+
                 $response = curl_request("POST", "/headerAkun", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -407,9 +401,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -422,7 +414,7 @@ class Account extends BaseController
 
     public function updateHeaderAccount()
     {
-        try{
+        try {
             $rules = [
                 "category_id_header" => [
                     "rules" => "required"
@@ -443,7 +435,7 @@ class Account extends BaseController
                     "no_header" => $this->request->getPost("kode_akun_header"),
                     "nama_header" => $this->request->getPost("nama_akun_header"),
                 ]);
-                
+
                 $response = curl_request("PATCH", "/headerAkun/$id", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -472,9 +464,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -515,7 +505,7 @@ class Account extends BaseController
 
     public function deleteHeaderAccount()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -544,9 +534,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -611,7 +599,7 @@ class Account extends BaseController
 
     public function saveSubAccount()
     {
-        try{
+        try {
             $rules = [
                 "header_id_sub" => [
                     "rules" => "required"
@@ -636,7 +624,7 @@ class Account extends BaseController
                     "nama_sub" => $this->request->getPost("nama_akun_sub"),
                     "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
                 ]);
-                
+
                 $response = curl_request("POST", "/subAkun", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -665,9 +653,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -680,7 +666,7 @@ class Account extends BaseController
 
     public function updateSubAccount()
     {
-        try{
+        try {
             $rules = [
                 "header_id_sub" => [
                     "rules" => "required"
@@ -707,7 +693,7 @@ class Account extends BaseController
                     "nama_sub" => $this->request->getPost("nama_akun_sub"),
                     "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
                 ]);
-                
+
                 $response = curl_request("PATCH", "/subAkun/$id", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -736,9 +722,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -751,13 +735,13 @@ class Account extends BaseController
 
     public function updateStatusSubAccount()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
                 "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Void"
             ]);
-            
+
             $response = curl_request("PATCH", "/subAkun/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
@@ -778,9 +762,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -821,7 +803,7 @@ class Account extends BaseController
 
     public function deleteSubAccount()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -850,9 +832,7 @@ class Account extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -863,4 +843,3 @@ class Account extends BaseController
         return;
     }
 }
-?>
