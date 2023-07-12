@@ -248,20 +248,21 @@ class Customer extends BaseController
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "list_address" => json_decode($this->request->getPost("list_address"))
                 ];
-                if ($response["code"] === 200) {
+
+                if ($this->CustomerModel->insert($values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
