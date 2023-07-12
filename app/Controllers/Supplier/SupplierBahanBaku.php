@@ -2,8 +2,9 @@
 
 namespace App\Controllers\Supplier;
 
-use App\Models\SupplierModel;
 use App\Controllers\BaseController;
+
+use App\Models\SupplierModel;
 
 class SupplierBahanBaku extends BaseController
 {

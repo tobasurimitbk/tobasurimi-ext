@@ -4,6 +4,8 @@ namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
 
+use App\Models\SupplierModel;
+
 class SupplierBahanPenolong extends BaseController
 {
     protected $token;
@@ -35,55 +37,63 @@ class SupplierBahanPenolong extends BaseController
     public function allSupplierBahanPenolong()
     {
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this->this_company_id,
-            "kategori" => "LOKAL",
-            "type" => "BAHAN PENOLONG"
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "idCompany"     => $this->this_company_id,
+            "kategori"      => "LOKAL",
+            "type"          => "BAHAN PENOLONG"
         ];
 
-        $response = curl_request("GET", "/suppliers", $this->token, $payload);
+        $supplierModel = new SupplierModel();
+        $condition = [
+            "company_id"    => $this->this_company_id,
+            "kategori"      => "LOKAL",
+            "suppliers.type"=> "BAHAN PENOLONG"
+        ];
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType")
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $supplierData = $supplierModel->getSupplierList($condition, $addCondition, $limit, $offset);
+
         $dataSupplier = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataSupplier, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "kode" => $data->kode,
-                    "name" => $data->name,
-                    "address" => $data->address,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
-                    "postal_code" => $data->postal_code, 
-                    "no_npwp" => $data->no_npwp,
-                    "phone" => $data->phone,
-                    "contact_person" => $data->contact_person,
-                    "email" => $data->email,
-                    "no_rekening" => $data->no_rekening,
-                    "supplier_buyer" => $data->supplier_buyer,
-                    "ap_name" => $data->ap_name,
-                    "ar_name" => $data->ar_name
-                ]);
-            }
+        foreach ($supplierData['data'] as $data) {
+            array_push($dataSupplier, [
+                "no"            => $no++,
+                "id"            => $data->id,
+                "kode"          => $data->kode,
+                "name"          => $data->name,
+                "address"       => $data->address,
+                "province_name" => $data->province_name,
+                "city_name"     => $data->city_name,
+                "postal_code"   => $data->postal_code, 
+                "no_npwp"       => $data->no_npwp,
+                "phone"         => $data->phone,
+                "contact_person"=> $data->contact_person,
+                "email"         => $data->email,
+                "no_rekening"   => $data->no_rekening,
+                "supplier_buyer"=> $data->supplier_buyer,
+                "ap_name"       => $data->ap_name,
+                "ar_name"       => $data->ar_name
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataSupplier,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $supplierData['totalData'],
+            "recordsFiltered"   => $supplierData['totalFilteredData'],
+            "data"              => $dataSupplier,
+            // "response" => $response,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
