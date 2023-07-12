@@ -12,9 +12,8 @@
         <?php if(!empty($rekapData) && $rekapData->is_posted === false): ?> 
             <button class="btn btn-success posting-rekap">Posting</button>
             <button class="btn btn-hapus delete-parent float-right">Hapus</button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
         <?php endif; ?>
-
+        <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
     </div>
 </div>
 <div class="card">
