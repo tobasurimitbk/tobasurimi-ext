@@ -45,6 +45,19 @@ class ListAddressesModel extends Model
             return $query->getResultArray();
     }
 
+    public function  get_by_vendor_id($vendor_id, $type = '')
+    {
+        $requete = "SELECT list_addresses.*,provinces.province_name,cities.city_name FROM list_addresses ";
+        $requete .= "LEFT JOIN provinces ON (provinces.id=list_addresses.province_id) ";
+        $requete .= "LEFT JOIN cities ON (cities.id=list_addresses.city_id) ";
+        $requete .= "WHERE deletedAt is null and vendor_id='" . $vendor_id . "' ";
+        $query = $this->db->query($requete);
+        if ($type == '1')
+            return $query->getResultObject();
+        else
+            return $query->getResultArray();
+    }
+
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
         $requete = "SELECT * FROM list_addresses ";
