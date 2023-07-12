@@ -48,7 +48,7 @@ class CustomerModel extends Model
         $requete .= "LEFT JOIN cities ON (customers.city_id=cities.id) ";
         $requete .= "LEFT JOIN sub_akuns s1 ON (customers.ap_id=s1.id) ";
         $requete .= "LEFT JOIN sub_akuns s2 ON (customers.ar_id=s2.id) ";
-        $requete .= "WHERE 1 ";
+        $requete .= "WHERE customers.deletedAt is null ";
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND UPPER(customers.name) like '%" . strtoupper($values["name"]) . "%' ");
         if (isset($values["search"]))
@@ -64,10 +64,10 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    function total_list($values)
+    public function total_list($values)
     {
         $requete  = "SELECT count(*) as total FROM customers ";
-        $requete .= "WHERE 1 ";
+        $requete .= "WHERE customers.deletedAt is null ";
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND UPPER(customers.name) like '%" . strtoupper($values["name"]) . "%' ");
         if (isset($values["search"]))

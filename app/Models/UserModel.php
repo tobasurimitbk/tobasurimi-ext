@@ -61,7 +61,7 @@ class UserModel extends Model
         return $query->getResultArray();
     }
 
-    function total_list($values)
+    public function total_list($values)
     {
         $requete  = "SELECT count(*) as total FROM users ";
         $requete .= "WHERE deletedAt is null ";

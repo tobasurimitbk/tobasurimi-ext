@@ -5,6 +5,8 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\ProvincesModel;
 use App\Models\CustomerModel;
+use App\Models\BanksModel;
+use App\Models\ListAddressesModel;
 
 class Customer extends BaseController
 {
@@ -12,6 +14,8 @@ class Customer extends BaseController
     protected $this_company_id;
     protected $ProvincesModel;
     protected $CustomerModel;
+    protected $BanksModel;
+    protected $ListAddressesModel;
 
     public function __construct()
     {
@@ -19,16 +23,22 @@ class Customer extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->ProvincesModel = new ProvincesModel();
         $this->CustomerModel = new CustomerModel();
+        $this->BanksModel = new BanksModel();
+        $this->ListAddressesModel = new ListAddressesModel();
     }
 
     public function customer()
     {
         //Get Provinces
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
+        $dataBanks = $this->BanksModel->search_list(array(), 'name');
 
         $data = [
             "dataProvinces" => $dataProvinces,
+            "dataBanks" => $dataBanks,
         ];
+
+
 
         return view('Master/customer/index', $data);
     }
@@ -96,72 +106,7 @@ class Customer extends BaseController
             "aaData" => $data
         );
 
-        // header('Access-Control-Allow-Origin: *');
-        // header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS");
-        // header('Access-Control-Max-Age: 86400');
-        // header("Access-Control-Expose-Headers: Content-Length, X-JSON");
-        // header("Access-Control-Allow-Headers: *");
-
-        //echo json_encode($response);
-        //return;
         return $this->response->setJSON($response);
-
-        /*
-        print_r($this->request);
-        exit;
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this->this_company_id
-        ];
-
-        $response = curl_request("GET", "/customers", $this->token, $payload);
-        $dataCustomer = [];
-        $totalRecords = 0;
-
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
-
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataCustomer, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "kode" => $data->kode,
-                    "name" => $data->name,
-                    "address" => $data->address,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
-                    "postal_code" => $data->postal_code,
-                    "no_npwp" => $data->no_npwp,
-                    "phone" => $data->phone,
-                    "contact_person" => $data->contact_person,
-                    "email" => $data->email,
-                    "no_rekening" => $data->no_rekening,
-                    "supplier_buyer" => $data->supplier_buyer,
-                    "ap_name" => $data->ap_name,
-                    "ar_name" => $data->ar_name
-                ]);
-            }
-        }
-
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataCustomer,
-            "response" => $response,
-            "payload" => $payload
-        ];
-
-        echo json_encode($data);
-        return;
-        */
     }
 
     public function saveCustomer()
@@ -195,12 +140,12 @@ class Customer extends BaseController
                 "supplier_buyer" => [
                     "rules" => "required"
                 ],
-                "province_parent_id" => [
-                    "rules" => "required"
-                ],
-                "city_parent_id" => [
-                    "rules" => "required"
-                ],
+                // "province_parent_id" => [
+                //     "rules" => "required"
+                // ],
+                // "city_parent_id" => [
+                //     "rules" => "required"
+                // ],
                 "ap_id" => [
                     "rules" => "required"
                 ],
@@ -210,27 +155,7 @@ class Customer extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                /*
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
-                    "phone" => $this->request->getPost("phone"),
-                    "contact_person" => $this->request->getPost("contact_person"),
-                    "email" => $this->request->getPost("email"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                    "province_id" => $this->request->getPost("province_parent_id"),
-                    "city_id" => $this->request->getPost("city_parent_id"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "list_address" => json_decode($this->request->getPost("list_address"))
-                ]);
 
-                $response = curl_request("POST", "/customers", $this->token, $payload);
-                */
                 $values = [
                     "company_id" => $this->this_company_id,
                     "kode" => $this->request->getPost("kode"),
@@ -240,6 +165,8 @@ class Customer extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
+                    "bank_id" => $this->request->getPost("bank_id"),
+                    "nama_rekening" => $this->request->getPost("nama_rekening"),
                     "no_rekening" => $this->request->getPost("no_rekening"),
                     "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                     "province_id" => $this->request->getPost("province_parent_id"),
@@ -248,8 +175,21 @@ class Customer extends BaseController
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "list_address" => json_decode($this->request->getPost("list_address"))
                 ];
+                $id = $this->CustomerModel->insert($values);
+                if ($id > 0) {
+                    $dlist_address = json_decode($this->request->getPost("list_address"), true);
+                    for ($i = 0; $i < count($dlist_address); $i++) {
+                        $values = [
+                            "customer_id"   => $id,
+                            "address"       => $dlist_address[$i]["address"],
+                            "province_id"   => isset($dlist_address[$i]["province_id"]) ? $dlist_address[$i]["province_id"] : "",
+                            "city_id"       => isset($dlist_address[$i]["city_id"]) ? $dlist_address[$i]["city_id"] : "",
+                            "postal_code"   => isset($dlist_address[$i]["postal_code"]) ? $dlist_address[$i]["postal_code"] : "",
+                            "main_address"  => isset($dlist_address[$i]["main_address"]) ? $dlist_address[$i]["main_address"] : "0",
+                        ];
+                        $this->ListAddressesModel->insert($values);
+                    }
 
-                if ($this->CustomerModel->insert($values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
@@ -317,12 +257,12 @@ class Customer extends BaseController
                 "supplier_buyer" => [
                     "rules" => "required"
                 ],
-                "province_parent_id" => [
-                    "rules" => "required"
-                ],
-                "city_parent_id" => [
-                    "rules" => "required"
-                ],
+                // "province_parent_id" => [
+                //     "rules" => "required"
+                // ],
+                // "city_parent_id" => [
+                //     "rules" => "required"
+                // ],
                 "ap_id" => [
                     "rules" => "required"
                 ],
@@ -336,8 +276,7 @@ class Customer extends BaseController
 
                 $id = $this->request->getPost("id");
 
-
-                $payload = json_encode([
+                $values = [
                     "company_id" => $this->this_company_id,
                     "kode" => $this->request->getPost("kode"),
                     "name" => $this->request->getPost("name"),
@@ -347,32 +286,58 @@ class Customer extends BaseController
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
                     "no_rekening" => $this->request->getPost("no_rekening"),
+                    "bank_id" => $this->request->getPost("bank_id"),
+                    "nama_rekening" => $this->request->getPost("nama_rekening"),
                     "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                     "province_id" => $this->request->getPost("province_parent_id"),
                     "city_id" => $this->request->getPost("city_parent_id"),
                     "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "list_address" => json_decode($this->request->getPost("list_address"))
-                ]);
-            }
+                ];
+                if ($this->CustomerModel->update($id, $values)) {
+                    $dlist_address = json_decode($this->request->getPost("list_address"), true);
 
-            if ($payload) {
-                $response = curl_request("PATCH", "/customers/$id", $this->token, $payload);
+                    for ($i = 0; $i < count($dlist_address); $i++) {
 
-                if ($response["code"] === 200) {
+                        $values = [
+                            "customer_id"   => $id,
+                            "address"       => $dlist_address[$i]["address"],
+                            "province_id"   => isset($dlist_address[$i]["province_id"]) ? $dlist_address[$i]["province_id"] : "",
+                            "city_id"       => isset($dlist_address[$i]["city_id"]) ? $dlist_address[$i]["city_id"] : "",
+                            "postal_code"   => isset($dlist_address[$i]["postal_code"]) ? $dlist_address[$i]["postal_code"] : "",
+                            "main_address"  => isset($dlist_address[$i]["main_address"]) ? $dlist_address[$i]["main_address"] : "0",
+                        ];
+
+                        if (isset($dlist_address[$i]["isDelete"])) {
+                            if ($dlist_address[$i]["isDelete"] == 1) {
+                                $values = [
+                                    "deletedAt" => date("Y-m-d H:i:s")
+                                ];
+
+                                $this->ListAddressesModel->update($dlist_address[$i]["id"], $values);
+                            }
+                        } else {
+                            if (isset($dlist_address[$i]["id"])) {
+                                $this->ListAddressesModel->update($dlist_address[$i]["id"], $values);
+                            } else {
+                                $this->ListAddressesModel->insert($values);
+                            }
+                        }
+                    }
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -393,15 +358,29 @@ class Customer extends BaseController
     public function getByIdCustomer($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/customers/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->CustomerModel->get_by_id($id, '1');
+
+            //$response = curl_request("GET", "/customers/$id?idCompany=$this->this_company_id", $this->token);
+            //if ($response["code"] === 200) {
+            if (count($res) > 0) {
+                $res_list = $this->ListAddressesModel->get_by_customer_id($id, '1');
+                for ($i = 0; $i < count($res_list); $i++) {
+                    $res_list[$i]->province_id = ($res_list[$i]->province_id == null) ? "" : $res_list[$i]->province_id;
+                    $res_list[$i]->province_name = ($res_list[$i]->province_name == null) ? "" : $res_list[$i]->province_name;
+                    $res_list[$i]->city_id = ($res_list[$i]->city_id == null) ? "" : $res_list[$i]->city_id;
+                    $res_list[$i]->city_name = ($res_list[$i]->city_name == null) ? "" : $res_list[$i]->city_name;
+                    $res_list[$i]->postal_code = ($res_list[$i]->postal_code == null) ? "" : $res_list[$i]->postal_code;
+                }
+                $res[0]["list_address"] = $res_list;
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"    => $res[0]
+                    //"data"  => json_decode($response["body"])->data,
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+                //$message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+                $message = 'Data Gagal Ditampilkan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -424,8 +403,14 @@ class Customer extends BaseController
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/customers/$id", $this->token);
-                if ($response["code"] === 200) {
+                $res_list = $this->ListAddressesModel->get_by_customer_id($id);
+                for ($i = 0; $i < count($res_list); $i++) {
+                    $values = [
+                        "deletedAt" => date("Y-m-d H:i:s")
+                    ];
+                    $this->ListAddressesModel->update($res_list[$i]["id"], $values);
+                }
+                if ($this->CustomerModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -433,7 +418,7 @@ class Customer extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,

@@ -50,7 +50,7 @@ class CitiesModel extends Model
         return $query->getResultArray();
     }
 
-    function total_list($values)
+    public function total_list($values)
     {
         $requete  = "SELECT count(*) as total FROM cities ";
         $requete .= "WHERE 1 ";

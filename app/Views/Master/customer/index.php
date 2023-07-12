@@ -101,6 +101,32 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select bank_id" name="bank_id" id="bank_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataBanks)) {
+                                        foreach ($dataBanks as $bank) {
+                                    ?>
+                                            <option value="<?= $bank["id"]; ?>"><?= $bank["name"]; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Bank</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control nama_rekening" id="nama_rekening" name="nama_rekening" placeholder="Nama Rekening">
+                                <label for="floatingInput">Nama Rekening</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
                                 <label for="floatingInput">No. Rekening</label>
                             </div>
@@ -390,23 +416,23 @@
             detail_address: {
                 required: true
             },
-            province_id: {
-                required: true
-            },
-            city_id: {
-                required: true
-            }
+            // province_id: {
+            //     required: true
+            // },
+            // city_id: {
+            //     required: true
+            // }
         },
         messages: {
             detail_address: {
                 required: "Address wajib diisi"
             },
-            province_id: {
-                required: "Province wajib diisi"
-            },
-            city_id: {
-                required: "City wajib diisi"
-            },
+            // province_id: {
+            //     required: "Province wajib diisi"
+            // },
+            // city_id: {
+            //     required: "City wajib diisi"
+            // },
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -630,12 +656,12 @@
                 supplier_buyer: {
                     required: true
                 },
-                province_parent_id: {
-                    required: true
-                },
-                city_parent_id: {
-                    required: true
-                },
+                // province_parent_id: {
+                //     required: true
+                // },
+                // city_parent_id: {
+                //     required: true
+                // },
                 ap_id: {
                     required: true
                 },
@@ -831,18 +857,21 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if (res.status) {
+                    if (res.data) {
                         $(".id").val(id);
                         $(".kode").val(res?.data?.kode);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
                         $(".no_npwp").val(res?.data?.no_npwp);
                         $(".phone").val(res?.data?.phone);
+                        $(".nama_rekening").val(res?.data?.nama_rekening);
+
                         $(".contact_person").val(res?.data?.contact_person);
                         $(".email").val(res?.data?.email);
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
+                        $(".bank_id").val(res?.data?.bank_id).change();
 
                         row = res?.data?.list_address.length;
 
@@ -1346,7 +1375,7 @@
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    console.log(id)
+                    //console.log(id)
                     let new_list_address = []
                     let tag_html = "";
 
@@ -1354,7 +1383,7 @@
 
                     row = 0;
 
-                    console.log(list_address)
+                    //console.log(list_address)
 
                     list_address.map(item => {
                         if (item.row != id) {
@@ -1440,24 +1469,26 @@
         $(".detail_address").val(address)
 
         // AJAX GET CITY
-        $.ajax({
-            url: `<?= base_url("city"); ?>/${province_id}`,
-            method: "GET",
-            dataType: "json",
-            success: function(result) {
-                $(".city_id").empty()
-                $(".city_id").val("").change()
-                $(".city_id").append(`<option value=""></option>`)
-                result.data.forEach(function(item) {
-                    $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                })
+        if (province_id != "") {
+            $.ajax({
+                url: `<?= base_url("city"); ?>/${province_id}`,
+                method: "GET",
+                dataType: "json",
+                success: function(result) {
+                    $(".city_id").empty()
+                    $(".city_id").val("").change()
+                    $(".city_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                    })
 
-                $(".city_id").val(city_id).change()
-                $(".postal_code").val(postal_code)
-                trigger = true;
-                $(".detail-modal").modal("show")
-            }
-        })
+                    $(".city_id").val(city_id).change()
+                    $(".postal_code").val(postal_code)
+                    trigger = true;
+                }
+            })
+        }
+        $(".detail-modal").modal("show")
         // }
     })
 
@@ -1486,7 +1517,7 @@
     }
 
     const getPostalCodeParent = function() {
-        $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
+        //$(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
     }
 
     const changeSort = function(val) {

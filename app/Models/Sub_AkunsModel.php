@@ -46,7 +46,7 @@ class Sub_AkunsModel extends Model
         return $query->getResultArray();
     }
 
-    function total_list($values)
+    public function total_list($values)
     {
         $requete  = "SELECT count(*) as total FROM sub_akuns ";
         $requete .= "WHERE 1 ";
