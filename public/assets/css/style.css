@@ -4572,6 +4572,7 @@ footer.main-footer .footer-right a {
   font-size: 13px;
   font-weight: 500;
   color: #2f4858 !important;
+  padding-left: 0px !important;
 }
 
 .select2-container--bootstrap-5
