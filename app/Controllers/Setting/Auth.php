@@ -78,12 +78,12 @@ class Auth extends BaseController
                 $pass = $res_user[0]['user_pass'];
                 $authenticatePassword = password_verify($password, $pass);
                 if ($authenticatePassword) {
-                    $data = json_encode([
-                        "username" => $username,
-                        "password" => $password
-                    ]);
-                    $response = curl_request("POST", "/auth/login", $token, $data);
-                    $data = json_decode($response["body"]);
+                    //$data = json_encode([
+                    //    "username" => $username,
+                    //    "password" => $password
+                    //]);
+                    //$response = curl_request("POST", "/auth/login", $token, $data);
+                    //$data = json_decode($response["body"]);
                     //(object)
 
                     $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($res_roles[0]["id"], $res_company[0]["id"]);

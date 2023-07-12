@@ -3,6 +3,8 @@
 namespace App\Controllers\Setting;
 
 use App\Controllers\BaseController;
+use App\Models\CompaniesModel;
+use App\Models\AccessListsModel;
 
 use DateTime;
 
@@ -12,36 +14,73 @@ class User extends BaseController
     protected $token;
     protected $this_company_id;
     protected $session;
+    protected $CompaniesModel;
+    protected $AccessListsModel;
 
     public function __construct()
     {
-        $this->company_role = session()->get("login")->company_role;
+        //$this->company_role = session()->get("login")->company_role;
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->session = session()->get("login");
+        $this->CompaniesModel = new CompaniesModel();
+        $this->AccessListsModel = new AccessListsModel();
     }
 
     public function changeCompany()
     {
         $id = $this->request->getGet("id");
-        $name = $this->request->getGet("name");
-        $role_id = $this->request->getGet("role_id");
-        $role_name = $this->request->getGet("role_name");
+        //$res = $this->CompaniesModel->get_by_id($id);
+        $ses = session()->get("login")->arr_company;
+        $name = "";
+        $role_id = "";
+        $role_name = "";
+
+        for ($i = 0; $i < count($ses); $i++) {
+            if ($ses[$i]["id"] == $id) {
+                $name = $ses[$i]["company"];
+                $role_id = $ses[$i]["role_id"];
+                $role_name = $ses[$i]["role_name"];
+                break;
+            }
+        }
 
         if ($id) {
             $this_access = "";
 
-            foreach ($this->company_role as $item) {
-                if ($item->company_id == $id) {
-                    $this_access = $item->access_list;
+            $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($role_id, $id);
+            $res_child_access = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_not_parent($role_id, $id);
+            $arr = [];
+            for ($i = 0; $i < count($res_access_list); $i++) {
+                $arr_child = [];
+                for ($j = 0; $j < count($res_child_access); $j++) {
+                    if ($res_child_access[$j]["parent_id"] == $res_access_list[$i]["menu_url_id"]) {
+                        $access = json_decode($res_child_access[$j]["action"]);
+                        $values = [
+                            "name"  => $res_child_access[$j]["menuName"],
+                            "menu_url_id"   => $res_child_access[$j]["menu_url_id"],
+                            "url"   => $res_child_access[$j]["url"],
+                            "access"    => $access
+                        ];
+                        array_push($arr_child, (object) $values);
+                    }
                 }
+                $values = [
+                    "menu_url_id"   => $res_access_list[$i]["menu_url_id"],
+                    "icon"          => $res_access_list[$i]["icon"],
+                    "menuName"      => $res_access_list[$i]["menuName"],
+                    "url"           => $res_access_list[$i]["url"],
+                    "isParent"      => $res_access_list[$i]["parent_id"],
+                    "child"         => $arr_child
+                ];
+                array_push($arr, (object) $values);
             }
 
             $this->session->this_company_id = $id;
             $this->session->this_company = $name;
             $this->session->this_role_id = $role_id;
             $this->session->this_role_name = $role_name;
-            $this->session->this_access = $this_access;
+            $this->session->this_access = $arr;
 
             session()->setTempdata("login", $this->session, 36000);
 
@@ -108,64 +147,62 @@ class User extends BaseController
 
     public function saveUser()
     {
-        try{
-        $rules = [
-            "name" => [
-                "rules" => "required"
-            ],
-            "username" => [
-                "rules" => "required"
-            ],
-            "password" => [
-                "rules" => "required"
-            ],
-            "employee_id" => [
-                "rules" => "required"
-            ]
-        ];
+        try {
+            $rules = [
+                "name" => [
+                    "rules" => "required"
+                ],
+                "username" => [
+                    "rules" => "required"
+                ],
+                "password" => [
+                    "rules" => "required"
+                ],
+                "employee_id" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "name" => $this->request->getPost("name"),
-                "username" => $this->request->getPost("username"),
-                "password" => $this->request->getPost("password"),
-                "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                "company_role" => json_decode($this->request->getPost("company_role")),
-                "status" => $this->request->getPost("status")
-            ]);
+            if ($this->validate($rules)) {
+                $payload = json_encode([
+                    "company_id" => $this->this_company_id,
+                    "name" => $this->request->getPost("name"),
+                    "username" => $this->request->getPost("username"),
+                    "password" => $this->request->getPost("password"),
+                    "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                    "company_role" => json_decode($this->request->getPost("company_role")),
+                    "status" => $this->request->getPost("status")
+                ]);
 
-            $response = curl_request("POST", "/users", $this->token, $payload);
+                $response = curl_request("POST", "/users", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Disimpan",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -178,72 +215,70 @@ class User extends BaseController
 
     public function updateUser()
     {
-        try{
-        $rules = [
-            "name" => [
-                "rules" => "required"
-            ],
-            "username" => [
-                "rules" => "required"
-            ]
-        ];
+        try {
+            $rules = [
+                "name" => [
+                    "rules" => "required"
+                ],
+                "username" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
 
-            if ($this->request->getPost("employee_id")) {
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "name" => $this->request->getPost("name"),
-                    "username" => $this->request->getPost("username"),
-                    "password" => $this->request->getPost("password"),
-                    "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                    "company_role" => json_decode($this->request->getPost("company_role")),
-                    "status" => $this->request->getPost("status")
-                ]);
+                if ($this->request->getPost("employee_id")) {
+                    $payload = json_encode([
+                        "company_id" => $this->this_company_id,
+                        "name" => $this->request->getPost("name"),
+                        "username" => $this->request->getPost("username"),
+                        "password" => $this->request->getPost("password"),
+                        "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                        "company_role" => json_decode($this->request->getPost("company_role")),
+                        "status" => $this->request->getPost("status")
+                    ]);
+                } else {
+                    $payload = json_encode([
+                        "company_id" => $this->this_company_id,
+                        "name" => $this->request->getPost("name"),
+                        "username" => $this->request->getPost("username"),
+                        "password" => $this->request->getPost("password"),
+                        "company_role" => json_decode($this->request->getPost("company_role")),
+                        "status" => $this->request->getPost("status")
+                    ]);
+                }
+
+
+                $response = curl_request("PATCH", "/users/$id", $this->token, $payload);
+
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "name" => $this->request->getPost("name"),
-                    "username" => $this->request->getPost("username"),
-                    "password" => $this->request->getPost("password"),
-                    "company_role" => json_decode($this->request->getPost("company_role")),
-                    "status" => $this->request->getPost("status")
-                ]);
-            }
-
-
-            $response = curl_request("PATCH", "/users/$id", $this->token, $payload);
-
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Diubah",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -284,38 +319,36 @@ class User extends BaseController
 
     public function deleteUser()
     {
-        try{
-        $id = $this->request->getPost("id");
+        try {
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/users/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/users/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

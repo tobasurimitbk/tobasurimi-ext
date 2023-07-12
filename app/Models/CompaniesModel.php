@@ -31,4 +31,12 @@ class CompaniesModel extends Model
         $query = $this->db->query($requete);
         return $query->getResultArray();
     }
+
+    public function get_by_id($id)
+    {
+        $requete = "SELECT * FROM companies WHERE id='" . $id . "'";
+        //echo $requete;
+        $query = $this->db->query($requete);
+        return $query->getResultArray();
+    }
 }
