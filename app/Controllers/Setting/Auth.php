@@ -3,15 +3,26 @@
 namespace App\Controllers\Setting;
 
 use App\Controllers\BaseController;
+use App\Models\UserModel;
+use App\Models\CompaniesModel;
+use App\Models\RolesModel;
+use App\Models\AccessListsModel;
 
 use DateTime;
 
 class Auth extends BaseController
 {
+    protected $userModel;
+    protected $CompaniesModel;
+    protected $RolesModel;
+    protected $AccessListsModel;
 
     public function __construct()
     {
-
+        $this->userModel = new UserModel();
+        $this->CompaniesModel = new CompaniesModel();
+        $this->RolesModel = new RolesModel();
+        $this->AccessListsModel = new AccessListsModel();
     }
 
     public function login()
@@ -25,77 +36,135 @@ class Auth extends BaseController
 
     public function doLogin()
     {
-        try{
-        $rules = [
-            "username" => [
-                "rules" => "required"
-            ],
-            "password" => [
-                "rules" => "required"
-            ]
-        ];
+        try {
+            $rules = [
+                "username" => [
+                    "rules" => "required"
+                ],
+                "password" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $token = "";
-            $data = json_encode([
-                "username" => $this->request->getPost("username"),
-                "password" => $this->request->getPost("password")
-            ]);
-            $response = curl_request("POST", "/auth/login", $token, $data);
+            if ($this->validate($rules)) {
+                $token = "";
 
-            if ($response["code"] === 200) {
-                $data = json_decode($response["body"]);
+                $username = $this->request->getPost('username');
+                $password = $this->request->getPost('password');
 
-                $this_company_id = $data->company_role[0]->company_id;
-                $this_company = $data->company_role[0]->company_name;
-                $this_access = $data->company_role[0]->access_list;
-                $this_role_id = $data->company_role[0]->role_id;
-                $this_role_name = $data->company_role[0]->role_name;
+                $res_user = $this->userModel->get_by_username($username);
+                $arr_companies = json_decode($res_user[0]["company_role"], true);
+                $in_company_id = implode(', ', array_column($arr_companies, 'company_id'));
+                $in_roles_id = implode(', ', array_column($arr_companies, 'role_id'));
 
-                // token add bearer
-                $session = (object) [
-                    "isLogin" => true,
-                    "token" => $data->token,
-                    "name" => $data->name,
-                    "username" => $data->username,
-                    "this_role_id" => $this_role_id,
-                    "this_role_name" => $this_role_name,
-                    "company_role" => $data->company_role,
-                    "this_company_id" => $this_company_id,
-                    "this_company" => $this_company,
-                    "this_access" => $this_access,
-                    "user_id" => $data->id,
-                    "employee_id" => $data->employee_id,
-                    "status" => $data->status
-                ];
-                session()->setTempdata("login", $session, 36000);
+                $res_company = $this->CompaniesModel->get_by_in_id($in_company_id);
+                $res_roles = $this->RolesModel->get_by_in_id($in_roles_id);
 
-                $data = [
-                    "status"            => true,
-                    "message"   => "Berhasil Login",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                for ($i = 0; $i < count($res_company); $i++) {
+                    $check = 1;
+                    for ($j = 0; $j < count($res_roles); $j++) {
+                        for ($k = 0; $k < count($arr_companies); $k++) {
+                            if ($res_company[$i]["id"] == $arr_companies[$k]["company_id"] && $res_roles[$j]["id"] == $arr_companies[$k]["role_id"]) {
+                                $res_company[$i]["role_id"] = $res_roles[$j]["id"];
+                                $res_company[$i]["role_name"] = $res_roles[$j]["name"];
+                                $check = 0;
+                                break;
+                            }
+                        }
+                        if ($check == 0) break;
+                    }
+                }
+
+                $pass = $res_user[0]['user_pass'];
+                $authenticatePassword = password_verify($password, $pass);
+                if ($authenticatePassword) {
+                    $data = json_encode([
+                        "username" => $username,
+                        "password" => $password
+                    ]);
+                    $response = curl_request("POST", "/auth/login", $token, $data);
+                    $data = json_decode($response["body"]);
+                    //(object)
+
+                    $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($res_roles[0]["id"], $res_company[0]["id"]);
+                    $res_child_access = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_not_parent($res_roles[0]["id"], $res_company[0]["id"]);
+                    $arr = [];
+                    for ($i = 0; $i < count($res_access_list); $i++) {
+                        $arr_child = [];
+                        for ($j = 0; $j < count($res_child_access); $j++) {
+                            if ($res_child_access[$j]["parent_id"] == $res_access_list[$i]["menu_url_id"]) {
+                                $access = json_decode($res_child_access[$j]["action"]);
+                                $values = [
+                                    "name"  => $res_child_access[$j]["menuName"],
+                                    "menu_url_id"   => $res_child_access[$j]["menu_url_id"],
+                                    "url"   => $res_child_access[$j]["url"],
+                                    "access"    => $access
+                                ];
+                                array_push($arr_child, (object) $values);
+                            }
+                        }
+                        $values = [
+                            "menu_url_id"   => $res_access_list[$i]["menu_url_id"],
+                            "icon"          => $res_access_list[$i]["icon"],
+                            "menuName"      => $res_access_list[$i]["menuName"],
+                            "url"           => $res_access_list[$i]["url"],
+                            "isParent"      => $res_access_list[$i]["parent_id"],
+                            "child"         => $arr_child
+                        ];
+                        array_push($arr, (object) $values);
+                    }
+
+                    $this_company_id = $res_company[0]["id"];
+                    $this_company = $res_company[0]["company"];
+                    $this_access = $arr;
+                    $this_role_id = $res_roles[0]["id"];
+                    $this_role_name = $res_roles[0]["name"];
+
+                    // token add bearer
+                    $session = (object) [
+                        "isLogin" => true,
+                        "token" => $token,
+                        "name" => $res_user[0]["name"],
+                        "username" => $res_user[0]["username"],
+                        "this_role_id" => $this_role_id,
+                        "this_role_name" => $this_role_name,
+                        //"company_role" => $data->company_role,
+                        //"company_role" => $data->company_role,
+                        "arr_company"   => $res_company,
+                        "this_company_id" => $this_company_id,
+                        "this_company" => $this_company,
+                        "this_access" => $this_access,
+                        "user_id" => $res_user[0]["id"],
+                        "employee_id" => $res_user[0]["employee_id"],
+                        "status" => $res_user[0]["status"],
+                    ];
+
+                    session()->setTempdata("login", $session, 36000);
+
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Berhasil Login",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = 'Login Gagal, Coba Lagi';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Login Gagal, Coba Lagi';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Gagal Login, Coba Lagi",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Gagal Login, Coba Lagi",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
