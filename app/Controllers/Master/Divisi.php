@@ -3,16 +3,19 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\DivisisModel;
 
 class Divisi extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    
+    protected $DivisisModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->DivisisModel = new DivisisModel();
     }
 
     public function divisi()
@@ -77,7 +80,7 @@ class Divisi extends BaseController
 
     public function saveDivisi()
     {
-        try{
+        try {
             $rules = [
                 "divisi" => [
                     "rules" => "required"
@@ -89,7 +92,7 @@ class Divisi extends BaseController
                     "company_id" => $this->this_company_id,
                     "divisi" => $this->request->getPost("divisi")
                 ]);
-                
+
                 $response = curl_request("POST", "/divisis", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -118,9 +121,7 @@ class Divisi extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -133,7 +134,7 @@ class Divisi extends BaseController
 
     public function updateDivisi()
     {
-        try{
+        try {
             $rules = [
                 "divisi" => [
                     "rules" => "required"
@@ -147,7 +148,7 @@ class Divisi extends BaseController
                     "company_id" => $this->this_company_id,
                     "divisi" => $this->request->getPost("divisi")
                 ]);
-                
+
                 $response = curl_request("PATCH", "/divisis/$id", $this->token, $payload);
 
                 if ($response["code"] === 200) {
@@ -176,9 +177,7 @@ class Divisi extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -219,7 +218,7 @@ class Divisi extends BaseController
 
     public function deleteDivisi()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -248,9 +247,7 @@ class Divisi extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -263,12 +260,15 @@ class Divisi extends BaseController
 
     public function dropdownDivisi()
     {
-        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
+        $dataDivisi = $this->DivisisModel->get_by_company_id($this->this_company_id);
 
+        /*
+        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
         $dataDivisi = [];
         if ($responseDivisi["code"] === 200) {
             $dataDivisi = json_decode($responseDivisi["body"])->data;
         }
+        */
 
         $data = [
             "data" => $dataDivisi
