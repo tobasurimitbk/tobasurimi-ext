@@ -136,24 +136,20 @@ class Divisi extends BaseController
                     "company_id" => $this->this_company_id,
                     "divisi" => $this->request->getPost("divisi")
                 ];
-
-                $response = curl_request("POST", "/divisis", $this->token, $payload);
-
-
-                if ($this->EmployeesModel->insert($values)) {
+                if ($this->DivisisModel->insert($values)) {
                     $data = [
                         "status"    => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -187,29 +183,28 @@ class Divisi extends BaseController
             ];
 
             if ($this->validate($rules)) {
+
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $values = [
                     "company_id" => $this->this_company_id,
                     "divisi" => $this->request->getPost("divisi")
-                ]);
+                ];
 
-                $response = curl_request("PATCH", "/divisis/$id", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->DivisisModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -236,15 +231,15 @@ class Divisi extends BaseController
     public function getByIdDivisi($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/divisis/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->DivisisModel->get_by_id($id);
+            if (count($res)) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -267,8 +262,10 @@ class Divisi extends BaseController
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/divisis/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->DivisisModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -276,7 +273,7 @@ class Divisi extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
