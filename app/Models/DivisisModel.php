@@ -40,7 +40,7 @@ class DivisisModel extends Model
         $requete .= "WHERE divisis.deletedAt is null ";
         if (isset($values["company_id"]))
             $requete .= ($values["company_id"] == "") ? "" : ("AND divisis.company_id ='" . $values["company_id"] . "' ");
-        if (isset($values["name"]))
+        if (isset($values["divisi"]))
             $requete .= ($values["divisi"] == "") ? "" : ("AND UPPER(divisis.divisi) like '%" . strtoupper($values["divisi"]) . "%' ");
         if (isset($values["search"]))
             $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(divisis.divisi) like '%" . strtoupper($values["search"]) . "%') ");
@@ -62,7 +62,7 @@ class DivisisModel extends Model
         $requete .= "WHERE divisis.deletedAt is null ";
         if (isset($values["company_id"]))
             $requete .= ($values["company_id"] == "") ? "" : ("AND divisis.company_id ='" . $values["company_id"] . "' ");
-        if (isset($values["name"]))
+        if (isset($values["divisi"]))
             $requete .= ($values["divisi"] == "") ? "" : ("AND UPPER(divisis.divisi) like '%" . strtoupper($values["divisi"]) . "%' ");
         if (isset($values["search"]))
             $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(divisis.divisi) like '%" . strtoupper($values["search"]) . "%') ");

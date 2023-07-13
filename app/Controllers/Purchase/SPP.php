@@ -133,9 +133,16 @@ class SPP extends BaseController
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
             "sortType"            => $this->request->getGet("sortType"),
-            "dateStart"       >= $this->request->getGet("dateStart"),
-            "dateEnd"       <= $this->request->getGet("dateEnd"),
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
+        // $addCondition = [
+        //     "search"        => $this->request->getGet("search"),
+        //     "sort"          => $this->request->getGet("sort"),
+        //     "sortType"      => $this->request->getGet("sortType"),
+        //     "dateStart"     >= $this->request->getGet("dateStart"),
+        //     "dateEnd"       <= $this->request->getGet("dateEnd"),
+        // ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
         $sppData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);
@@ -150,18 +157,17 @@ class SPP extends BaseController
                 "id" => $data->id,
                 "spp_type" => $data->spp_type,
                 "spp_no" => $data->spp_no,
-                // "warehouseName" => "test",
                 "warehouseName" => $data->warehouseName,
                 "total" => $data->total,
                 "request_date" => $data->request_date,
-                // "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
-                // "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
-                // "approvedByDirectorName" => $data->approvedByDirectorName,
-                // "is_posted" => $data->is_posted,
-                // "createdAt" => $data->createdAt,
-                // "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
-                // "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
-                // "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
+                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
+                "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
+                "approvedByDirectorName" => $data->approvedByDirectorName,
+                "is_posted" => $data->is_posted,
+                "createdAt" => $data->createdAt,
+                "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
+                "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
+                "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
             ]);
         }
 
