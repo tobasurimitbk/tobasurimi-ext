@@ -678,9 +678,9 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        let new_spek = res?.data?.spek;
+                        let new_spek = JSON.parse(res?.data?.spek);
                         let tag_html = "";
-
+                        console.log(new_spek);
                         new_spek.forEach((item) => {
                             row_detail++;
                             list_spek.push(
@@ -703,8 +703,8 @@
                         $(".id").val(id);
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".nama_barang").val(res?.data?.nama_barang);
-                        $(".harga_barang").val(res?.data?.harga_barang);
-                        
+                        $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
+                        console.log()
                         validator.resetForm();
                         validator.reset();
 

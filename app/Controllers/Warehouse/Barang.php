@@ -143,37 +143,44 @@ class Barang extends BaseController
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
                     "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    "spek" => "'" . json_decode($this->request->getPost("spek")) . "'"
+                    "spek" => $this->request->getPost("spek")
                 ];
 
-                $data = [
-                    "status"            => false,
-                    "message"    => $payload,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                $exist = $this->barangModel->getBarangByKode($this->request->getPost("kode_barang"), null);
 
-                // $response =  $this->barangModel->insert($payload);
+                if(sizeof($exist) === 0){
+                    $response =  $this->barangModel->insert($payload);
 
-                // if ($response) {
-                //     $data = [
-                //         "status"            => true,
-                //         "message"   => "Data Berhasil disimpan",
-                //         "payload"   => $payload,
-                //         'token' => csrf_hash()
-                //     ];
-                //     echo json_encode($data);
-                // } else {
-                //     $message =  'Data Gagal Disimpan';
-                //     $data = [
-                //         "status"            => false,
-                //         "message"    => $message,
-                //         "payload"   => $payload,
-                //         'token' => csrf_hash()
-                //     ];
-                //     echo json_encode($data);
-                // }
+                    if ($response) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil disimpan",
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message =  'Data Gagal Disimpan';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                }
+                else
+                {
+                    $message =  'Kode Barang Sudah Ada';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
                 $data = [
                     "status"            => false,
@@ -239,7 +246,7 @@ class Barang extends BaseController
                     "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    "spek" => json_decode($this->request->getPost("spek"))
+                    "spek" => $this->request->getPost("spek")
                 ];
 
                 // $data = [
@@ -254,18 +261,33 @@ class Barang extends BaseController
                     'id' => $id
                 ];
 
-                $response = $this->barangModel->where($condition)->set($payload)->update();
+                $exist = $this->barangModel->getBarangByKode($this->request->getPost("kode_barang"), $id);
 
-                if ($response) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Diubah';
+                if(sizeof($exist) === 0){
+                    $response = $this->barangModel->where($condition)->set($payload)->update();
+
+                    if ($response) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil diubah",
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message = 'Data Gagal Diubah';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                }
+                else
+                {
+                    $message =  'Kode Barang Sudah Ada';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -349,7 +371,7 @@ class Barang extends BaseController
             if ($response) {
                 $data = [
                     "status"  => true,
-                    "data"  => $this->response->setJSON($response),
+                    "data"  => $response,
                 ];
                 echo json_encode($data);
             } else {
@@ -377,7 +399,7 @@ class Barang extends BaseController
 
             if (!empty($id)) {
                 $findBarang = $this->barangModel->find($id);
-                if (!$findBarang) {
+                if ($findBarang) {
                     $response =  $this->barangModel->delete($id);
                     if ($response) {
                         $data = [

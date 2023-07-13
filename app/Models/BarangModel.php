@@ -97,8 +97,10 @@ class BarangModel extends Model
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        $barangDataQry->groupStart();
-        
+        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['status']) {
+            $barangDataQry->groupStart();
+        }
+
         if ($addCondition['search']) {
             $barangDataQry->like('nama_barang', $addCondition['search']);
         }
@@ -111,7 +113,9 @@ class BarangModel extends Model
             $barangDataQry->where('barangs.status', $addCondition['status']);
         }
 
-        $barangDataQry->groupEnd();
+        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['status']) {
+            $barangDataQry->groupEnd();
+        }
         
         $totalFilteredData = $barangDataQry->countAllResults(false);
         $data = $barangDataQry->findAll($limit, $offset);
@@ -134,6 +138,32 @@ class BarangModel extends Model
 
         $builder = $this->db->table('barangs');
         $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResult();
+    }
+
+    public function getBarangByKode($kode, $id = null)
+    {
+        if($id)
+        {
+            $arrCondition = [
+                'deletedAt' => null,
+                'kode_barang' => $kode,
+                'id !=' => $id
+            ];
+        }
+        else
+        {
+            $arrCondition = [
+                'deletedAt' => null,
+                'kode_barang' => $kode
+            ];
+        }
+
+        $builder = $this->db->table('barangs');
+        $builder->where($arrCondition);
+
         $query = $builder->get();
         
         return $query->getResult();
