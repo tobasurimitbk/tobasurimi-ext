@@ -5,6 +5,8 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\SatuansModel;
 
+use App\Models\SatuanModel;
+
 class Satuan extends BaseController
 {
     protected $token;
@@ -259,7 +261,12 @@ class Satuan extends BaseController
 
     public function dropdownSatuan()
     {
+<<<<<<< HEAD
         $dataSatuan = $this->SatuansModel->search_list(array(), 'nama_satuan');
+=======
+        $dataSatuan = $this->satuanModel->asObject()->find();
+
+>>>>>>> 88821f675e383d4a381a25aa71d3634bd7e86cc3
         $data = [
             "data" => $dataSatuan
         ];

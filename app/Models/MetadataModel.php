@@ -27,6 +27,14 @@ class MetadataModel extends Model
         return $query->getResultArray();
     }
 
+    public function get_by_name($name)
+    {
+        $requete = "SELECT * FROM metadata WHERE name='" . $name . "'";
+        //echo $requete;
+        $query = $this->db->query($requete);
+        return $query->getResultArray();
+    }
+
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
         $requete = "SELECT * FROM metadata ";

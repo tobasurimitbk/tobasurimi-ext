@@ -14,7 +14,25 @@ class BarangModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        'id',
+        'company_id',
+        'warehouse_id',
+        'kode_barang',
+        'nama_barang',
+        'spek',
+        'harga_barang',
+        'satuan_id',
+        'kategori_id',
+        'hs_id',
+        'ap_id',
+        'ar_id',
+        'stok',
+        'status',
+        'createdAt',
+        'updatedAt',
+        'deletedAt'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -80,17 +98,17 @@ class BarangModel extends Model
         $totalData = $barangDataQry->countAllResults(false);
 
         $barangDataQry->groupStart();
-
+        
         if ($addCondition['search']) {
             $barangDataQry->like('nama_barang', $addCondition['search']);
         }
 
         if ($addCondition['kategori']) {
-            $barangDataQry->like('kategori', $addCondition['kategori']);
+            $barangDataQry->where('metadata.id', $addCondition['kategori']);
         }
 
         if ($addCondition['status']) {
-            $barangDataQry->like('barangs.status', $addCondition['status']);
+            $barangDataQry->where('barangs.status', $addCondition['status']);
         }
 
         $barangDataQry->groupEnd();

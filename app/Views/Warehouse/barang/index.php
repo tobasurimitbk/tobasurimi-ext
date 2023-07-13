@@ -153,7 +153,7 @@
                     if (!empty($dataKategori)) {
                         foreach ($dataKategori as $kategori) {
                     ?>
-                            <option value="<?= $kategori->id; ?>"><?= $kategori->value; ?></option>
+                            <option value="<?= $kategori["id"]; ?>"><?= $kategori["value"]; ?></option>
                     <?php
                         }
                     }
@@ -610,8 +610,8 @@
                     $(".ar_id").append(`<option value=""></option>`)
 
                     res.data.forEach(function(item) {
-                        $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                        $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                        $(".ap_id").append(`<option value="${item.id}">[${item.no_sub}]${item.nama_sub}</option>`)
+                        $(".ar_id").append(`<option value="${item.id}">[${item.no_sub}]${item.nama_sub}</option>`)
                     })
 
                     $(".ap_id").val("").change();
@@ -738,8 +738,8 @@
                                 $(".ar_id").append(`<option value=""></option>`)
 
                                 result.data.forEach(function(item) {
-                                    $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                                    $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                                    $(".ap_id").append(`<option value="${item.id}">[${item.no_sub}]${item.nama_sub}</option>`)
+                                    $(".ar_id").append(`<option value="${item.id}">[${item.no_sub}]${item.nama_sub}</option>`)
                                 })
 
                                 $(".ap_id").val(res?.data?.ap_id).change();
