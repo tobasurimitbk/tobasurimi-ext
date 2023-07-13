@@ -1084,7 +1084,7 @@
     const changeSort = function(val) {
         if(sort !== val)
         {
-            sortType = "asc";
+            sortType = "ASC";
             sort = val;
         }
         else

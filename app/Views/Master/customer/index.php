@@ -28,7 +28,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <textarea class="form-control address" id="address" name="address"></textarea>
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
@@ -44,7 +44,7 @@
                                             if (!empty($dataProvinces)) {
                                                 foreach ($dataProvinces as $province) {
                                             ?>
-                                                    <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                                    <option value="<?= $province["id"]; ?>"><?= $province["province_name"]; ?></option>
                                             <?php
                                                 }
                                             }
@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input readonly="true" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Postal Code">
+                                        <input type="text" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Postal Code">
                                         <label for="floatingInput">Kode Pos</label>
                                     </div>
                                 </div>
@@ -71,7 +71,7 @@
                         </div>
                     </div>
                     <div class="row">
-                     <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
                                 <label for="floatingInput">Nomor NPWP</label>
@@ -97,6 +97,32 @@
                                 <label for="floatingInput">Email</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select bank_id" name="bank_id" id="bank_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataBanks)) {
+                                        foreach ($dataBanks as $bank) {
+                                    ?>
+                                            <option value="<?= $bank["id"]; ?>"><?= $bank["name"]; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Bank</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control nama_rekening" id="nama_rekening" name="nama_rekening" placeholder="Nama Rekening">
+                                <label for="floatingInput">Nama Rekening</label>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -186,7 +212,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
+                                <textarea class="form-control detail_address" id="detail_address" name="detail_address"></textarea>
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
@@ -198,7 +224,7 @@
                                     if (!empty($dataProvinces)) {
                                         foreach ($dataProvinces as $province) {
                                     ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                            <option value="<?= $province["id"]; ?>"><?= $province["province_name"]; ?></option>
                                     <?php
                                         }
                                     }
@@ -219,7 +245,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
+                                <input type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
                                 <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
@@ -237,49 +263,49 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Customer</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-    <div class="row justify-content-end mb-3">
-        <div class="col-md-2">
-            <input class="form-control search form-out-search" placeholder="Search" value="" />
-        </div>
+    <div class="section-header">
+        <h1>Customer</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
     </div>
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>No.</th>
-                        <th onclick="changeSort('kode')" class="sort">Kode</th>
-                        <th onclick="changeSort('name')" class="sort">Nama</th>
-                        <th onclick="changeSort('address')" class="sort">Alamat</th>
-                        <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
-                        <th onclick="changeSort('city_name')" class="sort">Kota</th>
-                        <th onclick="changeSort('postal_code')" class="sort">Kode Pos</th>
-                        <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
-                        <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
-                        <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
-                        <th onclick="changeSort('email')" class="sort">Email</th>
-                        <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
-                        <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
-                        <th onclick="changeSort('ap_name')" class="sort">AP</th>
-                        <th onclick="changeSort('ar_name')" class="sort">AR</th>
-                    </tr>
-                </thead>
-                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('kode')" class="sort">Kode</th>
+                                <th onclick="changeSort('name')" class="sort">Nama</th>
+                                <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
+                                <th onclick="changeSort('city_name')" class="sort">Kota</th>
+                                <th onclick="changeSort('postal_code')" class="sort">Kode Pos</th>
+                                <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
+                                <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
+                                <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
+                                <th onclick="changeSort('email')" class="sort">Email</th>
+                                <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
+                                <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
+                                <th onclick="changeSort('ap_name')" class="sort">AP</th>
+                                <th onclick="changeSort('ar_name')" class="sort">AR</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
 </section>
 
 <script>
@@ -297,7 +323,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -384,49 +412,49 @@
     });
 
     var validator_detail = $(".detail-form").validate({
-            rules: {
-                detail_address: {
-                    required: true
-                },
-                province_id: {
-                    required: true
-                },
-                city_id: {
-                    required: true
-                }
+        rules: {
+            detail_address: {
+                required: true
             },
-            messages: {
-                detail_address: {
-                    required: "Address wajib diisi"
-                },
-                province_id: {
-                    required: "Province wajib diisi"
-                },
-                city_id: {
-                    required: "City wajib diisi"
-                },
+            // province_id: {
+            //     required: true
+            // },
+            // city_id: {
+            //     required: true
+            // }
+        },
+        messages: {
+            detail_address: {
+                required: "Address wajib diisi"
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
+            // province_id: {
+            //     required: "Province wajib diisi"
+            // },
+            // city_id: {
+            //     required: "City wajib diisi"
+            // },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
     $(document).ready(function() {
         // PROVINCE
@@ -628,12 +656,12 @@
                 supplier_buyer: {
                     required: true
                 },
-                province_parent_id: {
-                    required: true
-                },
-                city_parent_id: {
-                    required: true
-                },
+                // province_parent_id: {
+                //     required: true
+                // },
+                // city_parent_id: {
+                //     required: true
+                // },
                 ap_id: {
                     required: true
                 },
@@ -730,7 +758,7 @@
             $(".title-detail-name").text("Tambah")
             $(".id_detail").val('')
             $(".detail_address").val('')
-            
+
             $(".postal_code").val('')
 
             validator_detail.resetForm();
@@ -775,8 +803,8 @@
                     $(".ar_id").append(`<option value=""></option>`)
 
                     res.data.forEach(function(item) {
-                        $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                        $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
+                        $(".ap_id").append(`<option value="${item.id}">[${item.no_sub}]${item.nama_sub}</option>`)
+                        $(".ar_id").append(`<option value="${item.id}">[${item.no_sub}]${item.nama_sub}</option>`)
                     })
 
                     $(".ap_id").val('').change();
@@ -829,18 +857,21 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    if (res.status) {
+                    if (res.data) {
                         $(".id").val(id);
                         $(".kode").val(res?.data?.kode);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
                         $(".no_npwp").val(res?.data?.no_npwp);
                         $(".phone").val(res?.data?.phone);
+                        $(".nama_rekening").val(res?.data?.nama_rekening);
+
                         $(".contact_person").val(res?.data?.contact_person);
                         $(".email").val(res?.data?.email);
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
+                        $(".bank_id").val(res?.data?.bank_id).change();
 
                         row = res?.data?.list_address.length;
 
@@ -881,18 +912,15 @@
                             tag_html += item.postal_code;
                             tag_html += "</td>";
                             tag_html += "<td class='actions'>";
-                            if(item.main_address == 1)
-                            {
+                            if (item.main_address == 1) {
                                 tag_html += `<input type="radio" checked id="main" name="main" value="${index + 1}">`;
-                            }   
-                            else
-                            {
+                            } else {
                                 tag_html += `<input type="radio" id="main" name="main" value="${index + 1}">`;
-                            } 
+                            }
                             tag_html += "</td>";
                             tag_html += "</tr>";
                         })
-                        
+
                         $(".body-detail-table").append(tag_html)
 
                         validator.resetForm();
@@ -913,7 +941,7 @@
                                 })
 
                                 $(".city_parent_id").val(res?.data?.city_id).change();
-                                $(".parent_postal_code").val(res?.data?.postal_code);
+                                //$(".parent_postal_code").val(res?.data?.postal_code);
                             }
                         })
 
@@ -1021,8 +1049,7 @@
             let postal_code = $(".postal_code").val();
 
             // update detail
-            if(row_detail)
-            {
+            if (row_detail) {
                 let main_address = document.querySelector('input[name="main"]:checked').value;
 
                 if ($(".detail-form").valid()) {
@@ -1046,8 +1073,7 @@
                             $(".body-detail-table").empty()
 
                             list_address.map(item => {
-                                if(item.row == row_detail)
-                                {
+                                if (item.row == row_detail) {
                                     tag_html += `<tr>`;
                                     tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                                     tag_html += row + 1;
@@ -1065,12 +1091,9 @@
                                     tag_html += postal_code;
                                     tag_html += "</td>";
                                     tag_html += "<td class='actions'>";
-                                    if(item.row == main_address)
-                                    {
+                                    if (item.row == main_address) {
                                         tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
                                     }
                                     tag_html += "</td>";
@@ -1090,9 +1113,7 @@
                                     });
 
                                     row = row + 1;
-                                }
-                                else
-                                {
+                                } else {
                                     tag_html += `<tr>`;
                                     tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                                     tag_html += row + 1;
@@ -1110,12 +1131,9 @@
                                     tag_html += item.postal_code;
                                     tag_html += "</td>";
                                     tag_html += "<td class='actions'>";
-                                    if(item.row == main_address)
-                                    {
+                                    if (item.row == main_address) {
                                         tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
                                     }
                                     tag_html += "</td>";
@@ -1139,8 +1157,7 @@
                 }
             }
             // create detail
-            else
-            {
+            else {
                 if ($(".detail-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -1165,7 +1182,7 @@
                                 postal_code: postal_code,
                                 main_address: 0
                             })
-                        let tag_html = "";
+                            let tag_html = "";
                             tag_html += `<tr>`;
                             tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
                             tag_html += row + 1;
@@ -1183,14 +1200,11 @@
                             tag_html += postal_code;
                             tag_html += "</td>";
                             tag_html += "<td class='actions'>";
-                            if(row === 0)
-                            {
+                            if (row === 0) {
                                 tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                            }   
-                            else
-                            {
+                            } else {
                                 tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
-                            } 
+                            }
                             tag_html += "</td>";
                             tag_html += "</tr>";
                             $(".body-detail-table").append(tag_html)
@@ -1204,16 +1218,13 @@
 
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
-            if(list_address.length == 0)
-            {
+            if (list_address.length == 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'List Alamat Pengiriman Tidak Boleh Kosong',
                     confirmButtonColor: '#4e73df',
                 })
-            }
-            else
-            {
+            } else {
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -1232,73 +1243,56 @@
                             let update_list_address = [];
                             let main_address = document.querySelector('input[name="main"]:checked').value;
 
-                            if(list_delete.length !== 0)
-                            {
+                            if (list_delete.length !== 0) {
                                 list_delete.map(obj => {
-                                    update_list_address.push(
-                                        {
+                                    update_list_address.push({
+                                        id: obj.id,
+                                        customer_id: obj.customer_id,
+                                        address: obj.address,
+                                        province_id: obj.province_id,
+                                        city_id: obj.city_id,
+                                        main_address: 0,
+                                        isDelete: true
+                                    })
+                                })
+                            }
+
+                            list_address.map(obj => {
+                                if (main_address == obj.row) {
+                                    if (obj.id) {
+                                        update_list_address.push({
                                             id: obj.id,
                                             customer_id: obj.customer_id,
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
-                                            main_address: 0,
-                                            isDelete: true
-                                        }
-                                    )
-                                })
-                            }
-                            
-                            list_address.map(obj => {
-                                if (main_address == obj.row) {
+                                            main_address: 1
+                                        })
+                                    } else {
+                                        update_list_address.push({
+                                            address: obj.address,
+                                            province_id: obj.province_id,
+                                            city_id: obj.city_id,
+                                            main_address: 1
+                                        })
+                                    }
+                                } else {
                                     if (obj.id) {
-                                        update_list_address.push(
-                                            {
-                                                id: obj.id,
-                                                customer_id: obj.customer_id,
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 1
-                                            }
-                                        )
-                                    }
-                                    else
-                                    {
-                                        update_list_address.push(
-                                            {
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 1
-                                            }
-                                        )
-                                    }
-                                }
-                                else
-                                {
-                                    if (obj.id) {
-                                        update_list_address.push(
-                                            {
-                                                id: obj.id,
-                                                customer_id: obj.customer_id,
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 0
-                                            }
-                                        )
-                                    }
-                                    else
-                                    {
-                                        update_list_address.push(
-                                            {
-                                                address: obj.address,
-                                                province_id: obj.province_id,
-                                                city_id: obj.city_id,
-                                                main_address: 0
-                                            }
-                                        )
+                                        update_list_address.push({
+                                            id: obj.id,
+                                            customer_id: obj.customer_id,
+                                            address: obj.address,
+                                            province_id: obj.province_id,
+                                            city_id: obj.city_id,
+                                            main_address: 0
+                                        })
+                                    } else {
+                                        update_list_address.push({
+                                            address: obj.address,
+                                            province_id: obj.province_id,
+                                            city_id: obj.city_id,
+                                            main_address: 0
+                                        })
                                     }
                                 }
                             })
@@ -1363,16 +1357,13 @@
         console.log(id)
         console.log(main_address)
 
-        if(id === main_address)
-        {
+        if (id === main_address) {
             Swal.fire({
                 icon: 'error',
                 title: 'Main Address Tidak Dapat Dihapus',
                 confirmButtonColor: '#4e73df',
             })
-        }
-        else
-        {
+        } else {
             Swal.fire({
                 icon: 'question',
                 title: 'Hapus Data?',
@@ -1384,7 +1375,7 @@
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    console.log(id)
+                    //console.log(id)
                     let new_list_address = []
                     let tag_html = "";
 
@@ -1392,11 +1383,10 @@
 
                     row = 0;
 
-                    console.log(list_address)
+                    //console.log(list_address)
 
                     list_address.map(item => {
-                        if(item.row != id)
-                        {
+                        if (item.row != id) {
                             tag_html += `<tr>`;
                             tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
                             tag_html += row + 1;
@@ -1414,26 +1404,23 @@
                             tag_html += item.postal_code;
                             tag_html += "</td>";
                             tag_html += "<td class='actions'>";
-                            if(main_address == item.row)
-                            {
+                            if (main_address == item.row) {
                                 tag_html += `<input type="radio" checked id="main" name="main" value="${row + 1}">`;
-                            }   
-                            else
-                            {
+                            } else {
                                 tag_html += `<input type="radio" id="main" name="main" value="${row + 1}">`;
-                            } 
+                            }
                             tag_html += "</td>";
                             tag_html += "</tr>";
 
-                            new_list_address.push({...item, row: row + 1});
+                            new_list_address.push({
+                                ...item,
+                                row: row + 1
+                            });
 
                             row = row + 1;
-                        }
-                        else
-                        {
+                        } else {
                             // sent parameter isDelete if have customer id and id
-                            if(item.id)
-                            {
+                            if (item.id) {
                                 list_delete.push(item)
                             }
                         }
@@ -1451,11 +1438,11 @@
         }
     })
 
-    $(document).on('show.bs.modal','.detail-modal', function () {
-       document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
+    $(document).on('show.bs.modal', '.detail-modal', function() {
+        document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
     })
 
-    $(document).on('hide.bs.modal','.detail-modal', function () {
+    $(document).on('hide.bs.modal', '.detail-modal', function() {
         document.getElementById("add_modal").style = "display: block;";
         $(".add-modal").css("overflow-y", "auto");
     })
@@ -1463,25 +1450,26 @@
     $(document).on('click', '.edit-table-detail', function(evt) {
         console.log(evt.target)
         // if(!$(evt.target).is('.actions')) {
-            $(".title-detail-name").text("Update")
-            $(".delete-detail").css('display', '');
-            let address = $(this).data('address')
-            let province_id = $(this).data('province')
-            let city_id = $(this).data('city')
-            let postal_code = $(this).data('postalcode')
-            let rowid = $(this).data('row')
-            let id = $(this).data('id')
+        $(".title-detail-name").text("Update")
+        $(".delete-detail").css('display', '');
+        let address = $(this).data('address')
+        let province_id = $(this).data('province')
+        let city_id = $(this).data('city')
+        let postal_code = $(this).data('postalcode')
+        let rowid = $(this).data('row')
+        let id = $(this).data('id')
 
-            validator_detail.resetForm();
-            validator_detail.reset();
+        validator_detail.resetForm();
+        validator_detail.reset();
 
-            trigger = false;
-            $(".province_id").val(province_id).trigger('change');
+        trigger = false;
+        $(".province_id").val(province_id).trigger('change');
 
-            $(".id_detail").val(rowid)
-            $(".detail_address").val(address)
+        $(".id_detail").val(rowid)
+        $(".detail_address").val(address)
 
-            // AJAX GET CITY
+        // AJAX GET CITY
+        if (province_id != "") {
             $.ajax({
                 url: `<?= base_url("city"); ?>/${province_id}`,
                 method: "GET",
@@ -1497,9 +1485,10 @@
                     $(".city_id").val(city_id).change()
                     $(".postal_code").val(postal_code)
                     trigger = true;
-                    $(".detail-modal").modal("show")
                 }
             })
+        }
+        $(".detail-modal").modal("show")
         // }
     })
 
@@ -1524,21 +1513,18 @@
     }
 
     const getPostalCode = function() {
-        $(".postal_code").val($(".city_id option:selected").attr("data-code"))
+        //$(".postal_code").val($(".city_id option:selected").attr("data-code"))
     }
 
     const getPostalCodeParent = function() {
-        $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
+        //$(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
     }
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }

@@ -75,7 +75,7 @@
                                     if (!empty($dataProvinces)) {
                                         foreach ($dataProvinces as $province) {
                                     ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                            <option value="<?= $province["id"]; ?>"><?= $province["province_name"]; ?></option>
                                     <?php
                                         }
                                     }
@@ -94,7 +94,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
@@ -203,7 +203,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control owner_name" id="owner_name" name="owner_name" placeholder="Nama Pemilik Rekening" maxlength="100">
+                                <input type="text" class="form-control owner_name" id="owner_name" name="owner_name" placeholder="Nama Pemilik Rekening" maxlength="100">
                                 <label for="floatingInput">Nama Pemilik Rekening</label>
                             </div>
                         </div>
@@ -230,9 +230,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -240,43 +240,43 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Employee</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end mb-3">
-            <div class="col-md-2">
-                <input class="form-control search form-out-search" placeholder="Search" value="" />
+    <div class="section-header">
+        <h1>Employee</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th onclick="changeSort('nip')" class="sort">NIP</th>
-                            <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
-                            <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
-                            <th onclick="changeSort('email')" class="sort">Email</th>
-                            <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
-                            <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
-                            <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
-                            <th onclick="changeSort('status')" class="sort">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('nip')" class="sort">NIP</th>
+                                <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
+                                <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
+                                <th onclick="changeSort('email')" class="sort">Email</th>
+                                <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
+                                <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
+                                <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
+                                <th onclick="changeSort('status')" class="sort">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -289,7 +289,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -392,87 +394,87 @@
 
         //CSS SELECT2 FLOATING LABEL
         $('.province_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $('.province_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.province_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         //CSS SELECT2 FLOATING LABEL
         $('.city_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $('.city_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.city_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         //CSS SELECT2 FLOATING LABEL
         $('.religion_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $('.religion_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.religion_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         //CSS SELECT2 FLOATING LABEL
         $('.marriage_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $('.marriage_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.marriage_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -505,12 +507,12 @@
                 division_id: {
                     required: true,
                 },
-                province_id: {
-                    required: true,
-                },
-                city_id: {
-                    required: true,
-                },
+                // province_id: {
+                //     required: true,
+                // },
+                // city_id: {
+                //     required: true,
+                // },
                 religion_id: {
                     required: true,
                 },
@@ -563,12 +565,12 @@
                 division_id: {
                     required: "Divisi wajib diisi"
                 },
-                province_id: {
-                    required: "Provinsi wajib diisi"
-                },
-                city_id: {
-                    required: "Kota wajib diisi"
-                },
+                // province_id: {
+                //     required: "Provinsi wajib diisi"
+                // },
+                // city_id: {
+                //     required: "Kota wajib diisi"
+                // },
                 religion_id: {
                     required: "Agama wajib diisi"
                 },
@@ -653,7 +655,7 @@
             $(".city_id").val('').change()
             $(".city_id").empty()
             $(".city_id").append(`<option value=""></option>`)
-            
+
             $(".title-name").text("Tambah");
             validator.resetForm();
             validator.reset();
@@ -1046,17 +1048,14 @@
     }
 
     const getZipCode = function() {
-        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
+        //        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
     }
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }

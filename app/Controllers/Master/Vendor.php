@@ -3,94 +3,112 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\ProvincesModel;
+use App\Models\VendorModel;
+use App\Models\BanksModel;
+use App\Models\ListAddressesModel;
 
 class Vendor extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $ProvincesModel;
+    protected $VendorModel;
+    protected $BanksModel;
+    protected $ListAddressesModel;
+
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->ProvincesModel = new ProvincesModel();
+        $this->VendorModel = new VendorModel();
+        $this->BanksModel = new BanksModel();
+        $this->ListAddressesModel = new ListAddressesModel();
     }
 
     public function vendor()
     {
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
 
         $data = [
             "dataProvinces" => $dataProvinces,
         ];
+
 
         return view('Master/vendors/index', $data);
     }
 
     public function allVendor()
     {
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this->this_company_id
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
+
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
+
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
+
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
+
+        $values = [
+            "company_id"    => $this->this_company_id,
+            "search"        => $search
         ];
 
-        $response = curl_request("GET", "/vendors", $this->token, $payload);
-        $dataVendor = [];
-        $totalRecords = 0;
+        $totalRecords = $this->VendorModel->total_list(array());
+        $totalRecordwithFilter = $this->VendorModel->total_list($values);
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $res = $this->VendorModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $number = $row * $rowperpage;
 
-            foreach ($body as $data) {
-                array_push($dataVendor, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "kode" => $data->kode,
-                    "name" => $data->name,
-                    "address" => $data->address,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
-                    "postal_code" => $data->postal_code, 
-                    "no_npwp" => $data->no_npwp,
-                    "phone" => $data->phone,
-                    "contact_person" => $data->contact_person,
-                    "email" => $data->email,
-                    "no_rekening" => $data->no_rekening,
-                    "supplier_buyer" => $data->supplier_buyer,
-                    "ap_name" => $data->ap_name,
-                    "ar_name" => $data->ar_name
-                ]);
-            }
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "number" => ($row + $i + 1),
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "kode" => $res[$i]["kode"],
+                "name" => $res[$i]["name"],
+                "address" => $res[$i]["address"],
+                "province_name" => $res[$i]["province_name"],
+                "city_name" => $res[$i]["city_name"],
+                "postal_code" => $res[$i]["postal_code"],
+                "no_npwp" => $res[$i]["no_npwp"],
+                "phone" => $res[$i]["phone"],
+                "contact_person" => $res[$i]["contact_person"],
+                "email" => $res[$i]["email"],
+                "no_rekening" => $res[$i]["no_rekening"],
+                "supplier_buyer" => $res[$i]["supplier_buyer"],
+                "ap_name" => $res[$i]["ap_name"],
+                "ar_name" => $res[$i]["ar_name"]
+            );
         }
 
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataVendor,
-            "response" => $response,
-            "payload" => $payload
-        ];
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
 
-        echo json_encode($data);
-        return;
+        return $this->response->setJSON($response);
     }
 
     public function saveVendor()
     {
-        try{
+        try {
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -119,12 +137,12 @@ class Vendor extends BaseController
                 "supplier_buyer" => [
                     "rules" => "required"
                 ],
-                "province_parent_id" => [
-                    "rules" => "required"
-                ],
-                "city_parent_id" => [
-                    "rules" => "required"
-                ],
+                // "province_parent_id" => [
+                //     "rules" => "required"
+                // ],
+                // "city_parent_id" => [
+                //     "rules" => "required"
+                // ],
                 "ap_id" => [
                     "rules" => "required"
                 ],
@@ -134,7 +152,7 @@ class Vendor extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $values = [
                     "company_id" => $this->this_company_id,
                     "kode" => $this->request->getPost("kode"),
                     "name" => $this->request->getPost("name"),
@@ -143,6 +161,8 @@ class Vendor extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
+                    "bank_id" => $this->request->getPost("bank_id"),
+                    "nama_rekening" => $this->request->getPost("nama_rekening"),
                     "no_rekening" => $this->request->getPost("no_rekening"),
                     "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                     "province_id" => $this->request->getPost("province_parent_id"),
@@ -150,24 +170,35 @@ class Vendor extends BaseController
                     "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "list_address" => json_decode($this->request->getPost("list_address"))
-                ]);
+                ];
+                $id = $this->VendorModel->insert($values);
+                if ($id > 0) {
+                    $dlist_address = json_decode($this->request->getPost("list_address"), true);
+                    for ($i = 0; $i < count($dlist_address); $i++) {
+                        $values = [
+                            "vendor_id"   => $id,
+                            "address"       => $dlist_address[$i]["address"],
+                            "province_id"   => isset($dlist_address[$i]["province_id"]) ? $dlist_address[$i]["province_id"] : "",
+                            "city_id"       => isset($dlist_address[$i]["city_id"]) ? $dlist_address[$i]["city_id"] : "",
+                            "postal_code"   => isset($dlist_address[$i]["postal_code"]) ? $dlist_address[$i]["postal_code"] : "",
+                            "main_address"  => isset($dlist_address[$i]["main_address"]) ? $dlist_address[$i]["main_address"] : "0",
+                        ];
+                        $this->ListAddressesModel->insert($values);
+                    }
 
-                $response = curl_request("POST", "/vendors", $this->token, $payload);
-
-                if ($response["code"] === 200) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -180,9 +211,7 @@ class Vendor extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -195,7 +224,7 @@ class Vendor extends BaseController
 
     public function updateVendor()
     {
-        try{
+        try {
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -224,12 +253,12 @@ class Vendor extends BaseController
                 "supplier_buyer" => [
                     "rules" => "required"
                 ],
-                "province_parent_id" => [
-                    "rules" => "required"
-                ],
-                "city_parent_id" => [
-                    "rules" => "required"
-                ],
+                // "province_parent_id" => [
+                //     "rules" => "required"
+                // ],
+                // "city_parent_id" => [
+                //     "rules" => "required"
+                // ],
                 "ap_id" => [
                     "rules" => "required"
                 ],
@@ -241,7 +270,7 @@ class Vendor extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $values = [
                     "company_id" => $this->this_company_id,
                     "kode" => $this->request->getPost("kode"),
                     "name" => $this->request->getPost("name"),
@@ -257,34 +286,57 @@ class Vendor extends BaseController
                     "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "list_address" => json_decode($this->request->getPost("list_address"))
-                ]);
-            }
+                ];
 
-            if ($payload) {
-                $response = curl_request("PATCH", "/vendors/$id", $this->token, $payload);
+                if ($this->VendorModel->update($id, $values)) {
+                    $dlist_address = json_decode($this->request->getPost("list_address"), true);
 
-                if ($response["code"] === 200) {
+                    for ($i = 0; $i < count($dlist_address); $i++) {
+
+                        $values = [
+                            "vendor_id"   => $id,
+                            "address"       => $dlist_address[$i]["address"],
+                            "province_id"   => isset($dlist_address[$i]["province_id"]) ? $dlist_address[$i]["province_id"] : "",
+                            "city_id"       => isset($dlist_address[$i]["city_id"]) ? $dlist_address[$i]["city_id"] : "",
+                            "postal_code"   => isset($dlist_address[$i]["postal_code"]) ? $dlist_address[$i]["postal_code"] : "",
+                            "main_address"  => isset($dlist_address[$i]["main_address"]) ? $dlist_address[$i]["main_address"] : "0",
+                        ];
+
+                        if (isset($dlist_address[$i]["isDelete"])) {
+                            if ($dlist_address[$i]["isDelete"] == 1) {
+                                $values = [
+                                    "deletedAt" => date("Y-m-d H:i:s")
+                                ];
+
+                                $this->ListAddressesModel->update($dlist_address[$i]["id"], $values);
+                            }
+                        } else {
+                            if (isset($dlist_address[$i]["id"])) {
+                                $this->ListAddressesModel->update($dlist_address[$i]["id"], $values);
+                            } else {
+                                $this->ListAddressesModel->insert($values);
+                            }
+                        }
+                    }
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -298,15 +350,25 @@ class Vendor extends BaseController
     public function getByIdVendor($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/vendors/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->VendorModel->get_by_id($id, '1');
+            if (count($res) > 0) {
+                $res_list = $this->ListAddressesModel->get_by_vendor_id($id, '1');
+                for ($i = 0; $i < count($res_list); $i++) {
+                    $res_list[$i]->province_id = ($res_list[$i]->province_id == null) ? "" : $res_list[$i]->province_id;
+                    $res_list[$i]->province_name = ($res_list[$i]->province_name == null) ? "" : $res_list[$i]->province_name;
+                    $res_list[$i]->city_id = ($res_list[$i]->city_id == null) ? "" : $res_list[$i]->city_id;
+                    $res_list[$i]->city_name = ($res_list[$i]->city_name == null) ? "" : $res_list[$i]->city_name;
+                    $res_list[$i]->postal_code = ($res_list[$i]->postal_code == null) ? "" : $res_list[$i]->postal_code;
+                }
+                $res[0]["list_address"] = $res_list;
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"    => $res[0]
+                    //"data"  => json_decode($response["body"])->data,
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+                $message = 'Data Gagal Ditampilkan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -325,12 +387,18 @@ class Vendor extends BaseController
 
     public function deleteVendor()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/vendors/$id", $this->token);
-                if ($response["code"] === 200) {
+                $res_list = $this->ListAddressesModel->get_by_vendor_id($id);
+                for ($i = 0; $i < count($res_list); $i++) {
+                    $values = [
+                        "deletedAt" => date("Y-m-d H:i:s")
+                    ];
+                    $this->ListAddressesModel->update($res_list[$i]["id"], $values);
+                }
+                if ($this->VendorModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -338,7 +406,7 @@ class Vendor extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -354,9 +422,7 @@ class Vendor extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

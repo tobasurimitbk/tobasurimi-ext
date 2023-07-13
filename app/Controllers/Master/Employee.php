@@ -3,28 +3,28 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\ProvincesModel;
+use App\Models\EmployeesModel;
 
 class Employee extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $ProvincesModel;
+    protected $EmployeesModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->ProvincesModel = new ProvincesModel();
+        $this->EmployeesModel = new EmployeesModel();
     }
 
     public function employee()
     {
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
-
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $data = [
             "dataProvinces" => $dataProvinces,
         ];
@@ -35,10 +35,10 @@ class Employee extends BaseController
     public function dropdownEmployee()
     {
         $dataEmployee = [];
-        $responseEmployee = curl_request("GET", "/employees/selectOption?idCompany=$this->this_company_id", $this->token);
-        if ($responseEmployee["code"] === 200) {
-            $dataEmployee = json_decode($responseEmployee["body"])->data;
-        }
+        // $responseEmployee = curl_request("GET", "/employees/selectOption?idCompany=$this->this_company_id", $this->token);
+        // if ($responseEmployee["code"] === 200) {
+        //     $dataEmployee = json_decode($responseEmployee["body"])->data;
+        // }
 
         $data = [
             "data" => $dataEmployee
@@ -66,58 +66,66 @@ class Employee extends BaseController
 
     public function allEmployee()
     {
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this->this_company_id
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
+
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
+
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
+
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
+
+        $values = [
+            "company_id"    => $this->this_company_id,
+            "search"        => $search
         ];
 
-        $response = curl_request("GET", "/employees", $this->token, $payload);
-        $dataRole = [];
-        $totalRecords = 0;
+        $totalRecords = $this->EmployeesModel->total_list(array());
+        $totalRecordwithFilter = $this->EmployeesModel->total_list($values);
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $res = $this->EmployeesModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $number = $row * $rowperpage;
 
-            foreach ($body as $data) {
-                array_push($dataRole, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "nip" => $data->nip,
-                    "name" => $data->name,
-                    "divisionName" => $data->divisionName,
-                    "email" => $data->email,
-                    "phone_no" => $data->phone_no,
-                    "dob" => $data->dob,
-                    "gender" => $data->gender,
-                    "acc_no" => $data->acc_no,
-                    "status" => $data->status,
-                ]);
-            }
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "nip" => $res[$i]["nip"],
+                "name" => $res[$i]["name"],
+                "divisionName" => $res[$i]["divisionName"],
+                "email" => $res[$i]["email"],
+                "phone_no" => $res[$i]["phone_no"],
+                "dob" => date("d/m/Y", strtotime($res[$i]["dob"])),
+                "gender" => $res[$i]["gender"],
+                "acc_no" => $res[$i]["acc_no"],
+                "status" => $res[$i]["status"],
+            );
         }
 
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataRole,
-            "response" => $response,
-            "payload" => $payload
-        ];
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
 
-        echo json_encode($data);
-        return;
+        return $this->response->setJSON($response);
     }
 
     public function saveEmployee()
     {
-        try{
+        try {
             $rules = [
                 "nip" => [
                     "rules" => "required"
@@ -176,82 +184,53 @@ class Employee extends BaseController
                 $payload = '';
 
                 $file = $this->request->getFile("employeeImg");
-
+                $values = [
+                    "company_id" => $this->this_company_id,
+                    "nip" => $this->request->getPost("nip"),
+                    "name" => $this->request->getPost("name"),
+                    "gender" => $this->request->getPost("gender"),
+                    "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
+                    "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
+                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                    "phone_no" => $this->request->getPost("phone_no"),
+                    "acc_no" => $this->request->getPost("acc_no"),
+                    "email" => $this->request->getPost("email"),
+                    "address" => $this->request->getPost("address"),
+                    "status" => $this->request->getPost("status"),
+                    "nik" => $this->request->getPost("nik"),
+                    "child" => $this->request->getPost("child"),
+                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                    "jabatan" => $this->request->getPost("jabatan"),
+                    "bank_name" => $this->request->getPost("bank_name"),
+                    "owner_name" => $this->request->getPost("owner_name"),
+                    "pin"  => $this->request->getPost("pin")
+                ];
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
                     if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                         $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-
-                        $payload = json_encode([
-                            "company_id" => $this->this_company_id,
-                            "employeeImg" => $image,
-                            "nip" => $this->request->getPost("nip"),
-                            "name" => $this->request->getPost("name"),
-                            "gender" => $this->request->getPost("gender"),
-                            "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
-                            "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                            "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                            "phone_no" => $this->request->getPost("phone_no"),
-                            "acc_no" => $this->request->getPost("acc_no"),
-                            "email" => $this->request->getPost("email"),
-                            "address" => $this->request->getPost("address"),
-                            "status" => $this->request->getPost("status"),
-                            "nik" => $this->request->getPost("nik"),
-                            "child" => $this->request->getPost("child"),
-                            "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                            "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                            "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                            "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                            "jabatan" => $this->request->getPost("jabatan"),
-                            "bank_name" => $this->request->getPost("bank_name"),
-                            "owner_name" => $this->request->getPost("owner_name"),
-                            "pin"  => $this->request->getPost("pin")
-                        ]);
+                        $values["employee_img"] = $image;
                     }
-                } else {
-                    $payload = json_encode([
-                        "company_id" => $this->this_company_id,
-                        "nip" => $this->request->getPost("nip"),
-                        "name" => $this->request->getPost("name"),
-                        "gender" => $this->request->getPost("gender"),
-                        "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
-                        "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                        "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                        "phone_no" => $this->request->getPost("phone_no"),
-                        "acc_no" => $this->request->getPost("acc_no"),
-                        "email" => $this->request->getPost("email"),
-                        "address" => $this->request->getPost("address"),
-                        "status" => $this->request->getPost("status"),
-                        "nik" => $this->request->getPost("nik"),
-                        "child" => $this->request->getPost("child"),
-                        "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                        "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                        "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                        "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                        "jabatan" => $this->request->getPost("jabatan"),
-                        "bank_name" => $this->request->getPost("bank_name"),
-                        "owner_name" => $this->request->getPost("owner_name"),
-                        "pin"  => $this->request->getPost("pin")
-                    ]);
                 }
 
-                if ($payload) {
-                    $response = curl_request("POST", "/employees", $this->token, $payload);
-
-                    if ($response["code"] === 200) {
+                if (isset($values)) {
+                    if ($this->EmployeesModel->insert($values)) {
                         $data = [
                             "status"            => true,
                             "message"   => "Data Berhasil disimpan",
-                            "payload"   => $payload,
+                            "payload"   => "",
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
                     } else {
-                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                        $message = 'Data Gagal Disimpan';
                         $data = [
                             "status"            => false,
                             "message"    => $message,
-                            "payload"   => $payload,
+                            "payload"   => "",
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
@@ -273,9 +252,7 @@ class Employee extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -288,7 +265,7 @@ class Employee extends BaseController
 
     public function updateEmployee()
     {
-        try{
+        try {
             $rules = [
                 "nip" => [
                     "rules" => "required"
@@ -348,79 +325,53 @@ class Employee extends BaseController
 
                 $id = $this->request->getPost("id");
 
+                $values = [
+                    "company_id" => $this->this_company_id,
+                    "nip" => $this->request->getPost("nip"),
+                    "name" => $this->request->getPost("name"),
+                    "gender" => $this->request->getPost("gender"),
+                    "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
+                    "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
+                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                    "phone_no" => $this->request->getPost("phone_no"),
+                    "acc_no" => $this->request->getPost("acc_no"),
+                    "email" => $this->request->getPost("email"),
+                    "address" => $this->request->getPost("address"),
+                    "status" => $this->request->getPost("status"),
+                    "nik" => $this->request->getPost("nik"),
+                    "child" => $this->request->getPost("child"),
+                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                    "jabatan" => $this->request->getPost("jabatan"),
+                    "bank_name" => $this->request->getPost("bank_name"),
+                    "owner_name" => $this->request->getPost("owner_name"),
+                ];
                 $file = $this->request->getFile("employeeImg");
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
                     if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                         $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-
-                        $payload = json_encode([
-                            "company_id" => $this->this_company_id,
-                            "employeeImg" => $image,
-                            "nip" => $this->request->getPost("nip"),
-                            "name" => $this->request->getPost("name"),
-                            "gender" => $this->request->getPost("gender"),
-                            "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
-                            "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                            "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                            "phone_no" => $this->request->getPost("phone_no"),
-                            "acc_no" => $this->request->getPost("acc_no"),
-                            "email" => $this->request->getPost("email"),
-                            "address" => $this->request->getPost("address"),
-                            "status" => $this->request->getPost("status"),
-                            "nik" => $this->request->getPost("nik"),
-                            "child" => $this->request->getPost("child"),
-                            "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                            "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                            "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                            "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                            "jabatan" => $this->request->getPost("jabatan"),
-                            "bank_name" => $this->request->getPost("bank_name"),
-                            "owner_name" => $this->request->getPost("owner_name"),
-                        ]);
+                        $values["employee_img"] = $image;
                     }
-                } else {
-                    $payload = json_encode([
-                        "company_id" => $this->this_company_id,
-                        "nip" => $this->request->getPost("nip"),
-                        "name" => $this->request->getPost("name"),
-                        "gender" => $this->request->getPost("gender"),
-                        "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                        "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                        "phone_no" => $this->request->getPost("phone_no"),
-                        "acc_no" => $this->request->getPost("acc_no"),
-                        "email" => $this->request->getPost("email"),
-                        "address" => $this->request->getPost("address"),
-                        "status" => $this->request->getPost("status"),
-                        "nik" => $this->request->getPost("nik"),
-                        "child" => $this->request->getPost("child"),
-                        "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                        "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                        "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                        "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                        "jabatan" => $this->request->getPost("jabatan"),
-                        "bank_name" => $this->request->getPost("bank_name"),
-                        "owner_name" => $this->request->getPost("owner_name"),
-                    ]);
                 }
 
-                if ($payload) {
-                    $response = curl_request("PATCH", "/employees/$id", $this->token, $payload);
-
-                    if ($response["code"] === 200) {
+                if (isset($values)) {
+                    if ($this->EmployeesModel->update($id, $values)) {
                         $data = [
                             "status"            => true,
                             "message"   => "Data Berhasil diubah",
-                            "payload"   => $payload,
+                            "payload"   => "",
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
                     } else {
-                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                        $message = 'Data Gagal Diubah';
                         $data = [
                             "status"            => false,
                             "message"    => $message,
-                            "payload"   => $payload,
+                            "payload"   => "",
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
@@ -442,9 +393,7 @@ class Employee extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -458,15 +407,16 @@ class Employee extends BaseController
     public function getByIdEmployee($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/employees/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->EmployeesModel->get_by_id($id);
+            //            $response = curl_request("GET", "/employees/$id?idCompany=$this->this_company_id", $this->token);
+            if (count($res)) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -485,12 +435,14 @@ class Employee extends BaseController
 
     public function deleteEmployee()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/employees/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->EmployeesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -498,7 +450,7 @@ class Employee extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -514,9 +466,7 @@ class Employee extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
