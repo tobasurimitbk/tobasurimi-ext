@@ -3,45 +3,36 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\WarehousesModel;
+use App\Models\ProvincesModel;
+use App\Models\EmployeesModel;
 
 class Warehouse extends BaseController
 {
     protected $token;
-    
+    protected $this_company_id;
+    protected $WarehousesModel;
+    protected $ProvincesModel;
+    protected $EmployeesModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
+        $this->WarehousesModel = new WarehousesModel();
+        $this->ProvincesModel = new ProvincesModel();
+        $this->EmployeesModel = new EmployeesModel();
     }
 
     public function warehouse()
     {
-        //Get Warehouses
-        $responseWarehouses = curl_request("GET", "/warehouses", $this->token);
-
-        $dataWarehouses = [];
-        if ($responseWarehouses["code"] === 200) {
-            $dataWarehouses = json_decode($responseWarehouses["body"])->data;
-        }
-
-        //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
-
-        //Get Pic
-        $responsePic = curl_request("GET", "/employees/selectOption", $this->token);
-
-        $dataPic = [];
-        if ($responsePic["code"] === 200) {
-            $dataPic = json_decode($responsePic["body"])->data;
-        }
+        //$dataWarehouses = $this->WarehousesModel->search_list(array("company_id" => $this->this_company_id), 'warehouse_name');
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
+        $dataPic = $this->EmployeesModel->search_list(array(), 'name');
 
         $data = [
             "dataPic" => $dataPic,
-            "dataWarehouses" => $dataWarehouses,
+            //  "dataWarehouses" => $dataWarehouses,
             "dataProvinces" => $dataProvinces
         ];
 
@@ -50,59 +41,68 @@ class Warehouse extends BaseController
 
     public function allWarehouse()
     {
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType")
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
+
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
+
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
+
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
+
+        $values = [
+            "company_id"    => $this->this_company_id,
+            "search"        => $search
         ];
 
-        $response = curl_request("GET", "/warehouses", $this->token, $payload);
-        $dataWarehouse = [];
-        $totalRecords = 0;
+        $totalRecords = $this->WarehousesModel->total_list(array());
+        $totalRecordwithFilter = $this->WarehousesModel->total_list($values);
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $res = $this->WarehousesModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $number = $row * $rowperpage;
 
-            foreach ($body as $data) {
-                array_push($dataWarehouse, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "code_warehouse" => $data->code_warehouse,
-                    "warehouse_name" => $data->warehouse_name,
-                    "address" => $data->address,
-                    "province_id" => $data->province_id,
-                    "city_id" => $data->city_id,
-                    "zip_code" => $data->zip_code,
-                    "phone" => $data->phone,
-                    "email" => $data->email,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
-                    "pic_name" => $data->pic_name
-                ]);
-            }
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "code_warehouse" => $res[$i]["code_warehouse"],
+                "warehouse_name" => $res[$i]["warehouse_name"],
+                "address" => $res[$i]["address"],
+                "province_id" => $res[$i]["province_id"],
+                "city_id" => $res[$i]["city_id"],
+                "zip_code" => $res[$i]["zip_code"],
+                "phone" => $res[$i]["phone"],
+                "email" => $res[$i]["email"],
+                "province_name" => $res[$i]["province_name"],
+                "city_name" => $res[$i]["city_name"],
+                "pic_name" => $res[$i]["pic_name"],
+            );
         }
 
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataWarehouse,
-            "response" => $response,
-            "payload" => $payload
-        ];
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
 
-        echo json_encode($data);
-        return;
+        return $this->response->setJSON($response);
     }
 
     public function saveWarehouse()
     {
-        try{
+        try {
             $rules = [
                 "code_warehouse" => [
                     "rules" => "required"
@@ -134,7 +134,8 @@ class Warehouse extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $values = [
+                    "company_id"    => $this->this_company_id,
                     "code_warehouse" => $this->request->getPost("code_warehouse"),
                     "warehouse_name" => $this->request->getPost("warehouse_name"),
                     "address" => $this->request->getPost("address"),
@@ -144,24 +145,22 @@ class Warehouse extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "email" => $this->request->getPost("email"),
                     "pic_id" => $this->request->getPost("pic_id"),
-                ]);
+                ];
 
-                $response = curl_request("POST", "/warehouses", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->WarehousesModel->insert($values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -174,9 +173,7 @@ class Warehouse extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -189,7 +186,7 @@ class Warehouse extends BaseController
 
     public function updateWarehouse()
     {
-        try{
+        try {
             $rules = [
                 "code_warehouse" => [
                     "rules" => "required"
@@ -223,7 +220,7 @@ class Warehouse extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $values = [
                     "code_warehouse" => $this->request->getPost("code_warehouse"),
                     "warehouse_name" => $this->request->getPost("warehouse_name"),
                     "address" => $this->request->getPost("address"),
@@ -233,34 +230,28 @@ class Warehouse extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "email" => $this->request->getPost("email"),
                     "pic_id" => $this->request->getPost("pic_id"),
-                ]);
-            }
+                ];
 
-            if ($payload) {
-                $response = curl_request("PATCH", "/warehouses/$id", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->WarehousesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -274,15 +265,16 @@ class Warehouse extends BaseController
     public function getByIdWarehouse($id = null)
     {
         if (!empty($id)) {
+            $res = $this->WarehousesModel->get_by_id($id);
             $response = curl_request("GET", "/warehouses/$id", $this->token);
-            if ($response["code"] === 200) {
+            if (count($res)) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
+                $message = 'Data Gagal Ditampilkan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -301,12 +293,14 @@ class Warehouse extends BaseController
 
     public function deleteWarehouse()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/warehouses/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->WarehousesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -314,7 +308,7 @@ class Warehouse extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -330,9 +324,7 @@ class Warehouse extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -345,11 +337,7 @@ class Warehouse extends BaseController
 
     public function dropdownWarehouse()
     {
-        $dataWarehouse = [];
-        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
-        if ($responseWarehouse["code"] === 200) {
-            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
-        }
+        $dataWarehouse = $this->WarehousesModel->get_by_company_id($this->this_company_id);
 
         $data = [
             "data" => $dataWarehouse
