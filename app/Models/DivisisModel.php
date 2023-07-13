@@ -28,7 +28,7 @@ class DivisisModel extends Model
 
     public function get_by_company_id($company_id)
     {
-        $requete = "SELECT * FROM divisis WHERE company_id='" . $company_id . "'";
+        $requete = "SELECT * FROM divisis WHERE divisis.deletedAt is null and company_id='" . $company_id . "'";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();
@@ -38,6 +38,8 @@ class DivisisModel extends Model
     {
         $requete = "SELECT divisis.* FROM divisis ";
         $requete .= "WHERE divisis.deletedAt is null ";
+        if (isset($values["company_id"]))
+            $requete .= ($values["company_id"] == "") ? "" : ("AND divisis.company_id ='" . $values["company_id"] . "' ");
         if (isset($values["name"]))
             $requete .= ($values["divisi"] == "") ? "" : ("AND UPPER(divisis.divisi) like '%" . strtoupper($values["divisi"]) . "%' ");
         if (isset($values["search"]))
@@ -58,6 +60,8 @@ class DivisisModel extends Model
     {
         $requete  = "SELECT count(*) as total FROM divisis ";
         $requete .= "WHERE divisis.deletedAt is null ";
+        if (isset($values["company_id"]))
+            $requete .= ($values["company_id"] == "") ? "" : ("AND divisis.company_id ='" . $values["company_id"] . "' ");
         if (isset($values["name"]))
             $requete .= ($values["divisi"] == "") ? "" : ("AND UPPER(divisis.divisi) like '%" . strtoupper($values["divisi"]) . "%' ");
         if (isset($values["search"]))

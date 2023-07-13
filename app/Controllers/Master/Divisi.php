@@ -20,23 +20,18 @@ class Divisi extends BaseController
 
     public function divisi()
     {
-        //Get Divisi
-        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
-
-        $dataDivisi = [];
-        if ($responseDivisi["code"] === 200) {
-            $dataDivisi = json_decode($responseDivisi["body"])->data;
-        }
-
+        $dataDivisi = $this->DivisisModel->search_list(array(), 'divisi');
         $data = [
             "dataDivisi" => $dataDivisi,
         ];
+
 
         return view('Master/divisi/index', $data);
     }
 
     public function allDivisi()
     {
+        /*
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -76,6 +71,55 @@ class Divisi extends BaseController
 
         echo json_encode($data);
         return;
+        */
+
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
+
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
+
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
+
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
+
+        $values = [
+            "company_id"    => $this->this_company_id,
+            "search"        => $search
+        ];
+
+        $totalRecords = $this->DivisisModel->total_list(array());
+        $totalRecordwithFilter = $this->DivisisModel->total_list($values);
+
+        $res = $this->DivisisModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+
+        $number = $row * $rowperpage;
+
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "divisi" => $res[$i]["divisi"],
+            );
+        }
+
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
+
+        return $this->response->setJSON($response);
     }
 
     public function saveDivisi()
@@ -88,27 +132,24 @@ class Divisi extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $values = [
                     "company_id" => $this->this_company_id,
                     "divisi" => $this->request->getPost("divisi")
-                ]);
-
-                $response = curl_request("POST", "/divisis", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                ];
+                if ($this->DivisisModel->insert($values)) {
                     $data = [
-                        "status"            => true,
+                        "status"    => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -142,29 +183,28 @@ class Divisi extends BaseController
             ];
 
             if ($this->validate($rules)) {
+
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $values = [
                     "company_id" => $this->this_company_id,
                     "divisi" => $this->request->getPost("divisi")
-                ]);
+                ];
 
-                $response = curl_request("PATCH", "/divisis/$id", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->DivisisModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -191,15 +231,15 @@ class Divisi extends BaseController
     public function getByIdDivisi($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/divisis/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->DivisisModel->get_by_id($id);
+            if (count($res)) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -222,8 +262,10 @@ class Divisi extends BaseController
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/divisis/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->DivisisModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -231,7 +273,7 @@ class Divisi extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,

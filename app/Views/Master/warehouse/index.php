@@ -48,7 +48,7 @@
                                     if (!empty($dataProvinces)) {
                                         foreach ($dataProvinces as $province) {
                                     ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
+                                            <option value="<?= $province["id"]; ?>"><?= $province["province_name"]; ?></option>
                                     <?php
                                         }
                                     }
@@ -59,7 +59,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id" onchange="getZipCode()">
+                                <select class="form-select city_id" name="city_id" id="city_id">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Kota</label>
@@ -67,8 +67,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
-                                <label for="floatingInput">kode Pos</label>
+                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
                     </div>
@@ -82,6 +82,16 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select pic_id" name="pic_id" id="pic_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataPic)) {
+                                        foreach ($dataPic as $pic) {
+                                    ?>
+                                            <option value="<?= $pic["id"]; ?>"><?= $pic["nip"] . " - " . $pic["name"]; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
                                 </select>
                                 <label for="floatingInput">PIC</label>
                             </div>
@@ -101,44 +111,44 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Warehouse</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end mb-3">
-            <div class="col-md-2">
-                <input class="form-control search form-out-search" placeholder="Search" value="" />
+    <div class="section-header">
+        <h1>Warehouse</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th onclick="changeSort('code_warehouse')" class="sort">Kode Warehouse</th>
-                            <th onclick="changeSort('warehouse_name')" class="sort">Nama Warehouse</th>
-                            <th onclick="changeSort('address')" class="sort">Alamat</th>
-                            <th onclick="changeSort('phone')" class="sort">Nomor Telepon</th>
-                            <th onclick="changeSort('email')" class="sort">Email</th>
-                            <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
-                            <th onclick="changeSort('city_name')" class="sort">Kota</th>
-                            <th onclick="changeSort('zip_code')" class="sort">Kode Pos</th>
-                            <th onclick="changeSort('pic_name')" class="sort">PIC</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('code_warehouse')" class="sort">Kode Warehouse</th>
+                                <th onclick="changeSort('warehouse_name')" class="sort">Nama Warehouse</th>
+                                <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th onclick="changeSort('phone')" class="sort">Nomor Telepon</th>
+                                <th onclick="changeSort('email')" class="sort">Email</th>
+                                <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
+                                <th onclick="changeSort('city_name')" class="sort">Kota</th>
+                                <th onclick="changeSort('zip_code')" class="sort">Kode Pos</th>
+                                <th onclick="changeSort('pic_name')" class="sort">PIC</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -147,80 +157,82 @@
     let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            serverSide: true,
-            ordering: true,
-            order: [[1, 'asc']],
-            fixedHeader: true,
-            lengthMenu: [
-                [25],
-                [25],
-            ],
-            pageLength: 25,
-            ajax: {
-                url: "<?= base_url("warehouse/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                    data.sort = sort;
-                    data.sortType = sortType;
-                }
-            },
-            // scrollX: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            //responsive: true,
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            }, {
-                data: "code_warehouse",
-                className: "text-center"
-            }, {
-                data: "warehouse_name",
-                className: "text-center"
-            }, {
-                data: "address",
-                className: "text-center"
-            }, {
-                data: "phone",
-                className: "text-center"
-            }, {
-                data: "email",
-                className: "text-center"
-            }, {
-                data: "province_name",
-                className: "text-center"
-            }, {
-                data: "city_name",
-                className: "text-center"
-            }, {
-                data: "zip_code",
-                className: "text-center"
-            }, {
-                data: "pic_name",
-                className: "text-center"
-            }],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("warehouse/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.sort = sort;
+                data.sortType = sortType;
             }
-        });
+        },
+        // scrollX: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
+            data: "code_warehouse",
+            className: "text-center"
+        }, {
+            data: "warehouse_name",
+            className: "text-center"
+        }, {
+            data: "address",
+            className: "text-center"
+        }, {
+            data: "phone",
+            className: "text-center"
+        }, {
+            data: "email",
+            className: "text-center"
+        }, {
+            data: "province_name",
+            className: "text-center"
+        }, {
+            data: "city_name",
+            className: "text-center"
+        }, {
+            data: "zip_code",
+            className: "text-center"
+        }, {
+            data: "pic_name",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     $(document).ready(function() {
         var validator = $(".create-form").validate({
@@ -419,22 +431,23 @@
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
 
-            $.ajax({
-                url: `<?= base_url("employee-pic/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(result) {
-                    $(".pic_id").empty()
-                    $(".pic_id").val("").change()
-                    $(".pic_id").append(`<option value=""></option>`)
-                    result.data.forEach(function(item) {
-                        $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
-                    })
+            // $.ajax({
+            //     url: `<?= base_url("employee-pic/dropdown"); ?>`,
+            //     method: "GET",
+            //     dataType: "json",
+            //     success: function(result) {
+            //         $(".pic_id").empty()
+            //         $(".pic_id").val("").change()
+            //         $(".pic_id").append(`<option value=""></option>`)
+            //         result.data.forEach(function(item) {
+            //             $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+            //         })
 
-                    $(".pic_id").val('').change();
-                    $(".add-modal").modal("show")
-                }
-            })
+            //         $(".pic_id").val('').change();
+            //         $(".add-modal").modal("show")
+            //     }
+            // })
+            $(".add-modal").modal("show")
         })
 
         $(".btn-hide-form").click(function() {
@@ -465,21 +478,22 @@
                         $(".email").val(res?.data?.email);
                         $(".province_id").val(res?.data?.province_id).change();
 
-                        $.ajax({
-                            url: `<?= base_url("employee-pic/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".pic_id").empty()
-                                $(".pic_id").val("").change()
-                                $(".pic_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
-                                })
+                        // $.ajax({
+                        //     url: `<?= base_url("employee-pic/dropdown"); ?>`,
+                        //     method: "GET",
+                        //     dataType: "json",
+                        //     success: function(result) {
+                        //         $(".pic_id").empty()
+                        //         $(".pic_id").val("").change()
+                        //         $(".pic_id").append(`<option value=""></option>`)
+                        //         result.data.forEach(function(item) {
+                        //             $(".pic_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+                        //         })
 
-                                $(".pic_id").val(res?.data?.pic_id).change();
-                            }
-                        })
+                        //         $(".pic_id").val(res?.data?.pic_id).change();
+                        //     }
+                        // })
+                        $(".pic_id").val(res?.data?.pic_id).change()
 
                         // AJAX GET CITY
                         $.ajax({
@@ -657,18 +671,11 @@
         }
     }
 
-    const getZipCode = function() {
-        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
-    }
-
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
