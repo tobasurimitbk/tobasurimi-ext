@@ -4,19 +4,31 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 
-use App\Models\penerimaanBarangModel;
+use App\Models\AMPurchaseOrderModel;
+use App\Models\MetadataModel;
+use App\Models\PenerimaanBarangModel;
+use App\Models\RMPurchaseOrderModel;
+use App\Models\SupplierModel;
 
 class PenerimaanBarangLokal extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $amPurchaseOrderModel;
+    protected $metadataModel;
     protected $penerimaanBarangModel;
+    protected $rmPurchaseOrderModel;
+    protected $supplierModel;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->metadataModel = new MetadataModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $this->supplierModel = new SupplierModel();
     }
 
     public function penerimaanBarangLokal()
@@ -27,19 +39,10 @@ class PenerimaanBarangLokal extends BaseController
     public function createPenerimaanBarangLokal()
     {
         //Get AJU
-        $responseAJU = curl_request("GET", "/penerimaanBarang/drop-down-aju", $this->token);
+        $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
 
-        $dataAJU = [];
-        if ($responseAJU["code"] === 200) {
-            $dataAJU = json_decode($responseAJU["body"])->data;
-        }
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
-
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
+        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
         $data = [
             "dataSupplier" => $dataSupplier,
@@ -52,69 +55,48 @@ class PenerimaanBarangLokal extends BaseController
     public function getByIdPenerimaanBarangLokal($id = null)
     {
         //Get AJU
-        $responseAJU = curl_request("GET", "/penerimaanBarang/drop-down-aju", $this->token);
-
-        $dataAJU = [];
-        if ($responseAJU["code"] === 200) {
-            $dataAJU = json_decode($responseAJU["body"])->data;
-        }
+        $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         $data["dataAJU"] = $dataAJU;
 
         if (!empty($id)) {
-            $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/$id", $this->token);
+            $dataPenerimaanBarang = $this->penerimaanBarangModel->asObject()->find($id);
+            if($dataPenerimaanBarang)
+            {
+                $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
 
-            $dataPenerimaanBarang = [];
-            if ($responsePenerimaanBarang["code"] === 200) {
-                $status_penerimaan = json_decode($responsePenerimaanBarang["body"])->data->status_penerimaan;
                 if($status_penerimaan === "LOKAL")
                 {
-                    $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
+                    $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
 
-                    $tipe_bahan = json_decode($responsePenerimaanBarang["body"])->data->tipe_bahan;
+                    $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
+
                     if($tipe_bahan === "BAKU")
                     {
-                        $dataNo = [];
-                        $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
-                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=BAKU&supplierid=$arr", $this->token);
-                        if ($responseNo["code"] === 200) {
-                            $dataNo = json_decode($responseNo["body"])->data;
-                        }
+                        $supplier_id = $dataPenerimaanBarang->supplier_id;
+
+                        $dataNo = $this->rmPurchaseOrderModel->getNoPenerimaanBarang($supplier_id, $this->this_company_id);
 
                         //Get Supplier
-                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+                        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
-                        $dataSupplier = [];
-                        if ($responseSupplier["code"] === 200) {
-                            $dataSupplier = json_decode($responseSupplier["body"])->data;
-                        }
-                        
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
                     }
                     if($tipe_bahan === "PENOLONG")
                     {
-                        $dataNo = [];
-                        $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
-                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=PENOLONG&supplierid=$arr", $this->token);
-                        if ($responseNo["code"] === 200) {
-                            $dataNo = json_decode($responseNo["body"])->data;
-                        }
+                        $supplier_id = $dataPenerimaanBarang->supplier_id;
+
+                        $dataNo = $this->amPurchaseOrderModel->getNoPenerimaanBarangPenolong("Lokal", $supplier_id, $this->this_company_id);
 
                         //Get Supplier
-                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
-
-                        $dataSupplier = [];
-                        if ($responseSupplier["code"] === 200) {
-                            $dataSupplier = json_decode($responseSupplier["body"])->data;
-                        }
+                        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
 
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
                     }
                 } 
             }
-            $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
         }
 
         return view('Warehouse/penerimaanBarangLokal/form', $data);

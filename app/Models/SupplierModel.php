@@ -123,4 +123,20 @@ class SupplierModel extends Model
 
         return $supplierData;
     }
+
+    public function getSupplierByKategoriAndType($kategori, $type, $company_id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'kategori' => $kategori,
+            'type' => $type,
+            'company_id' => $company_id
+        ];
+
+        $builder = $this->db->table('suppliers');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResultArray();
+    }
 }

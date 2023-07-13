@@ -87,7 +87,7 @@
                             if (!empty($dataSupplier)) {
                                 foreach ($dataSupplier as $supplier) {
                             ?>
-                                    <option value="<?= $supplier->id; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->supplier_id === $supplier->id ? "selected" : "") : ""; ?>><?= $supplier->name; ?></option>
+                                    <option value="<?= $supplier["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?>><?= $supplier["name"]; ?></option>
                             <?php
                                 }
                             }
@@ -104,7 +104,7 @@
                             if (!empty($dataNo)) {
                                 foreach ($dataNo as $no) {
                             ?>
-                                    <option value="<?= $no->id; ?>" <?= (!empty($dataPenerimaanBarang) ? (in_array($no->id, $dataPenerimaanBarang->multiple_po_id) ? "selected" : "") : ""); ?>><?= $no->po_no; ?></option>
+                                    <option value="<?= $no["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? (in_array($no["id"], ($dataPenerimaanBarang->multiple_po_id ? json_decode($dataPenerimaanBarang->multiple_po_id) : [])) ? "selected" : "") : ""); ?>><?= $no["po_no"]; ?></option>
                             <?php
                                 }
                             }
@@ -128,7 +128,7 @@
                             if (!empty($dataAJU)) {
                                 foreach ($dataAJU as $aju) {
                             ?>
-                                    <option value="<?= $aju->id; ?>" <?= (!empty($dataPenerimaanBarang) ? ($aju->id === $dataPenerimaanBarang->aju_document_type ? "selected" : "") : ""); ?>><?= $aju->value; ?></option>
+                                    <option value="<?= $aju["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? ($aju["id"] === $dataPenerimaanBarang->aju_document_type ? "selected" : "") : ""); ?>><?= $aju["value"]; ?></option>
                             <?php
                                 }
                             }
@@ -146,7 +146,7 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->validation_date : ""; ?>" type="text" class="form-control input-picker validation_date" id="validation_date" name="validation_date" placeholder="Tanggal Pendaftaran">
+                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : "") : ""; ?>" type="text" class="form-control input-picker validation_date" id="validation_date" name="validation_date" placeholder="Tanggal Pendaftaran">
                             <label for="floatingInput">Tanggal Pendaftaran</label>
                         </div>
                     </div>
@@ -194,19 +194,19 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->shipping_cost : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->shipping_cost) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
                         <label for="floatingInput">Biaya Ongkos Kirim</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->biaya_masuk : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Biaya Masuk">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->biaya_masuk) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Biaya Masuk">
                         <label for="floatingInput">Biaya Masuk</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->ppnbm : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control ppnbm" id="ppnbm" name="ppnbm" placeholder="PPNBM">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->ppnbm) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control ppnbm" id="ppnbm" name="ppnbm" placeholder="PPNBM">
                         <label for="floatingInput">PPNBM</label>
                     </div>
                 </div>
@@ -273,55 +273,27 @@
                         $total_penyerahan = 0;
 
                         if(!empty($dataPenerimaanBarang)){ 
-                            foreach($dataPenerimaanBarang->detail as $details){  
-                                $total_jml_order = $total_jml_order + $details->qty;
-                                $total_jml_dokumen = $total_jml_dokumen + $details->doc_qty;
-                                $total_jml_masuk = $total_jml_masuk + $details->jml_masuk;
-                                $total_selisih = $total_selisih + $details->selisih;
-                                $total_konversi = $total_konversi + $details->konversi;
-                                $total_harga = $total_harga + ($details->harga ? formatter(str_replace(",", "", $details->harga), "STR_TO_INT") : 0);
-                                $total_penyerahan = $total_penyerahan + ($details->penyerahan ? formatter(str_replace(",", "", $details->penyerahan), "STR_TO_INT") : 0);
-                        ?> 
+                        //     foreach($dataPenerimaanBarang->detail as $details){  
+                        //         $total_jml_order = $total_jml_order + $details->qty;
+                        //         $total_jml_dokumen = $total_jml_dokumen + $details->doc_qty;
+                        //         $total_jml_masuk = $total_jml_masuk + $details->jml_masuk;
+                        //         $total_selisih = $total_selisih + $details->selisih;
+                        //         $total_konversi = $total_konversi + $details->konversi;
+                        //         $total_harga = $total_harga + ($details->harga ? formatter(str_replace(",", "", $details->harga), "STR_TO_INT") : 0);
+                        //         $total_penyerahan = $total_penyerahan + ($details->penyerahan ? formatter(str_replace(",", "", $details->penyerahan), "STR_TO_INT") : 0);
+                        // ?> 
     
                             <tr>
                                 <?php if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
 
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $no; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->kode_barang; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->nama_barang; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->nama_satuan; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->qty; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->doc_qty; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->jml_masuk; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->selisih; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->konversi; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->harga ? $details->harga : 0; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->penyerahan ? $details->penyerahan : 0; ?></td>
-                                        <td class="edit-table-detail" data-unit="<?= $details->id_satuan; ?>" data-keterangan="<?= $details->keterangan; ?>" data-ppn="<?= $details->id_ppn; ?>" data-pph="<?= $details->id_pph; ?>" data-penyerahan="<?= $details->penyerahan ? $details->penyerahan : 0; ?>" data-harga="<?= $details->harga ? $details->harga : 0; ?>" data-doc_qty="<?= $details->doc_qty; ?>" data-nama_barang_dokumen="<?= $details->nama_barang_dok; ?>" data-qty="<?= $details->qty; ?>" data-satuan="<?= $details->nama_satuan; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-kode="<?= $details->kode_barang; ?>" data-purchase_order_details_id="<?= $details->purchase_order_details_id; ?>" data-id="${item.id}" data-row="<?= $no; ?>"><?= $details->keterangan; ?></td>
-                                        <td><button class="btn-trash" onclick='deleteRow("<?= $no; ?>")'>X</button></td>
-    
                                 <?php } else { ?>
-    
-                                        <td><?= $no; ?></td>
-                                        <td><?= $details->kode_barang; ?></td>
-                                        <td><?= $details->nama_barang; ?></td>
-                                        <td><?= $details->nama_satuan; ?></td>
-                                        <td><?= $details->qty; ?></td>
-                                        <td><?= $details->doc_qty; ?></td>
-                                        <td><?= $details->jml_masuk; ?></td>
-                                        <td><?= $details->selisih; ?></td>
-                                        <td><?= $details->konversi; ?></td>
-                                        <td><?= $details->harga ? $details->harga : 0; ?></td>
-                                        <td><?= $details->penyerahan ? $details->penyerahan : 0; ?></td>
-                                        <td><?= $details->keterangan; ?></td>
-                                        <td><button class="btn-view" onclick='view("<?= $no; ?>")'>View</button></td>
-    
+
                                 <?php } ?>
                             
                             </tr>
                         <?php 
-                            $no++;
-                            }
+                            // $no++;
+                            // }
                         } ?> 
                     </tbody>
                     <tfoot class="foot-detail-table" id="foot-detail-table">
@@ -544,52 +516,6 @@
     var penyerahanEdit = 0;
     let data_satuan = [];
     let data_warehouse = [];
-
-    <?php if(!empty($dataPenerimaanBarang)){ 
-        foreach($dataPenerimaanBarang->detail as $details){  
-    ?>
-
-    priceEdit = Number('<?= $details->harga; ?>'.replaceAll(",", ""));
-    penyerahanEdit = Number('<?= $details->penyerahan; ?>'.replaceAll(",", ""));
-    row = row + 1;
-
-    total_jml_order = total_jml_order + <?= $details->qty; ?>;
-    total_jml_dokumen = total_jml_dokumen + <?= $details->doc_qty; ?>;
-    total_jml_masuk = total_jml_masuk + <?= $details->jml_masuk; ?>;
-    total_jml_selisih = total_jml_selisih + <?= $details->selisih; ?>;
-    total_jml_konversi = total_jml_konversi + <?= $details->konversi; ?>;
-    total_jml_harga = total_jml_harga + priceEdit;
-    total_jml_penyerahan = total_jml_penyerahan + penyerahanEdit;
-
-    list_items.push({
-        id: <?= $details->id; ?>,
-        row: row,
-        purchase_order_details_id: <?= $details->purchase_order_details_id; ?>,
-        barang_id: <?= $details->barang_id; ?>,
-        doc_qty: <?= $details->doc_qty; ?>,
-        unit: <?= $details->id_satuan; ?>,
-        kode_barang: '<?= $details->kode_barang; ?>',
-        nama_barang: '<?= $details->nama_barang; ?>',
-        nama_barang_dokumen: '<?= $details->nama_barang_dok; ?>',
-        qty: <?= $details->qty; ?>,
-        selisih: <?= $details->selisih; ?>,
-        satuan: '<?= $details->nama_satuan; ?>',
-        konversi: <?= $details->konversi; ?>,
-        jml_masuk: <?= $details->jml_masuk; ?>,
-        harga: '<?= $details->harga ? $details->harga : 0; ?>',
-        penyerahan: '<?= $details->penyerahan ? $details->penyerahan : 0; ?>',
-        keterangan: '<?= $details->keterangan; ?>',
-        ppn: <?= $details->id_ppn ? $details->id_ppn : 0; ?>,
-        nilai_ppn: '<?= $details->ppn; ?>',
-        pph: <?= $details->id_pph ? $details->id_pph : 0; ?>,
-        nilai_pph: '<?= $details->pph; ?>',
-        warehouse: <?= json_encode($details->warehouse); ?>,
-    })
-    <?php 
-        }
-    ?>
-    <?php
-    } ?>
 
     console.log(list_items)
 
