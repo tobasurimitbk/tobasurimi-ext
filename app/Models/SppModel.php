@@ -73,26 +73,23 @@ class SppModel extends Model
 
         $totalData = $purchaseRequestsDataQry->countAllResults(false);
 
-        // $purchaseRequestsDataQry->groupStart();
-        // if ($addCondition['search']) {
-        //     $purchaseRequestsDataQry
-        //         ->like('spp_no', $addCondition['search'])
-        //         ->orLike('spp_type', $addCondition['search']);
-        // }
-
-        // if ($addCondition['startDate']) {
-        //     $purchaseRequestsDataQry->where('purchase_requests.request_date >=',  $addCondition['dateStart'] . '00:00:00');
-        // }
-        // if ($addCondition['endDate']) {
-        //     $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd'] . '23:59:59');
-        // }
-        // $purchaseRequestsDataQry->groupEnd();
-
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->groupStart();
+        }
         if ($addCondition['search']) {
-            $purchaseRequestsDataQry->groupStart()
+            $purchaseRequestsDataQry
                 ->like('spp_no', $addCondition['search'])
-                ->orLike('spp_type', $addCondition['search'])
-                ->groupEnd();
+                ->orLike('spp_type', $addCondition['search']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $purchaseRequestsDataQry->where('purchase_requests.request_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
+        }
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $purchaseRequestsDataQry->groupEnd();
         }
 
         $totalFilteredData = $purchaseRequestsDataQry->countAllResults(false);
