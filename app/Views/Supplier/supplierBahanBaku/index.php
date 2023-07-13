@@ -955,6 +955,8 @@
                                 $(".add-modal").modal("show")
                             }
                         }) */
+                        $('.ap_id').select2(select2Prop);
+                        $('.ar_id').select2(select2Prop);
 
                         const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
                         $(".ap_id").append($apOption).trigger('change');
