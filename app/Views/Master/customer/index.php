@@ -868,6 +868,7 @@
 
                         $(".contact_person").val(res?.data?.contact_person);
                         $(".email").val(res?.data?.email);
+                        $(".parent_postal_code").val(res?.data?.postal_code);
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
