@@ -935,6 +935,7 @@
                         $(".phone_no").val(res?.data?.phone_no);
                         $(".status").val(res?.data?.status);
                         $(".jabatan").val(res?.data?.jabatan);
+                        $(".zip_code").val(res?.data?.postal_code);
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
@@ -953,7 +954,7 @@
                                 })
 
                                 $(".city_id").val(res?.data?.city_id).change();
-                                $(".zip_code").val(res?.data?.postalCode);
+                                //$(".zip_code").val(res?.data?.postalCode);
                             }
                         })
 
