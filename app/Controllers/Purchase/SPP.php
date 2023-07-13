@@ -3,16 +3,19 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\SppModel;
 
 class SPP extends BaseController
 {
     protected $token;
     protected $role_id;
+    protected $SppModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->role_id = session()->get("login")->this_role_id;
+        $this->SppModel = new SppModel();
     }
 
     public function spp()
@@ -115,56 +118,59 @@ class SPP extends BaseController
     public function allSPP()
     {
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            // "requestStatus" => $this->request->getGet("status"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "pageSize"         => $this->request->getGet("length"),
+            "currentPage"      => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"           => $this->request->getGet("search"),
+            "sort"             => $this->request->getGet("sort"),
+            "sortType"         => $this->request->getGet("sortType"),
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/purchaseRequest", $this->token, $payload);
+        $SppModel = new SppModel();
+        $condition = [];
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"            => $this->request->getGet("sortType"),
+            "dateStart"       >= $this->request->getGet("dateStart"),
+            "dateEnd"       <= $this->request->getGet("dateEnd"),
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $sppData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);
 
         $dataSPP = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataSPP, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "spp_type" => $data->spp_type,
-                    "spp_no" => $data->spp_no,
-                    "warehouseName" => $data->warehouseName,
-                    "total" => $data->total,
-                    "request_date" => $data->request_date,
-                    "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
-                    "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
-                    "approvedByDirectorName" => $data->approvedByDirectorName,
-                    "is_posted" => $data->is_posted,
-                    "createdAt" => $data->createdAt,
-                    "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
-                    "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
-                    "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
-                ]);
-            }
+        foreach ($sppData['data'] as $data) {
+            array_push($dataSPP, [
+                "no" => $no++,
+                "id" => $data->id,
+                "spp_type" => $data->spp_type,
+                "spp_no" => $data->spp_no,
+                // "warehouseName" => "test",
+                "warehouseName" => $data->warehouseName,
+                "total" => $data->total,
+                "request_date" => $data->request_date,
+                // "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
+                // "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
+                // "approvedByDirectorName" => $data->approvedByDirectorName,
+                // "is_posted" => $data->is_posted,
+                // "createdAt" => $data->createdAt,
+                // "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
+                // "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
+                // "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataSPP,
-            "response" => $response,
-            "payload" => $payload,
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $sppData['totalData'],
+            "recordsFiltered"   => $sppData['totalFilteredData'],
+            "data"              => $dataSPP,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -173,7 +179,7 @@ class SPP extends BaseController
 
     public function saveSPP()
     {
-        try { 
+        try {
             $rules = [
                 "request_date" => [
                     "rules" => "required"
@@ -239,9 +245,7 @@ class SPP extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -254,7 +258,7 @@ class SPP extends BaseController
 
     public function updateSPP()
     {
-        try{
+        try {
             $rules = [
                 "request_date" => [
                     "rules" => "required"
@@ -318,9 +322,7 @@ class SPP extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -333,7 +335,7 @@ class SPP extends BaseController
 
     public function updateStatusSPP()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
@@ -360,9 +362,7 @@ class SPP extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -374,7 +374,7 @@ class SPP extends BaseController
 
     public function approveSPP()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             $payload = json_encode([]);
@@ -399,9 +399,7 @@ class SPP extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -414,7 +412,7 @@ class SPP extends BaseController
 
     public function deleteSPP()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -443,9 +441,7 @@ class SPP extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
