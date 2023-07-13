@@ -48,8 +48,8 @@ class CompaniesModel extends Model
         $requete .= "LEFT JOIN provinces ON (companies.province_id=provinces.id) ";
         $requete .= "LEFT JOIN cities ON (companies.city_id=cities.id) ";
         $requete .= "WHERE companies.deletedAt is null ";
-        if (isset($values["company"]))
-            $requete .= ($values["company"] == "") ? "" : ("AND UPPER(company) like '%" . strtoupper($values["company"]) . "%' ");
+        if (isset($values["search"]))
+            $requete .= ($values["search"] == "") ? "" : ("AND UPPER(company) like '%" . strtoupper($values["search"]) . "%' ");
 
         if ($sortby != '')
             $requete .= "ORDER BY $sortby ";
@@ -64,8 +64,9 @@ class CompaniesModel extends Model
     {
         $requete  = "SELECT count(*) as total FROM companies ";
         $requete .= "WHERE companies.deletedAt is null ";
-        if (isset($values["company"]))
-            $requete .= ($values["company"] == "") ? "" : ("AND UPPER(company) like '%" . strtoupper($values["company"]) . "%' ");
+        if (isset($values["search"]))
+            $requete .= ($values["search"] == "") ? "" : ("AND UPPER(company) like '%" . strtoupper($values["search"]) . "%' ");
+
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;

@@ -20,23 +20,18 @@ class Divisi extends BaseController
 
     public function divisi()
     {
-        //Get Divisi
-        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
-
-        $dataDivisi = [];
-        if ($responseDivisi["code"] === 200) {
-            $dataDivisi = json_decode($responseDivisi["body"])->data;
-        }
-
+        $dataDivisi = $this->DivisisModel->search_list(array(), 'divisi');
         $data = [
             "dataDivisi" => $dataDivisi,
         ];
+
 
         return view('Master/divisi/index', $data);
     }
 
     public function allDivisi()
     {
+        /*
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -76,6 +71,55 @@ class Divisi extends BaseController
 
         echo json_encode($data);
         return;
+        */
+
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
+
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
+
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
+
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
+
+        $values = [
+            "company_id"    => $this->this_company_id,
+            "search"        => $search
+        ];
+
+        $totalRecords = $this->DivisisModel->total_list(array());
+        $totalRecordwithFilter = $this->DivisisModel->total_list($values);
+
+        $res = $this->DivisisModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+
+        $number = $row * $rowperpage;
+
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "divisi" => $res[$i]["divisi"],
+            );
+        }
+
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
+
+        return $this->response->setJSON($response);
     }
 
     public function saveDivisi()
@@ -88,16 +132,17 @@ class Divisi extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $values = [
                     "company_id" => $this->this_company_id,
                     "divisi" => $this->request->getPost("divisi")
-                ]);
+                ];
 
                 $response = curl_request("POST", "/divisis", $this->token, $payload);
 
-                if ($response["code"] === 200) {
+
+                if ($this->EmployeesModel->insert($values)) {
                     $data = [
-                        "status"            => true,
+                        "status"    => true,
                         "message"   => "Data Berhasil disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash()
