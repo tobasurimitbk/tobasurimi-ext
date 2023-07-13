@@ -10,12 +10,14 @@ use App\Models\SatuanModel;
 class Satuan extends BaseController
 {
     protected $token;
+    protected $satuanModel;
     protected $SatuansModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->SatuansModel = new SatuansModel();
+        $this->satuanModel = new satuanModel();
     }
 
     public function satuan()
@@ -261,12 +263,8 @@ class Satuan extends BaseController
 
     public function dropdownSatuan()
     {
-<<<<<<< HEAD
-        $dataSatuan = $this->SatuansModel->search_list(array(), 'nama_satuan');
-=======
         $dataSatuan = $this->satuanModel->asObject()->find();
 
->>>>>>> 88821f675e383d4a381a25aa71d3634bd7e86cc3
         $data = [
             "data" => $dataSatuan
         ];
