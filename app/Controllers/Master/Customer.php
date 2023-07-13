@@ -166,6 +166,7 @@ class Customer extends BaseController
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
                     "bank_id" => $this->request->getPost("bank_id"),
+                    "postal_code" => $this->request->getPost("parent_postal_code"),
                     "nama_rekening" => $this->request->getPost("nama_rekening"),
                     "no_rekening" => $this->request->getPost("no_rekening"),
                     "supplier_buyer" => $this->request->getPost("supplier_buyer"),
@@ -285,6 +286,7 @@ class Customer extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
+                    "postal_code" => $this->request->getPost("parent_postal_code"),
                     "no_rekening" => $this->request->getPost("no_rekening"),
                     "bank_id" => $this->request->getPost("bank_id"),
                     "nama_rekening" => $this->request->getPost("nama_rekening"),
@@ -297,7 +299,6 @@ class Customer extends BaseController
                 ];
                 if ($this->CustomerModel->update($id, $values)) {
                     $dlist_address = json_decode($this->request->getPost("list_address"), true);
-
                     for ($i = 0; $i < count($dlist_address); $i++) {
 
                         $values = [

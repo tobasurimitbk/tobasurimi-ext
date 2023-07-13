@@ -3,26 +3,25 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\CompaniesModel;
+use App\Models\ProvincesModel;
 
 class Company extends BaseController
 {
     protected $token;
-    
+    protected $CompaniesModel;
+    protected $ProvincesModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->CompaniesModel = new CompaniesModel();
+        $this->ProvincesModel = new ProvincesModel();
     }
 
     public function company()
     {
-        //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
-
+        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $data = [
             "dataProvinces" => $dataProvinces,
         ];
@@ -32,54 +31,64 @@ class Company extends BaseController
 
     public function allCompany()
     {
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType")
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
+
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
+
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
+
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
+
+        $values = [
+            "search"        => $search
         ];
 
-        $response = curl_request("GET", "/companies", $this->token, $payload);
-        $dataCompany = [];
-        $totalRecords = 0;
+        $totalRecords = $this->CompaniesModel->total_list(array());
+        $totalRecordwithFilter = $this->CompaniesModel->total_list($values);
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $res = $this->CompaniesModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $number = $row * $rowperpage;
 
-            foreach ($body as $data) {
-                array_push($dataCompany, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "company" => $data->company,
-                    "holding_company" => $data->holding_company,
-                    "address" => $data->address,
-                    "phone" => $data->phone,
-                    "email" => $data->email,
-                    "province_name" => $data->province_name,
-                    "city_name" => $data->city_name,
-                    "zip_code" => $data->zip_code
-                ]);
-            }
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "company" => $res[$i]["company"],
+                "holding_company" => $res[$i]["holding_company"],
+                "address" => $res[$i]["address"],
+                "phone" => $res[$i]["phone"],
+                "email" => $res[$i]["email"],
+                "province_name" => $res[$i]["province_name"],
+                "city_name" => $res[$i]["city_name"],
+                "zip_code" => $res[$i]["zip_code"],
+            );
         }
 
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataCompany
-        ];
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
 
-        echo json_encode($data);
-        return;
+        return $this->response->setJSON($response);
     }
 
     public function saveCompany()
     {
-        try{
+        try {
             $rules = [
                 "holding_company" => [
                     "rules" => "required"
@@ -111,31 +120,27 @@ class Company extends BaseController
 
                 $logo = "";
 
-                if (!empty($file->getName())) 
-                {
+                $values = [
+                    "company" => $this->request->getPost("company"),
+                    "holding_company" => $this->request->getPost("holding_company"),
+                    "address" => $this->request->getPost("address"),
+                    "phone" => $this->request->getPost("phone"),
+                    "email" => $this->request->getPost("email"),
+                    "zip_code" => $this->request->getPost("zip_code"),
+                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
+                ];
+
+                if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
                     if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                         $logo = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-
-                        $payload = json_encode([
-                            "logo" => $logo,
-                            "company" => $this->request->getPost("company"),
-                            "holding_company" => $this->request->getPost("holding_company"),
-                            "address" => $this->request->getPost("address"),
-                            "phone" => $this->request->getPost("phone"),
-                            "email" => $this->request->getPost("email"),
-                            "zip_code" => $this->request->getPost("zip_code"),
-                            "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                            "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
-                        ]);
+                        $values["logo"] = $logo;
                     }
                 }
 
-                if($payload)
-                {
-                    $response = curl_request("POST", "/companies", $this->token, $payload);
-        
-                    if ($response["code"] === 200) {
+                if (isset($values)) {
+                    if ($this->CompaniesModel->insert($values)) {
                         $data = [
                             "status"            => true,
                             "message"   => "Data Berhasil disimpan",
@@ -144,7 +149,7 @@ class Company extends BaseController
                         ];
                         echo json_encode($data);
                     } else {
-                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                        $message = 'Data Gagal Disimpan';
                         $data = [
                             "status"            => false,
                             "message"    => $message,
@@ -153,9 +158,7 @@ class Company extends BaseController
                         ];
                         echo json_encode($data);
                     }
-                }
-                else
-                {
+                } else {
                     $data = [
                         "status"            => false,
                         "message"    => "Format gambar harus bertipe png, jpg, jpeg",
@@ -172,9 +175,7 @@ class Company extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -187,7 +188,7 @@ class Company extends BaseController
 
     public function updateCompany()
     {
-        try{
+        try {
             $rules = [
                 "holding_company" => [
                     "rules" => "required"
@@ -218,44 +219,28 @@ class Company extends BaseController
                 $id = $this->request->getPost("id");
 
                 $file = $this->request->getFile("logo");
-                if (!empty($file->getName())) 
-                {
+
+                $values = [
+                    "company" => $this->request->getPost("company"),
+                    "holding_company" => $this->request->getPost("holding_company"),
+                    "address" => $this->request->getPost("address"),
+                    "phone" => $this->request->getPost("phone"),
+                    "email" => $this->request->getPost("email"),
+                    "zip_code" => $this->request->getPost("zip_code"),
+                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
+                ];
+
+                if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
                     if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                         $logo = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-                        
-                        $payload = json_encode([
-                            "logo" => $logo,
-                            "company" => $this->request->getPost("company"),
-                            "holding_company" => $this->request->getPost("holding_company"),
-                            "address" => $this->request->getPost("address"),
-                            "phone" => $this->request->getPost("phone"),
-                            "email" => $this->request->getPost("email"),
-                            "zip_code" => $this->request->getPost("zip_code"),
-                            "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                            "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
-                        ]);
+                        $values["logo"] = $logo;
                     }
                 }
-                else
-                {
-                    $payload = json_encode([
-                        "company" => $this->request->getPost("company"),
-                        "holding_company" => $this->request->getPost("holding_company"),
-                        "address" => $this->request->getPost("address"),
-                        "phone" => $this->request->getPost("phone"),
-                        "email" => $this->request->getPost("email"),
-                        "zip_code" => $this->request->getPost("zip_code"),
-                        "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                        "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
-                    ]);
-                }
 
-                if($payload)
-                {
-                    $response = curl_request("PATCH", "/companies/$id", $this->token, $payload);
-
-                    if ($response["code"] === 200) {
+                if (isset($values)) {
+                    if ($this->CompaniesModel->update($id, $values)) {
                         $data = [
                             "status"            => true,
                             "message"   => "Data Berhasil diubah",
@@ -264,18 +249,16 @@ class Company extends BaseController
                         ];
                         echo json_encode($data);
                     } else {
-                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                        $message = 'Data Gagal Diubah';
                         $data = [
                             "status"            => false,
                             "message"    => $message,
-                            "payload"   => $payload,
+                            "payload"   => "",
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
                     }
-                }
-                else
-                {
+                } else {
                     $data = [
                         "status"            => false,
                         "message"    => "Format gambar harus bertipe png, jpg, jpeg",
@@ -292,9 +275,7 @@ class Company extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -309,15 +290,15 @@ class Company extends BaseController
     public function getByIdCompany($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/companies/$id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->CompaniesModel->get_by_id($id);
+            if (count($res)) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -336,12 +317,14 @@ class Company extends BaseController
 
     public function deleteCompany()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/companies/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->CompaniesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -349,7 +332,7 @@ class Company extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -365,9 +348,7 @@ class Company extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -380,12 +361,8 @@ class Company extends BaseController
 
     public function dropdownCompany()
     {
-        $responseCompany = curl_request("GET", "/companies/all", $this->token);
-
-        $dataCompany = [];
-        if ($responseCompany["code"] === 200) {
-            $dataCompany = json_decode($responseCompany["body"])->data;
-        }
+        //$responseCompany = curl_request("GET", "/companies/all", $this->token);
+        $dataCompany = $this->CompaniesModel->search_list(array(), "value");
 
         $data = [
             "data" => $dataCompany

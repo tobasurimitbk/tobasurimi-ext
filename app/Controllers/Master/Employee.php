@@ -201,6 +201,7 @@ class Employee extends BaseController
                     "child" => $this->request->getPost("child"),
                     "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
                     "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
                     "jabatan" => $this->request->getPost("jabatan"),
@@ -342,6 +343,7 @@ class Employee extends BaseController
                     "child" => $this->request->getPost("child"),
                     "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
                     "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
                     "jabatan" => $this->request->getPost("jabatan"),
@@ -408,6 +410,8 @@ class Employee extends BaseController
     {
         if (!empty($id)) {
             $res = $this->EmployeesModel->get_by_id($id);
+            $res[0]["join_date"] = date("d/m/Y", strtotime($res[0]["join_date"]));
+            $res[0]["dob"] = date("d/m/Y", strtotime($res[0]["dob"]));
             //            $response = curl_request("GET", "/employees/$id?idCompany=$this->this_company_id", $this->token);
             if (count($res)) {
                 $data = [
