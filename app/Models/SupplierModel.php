@@ -112,4 +112,15 @@ class SupplierModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getSupplierById($id)
+    {
+        $supplierData = $this->asObject()
+            ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name')
+            ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id')
+            ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id')
+            ->find($id);
+
+        return $supplierData;
+    }
 }

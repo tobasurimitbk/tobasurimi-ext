@@ -46,9 +46,9 @@ class SupplierBahanBaku extends BaseController
 
         $supplierModel = new SupplierModel();
         $condition = [
-            "company_id"    => $this->this_company_id,
-            "kategori"      => "LOKAL",
-            "suppliers.type"=> "BAHAN BAKU"
+            "suppliers.company_id"  => $this->this_company_id,
+            "kategori"              => "LOKAL",
+            "suppliers.type"        => "BAHAN BAKU"
         ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
@@ -224,8 +224,8 @@ class SupplierBahanBaku extends BaseController
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
+            return;
         }
-        return;
     }
 
     public function updateSupplierBahanBaku()
@@ -331,18 +331,14 @@ class SupplierBahanBaku extends BaseController
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
+            return;
         }
-        return;
     }
 
     public function getByIdSupplierBahanBaku($id)
     {
         $supplierModel = new SupplierModel();
-        $supplierData = $supplierModel->asObject()
-            ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name')
-            ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id')
-            ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id')
-            ->find($id);
+        $supplierData = $supplierModel->getSupplierById($id);
 
         if (!$supplierData) {
             $data = [
@@ -389,23 +385,6 @@ class SupplierBahanBaku extends BaseController
             ];
             echo json_encode($data);
             return;
-            // $response = curl_request("DELETE", "/suppliers/$id", $this->token);
-            /* if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } */
         }
         catch(\Exception $e)
         {
@@ -415,8 +394,8 @@ class SupplierBahanBaku extends BaseController
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
+            return;
         }
-        return;
     }
 
     public function dropdownSupplier()

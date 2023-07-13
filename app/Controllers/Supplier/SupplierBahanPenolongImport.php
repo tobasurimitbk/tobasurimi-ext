@@ -4,6 +4,7 @@ namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
 
+use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
 
 class SupplierBahanPenolongImport extends BaseController
@@ -19,16 +20,12 @@ class SupplierBahanPenolongImport extends BaseController
 
     public function supplierBahanPenolongImport()
     {
+        $provinceModel = new ProvinceModel();
         //Get Provinces
-        $responseProvinces = curl_request("GET", "/provinces/all", $this->token);
-
-        $dataProvinces = [];
-        if ($responseProvinces["code"] === 200) {
-            $dataProvinces = json_decode($responseProvinces["body"])->data;
-        }
+        $provinceData = $provinceModel->asObject()->findAll();
 
         $data = [
-            "dataProvinces" => $dataProvinces,
+            "dataProvinces" => $provinceData,
         ];
 
         return view('Supplier/supplierBahanPenolongImport/index', $data);
@@ -49,9 +46,9 @@ class SupplierBahanPenolongImport extends BaseController
 
         $supplierModel = new SupplierModel();
         $condition = [
-            "company_id"    => $this->this_company_id,
-            "kategori"      => "IMPORT",
-            "suppliers.type"=> "BAHAN PENOLONG"
+            "suppliers.company_id"  => $this->this_company_id,
+            "kategori"              => "IMPORT",
+            "suppliers.type"        => "BAHAN PENOLONG"
         ];
         $addCondition = [
             "search"    => $this->request->getGet("search"),
@@ -103,6 +100,8 @@ class SupplierBahanPenolongImport extends BaseController
     public function saveSupplierBahanPenolongImport()
     {
         try{
+            $supplierModel = new SupplierModel();
+
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -145,55 +144,77 @@ class SupplierBahanPenolongImport extends BaseController
                 ]
             ];
 
-            if ($this->validate($rules)) {
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
-                    "phone" => $this->request->getPost("phone"),
-                    "contact_person" => $this->request->getPost("contact_person"),
-                    "email" => $this->request->getPost("email"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                    "province_id" => $this->request->getPost("province_parent_id"),
-                    "city_id" => $this->request->getPost("city_parent_id"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "kategori" => "IMPORT",
-                    "type" => "BAHAN PENOLONG"
-                    // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
-                ]);
-
-                $response = curl_request("POST", "/suppliers", $this->token, $payload);
-
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            $payload = json_encode([
+                "company_id" => $this->this_company_id,
+                "kode" => $this->request->getPost("kode"),
+                "name" => $this->request->getPost("name"),
+                "address" => $this->request->getPost("address"),
+                "no_npwp" => $this->request->getPost("no_npwp"),
+                "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
+                "email" => $this->request->getPost("email"),
+                "no_rekening" => $this->request->getPost("no_rekening"),
+                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
+                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                "kategori" => "LOKAL",
+                "type" => "BAHAN BAKU"
+                // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
+            ]);
+
+            $insertData = [
+                "company_id"        => $this->this_company_id,
+                "kode"              => $this->request->getPost("kode"),
+                "name"              => $this->request->getPost("name"),
+                "address"           => $this->request->getPost("address"),
+                "no_npwp"           => $this->request->getPost("no_npwp"),
+                "phone"             => $this->request->getPost("phone"),
+                "contact_person"    => $this->request->getPost("contact_person"),
+                "email"             => $this->request->getPost("email"),
+                "no_rekening"       => $this->request->getPost("no_rekening"),
+                "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
+                "province_id"       => $this->request->getPost("province_parent_id"),
+                "city_id"           => $this->request->getPost("city_parent_id"),
+                "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                "kategori"          => "LOKAL",
+                "type"              => "BAHAN BAKU"
+            ];
+            $insert = $supplierModel->insert($insertData);
+            $response = curl_request("POST", "/suppliers", $this->token, $payload);
+
+            if (!$insert) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Data Gagal Disimpan!',
+                    "payload"   => $payload,
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+                
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $payload,
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
         }
         catch(\Exception $e)
         {
@@ -203,13 +224,15 @@ class SupplierBahanPenolongImport extends BaseController
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
+            return;
         }
-        return;
     }
 
     public function updateSupplierBahanPenolongImport()
     {
         try{
+            $supplierModel = new SupplierModel();
+
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -252,51 +275,52 @@ class SupplierBahanPenolongImport extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
-                    "phone" => $this->request->getPost("phone"),
-                    "contact_person" => $this->request->getPost("contact_person"),
-                    "email" => $this->request->getPost("email"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                    "province_id" => $this->request->getPost("province_parent_id"),
-                    "city_id" => $this->request->getPost("city_parent_id"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "kategori" => "IMPORT",
-                    "type" => "BAHAN PENOLONG"
+                $payload = [
+                    "company_id"        => $this->this_company_id,
+                    "kode"              => $this->request->getPost("kode"),
+                    "name"              => $this->request->getPost("name"),
+                    "address"           => $this->request->getPost("address"),
+                    "no_npwp"           => $this->request->getPost("no_npwp"),
+                    "phone"             => $this->request->getPost("phone"),
+                    "contact_person"    => $this->request->getPost("contact_person"),
+                    "email"             => $this->request->getPost("email"),
+                    "no_rekening"       => $this->request->getPost("no_rekening"),
+                    "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
+                    "province_id"       => $this->request->getPost("province_parent_id"),
+                    "city_id"           => $this->request->getPost("city_parent_id"),
+                    "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "kategori"          => "LOKAL",
+                    "type"              => "BAHAN BAKU"
                     // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
-                ]);
+                ];
             }
 
             if ($payload) {
-                $response = curl_request("PATCH", "/suppliers/$id", $this->token, $payload);
+                $supplierModel->update($id, $payload);
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
             }
         }
         catch(\Exception $e)
@@ -307,70 +331,60 @@ class SupplierBahanPenolongImport extends BaseController
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
+            return;
         }
-
-        return;
     }
 
-    public function getByIdSupplierBahanPenolongImport($id = null)
+    public function getByIdSupplierBahanPenolongImport($id)
     {
-        if (!empty($id)) {
-            $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
+        $supplierModel = new SupplierModel();
+        $supplierData = $supplierModel->getSupplierById($id);
+
+        if (!$supplierData) {
             $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
+                "status"    => false,
+                "message"   => 'Not Found!'
             ];
             echo json_encode($data);
+            return;
         }
+        
+        // $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
+
+        $supplierData->list_address = []; // cek nanti
+        $data = [
+            "status"    => true,
+            "data"      => $supplierData,
+        ];
+        echo json_encode($data);
+        
         return;
     }
 
     public function deleteSupplierBahanPenolongImport()
     {
         try{
+            $supplierModel = new SupplierModel();
             $id = $this->request->getPost("id");
 
-            if (!empty($id)) {
-                $response = curl_request("DELETE", "/suppliers/$id", $this->token);
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (empty($id)) {
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Dihapus",
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            $supplierModel->delete($id);
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil dihapus",
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
         }
         catch(\Exception $e)
         {
@@ -380,8 +394,8 @@ class SupplierBahanPenolongImport extends BaseController
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
+            return;
         }
-        return;
     }
 
     public function dropdownSupplier()
