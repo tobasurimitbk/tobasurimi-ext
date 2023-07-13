@@ -299,7 +299,6 @@ class Customer extends BaseController
                 ];
                 if ($this->CustomerModel->update($id, $values)) {
                     $dlist_address = json_decode($this->request->getPost("list_address"), true);
-
                     for ($i = 0; $i < count($dlist_address); $i++) {
 
                         $values = [

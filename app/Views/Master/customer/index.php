@@ -1252,6 +1252,7 @@
                                         address: obj.address,
                                         province_id: obj.province_id,
                                         city_id: obj.city_id,
+                                        postal_code: obj.postal_code,
                                         main_address: 0,
                                         isDelete: true
                                     })
@@ -1267,6 +1268,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 1
                                         })
                                     } else {
@@ -1274,6 +1276,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 1
                                         })
                                     }
@@ -1285,6 +1288,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 0
                                         })
                                     } else {
@@ -1292,6 +1296,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 0
                                         })
                                     }

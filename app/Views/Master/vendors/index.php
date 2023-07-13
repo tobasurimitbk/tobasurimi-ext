@@ -841,6 +841,7 @@
                         $(".contact_person").val(res?.data?.contact_person);
                         $(".email").val(res?.data?.email);
                         $(".no_rekening").val(res?.data?.no_rekening);
+                        $(".parent_postal_code").val(res?.data?.postal_code);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
 
@@ -1222,6 +1223,7 @@
                                         address: obj.address,
                                         province_id: obj.province_id,
                                         city_id: obj.city_id,
+                                        postal_code: obj.postal_code,
                                         main_address: 0,
                                         isDelete: true
                                     })
@@ -1237,6 +1239,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 1
                                         })
                                     } else {
@@ -1244,6 +1247,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 1
                                         })
                                     }
@@ -1255,6 +1259,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 0
                                         })
                                     } else {
@@ -1262,6 +1267,7 @@
                                             address: obj.address,
                                             province_id: obj.province_id,
                                             city_id: obj.city_id,
+                                            postal_code: obj.postal_code,
                                             main_address: 0
                                         })
                                     }
