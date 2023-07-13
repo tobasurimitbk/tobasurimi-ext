@@ -1,7 +1,6 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-
 <div class="modal add-modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
@@ -51,9 +50,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -61,40 +60,40 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Kode HS</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-    <div class="row justify-content-end mb-3">
-        <div class="col-md-2">
-            <input class="form-control search form-out-search" placeholder="Search" value="" />
-        </div>
+    <div class="section-header">
+        <h1>Kode HS</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
     </div>
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>No.</th>
-                        <th onclick="changeSort('komoditi')" class="sort">Komoditi</th>
-                        <th onclick="changeSort('code')" class="sort">HS Code</th>
-                        <th onclick="changeSort('uraian_barang')" class="sort">Uraian Barang</th>
-                        <th onclick="changeSort('satuan_barang')" class="sort">Satuan</th>
-                        <th onclick="changeSort('uraian_satuan')" class="sort">Uraian Satuan</th>
-                    </tr>
-                </thead>
-                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('komoditi')" class="sort">Komoditi</th>
+                                <th onclick="changeSort('code')" class="sort">HS Code</th>
+                                <th onclick="changeSort('uraian_barang')" class="sort">Uraian Barang</th>
+                                <th onclick="changeSort('satuan_barang')" class="sort">Satuan</th>
+                                <th onclick="changeSort('uraian_satuan')" class="sort">Uraian Satuan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
 </section>
 
 <script>
@@ -107,7 +106,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -363,8 +364,7 @@
 
                         let id = $(".id").val();
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("hs-code/update"); ?>",
                                 data: data,
@@ -380,14 +380,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -409,8 +409,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("hs-code/save"); ?>",
                                 data: data,
@@ -426,14 +425,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -461,13 +460,10 @@
     })
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }

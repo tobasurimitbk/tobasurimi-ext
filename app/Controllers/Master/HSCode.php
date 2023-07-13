@@ -3,6 +3,7 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\HsCodesModel;
 
 use App\Models\HSCodeModel;
 
@@ -10,11 +11,13 @@ class HSCode extends BaseController
 {
     protected $token;
     protected $HSCodeModel;
-    
+    protected $HsCodesModel;
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->HSCodeModel = new HSCodeModel();
+        $this->HsCodesModel = new HsCodesModel();
     }
 
     public function hsCode()
@@ -24,53 +27,61 @@ class HSCode extends BaseController
 
     public function allHSCode()
     {
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType")
-        ]; 
+        $draw = $this->request->getVar('draw');
+        $row = $this->request->getVar('start');
+        $rowperpage = $this->request->getVar('length');
+        $temp = $this->request->getVar('order');
+        $columnIndex = $temp[0]['column']; // Column index
 
-        $response = curl_request("GET", "/hscode", $this->token, $payload);
-        $dataKodeHS = [];
-        $totalRecords = 0;
+        $temp = $this->request->getVar('columns');
+        $columnName = $temp[$columnIndex]['data']; // Column index
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $temp = $this->request->getVar('order');
+        $columnSortOrder = $temp[0]['dir']; // Column index
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $search = $this->request->getVar('search');
+        //$searchValue = $temp['value']; // Column index
 
-            foreach ($body as $data) {
-                array_push($dataKodeHS, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "komoditi" => $data->komoditi,
-                    "code" => $data->code,
-                    "uraian_barang" => $data->uraian_barang,
-                    "satuan_barang" => $data->satuan_barang,
-                    "uraian_satuan" => $data->uraian_satuan
-                ]);
-            }
-        }
-
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataKodeHS,
-            "response" => $response,
-            "payload" => $payload
+        $values = [
+            "search"        => $search
         ];
 
-        echo json_encode($data);
-        return;
+        $totalRecords = $this->HsCodesModel->total_list(array());
+        $totalRecordwithFilter = $this->HsCodesModel->total_list($values);
+
+        $res = $this->HsCodesModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+
+        $number = $row * $rowperpage;
+
+        $data = [];
+
+        for ($i = 0; $i < count($res); $i++) {
+
+            $data[] = array(
+                "no" => ($row + $i + 1),
+                "id" => $res[$i]["id"],
+                "komoditi" => $res[$i]["komoditi"],
+                "code" => $res[$i]["code"],
+                "uraian_barang" => $res[$i]["uraian_barang"],
+                "satuan_barang" => $res[$i]["satuan_barang"],
+                "uraian_satuan" => $res[$i]["uraian_satuan"],
+            );
+        }
+
+        ## Response
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+        );
+
+        return $this->response->setJSON($response);
     }
 
     public function saveHSCode()
     {
-        try{
+        try {
             $rules = [
                 "komoditi" => [
                     "rules" => "required"
@@ -90,30 +101,28 @@ class HSCode extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $values = [
                     "komoditi" => $this->request->getPost("komoditi"),
                     "code" => $this->request->getPost("code"),
                     "uraian_barang" => $this->request->getPost("uraian_barang"),
                     "satuan_barang" => $this->request->getPost("satuan_barang"),
                     "uraian_satuan" => $this->request->getPost("uraian_satuan")
-                ]);
+                ];
 
-                $response = curl_request("POST", "/hscode", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->HsCodesModel->insert($values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -126,9 +135,7 @@ class HSCode extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -141,7 +148,7 @@ class HSCode extends BaseController
 
     public function updateHSCode()
     {
-        try{
+        try {
             $rules = [
                 "komoditi" => [
                     "rules" => "required"
@@ -163,30 +170,28 @@ class HSCode extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $values = [
                     "komoditi" => $this->request->getPost("komoditi"),
                     "code" => $this->request->getPost("code"),
                     "uraian_barang" => $this->request->getPost("uraian_barang"),
                     "satuan_barang" => $this->request->getPost("satuan_barang"),
                     "uraian_satuan" => $this->request->getPost("uraian_satuan")
-                ]);
+                ];
 
-                $response = curl_request("PATCH", "/hscode/$id", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->HsCodesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -199,9 +204,7 @@ class HSCode extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -215,15 +218,16 @@ class HSCode extends BaseController
     public function getByIdHSCode($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/hscode/$id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->HsCodesModel->get_by_id($id);
+
+            if (count($res)) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -242,12 +246,14 @@ class HSCode extends BaseController
 
     public function deleteHSCode()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/hscode/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->HsCodesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -255,7 +261,7 @@ class HSCode extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -271,9 +277,7 @@ class HSCode extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
