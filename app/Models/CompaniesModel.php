@@ -18,6 +18,8 @@ class CompaniesModel extends Model
         'province_id',
         'city_id',
         'zip_code',
+        'phone',
+        'email',
         'createdAt',
         'updatedAt',
         'deletedAt'

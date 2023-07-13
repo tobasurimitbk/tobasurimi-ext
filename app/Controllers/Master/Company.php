@@ -219,40 +219,28 @@ class Company extends BaseController
                 $id = $this->request->getPost("id");
 
                 $file = $this->request->getFile("logo");
+
+                $values = [
+                    "company" => $this->request->getPost("company"),
+                    "holding_company" => $this->request->getPost("holding_company"),
+                    "address" => $this->request->getPost("address"),
+                    "phone" => $this->request->getPost("phone"),
+                    "email" => $this->request->getPost("email"),
+                    "zip_code" => $this->request->getPost("zip_code"),
+                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
+                ];
+
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
                     if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
                         $logo = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-
-                        $payload = json_encode([
-                            "logo" => $logo,
-                            "company" => $this->request->getPost("company"),
-                            "holding_company" => $this->request->getPost("holding_company"),
-                            "address" => $this->request->getPost("address"),
-                            "phone" => $this->request->getPost("phone"),
-                            "email" => $this->request->getPost("email"),
-                            "zip_code" => $this->request->getPost("zip_code"),
-                            "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                            "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
-                        ]);
+                        $values["logo"] = $logo;
                     }
-                } else {
-                    $payload = json_encode([
-                        "company" => $this->request->getPost("company"),
-                        "holding_company" => $this->request->getPost("holding_company"),
-                        "address" => $this->request->getPost("address"),
-                        "phone" => $this->request->getPost("phone"),
-                        "email" => $this->request->getPost("email"),
-                        "zip_code" => $this->request->getPost("zip_code"),
-                        "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                        "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
-                    ]);
                 }
 
-                if ($payload) {
-                    $response = curl_request("PATCH", "/companies/$id", $this->token, $payload);
-
-                    if ($response["code"] === 200) {
+                if (isset($values)) {
+                    if ($this->CompaniesModel->update($id, $values)) {
                         $data = [
                             "status"            => true,
                             "message"   => "Data Berhasil diubah",
@@ -261,11 +249,11 @@ class Company extends BaseController
                         ];
                         echo json_encode($data);
                     } else {
-                        $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                        $message = 'Data Gagal Diubah';
                         $data = [
                             "status"            => false,
                             "message"    => $message,
-                            "payload"   => $payload,
+                            "payload"   => "",
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
@@ -302,15 +290,15 @@ class Company extends BaseController
     public function getByIdCompany($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/companies/$id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->CompaniesModel->get_by_id($id);
+            if (count($res)) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -333,8 +321,10 @@ class Company extends BaseController
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/companies/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->CompaniesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -342,7 +332,7 @@ class Company extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -371,12 +361,8 @@ class Company extends BaseController
 
     public function dropdownCompany()
     {
-        $responseCompany = curl_request("GET", "/companies/all", $this->token);
-
-        $dataCompany = [];
-        if ($responseCompany["code"] === 200) {
-            $dataCompany = json_decode($responseCompany["body"])->data;
-        }
+        //$responseCompany = curl_request("GET", "/companies/all", $this->token);
+        $dataCompany = $this->CompaniesModel->search_list(array(), "value");
 
         $data = [
             "data" => $dataCompany

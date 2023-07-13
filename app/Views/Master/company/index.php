@@ -77,7 +77,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id" onchange="getZipCode()">
+                                <select class="form-select city_id" name="city_id" id="city_id">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Kota</label>
@@ -85,7 +85,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <input type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
@@ -655,10 +655,6 @@
     const previewPhoto = function() {
         let file = document.getElementById("logo").files[0];
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
-    }
-
-    const getZipCode = function() {
-        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
     }
 
     const changeSort = function(val) {
