@@ -55,13 +55,20 @@ class SppModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'purchase_requests.updatedAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "purchase_requests.*,warehouses.warehouse_name AS warehouseName, users.name AS approvedByHeadwarehouseName*";
+        $selectQry = "purchase_requests.*,
+                        warehouses.warehouse_name AS warehouseName, 
+                        headwarehouse.name AS approvedByHeadwarehouseName,
+                        headpurchasing.name AS approvedByHeadofPurchasingName,
+                        director.name AS approvedByDirectorName
+                        ";
 
         $purchaseRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
-            ->join('users', 'purchase_requests.approved_by_headwarehouse = users.id')
+            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id')
+            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id')
+            ->join('users AS director', 'purchase_requests.approved_by_director = director.id')
             ->orderBy($sort, $sortType);
 
         $totalData = $purchaseRequestsDataQry->countAllResults(false);
@@ -81,13 +88,12 @@ class SppModel extends Model
         // }
         // $purchaseRequestsDataQry->groupEnd();
 
-        // if ($addCondition['search']) {
-        //     $purchaseRequestsDataQry->groupStart()
-        //         ->like('spp_no', $addCondition['search'])
-        //         ->orLike('spp_type', $addCondition['search'])
-        //         ->groupEnd();
-        // }
-
+        if ($addCondition['search']) {
+            $purchaseRequestsDataQry->groupStart()
+                ->like('spp_no', $addCondition['search'])
+                ->orLike('spp_type', $addCondition['search'])
+                ->groupEnd();
+        }
 
         $totalFilteredData = $purchaseRequestsDataQry->countAllResults(false);
         $data = $purchaseRequestsDataQry->findAll($limit, $offset);
