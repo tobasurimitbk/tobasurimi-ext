@@ -100,6 +100,8 @@ class SupplierBahanBaku extends BaseController
     public function saveSupplierBahanBaku()
     {
         try{
+            $supplierModel = new SupplierModel();
+
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -142,55 +144,77 @@ class SupplierBahanBaku extends BaseController
                 ]
             ];
 
-            if ($this->validate($rules)) {
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
-                    "phone" => $this->request->getPost("phone"),
-                    "contact_person" => $this->request->getPost("contact_person"),
-                    "email" => $this->request->getPost("email"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                    "province_id" => $this->request->getPost("province_parent_id"),
-                    "city_id" => $this->request->getPost("city_parent_id"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "kategori" => "LOKAL",
-                    "type" => "BAHAN BAKU"
-                    // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
-                ]);
-
-                $response = curl_request("POST", "/suppliers", $this->token, $payload);
-
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            $payload = json_encode([
+                "company_id" => $this->this_company_id,
+                "kode" => $this->request->getPost("kode"),
+                "name" => $this->request->getPost("name"),
+                "address" => $this->request->getPost("address"),
+                "no_npwp" => $this->request->getPost("no_npwp"),
+                "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
+                "email" => $this->request->getPost("email"),
+                "no_rekening" => $this->request->getPost("no_rekening"),
+                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
+                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                "kategori" => "LOKAL",
+                "type" => "BAHAN BAKU"
+                // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
+            ]);
+
+            $insertData = [
+                "company_id"        => $this->this_company_id,
+                "kode"              => $this->request->getPost("kode"),
+                "name"              => $this->request->getPost("name"),
+                "address"           => $this->request->getPost("address"),
+                "no_npwp"           => $this->request->getPost("no_npwp"),
+                "phone"             => $this->request->getPost("phone"),
+                "contact_person"    => $this->request->getPost("contact_person"),
+                "email"             => $this->request->getPost("email"),
+                "no_rekening"       => $this->request->getPost("no_rekening"),
+                "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
+                "province_id"       => $this->request->getPost("province_parent_id"),
+                "city_id"           => $this->request->getPost("city_parent_id"),
+                "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                "kategori"          => "LOKAL",
+                "type"              => "BAHAN BAKU"
+            ];
+            $insert = $supplierModel->insert($insertData);
+            $response = curl_request("POST", "/suppliers", $this->token, $payload);
+
+            if (!$insert) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Data Gagal Disimpan!',
+                    "payload"   => $payload,
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+                
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $payload,
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
         }
         catch(\Exception $e)
         {
@@ -207,6 +231,8 @@ class SupplierBahanBaku extends BaseController
     public function updateSupplierBahanBaku()
     {
         try{
+            $supplierModel = new SupplierModel();
+
             $rules = [
                 "kode" => [
                     "rules" => "required"
@@ -249,51 +275,52 @@ class SupplierBahanBaku extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
-                    "phone" => $this->request->getPost("phone"),
-                    "contact_person" => $this->request->getPost("contact_person"),
-                    "email" => $this->request->getPost("email"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                    "province_id" => $this->request->getPost("province_parent_id"),
-                    "city_id" => $this->request->getPost("city_parent_id"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "kategori" => "LOKAL",
-                    "type" => "BAHAN BAKU"
+                $payload = [
+                    "company_id"        => $this->this_company_id,
+                    "kode"              => $this->request->getPost("kode"),
+                    "name"              => $this->request->getPost("name"),
+                    "address"           => $this->request->getPost("address"),
+                    "no_npwp"           => $this->request->getPost("no_npwp"),
+                    "phone"             => $this->request->getPost("phone"),
+                    "contact_person"    => $this->request->getPost("contact_person"),
+                    "email"             => $this->request->getPost("email"),
+                    "no_rekening"       => $this->request->getPost("no_rekening"),
+                    "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
+                    "province_id"       => $this->request->getPost("province_parent_id"),
+                    "city_id"           => $this->request->getPost("city_parent_id"),
+                    "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "kategori"          => "LOKAL",
+                    "type"              => "BAHAN BAKU"
                     // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
-                ]);
+                ];
             }
 
             if ($payload) {
-                $response = curl_request("PATCH", "/suppliers/$id", $this->token, $payload);
+                $supplierModel->update($id, $payload);
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
             }
         }
         catch(\Exception $e)
@@ -311,7 +338,11 @@ class SupplierBahanBaku extends BaseController
     public function getByIdSupplierBahanBaku($id)
     {
         $supplierModel = new SupplierModel();
-        $supplierData = $supplierModel->asObject()->find($id);
+        $supplierData = $supplierModel->asObject()
+            ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name')
+            ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id')
+            ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id')
+            ->find($id);
 
         if (!$supplierData) {
             $data = [
@@ -340,7 +371,7 @@ class SupplierBahanBaku extends BaseController
             $supplierModel = new SupplierModel();
             $id = $this->request->getPost("id");
 
-            if (!empty($id)) {
+            if (empty($id)) {
                 $data = [
                     "status"    => false,
                     "message"   => "Data Gagal Dihapus",

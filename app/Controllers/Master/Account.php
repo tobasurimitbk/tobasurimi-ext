@@ -57,12 +57,28 @@ class Account extends BaseController
 
     public function dropdownSubAccount()
     {
+        $search = $this->request->getGet('search');
+        $page = $this->request->getGet('page') ?? 1;
+        $limit = 10;
+        $offset = ($page - 1) * 10;
 
-        $res = $this->Sub_AkunsModel->search_list(array(), 'nama_sub');
+        $dataQry = $this->Sub_AkunsModel;
+
+        if (!empty($search)) {
+            $dataQry->like('nama_sub', $search);
+        }
+
+        $totalData = $dataQry->countAllResults(false);
+        $subAccData = $dataQry->select('id, nama_sub AS text')
+            ->orderBy('nama_sub', 'asc')
+            ->findAll($limit, $offset);
 
 
         $data = [
-            "data" => $res
+            "results"   => $subAccData,
+            "pagination"=> [
+                "more"  => $offset < $totalData
+            ]
         ];
 
         echo json_encode($data);

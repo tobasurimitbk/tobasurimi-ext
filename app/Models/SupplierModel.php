@@ -14,7 +14,24 @@ class SupplierModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        'company_id', 
+        'kode', 
+        'name', 
+        'address', 
+        'province_id', 
+        'city_id', 
+        'no_npwp', 
+        'phone', 
+        'contact_person',
+        'email',
+        'no_rekening',
+        'supplier_buyer',
+        'type',
+        'kategori',
+        'ap_id',
+        'ar_id'
+    ];
 
     // Dates
     protected $useTimestamps = true;
