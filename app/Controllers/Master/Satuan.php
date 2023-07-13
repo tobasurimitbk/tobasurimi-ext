@@ -4,13 +4,17 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 
+use App\Models\SatuanModel;
+
 class Satuan extends BaseController
 {
     protected $token;
+    protected $satuanModel;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->satuanModel = new SatuanModel();
     }
 
     public function satuan()
@@ -255,12 +259,7 @@ class Satuan extends BaseController
 
     public function dropdownSatuan()
     {
-        $responseSatuan = curl_request("GET", "/satuan/all", $this->token);
-
-        $dataSatuan = [];
-        if ($responseSatuan["code"] === 200) {
-            $dataSatuan = json_decode($responseSatuan["body"])->data;
-        }
+        $dataSatuan = $this->satuanModel->asObject()->find();
 
         $data = [
             "data" => $dataSatuan

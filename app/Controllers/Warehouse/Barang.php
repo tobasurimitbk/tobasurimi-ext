@@ -5,29 +5,27 @@ namespace App\Controllers\Warehouse;
 use App\Controllers\BaseController;
 
 use App\Models\BarangModel;
+use App\Models\MetadataModel;
 
 class Barang extends BaseController
 {
     protected $token;
     protected $this_company_id;
     protected $barangModel;
+    protected $metadataModel;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
+        $this->metadataModel = new MetadataModel();
     }
 
     public function barang()
     {
         // Get Kategori
-        $responseKategori = curl_request("GET", "/metadata/all?name=kategori_barang", $this->token);
-
-        $dataKategori = [];
-        if ($responseKategori) {
-            $dataKategori = json_decode($responseKategori["body"])->data;
-        }
+        $dataKategori = $this->metadataModel->get_by_name('Kategori Barang');
          
         $data = [
             "dataKategori" => $dataKategori
@@ -133,7 +131,7 @@ class Barang extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $payload = [
                     "company_id" => $this->this_company_id,
                     "kode_barang" => $this->request->getPost("kode_barang"),
                     "nama_barang" => $this->request->getPost("nama_barang"),
@@ -145,37 +143,37 @@ class Barang extends BaseController
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
                     "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    "spek" => json_decode($this->request->getPost("spek"))
-                ]);
+                    "spek" => "'" . json_decode($this->request->getPost("spek")) . "'"
+                ];
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
+                $data = [
+                    "status"            => false,
+                    "message"    => $payload,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
 
-                $response =  $this->barangModel->insert($payload);
+                // $response =  $this->barangModel->insert($payload);
 
-                if ($response) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
+                // if ($response) {
+                //     $data = [
+                //         "status"            => true,
+                //         "message"   => "Data Berhasil disimpan",
+                //         "payload"   => $payload,
+                //         'token' => csrf_hash()
+                //     ];
+                //     echo json_encode($data);
+                // } else {
+                //     $message =  'Data Gagal Disimpan';
+                //     $data = [
+                //         "status"            => false,
+                //         "message"    => $message,
+                //         "payload"   => $payload,
+                //         'token' => csrf_hash()
+                //     ];
+                //     echo json_encode($data);
+                // }
             } else {
                 $data = [
                     "status"            => false,
@@ -230,7 +228,7 @@ class Barang extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $payload = [
                     "company_id" => $this->this_company_id,
                     "kode_barang" => $this->request->getPost("kode_barang"),
                     "nama_barang" => $this->request->getPost("nama_barang"),
@@ -242,7 +240,7 @@ class Barang extends BaseController
                     "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                     "spek" => json_decode($this->request->getPost("spek"))
-                ]);
+                ];
 
                 // $data = [
                 //     "status"            => false,
@@ -381,7 +379,7 @@ class Barang extends BaseController
                 $findBarang = $this->barangModel->find($id);
                 if (!$findBarang) {
                     $response =  $this->barangModel->delete($id);
-                    if ($response["code"] === 200) {
+                    if ($response) {
                         $data = [
                             "status"            => true,
                             "message"   => "Data Berhasil dihapus",
@@ -428,12 +426,7 @@ class Barang extends BaseController
 
     public function dropdownBarang()
     {
-        $responseBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
-
-        $dataBarang = [];
-        if ($responseBarang) {
-            $dataBarang = $this->response->setJSON($responseBarang);
-        }
+        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
         $data = [
             "data" => $dataBarang
@@ -446,12 +439,7 @@ class Barang extends BaseController
     public function dropdownBarangKategori()
     {
         $kategori = $this->request->getGet("kategori");
-        $responseBarang = $this->barangModel->getBarangByKategori($kategori);
-
-        $dataBarang = [];
-        if ($responseBarang) {
-            $dataBarang = $this->response->setJSON($responseBarang);
-        }
+        $dataBarang = $this->barangModel->getBarangByKategori($kategori);
 
         $data = [
             "data" => $dataBarang

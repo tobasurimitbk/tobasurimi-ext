@@ -4,13 +4,17 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 
+use App\Models\HSCodeModel;
+
 class HSCode extends BaseController
 {
     protected $token;
+    protected $HSCodeModel;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->HSCodeModel = new HSCodeModel();
     }
 
     public function hsCode()
@@ -282,12 +286,7 @@ class HSCode extends BaseController
 
     public function dropdownHSCode()
     {
-        $responseKodeHS = curl_request("GET", "/hscode/all", $this->token);
-
-        $dataKodeHS = [];
-        if ($responseKodeHS["code"] === 200) {
-            $dataKodeHS = json_decode($responseKodeHS["body"])->data;
-        }
+        $dataKodeHS = $this->HSCodeModel->asObject()->find();
 
         $data = [
             "data" => $dataKodeHS
