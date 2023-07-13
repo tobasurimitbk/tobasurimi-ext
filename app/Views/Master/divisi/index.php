@@ -8,7 +8,7 @@
                 <h5 class="modal-title"><label class="title-name"></label> Divisi</h5>
             </div>
             <div class="modal-body">
-                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                <form class="create-form" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
                     <input type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
@@ -22,9 +22,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -32,36 +32,36 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Divisi</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-    <div class="row justify-content-end mb-3">
-        <div class="col-md-2">
-            <input class="form-control search form-out-search" placeholder="Search" value="" />
-        </div>
+    <div class="section-header">
+        <h1>Divisi</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
     </div>
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>No.</th>
-                        <th onclick="changeSort('divisi')" class="sort">Divisi</th>
-                    </tr>
-                </thead>
-                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('divisi')" class="sort">Divisi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
 </section>
 
 <script>
@@ -74,7 +74,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -91,10 +93,10 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
@@ -120,7 +122,7 @@
             }
         }
     });
-    
+
     $(document).ready(function() {
 
         var validator = $(".create-form").validate({
@@ -203,11 +205,23 @@
             })
         })
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
         $(".btn-submit-form").click(function() {
+            proses_form();
+        })
+
+        $(".divisi").keyup(function(event) {
+            if (event.keyCode === 13) {
+
+                proses_form();
+                return false;
+            }
+        })
+
+        function proses_form() {
             if ($(".create-form").valid()) {
                 Swal.fire({
                     icon: 'question',
@@ -226,8 +240,7 @@
 
                         let id = $(".id").val();
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("divisi/update"); ?>",
                                 data: data,
@@ -243,14 +256,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -272,8 +285,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("divisi/save"); ?>",
                                 data: data,
@@ -289,14 +301,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -320,7 +332,7 @@
                     }
                 })
             }
-        })
+        }
 
         $(".delete-btn").click(function() {
             Swal.fire({
@@ -352,14 +364,14 @@
                             if (response.status) {
                                 stopLoading()
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                    $(".add-modal").modal("hide")
-                                })
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                        $(".add-modal").modal("hide")
+                                    })
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -385,13 +397,10 @@
     })
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
