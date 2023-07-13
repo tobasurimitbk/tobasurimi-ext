@@ -47,7 +47,6 @@ class Barang extends BaseController
             "idCompany"     => $this->this_company_id
         ]; 
 
-        $barangModel = new BarangModel();
         $condition = [
             "company_id"    => $this->this_company_id
         ];
@@ -61,7 +60,7 @@ class Barang extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $barangData = $barangModel->getBarangList($condition, $addCondition, $limit, $offset);
+        $barangData = $this->barangModel->getBarangList($condition, $addCondition, $limit, $offset);
 
         $dataBarang = [];
 
@@ -102,7 +101,8 @@ class Barang extends BaseController
         try{
             $rules = [
                 "kode_barang" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[barangs.kode_barang]",
+                    'errors' => ['is_unique' => 'kode Barang sudah ada!']
                 ],
                 "nama_barang" => [
                     "rules" => "required"
@@ -130,6 +130,17 @@ class Barang extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
                 $payload = [
                     "company_id" => $this->this_company_id,
@@ -146,33 +157,18 @@ class Barang extends BaseController
                     "spek" => $this->request->getPost("spek")
                 ];
 
-                $exist = $this->barangModel->getBarangByKode($this->request->getPost("kode_barang"), null);
+                $response =  $this->barangModel->insert($payload);
 
-                if(sizeof($exist) === 0){
-                    $response =  $this->barangModel->insert($payload);
-
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil disimpan",
-                            "payload"   => $payload,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message =  'Data Gagal Disimpan';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            "payload"   => $payload,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                }
-                else
-                {
-                    $message =  'Kode Barang Sudah Ada';
+                if ($response) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -181,13 +177,6 @@ class Barang extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
             }
         }
         catch(\Exception $e)
@@ -206,9 +195,6 @@ class Barang extends BaseController
     {
         try{
             $rules = [
-                "kode_barang" => [
-                    "rules" => "required"
-                ],
                 "nama_barang" => [
                     "rules" => "required"
                 ],
@@ -232,12 +218,22 @@ class Barang extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
                 $payload = [
                     "company_id" => $this->this_company_id,
-                    "kode_barang" => $this->request->getPost("kode_barang"),
                     "nama_barang" => $this->request->getPost("nama_barang"),
                     "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
                     "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
@@ -261,33 +257,18 @@ class Barang extends BaseController
                     'id' => $id
                 ];
 
-                $exist = $this->barangModel->getBarangByKode($this->request->getPost("kode_barang"), $id);
+                $response = $this->barangModel->where($condition)->set($payload)->update();
 
-                if(sizeof($exist) === 0){
-                    $response = $this->barangModel->where($condition)->set($payload)->update();
-
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil diubah",
-                            "payload"   => $payload,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Diubah';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            "payload"   => $payload,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                }
-                else
-                {
-                    $message =  'Kode Barang Sudah Ada';
+                if ($response) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,

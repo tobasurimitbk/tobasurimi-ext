@@ -4,15 +4,19 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 
+use App\Models\penerimaanBarangModel;
+
 class PenerimaanBarangLokal extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $penerimaanBarangModel;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
     }
 
     public function penerimaanBarangLokal()
@@ -119,51 +123,62 @@ class PenerimaanBarangLokal extends BaseController
     public function allPenerimaanBarangLokal()
     {
         $payload = [
-            "pagesize" => $this->request->getGet("length"),
-            "currentpage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sorttype" => $this->request->getGet("sortType"),
             "statuspenerimaan" => "LOKAL",
             "status" => $this->request->getGet("status"),
-            "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/penerimaanBarang", $this->token, $payload);
-        $dataPenerimaanBarangLokal = [];
-        $totalRecords = 0;
+        $condition = [
+            "company_id"        => $this->this_company_id,
+            "status_penerimaan" => "LOKAL"
+        ];
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "status" => $this->request->getGet("status"),
+            "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
 
-            $no = ($payload["pagesize"] * ($payload["currentpage"] - 1)) + 1;
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, $limit, $offset);
 
-            foreach ($body as $data) {
-                array_push($dataPenerimaanBarangLokal, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "no_penerimaan_barang" => $data->no_penerimaan_barang,
-                    "invoice_no" => $data->invoice_no,
-                    "multiple_po_no" => $data->multiple_po_no,
-                    "acceptance_type" => $data->acceptance_type,
-                    "aju_type" => $data->aju_type,
-                    "aju_no" => $data->aju_no,
-                    "validation_date" => $data->validation_date,
-                    "sender_name" => $data->sender_name,
-                    "status_post" => $data->status_post
-                ]);
-            }
+        $dataPenerimaanBarang = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($penerimaanBarangData['data'] as $data) {
+            array_push($dataPenerimaanBarang, [
+                "no"                    => $no++,
+                "id"                    => $data->id,
+                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
+                "invoice_no"            => $data->invoice_no,
+                "multiple_po_no"        => json_decode($data->multiple_po_no),
+                "acceptance_type"       => $data->acceptance_type,
+                "aju_type"              => $data->aju_type,
+                "aju_no"                => $data->aju_no,
+                "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
+                "sender_name"           => $data->sender_name,
+                "status_post"           => $data->status_post
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataPenerimaanBarangLokal,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $penerimaanBarangData['totalData'],
+            "recordsFiltered"   => $penerimaanBarangData['totalFilteredData'],
+            "data"              => $dataPenerimaanBarang,
+            // "response" => $response,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
