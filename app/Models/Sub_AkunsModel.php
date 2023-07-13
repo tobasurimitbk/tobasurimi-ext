@@ -32,10 +32,16 @@ class Sub_AkunsModel extends Model
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
-        $requete = "SELECT * FROM sub_akuns ";
-        $requete .= "WHERE 1 ";
+        $requete = "SELECT sub_akuns.*,kategori_akuns.nama_kategori,m1.value as kelompok_akun,m2.value as akun_coa,header_akuns.no_header,header_akuns.nama_header FROM sub_akuns ";
+        $requete .= "LEFT JOIN kategori_akuns ON (kategori_akuns.id=sub_akuns.kategori_id) ";
+        $requete .= "LEFT JOIN header_akuns ON (sub_akuns.header_id=header_akuns.id) ";
+        $requete .= "LEFT JOIN metadata m1 ON (kategori_akuns.kelompok_id=m1.id) ";
+        $requete .= "LEFT JOIN metadata m2 ON (sub_akuns.coa_id=m2.id) ";
+        $requete .= "WHERE sub_akuns.deletedAt is null ";
+        if (isset($values["company_id"]))
+            $requete .= ($values["company_id"] == "") ? "" : ("AND sub_akuns.company_id ='" . $values["company_id"] . "' ");
         if (isset($values["nama_sub"]))
-            $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
+            $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
 
         if ($sortby != '')
             $requete .= "ORDER BY $sortby ";
@@ -49,9 +55,11 @@ class Sub_AkunsModel extends Model
     public function total_list($values)
     {
         $requete  = "SELECT count(*) as total FROM sub_akuns ";
-        $requete .= "WHERE 1 ";
+        $requete .= "WHERE sub_akuns.deletedAt is null ";
+        if (isset($values["company_id"]))
+            $requete .= ($values["company_id"] == "") ? "" : ("AND sub_akuns.company_id ='" . $values["company_id"] . "' ");
         if (isset($values["nama_sub"]))
-            $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
+            $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
