@@ -3,11 +3,16 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\RMPurchaseOrderModel;
+use App\Models\RMPurchaseOrderDetailModel;
+
 
 class POLokalBahanBaku extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $RMPurchaseOrderModel;
+    protected $RMPurchaseOrderDetailModel;
 
     public function __construct()
     {
