@@ -431,6 +431,20 @@
     });
 
     $(document).ready(function() {
+        const select2Prop = {
+            dropdownParent: $("#add_modal"),
+            ajax: {
+                delay: 300,
+                url: `<?= base_url("sub-account/dropdown"); ?>`,
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                }
+            }
+        };
         // PROVINCE
         $('.province_id').select2({
             placeholder: "",
@@ -765,28 +779,10 @@
             $(".delete-form").css('display', 'none');
             $(".body-detail-table").empty()
 
-            $.ajax({
-                url: `<?= base_url("sub-account/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".ap_id").empty()
-                    $(".ar_id").empty()
+            $('.ap_id').select2(select2Prop);
+            $('.ar_id').select2(select2Prop);
 
-                    $(".ap_id").append(`<option value=""></option>`)
-                    $(".ar_id").append(`<option value=""></option>`)
-
-                    res.data.forEach(function(item) {
-                        $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                        $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                    })
-
-                    $(".ap_id").val('').change();
-                    $(".ar_id").val('').change();
-
-                    $(".add-modal").modal("show")
-                }
-            })
+            $(".add-modal").modal("show");
         })
 
         $(".btn-hide-detail").click(function() {
@@ -916,28 +912,14 @@
                                 $(".parent_postal_code").val(res?.data?.postal_code);
                             }
                         })
+                        $('.ap_id').select2(select2Prop);
+                        $('.ar_id').select2(select2Prop);
 
-                        $.ajax({
-                            url: `<?= base_url("sub-account/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".ap_id").empty()
-                                $(".ar_id").empty()
-
-                                $(".ap_id").append(`<option value=""></option>`)
-                                $(".ar_id").append(`<option value=""></option>`)
-
-                                result.data.forEach(function(item) {
-                                    $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                                    $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                                })
-
-                                $(".ap_id").val(res?.data?.ap_id).change();
-                                $(".ar_id").val(res?.data?.ar_id).change();
-                                $(".add-modal").modal("show")
-                            }
-                        })
+                        const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
+                        $(".ap_id").append($apOption).trigger('change');
+                        const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
+                        $(".ar_id").append($arOption).trigger('change');
+                        $(".add-modal").modal("show")
                     } else {
                         Swal.fire({
                             icon: 'error',

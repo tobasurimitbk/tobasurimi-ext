@@ -33,7 +33,11 @@ class VendorModel extends Model
 
     public function get_by_id($id)
     {
-        $requete = "SELECT * FROM vendors WHERE id='" . $id . "'";
+        $requete = "SELECT vendors.*,ap.nama_sub as ap_name, ar.nama_sub as ar_name FROM vendors ";
+        $requete .= "LEFT JOIN sub_akuns ap ON (ap.id=vendors.ap_id) ";
+        $requete .= "LEFT JOIN sub_akuns ar ON (ar.id=vendors.ar_id) ";
+        $requete .= "WHERE vendors.deletedAt is null and vendors.id='" . $id . "'";
+
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();
