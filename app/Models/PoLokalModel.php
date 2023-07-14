@@ -4,36 +4,24 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class SppModel extends Model
+class PoModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'purchase_requests';
+    protected $table            = 'rm_purchase_orders';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
-        'request_date',
-        'spp_no',
-        'spp_type',
-        'warehouse_id',
-        'total',
-        'note',
-        'is_posted',
-        'approved_by_headwarehouse',
-        'approved_by_head_of_purchasing',
-        'approved_by_director',
-        'request_status',
-    ];
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'createdAt';
-    protected $updatedField  = 'updatedAt';
-    protected $deletedField  = 'deletedAt';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 
     // Validation
     protected $validationRules      = [];
@@ -52,7 +40,7 @@ class SppModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getSppList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function PoLokalList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
             'spp_type'          => 'purchase_requests.spp_type',
@@ -112,27 +100,5 @@ class SppModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
-    }
-
-    public function getSppById($id)
-    {
-        $selectQry = "purchase_requests.*,
-        warehouses.warehouse_name AS warehouseName, 
-        headwarehouse.name AS approvedByHeadwarehouseName,
-        headpurchasing.name AS approvedByHeadofPurchasingName,
-        director.name AS approvedByDirectorName,
-        createdBy.name AS createdByName
-        ";
-
-        $sppData = $this->asObject()
-            ->select($selectQry)
-            ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
-            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id')
-            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id')
-            ->join('users AS director', 'purchase_requests.approved_by_director = director.id')
-            ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id')
-            ->find($id);
-
-        return $sppData;
     }
 }

@@ -9,6 +9,7 @@ class WarehousesModel extends Model
     protected $table = 'warehouses';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
+    protected $useSoftDeletes   = true;
     protected $allowedFields = [
         'id',
         'company_id',
@@ -25,6 +26,10 @@ class WarehousesModel extends Model
         'updatedAt',
         'deletedAt'
     ];
+
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
 
     public function get_by_id($id)
     {

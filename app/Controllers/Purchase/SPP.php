@@ -4,6 +4,9 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 use App\Models\SppModel;
+use App\Models\SppDetailModel;
+use App\Models\MetadataModel;
+use App\Models\WarehousesModel;
 
 class SPP extends BaseController
 {
@@ -52,33 +55,40 @@ class SPP extends BaseController
     public function getByIdSPP($id = null)
     {
         //Get Order Type By Metadata
-        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $this->token);
+        $MetadataModel = new MetadataModel();
+        $dataOrderType =  $MetadataModel->get_by_name("Tipe PO");
+        // $dataOrderType =  "";
 
-        $dataOrderType = [];
-        if ($responseOrderType["code"] === 200) {
-            $dataOrderType = json_decode($responseOrderType["body"])->data;
-        }
+        // $dataOrderType = [];
+        // if ($responseOrderType["code"] === 200) {
+        //     $dataOrderType = json_decode($responseOrderType["body"])->data;
+        // }
 
         //Get Warehouse
-        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
+        // $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
+        $WarehousesModel = new WarehousesModel();
+        $dataWarehouse = $WarehousesModel->asObject()->findAll();
 
-        $dataWarehouse = [];
-        if ($responseWarehouse["code"] === 200) {
-            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
-        }
+        // $dataWarehouse = [];
+        // if ($responseWarehouse["code"] === 200) {
+        //     $dataWarehouse = json_decode($responseWarehouse["body"])->data;
+        // }
 
         $data = [
             "dataOrderType" => $dataOrderType,
             "dataWarehouse" => $dataWarehouse
         ];
 
+        $SppModel = new SppModel();
+        $SppDetailModel = new SppDetailModel();
+
+        $sppId = 3;
+
         if (!empty($id)) {
-            $responseSPP = curl_request("GET", "/purchaseRequest/$id", $this->token);
-            $dataSPP = [];
-            if ($responseSPP["code"] === 200) {
-                $dataSPP = json_decode($responseSPP["body"])->data;
-            }
+            $dataSPP = $SppModel->getSppById($id);
+            $dataSppDetail = $SppDetailModel->getSppDetailById($sppId);
             $data["dataSPP"] = $dataSPP;
+            $data["dataSPP"]->purchase_request_details = $dataSppDetail;
         }
 
         return view('Purchase/spp/form', $data);
@@ -128,21 +138,16 @@ class SPP extends BaseController
         ];
 
         $SppModel = new SppModel();
+
         $condition = [];
+
         $addCondition = [
-            "search"    => $this->request->getGet("search"),
-            "sort"      => $this->request->getGet("sort"),
-            "sortType"            => $this->request->getGet("sortType"),
-            "dateStart"        => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
-        // $addCondition = [
-        //     "search"        => $this->request->getGet("search"),
-        //     "sort"          => $this->request->getGet("sort"),
-        //     "sortType"      => $this->request->getGet("sortType"),
-        //     "dateStart"     >= $this->request->getGet("dateStart"),
-        //     "dateEnd"       <= $this->request->getGet("dateEnd"),
-        // ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
         $sppData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);

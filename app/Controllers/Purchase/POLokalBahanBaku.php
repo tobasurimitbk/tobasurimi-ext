@@ -3,11 +3,13 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\SppModel;
 
 class POLokalBahanBaku extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $SppModel;
 
     public function __construct()
     {
@@ -29,7 +31,7 @@ class POLokalBahanBaku extends BaseController
         if ($responseSupplier["code"] === 200) {
             $dataSupplier = json_decode($responseSupplier["body"])->data;
         }
-        
+
         $data = [
             "dataSupplier" => $dataSupplier
         ];
@@ -46,7 +48,7 @@ class POLokalBahanBaku extends BaseController
         if ($responseSupplier["code"] === 200) {
             $dataSupplier = json_decode($responseSupplier["body"])->data;
         }
-        
+
         $data = [
             "dataSupplier" => $dataSupplier
         ];
@@ -64,7 +66,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         return view('Purchase/poLokalBahanBaku/form', $data);
-        
+
         return;
     }
 
@@ -103,45 +105,54 @@ class POLokalBahanBaku extends BaseController
     public function allPOLokalBahanBaku()
     {
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            // "requestStatus" => $this->request->getGet("status"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/rawMaterialPO", $this->token, $payload);
+        $SppModel = new SppModel();
+
+        $condition = [
+            // "spp_type"      => "Bahan Baku Lokal",
+            "is_posted"     => 1
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $poData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);
+
         $dataPOLokal = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataPOLokal, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "po_date" => $data->po_date,
-                    "po_no" => $data->po_no,
-                    "supplierName" => $data->supplierName,
-                    "itemCount" => $data->itemCount
-                ]);
-            }
+        foreach ($poData['data'] as $data) {
+            array_push($dataPOLokal, [
+                "no" => $no++,
+                "id" => $data->id,
+                "po_date" => $data->po_date,
+                // "po_no" => $data->spp_no,
+                // "supplierName" => $data->supplierName,
+                // "itemCount" => $data->itemCount
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataPOLokal,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $poData['totalData'],
+            "recordsFiltered"   => $poData['totalFilteredData'],
+            "data"              => $dataPOLokal,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -150,7 +161,7 @@ class POLokalBahanBaku extends BaseController
 
     public function savePOLokalBahanBaku()
     {
-        try{
+        try {
             $rules = [
                 "po_date" => [
                     "rules" => "required"
@@ -180,7 +191,7 @@ class POLokalBahanBaku extends BaseController
                 //     'token' => csrf_hash()
                 // ];
                 // echo json_encode($data);
-                
+
                 $response = curl_request("POST", "/rawMaterialPO", $this->token, $payload);
 
                 if ($response["code"] === 201) {
@@ -212,9 +223,7 @@ class POLokalBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -227,7 +236,7 @@ class POLokalBahanBaku extends BaseController
 
     public function updatePOLokalBahanBaku()
     {
-        try{
+        try {
             $rules = [
                 "po_date" => [
                     "rules" => "required"
@@ -287,9 +296,7 @@ class POLokalBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -302,13 +309,13 @@ class POLokalBahanBaku extends BaseController
 
     public function updateStatusPOLokalBahanBaku()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             $payload = json_encode([
                 "is_posted" => true
             ]);
-            
+
             $response = curl_request("PATCH", "/rawMaterialPO/$id", $this->token, $payload);
 
             if ($response["code"] === 200) {
@@ -329,9 +336,7 @@ class POLokalBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -344,7 +349,7 @@ class POLokalBahanBaku extends BaseController
 
     public function deletePOLokalBahanBaku()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -373,9 +378,7 @@ class POLokalBahanBaku extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
