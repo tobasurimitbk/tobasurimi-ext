@@ -11,6 +11,7 @@ class Sub_AkunsModel extends Model
     protected $useAutoIncrement = true;
     protected $allowedFields = [
         'id',
+        'company_id',
         'kategori_id',
         'header_id',
         'no_sub',
@@ -22,9 +23,18 @@ class Sub_AkunsModel extends Model
         'deletedAt'
     ];
 
+    public function update_status_by_id($id, $status)
+    {
+        $requete = "UPDATE sub_akuns SET status='" . $status . "' where id='" . $id . "'";
+        return $this->db->query($requete);
+    }
+
+
     public function get_by_id($id)
     {
-        $requete = "SELECT * FROM provinces WHERE id='" . $id . "'";
+        $requete = "SELECT sub_akuns.*,header_akuns.nama_header FROM sub_akuns ";
+        $requete .= "LEFT JOIN header_akuns ON (header_akuns.id=sub_akuns.header_id) ";
+        $requete .= "WHERE sub_akuns.id='" . $id . "'";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();
@@ -42,6 +52,8 @@ class Sub_AkunsModel extends Model
             $requete .= ($values["company_id"] == "") ? "" : ("AND sub_akuns.company_id ='" . $values["company_id"] . "' ");
         if (isset($values["nama_sub"]))
             $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
+        if (isset($values["search"]))
+            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(sub_akuns.no_sub) like '%" . strtoupper($values["search"]) . "%' OR UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["search"]) . "%') ");
 
         if ($sortby != '')
             $requete .= "ORDER BY $sortby ";
@@ -60,6 +72,8 @@ class Sub_AkunsModel extends Model
             $requete .= ($values["company_id"] == "") ? "" : ("AND sub_akuns.company_id ='" . $values["company_id"] . "' ");
         if (isset($values["nama_sub"]))
             $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
+        if (isset($values["search"]))
+            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(sub_akuns.no_sub) like '%" . strtoupper($values["search"]) . "%' OR UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["search"]) . "%') ");
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;

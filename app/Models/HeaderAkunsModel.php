@@ -22,7 +22,9 @@ class HeaderAkunsModel extends Model
 
     public function get_by_id($id)
     {
-        $requete = "SELECT * FROM " . $this->table . " WHERE id='" . $id . "'";
+        $requete = "SELECT header_akuns.*,kategori_akuns.nama_kategori FROM header_akuns ";
+        $requete .= "LEFT JOIN kategori_akuns ON (kategori_akuns.id=header_akuns.kategori_id) ";
+        $requete .= "WHERE header_akuns.id='" . $id . "'";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();
@@ -36,7 +38,7 @@ class HeaderAkunsModel extends Model
         if (isset($values["company_id"]))
             $requete .= ($values["company_id"] == "") ? "" : ("AND header_akuns.company_id ='" . $values["company_id"] . "' ");
         if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(no_kategori) like '%" . strtoupper($values["search"]) . "%' OR UPPER(nama_kategori) like '%" . strtoupper($values["search"]) . "%')");
+            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(no_header) like '%" . strtoupper($values["search"]) . "%' OR UPPER(nama_header) like '%" . strtoupper($values["search"]) . "%')");
 
         if ($sortby != '')
             $requete .= "ORDER BY $sortby ";
@@ -53,8 +55,9 @@ class HeaderAkunsModel extends Model
         $requete .= "WHERE header_akuns.deletedAt is null ";
         if (isset($values["company_id"]))
             $requete .= ($values["company_id"] == "") ? "" : ("AND header_akuns.company_id ='" . $values["company_id"] . "' ");
-        if (isset($values["nama_sub"]))
-            $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
+        if (isset($values["search"]))
+            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(no_header) like '%" . strtoupper($values["search"]) . "%' OR UPPER(nama_header) like '%" . strtoupper($values["search"]) . "%')");
+
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
