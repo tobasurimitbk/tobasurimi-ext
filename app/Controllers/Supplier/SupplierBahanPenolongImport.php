@@ -170,8 +170,8 @@ class SupplierBahanPenolongImport extends BaseController
                 "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "kategori" => "LOKAL",
-                "type" => "BAHAN BAKU"
+                "kategori" => "IMPORT",
+                "type" => "BAHAN PENOLONG"
                 // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
@@ -190,11 +190,11 @@ class SupplierBahanPenolongImport extends BaseController
                 "city_id"           => $this->request->getPost("city_parent_id"),
                 "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "kategori"          => "LOKAL",
-                "type"              => "BAHAN BAKU"
+                "kategori"          => "IMPORT",
+                "type"              => "BAHAN PENOLONG"
             ];
             $insert = $supplierModel->insert($insertData);
-            $response = curl_request("POST", "/suppliers", $this->token, $payload);
+            // $response = curl_request("POST", "/suppliers", $this->token, $payload);
 
             if (!$insert) {
                 $data = [
@@ -304,8 +304,8 @@ class SupplierBahanPenolongImport extends BaseController
                     "city_id"           => $this->request->getPost("city_parent_id"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "kategori"          => "LOKAL",
-                    "type"              => "BAHAN BAKU"
+                    "kategori"          => "IMPORT",
+                    "type"              => "BAHAN PENOLONG"
                     // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
                 ];
             }
