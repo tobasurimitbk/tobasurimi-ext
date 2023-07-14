@@ -34,7 +34,10 @@ class PenerimaanBarangModel extends Model
         'updatedAt',
         'deletedAt',
         'ppnbm',
-        'tipe_bahan'
+        'tipe_bahan',
+        'biaya_masuk',
+        'status_post',
+        'status_penerimaan'
     ];
 
     // Dates
@@ -122,5 +125,17 @@ class PenerimaanBarangModel extends Model
             'sort'  => $sort,
             'sortType'  => $sortType
         ];
+    }
+
+    public function get_no($bln, $thn)
+    {
+        $filt_no = "LPB/1/" . $thn . "/" . $bln;
+
+        $no = $this->db->table('penerimaan_barang')->countAllResults(false) + 1;
+
+        if ($no != '') {
+            $filt_no = "LPB/". $no . "/" . $thn . "/" . $bln;
+        }
+        return $filt_no;
     }
 }

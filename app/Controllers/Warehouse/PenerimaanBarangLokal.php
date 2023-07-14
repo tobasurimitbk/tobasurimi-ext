@@ -10,6 +10,8 @@ use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\SupplierModel;
+use App\Models\WarehousesModel;
+use App\Models\SatuanModel;
 
 class PenerimaanBarangLokal extends BaseController
 {
@@ -21,6 +23,8 @@ class PenerimaanBarangLokal extends BaseController
     protected $penerimaanBarangDetailModel;
     protected $rmPurchaseOrderModel;
     protected $supplierModel;
+    protected $warehousesModel;
+    protected $satuanModel;
     
     public function __construct()
     {
@@ -32,6 +36,8 @@ class PenerimaanBarangLokal extends BaseController
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->supplierModel = new SupplierModel();
+        $this->warehousesModel = new WarehousesModel();
+        $this->satuanModel = new SatuanModel();
     }
 
     public function penerimaanBarangLokal()
@@ -47,7 +53,15 @@ class PenerimaanBarangLokal extends BaseController
         //Get Supplier
         $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
+        //Get Warehouse
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+
+        //Get Satuan
+        $dataSatuan = $this->satuanModel->asObject()->find();
+
         $data = [
+            "dataSatuan" => $dataSatuan,
+            "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
             "dataAJU" => $dataAJU
         ];
@@ -60,7 +74,17 @@ class PenerimaanBarangLokal extends BaseController
         //Get AJU
         $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
 
+        //Get Warehouse
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+
+        //Get Satuan
+        $dataSatuan = $this->satuanModel->asObject()->find();
+
         $data["dataAJU"] = $dataAJU;
+
+        $data["dataWarehouse"] = $dataWarehouse;
+
+        $data["dataSatuan"] = $dataSatuan;
 
         if (!empty($id)) {
             $dataPenerimaanBarang = $this->penerimaanBarangModel->asObject()->find($id);
@@ -237,11 +261,13 @@ class PenerimaanBarangLokal extends BaseController
             }
 
             if ($this->validate($rules)) {
+                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
                 $payload = [
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("no_penerimaan_barang"),
+                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
-                    "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
+                    "acceptance_type" => $this->request->getPost("acceptance_type"),
+                    "multiple_po_id" => json_encode(formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT")),
+                    "multiple_po_no" => $this->request->getPost("multiple_po_no"),
                     "tipe_bahan" => $this->request->getPost("tipe_bahan"),
                     "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
                     "aju_no" => $this->request->getPost("aju_no"),
@@ -256,38 +282,77 @@ class PenerimaanBarangLokal extends BaseController
                     "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "LOKAL",
-                    // "penerimaan_barang_detail" => json_decode($this->request->getPost("items"))
                 ];
 
-                $data = [
-                    "status"            => false,
-                    "message"    => $payload,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                $items = json_decode($this->request->getPost("items"));
+
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $detailPayload,
+                //     "payload"   => $detailPayload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
                 
-                // $response =  $this->penerimaanBarangModel->insert($payload);
+                $response =  $this->penerimaanBarangModel->insert($payload);
 
-                // if ($response) {
-                //     $data = [
-                //         "id" => "",
-                //         "status"            => true,
-                //         "message"   => "Data Berhasil disimpan",
-                //         "payload"   => $payload,
-                //         'token' => csrf_hash()
-                //     ];
-                //     echo json_encode($data);
-                // } else {
-                //     $message =  'Data Gagal Disimpan';
-                //     $data = [
-                //         "status"            => false,
-                //         "message"    => $message,
-                //         "payload"   => $payload,
-                //         'token' => csrf_hash()
-                //     ];
-                //     echo json_encode($data);
-                // }
+                if ($response) {
+                    foreach($items as $data)
+                    {
+                        $detailPayload = [];
+
+                        $detailPayload = [
+                            'purchase_order_details_id' => $data->purchase_order_details_id,
+                            'penerimaan_barang_id' => $response,
+                            'doc_qty' => $data->doc_qty,
+                            'selisih' => $data->selisih,
+                            'konversi' => $data->konversi,
+                            'harga' => $data->harga,
+                            'penyerahan' => $data->penyerahan,
+                            'keterangan' => $data->keterangan,
+                            'warehouse' => $data->warehouse,
+                            'barang_id' => $data->barang_id,
+                            'qty' => $data->qty,
+                            'pph' => $data->ppn,
+                            'ppn' => $data->pph,
+                            'unit' => $data->unit,
+                            'nama_barang_dok' => $data->nama_barang_dok,
+                            'jml_masuk' => $data->jml_masuk
+                        ];
+
+                        $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
+
+                        if(!$responseDetail) {
+                            $message =  'Data Gagal Disimpan';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    }
+
+                    $data = [
+                        "id" => $response,
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        "response" => $response,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message =  'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } 
         }
         catch(\Exception $e)
@@ -360,12 +425,14 @@ class PenerimaanBarangLokal extends BaseController
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
+                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
 
                 $payload = [
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("no_penerimaan_barang"),
+                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
-                    "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
+                    "acceptance_type" => $this->request->getPost("acceptance_type"),
+                    "multiple_po_id" => json_encode(formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT")),
+                    "multiple_po_no" => $this->request->getPost("multiple_po_no"),
                     "tipe_bahan" => $this->request->getPost("tipe_bahan"),
                     "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
                     "aju_no" => $this->request->getPost("aju_no"),
@@ -380,16 +447,17 @@ class PenerimaanBarangLokal extends BaseController
                     "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "LOKAL",
-                    "penerimaan_barang_detail" => json_decode($this->request->getPost("items"))
                 ];
 
-                $data = [
-                    "status"            => false,
-                    "message"    => $payload,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                $items = json_decode($this->request->getPost("items"));
+
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
                 
                 $condition = [
                     'id' => $id
@@ -398,13 +466,87 @@ class PenerimaanBarangLokal extends BaseController
                 $response = $this->penerimaanBarangModel->where($condition)->set($payload)->update();
 
                 if ($response) {
+                    foreach($items as $data)
+                    {
+                        $detailPayload = [];
+
+                        $detailPayload = [
+                            'purchase_order_details_id' => $data->purchase_order_details_id,
+                            'penerimaan_barang_id' => $id,
+                            'doc_qty' => $data->doc_qty,
+                            'selisih' => $data->selisih,
+                            'konversi' => $data->konversi,
+                            'harga' => $data->harga,
+                            'penyerahan' => $data->penyerahan,
+                            'keterangan' => $data->keterangan,
+                            'warehouse' => $data->warehouse,
+                            'barang_id' => $data->barang_id,
+                            'qty' => $data->qty,
+                            'pph' => $data->ppn,
+                            'ppn' => $data->pph,
+                            'unit' => $data->unit,
+                            'nama_barang_dok' => $data->nama_barang_dok,
+                            'jml_masuk' => $data->jml_masuk
+                        ];
+
+                        if($data->is_delete)
+                        {
+                            $responseDetail = $this->penerimaanBarangDetailModel->delete($data->id);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Dihapus';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+                        if($data->id)
+                        {
+                            $conditionDetail = [
+                                'id' => $data->id
+                            ];
+
+                            $responseDetail = $this->penerimaanBarangDetailModel->where($conditionDetail)->set($detailPayload)->update();
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Disimpan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+                        else
+                        {
+                            $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Disimpan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+                    }
+                    
                     $data = [
                         "id" => "",
                         "status"            => true,
-                        "message"   => "Data Berhasil diubah",
+                        "message"   => "Data Berhasil disimpan",
                         "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
+                        "response" => $response,
+                        'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {

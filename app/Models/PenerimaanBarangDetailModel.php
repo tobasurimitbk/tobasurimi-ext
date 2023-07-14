@@ -26,7 +26,14 @@ class PenerimaanBarangDetailModel extends Model
         'keterangan',
         'createdAt',
         'updatedAt',
-        'deletedAt'
+        'deletedAt',
+        'barang_id',
+        'qty',
+        'ppn', 
+        'pph',
+        'unit',
+        'nama_barang_dok',
+        'jml_masuk'
     ];
 
     // Dates
@@ -94,14 +101,14 @@ class PenerimaanBarangDetailModel extends Model
         barangs.kode_barang, 
         barangs.nama_barang,
         penerimaan_barang_detail.ppn as id_ppn,
-        ppn.tax_value as ppn,
+        penerimaan_barang_detail.pph as id_pph,
         ppn.tax_value as ppn,
         pph.tax_value as pph'
         )
         ->where($arrCondition)
         ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
-        ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn')
-        ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph')
+        ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
+        ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
         ->join('satuans', 'satuans.id = barangs.satuan_id');
         $query = $builder->get();
         
