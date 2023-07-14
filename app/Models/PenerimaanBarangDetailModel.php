@@ -28,6 +28,7 @@ class PenerimaanBarangDetailModel extends Model
         'updatedAt',
         'deletedAt',
         'barang_id',
+        'warehouse',
         'qty',
         'ppn', 
         'pph',

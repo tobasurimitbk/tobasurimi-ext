@@ -295,6 +295,7 @@ class PenerimaanBarangLokal extends BaseController
                 // echo json_encode($data);
                 
                 $response =  $this->penerimaanBarangModel->insert($payload);
+                // $response =  '';
 
                 if ($response) {
                     foreach($items as $data)
@@ -319,6 +320,14 @@ class PenerimaanBarangLokal extends BaseController
                             'nama_barang_dok' => $data->nama_barang_dok,
                             'jml_masuk' => $data->jml_masuk
                         ];
+
+                        // $data = [
+                        //     "status"            => false,
+                        //     "message"    => $detailPayload,
+                        //     "payload"   => $detailPayload,
+                        //     'token' => csrf_hash()
+                        // ];
+                        // echo json_encode($data);
 
                         $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
 
@@ -464,6 +473,7 @@ class PenerimaanBarangLokal extends BaseController
                 ];
 
                 $response = $this->penerimaanBarangModel->where($condition)->set($payload)->update();
+                // $response = '';
 
                 if ($response) {
                     foreach($items as $data)
@@ -489,6 +499,15 @@ class PenerimaanBarangLokal extends BaseController
                             'jml_masuk' => $data->jml_masuk
                         ];
 
+                        // $data = [
+                        //     "status"            => false,
+                        //     "message"    => $detailPayload,
+                        //     "payload"   => $detailPayload,
+                        //     'token' => csrf_hash()
+                        // ];
+                        // echo json_encode($data);
+
+                        // kalau hapus
                         if($data->is_delete)
                         {
                             $responseDetail = $this->penerimaanBarangDetailModel->delete($data->id);
@@ -504,6 +523,8 @@ class PenerimaanBarangLokal extends BaseController
                                 echo json_encode($data);
                             }
                         }
+
+                         // kalau update
                         if($data->id)
                         {
                             $conditionDetail = [
@@ -523,6 +544,8 @@ class PenerimaanBarangLokal extends BaseController
                                 echo json_encode($data);
                             }
                         }
+
+                        // kalau create
                         else
                         {
                             $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
