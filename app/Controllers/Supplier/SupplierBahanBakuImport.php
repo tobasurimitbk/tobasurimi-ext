@@ -170,7 +170,7 @@ class SupplierBahanBakuImport extends BaseController
                 "city_id" => $this->request->getPost("city_parent_id"),
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "kategori" => "LOKAL",
+                "kategori" => "IMPORT",
                 "type" => "BAHAN BAKU"
                 // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
@@ -190,11 +190,11 @@ class SupplierBahanBakuImport extends BaseController
                 "city_id"           => $this->request->getPost("city_parent_id"),
                 "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "kategori"          => "LOKAL",
+                "kategori"          => "IMPORT",
                 "type"              => "BAHAN BAKU"
             ];
             $insert = $supplierModel->insert($insertData);
-            $response = curl_request("POST", "/suppliers", $this->token, $payload);
+            // $response = curl_request("POST", "/suppliers", $this->token, $payload);s
 
             if (!$insert) {
                 $data = [
@@ -304,7 +304,7 @@ class SupplierBahanBakuImport extends BaseController
                     "city_id"           => $this->request->getPost("city_parent_id"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "kategori"          => "LOKAL",
+                    "kategori"          => "IMPORT",
                     "type"              => "BAHAN BAKU"
                     // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
                 ];

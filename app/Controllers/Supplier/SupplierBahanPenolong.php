@@ -171,7 +171,7 @@ class SupplierBahanPenolong extends BaseController
                 "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "kategori" => "LOKAL",
-                "type" => "BAHAN BAKU"
+                "type" => "BAHAN PENOLONG"
                 // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
@@ -191,10 +191,10 @@ class SupplierBahanPenolong extends BaseController
                 "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "kategori"          => "LOKAL",
-                "type"              => "BAHAN BAKU"
+                "type"              => "BAHAN PENOLONG"
             ];
             $insert = $supplierModel->insert($insertData);
-            $response = curl_request("POST", "/suppliers", $this->token, $payload);
+            // $response = curl_request("POST", "/suppliers", $this->token, $payload);
 
             if (!$insert) {
                 $data = [
@@ -305,7 +305,7 @@ class SupplierBahanPenolong extends BaseController
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "kategori"          => "LOKAL",
-                    "type"              => "BAHAN BAKU"
+                    "type"              => "BAHAN PENOLONG"
                     // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
                 ];
             }

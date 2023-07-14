@@ -35,8 +35,11 @@ class CustomerModel extends Model
 
     public function get_by_id($id)
     {
-        $requete = "SELECT * FROM customers WHERE id='" . $id . "'";
-        //echo $requete;
+        $requete = "SELECT customers.*,ap.nama_sub as ap_name, ar.nama_sub as ar_name FROM customers ";
+        $requete .= "LEFT JOIN sub_akuns ap ON (ap.id=customers.ap_id) ";
+        $requete .= "LEFT JOIN sub_akuns ar ON (ar.id=customers.ar_id) ";
+        $requete .= "WHERE customers.deletedAt is null and customers.id='" . $id . "'";
+
         $query = $this->db->query($requete);
         return $query->getResultArray();
     }
