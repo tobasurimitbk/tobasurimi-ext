@@ -368,7 +368,7 @@ $routes->get('/employee-pic/dropdown', 'Master\Employee::dropdownEmployeePIC', [
 $routes->get('/shift/dropdown', 'Master\Shift::dropdownShift', ['filter' => 'Auth']);
 // METADATA
 $routes->get('/metadata/dropdown', 'Master\Metadata::dropdownMetadata', ['filter' => 'Auth']);
-
+$routes->get('/metadata/dropdown1', 'Master\Metadata::dropdownMetadata1', ['filter' => 'Auth']);
 // KODE HS
 $routes->get('/hs-code/dropdown', 'Master\HSCode::dropdownHSCode', ['filter' => 'Auth']);
 

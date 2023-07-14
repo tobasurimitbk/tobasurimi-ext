@@ -31,15 +31,30 @@ class Account extends BaseController
 
     public function dropdownKategoriAccount()
     {
-        $responseKelompokAkunKategori = curl_request("GET", "/kategoriAkun/all", $this->token);
+        $search = $this->request->getGet('search');
+        $page = $this->request->getGet('page') ?? 1;
+        $limit = 10;
+        $offset = ($page - 1) * 10;
 
-        $dataKelompokAkunKategori = [];
-        if ($responseKelompokAkunKategori["code"] === 200) {
-            $dataKelompokAkunKategori = json_decode($responseKelompokAkunKategori["body"])->data;
+        $dataQry = $this->KategoriAkunsModel;
+
+        if (!empty($search)) {
+            $dataQry->like('nama_kategori', $search);
         }
 
+        $totalData = $dataQry->countAllResults(false);
+        $subAccData = $dataQry->select('id, nama_kategori AS text')
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt is null')
+            ->orderBy('nama_kategori', 'asc')
+            ->findAll($limit, $offset);
+
+
         $data = [
-            "data" => $dataKelompokAkunKategori
+            "results"   => $subAccData,
+            "pagination" => [
+                "more"  => $offset < $totalData
+            ]
         ];
 
         echo json_encode($data);
@@ -48,15 +63,30 @@ class Account extends BaseController
 
     public function dropdownHeaderAccount()
     {
-        $responseKelompokAkunKategori = curl_request("GET", "/headerAkun/all", $this->token);
+        $search = $this->request->getGet('search');
+        $page = $this->request->getGet('page') ?? 1;
+        $limit = 10;
+        $offset = ($page - 1) * 10;
 
-        $dataKelompokAkunKategori = [];
-        if ($responseKelompokAkunKategori["code"] === 200) {
-            $dataKelompokAkunKategori = json_decode($responseKelompokAkunKategori["body"])->data;
+        $dataQry = $this->HeaderAkunsModel;
+
+        if (!empty($search)) {
+            $dataQry->like('nama_header', $search);
         }
 
+        $totalData = $dataQry->countAllResults(false);
+        $subAccData = $dataQry->select('id, nama_header AS text')
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt is null')
+            ->orderBy('nama_header', 'asc')
+            ->findAll($limit, $offset);
+
+
         $data = [
-            "data" => $dataKelompokAkunKategori
+            "results"   => $subAccData,
+            "pagination" => [
+                "more"  => $offset < $totalData
+            ]
         ];
 
         echo json_encode($data);
@@ -667,31 +697,32 @@ class Account extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $res_header = $this->HeaderAkunsModel->get_by_id($this->request->getPost("header_id_sub"));
+
+                $values = [
+                    "company_id"    => $this->this_company_id,
                     "header_id" => formatter($this->request->getPost("header_id_sub"), "STR_TO_INT"),
-                    "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
+                    "kategori_id" => $res_header[0]["kategori_id"],
                     "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                     "no_sub" => $this->request->getPost("kode_akun_sub"),
                     "nama_sub" => $this->request->getPost("nama_akun_sub"),
                     "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
-                ]);
+                ];
 
-                $response = curl_request("POST", "/subAkun", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->Sub_AkunsModel->insert($values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message = 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -735,32 +766,30 @@ class Account extends BaseController
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id_sub");
-
-                $payload = json_encode([
+                $res_header = $this->HeaderAkunsModel->get_by_id($this->request->getPost("header_id_sub"));
+                $values = [
                     "header_id" => formatter($this->request->getPost("header_id_sub"), "STR_TO_INT"),
-                    "kategori_id" => formatter($this->request->getPost("category_id_sub"), "STR_TO_INT"),
+                    "kategori_id" => $res_header[0]["kategori_id"],
                     "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                     "no_sub" => $this->request->getPost("kode_akun_sub"),
                     "nama_sub" => $this->request->getPost("nama_akun_sub"),
                     "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
-                ]);
+                ];
 
-                $response = curl_request("PATCH", "/subAkun/$id", $this->token, $payload);
-
-                if ($response["code"] === 200) {
+                if ($this->Sub_AkunsModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
-                        "payload"   => $payload,
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -789,22 +818,18 @@ class Account extends BaseController
         try {
             $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Void"
-            ]);
+            $status = !empty($this->request->getPost("status")) ? "Aktif" : "Void";
 
-            $response = curl_request("PATCH", "/subAkun/$id", $this->token, $payload);
-
-            if ($response["code"] === 200) {
+            if ($this->Sub_AkunsModel->update_status_by_id($id, $status)) {
                 $data = [
                     "status"            => true,
                     "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
+                    "payload"   => "",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                $message = 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
                     "message"    => $message,
@@ -827,15 +852,17 @@ class Account extends BaseController
     public function getByIdSubAccount($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/subAkun/$id", $this->token);
-            if ($response["code"] === 200) {
+            $res = $this->Sub_AkunsModel->get_by_id($id);
+
+            if (count($res)) {
+
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => (object) $res[0],
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -858,8 +885,10 @@ class Account extends BaseController
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/subAkun/$id", $this->token);
-                if ($response["code"] === 200) {
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+                if ($this->Sub_AkunsModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -867,7 +896,7 @@ class Account extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $message = 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
                         "message"    => $message,

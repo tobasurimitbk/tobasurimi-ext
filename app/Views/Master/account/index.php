@@ -40,15 +40,15 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Hapus</button>
+                <button type="button" class="btn btn-hide-form-kategori btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-kategori">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-kategori">Hapus</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal add-modal-header" tabindex="-1">
+<div class="modal add-modal-header" id="add_modal_header" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -87,15 +87,15 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-form-header">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-header">Hapus</button>
+                <button type="button" class="btn btn-hide-form-header btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-header">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-header">Hapus</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal add-modal-sub" tabindex="-1">
+<div class="modal add-modal-sub" id="add_modal_sub" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -148,8 +148,8 @@
                                 <label for="floatingInput">Status</label>
                                 <div>
                                     <label class="switch">
-                                    <input class="status_sub" name="status_sub" id="status_sub" type="checkbox" checked>
-                                    <span class="slider round"></span>
+                                        <input class="status_sub" name="status_sub" id="status_sub" type="checkbox" checked>
+                                        <span class="slider round"></span>
                                     </label>
                                 </div>
                             </div>
@@ -158,9 +158,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Hapus</button>
+                <button type="button" class="btn btn-hide-form-sub btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-sub">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-sub">Hapus</button>
             </div>
         </div>
     </div>
@@ -168,110 +168,110 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Account</h1>
-    <!-- Navigation -->
-    <ul class="nav nav-tabs float-right" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation" style="cursor:pointer">
-            <a class="nav-link active" onclick="removeAllTab()" id="kategori-tab" data-toggle="tab" data-target="#kategori" role="tab" aria-controls="kategori" aria-selected="true">Kategori Akun</a>
-        </li>
-        <li class="nav-item" role="presentation" style="cursor:pointer">
-            <a class="nav-link" onclick="removeAllTab()" id="header-tab" data-toggle="tab" data-target="#header" role="tab" aria-controls="header" aria-selected="false">Header Akun</a>
-        </li>
-        <li class="nav-item" role="presentation" style="cursor:pointer">
-            <a class="nav-link" onclick="removeAllTab()" id="sub-tab" data-toggle="tab" data-target="#sub" role="tab" aria-controls="sub" aria-selected="false">Sub Akun</a>
-        </li>
-    </ul>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
-                <div class="collapse-kategori-list show" id="collapseKategoriList">
-                    <div class="d-flex float-right mb-3">
-                        <input class="form-control search search-kategori form-out-search mr-3" placeholder="Search"/>
-                        <button class="btn btn-show-form btn-add float-right btn-show-form-kategori" data-btn="create-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>No.</th>
-                                    <th onclick="changeSortKategori('kelompok_akun')" class="sort">Kelompok Akun</th>
-                                    <th onclick="changeSortKategori('no_kategori')" class="sort">No. Kategori Akun</th>
-                                    <th onclick="changeSortKategori('nama_kategori')" class="sort">Nama Kategori Akun</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+    <div class="section-header">
+        <h1>Account</h1>
+        <!-- Navigation -->
+        <ul class="nav nav-tabs float-right" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation" style="cursor:pointer">
+                <a class="nav-link active" onclick="removeAllTab()" id="kategori-tab" data-toggle="tab" data-target="#kategori" role="tab" aria-controls="kategori" aria-selected="true">Kategori Akun</a>
+            </li>
+            <li class="nav-item" role="presentation" style="cursor:pointer">
+                <a class="nav-link" onclick="removeAllTab()" id="header-tab" data-toggle="tab" data-target="#header" role="tab" aria-controls="header" aria-selected="false">Header Akun</a>
+            </li>
+            <li class="nav-item" role="presentation" style="cursor:pointer">
+                <a class="nav-link" onclick="removeAllTab()" id="sub-tab" data-toggle="tab" data-target="#sub" role="tab" aria-controls="sub" aria-selected="false">Sub Akun</a>
+            </li>
+        </ul>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
+                    <div class="collapse-kategori-list show" id="collapseKategoriList">
+                        <div class="d-flex float-right mb-3">
+                            <input class="form-control search search-kategori form-out-search mr-3" placeholder="Search" />
+                            <button class="btn btn-show-form btn-add float-right btn-show-form-kategori" data-btn="create-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi kategoriDataTable" id="kategoriDataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th onclick="changeSortKategori('kelompok_akun')" class="sort">Kelompok Akun</th>
+                                        <th onclick="changeSortKategori('no_kategori')" class="sort">No. Kategori Akun</th>
+                                        <th onclick="changeSortKategori('nama_kategori')" class="sort">Nama Kategori Akun</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
-                <div class="collapse-header-list show" id="collapseHeaderList">
-                    <div class="d-flex float-right mb-3">
-                        <input class="form-control search cari-header form-out-search mr-3" placeholder="Search"/>
-                        <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>No.</th>
-                                    <th onclick="changeSortHeader('nama_kategori')" class="sort">Kategori Akun</th>
-                                    <th onclick="changeSortHeader('no_header')" class="sort">No. Header Akun</th>
-                                    <th onclick="changeSortHeader('nama_header')" class="sort">Nama Header Akun</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
+                    <div class="collapse-header-list show" id="collapseHeaderList">
+                        <div class="d-flex float-right mb-3">
+                            <input class="form-control search cari-header form-out-search mr-3" placeholder="Search" />
+                            <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi headerDataTable" id="headerDataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th onclick="changeSortHeader('nama_kategori')" class="sort">Kategori Akun</th>
+                                        <th onclick="changeSortHeader('no_header')" class="sort">No. Header Akun</th>
+                                        <th onclick="changeSortHeader('nama_header')" class="sort">Nama Header Akun</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
-                <div class="collapse-header-list show" id="collapseSubList">
-                    <div class="d-flex float-right mb-3 col-nav-tabs-contents-input-btn">
-                        <input class="form-control search search-sub form-out-search mr-3" placeholder="Search"/>
-                        <select class="form-select status mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
-                            <option value="Aktif">Aktif</option>
-                            <option value="Void">Void</option>
-                        </select>
-                        <button class="btn btn-show-form btn-add float-right btn-show-form-sub" data-btn="create-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>No.</th>
-                                    <th onclick="changeSortSub('nama_kategori')" class="sort">Kategori Akun</th>
-                                    <th onclick="changeSortSub('no_header')" class="sort">No. Header Akun</th>
-                                    <th onclick="changeSortSub('nama_header')" class="sort">Header Akun</th>
-                                    <th onclick="changeSortSub('no_sub')" class="sort">No. Sub Akun</th>
-                                    <th onclick="changeSortSub('nama_sub')" class="sort">Nama Sub Akun</th>
-                                    <th onclick="changeSortSub('akun_coa')" class="sort">COA</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
+                    <div class="collapse-header-list show" id="collapseSubList">
+                        <div class="d-flex float-right mb-3 col-nav-tabs-contents-input-btn">
+                            <input class="form-control search search-sub form-out-search mr-3" placeholder="Search" />
+                            <select class="form-select status mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Void">Void</option>
+                            </select>
+                            <button class="btn btn-show-form btn-add float-right btn-show-form-sub" data-btn="create-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi subDataTable" id="subDataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th onclick="changeSortSub('nama_kategori')" class="sort">Kategori Akun</th>
+                                        <th onclick="changeSortSub('no_header')" class="sort">No. Header Akun</th>
+                                        <th onclick="changeSortSub('nama_header')" class="sort">Header Akun</th>
+                                        <th onclick="changeSortSub('no_sub')" class="sort">No. Sub Akun</th>
+                                        <th onclick="changeSortSub('nama_sub')" class="sort">Nama Sub Akun</th>
+                                        <th onclick="changeSortSub('akun_coa')" class="sort">COA</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -288,7 +288,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -305,30 +307,31 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.kategoriDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.kategoriDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        },{
-            data: "kelompok_akun",
-            className: "text-center"
-        },
-        {
-            data: "no_kategori",
-            className: "text-center"
-        },
-        {
-            data: "nama_kategori",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "kelompok_akun",
+                className: "text-center"
+            },
+            {
+                data: "no_kategori",
+                className: "text-center"
+            },
+            {
+                data: "nama_kategori",
+                className: "text-center"
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -348,7 +351,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -365,30 +370,31 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.headerDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.headerDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        },{
-            data: "nama_kategori",
-            className: "text-center"
-        },
-        {
-            data: "no_header",
-            className: "text-center"
-        },
-        {
-            data: "nama_header",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "nama_kategori",
+                className: "text-center"
+            },
+            {
+                data: "no_header",
+                className: "text-center"
+            },
+            {
+                data: "nama_header",
+                className: "text-center"
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -408,7 +414,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -426,50 +434,50 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.subDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.subDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        },{
-            data: "nama_kategori",
-            className: "text-center"
-        },
-        {
-            data: "no_header",
-            className: "text-center"
-        },
-        {
-            data: "nama_header",
-            className: "text-center"
-        },
-        {
-            data: "no_sub",
-            className: "text-center"
-        },
-        {
-            data: "nama_sub",
-            className: "text-center"
-        },
-        {
-            data: "akun_coa",
-            className: "text-center"
-        },
-        {
-            data: "status",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                return `
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "nama_kategori",
+                className: "text-center"
+            },
+            {
+                data: "no_header",
+                className: "text-center"
+            },
+            {
+                data: "nama_header",
+                className: "text-center"
+            },
+            {
+                data: "no_sub",
+                className: "text-center"
+            },
+            {
+                data: "nama_sub",
+                className: "text-center"
+            },
+            {
+                data: "akun_coa",
+                className: "text-center"
+            },
+            {
+                data: "status",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `
                 <div class="mt-0">
                 <label class="switch">
                 <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
@@ -477,8 +485,9 @@
                 </label>
                 </div>
                 `
+                }
             }
-        }],              
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -494,6 +503,36 @@
     });
 
     $(document).ready(function() {
+        const select2categori_id_header = {
+            dropdownParent: $("#add_modal_header"),
+            ajax: {
+                delay: 300,
+                url: `<?= base_url("kategori-account/dropdown"); ?>`,
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                }
+            }
+        };
+
+        const select2header_id_sub = {
+            dropdownParent: $("#add_modal_sub"),
+            ajax: {
+                delay: 300,
+                url: `<?= base_url("header-account/dropdown"); ?>`,
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                }
+            }
+        };
+
         $('.kelompok_akun_id_kategori').select2({
             placeholder: "",
             theme: "bootstrap-5",
@@ -520,84 +559,84 @@
 
         //CSS SELECT2 FLOATING LABEL
         $(".kelompok_akun_id_kategori")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".kelompok_akun_id_kategori")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".kelompok_akun_id_kategori")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $(".category_id_header")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".category_id_header")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".category_id_header")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $(".header_id_sub")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".header_id_sub")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".header_id_sub")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $(".coa_id_sub")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
 
         $(".coa_id_sub")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
 
         $(".coa_id_sub")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         var validator_kategori = $(".create-form-kategori").validate({
             rules: {
@@ -811,22 +850,11 @@
                         validator_header.resetForm();
                         validator_header.reset();
 
-                        $.ajax({
-                            url: `<?= base_url("kategori-account/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".category_id_header").empty()
+                        $('.category_id_header').select2(select2categori_id_header);
 
-                                $(".category_id_header").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".category_id_header").append(`<option value="${item.id}">${item.nama_kategori}</option>`)
-                                })
-
-                                $(".category_id_header").val(res?.data?.kategori_id).change();
-                                $(".add-modal-header").modal("show")
-                            }
-                        })
+                        const $apOption = $("<option selected='selected'></option>").val(id).text(res?.data?.nama_kategori);
+                        $(".category_id_header").append($apOption).trigger('change');
+                        $(".add-modal-header").modal("show")
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -855,25 +883,28 @@
                         $(".category_id_sub").val(res?.data?.kategori_id);
                         $(".kode_akun_sub").val(res?.data?.no_sub);
                         $(".nama_akun_sub").val(res?.data?.nama_sub);
-                        $(".status_sub").prop( "checked", res?.data?.status === "Aktif" ? true : false);
+                        $(".status_sub").prop("checked", res?.data?.status === "Aktif" ? true : false);
 
                         validator_sub.resetForm();
                         validator_sub.reset();
 
-                        $.ajax({
-                            url: `<?= base_url("header-account/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".header_id_sub").empty()
-                                $(".header_id_sub").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
-                                })
+                        // $.ajax({
+                        //     url: `<?= base_url("header-account/dropdown"); ?>`,
+                        //     method: "GET",
+                        //     dataType: "json",
+                        //     success: function(result) {
+                        //         $(".header_id_sub").empty()
+                        //         $(".header_id_sub").append(`<option value=""></option>`)
+                        //         result.data.forEach(function(item) {
+                        //             $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
+                        //         })
 
-                                $(".header_id_sub").val(res?.data?.header_id).change();
-                            }
-                        })
+                        //         $(".header_id_sub").val(res?.data?.header_id).change();
+                        //     }
+                        // })
+                        $('.header_id_sub').select2(select2header_id_sub);
+                        const $apOption = $("<option selected='selected'></option>").val(res?.data?.header_id).text(res?.data?.nama_header);
+                        $(".header_id_sub").append($apOption).trigger('change');
 
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -904,19 +935,19 @@
             })
         })
 
-        $(".search-kategori").keyup(function () {
+        $(".search-kategori").keyup(function() {
             kategoriTable.ajax.reload();
         })
 
-        $(".cari-header").keyup(function () {
+        $(".cari-header").keyup(function() {
             headerTable.ajax.reload();
         })
 
-        $(".search-sub").keyup(function () {
+        $(".search-sub").keyup(function() {
             subTable.ajax.reload();
         })
 
-        $(".status").change(function () {
+        $(".status").change(function() {
             subTable.ajax.reload();
         })
 
@@ -940,7 +971,7 @@
             $(".create-form-kategori")[0].reset()
 
             $.ajax({
-                url: `<?= base_url("metadata/dropdown"); ?>`,
+                url: `<?= base_url("metadata/dropdown1"); ?>`,
                 method: "GET",
                 data: {
                     name: 'kelompok_akun'
@@ -968,21 +999,9 @@
             validator_header.reset();
             $(".create-form-header")[0].reset()
 
-            $.ajax({
-                url: `<?= base_url("kategori-account/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".category_id_header").empty()
-                    $(".category_id_header").val('').change();
-                    $(".category_id_header").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".category_id_header").append(`<option value="${item.id}">${item.nama_kategori}</option>`)
-                    })
-                    $(".delete-btn-header").css('display', 'none');
-                    $(".add-modal-header").modal("show")
-                }
-            })
+            $(".delete-btn-header").css('display', 'none');
+            $('.category_id_header').select2(select2categori_id_header);
+            $(".add-modal-header").modal("show");
         })
 
         $(".btn-show-form-sub").click(function() {
@@ -994,21 +1013,22 @@
             validator_sub.reset();
             $(".create-form-sub")[0].reset()
 
-            $(".status_sub").prop( "checked", true);
+            $(".status_sub").prop("checked", true);
 
-            $.ajax({
-                url: `<?= base_url("header-account/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".header_id_sub").empty()
-                    $(".header_id_sub").val('').change();
-                    $(".header_id_sub").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
-                    })
-                }
-            })
+            // $.ajax({
+            //     url: `<?= base_url("header-account/dropdown"); ?>`,
+            //     method: "GET",
+            //     dataType: "json",
+            //     success: function(res) {
+            //         $(".header_id_sub").empty()
+            //         $(".header_id_sub").val('').change();
+            //         $(".header_id_sub").append(`<option value=""></option>`)
+            //         res.data.forEach(function(item) {
+            //             $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
+            //         })
+            //     }
+            // })
+            $('.header_id_sub').select2(select2header_id_sub);
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -1024,9 +1044,10 @@
                         $(".coa_id_sub").append(`<option value="${item.id}">${item.value}</option>`)
                     })
                     $(".delete-btn-sub").css('display', 'none');
-                    $(".add-modal-sub").modal("show")
+
                 }
             })
+            $(".add-modal-sub").modal("show")
         })
 
         $(".btn-hide-form-kategori").click(function() {
@@ -1060,8 +1081,7 @@
 
                         let id = $(".id_kategori").val();
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("kategori-account/update"); ?>",
                                 data: data,
@@ -1077,17 +1097,17 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal-kategori").modal("hide")
-                                            $(".create-form-kategori")[0].reset()
-                                            $(".kelompok_akun_id_kategori").val("").change()
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal-kategori").modal("hide")
+                                                $(".create-form-kategori")[0].reset()
+                                                $(".kelompok_akun_id_kategori").val("").change()
 
-                                            kategoriTable.ajax.reload()
-                                        })
+                                                kategoriTable.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1109,8 +1129,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("kategori-account/save"); ?>",
                                 data: data,
@@ -1126,17 +1145,17 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal-kategori").modal("hide")
-                                            $(".create-form-kategori")[0].reset()
-                                            $(".kelompok_akun_id_kategori").val("").change()
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal-kategori").modal("hide")
+                                                $(".create-form-kategori")[0].reset()
+                                                $(".kelompok_akun_id_kategori").val("").change()
 
-                                            kategoriTable.ajax.reload()
-                                        })
+                                                kategoriTable.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1181,8 +1200,7 @@
 
                         let id = $(".id_header").val();
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("header-account/update"); ?>",
                                 data: data,
@@ -1198,17 +1216,17 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal-header").modal("hide")
-                                            $(".create-form-header")[0].reset()
-                                            $(".category_id_header").val("").change()
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal-header").modal("hide")
+                                                $(".create-form-header")[0].reset()
+                                                $(".category_id_header").val("").change()
 
-                                            headerTable.ajax.reload()
-                                        })
+                                                headerTable.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1230,8 +1248,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("header-account/save"); ?>",
                                 data: data,
@@ -1247,17 +1264,17 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal-header").modal("hide")
-                                            $(".create-form-header")[0].reset()
-                                            $(".category_id_header").val("").change()
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal-header").modal("hide")
+                                                $(".create-form-header")[0].reset()
+                                                $(".category_id_header").val("").change()
 
-                                            headerTable.ajax.reload()
-                                        })
+                                                headerTable.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1302,8 +1319,7 @@
 
                         let id = $(".id_sub").val();
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("sub-account/update"); ?>",
                                 data: data,
@@ -1319,17 +1335,17 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal-sub").modal("hide")
-                                            $(".create-form-sub")[0].reset()
-                                            $(".header_id_sub").val("").change()
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal-sub").modal("hide")
+                                                $(".create-form-sub")[0].reset()
+                                                $(".header_id_sub").val("").change()
 
-                                            subTable.ajax.reload()
-                                        })
+                                                subTable.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1351,8 +1367,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("sub-account/save"); ?>",
                                 data: data,
@@ -1368,17 +1383,17 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal-sub").modal("hide")
-                                            $(".create-form-sub")[0].reset()
-                                            $(".header_id_sub").val("").change()
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                $(".add-modal-sub").modal("hide")
+                                                $(".create-form-sub")[0].reset()
+                                                $(".header_id_sub").val("").change()
 
-                                            subTable.ajax.reload()
-                                        })
+                                                subTable.ajax.reload()
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1435,17 +1450,17 @@
                             if (response.status) {
                                 stopLoading()
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    $(".add-modal-kategori").modal("hide")
-                                    $(".create-form-kategori")[0].reset()
-                                    $(".kelompok_akun_id_kategori").val("").change()
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal-kategori").modal("hide")
+                                        $(".create-form-kategori")[0].reset()
+                                        $(".kelompok_akun_id_kategori").val("").change()
 
-                                    kategoriTable.ajax.reload()
-                                })
+                                        kategoriTable.ajax.reload()
+                                    })
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -1468,7 +1483,7 @@
                 }
             })
         })
-        
+
         $(".delete-btn-header").click(function() {
             Swal.fire({
                 icon: 'question',
@@ -1499,17 +1514,17 @@
                             if (response.status) {
                                 stopLoading()
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    $(".add-modal-header").modal("hide")
-                                    $(".create-form-header")[0].reset()
-                                    $(".category_id_header").val("").change()
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal-header").modal("hide")
+                                        $(".create-form-header")[0].reset()
+                                        $(".category_id_header").val("").change()
 
-                                    headerTable.ajax.reload()
-                                })
+                                        headerTable.ajax.reload()
+                                    })
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -1563,17 +1578,17 @@
                             if (response.status) {
                                 stopLoading()
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    $(".add-modal-sub").modal("hide")
-                                    $(".create-form-sub")[0].reset()
-                                    $(".header_id_sub").val("").change()
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal-sub").modal("hide")
+                                        $(".create-form-sub")[0].reset()
+                                        $(".header_id_sub").val("").change()
 
-                                    subTable.ajax.reload()
-                                })
+                                        subTable.ajax.reload()
+                                    })
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -1605,8 +1620,7 @@
         $(".collapse-sub-list").addClass("show")
     }
 
-    const changeStatus = function(id)
-    {
+    const changeStatus = function(id) {
         const csrf = $(`[name="${csrfToken}"]`);
         let value = document.getElementById('status_table_' + id).checked ? true : false;
 
@@ -1614,8 +1628,7 @@
             id: id
         }
 
-        if(value)
-        {
+        if (value) {
             data["status"] = true;
         }
 
@@ -1631,13 +1644,13 @@
                 csrf.val(response.token);
                 if (response.status) {
                     Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    .then(() => {
-                        subTable.ajax.reload()
-                    })
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        .then(() => {
+                            subTable.ajax.reload()
+                        })
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -1658,37 +1671,28 @@
     }
 
     const changeSortKategori = function(val) {
-        if(sortKategori !== val)
-        {
+        if (sortKategori !== val) {
             sortTypeKategori = "asc";
             sortKategori = val;
-        }
-        else
-        {
+        } else {
             sortTypeKategori = sortTypeKategori === "asc" ? "desc" : "asc";
         }
     }
 
     const changeSortHeader = function(val) {
-        if(sortHeader !== val)
-        {
+        if (sortHeader !== val) {
             sortTypeHeader = "asc";
             sortHeader = val;
-        }
-        else
-        {
+        } else {
             sortTypeHeader = sortTypeHeader === "asc" ? "desc" : "asc";
         }
     }
 
     const changeSortSub = function(val) {
-        if(sortSub !== val)
-        {
+        if (sortSub !== val) {
             sortTypeSub = "asc";
             sortSub = val;
-        }
-        else
-        {
+        } else {
             sortTypeSub = sortTypeSub === "asc" ? "desc" : "asc";
         }
     }
