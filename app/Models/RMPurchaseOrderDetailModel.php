@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AMPurchaseOrderModel extends Model
+class RMPurchaseOrderDetailModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'am_purchase_orders';
+    protected $table            = 'rm_purchase_order_details';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -40,18 +40,17 @@ class AMPurchaseOrderModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getNoPenerimaanBarang($po_type, $supplier_id, $company_id)
+    public function getPurchaseOrderDetailByPurchaseOrderId($id)
     {
         $arrCondition = [
-            'deletedAt' => null,
-            'supplier_id' => $supplier_id,
-            'is_posted' => 1,
-            'status_penerimaan' => 0,
-            'po_type' => $po_type,
-            'company_id' => $company_id
+            'rm_purchase_order_details.deletedAt' => null,
+            'rm_purchase_order_details.rm_purchase_order_id' => $id
         ];
 
-        $builder = $this->db->table('am_purchase_orders');
+        $builder = $this->db->table('rm_purchase_order_details')
+        ->select('rm_purchase_order_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
+        ->join('barangs', 'barangs.id = rm_purchase_order_details.barang_id')
+        ->join('satuans', 'satuans.id = barangs.satuan_id');
         $builder->where($arrCondition);
         $query = $builder->get();
         

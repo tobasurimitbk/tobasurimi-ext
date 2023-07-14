@@ -4,15 +4,22 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 
+use App\Models\AMPurchaseOrderModel;
+use App\Models\AMPurchaseOrderDetailModel;
+
 class POLokalBahanPenolong extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $AMPurchaseOrderModel;
+    protected $AMPurchaseOrderDetailModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->AMPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
     }
 
     public function poLokalBahanPenolong()
@@ -464,15 +471,11 @@ class POLokalBahanPenolong extends BaseController
     public function dropdownPOLokalBahanPenolong()
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-        $dataPOLokal = [];
-        $responsePOLokal = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=LOKAL&tipebahan=PENOLONG&supplierid=$id", $this->token);
-        if ($responsePOLokal["code"] === 200) {
-            $dataPOLokal = json_decode($responsePOLokal["body"])->data;
-        }
+
+        $dataPOLokal = $this->AMPurchaseOrderModel->getNoPenerimaanBarang("LOKAL", $id, $this->this_company_id);
 
         $data = [
-            "data" => $dataPOLokal,
-            "response" => $responsePOLokal
+            "data" => $dataPOLokal
         ];
 
         echo json_encode($data);
@@ -481,22 +484,12 @@ class POLokalBahanPenolong extends BaseController
 
     public function dropdownBarangPOLokalBahanPenolong()
     {
-        $payload = json_encode([
-            "multiple_id_po" => json_decode($this->request->getGet("id")),
-            "po_type" => "LOKAL",
-            "tipe_bahan" => "PENOLONG"
-        ]);
+        $id = $this->request->getGet("id");
 
-        $dataPOLokal = [];
-        $responsePOLokal = curl_request("POST", "/penerimaanBarang/list-po", $this->token, $payload);
-        if ($responsePOLokal["code"] === 200) {
-            $dataPOLokal = json_decode($responsePOLokal["body"])->data;
-        }
+        $dataPOLokal = $this->AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
         $data = [
-            "data" =>  $dataPOLokal,
-            "response" => $responsePOLokal,
-            "payload" => $payload
+            "data" =>  $dataPOLokal
         ];
 
         echo json_encode($data);

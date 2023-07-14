@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AMPurchaseOrderModel extends Model
+class TaxModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'am_purchase_orders';
+    protected $table            = 'taxes';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -40,18 +40,14 @@ class AMPurchaseOrderModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getNoPenerimaanBarang($po_type, $supplier_id, $company_id)
+    public function getTaxByType($type)
     {
         $arrCondition = [
             'deletedAt' => null,
-            'supplier_id' => $supplier_id,
-            'is_posted' => 1,
-            'status_penerimaan' => 0,
-            'po_type' => $po_type,
-            'company_id' => $company_id
+            'type' => $type
         ];
 
-        $builder = $this->db->table('am_purchase_orders');
+        $builder = $this->db->table('taxes');
         $builder->where($arrCondition);
         $query = $builder->get();
         
