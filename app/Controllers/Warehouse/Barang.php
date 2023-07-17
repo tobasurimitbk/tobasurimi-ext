@@ -13,7 +13,7 @@ class Barang extends BaseController
     protected $this_company_id;
     protected $barangModel;
     protected $metadataModel;
-    
+
     public function __construct()
     {
         $this->token = session()->get("login")->token;
@@ -26,7 +26,7 @@ class Barang extends BaseController
     {
         // Get Kategori
         $dataKategori = $this->metadataModel->get_by_name('Kategori Barang');
-         
+
         $data = [
             "dataKategori" => $dataKategori
         ];
@@ -45,7 +45,7 @@ class Barang extends BaseController
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "idCompany"     => $this->this_company_id
-        ]; 
+        ];
 
         $condition = [
             "barangs.company_id"    => $this->this_company_id
@@ -98,7 +98,7 @@ class Barang extends BaseController
 
     public function saveBarang()
     {
-        try{
+        try {
             $rules = [
                 "kode_barang" => [
                     "rules" => "required|is_unique[barangs.kode_barang]",
@@ -178,9 +178,7 @@ class Barang extends BaseController
                     echo json_encode($data);
                 }
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -193,7 +191,7 @@ class Barang extends BaseController
 
     public function updateBarang()
     {
-        try{
+        try {
             $rules = [
                 "nama_barang" => [
                     "rules" => "required"
@@ -285,9 +283,7 @@ class Barang extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -300,13 +296,13 @@ class Barang extends BaseController
 
     public function updateStatusBarang()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             $payload = [
                 "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
             ];
-            
+
             $condition = [
                 'id' => $id,
                 'company_id' => $this->this_company_id
@@ -332,9 +328,7 @@ class Barang extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -375,7 +369,7 @@ class Barang extends BaseController
 
     public function deleteBarang()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -414,9 +408,7 @@ class Barang extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -452,4 +444,3 @@ class Barang extends BaseController
         return;
     }
 }
-?>
