@@ -143,7 +143,7 @@ class SPP extends BaseController
                 "warehouseName" => $data->warehouseName,
                 "total" => $data->total,
                 "request_date" => $data->request_date,
-                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
+                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName ?? "-",
                 "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
                 "approvedByDirectorName" => $data->approvedByDirectorName,
                 "is_posted" => $data->is_posted,
@@ -169,6 +169,9 @@ class SPP extends BaseController
     public function saveSPP()
     {
         try {
+            $SppModel = new SppModel();
+            $SppDetailModel = new SppDetailModel();
+
             $rules = [
                 "request_date" => [
                     "rules" => "required"
@@ -185,38 +188,51 @@ class SPP extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $insertData = [
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
-                    "items" =>  json_decode($this->request->getPost("items"))
-                ]);
+                    "createdBy" => session()->get("login")->user_id,
+                    "items" =>  json_decode($this->request->getPost("items")),
+                ];
 
-                dd($payload);
+                $totalPrice = 0;
 
-                $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
+                foreach ($insertData["items"] as $value) {
+                    $totalPrice += $value->qty * $value->price;
+                };
 
-                if ($response["code"] === 201) {
+                $insertData["total"] = $totalPrice;
+
+
+                $payload = json_encode($insertData);
+
+                $insert = $SppModel->insert($insertData);
+                foreach ($insertData["items"] as $value) {
+                    $value->barang_id = $value->item_id;
+                    $value->purchase_request_id = $insert;
+                }
+                $insert2 = $SppDetailModel->insertBatch($insertData["items"]);
+                // $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
+
+                if ($insert) {
                     $data = [
-                        "id" => json_decode($response["body"])->createdId,
+                        "id" => $insert,
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
+                        "message"    => "Data Gagal Disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 }

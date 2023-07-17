@@ -843,17 +843,16 @@
                     method: "GET",
                     dataType: "json",
                     data: {
-                        kategori: "bahan-baku"
+                        kategori: "Bahan Baku"
                     },
                     success: function(res) {
-                        console.log(res, "ppp")
                         $(".kode_barang").empty();
 
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
-                        // res.data.forEach(function(item) {
-                        //     $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
-                        // })
+                        res.data.forEach(function(item) {
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        })
 
                         $(".kode_barang").val("").change();
                     }
@@ -864,18 +863,17 @@
                     method: "GET",
                     dataType: "json",
                     data: {
-                        kategori: "bahan-penolong"
+                        kategori: "Bahan Penolong"
                     },
                     success: function(res) {
-                        console.log(res, "ppp")
 
                         $(".kode_barang").empty();
 
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
-                        // res.data.forEach(function(item) {
-                        //     $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
-                        // })
+                        res.data.forEach(function(item) {
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        })
 
                         $(".kode_barang").val("").change();
                     }
@@ -920,6 +918,7 @@
                     success: function(res) {
                         $(".spesifikasi").empty()
                         $(".spesifikasi").append(`<option value=""></option>`)
+                        res.data.spek = JSON.parse(res.data.spek)
                         res.data.spek.forEach(function(item) {
                             $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                         })
@@ -1578,6 +1577,7 @@
             success: function(res) {
                 $(".spesifikasi").empty()
                 $(".spesifikasi").append(`<option value=""></option>`)
+                res.data.spek = JSON.parse(res.data.spek)
                 res.data.spek.forEach(function(item) {
                     $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                 })
@@ -1591,7 +1591,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-baku"
+                    kategori: "Bahan Baku"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1617,7 +1617,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-penolong"
+                    kategori: "Bahan Penolong"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();

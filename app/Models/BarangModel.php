@@ -116,7 +116,7 @@ class BarangModel extends Model
         if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['status']) {
             $barangDataQry->groupEnd();
         }
-        
+
         $totalFilteredData = $barangDataQry->countAllResults(false);
         $data = $barangDataQry->findAll($limit, $offset);
 
@@ -139,22 +139,19 @@ class BarangModel extends Model
         $builder = $this->db->table('barangs');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResult();
     }
 
     public function getBarangByKode($kode, $id = null)
     {
-        if($id)
-        {
+        if ($id) {
             $arrCondition = [
                 'deletedAt' => null,
                 'kode_barang' => $kode,
                 'id !=' => $id
             ];
-        }
-        else
-        {
+        } else {
             $arrCondition = [
                 'deletedAt' => null,
                 'kode_barang' => $kode
@@ -165,7 +162,7 @@ class BarangModel extends Model
         $builder->where($arrCondition);
 
         $query = $builder->get();
-        
+
         return $query->getResult();
     }
 
@@ -177,11 +174,16 @@ class BarangModel extends Model
             'metadata.value' => $kategori
         ];
 
+        $selectQry = "barangs.*,
+        metadata.value AS value, 
+        ";
+
         $builder = $this->db->table('barangs')
-        ->join('metadata', 'metadata.id = barangs.kategori_id');
+            ->select($selectQry)
+            ->join('metadata', 'metadata.id = barangs.kategori_id');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }
