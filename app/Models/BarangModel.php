@@ -159,7 +159,8 @@ class BarangModel extends Model
         }
 
         $builder = $this->db->table('barangs');
-        $builder->where($arrCondition);
+        $builder->where($arrCondition)
+        ->orderBy('nama_barang', 'ASC');
 
         $query = $builder->get();
 
@@ -179,9 +180,9 @@ class BarangModel extends Model
         ";
 
         $builder = $this->db->table('barangs')
-            ->select($selectQry)
-            ->join('metadata', 'metadata.id = barangs.kategori_id');
-        $builder->where($arrCondition);
+        ->join('metadata', 'metadata.id = barangs.kategori_id');
+        $builder->where($arrCondition)
+        ->orderBy('barangs.nama_barang', 'ASC');
         $query = $builder->get();
 
         return $query->getResultArray();

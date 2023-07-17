@@ -128,11 +128,18 @@ class PenerimaanBarangModel extends Model
         ];
     }
 
-    public function get_no($bln, $thn)
+    public function get_no($tgl, $bln, $thn)
     {
         $filt_no = "LPB/1/" . $thn . "/" . $bln;
 
-        $no = $this->db->table('penerimaan_barang')->countAllResults(false) + 1;
+        $conditions = [
+            'deletedAt' => null
+        ];
+
+        $no = $this->db->table('penerimaan_barang')
+        ->like('rm_import_pos.createdAt', $thn . "-" . $bln . "-" . $tgl)
+        ->where($conditions)
+        ->countAllResults(false) + 1;
 
         if ($no != '') {
             $filt_no = "LPB/". $no . "/" . $thn . "/" . $bln;

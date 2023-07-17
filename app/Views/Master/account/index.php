@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal add-modal-kategori" tabindex="-1">
+<div class="modal add-modal-kategori" id="add_modal_kategori" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -503,6 +503,22 @@
     });
 
     $(document).ready(function() {
+        const select2kelompok_akun = {
+            dropdownParent: $("#add_modal_kategori"),
+            ajax: {
+                delay: 300,
+                url: `<?= base_url("metadata/dropdown1"); ?>`,
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        name: 'kelompok akun',
+                        search: params.term,
+                        page: params.page || 1
+                    }
+                }
+            }
+        };
+
         const select2categori_id_header = {
             dropdownParent: $("#add_modal_header"),
             ajax: {
@@ -517,6 +533,8 @@
                 }
             }
         };
+
+        console.log(select2categori_id_header);
 
         const select2header_id_sub = {
             dropdownParent: $("#add_modal_sub"),
@@ -801,24 +819,29 @@
                         validator_kategori.resetForm();
                         validator_kategori.reset();
 
-                        $.ajax({
-                            url: `<?= base_url("metadata/dropdown"); ?>`,
-                            method: "GET",
-                            data: {
-                                name: 'kelompok_akun'
-                            },
-                            dataType: "json",
-                            success: function(result) {
-                                $(".kelompok_akun_id_kategori").empty()
-                                $(".kelompok_akun_id_kategori").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
-                                })
+                        // $.ajax({
+                        //     url: `<?= base_url("metadata/dropdown"); ?>`,
+                        //     method: "GET",
+                        //     data: {
+                        //         name: 'kelompok_akun'
+                        //     },
+                        //     dataType: "json",
+                        //     success: function(result) {
+                        //         $(".kelompok_akun_id_kategori").empty()
+                        //         $(".kelompok_akun_id_kategori").append(`<option value=""></option>`)
+                        //         result.data.forEach(function(item) {
+                        //             $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
+                        //         })
 
-                                $(".kelompok_akun_id_kategori").val(res?.data?.kelompok_id).change();
-                                $(".add-modal-kategori").modal("show")
-                            }
-                        })
+                        //         $(".kelompok_akun_id_kategori").val(res?.data?.kelompok_id).change();
+                        //         $(".add-modal-kategori").modal("show")
+                        //     }
+                        // })
+                        $('.kelompok_akun_id_kategori').select2(select2kelompok_akun);
+
+                        const $apOption = $("<option selected='selected'></option>").val(id).text(res?.data?.value);
+                        $(".kelompok_akun_id_kategori").append($apOption).trigger('change');
+
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -964,30 +987,33 @@
             $(".id_kategori").val("");
 
             $(".title-name-kategori").text("Tambah");
-            $(".kelompok_akun_id_kategori").val('').change();
+            //$(".kelompok_akun_id_kategori").val('').change();
 
             validator_kategori.resetForm();
             validator_kategori.reset();
             $(".create-form-kategori")[0].reset()
 
-            $.ajax({
-                url: `<?= base_url("metadata/dropdown1"); ?>`,
-                method: "GET",
-                data: {
-                    name: 'kelompok_akun'
-                },
-                dataType: "json",
-                success: function(res) {
-                    $(".kelompok_akun_id_kategori").empty()
-                    $(".kelompok_akun_id_kategori").val('').change();
-                    $(".kelompok_akun_id_kategori").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
-                    })
-                    $(".delete-btn-kategori").css('display', 'none');
-                    $(".add-modal-kategori").modal("show")
-                }
-            })
+            // $.ajax({
+            //     url: `<?= base_url("metadata/dropdown1"); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         name: 'kelompok_akun'
+            //     },
+            //     dataType: "json",
+            //     success: function(res) {
+            //         $(".kelompok_akun_id_kategori").empty()
+            //         $(".kelompok_akun_id_kategori").val('').change();
+            //         $(".kelompok_akun_id_kategori").append(`<option value=""></option>`)
+            //         res.data.forEach(function(item) {
+            //             $(".kelompok_akun_id_kategori").append(`<option value="${item.id}">${item.value}</option>`)
+            //         })
+            //         $(".delete-btn-kategori").css('display', 'none');
+            //         $(".add-modal-kategori").modal("show")
+            //     }
+            // })
+            $(".delete-btn-kategori").css('display', 'none');
+            $('.kelompok_akun_id_kategori').select2(select2kelompok_akun);
+            $(".add-modal-kategori").modal("show");
         })
 
         $(".btn-show-form-header").click(function() {

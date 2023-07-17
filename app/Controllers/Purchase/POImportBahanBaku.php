@@ -198,8 +198,8 @@ class POImportBahanBaku extends BaseController
 
             if ($this->validate($rules)) {
                 $warehouse_id = formatter($this->request->getPost("warehouse_id"), "STR_TO_INT");
-                $warehouse_name = $this->request->getPost("warehouse_name");
-                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $warehouse_name, date('y'), $warehouse_id);
+                $warehouse = $this->request->getPost("warehouse");
+                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $warehouse, date('y'), $warehouse_id);
                 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
@@ -209,7 +209,7 @@ class POImportBahanBaku extends BaseController
                     "warehouse_id" => $warehouse_id,
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "total" => 0,
+                    "total" => $this->request->getPost("total"),
                     "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
@@ -273,16 +273,13 @@ class POImportBahanBaku extends BaseController
                         $detailPayload = [
                             'rm_import_po_id' => $response,
                             'barang_id' =>$barang_id,
-                            'item_desc' => $data->item_desc,
                             'spec' => $data->spec,
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
                             'price' => $data->price,
                             'disc' => $data->disc,
-                            'additional_cost' => $data->additional_cost,
-                            'ppn' => $data->ppn,
-                            'pph' => $data->pph,
+                            'additional_cost' => $data->additional_cost
                         ];
 
                         // $data = [
@@ -367,6 +364,17 @@ class POImportBahanBaku extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
                 $warehouse_id = formatter($this->request->getPost("warehouse_id"), "STR_TO_INT");
@@ -385,7 +393,7 @@ class POImportBahanBaku extends BaseController
                     "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note" => $this->request->getPost("note"),
                     "createdBy" => $this->user_id,
-                    "total" => 0
+                    "total" => $this->request->getPost("total")
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
@@ -447,16 +455,13 @@ class POImportBahanBaku extends BaseController
                         $detailPayload = [
                             'rm_import_po_id' => $id,
                             'barang_id' =>$barang_id,
-                            'item_desc' => $data->item_desc,
                             'spec' => $data->spec,
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
                             'price' => $data->price,
                             'disc' => $data->disc,
-                            'additional_cost' => $data->additional_cost,
-                            'ppn' => $data->ppn,
-                            'pph' => $data->pph
+                            'additional_cost' => $data->additional_cost
                         ];
 
                         // $data = [
@@ -542,14 +547,7 @@ class POImportBahanBaku extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         }
         catch(\Exception $e)
         {
