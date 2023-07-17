@@ -136,4 +136,19 @@ class SppModel extends Model
 
         return $sppData;
     }
+
+    public function getNoSPP($type)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'spp_type' => $type,
+            'is_posted' => 1
+        ];
+
+        $builder = $this->db->table('purchase_requests');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResultArray();
+    }
 }

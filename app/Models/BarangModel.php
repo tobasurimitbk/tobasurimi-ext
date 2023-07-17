@@ -102,7 +102,7 @@ class BarangModel extends Model
         }
 
         if ($addCondition['search']) {
-            $barangDataQry->like('nama_barang', $addCondition['search']);
+            $barangDataQry->like('nama_barang', $addCondition['search'])->orLike('kode_barang', $addCondition['search']);
         }
 
         if ($addCondition['kategori']) {
