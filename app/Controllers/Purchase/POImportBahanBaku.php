@@ -3,22 +3,31 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\MetadataModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
+use App\Models\SppModel;
+use App\Models\SupplierModel;
 
 class POImportBahanBaku extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    protected $RMImportPOModel;
-    protected $RMImportPODetailModel;
+    protected $metadataModel;
+    protected $rmImportPOModel;
+    protected $rmImportPODetailModel;
+    protected $sppModel;
+    protected $supplierModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->RMImportPOModel = new RMImportPOModel();
-        $this->RMImportPODetailModel = new RMImportPODetailModel();
+        $this->metadataModel = new MetadataModel();
+        $this->rmImportPOModel = new RMImportPOModel();
+        $this->rmImportPODetailModel = new RMImportPODetailModel();
+        $this->sppModel = new SppModel();
+        $this->supplierModel = new SupplierModel();
     }
 
     public function poImportBahanBaku()
@@ -29,28 +38,13 @@ class POImportBahanBaku extends BaseController
     public function createPOImportBahanBaku()
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Baku%20Import", $this->token);
-
-        $dataSPP = [];
-        if ($responseSPP["code"] === 200) {
-            $dataSPP = json_decode($responseSPP["body"])->data;
-        }
+        $dataSPP = $this->sppModel->getNoSPP("Bahan Baku Import");
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
-
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
+        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN BAKU', $this->this_company_id);
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
-
-        $dataValuta = [];
-        if ($responseValuta["code"] === 200) {
-            $dataValuta = json_decode($responseValuta["body"])->data;
-        }
+        $dataValuta = $this->metadataModel->get_by_name('Valuta Asing');
         
         $data = [
             "dataSPP" => $dataSPP,
@@ -64,28 +58,13 @@ class POImportBahanBaku extends BaseController
     public function getByIdPOImportBahanBaku($id = null)
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Baku%20Import", $this->token);
-
-        $dataSPP = [];
-        if ($responseSPP["code"] === 200) {
-            $dataSPP = json_decode($responseSPP["body"])->data;
-        }
+        $dataSPP = $this->sppModel->getNoSPP("Bahan Baku Import");
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
-
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
+        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN BAKU', $this->this_company_id);
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
-
-        $dataValuta = [];
-        if ($responseValuta["code"] === 200) {
-            $dataValuta = json_decode($responseValuta["body"])->data;
-        }
+        $dataValuta = $this->metadataModel->get_by_name('Valuta Asing');
         
         $data = [
             "dataSPP" => $dataSPP,
@@ -94,11 +73,7 @@ class POImportBahanBaku extends BaseController
         ];
 
         if (!empty($id)) {
-            $responsePOImport = curl_request("GET", "/rawMaterialImportPO/$id", $this->token);
-            $dataPOImport = [];
-            if ($responsePOImport["code"] === 200) {
-                $dataPOImport = json_decode($responsePOImport["body"])->data;
-            }
+            $dataPOImport = $this->rmImportPOModel->asObject()->find($id);
             $data["dataPOImport"] = $dataPOImport;
 
             // var_dump($dataPOImport);
@@ -107,38 +82,6 @@ class POImportBahanBaku extends BaseController
 
         return view('Purchase/poImportBahanBaku/form', $data);
         
-        return;
-    }
-
-    public function getByIdPOImportBahanBakuAjax()
-    {
-        $id = $this->request->getGet("id");
-
-        if (!empty($id)) {
-            $response = curl_request("GET", "/rawMaterialImportPO/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                    "message" => $response
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
-            ];
-            echo json_encode($data);
-        }
-
         return;
     }
 
@@ -155,36 +98,45 @@ class POImportBahanBaku extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/rawMaterialImportPO", $this->token, $payload);
+        $condition = [
+            "rm_import_pos.company_id"        => $this->this_company_id
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $poImportData = $this->rmImportPOModel->getPOList($condition, $addCondition, $limit, $offset);
+
         $dataPOImport = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataPOImport, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "po_date" => $data->po_date,
-                    "po_no" => $data->po_no,
-                    "supplierName" => $data->supplierName,
-                    "total" => $data->total,
-                    "currency" => $data->currency,
-                ]);
-            }
+        foreach ($poImportData['data'] as $data) {
+            array_push($dataPOImport, [
+                "no"            => $no++,
+                "id"            => $data->id,
+                "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
+                "po_no"         => $data->po_no,
+                "supplierName"  => $data->supplierName,
+                "total"         => number_format($data->total),
+                "currency"      => $data->currency,
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataPOImport,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $poImportData['totalData'],
+            "recordsFiltered"   => $poImportData['totalFilteredData'],
+            "data"              => $dataPOImport,
+            // "response" => $response,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -471,7 +423,7 @@ class POImportBahanBaku extends BaseController
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
 
-        $dataPOImport = $this->RMImportPOModel->getNoPenerimaanBarang($id, $this->this_company_id);
+        $dataPOImport = $this->rmImportPOModel->getNoPenerimaanBarang($id, $this->this_company_id);
 
         $data = [
             "data" => $dataPOImport
@@ -485,7 +437,7 @@ class POImportBahanBaku extends BaseController
     {
         $id = $this->request->getGet("id");
 
-        $dataPOImport = $this->RMImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+        $dataPOImport = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
         $data = [
             "data" =>  $dataPOImport

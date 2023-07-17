@@ -40,6 +40,66 @@ class RMImportPOModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function getPOList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'poDate'           => 'rm_import_pos.po_date',
+            'poNo'             => 'rm_import_pos.po_no',
+            'supplierName'      => 'suppliers.name',
+            'total'             => 'rm_import_pos.total',
+            'currency'          => 'metadata.value',
+            'createdAt'         => 'rm_import_pos.createdAt',
+            'updatedAt'         => 'rm_import_pos.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'rm_import_pos.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "rm_import_pos.*, 
+                      suppliers.name AS supplierName, 
+                      metadata.value AS currency";
+        $poDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
+            ->join('metadata', 'metadata.id = rm_import_pos.currency')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $poDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->like('rm_import_pos.po_no', $addCondition['search']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $poDataQry->where('rm_import_pos.po_date >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $poDataQry->where('rm_import_pos.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $poDataQry->groupEnd();
+        }
+        
+        $totalFilteredData = $poDataQry->countAllResults(false);
+        $data = $poDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
     public function getNoPenerimaanBarang($supplier_id, $company_id)
     {
         $arrCondition = [

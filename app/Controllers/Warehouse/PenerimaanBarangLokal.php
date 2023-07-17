@@ -312,7 +312,18 @@ class PenerimaanBarangLokal extends BaseController
                                 'status_penerimaan' => 1
                             ];
             
-                            $this->rmPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+                            $responseStatusPenerimaan = $this->rmPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+
+                            if(!$responseStatusPenerimaan) {
+                                $message =  'Data Ubah Status Penerimaan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
                         }
                     }
                     if($tipe_bahan === "PENOLONG")
@@ -327,7 +338,18 @@ class PenerimaanBarangLokal extends BaseController
                                 'status_penerimaan' => 1
                             ];
             
-                            $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+                            $responseStatusPenerimaan = $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+
+                            if(!$responseStatusPenerimaan) {
+                                $message =  'Data Ubah Status Penerimaan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
                         }
                     }
                 }
@@ -523,7 +545,18 @@ class PenerimaanBarangLokal extends BaseController
                                 'status_penerimaan' => 1
                             ];
             
-                            $this->rmPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+                            $responseStatusPenerimaan = $this->rmPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+
+                            if(!$responseStatusPenerimaan) {
+                                $message =  'Data Ubah Status Penerimaan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
                         }
                     }
                     if($tipe_bahan === "PENOLONG")
@@ -538,7 +571,18 @@ class PenerimaanBarangLokal extends BaseController
                                 'status_penerimaan' => 1
                             ];
             
-                            $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+                            $responseStatusPenerimaan = $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+
+                            if(!$responseStatusPenerimaan) {
+                                $message =  'Data Ubah Status Penerimaan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
                         }
                     }
                 }
