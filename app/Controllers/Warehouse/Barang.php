@@ -48,7 +48,7 @@ class Barang extends BaseController
         ]; 
 
         $condition = [
-            "company_id"    => $this->this_company_id
+            "barangs.company_id"    => $this->this_company_id
         ];
         $addCondition = [
             "search"        => $this->request->getGet("search"),
