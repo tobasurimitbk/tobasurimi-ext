@@ -195,7 +195,7 @@ class SPP extends BaseController
                     "items" =>  json_decode($this->request->getPost("items"))
                 ]);
 
-                dd($payload)
+                dd($payload);
 
                 $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
 

@@ -846,13 +846,14 @@
                         kategori: "bahan-baku"
                     },
                     success: function(res) {
+                        console.log(res, "ppp")
                         $(".kode_barang").empty();
 
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
-                        res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
-                        })
+                        // res.data.forEach(function(item) {
+                        //     $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        // })
 
                         $(".kode_barang").val("").change();
                     }
@@ -866,13 +867,15 @@
                         kategori: "bahan-penolong"
                     },
                     success: function(res) {
+                        console.log(res, "ppp")
+
                         $(".kode_barang").empty();
 
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
-                        res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
-                        })
+                        // res.data.forEach(function(item) {
+                        //     $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        // })
 
                         $(".kode_barang").val("").change();
                     }
