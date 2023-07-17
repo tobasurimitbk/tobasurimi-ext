@@ -215,7 +215,7 @@ class SPP extends BaseController
                     $value->barang_id = $value->item_id;
                     $value->purchase_request_id = $insert;
                 }
-                $insert2 = $SppDetailModel->insertBatch($insertData["items"]);
+                $SppDetailModel->insertBatch($insertData["items"]);
                 // $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
 
                 if ($insert) {
@@ -298,17 +298,36 @@ class SPP extends BaseController
 
                 $insertData["total"] = $totalPrice;
 
-                $payload = json_encode($insertData);
 
                 // $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
 
-                if ($payload) {
+                if ($insertData) {
                     $SppModel->update($id, $insertData);
+
+                    foreach ($insertData["items"] as $value) {
+                        $value->barang_id = $value->item_id;
+                        $value->purchase_request_id = $id;
+
+                        $dataDetail = [
+                            "id" => $value->id ?? null,
+                            "purchase_request_id" => $this->request->getPost("id"),
+                            "barang_id" => $value->item_id,
+                            "spec" => $value->spec,
+                            "qty" => $value->qty,
+                            "unit" => $value->unit,
+                            "price" => $value->price,
+                            "note" => $value->note,
+                        ];
+
+                        // $sql = $SppDetailModel->setData($value)->getCompiledUpsert();
+                        // echo $sql;
+                        $SppDetailModel->upsert($dataDetail);
+                    }
 
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   =>  json_encode($insertData),
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -316,7 +335,7 @@ class SPP extends BaseController
                     $data = [
                         "status"            => false,
                         "message"    => 'Data Gagal Diubah',
-                        "payload"   => $payload,
+                        "payload"   =>  json_encode($insertData),
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
