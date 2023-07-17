@@ -77,15 +77,15 @@ class SPP extends BaseController
         $id = $this->request->getGet("id");
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseRequest/$id", $this->token);
-            if ($response["code"] === 200) {
+            $response = $this->SppModel->getSppById($id);
+            if ($response) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => $response,
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
