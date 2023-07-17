@@ -6,6 +6,9 @@
 <div class="section-header">
     <h1 class="title-name">Tambah</h1>
     <div class="col-button-tambah-spp">
+        <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-lokal"); ?>">
+            Batal
+        </a>
         <?php if(!empty($dataPenerimaanBarang)){ ?> 
 
         <?php if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
@@ -20,26 +23,27 @@
 
             <?php if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
 
-            <button class="btn btn-success posting-penerimaan">
+            <!-- <button class="btn btn-success posting-penerimaan">
                 Posting
-            </button>
+            </button> -->
 
             <?php } 
             }
             ?> 
-
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-lokal"); ?>">
-                Batal
-            </a>
-
             <?php if(!empty($dataPenerimaanBarang)){ 
                 if($dataPenerimaanBarang->status_post === "WAITING"){ 
             ?> 
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
+                Simpan & Close PO
+            </button>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
             </button>
             <?php }
             } else { ?> 
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
+                Simpan & Close PO
+            </button>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
             </button>
@@ -98,18 +102,50 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select multiple <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : 'disabled=true'; ?>  class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataNo)) {
-                                foreach ($dataNo as $no) {
-                            ?>
-                                    <option value="<?= $no["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? (in_array($no["id"], ($dataPenerimaanBarang->multiple_po_id ? json_decode($dataPenerimaanBarang->multiple_po_id) : [])) ? "selected" : "") : ""); ?>><?= $no["po_no"]; ?></option>
-                            <?php
+                        <?php if(!empty($dataPenerimaanBarang)){ 
+                            if($dataPenerimaanBarang->status_post === "FINISH"){
+                        ?>
+                            <select multiple disabled="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                                <option value=""></option>
+                                <?php
+                                    $dataLoop = json_decode($dataPenerimaanBarang->multiple_po_no);
+                                    foreach ($dataLoop as $no) {
+                                ?>
+                                        <option value="<?= $no; ?>" selected><?= $no; ?></option>
+                                <?php
                                 }
-                            }
-                            ?>
-                        </select>
+                                ?>
+                            </select>    
+                        <?php } else { ?>
+                            <select multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataNo)) {
+                                    foreach ($dataNo as $no) {
+                                ?>
+                                        <option value="<?= $no["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? (in_array($no["id"], ($dataPenerimaanBarang->multiple_po_id ? json_decode($dataPenerimaanBarang->multiple_po_id) : [])) ? "selected" : "") : ""); ?>><?= $no["po_no"]; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>    
+                        <?php } ?>
+                        <?php } else {
+                        ?>
+                            <select multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataNo)) {
+                                    foreach ($dataNo as $no) {
+                                ?>
+                                        <option value="<?= $no["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? (in_array($no["id"], ($dataPenerimaanBarang->multiple_po_id ? json_decode($dataPenerimaanBarang->multiple_po_id) : [])) ? "selected" : "") : ""); ?>><?= $no["po_no"]; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                        <?php } 
+                        ?>
                         <label for="floatingInput">No. PO</label>
                     </div>
                 </div>
@@ -1122,10 +1158,10 @@
                 //     }
                 // })
 
-                if(total_masuk_sementara > doc_qty)
-                {
-                    validate_jml_masuk = true;
-                }
+                // if(total_masuk_sementara > doc_qty)
+                // {
+                //     validate_jml_masuk = true;
+                // }
 
                 // if(validate_same)
                 // {
@@ -1518,6 +1554,248 @@
             }
         })
 
+        $(".btn-submit-parent-and-close").click(function() {
+            $(".detail-modal").modal("hide")
+
+            // CHECK IF NO BARANG
+            if(list_items.length === 0)
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Barang Tidak Boleh Kosong",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+            else
+            {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading()
+                            let data = new FormData(document.querySelector(".create-form"));
+
+                            let update_list_items = [];
+
+                            data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
+                            var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
+                                return elem.text 
+                            });
+                            console.log(arr_no)
+                            data.append("acceptance_type", ($('.multiple_po_id').val().length > 1) ? "MULTIPLE ORDER" : "SINGLE ORDER")
+                            data.append("multiple_po_no", JSON.stringify(arr_no));
+
+                            let id = $(".id").val();
+                            // UPDATE
+                            if(id)
+                            {
+                                if(list_delete.length !== 0)
+                                {
+                                    list_delete.map(obj => {
+                                        update_list_items.push(
+                                            {
+                                                id: obj.id ? Number(obj.id) : "",
+                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                warehouse: JSON.stringify(obj.warehouse),
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                unit: obj.unit ? Number(obj.unit) : 0,
+                                                doc_qty: obj.doc_qty ? Number(obj.doc_qty) : 0,
+                                                nama_barang_dok: obj.nama_barang_dokumen,
+                                                qty: obj.qty ? Number(obj.qty) : 0,
+                                                selisih: obj.selisih ? Number(obj.selisih) : 0,
+                                                konversi: obj.konversi ? Number(obj.konversi) : 0,
+                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                penyerahan: obj.penyerahan ? Number(obj.penyerahan.replaceAll(",", "")) : 0,
+                                                keterangan: obj.keterangan,
+                                                ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                                pph: obj.pph ? Number(obj.pph) : 0,
+                                                is_delete: true
+                                            }
+                                        )
+                                    })
+                                }
+                                
+                                list_items.map(obj => {
+                                    if (obj.id) {
+                                        update_list_items.push(
+                                            {
+                                                id: obj.id ? Number(obj.id) : "",
+                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                warehouse: JSON.stringify(obj.warehouse),
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                unit: obj.unit ? Number(obj.unit) : 0,
+                                                doc_qty: obj.doc_qty ? Number(obj.doc_qty) : 0,
+                                                nama_barang_dok: obj.nama_barang_dokumen,
+                                                qty: obj.qty ? Number(obj.qty) : 0,
+                                                selisih: obj.selisih ? Number(obj.selisih) : 0,
+                                                konversi: obj.konversi ? Number(obj.konversi) : 0,
+                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                penyerahan: obj.penyerahan ? Number(obj.penyerahan.replaceAll(",", "")) : 0,
+                                                keterangan: obj.keterangan,
+                                                ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                                pph: obj.pph ? Number(obj.pph) : 0,
+                                                is_delete: false
+                                            }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        update_list_items.push(
+                                            {
+                                                id: obj.id ? Number(obj.id) : "",
+                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                warehouse: JSON.stringify(obj.warehouse),
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                unit: obj.unit ? Number(obj.unit) : 0,
+                                                doc_qty: obj.doc_qty ? Number(obj.doc_qty) : 0,
+                                                nama_barang_dok: obj.nama_barang_dokumen,
+                                                qty: obj.qty ? Number(obj.qty) : 0,
+                                                selisih: obj.selisih ? Number(obj.selisih) : 0,
+                                                konversi: obj.konversi ? Number(obj.konversi) : 0,
+                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                penyerahan: obj.penyerahan ? Number(obj.penyerahan.replaceAll(",", "")) : 0,
+                                                keterangan: obj.keterangan,
+                                                ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                                pph: obj.pph ? Number(obj.pph) : 0,
+                                                is_delete: false
+                                            }
+                                        )
+                                    }
+                                })
+
+                                data.append("items", JSON.stringify(update_list_items))
+
+                                data.append("status_post", "FINISH");
+
+                                $.ajax({
+                                    url: "<?= base_url("penerimaan-barang-lokal/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + id;
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                            // CREATE
+                            else
+                            {
+                                list_items.map(obj => {
+                                    update_list_items.push(
+                                        {
+                                            purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                            warehouse: JSON.stringify(obj.warehouse),
+                                            barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                            unit: obj.unit ? Number(obj.unit) : 0,
+                                            doc_qty: obj.doc_qty ? Number(obj.doc_qty) : 0,
+                                            nama_barang_dok: obj.nama_barang_dokumen,
+                                            qty: obj.qty ? Number(obj.qty) : 0,
+                                            selisih: obj.selisih ? Number(obj.selisih) : 0,
+                                            konversi: obj.konversi ? Number(obj.konversi) : 0,
+                                            jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                            harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                            penyerahan: obj.penyerahan ? Number(obj.penyerahan.replaceAll(",", "")) : 0,
+                                            keterangan: obj.keterangan,
+                                            ppn: obj.ppn ? Number(obj.ppn) : 0,
+                                            pph: obj.pph ? Number(obj.pph) : 0
+                                        }
+                                    )
+                                })
+
+                                data.append("items", JSON.stringify(update_list_items))
+
+                                data.append("status_post", "FINISH");
+
+                                $.ajax({
+                                    url: "<?= base_url("penerimaan-barang-lokal/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + response.id;
+                                            })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                        }
+                    })
+                }
+            }
+        })
+
         $(".btn-submit-parent").click(function() {
             $(".detail-modal").modal("hide")
 
@@ -1641,6 +1919,8 @@
 
                                 data.append("items", JSON.stringify(update_list_items))
 
+                                data.append("status_post", "WAITING");
+
                                 $.ajax({
                                     url: "<?= base_url("penerimaan-barang-lokal/update"); ?>",
                                     data: data,
@@ -1708,6 +1988,8 @@
                                 })
 
                                 data.append("items", JSON.stringify(update_list_items))
+
+                                data.append("status_post", "WAITING");
 
                                 $.ajax({
                                     url: "<?= base_url("penerimaan-barang-lokal/save"); ?>",
@@ -1990,63 +2272,63 @@
             }
         })
 
-        $(".posting-penerimaan").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di Posting?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Posting',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    $.ajax({
-                        url: "<?= base_url("penerimaan-barang-lokal/update-status"); ?>",
-                        data: {
-                            id: $(".id").val()
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + $(".id").val()
-                                })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
+        // $(".posting-penerimaan").click(function() {
+        //     Swal.fire({
+        //         icon: 'question',
+        //         title: 'Yakin akan di Posting?',
+        //         confirmButtonColor: '#4e73df',
+        //         cancelButtonColor: '#d33',
+        //         showCancelButton: true,
+        //         reverseButtons: true,
+        //         confirmButtonText: 'Posting',
+        //         cancelButtonText: 'Batal',
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             const csrf = $(`[name="${csrfToken}"]`);
+        //             $.ajax({
+        //                 url: "<?= base_url("penerimaan-barang-lokal/update-status"); ?>",
+        //                 data: {
+        //                     id: $(".id").val()
+        //                 },
+        //                 beforeSend: function(xhr) {
+        //                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+        //                 },
+        //                 method: "POST",
+        //                 dataType: "json",
+        //                 success: function(response) {
+        //                     csrf.val(response.token);
+        //                     if (response.status) {
+        //                         stopLoading()
+        //                         Swal.fire({
+        //                             icon: 'success',
+        //                             title: response.message,
+        //                             confirmButtonColor: '#4e73df',
+        //                         })
+        //                         .then(() => {
+        //                             window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + $(".id").val()
+        //                         })
+        //                     } else {
+        //                         Swal.fire({
+        //                             icon: 'error',
+        //                             title: response.message,
+        //                             confirmButtonColor: '#4e73df',
+        //                         })
+        //                         stopLoading()
+        //                     }
+        //                 },
+        //                 onError: function(response) {
+        //                     csrf.val(response.token);
+        //                     Swal.fire({
+        //                         icon: 'error',
+        //                         title: 'Data Gagal Disimpan, coba Lagi',
+        //                         confirmButtonColor: '#4e73df',
+        //                     })
+        //                     stopLoading()
+        //                 }
+        //             });
+        //         }
+        //     })
+        // })
 
         $(".supplier_id").change(function() {
             if($(".supplier_id option:selected").val())

@@ -4,15 +4,40 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 
+use App\Models\AMPurchaseOrderModel;
+use App\Models\MetadataModel;
+use App\Models\PenerimaanBarangModel;
+use App\Models\PenerimaanBarangDetailModel;
+use App\Models\RMImportPOModel;
+use App\Models\SupplierModel;
+use App\Models\WarehousesModel;
+use App\Models\SatuanModel;
+
 class PenerimaanBarangImport extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $amPurchaseOrderModel;
+    protected $metadataModel;
+    protected $penerimaanBarangModel;
+    protected $penerimaanBarangDetailModel;
+    protected $rmImportPOModel;
+    protected $supplierModel;
+    protected $warehousesModel;
+    protected $satuanModel;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->metadataModel = new MetadataModel();
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->rmImportPOModel = new RMImportPOModel();
+        $this->supplierModel = new SupplierModel();
+        $this->warehousesModel = new WarehousesModel();
+        $this->satuanModel = new SatuanModel();
     }
 
     public function penerimaanBarangImport()
@@ -23,22 +48,20 @@ class PenerimaanBarangImport extends BaseController
     public function createPenerimaanBarangImport()
     {
         //Get AJU
-        $responseAJU = curl_request("GET", "/penerimaanBarang/drop-down-aju", $this->token);
-
-        $dataAJU = [];
-        if ($responseAJU["code"] === 200) {
-            $dataAJU = json_decode($responseAJU["body"])->data;
-        }
+        $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN BAKU', $this->this_company_id);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
+        //Get Warehouse
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+
+        //Get Satuan
+        $dataSatuan = $this->satuanModel->asObject()->find();
 
         $data = [
+            "dataSatuan" => $dataSatuan,
+            "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
             "dataAJU" => $dataAJU
         ];
@@ -49,72 +72,68 @@ class PenerimaanBarangImport extends BaseController
     public function getByIdPenerimaanBarangImport($id = null)
     {
         //Get AJU
-        $responseAJU = curl_request("GET", "/penerimaanBarang/drop-down-aju", $this->token);
+        $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
 
-        $dataAJU = [];
-        if ($responseAJU["code"] === 200) {
-            $dataAJU = json_decode($responseAJU["body"])->data;
-        }
+        //Get Warehouse
+        $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
+
+        //Get Satuan
+        $dataSatuan = $this->satuanModel->asObject()->find();
 
         $data["dataAJU"] = $dataAJU;
 
+        $data["dataWarehouse"] = $dataWarehouse;
+
+        $data["dataSatuan"] = $dataSatuan;
+
         if (!empty($id)) {
-            $responsePenerimaanBarang = curl_request("GET", "/penerimaanBarang/$id", $this->token);
+            $dataPenerimaanBarang = $this->penerimaanBarangModel->asObject()->find($id);
 
-            // var_dump($responsePenerimaanBarang);
-            // die;
+            if($dataPenerimaanBarang)
+            {
+                $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
 
-            $dataPenerimaanBarang = [];
-            if ($responsePenerimaanBarang["code"] === 200) {
-                $status_penerimaan = json_decode($responsePenerimaanBarang["body"])->data->status_penerimaan;
                 if($status_penerimaan === "IMPORT")
                 {
-                    $dataPenerimaanBarang = json_decode($responsePenerimaanBarang["body"])->data;
+                    $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
 
-                    $tipe_bahan = json_decode($responsePenerimaanBarang["body"])->data->tipe_bahan;
+                    // var_dump($dataPenerimaanBarangDetail);
+                    // die;
+
+                    if($dataPenerimaanBarangDetail)
+                    {
+                        $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
+                    }
+
+                    $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
+
                     if($tipe_bahan === "BAKU")
                     {
-                        $dataNo = [];
-                        $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
-                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=BAKU&supplierid=$arr", $this->token);
-                        if ($responseNo["code"] === 200) {
-                            $dataNo = json_decode($responseNo["body"])->data;
-                        }
+                        $supplier_id = $dataPenerimaanBarang->supplier_id;
+
+                        $dataNo = $this->rmImportPOModel->getNoPenerimaanBarang($supplier_id, $this->this_company_id);
 
                         //Get Supplier
-                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+                        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN BAKU', $this->this_company_id);
 
-                        $dataSupplier = [];
-                        if ($responseSupplier["code"] === 200) {
-                            $dataSupplier = json_decode($responseSupplier["body"])->data;
-                        }
-                        
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
                     }
                     if($tipe_bahan === "PENOLONG")
                     {
-                        $dataNo = [];
-                        $arr = json_decode($responsePenerimaanBarang["body"])->data->supplier_id;
-                        $responseNo = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=PENOLONG&supplierid=$arr", $this->token);
-                        if ($responseNo["code"] === 200) {
-                            $dataNo = json_decode($responseNo["body"])->data;
-                        }
+                        $supplier_id = $dataPenerimaanBarang->supplier_id;
+
+                        $dataNo = $this->amPurchaseOrderModel->getNoPenerimaanBarangPenolong("Import", $supplier_id, $this->this_company_id);
 
                         //Get Supplier
-                        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
-
-                        $dataSupplier = [];
-                        if ($responseSupplier["code"] === 200) {
-                            $dataSupplier = json_decode($responseSupplier["body"])->data;
-                        }
+                        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN PENOLONG', $this->this_company_id);
 
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
                     }
                 } 
             }
-            $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
         }
 
         return view('Warehouse/penerimaanBarangImport/form', $data);
@@ -123,51 +142,62 @@ class PenerimaanBarangImport extends BaseController
     public function allPenerimaanBarangImport()
     {
         $payload = [
-            "pagesize" => $this->request->getGet("length"),
-            "currentpage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sorttype" => $this->request->getGet("sortType"),
             "statuspenerimaan" => "IMPORT",
             "status" => $this->request->getGet("status"),
-            "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/penerimaanBarang", $this->token, $payload);
-        $dataPenerimaanBarangImport = [];
-        $totalRecords = 0;
+        $condition = [
+            "company_id"        => $this->this_company_id,
+            "status_penerimaan" => "IMPORT"
+        ];
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "status" => $this->request->getGet("status"),
+            "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
 
-            $no = ($payload["pagesize"] * ($payload["currentpage"] - 1)) + 1;
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, $limit, $offset);
 
-            foreach ($body as $data) {
-                array_push($dataPenerimaanBarangImport, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "no_penerimaan_barang" => $data->no_penerimaan_barang,
-                    "invoice_no" => $data->invoice_no,
-                    "multiple_po_no" => $data->multiple_po_no,
-                    "acceptance_type" => $data->acceptance_type,
-                    "aju_type" => $data->aju_type,
-                    "aju_no" => $data->aju_no,
-                    "validation_date" => $data->validation_date,
-                    "sender_name" => $data->sender_name,
-                    "status_post" => $data->status_post
-                ]);
-            }
+        $dataPenerimaanBarang = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($penerimaanBarangData['data'] as $data) {
+            array_push($dataPenerimaanBarang, [
+                "no"                    => $no++,
+                "id"                    => $data->id,
+                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
+                "invoice_no"            => $data->invoice_no,
+                "multiple_po_no"        => json_decode($data->multiple_po_no),
+                "acceptance_type"       => $data->acceptance_type,
+                "aju_type"              => $data->aju_type,
+                "aju_no"                => $data->aju_no,
+                "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
+                "sender_name"           => $data->sender_name,
+                "status_post"           => $data->status_post
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataPenerimaanBarangImport,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $penerimaanBarangData['totalData'],
+            "recordsFiltered"   => $penerimaanBarangData['totalFilteredData'],
+            "data"              => $dataPenerimaanBarang,
+            // "response" => $response,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -219,13 +249,30 @@ class PenerimaanBarangImport extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
-                $payload = json_encode([
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("no_penerimaan_barang"),
+                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
+                $status_post = $this->request->getPost("status_post");
+                $tipe_bahan = $this->request->getPost("tipe_bahan");
+                $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
+
+                $payload = [
+                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
-                    "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
-                    "tipe_bahan" => $this->request->getPost("tipe_bahan"),
+                    "acceptance_type" => $this->request->getPost("acceptance_type"),
+                    "multiple_po_id" => json_encode($multiple_po_id),
+                    "multiple_po_no" => $this->request->getPost("multiple_po_no"),
+                    "tipe_bahan" => $tipe_bahan,
                     "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
                     "aju_no" => $this->request->getPost("aju_no"),
                     "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
@@ -237,51 +284,123 @@ class PenerimaanBarangImport extends BaseController
                     "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
                     "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
                     "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
-                    "status_post" => "WAITING",
+                    "status_post" => $status_post,
                     "status_penerimaan" => "IMPORT",
-                    "penerimaan_barang_detail" => json_decode($this->request->getPost("items"))
-                ]);
+                ];
+
+                $items = json_decode($this->request->getPost("items"));
 
                 // $data = [
                 //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
+                //     "message"    => $detailPayload,
+                //     "payload"   => $detailPayload,
                 //     'token' => csrf_hash()
                 // ];
                 // echo json_encode($data);
-                
-                $response = curl_request("POST", "/penerimaanBarang", $this->token, $payload);
 
-                if ($response["code"] === 200) {
+                if($status_post === "FINISH")
+                {
+                    if($tipe_bahan === "BAKU")
+                    {
+                        foreach($multiple_po_id as $po_id)
+                        {
+                            $conditionUpdate = [
+                                'id' => $po_id
+                            ];
+
+                            $payloadupdate = [
+                                'status_penerimaan' => 1
+                            ];
+            
+                            $this->rmImportPOModel->where($conditionUpdate)->set($payloadupdate)->update();
+                        }
+                    }
+                    if($tipe_bahan === "PENOLONG")
+                    {
+                        foreach($multiple_po_id as $po_id)
+                        {
+                            $conditionUpdate = [
+                                'id' => $po_id
+                            ];
+
+                            $payloadupdate = [
+                                'status_penerimaan' => 1
+                            ];
+            
+                            $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+                        }
+                    }
+                }
+                
+                $response =  $this->penerimaanBarangModel->insert($payload);
+                // $response =  '';
+
+                if ($response) {
+                    foreach($items as $data)
+                    {
+                        $detailPayload = [];
+
+                        $detailPayload = [
+                            'purchase_order_details_id' => $data->purchase_order_details_id,
+                            'penerimaan_barang_id' => $response,
+                            'doc_qty' => $data->doc_qty,
+                            'selisih' => $data->selisih,
+                            'konversi' => $data->konversi,
+                            'harga' => $data->harga,
+                            'penyerahan' => $data->penyerahan,
+                            'keterangan' => $data->keterangan,
+                            'warehouse' => $data->warehouse,
+                            'barang_id' => $data->barang_id,
+                            'qty' => $data->qty,
+                            'pph' => $data->ppn,
+                            'ppn' => $data->pph,
+                            'unit' => $data->unit,
+                            'nama_barang_dok' => $data->nama_barang_dok,
+                            'jml_masuk' => $data->jml_masuk
+                        ];
+
+                        // $data = [
+                        //     "status"            => false,
+                        //     "message"    => $detailPayload,
+                        //     "payload"   => $detailPayload,
+                        //     'token' => csrf_hash()
+                        // ];
+                        // echo json_encode($data);
+
+                        $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
+
+                        if(!$responseDetail) {
+                            $message =  'Data Gagal Disimpan';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    }
+
                     $data = [
-                        "id" => json_decode($response["body"])->data->id,
+                        "id" => $response,
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
                         "payload"   => $payload,
-                        'token' => csrf_hash(),
                         "response" => $response,
-                        'code' => $response["code"]
+                        'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
                         "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
+                        'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         }
         catch(\Exception $e)
         {
@@ -340,15 +459,31 @@ class PenerimaanBarangImport extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
+                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
+                $status_post = $this->request->getPost("status_post");
+                $tipe_bahan = $this->request->getPost("tipe_bahan");
+                $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
 
-                $payload = json_encode([
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("no_penerimaan_barang"),
+                $payload = [
+                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
-                    "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
-                    "tipe_bahan" => $this->request->getPost("tipe_bahan"),
+                    "acceptance_type" => $this->request->getPost("acceptance_type"),
+                    "multiple_po_id" => json_encode($multiple_po_id),
+                    "multiple_po_no" => $this->request->getPost("multiple_po_no"),
+                    "tipe_bahan" => $tipe_bahan,
                     "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
                     "aju_no" => $this->request->getPost("aju_no"),
                     "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
@@ -360,10 +495,11 @@ class PenerimaanBarangImport extends BaseController
                     "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
                     "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
                     "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
-                    "status_post" => "WAITING",
+                    "status_post" => $status_post,
                     "status_penerimaan" => "IMPORT",
-                    "penerimaan_barang_detail" => json_decode($this->request->getPost("items"))
-                ]);
+                ];
+
+                $items = json_decode($this->request->getPost("items"));
 
                 // $data = [
                 //     "status"            => false,
@@ -372,21 +508,147 @@ class PenerimaanBarangImport extends BaseController
                 //     'token' => csrf_hash()
                 // ];
                 // echo json_encode($data);
-                
-                $response = curl_request("PATCH", "/penerimaanBarang/$id", $this->token, $payload);
 
-                if ($response["code"] === 200) {
+                if($status_post === "FINISH")
+                {
+                    if($tipe_bahan === "BAKU")
+                    {
+                        foreach($multiple_po_id as $po_id)
+                        {
+                            $conditionUpdate = [
+                                'id' => $po_id
+                            ];
+
+                            $payloadupdate = [
+                                'status_penerimaan' => 1
+                            ];
+            
+                            $this->rmImportPOModel->where($conditionUpdate)->set($payloadupdate)->update();
+                        }
+                    }
+                    if($tipe_bahan === "PENOLONG")
+                    {
+                        foreach($multiple_po_id as $po_id)
+                        {
+                            $conditionUpdate = [
+                                'id' => $po_id
+                            ];
+
+                            $payloadupdate = [
+                                'status_penerimaan' => 1
+                            ];
+            
+                            $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+                        }
+                    }
+                }
+                
+                $condition = [
+                    'id' => $id
+                ];
+
+                $response = $this->penerimaanBarangModel->where($condition)->set($payload)->update();
+                // $response = '';
+
+                if ($response) {
+                    foreach($items as $data)
+                    {
+                        $detailPayload = [];
+
+                        $detailPayload = [
+                            'purchase_order_details_id' => $data->purchase_order_details_id,
+                            'penerimaan_barang_id' => $id,
+                            'doc_qty' => $data->doc_qty,
+                            'selisih' => $data->selisih,
+                            'konversi' => $data->konversi,
+                            'harga' => $data->harga,
+                            'penyerahan' => $data->penyerahan,
+                            'keterangan' => $data->keterangan,
+                            'warehouse' => $data->warehouse,
+                            'barang_id' => $data->barang_id,
+                            'qty' => $data->qty,
+                            'pph' => $data->ppn,
+                            'ppn' => $data->pph,
+                            'unit' => $data->unit,
+                            'nama_barang_dok' => $data->nama_barang_dok,
+                            'jml_masuk' => $data->jml_masuk
+                        ];
+
+                        // $data = [
+                        //     "status"            => false,
+                        //     "message"    => $detailPayload,
+                        //     "payload"   => $detailPayload,
+                        //     'token' => csrf_hash()
+                        // ];
+                        // echo json_encode($data);
+
+                        // kalau hapus
+                        if($data->is_delete)
+                        {
+                            $responseDetail = $this->penerimaanBarangDetailModel->delete($data->id);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Dihapus';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+
+                         // kalau update
+                        if($data->id)
+                        {
+                            $conditionDetail = [
+                                'id' => $data->id
+                            ];
+
+                            $responseDetail = $this->penerimaanBarangDetailModel->where($conditionDetail)->set($detailPayload)->update();
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Diubah';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+
+                        // kalau create
+                        else
+                        {
+                            $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Disimpan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+                    }
+                    
                     $data = [
                         "id" => "",
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
                         "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
+                        "response" => $response,
+                        'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $message = 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -396,14 +658,7 @@ class PenerimaanBarangImport extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         }
         catch(\Exception $e)
         {
@@ -417,47 +672,51 @@ class PenerimaanBarangImport extends BaseController
         return;
     }
 
-    public function updateStatusPenerimaanBarangImport()
-    {
-        try{
-            $id = $this->request->getPost("id");
+    // public function updateStatusPenerimaanBarangLokal()
+    // {
+    //     try{
+    //         $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "status_post" => "FINISH"
-            ]);
+    //         $payload = [
+    //             "status_post" => "FINISH"
+    //         ];
             
-            $response = curl_request("PATCH", "/penerimaanBarang/status/$id", $this->token, $payload);
+    //         $condition = [
+    //             'id' => $id
+    //         ];
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diposting",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        }
-        catch(\Exception $e)
-        {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
+    //         $response = $this->penerimaanBarangModel->where($condition)->set($payload)->update();
+
+    //         if ($response) {
+    //             $data = [
+    //                 "status"            => true,
+    //                 "message"   => "Data Berhasil diposting",
+    //                 "payload"   => $payload,
+    //                 'token' => csrf_hash()
+    //             ];
+    //             echo json_encode($data);
+    //         } else {
+    //             $message = 'Data Gagal Diposting';
+    //             $data = [
+    //                 "status"            => false,
+    //                 "message"    => $message,
+    //                 "payload"   => $payload,
+    //                 'token' => csrf_hash()
+    //             ];
+    //             echo json_encode($data);
+    //         }
+    //     }
+    //     catch(\Exception $e)
+    //     {
+    //         $data = [
+    //             "status"            => false,
+    //             "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+    //             'token' => csrf_hash()
+    //         ];
+    //         echo json_encode($data);
+    //     }
+    //     return;
+    // }
 
     public function deletePenerimaanBarangImport()
     {
@@ -465,19 +724,29 @@ class PenerimaanBarangImport extends BaseController
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/penerimaanBarang/$id", $this->token);
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                $findPenerimaanBarang = $this->penerimaanBarangModel->find($id);
+                if ($findPenerimaanBarang) {
+                    $response =  $this->penerimaanBarangModel->delete($id);
+                    if ($response) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil dihapus",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message = 'Data Gagal Dihapus';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
+                        "message"    => "Data Tidak Ditemukan",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);

@@ -14,7 +14,7 @@ class AMPurchaseOrderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['id', 'status_penerimaan'];
 
     // Dates
     protected $useTimestamps = true;

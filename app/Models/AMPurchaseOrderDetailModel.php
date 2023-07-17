@@ -50,7 +50,7 @@ class AMPurchaseOrderDetailModel extends Model
         $builder = $this->db->table('am_purchase_order_details')
         ->select('am_purchase_order_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
         ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
-        ->join('satuans', 'satuans.id = barangs.satuan_id', 'left');
+        ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
         

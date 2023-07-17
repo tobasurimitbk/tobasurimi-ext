@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class RMPurchaseOrderModel extends Model
+class RMImportPOModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'rm_purchase_orders';
+    protected $table            = 'rm_import_pos';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -50,7 +50,7 @@ class RMPurchaseOrderModel extends Model
             'company_id' => $company_id
         ];
 
-        $builder = $this->db->table('rm_purchase_orders');
+        $builder = $this->db->table('rm_import_pos');
         $builder->where($arrCondition);
         $query = $builder->get();
         

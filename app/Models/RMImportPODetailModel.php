@@ -4,17 +4,17 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class RMPurchaseOrderModel extends Model
+class RMImportPODetailModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'rm_purchase_orders';
+    protected $table            = 'rm_import_po_details';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'status_penerimaan'];
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = true;
@@ -40,17 +40,17 @@ class RMPurchaseOrderModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getNoPenerimaanBarang($supplier_id, $company_id)
+    public function getPurchaseOrderDetailByPurchaseOrderId($id)
     {
         $arrCondition = [
-            'deletedAt' => null,
-            'supplier_id' => $supplier_id,
-            'is_posted' => 1,
-            'status_penerimaan' => 0,
-            'company_id' => $company_id
+            'rm_import_po_details.deletedAt' => null,
+            'rm_import_po_details.rm_import_po_id' => $id
         ];
 
-        $builder = $this->db->table('rm_purchase_orders');
+        $builder = $this->db->table('rm_import_po_details')
+        ->select('rm_import_po_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
+        ->join('barangs', 'barangs.id = rm_import_po_details.barang_id', 'left')
+        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
         

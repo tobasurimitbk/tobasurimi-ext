@@ -3,16 +3,22 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\RMImportPOModel;
+use App\Models\RMImportPODetailModel;
 
 class POImportBahanBaku extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $RMImportPOModel;
+    protected $RMImportPODetailModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->RMImportPOModel = new RMImportPOModel();
+        $this->RMImportPODetailModel = new RMImportPODetailModel();
     }
 
     public function poImportBahanBaku()
@@ -464,11 +470,8 @@ class POImportBahanBaku extends BaseController
     public function dropdownPOImportBahanBaku()
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-        $dataPOImport = [];
-        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=BAKU&supplierid=$id", $this->token);
-        if ($responsePOImport["code"] === 200) {
-            $dataPOImport = json_decode($responsePOImport["body"])->data;
-        }
+
+        $dataPOImport = $this->RMImportPOModel->getNoPenerimaanBarang($id, $this->this_company_id);
 
         $data = [
             "data" => $dataPOImport
@@ -480,21 +483,12 @@ class POImportBahanBaku extends BaseController
 
     public function dropdownBarangPOImportBahanBaku()
     {
-        $payload = json_encode([
-            "multiple_id_po" => json_decode($this->request->getGet("id")),
-            "po_type" => "IMPORT",
-            "tipe_bahan" => "BAKU"
-        ]);
+        $id = $this->request->getGet("id");
 
-        $dataPOImport = [];
-        $responsePOImport = curl_request("POST", "/penerimaanBarang/list-po", $this->token, $payload);
-        if ($responsePOImport["code"] === 200) {
-            $dataPOImport = json_decode($responsePOImport["body"])->data;
-        }
+        $dataPOImport = $this->RMImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
         $data = [
-            "data" =>  $dataPOImport,
-            "response" => $responsePOImport
+            "data" =>  $dataPOImport
         ];
 
         echo json_encode($data);
