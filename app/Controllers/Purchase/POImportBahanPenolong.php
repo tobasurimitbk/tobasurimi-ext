@@ -4,15 +4,22 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 
+use App\Models\AMPurchaseOrderModel;
+use App\Models\AMPurchaseOrderDetailModel;
+
 class POImportBahanPenolong extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $AMPurchaseOrderModel;
+    protected $AMPurchaseOrderDetailModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->AMPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
     }
 
     public function poImportBahanPenolong()
@@ -464,11 +471,8 @@ class POImportBahanPenolong extends BaseController
     public function dropdownPOImportBahanPenolong()
     {
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
-        $dataPOImport = [];
-        $responsePOImport = curl_request("GET", "/penerimaanBarang/drop-down-po?potype=IMPORT&tipebahan=PENOLONG&supplierid=$id", $this->token);
-        if ($responsePOImport["code"] === 200) {
-            $dataPOImport = json_decode($responsePOImport["body"])->data;
-        }
+
+        $dataPOImport = $this->AMPurchaseOrderModel->getNoPenerimaanBarang("IMPORT", $id, $this->this_company_id);
 
         $data = [
             "data" => $dataPOImport
@@ -480,21 +484,12 @@ class POImportBahanPenolong extends BaseController
 
     public function dropdownBarangPOImportBahanPenolong()
     {
-        $payload = json_encode([
-            "multiple_id_po" => json_decode($this->request->getGet("id")),
-            "po_type" => "IMPORT",
-            "tipe_bahan" => "PENOLONG"
-        ]);
+        $id = $this->request->getGet("id");
 
-        $dataPOImport = [];
-        $responsePOImport = curl_request("POST", "/penerimaanBarang/list-po", $this->token, $payload);
-        if ($responsePOImport["code"] === 200) {
-            $dataPOImport = json_decode($responsePOImport["body"])->data;
-        }
+        $dataPOImport = $this->AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
 
         $data = [
-            "data" =>  $dataPOImport,
-            "response" => $responsePOImport
+            "data" =>  $dataPOImport
         ];
 
         echo json_encode($data);

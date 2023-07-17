@@ -400,12 +400,8 @@ class SupplierBahanBakuImport extends BaseController
 
     public function dropdownSupplier()
     {
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=IMPORT&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
-
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
+        $supplierModel = new SupplierModel();
+        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN BAKU', $this->this_company_id);
 
         $data = [
             "data" => $dataSupplier

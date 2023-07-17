@@ -29,20 +29,12 @@ class SPP extends BaseController
     public function createSPP()
     {
         //Get Order Type By Metadata
-        $responseOrderType = curl_request("GET", "/metadata/all?name=tipe_po", $this->token);
-
-        $dataOrderType = [];
-        if ($responseOrderType["code"] === 200) {
-            $dataOrderType = json_decode($responseOrderType["body"])->data;
-        }
+        $MetadataModel = new MetadataModel();
+        $dataOrderType =  $MetadataModel->get_by_name("Tipe PO");
 
         //Get Warehouse
-        $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
-
-        $dataWarehouse = [];
-        if ($responseWarehouse["code"] === 200) {
-            $dataWarehouse = json_decode($responseWarehouse["body"])->data;
-        }
+        $WarehousesModel = new WarehousesModel();
+        $dataWarehouse = $WarehousesModel->asObject()->findAll();
 
         $data = [
             "dataOrderType" => $dataOrderType,
@@ -57,22 +49,10 @@ class SPP extends BaseController
         //Get Order Type By Metadata
         $MetadataModel = new MetadataModel();
         $dataOrderType =  $MetadataModel->get_by_name("Tipe PO");
-        // $dataOrderType =  "";
-
-        // $dataOrderType = [];
-        // if ($responseOrderType["code"] === 200) {
-        //     $dataOrderType = json_decode($responseOrderType["body"])->data;
-        // }
 
         //Get Warehouse
-        // $responseWarehouse = curl_request("GET", "/warehouses/all", $this->token);
         $WarehousesModel = new WarehousesModel();
         $dataWarehouse = $WarehousesModel->asObject()->findAll();
-
-        // $dataWarehouse = [];
-        // if ($responseWarehouse["code"] === 200) {
-        //     $dataWarehouse = json_decode($responseWarehouse["body"])->data;
-        // }
 
         $data = [
             "dataOrderType" => $dataOrderType,
@@ -82,11 +62,9 @@ class SPP extends BaseController
         $SppModel = new SppModel();
         $SppDetailModel = new SppDetailModel();
 
-        $sppId = 3;
-
         if (!empty($id)) {
             $dataSPP = $SppModel->getSppById($id);
-            $dataSppDetail = $SppDetailModel->getSppDetailById($sppId);
+            $dataSppDetail = $SppDetailModel->getSppDetailById($id);
             $data["dataSPP"] = $dataSPP;
             $data["dataSPP"]->purchase_request_details = $dataSppDetail;
         }
@@ -217,13 +195,7 @@ class SPP extends BaseController
                     "items" =>  json_decode($this->request->getPost("items"))
                 ]);
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
+                dd($payload);
 
                 $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
 
