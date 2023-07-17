@@ -143,13 +143,16 @@ class RMImportPOModel extends Model
         $filt_no = $tgl . $bln . $thn . "-01/" . $warehouse . "/TOBA/" . $thn2;
 
         $conditions = [
-            'warehouse_id' => $warehouse_id
+            'warehouse_id' => $warehouse_id,
+            'deletedAt' => null
         ];
 
-        $no = $this->db->table('penerimaan_barang')->where($conditions)->countAllResults(false) + 1;
+        $no = $this->db->table('rm_import_pos')
+        ->like('rm_import_pos.createdAt', $thn . "-" . $bln . "-" . $tgl)
+        ->where($conditions)->countAllResults(false) + 1;
 
         if ($no != '') {
-            $filt_no = $tgl . $bln . $thn . "-". $no. "/" . $warehouse . "/TOBA/" . $thn2;
+            $filt_no = $tgl . $bln . $thn . "-". sprintf("%02d", $no). "/" . $warehouse . "/TOBA/" . $thn2;
         }
         return $filt_no;
     }

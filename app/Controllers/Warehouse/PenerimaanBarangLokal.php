@@ -261,7 +261,7 @@ class PenerimaanBarangLokal extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
+                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'));
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
@@ -495,7 +495,7 @@ class PenerimaanBarangLokal extends BaseController
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
-                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
+                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'));
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
