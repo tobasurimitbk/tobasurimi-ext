@@ -17,7 +17,7 @@
             </button>
             <?php } ?> 
 
-            <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/penerimaanBarang/print/<?= $dataPenerimaanBarang->id ?>')">
+            <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal/print/"); ?><?= $dataPenerimaanBarang->id; ?>')">
                 Print
             </button>
 

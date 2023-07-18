@@ -12,6 +12,7 @@ use App\Models\RMPurchaseOrderModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuanModel;
+use Dompdf\Dompdf;
 
 class PenerimaanBarangLokal extends BaseController
 {
@@ -25,6 +26,7 @@ class PenerimaanBarangLokal extends BaseController
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
+    protected $dompdf;
     
     public function __construct()
     {
@@ -38,6 +40,7 @@ class PenerimaanBarangLokal extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuanModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function penerimaanBarangLokal()
@@ -820,63 +823,50 @@ class PenerimaanBarangLokal extends BaseController
         return;
     }
 
-    public function getReceivedItemsBySupplier($supplierId)
+    public function print($id = null) 
     {
-        $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "idCompany"     => $this->this_company_id,
-            "kategori"      => "LOKAL",
-            "type"          => "BAHAN BAKU"
-        ];
+        if($id)
+        {
+            $filename = "Penerimaan Barang Lokal";
 
-        $condition = [
-            // "suppliers.company_id"  => $this->this_company_id,
-            "penerimaan_barang.status_penerimaan"   => "LOKAL",
-            "penerimaan_barang.tipe_bahan"          => "BAKU",
+            $data = [];
+            $dataPenerimaanBarang = $this->penerimaanBarangModel->getById($id);
 
-            // "search"                                => $this->request->getGet("search"),
-            // "sort"                                  => $this->request->getGet("sort"),
-            // "sortType"                              => $this->request->getGet("sortType")
-        ];
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
+            if($dataPenerimaanBarang)
+            {
+                $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
 
-        $itemData = $this->penerimaanBarangModel
-            ->getReceivedItemsBySupplier($supplierId, $condition, $limit, $offset);
+                if($status_penerimaan === "LOKAL")
+                {
+                    $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
 
-        $receivedData = [];
+                    // var_dump($dataPenerimaanBarang);
+                    // die;
 
-        foreach ($itemData['data'] as $data) {
-            array_push($receivedData, [
-                "id"                    => $data->id,
-                "no_po"                 => "jugijagiju",
-                "lpb_date"              => $data->lpb_date,
-                "no_lpb"                => $data->no_lpb,
-                "item_name"             => $data->item_name,
-                "lpb_qty"               => $data->lpb_qty,
-                "price"                 => floatval($data->price),
-                "return_qty"            => 0, 
-                "received_qty"          => 0,
-                "qty_will_be_received"  => $data->lpb_qty,
-                "unit"                  => $data->unit
-            ]);
+                    if($dataPenerimaanBarangDetail)
+                    {
+                        $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
+                    }
+                }
+            }
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangLokal/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Warehouse/penerimaanBarangLokal/print', $data);
         }
-
-        $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $itemData['totalData'],
-            "recordsFiltered"   => $itemData['totalFilteredData'],
-            "data"              => $receivedData,
-            // "response" => $response,
-            // "payload"           => $payload
-        ];
-
-        echo json_encode($data);
-        return;
     }
 
     public function dropdownPenerimaanBarangLokal()
