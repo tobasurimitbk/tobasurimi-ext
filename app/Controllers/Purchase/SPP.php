@@ -443,34 +443,30 @@ class SPP extends BaseController
     public function deleteSPP()
     {
         try {
+            $SppModel = new SppModel();
+            $SppDetailModel = new SppDetailModel();
             $id = $this->request->getPost("id");
 
-            if (!empty($id)) {
-                $response = curl_request("DELETE", "/purchaseRequest/$id", $this->token);
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (empty($id)) {
                 $data = [
-                    "status"            => false,
+                    "status"     => false,
                     "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            $SppModel->delete($id);
+            $SppDetailModel->where('purchase_request_id', $id)->delete();
+
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil dihapus",
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
