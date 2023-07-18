@@ -22,8 +22,10 @@ class KategoriAkunsModel extends Model
 
     public function get_by_id($id)
     {
-        $requete = "SELECT * FROM " . $this->table . " WHERE id='" . $id . "'";
-        //echo $requete;
+        $requete = "SELECT kategori_akuns.*,metadata.value as meta_name FROM kategori_akuns ";
+        $requete .= "LEFT JOIN metadata ON (metadata.id=kategori_akuns.kelompok_id) ";
+        $requete .= "WHERE kategori_akuns.id='" . $id . "'";
+
         $query = $this->db->query($requete);
         return $query->getResultArray();
     }

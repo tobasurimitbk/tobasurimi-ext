@@ -54,7 +54,8 @@ class Sub_AkunsModel extends Model
             $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
         if (isset($values["search"]))
             $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(sub_akuns.no_sub) like '%" . strtoupper($values["search"]) . "%' OR UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["search"]) . "%') ");
-
+        if (isset($values["status_sub"]))
+            $requete .= ($values["status_sub"] == "") ? "" : ("AND sub_akuns.status ='" . $values["status_sub"] . "' ");
         if ($sortby != '')
             $requete .= "ORDER BY $sortby ";
         if ($limit >= 0)
@@ -74,6 +75,8 @@ class Sub_AkunsModel extends Model
             $requete .= ($values["nama_sub"] == "") ? "" : ("AND UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["nama_sub"]) . "%' ");
         if (isset($values["search"]))
             $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(sub_akuns.no_sub) like '%" . strtoupper($values["search"]) . "%' OR UPPER(sub_akuns.nama_sub) like '%" . strtoupper($values["search"]) . "%') ");
+        if (isset($values["status_sub"]))
+            $requete .= ($values["status_sub"] == "") ? "" : ("AND sub_akuns.status ='" . $values["status_sub"] . "' ");
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;

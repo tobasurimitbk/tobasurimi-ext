@@ -147,14 +147,14 @@ class SPP extends BaseController
                 "warehouseName" => $data->warehouseName,
                 "total" => $data->total,
                 "request_date" => $data->request_date,
-                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName ?? "-",
-                "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
-                "approvedByDirectorName" => $data->approvedByDirectorName,
+                // "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName ?? "-",
+                // "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
+                // "approvedByDirectorName" => $data->approvedByDirectorName,
                 "is_posted" => $data->is_posted,
                 "createdAt" => $data->createdAt,
-                "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
-                "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
-                "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
+                // "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
+                // "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
+                // "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
             ]);
         }
 
@@ -367,28 +367,28 @@ class SPP extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $SppModel = new SppModel();
 
-            $payload = json_encode([
-                "is_posted" => true
-            ]);
+            $payload = [
+                "is_posted" => "1"
+            ];
 
-            $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
+            if (!empty($id)) {
+                $SppModel->update($id, $payload);
 
-            if ($response["code"] === 200) {
                 $data = [
-                    "status"            => true,
+                    "status"    => true,
                     "message"   => "Data Berhasil diposting",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
                 $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Disimpan",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             }

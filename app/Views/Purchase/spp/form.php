@@ -17,15 +17,12 @@
                     Print
                 </button>
 
-                <?php if ($dataSPP->is_posted === "0" && $dataSPP->approved_by_director !== "0") {
-                    if ($dataSPP->approved_by_head_of_purchasing !== "0" && $dataSPP->approved_by_headwarehouse !== "0") {
+                <?php if ($dataSPP->is_posted === "0") {
                 ?>
-
-                        <button class="btn btn-success posting-spp">
-                            Posting
-                        </button>
-
-                <?php }
+                    <button class="btn btn-success posting-spp">
+                        Posting
+                    </button>
+                <?php
                 }
                 ?>
 
