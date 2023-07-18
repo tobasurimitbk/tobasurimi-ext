@@ -14,7 +14,8 @@ class RMImportPOModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'status_penerimaan'];
+    protected $allowedFields    = ['id', 'company_id', 'purchase_request_id', 'po_no', 'po_date', 'warehouse_id',
+    'currency', 'supplier_id', 'total', 'payment_term', 'payment_date', 'dpp', 'note', 'is_posted', 'createdBy', 'status_penerimaan'];
 
     // Dates
     protected $useTimestamps = true;
@@ -100,6 +101,26 @@ class RMImportPOModel extends Model
         ];
     }
 
+    public function getPOById($id)
+    {
+        $selectQry = "rm_import_pos.*,
+        purchase_requests.spp_no AS spp_no,
+        warehouses.warehouse_name AS warehouseName,
+        suppliers.name AS supplierName,
+        users.name AS createdByName
+        ";
+
+        $sppData = $this->asObject()
+            ->select($selectQry)
+            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id')
+            ->join('warehouses', 'warehouses.id = rm_import_pos.warehouse_id')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
+            ->join('users', 'users.id = purchase_requests.createdBy')
+            ->find($id);
+
+        return $sppData;
+    }
+
     public function getNoPenerimaanBarang($supplier_id, $company_id)
     {
         $arrCondition = [
@@ -115,5 +136,24 @@ class RMImportPOModel extends Model
         $query = $builder->get();
         
         return $query->getResultArray();
+    }
+
+    public function get_no($tgl, $bln, $thn, $warehouse, $thn2, $warehouse_id)
+    {
+        $filt_no = $tgl . $bln . $thn . "-01/" . $warehouse . "/TOBA/" . $thn2;
+
+        $conditions = [
+            'warehouse_id' => $warehouse_id,
+            'deletedAt' => null
+        ];
+
+        $no = $this->db->table('rm_import_pos')
+        ->like('rm_import_pos.createdAt', $thn . "-" . $bln . "-" . $tgl)
+        ->where($conditions)->countAllResults(false) + 1;
+
+        if ($no != '') {
+            $filt_no = $tgl . $bln . $thn . "-". sprintf("%02d", $no). "/" . $warehouse . "/TOBA/" . $thn2;
+        }
+        return $filt_no;
     }
 }

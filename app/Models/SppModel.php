@@ -26,6 +26,7 @@ class SppModel extends Model
         'approved_by_head_of_purchasing',
         'approved_by_director',
         'request_status',
+        'createdBy'
     ];
 
     // Dates
@@ -78,9 +79,9 @@ class SppModel extends Model
             ->select($selectQry)
             ->where($condition)
             ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
-            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id')
-            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id')
-            ->join('users AS director', 'purchase_requests.approved_by_director = director.id')
+            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id', 'left')
+            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id', 'left')
+            ->join('users AS director', 'purchase_requests.approved_by_director = director.id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $purchaseRequestsDataQry->countAllResults(false);
@@ -127,10 +128,10 @@ class SppModel extends Model
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
-            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id')
-            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id')
-            ->join('users AS director', 'purchase_requests.approved_by_director = director.id')
-            ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id')
+            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id', 'left')
+            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id', 'left')
+            ->join('users AS director', 'purchase_requests.approved_by_director = director.id', 'left')
+            ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id', 'left')
             ->find($id);
 
         return $sppData;

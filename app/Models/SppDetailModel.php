@@ -14,7 +14,15 @@ class SppDetailModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        "purchase_request_id",
+        "barang_id",
+        "spec",
+        "qty",
+        "unit",
+        "price",
+        "note"
+    ];
 
     // Dates
     protected $useTimestamps = false;
@@ -58,8 +66,7 @@ class SppDetailModel extends Model
             ->where($condition)
             ->join('barangs', 'purchase_request_details.barang_id = barangs.id')
             ->join('satuans', 'barangs.satuan_id = satuans.id')
-            ->findAll($id);
-
+            ->findAll();
 
         return $sppDetailData;
     }

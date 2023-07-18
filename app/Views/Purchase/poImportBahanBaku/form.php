@@ -6,10 +6,13 @@
     <div class="section-header">
         <h1 class="title-name">Tambah</h1>
         <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-baku"); ?>">
+                Batal
+            </a>
 
             <?php if (!empty($dataPOImport)) { ?>
 
-                <?php if ($dataPOImport->is_posted === false) { ?>
+                <?php if ($dataPOImport->is_posted === "0") { ?>
                     <button class="btn btn-hapus delete-parent float-right">
                         Hapus
                     </button>
@@ -19,7 +22,7 @@
                     Print
                 </button>
 
-                <?php if ($dataPOImport->is_posted === false) { ?>
+                <?php if ($dataPOImport->is_posted === "0") { ?>
                     <button class="btn btn-success posting-spp float-right">
                         Posting
                     </button>
@@ -27,12 +30,8 @@
 
             <?php } ?>
 
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-baku"); ?>">
-                Batal
-            </a>
-
             <?php if (!empty($dataPOImport)) {
-                if ($dataPOImport->is_posted === false) { ?>
+                if ($dataPOImport->is_posted === "0") { ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
@@ -59,7 +58,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'readonly=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? $dataPOImport->po_date : ""; ?>">
+                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'readonly=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? ($dataPOImport->po_date ? date("d/m/Y", strtotime($dataPOImport->po_date)) : "")  : ""; ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -82,7 +81,7 @@
                                     if (!empty($dataSPP)) {
                                         foreach ($dataSPP as $spp) {
                                     ?>
-                                            <option value="<?= $spp->id; ?>"><?= $spp->spp_no; ?></option>
+                                            <option value="<?= $spp["id"]; ?>"><?= $spp["spp_no"]; ?></option>
                                     <?php
                                         }
                                     }
@@ -96,10 +95,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOImport) ? $dataPOImport->po_no : ""; ?>">
+                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="No. PO" value="<?= !empty($dataPOImport) ? $dataPOImport->po_no : ""; ?>">
                                     <label for="floatingInput">No. PO</label>
                                 </div>
-                                <div style="<?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -121,13 +120,13 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSupplier)) {
                                     foreach ($dataSupplier as $supplier) {
                                 ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
+                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= $supplier["kode"]; ?> - <?= $supplier["name"]; ?></option>
                                 <?php
                                     }
                                 }
@@ -151,13 +150,13 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataValuta)) {
                                     foreach ($dataValuta as $valuta) {
                                 ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->currency === $valuta->value ? "selected" : "") : ""; ?> value="<?= $valuta->id; ?>"><?= $valuta->value; ?></option>
+                                        <option <?= !empty($dataPOImport) ? (($dataPOImport->currency ? formatter($dataPOImport->currency, "STR_TO_INT") : 0) === formatter($valuta["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?></option>
                                 <?php
                                     }
                                 }
@@ -168,7 +167,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran / Bulan">
+                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran / Bulan">
                             <label for="floatingInput">Termin Pembayaran / Bulan</label>
                         </div>
                     </div>
@@ -176,7 +175,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->payment_date : ""; ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
+                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "") : ""; ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
                                     <label for="floatingInput">Tanggal Pembayaran</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -187,7 +186,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->dpp : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
+                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? ($dataPOImport->dpp ? number_format(formatter($dataPOImport->dpp, "STR_TO_INT")) : "") : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
                             <label for="floatingInput">DPP</label>
                         </div>
                     </div>
@@ -195,13 +194,13 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOImport) ? $dataPOImport->createdBy : session()->get("login")->name; ?>">
+                            <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOImport) ? $dataPOImport->createdByName : session()->get("login")->name; ?>">
                             <label for="floatingInput">Order Oleh</label>
                         </div>
                     </div>
@@ -214,7 +213,7 @@
                     </div>
                     <div class="col-md-6">
                         <?php if (!empty($dataPOImport)) {
-                            if ($dataPOImport->is_posted === false) { ?>
+                            if ($dataPOImport->is_posted === "0") { ?>
                                 <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
                                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                 </button>
@@ -252,40 +251,40 @@
                             $total_harga_barang = 0;
                             $total_qty = 0;
                             $total_harga = 0;
+                            
                             if (!empty($dataPOImport)) {
-                                foreach ($dataPOImport->rm_import_po_details as $details) {
-                                    $total_harga_barang = $total_harga_barang + ($details->price ? formatter(str_replace(",", "", $details->price), "STR_TO_INT") : 0);
-                                    $total_qty = $total_qty + $details->qty;
-                                    $total_harga = $total_harga + ($details->totalPrice ? formatter(str_replace(",", "", $details->totalPrice), "STR_TO_INT") : 0);
+                                foreach ($dataPOImportDetail as $details) {
+                                    $total_harga_barang = $total_harga_barang + ($details["price"] ? formatter($details["price"], "STR_TO_INT") : 0);
+                                    $total_qty = $total_qty + ($details["qty"] ? formatter($details["qty"], "STR_TO_INT") : 0);
+                                    $total_harga = $total_harga + ($details["price"] && $details["qty"] ? (formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")) : 0);
                             ?>
                                     <tr>
-                                        <?php if ($dataPOImport->is_posted === false) { ?>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->kodeBarang; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->barangName; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->spec; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->satuanName; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->price; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->qty; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->totalPrice; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->disc; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->additional_cost; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= $details->totalPrice; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= $details->disc; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->note; ?></td>
+                                        <?php if ($dataPOImport->is_posted === "0") { ?>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["kode_barang"]; ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_barang"]; ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["spec"]; ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_satuan"]; ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["price"], "STR_TO_INT")); ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= formatter($details["qty"], "STR_TO_INT"); ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= formatter($details["disc"], "STR_TO_INT"); ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-spesifikasi="<?= $details["spec"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["note"]; ?></td>
                                             <td><button onclick='deleteRow("<?= $no; ?>")'>X</button></td>
-
                                         <?php } else { ?>
 
                                             <td><?= $no; ?></td>
-                                            <td><?= $details->kodeBarang; ?></td>
-                                            <td><?= $details->barangName; ?></td>
-                                            <td><?= $details->satuanName; ?></td>
-                                            <td><?= $details->spec; ?></td>
-                                            <td><?= $details->price; ?></td>
-                                            <td><?= $details->qty; ?></td>
-                                            <td><?= $details->totalPrice; ?></td>
-                                            <td><?= $details->disc; ?></td>
-                                            <td><?= $details->additional_cost; ?></td>
-                                            <td><?= $details->note; ?></td>
+                                            <td><?= $details["kode_barang"]; ?></td>
+                                            <td><?= $details["nama_barang"]; ?></td>
+                                            <td><?= $details["nama_satuan"]; ?></td>
+                                            <td><?= $details["spec"]; ?></td>
+                                            <td><?= number_format(formatter($details["price"], "STR_TO_INT")); ?></td>
+                                            <td><?= formatter($details["qty"], "STR_TO_INT"); ?></td>
+                                            <td><?= number_format(formatter($details["price"], "STR_TO_INT") * formatter($details["qty"], "STR_TO_INT")); ?></td>
+                                            <td><?= formatter($details["disc"], "STR_TO_INT"); ?></td>
+                                            <td><?= number_format(formatter($details["additional_cost"], "STR_TO_INT")); ?></td>
+                                            <td><?= $details["note"]; ?></td>
                                             <td></td>
 
                                         <?php } ?>
@@ -434,39 +433,41 @@
     var priceEdit = 0;
     var totalPriceEdit = 0;
 
-    <?php if (!empty($dataPOImport)) {
-        foreach ($dataPOImport->rm_import_po_details as $details) {
+    <?php if (!empty($dataPOImportDetail)) {
+        foreach ($dataPOImportDetail as $details) {
     ?>
 
-            priceEdit = Number('<?= $details->price; ?>'.replaceAll(",", ""));
-            totalPriceEdit = Number('<?= $details->totalPrice; ?>'.replaceAll(",", ""));
+            priceEdit = Number('<?= $details["price"]; ?>');
+            totalPriceEdit = Number('<?= $details["price"]; ?>') * Number('<?= $details["qty"]; ?>');
             row = row + 1;
 
             total_harga_barang = total_harga_barang + priceEdit;
-            total_qty = total_qty + <?= $details->qty; ?>;
+            total_qty = total_qty + Number('<?= $details["qty"]; ?>');
             total_harga = total_harga + totalPriceEdit;
 
             list_items.push({
-                id: <?= $details->id; ?>,
+                id: <?= $details["id"]; ?>,
                 row: row,
-                barang_id: '<?= $details->barang_id; ?>',
-                kode_barang: '<?= $details->kodeBarang; ?>',
-                nama_barang: '<?= $details->barangName; ?>',
-                nama_satuan: '<?= $details->satuanName; ?>',
-                satuan: <?= $details->unit; ?>,
-                spesifikasi: '<?= $details->spec; ?>',
-                harga: '<?= $details->price; ?>',
-                qty: <?= $details->qty; ?>,
-                total: '<?= $details->totalPrice; ?>',
-                keterangan: '<?= $details->note; ?>',
-                additional_cost: '<?= $details->additional_cost; ?>',
-                disc: '<?= $details->disc; ?>',
+                barang_id: '<?= $details["barang_id"]; ?>',
+                kode_barang: '<?= $details["kode_barang"]; ?>',
+                nama_barang: '<?= $details["nama_barang"]; ?>',
+                nama_satuan: '<?= $details["nama_satuan"]; ?>',
+                satuan: <?= $details["id_satuan"]; ?>,
+                spesifikasi: '<?= $details["spec"]; ?>',
+                harga: Number('<?= $details["price"]; ?>').toLocaleString(),
+                qty: Number('<?= $details["qty"]; ?>'),
+                total: Number('<?= $details["price"]; ?>') * Number('<?= $details["qty"]; ?>').toLocaleString(),
+                keterangan: '<?= $details["note"]; ?>',
+                additional_cost: Number('<?= $details["additional_cost"]; ?>').toLocaleString(),
+                disc: Number('<?= $details["disc"]; ?>')
             })
         <?php
         }
         ?>
     <?php
     } ?>
+
+    console.log(list_items);
 
     var validator_detail = $(".detail-form").validate({
         rules: {
@@ -810,7 +811,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-baku"
+                    kategori: "Bahan Baku"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1043,9 +1044,10 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
+                        let spek = res?.data?.spek ? JSON.parse(res.data.spek) : [];
                         $(".spesifikasi").empty()
                         $(".spesifikasi").append(`<option value=""></option>`)
-                        res.data.spek.forEach(function(item) {
+                        spek.forEach(function(item) {
                             $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                         })
 
@@ -1058,8 +1060,8 @@
                 $(".barang_id").val(barang_id);
                 $(".satuan").val(satuan).change();
                 $(".qty").val(stok);
-                $(".harga").val(harga ? harga.toLocaleString() : "");
-                $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
+                $(".harga").val(harga ? Number(harga).toLocaleString() : "");
+                $(".total").val(harga && stok ? (Number(harga) * stok).toLocaleString() : "");
             } else {
                 $(".spesifikasi").empty()
                 $(".spesifikasi").val("").change()
@@ -1552,6 +1554,7 @@
                             const csrf = $(`[name="${csrfToken}"]`);
                             setLoading()
                             let data = new FormData(document.querySelector(".create-form"));
+                            var total = 0;
 
                             let update_list_items = [];
 
@@ -1575,6 +1578,7 @@
                             }
 
                             list_items.map(obj => {
+                                total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
                                 if (obj.id) {
                                     update_list_items.push({
                                         id: obj.id ? Number(obj.id) : 0,
@@ -1587,10 +1591,12 @@
                                         note: obj.keterangan,
                                         disc: obj.disc ? Number(obj.disc) : 0,
                                         additional_cost: obj.additional_cost ? Number(obj.additional_cost.replaceAll(",", "")) : 0,
-                                        spec: obj.spesifikasi
+                                        spec: obj.spesifikasi,
+                                        isDeleted: false
                                     })
                                 } else {
                                     update_list_items.push({
+                                        id: "",
                                         item_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                         item_code: obj.kode_barang,
                                         item_name: obj.nama_barang,
@@ -1600,10 +1606,13 @@
                                         note: obj.keterangan,
                                         disc: obj.disc ? Number(obj.disc) : 0,
                                         additional_cost: obj.additional_cost ? Number(obj.additional_cost.replaceAll(",", "")) : 0,
-                                        spec: obj.spesifikasi
+                                        spec: obj.spesifikasi,
+                                        isDeleted: false
                                     })
                                 }
                             })
+
+                            data.append("total", total)
 
                             data.append("items", JSON.stringify(update_list_items))
 
@@ -1853,7 +1862,8 @@
             success: function(res) {
                 $(".spesifikasi").empty()
                 $(".spesifikasi").append(`<option value=""></option>`)
-                res.data.spek.forEach(function(item) {
+                let spek = res?.data?.spek ? JSON.parse(res.data.spek) : [];
+                spek.forEach(function(item) {
                     $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                 })
 
@@ -1866,7 +1876,7 @@
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "bahan-baku"
+                kategori: "Bahan Baku"
             },
             success: function(res) {
                 $(".kode_barang").empty();

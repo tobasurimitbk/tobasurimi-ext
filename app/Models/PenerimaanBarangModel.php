@@ -70,7 +70,7 @@ class PenerimaanBarangModel extends Model
             'no_penerimaan_barang'      => 'penerimaan_barang.no_penerimaan_barang',
             'no_po'                     => 'penerimaan_barang.multiple_po_no',
             'acceptance_type'           => 'penerimaan_barang.acceptance_type',
-            'aju_type'                  => 'penerimaan_barang.aju_document_type',
+            'aju_type'                  => 'metadata.value',
             'aju_no'                    => 'penerimaan_barang.aju_no',
             'validation_date'           => 'penerimaan_barang.validation_date',
             'sender_name'               => 'suppliers.name',
@@ -82,9 +82,10 @@ class PenerimaanBarangModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "penerimaan_barang.*, penerimaan_barang.aju_document_type as aju_type, suppliers.name as sender_name";
+        $selectQry = "penerimaan_barang.*, metadata.value as aju_type, suppliers.name as sender_name";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
+            ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type')
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id')
             ->where($condition)
             ->orderBy($sort, $sortType);
@@ -127,11 +128,18 @@ class PenerimaanBarangModel extends Model
         ];
     }
 
-    public function get_no($bln, $thn)
+    public function get_no($tgl, $bln, $thn)
     {
         $filt_no = "LPB/1/" . $thn . "/" . $bln;
 
-        $no = $this->db->table('penerimaan_barang')->countAllResults(false) + 1;
+        $conditions = [
+            'deletedAt' => null
+        ];
+
+        $no = $this->db->table('penerimaan_barang')
+        ->like('rm_import_pos.createdAt', $thn . "-" . $bln . "-" . $tgl)
+        ->where($conditions)
+        ->countAllResults(false) + 1;
 
         if ($no != '') {
             $filt_no = "LPB/". $no . "/" . $thn . "/" . $bln;

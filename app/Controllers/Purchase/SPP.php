@@ -77,15 +77,15 @@ class SPP extends BaseController
         $id = $this->request->getGet("id");
 
         if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseRequest/$id", $this->token);
-            if ($response["code"] === 200) {
+            $response = $this->SppModel->getSppById($id);
+            if ($response) {
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
+                    "data"  => $response,
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -143,7 +143,7 @@ class SPP extends BaseController
                 "warehouseName" => $data->warehouseName,
                 "total" => $data->total,
                 "request_date" => $data->request_date,
-                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName,
+                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName ?? "-",
                 "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
                 "approvedByDirectorName" => $data->approvedByDirectorName,
                 "is_posted" => $data->is_posted,
@@ -169,6 +169,9 @@ class SPP extends BaseController
     public function saveSPP()
     {
         try {
+            $SppModel = new SppModel();
+            $SppDetailModel = new SppDetailModel();
+
             $rules = [
                 "request_date" => [
                     "rules" => "required"
@@ -185,38 +188,51 @@ class SPP extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $insertData = [
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
-                    "items" =>  json_decode($this->request->getPost("items"))
-                ]);
+                    "createdBy" => session()->get("login")->user_id,
+                    "items" =>  json_decode($this->request->getPost("items")),
+                ];
 
-                dd($payload);
+                $totalPrice = 0;
 
-                $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
+                foreach ($insertData["items"] as $value) {
+                    $totalPrice += $value->qty * $value->price;
+                };
 
-                if ($response["code"] === 201) {
+                $insertData["total"] = $totalPrice;
+
+
+                $payload = json_encode($insertData);
+
+                $insert = $SppModel->insert($insertData);
+                foreach ($insertData["items"] as $value) {
+                    $value->barang_id = $value->item_id;
+                    $value->purchase_request_id = $insert;
+                }
+                $SppDetailModel->insertBatch($insertData["items"]);
+                // $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
+
+                if ($insert) {
                     $data = [
-                        "id" => json_decode($response["body"])->createdId,
+                        "id" => $insert,
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
+                        "message"    => "Data Gagal Disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 }
@@ -242,6 +258,9 @@ class SPP extends BaseController
     public function updateSPP()
     {
         try {
+            $SppModel = new SppModel();
+            $SppDetailModel = new SppDetailModel();
+
             $rules = [
                 "request_date" => [
                     "rules" => "required"
@@ -260,39 +279,63 @@ class SPP extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $insertData = [
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),
-                    "items" => json_decode($this->request->getPost("items"))
-                ]);
+                    "is_posted" => false,
+                    "createdBy" => session()->get("login")->user_id,
+                    "items" =>  json_decode($this->request->getPost("items")),
+                ];
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
+                $totalPrice = 0;
 
-                $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
+                foreach ($insertData["items"] as $value) {
+                    $totalPrice += $value->qty * $value->price;
+                };
 
-                if ($response["code"] === 200) {
+                $insertData["total"] = $totalPrice;
+
+
+                // $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
+
+                if ($insertData) {
+                    $SppModel->update($id, $insertData);
+
+                    foreach ($insertData["items"] as $value) {
+                        $value->barang_id = $value->item_id;
+                        $value->purchase_request_id = $id;
+
+                        $dataDetail = [
+                            "id" => $value->id ?? null,
+                            "purchase_request_id" => $this->request->getPost("id"),
+                            "barang_id" => $value->item_id,
+                            "spec" => $value->spec,
+                            "qty" => $value->qty,
+                            "unit" => $value->unit,
+                            "price" => $value->price,
+                            "note" => $value->note,
+                        ];
+
+                        // $sql = $SppDetailModel->setData($value)->getCompiledUpsert();
+                        // echo $sql;
+                        $SppDetailModel->upsert($dataDetail);
+                    }
+
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   =>  json_encode($insertData),
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
+                        "message"    => 'Data Gagal Diubah',
+                        "payload"   =>  json_encode($insertData),
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
