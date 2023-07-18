@@ -892,40 +892,41 @@
                             row = 0;
 
                             $(".body-detail-table").empty()
+                            console.log(res.detail)
 
-                            res?.data?.purchase_request_details.map(item => {
+                            res?.detail.map(item => {
                                 tag_html += `<tr>`;
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += row + 1;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += item.kodeBarang;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += item.barangName;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += item.spec;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += item.satuanName;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
-                                tag_html += item.price;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += item.price ? Number(item.price).toLocaleString() : 0;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
-                                tag_html += item.qty;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += item.qty ? Number(item.qty) : 0;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
-                                tag_html += item.totalPrice;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += item.totalPrice ? Number(item.totalPrice).toLocaleString() : 0;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += 0;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += 0;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail"  data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
+                                tag_html += `<td class="edit-table-detail" data-total="${Number(item.totalPrice).toLocaleString()}" data-additional_cost="" data-disc=""  data-barang_id="${Number(item.barang_id)}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${Number(item.unit)}" data-spesifikasi="${item.spec}" data-harga="${Number(item.price).toLocaleString()}" data-qty="${Number(item.qty)}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += item.note;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
@@ -936,25 +937,25 @@
                                 list_items.push({
                                     id: "",
                                     row: row + 1,
-                                    barang_id: item.barang_id,
+                                    barang_id: item.barang_id ? Number(item.barang_id) : 0,
                                     kode_barang: item.kodeBarang,
                                     nama_barang: item.barangName,
                                     nama_satuan: item.satuanName,
-                                    satuan: item.satuan_id,
+                                    satuan: item.unit ? Number(item.unit) : 0,
                                     spesifikasi: item.spec,
-                                    harga: item.price,
+                                    harga: item.price ? Number(item.price).toLocaleString() : 0,
                                     disc: "",
                                     additional_cost: "",
-                                    qty: item.qty,
-                                    total: item.totalPrice,
+                                    qty: item.qty ? Number(item.qty) : 0,
+                                    total: item.totalPrice ? Number(item.totalPrice).toLocaleString() : 0,
                                     keterangan: item.note
                                 });
 
                                 row = row + 1;
 
-                                total_harga_barang = total_harga_barang + Number(item.price.replaceAll(",", ""));
+                                total_harga_barang = total_harga_barang + Number(item.price);
                                 total_qty = total_qty + Number(item.qty);
-                                total_harga = total_harga + Number(item.totalPrice.replaceAll(",", ""));
+                                total_harga = total_harga + Number(item.totalPrice);
                             })
 
                             $(".body-detail-table").append(tag_html)
@@ -1039,21 +1040,24 @@
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
 
-                $.ajax({
-                    url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        let spek = res?.data?.spek ? JSON.parse(res.data.spek) : [];
-                        $(".spesifikasi").empty()
-                        $(".spesifikasi").append(`<option value=""></option>`)
-                        spek.forEach(function(item) {
-                            $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                        })
+                $(".spesifikasi").empty()
+                $(".spesifikasi").append(`<option value=""></option>`)
+                if(barang_id)
+                {
+                    $.ajax({
+                        url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
+                        method: "GET",
+                        dataType: "json",
+                        success: function(res) {
+                            let spek = res?.data?.spek ? JSON.parse(res.data.spek) : [];
+                            spek.forEach(function(item) {
+                                $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
+                            })
 
-                        $(".spesifikasi").val("").change();
-                    }
-                })
+                            $(".spesifikasi").val("").change();
+                        }
+                    })
+                }
 
                 $(".kode").val($(".kode_barang option:selected").val());
                 $(".nama_barang").val(nama);
@@ -1855,21 +1859,25 @@
         $(".kode").val(kode_barang)
         $(".keterangan").val(keterangan)
 
-        $.ajax({
-            url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                $(".spesifikasi").empty()
-                $(".spesifikasi").append(`<option value=""></option>`)
-                let spek = res?.data?.spek ? JSON.parse(res.data.spek) : [];
-                spek.forEach(function(item) {
-                    $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                })
+        $(".spesifikasi").empty()
+        $(".spesifikasi").append(`<option value=""></option>`)
 
-                $(".spesifikasi").val(spesifikasi).change();
-            }
-        })
+        if(barang_id)
+        {
+            $.ajax({
+                url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    let spek = res?.data?.spek ? JSON.parse(res.data.spek) : [];
+                    spek.forEach(function(item) {
+                        $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
+                    })
+
+                    $(".spesifikasi").val(spesifikasi).change();
+                }
+            })
+        }
 
         $.ajax({
             url: `<?= base_url("barang/dropdown/kategori"); ?>`,

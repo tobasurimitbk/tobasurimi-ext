@@ -252,7 +252,7 @@ class POImportBahanBaku extends BaseController
                                 "ar_id" => 1,
                                 "stok" => 0,
                                 "status" => "Aktif",
-                                "spek" => $data->spec
+                                "spek" => "[]"
                             ];
             
                             $responseBarang =  $this->barangModel->insert($payloadBarang);
@@ -433,7 +433,7 @@ class POImportBahanBaku extends BaseController
                                 "ar_id" => 1,
                                 "stok" => 0,
                                 "status" => "Aktif",
-                                "spek" => $data->spec
+                                "spek" => "[]"
                             ];
             
                             $responseBarang =  $this->barangModel->insert($payloadBarang);
