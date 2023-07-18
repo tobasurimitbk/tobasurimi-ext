@@ -128,7 +128,7 @@ class PenerimaanBarangModel extends Model
         ];
     }
 
-    public function get_no($tgl, $bln, $thn)
+    public function get_no($tgl, $bln, $thn, $last_day)
     {
         $filt_no = "LPB/1/" . $thn . "/" . $bln;
 
@@ -137,7 +137,8 @@ class PenerimaanBarangModel extends Model
         ];
 
         $no = $this->db->table('penerimaan_barang')
-        ->like('rm_import_pos.createdAt', $thn . "-" . $bln . "-" . $tgl)
+        ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+        ->where('createdAt <=', $last_day . " 23:59:59")
         ->where($conditions)
         ->countAllResults(false) + 1;
 
