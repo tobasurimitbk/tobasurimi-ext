@@ -23,7 +23,7 @@
                 <div class="col mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                        <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -31,14 +31,25 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                        <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
+                            <option value="">Pilih Tipe SPP</option>
+                            <option value="Bahan Penolong Lokal">Bahan Penolong Lokal</option>
+                            <option value="Bahan Penolong Import">Bahan Penolong Import</option>
+                            <option value="Bahan Baku Import">Bahan Baku Import</option>
+                        </select>
+                        <label for="floatingInput">Tipe SPP</label>
+                    </div>
+                </div>
                 <div class="col mb-3">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input class="form-control search form-out-search" placeholder="Ketik No SPP" value="" />
                 </div>
             </div>
             <div class="row">
@@ -53,9 +64,6 @@
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
                                 <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
-                                <!-- <th>Order Oleh</th>
-                                <th>Disetujui</th>
-                                <th>Penerima</th> -->
                                 <th>Posting</th>
                             </tr>
                         </thead>
@@ -75,6 +83,7 @@
     let sortType = "desc";
 
     let search = $('.search').val();
+    // let spp_type = $('.spp_type').val();
     let currentPage = 1;
 
     const table = $('.dataTable').DataTable({
@@ -97,11 +106,12 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.spp_type = $(".spp_type").val();;
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
                 data.sortType = sortType;
-            }
+            },
         },
         "drawCallback": function(settings) {
             //for set current page print
@@ -251,6 +261,10 @@
         $(".dataTable_info").addClass("pt-0");
 
         $(".search").keyup(function() {
+            table.ajax.reload();
+        })
+
+        $(".spp_type").change(function() {
             table.ajax.reload();
         })
 
