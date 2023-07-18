@@ -82,7 +82,7 @@ class PenerimaanBarangDetailModel extends Model
         ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
         ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
         ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
-        ->join('satuans', 'satuans.id = barangs.satuan_id');
+        ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT');
         $query = $builder->get();
         
         return $query->getResultArray();

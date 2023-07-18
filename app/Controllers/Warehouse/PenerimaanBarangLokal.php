@@ -838,7 +838,6 @@ class PenerimaanBarangLokal extends BaseController
 
                 if($status_penerimaan === "LOKAL")
                 {
-                    $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
                     $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
 
                     // var_dump($dataPenerimaanBarang);
@@ -846,7 +845,11 @@ class PenerimaanBarangLokal extends BaseController
 
                     if($dataPenerimaanBarangDetail)
                     {
+                        $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
                         $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
+
+                        // var_dump(json_decode($dataPenerimaanBarang->multiple_po_no));
+                        // die;
                     }
                 }
             }
