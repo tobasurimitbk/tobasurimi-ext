@@ -12,6 +12,7 @@ use App\Models\RMImportPOModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuanModel;
+use Dompdf\Dompdf;
 
 class PenerimaanBarangImport extends BaseController
 {
@@ -25,6 +26,7 @@ class PenerimaanBarangImport extends BaseController
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
+    protected $dompdf;
     
     public function __construct()
     {
@@ -38,6 +40,7 @@ class PenerimaanBarangImport extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuanModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function penerimaanBarangImport()
@@ -765,6 +768,57 @@ class PenerimaanBarangImport extends BaseController
     //     }
     //     return;
     // }
+
+    public function print($id = null) 
+    {
+        if($id)
+        {
+            $filename = "Penerimaan Barang Import";
+
+            $data = [];
+            $dataPenerimaanBarang = $this->penerimaanBarangModel->getById($id);
+
+            if($dataPenerimaanBarang)
+            {
+                $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
+
+                if($status_penerimaan === "IMPORT")
+                {
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
+
+                    // var_dump($dataPenerimaanBarang);
+                    // die;
+
+                    if($dataPenerimaanBarangDetail)
+                    {
+                        $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
+                        $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
+
+                        // var_dump(json_decode($dataPenerimaanBarang->multiple_po_no));
+                        // die;
+                    }
+                }
+            }
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangImport/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Warehouse/penerimaanBarangLokal/print', $data);
+        }
+    }
+
+       
 
     public function deletePenerimaanBarangImport()
     {
