@@ -838,9 +838,10 @@
                         //     }
                         // })
                         $('.kelompok_akun_id_kategori').select2(select2kelompok_akun);
-
-                        const $apOption = $("<option selected='selected'></option>").val(id).text(res?.data?.value);
+                        console.log(res?.data);
+                        const $apOption = $("<option selected='selected'></option>").val(id).text(res?.data?.meta_name);
                         $(".kelompok_akun_id_kategori").append($apOption).trigger('change');
+                        $(".add-modal-kategori").modal("show")
 
                     } else {
                         Swal.fire({
