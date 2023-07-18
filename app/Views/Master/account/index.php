@@ -240,7 +240,7 @@
                     <div class="collapse-header-list show" id="collapseSubList">
                         <div class="d-flex float-right mb-3 col-nav-tabs-contents-input-btn">
                             <input class="form-control search search-sub form-out-search mr-3" placeholder="Search" />
-                            <select class="form-select status mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
+                            <select class="form-select status status-sub mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
                                 <option value="Aktif">Aktif</option>
                                 <option value="Void">Void</option>
                             </select>
@@ -428,6 +428,7 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search-sub").val();
+                data.status_sub = $(".status-sub").val();
                 data.status = $(".status").val();
                 data.sort = sortSub;
                 data.sortType = sortTypeSub;
