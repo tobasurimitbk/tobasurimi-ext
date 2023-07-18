@@ -91,7 +91,7 @@ class SalesOrderModel extends Model
             ->where($condition)
             ->orderBy($sort, $sortType);
 
-        $totalData = $salesOrderLokal->countAllResults(false);
+        $totalData = $salesOrderLokal->where('tipe_sales_order', 'LOKAL');
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $salesOrderLokal->groupStart();

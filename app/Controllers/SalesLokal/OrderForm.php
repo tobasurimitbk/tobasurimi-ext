@@ -59,6 +59,8 @@ class OrderForm extends BaseController
     {
         $pageSize = $this->request->getGet("length");
         $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
+        $offset = $currentPage - 1;
+
         $payload = [
             "pageSize" => $pageSize,
             "currentPage" => $currentPage,
@@ -67,18 +69,42 @@ class OrderForm extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
+
+        $condition = [];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "spp_type"      => $this->request->getGet("spp_type"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
         $dataOrderForm = $this->SalesOrderModel
-            ->paginate($pageSize, 'group-by', $currentPage);
+            ->getAllSalesOrderLokal($condition, $addCondition, $pageSize, $offset);
 
-        $totalRecords = $this->SalesOrderModel->countAllResults();
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        $dataSalesOrder = [];
+        foreach ($dataOrderForm['data'] as $data) {
+            array_push($dataSalesOrder, [
+                "no"            => $no++,
+                "id"            => $data->id,
+                "no_sales_order"      => $data->no_sales_order,
+                "destination"        => $data->destination,
+                "qty_barang" => $data->qty_barang,
+                "total_harga"         => number_format($data->total_harga),
+                "keterangan"  => $data->keterangan
+            ]);
+        }
 
 
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data"              => $dataOrderForm,
+            "recordsTotal"    => $dataOrderForm['totalData'],
+            "recordsFiltered" => $dataOrderForm['totalFilteredData'],
+            "data"              => $dataSalesOrder,
             "payload"           => $payload
         ];
 
