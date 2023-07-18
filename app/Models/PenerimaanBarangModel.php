@@ -128,6 +128,21 @@ class PenerimaanBarangModel extends Model
         ];
     }
 
+    public function getById($id)
+    {
+        $selectQry = "penerimaan_barang.*, metadata.value aju_type_name, suppliers.name as supplier_name,
+        suppliers.address as supplier_address, suppliers.phone as supplier_phone
+        ";
+
+        $sppData = $this->asObject()
+            ->select($selectQry)
+            ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->find($id);
+
+        return $sppData;
+    }
+
     public function get_no($tgl, $bln, $thn, $last_day)
     {
         $filt_no = "LPB/1/" . $thn . "/" . $bln;
