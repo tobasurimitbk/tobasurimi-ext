@@ -21,6 +21,7 @@
         <div class="card-body">
             <form class="create-form form-add-order-form-lokal" role="form" method="POST" enctype="multipart/form-data">
                 <input type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input type="hidden" class="tipe_sales_order" name="tipe_sales_order" id="tipe_sales_order" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -31,7 +32,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php
                                     }
                                 }
@@ -42,24 +43,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true>
+                            <input type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $name ?>">
+                            <input type="hidden" class="form-control sales_name" id="id_user" name="id_user" value="<?= $id_user ?>">
                             <label for="floatingInput">Nama Sales</label>
                         </div>
                     </div>
-
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($data) ? ($data->no_po === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control no_order" id="no_order" name="no_order" placeholder="No. Order" value="<?= !empty($data) ? $data->no_po : ""; ?>">
-                                    <label for="floatingInput">No. SPP</label>
-                                </div>
-                                <div style="<?= !empty($data) ? ($data->no_po === true ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div>
-                            </div>
+                            <input type="text" class="form-control sales_name" id="destination" name="destination" value="">
+                            <label for="floatingInput">Tujuan Pengiriman</label>
                         </div>
                     </div>
+
+
                 </div>
 
                 <div class="row">
@@ -244,7 +240,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga" disabled>
+                                <input type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga">
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
@@ -252,6 +248,36 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
                                 <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control tax" name="tax" id="tax" placeholder="Total Pajak">
+                                <label for="floatingInput">Total Pajak</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
+                                <label for="floatingInput">disc%</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control dept" name="dept" id="dept" placeholder="dept">
+                                <label for="floatingInput">dept</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select warehouse" name="warehouse" id="warehouse" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">warehouse</label>
                             </div>
                         </div>
                     </div>
@@ -306,6 +332,36 @@
             .find('label')
             .css('z-index', '1');
 
+        // warehouse
+        $('.warehouse').select2({
+            placeholder: "Pilih warehouse",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            tags: true,
+            allowClear: true
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.warehouse')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.warehouse')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.warehouse')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
 
 
         // BARANG
@@ -344,10 +400,19 @@
             id_customer: {
                 required: true
             },
-            total_pinjaman: {
+            id_user: {
                 required: true
             },
-            termin_pembayaran: {
+            destination: {
+                required: true
+            },
+            order_date: {
+                required: true
+            },
+            shipping_date: {
+                required: true
+            },
+            terms: {
                 required: true
             },
         },
@@ -355,11 +420,20 @@
             id_customer: {
                 required: "Nama Customer wajib diisi"
             },
-            total_pinjaman: {
-                required: "Total Pinjaman wajib diisi"
+            id_user: {
+                required: "Nama Sales wajib diisi"
             },
-            termin_pembayaran: {
-                required: "Termin Pembayaran wajib diisi"
+            destination: {
+                required: "Tujuan pengiriman wajib diisi"
+            },
+            order_date: {
+                required: "tanggal pemesanan wajib diisi"
+            },
+            shipping_date: {
+                required: "tanggal pengiriman wajib diisi"
+            },
+            terms: {
+                required: "terms wajib diisi"
             },
         },
         errorElement: 'span',
@@ -466,10 +540,10 @@
             success: function(res) {
                 $(".id_barang").empty();
 
-                $(".id_barang").append(`<option data-satuan="" data-warehouse="" value=""></option>`);
+                $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
 
                 res.dataBarang.forEach(function(item) {
-                    $(".id_barang").append(`<option data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" value="${item.id}">${item.nama_barang}</option>`);
+                    $(".id_barang").append(`<option data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
                 })
 
                 $(".id_barang").val("").change();
@@ -884,6 +958,54 @@
             $(".no_order").val("");
         }
     }
+
+    // change data model jika sudah ada datanya di pilih
+
+    $(".id_barang").change(function() {
+        if ($(".id_barang option:selected").val()) {
+            let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";
+            let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
+            let satuan = $(".id_barang option:selected").data("satuan") ? $(".id_barang option:selected").data("satuan") : "";
+            let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
+            let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
+            let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : "";
+
+            $(".nama_barang").attr("readonly", nama ? true : false);
+            console.log(idBarang)
+            $.ajax({
+                url: "<?= base_url('/order-form-lokal/warehouseAll'); ?>" + "/" + idBarang,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".warehouse").empty();
+                    $(".warehouse").append(`<option value=""></option>`);
+
+                    console.log(res.dataWarehouse)
+                    res.dataWarehouse.forEach(function(item) {
+                        $(".warehouse").append(`<option  value="${item.warehouse_id}">${item.warehouse_name}</option>`);
+                    })
+
+                    $(".warehouse").val("").change();
+                }
+            })
+
+            $(".nama_barang").val(nama);
+            $(".harga").val(harga ? harga.toLocaleString() : "");
+            // $(".id_warehouse").val(warehouseId);
+            // $(".warehouse").val(warehouseName);
+        } else {
+            $(".nama_barang").attr("readonly", false)
+            $(".harga").val("");
+            $(".qty").val("");
+            $(".amount").val("");
+            $(".keterangan").val("").change();
+            $(".tax").val("");
+            $(".discount_percentage").val("");
+            $(".dept").val("");
+            $(".warehouse").val("");
+            $(".id_warehouse").val("");
+        }
+    })
 </script>
 
 <?= $this->endSection(); ?>

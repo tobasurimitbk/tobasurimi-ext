@@ -633,11 +633,13 @@ class Account extends BaseController
         $columnSortOrder = $temp[0]['dir']; // Column index
 
         $search = $this->request->getVar('search');
+        $status_sub = $this->request->getVar('status_sub');
         //$searchValue = $temp['value']; // Column index
 
         $values = [
             "company_id"    => $this->this_company_id,
-            "search"        => $search
+            "search"        => $search,
+            "status_sub"    => $status_sub
         ];
 
         $totalRecords = $this->Sub_AkunsModel->total_list(array());
@@ -920,6 +922,19 @@ class Account extends BaseController
             ];
             echo json_encode($data);
         }
+        return;
+    }
+
+    public function dropdownAPAR()
+    {
+
+        $dataAPAR = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
+
+        $data = [
+            "data" => $dataAPAR
+        ];
+
+        echo json_encode($data);
         return;
     }
 }

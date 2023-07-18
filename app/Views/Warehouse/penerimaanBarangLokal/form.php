@@ -585,35 +585,35 @@
     penyerahanEdit = Number('<?= $details["penyerahan"]; ?>');
     row = row + 1;
 
-    total_jml_order = total_jml_order + <?= $details["qty"]; ?>;
-    total_jml_dokumen = total_jml_dokumen + <?= $details["doc_qty"]; ?>;
-    total_jml_masuk = total_jml_masuk + <?= $details["jml_masuk"]; ?>;
-    total_jml_selisih = total_jml_selisih + <?= $details["selisih"]; ?>;
-    total_jml_konversi = total_jml_konversi + <?= $details["konversi"]; ?>;
+    total_jml_order = total_jml_order + Number(<?= $details["qty"]; ?>);
+    total_jml_dokumen = total_jml_dokumen + Number(<?= $details["doc_qty"]; ?>);
+    total_jml_masuk = total_jml_masuk + Number(<?= $details["jml_masuk"]; ?>);
+    total_jml_selisih = total_jml_selisih + Number(<?= $details["selisih"]; ?>);
+    total_jml_konversi = total_jml_konversi + Number(<?= $details["konversi"]; ?>);
     total_jml_harga = total_jml_harga + priceEdit;
     total_jml_penyerahan = total_jml_penyerahan + penyerahanEdit;
 
     list_items.push({
         id: <?= $details["id"]; ?>,
         row: row,
-        purchase_order_details_id: <?= $details["purchase_order_details_id"]; ?>,
-        barang_id: <?= $details["barang_id"]; ?>,
-        doc_qty: <?= $details["doc_qty"]; ?>,
-        unit: <?= $details["id_satuan"]; ?>,
+        purchase_order_details_id: Number(<?= $details["purchase_order_details_id"]; ?>),
+        barang_id: Number(<?= $details["barang_id"]; ?>),
+        doc_qty: Number(<?= $details["doc_qty"]; ?>),
+        unit: Number(<?= $details["id_satuan"]; ?>),
         kode_barang: '<?= $details["kode_barang"]; ?>',
         nama_barang: '<?= $details["nama_barang"]; ?>',
         nama_barang_dokumen: '<?= $details["nama_barang_dok"]; ?>',
-        qty: <?= $details["qty"]; ?>,
-        selisih: <?= $details["selisih"]; ?>,
+        qty: Number(<?= $details["qty"]; ?>),
+        selisih: Number(<?= $details["selisih"]; ?>),
         satuan: '<?= $details["nama_satuan"]; ?>',
-        konversi: <?= $details["konversi"]; ?>,
-        jml_masuk: <?= $details["jml_masuk"]; ?>,
-        harga: '<?= $details["harga"] ? $details["harga"] : 0; ?>',
-        penyerahan: '<?= $details["penyerahan"] ? $details["penyerahan"] : 0; ?>',
+        konversi: Number(<?= $details["konversi"]; ?>),
+        jml_masuk: Number(<?= $details["jml_masuk"]; ?>),
+        harga: Number('<?= $details["harga"] ? $details["harga"] : 0; ?>').toLocaleString(),
+        penyerahan: Number('<?= $details["penyerahan"] ? $details["penyerahan"] : 0; ?>').toLocaleString(),
         keterangan: '<?= $details["keterangan"]; ?>',
-        ppn: <?= $details["id_ppn"] ? $details["id_ppn"] : 0; ?>,
+        ppn: Number(<?= $details["id_ppn"] ? $details["id_ppn"] : 0; ?>),
         nilai_ppn: '<?= $details["ppn"]; ?>',
-        pph: <?= $details["id_pph"] ? $details["id_pph"] : 0; ?>,
+        pph: Number(<?= $details["id_pph"] ? $details["id_pph"] : 0; ?>),
         nilai_pph: '<?= $details["pph"]; ?>',
         warehouse: <?= $details["warehouse"]; ?>,
     })

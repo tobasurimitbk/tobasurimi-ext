@@ -4,7 +4,7 @@ namespace App\models;
 
 use CodeIgniter\Model;
 
-class SalesOrder extends Model
+class SalesOrderModel extends Model
 {
 
     protected $table      = 'sales_order';

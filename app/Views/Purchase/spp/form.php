@@ -7,8 +7,7 @@
         <h1 class="title-name">Tambah</h1>
         <div class="col-button-tambah-spp">
             <?php if (!empty($dataSPP)) { ?>
-
-                <?php if ($dataSPP->is_posted === false) { ?>
+                <?php if ($dataSPP->is_posted === "0") { ?>
                     <button class="btn btn-hapus delete-parent float-right">
                         Hapus
                     </button>
@@ -18,15 +17,12 @@
                     Print
                 </button>
 
-                <?php if ($dataSPP->is_posted === false && $dataSPP->approved_by_director !== 0) {
-                    if ($dataSPP->approved_by_head_of_purchasing !== 0 && $dataSPP->approved_by_headwarehouse !== 0) {
+                <?php if ($dataSPP->is_posted === "0") {
                 ?>
-
-                        <button class="btn btn-success posting-spp">
-                            Posting
-                        </button>
-
-                <?php }
+                    <button class="btn btn-success posting-spp">
+                        Posting
+                    </button>
+                <?php
                 }
                 ?>
 
@@ -37,7 +33,7 @@
             </a>
 
             <?php if (!empty($dataSPP)) {
-                if ($dataSPP->is_posted === false) { ?>
+                if ($dataSPP->is_posted === "0") { ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
@@ -64,7 +60,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? $dataSPP->request_date : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? $dataSPP->request_date : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
                                     <label for="floatingInput">Tanggal Order</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -82,7 +78,7 @@
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
 
-                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
+                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                                 <option value="Bahan Penolong Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Lokal" ? "selected" : "") : ""; ?>>Bahan Penolong Lokal</option>
                                 <option value="Bahan Penolong Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Import" ? "selected" : "") : ""; ?>>Bahan Penolong Import</option>
                                 <option value="Bahan Baku Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Baku Import" ? "selected" : "") : ""; ?>>Bahan Baku Import</option>
@@ -95,10 +91,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">No. SPP</label>
                                 </div>
-                                <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -108,7 +104,7 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataWarehouse)) {
@@ -125,7 +121,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataSPP) ? $dataSPP->note : ""; ?>" <?= !empty($dataSPP) ? ($dataSPP->is_posted === true ? 'readonly=true' : '') : ''; ?> type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                            <input value="<?= !empty($dataSPP) ? $dataSPP->note : ""; ?>" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
@@ -138,7 +134,7 @@
                     </div>
                     <div class="col-md-6">
                         <?php if (!empty($dataSPP)) {
-                            if ($dataSPP->is_posted === false) { ?>
+                            if ($dataSPP->is_posted === "0") { ?>
                                 <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
                                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                 </button>
@@ -183,7 +179,7 @@
                             ?>
 
                                     <tr>
-                                        <?php if ($dataSPP->is_posted === false) { ?>
+                                        <?php if ($dataSPP->is_posted === "0") { ?>
 
                                             <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
                                             <td class="edit-table-detail" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->kodeBarang; ?></td>
@@ -843,17 +839,16 @@
                     method: "GET",
                     dataType: "json",
                     data: {
-                        kategori: "bahan-baku"
+                        kategori: "Bahan Baku"
                     },
                     success: function(res) {
-                        console.log(res, "ppp")
                         $(".kode_barang").empty();
 
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
-                        // res.data.forEach(function(item) {
-                        //     $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
-                        // })
+                        res.data.forEach(function(item) {
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        })
 
                         $(".kode_barang").val("").change();
                     }
@@ -864,18 +859,17 @@
                     method: "GET",
                     dataType: "json",
                     data: {
-                        kategori: "bahan-penolong"
+                        kategori: "Bahan Penolong"
                     },
                     success: function(res) {
-                        console.log(res, "ppp")
 
                         $(".kode_barang").empty();
 
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
-                        // res.data.forEach(function(item) {
-                        //     $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
-                        // })
+                        res.data.forEach(function(item) {
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                        })
 
                         $(".kode_barang").val("").change();
                     }
@@ -920,6 +914,7 @@
                     success: function(res) {
                         $(".spesifikasi").empty()
                         $(".spesifikasi").append(`<option value=""></option>`)
+                        res.data.spek = JSON.parse(res.data.spek)
                         res.data.spek.forEach(function(item) {
                             $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                         })
@@ -1578,6 +1573,7 @@
             success: function(res) {
                 $(".spesifikasi").empty()
                 $(".spesifikasi").append(`<option value=""></option>`)
+                res.data.spek = JSON.parse(res.data.spek)
                 res.data.spek.forEach(function(item) {
                     $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                 })
@@ -1591,7 +1587,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-baku"
+                    kategori: "Bahan Baku"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1617,7 +1613,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-penolong"
+                    kategori: "Bahan Penolong"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();

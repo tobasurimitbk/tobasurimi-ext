@@ -154,7 +154,7 @@ class PenerimaanBarangImport extends BaseController
         ];
 
         $condition = [
-            "company_id"        => $this->this_company_id,
+            "penerimaan_barang.company_id"        => $this->this_company_id,
             "status_penerimaan" => "IMPORT"
         ];
 
@@ -261,12 +261,14 @@ class PenerimaanBarangImport extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'), $last_day);
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
 
                 $payload = [
+                    "company_id" => $this->this_company_id,
                     "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
@@ -494,12 +496,14 @@ class PenerimaanBarangImport extends BaseController
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
-                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'));
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'), $last_day);
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
 
                 $payload = [
+                    "company_id" => $this->this_company_id,
                     "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),

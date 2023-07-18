@@ -14,7 +14,8 @@ class RMImportPODetailModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['id', 'rm_import_po_id', 'barang_id', 'item_desc', 'spec', 'note', 'unit', 'qty', 'price',
+    'disc', 'additional_cost', 'ppn', 'pph', 'qty_diterima'];
 
     // Dates
     protected $useTimestamps = true;

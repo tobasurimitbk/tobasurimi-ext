@@ -12,9 +12,17 @@ class SppDetailModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        "purchase_request_id",
+        "barang_id",
+        "spec",
+        "qty",
+        "unit",
+        "price",
+        "note"
+    ];
 
     // Dates
     protected $useTimestamps = false;
@@ -58,8 +66,7 @@ class SppDetailModel extends Model
             ->where($condition)
             ->join('barangs', 'purchase_request_details.barang_id = barangs.id')
             ->join('satuans', 'barangs.satuan_id = satuans.id')
-            ->findAll($id);
-
+            ->findAll();
 
         return $sppDetailData;
     }
