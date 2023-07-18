@@ -77,7 +77,6 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-
                             <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                                 <option value="Bahan Penolong Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Lokal" ? "selected" : "") : ""; ?>>Bahan Penolong Lokal</option>
                                 <option value="Bahan Penolong Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Import" ? "selected" : "") : ""; ?>>Bahan Penolong Import</option>

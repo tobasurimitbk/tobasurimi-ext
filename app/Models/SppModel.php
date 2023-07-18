@@ -22,9 +22,6 @@ class SppModel extends Model
         'total',
         'note',
         'is_posted',
-        'approved_by_headwarehouse',
-        'approved_by_head_of_purchasing',
-        'approved_by_director',
         'request_status',
         'createdBy'
     ];
@@ -69,19 +66,13 @@ class SppModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "purchase_requests.*,
-                        warehouses.warehouse_name AS warehouseName, 
-                        headwarehouse.name AS approvedByHeadwarehouseName,
-                        headpurchasing.name AS approvedByHeadofPurchasingName,
-                        director.name AS approvedByDirectorName
+                        warehouses.warehouse_name AS warehouseName
                         ";
 
         $purchaseRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
-            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id', 'left')
-            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id', 'left')
-            ->join('users AS director', 'purchase_requests.approved_by_director = director.id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $purchaseRequestsDataQry->countAllResults(false);
@@ -91,8 +82,13 @@ class SppModel extends Model
         }
         if ($addCondition['search']) {
             $purchaseRequestsDataQry
-                ->like('spp_no', $addCondition['search'])
-                ->orLike('spp_type', $addCondition['search']);
+                ->like('spp_no', $addCondition['search']);
+            // ->orLike('spp_type', $addCondition['search']);
+        }
+
+        if ($addCondition['spp_type']) {
+            $purchaseRequestsDataQry
+                ->like('spp_type', $addCondition['spp_type']);
         }
 
         if ($addCondition['dateStart']) {
@@ -119,18 +115,12 @@ class SppModel extends Model
     {
         $selectQry = "purchase_requests.*,
         warehouses.warehouse_name AS warehouseName, 
-        headwarehouse.name AS approvedByHeadwarehouseName,
-        headpurchasing.name AS approvedByHeadofPurchasingName,
-        director.name AS approvedByDirectorName,
         createdBy.name AS createdByName
         ";
 
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
-            ->join('users AS headwarehouse', 'purchase_requests.approved_by_headwarehouse = headwarehouse.id', 'left')
-            ->join('users AS headpurchasing', 'purchase_requests.approved_by_head_of_purchasing = headpurchasing.id', 'left')
-            ->join('users AS director', 'purchase_requests.approved_by_director = director.id', 'left')
             ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id', 'left')
             ->find($id);
 
@@ -148,7 +138,7 @@ class SppModel extends Model
         $builder = $this->db->table('purchase_requests');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }
