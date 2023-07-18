@@ -9,6 +9,7 @@ use App\Models\CustomerModel;
 use App\Models\BarangModel;
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
+use App\Models\SalesOrderDetailModel;
 
 class OrderForm extends BaseController
 {
@@ -20,6 +21,7 @@ class OrderForm extends BaseController
     protected $BarangModel;
     protected $WarehousesModel;
     protected $DetailStockBarang;
+    protected $SalesOrderDetailModel;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class OrderForm extends BaseController
         $this->BarangModel = new BarangModel();
         $this->WarehousesModel = new WarehousesModel();
         $this->DetailStockBarang = new DetailStockBarang();
+        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
     }
 
     public function index()
@@ -100,6 +103,17 @@ class OrderForm extends BaseController
 
     public function save()
     {
+        $payload = $this->request->getVar();
+        $items = json_decode($this->request->getPost("items"));
+
+        /*
+        $data = [
+            "payload" => $payload,
+            //"items" => $items,
+            'token'   => csrf_hash()
+        ];
+        echo json_encode($data);
+        */
 
         $validate = $this->validate([
             "id_user" => [
@@ -107,13 +121,6 @@ class OrderForm extends BaseController
                 'errors' =>
                 [
                     'required' => 'User tidak boleh kosong',
-                ]
-            ],
-            "id_po" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'po tidak boleh kosong',
                 ]
             ],
             "id_customer" => [
@@ -144,34 +151,6 @@ class OrderForm extends BaseController
                     'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
             ],
-            "payment_terms" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'payment terms tidak boleh kosong',
-                ]
-            ],
-            "keterangan" => [
-                "rules" => "",
-                'errors' => []
-            ],
-            "discount_rupiah" => [
-                "rules" => "",
-                'errors' => []
-            ],
-            "discount_percentage" => [
-                "rules" => "",
-                'errors' => []
-            ],
-            "ppn" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'PPN  tidak boleh kosong',
-                ]
-            ],
-            "estimated_freight" => [
-                "rules" => "",
-                'errors' => []
-            ],
             "tax_status" => [
                 "rules" => "required",
                 'errors' => [
@@ -184,7 +163,7 @@ class OrderForm extends BaseController
                     'required' => 'include pa tidak boleh kosong',
                 ]
             ],
-            "total_harga" => [
+            "total" => [
                 "rules" => "required",
                 'errors' => [
                     'required' => 'total harga tidak boleh kosong',
@@ -196,43 +175,53 @@ class OrderForm extends BaseController
                 [
                     'required' => 'tipe sales order tidak boleh kosong',
                 ],
-            ]
+            ],
+            "items" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'barang tidak boleh kosong',
+                ],
+            ],
+            /*
+            "items" => 'is_array',
+            "items.id_barang" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Barang tidak boleh kosong',
+                ]
+            ],
+            "items.qty" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'qty tidak boleh kosong',
+                ]
+            ],
+            "items.amount" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'total harga tidak boleh kosong',
+                ]
+            ],
+            "items.warehouse_id" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'warehouse tidak boleh kosong',
+                ]
+            ],*/
+
         ]);
-
-
-
         if (!$validate) {
-            return redirect()->back()->withInput();
+            echo json_encode($payload);
+            return;
+            //return redirect()->to('/order-form-lokal/create')->back()->withInput();
         }
-        $barang = $this->request->getPost('barang');
 
-        $rulesBarang = [
-            "id_barang" => [
-                "rules" => "required"
-            ],
-            "qty" => [
-                "rules" => "required"
-            ],
-            "keterangan" => [
-                "rules" => "required"
-            ],
-            "discount_percentage" => [
-                "rules" => "required"
-            ],
-            "tax" => [
-                "rules" => "required"
-            ],
-            "amount" => [
-                "rules" => "required"
-            ],
-            "id_warehouse" => [
-                "rules" => "required"
-            ],
-            "dept" => [
-                "rules" => "required"
-            ],
-        ];
+        $noSalesOrder = null;
+        $orderDate = $this->request->getPost('order_date');
+        $shippingDate = $this->request->getPost('shipping_date');
 
+        dd($orderDate, $shippingDate);
         $values = [
             "id_user" => $this->request->getPost('id_user'),
             "id_po" => $this->request->getPost('id_po'),
@@ -241,30 +230,37 @@ class OrderForm extends BaseController
             "order_date" => $this->request->getPost('order_date'),
             "shipping_date" => $this->request->getPost('shipping_date'),
             "payment_terms" => $this->request->getPost('payment_terms'),
-            "keterangan" => $this->request->getPost('keterangan'),
+            "keterangan" => $this->request->getPost('parent_keterangan'),
             "discount_rupiah" => $this->request->getPost('discount_rupiah'),
             "discount_percentage" => $this->request->getPost('discount_percentage'),
             "ppn" => $this->request->getPost('ppn'),
             "estimated_freight" => $this->request->getPost('estimated_freight'),
             "tax_status" => $this->request->getPost('tax_status'),
             "include_pa" => $this->request->getPost('include_pa'),
-            "total_harga" => $this->request->getPost('total_harga'),
-            "total_harga" => $this->request->getPost('total_harga'),
+            "total_harga" => $this->request->getPost('total'),
             "tipe_sales_order" => $this->request->getPost('tipe_sales_order'),
-            "barang" => $this->request->getPost('barang'),
         ];
 
 
         // Create a new validation instance
-
-
-
-        foreach ($barang as $row) {
+        $dataSalesOrder =  $this->SalesOrderModel->insert($values);
+        foreach ($items as $row) {
+            $valueBarang = [
+                "id_sales_order" => $dataSalesOrder,
+                "id_barang" => $row->id_barang,
+                "qty" => $row->qty,
+                "amount" => $row->amount,
+                "keterangan" => $row->keterangan,
+                "tax" => $row->tax,
+                "discount_percentage" => $row->discount_percentage,
+                "dept" => $row->dept,
+                "id_warehouse" => $row->warehouse_id,
+            ];
+            $this->SalesOrderDetailModel->save($valueBarang);
         }
-
-
-        $dataSalesOrder =  $this->SalesOrderModel->save($values);
+        echo json_encode($dataSalesOrder);
     }
+
 
     public function getById($id = null)
     {
