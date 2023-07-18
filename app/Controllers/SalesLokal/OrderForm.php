@@ -57,44 +57,29 @@ class OrderForm extends BaseController
 
     public function all()
     {
+        $pageSize = $this->request->getGet("length");
+        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "pageSize" => $pageSize,
+            "currentPage" => $currentPage,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $response = curl_request("GET", "/salesOrderLokal", $this->token, $payload);
-        $dataOrderForm = [];
-        $totalRecords = 0;
+        $dataOrderForm = $this->SalesOrderModel
+            ->paginate($pageSize, 'group-by', $currentPage);
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $totalRecords = $this->SalesOrderModel->countAllResults();
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            foreach ($body as $data) {
-                array_push($dataOrderForm, [
-                    "no" => $no++,
-                    "id" =>  bin2hex($this->encrypter->encrypt($data->id)),
-                    "no_sales_order" => $data->no_sales_order,
-                    "destination" => $data->destination,
-                    "qty_barang" => $data->qty_barang,
-                    "total_harga" => $data->total_harga,
-                    "keterangan" => $data->keterangan,
-                ]);
-            }
-        }
 
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $totalRecords,
             "recordsFiltered" => $totalRecords,
-            "data" => $dataOrderForm,
-            "response" => $response,
-            "payload" => $payload
+            "data"              => $dataOrderForm,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -221,14 +206,14 @@ class OrderForm extends BaseController
         $orderDate = $this->request->getPost('order_date');
         $shippingDate = $this->request->getPost('shipping_date');
 
-        dd($orderDate, $shippingDate);
         $values = [
+            "no_sales_order" => $noSalesOrder,
             "id_user" => $this->request->getPost('id_user'),
             "id_po" => $this->request->getPost('id_po'),
             "id_customer" => $this->request->getPost('id_customer'),
             "destination" => $this->request->getPost('destination'),
-            "order_date" => $this->request->getPost('order_date'),
-            "shipping_date" => $this->request->getPost('shipping_date'),
+            "order_date" => $orderDate ? date("Y/m/d", strtotime(str_replace("/", "-", $orderDate))) : "",
+            "shipping_date" => $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
             "payment_terms" => $this->request->getPost('payment_terms'),
             "keterangan" => $this->request->getPost('parent_keterangan'),
             "discount_rupiah" => $this->request->getPost('discount_rupiah'),
@@ -258,7 +243,27 @@ class OrderForm extends BaseController
             ];
             $this->SalesOrderDetailModel->save($valueBarang);
         }
-        echo json_encode($dataSalesOrder);
+
+        if ($dataSalesOrder) {
+            $data = [
+                "id" => $dataSalesOrder,
+                "status"            => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $values,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Disimpan",
+                "payload"   => $values,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        }
     }
 
 

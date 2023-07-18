@@ -68,4 +68,58 @@ class SalesOrderModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getAllSalesOrderLokal($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_sales_order'          => 'sales_order.spp_type',
+            'destination'            => 'sales_order.destination',
+            'qty_barang'             => 'sales_order.qty_barang',
+            'total_harga'             => 'sales_order.total_harga',
+            'keterangan'      => 'sales_order.keterangan',
+            'createdAt'         => 'sales_order.createdAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'sales_order.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order.*";
+
+        $salesOrderLokal = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesOrderLokal->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesOrderLokal->groupStart();
+        }
+        if ($addCondition['search']) {
+            $salesOrderLokal
+                ->like('no_sales_order', $addCondition['search']);
+        }
+
+        $salesOrderLokal->where('tipe_sales_order', 'LOKAL');
+
+        if ($addCondition['dateStart']) {
+            $salesOrderLokal->where('purchase_requests.order_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $salesOrderLokal->where('purchase_requests.order_date <=', $addCondition['dateEnd']);
+        }
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $salesOrderLokal->groupEnd();
+        }
+
+        $totalFilteredData = $salesOrderLokal->countAllResults(false);
+        $data = $salesOrderLokal->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }
