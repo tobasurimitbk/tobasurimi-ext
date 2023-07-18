@@ -78,4 +78,18 @@ class Sub_AkunsModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getAPAR($company_id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'company_id' => $company_id
+        ];
+
+        $builder = $this->db->table('sub_akuns');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResult();
+    }
 }

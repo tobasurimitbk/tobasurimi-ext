@@ -599,7 +599,7 @@
             })
 
             $.ajax({
-                url: `<?= base_url("sub-account/dropdown"); ?>`,
+                url: `<?= base_url("ap-ar/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -727,7 +727,7 @@
                         })
 
                         $.ajax({
-                            url: `<?= base_url("sub-account/dropdown"); ?>`,
+                            url: `<?= base_url("ap-ar/dropdown"); ?>`,
                             method: "GET",
                             dataType: "json",
                             success: function(result) {

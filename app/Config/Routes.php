@@ -404,6 +404,7 @@ $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKateg
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
 $routes->get('/sub-account/dropdown', 'Master\Account::dropdownSubAccount', ['filter' => 'Auth']);
+$routes->get('/ap-ar/dropdown', 'Master\Account::dropdownAPAR', ['filter' => 'Auth']);
 
 // WAREHOUSE
 // MASTER BARANG
