@@ -456,7 +456,7 @@
                 spesifikasi: '<?= $details["spec"]; ?>',
                 harga: Number('<?= $details["price"]; ?>').toLocaleString(),
                 qty: Number('<?= $details["qty"]; ?>'),
-                total: Number('<?= $details["price"]; ?>') * Number('<?= $details["qty"]; ?>').toLocaleString(),
+                total: (Number('<?= $details["price"]; ?>') * Number('<?= $details["qty"]; ?>')).toLocaleString(),
                 keterangan: '<?= $details["note"]; ?>',
                 additional_cost: Number('<?= $details["additional_cost"]; ?>').toLocaleString(),
                 disc: Number('<?= $details["disc"]; ?>')
