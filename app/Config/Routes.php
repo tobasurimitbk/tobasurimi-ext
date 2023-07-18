@@ -238,7 +238,7 @@ $routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimafakturLo
 $routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimafakturLokal', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
-$routes->post('/terima-faktur-lokal/save', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
+$routes->post('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/delete', 'Purchase\TerimaFakturLokal::deleteTerimaFakturLokal', ['filter' => 'Auth']);
 
@@ -422,6 +422,7 @@ $routes->post('/penerimaan-barang-lokal/save', 'Warehouse\PenerimaanBarangLokal:
 $routes->post('/penerimaan-barang-lokal/update', 'Warehouse\PenerimaanBarangLokal::updatePenerimaanBarangLokal', ['filter' => 'Auth']);
 // $routes->post('/penerimaan-barang-lokal/update-status', 'Warehouse\PenerimaanBarangLokal::updateStatusPenerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal/delete', 'Warehouse\PenerimaanBarangLokal::deletePenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangLokal::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG IMPORT
 $routes->get('/penerimaan-barang-import', 'Warehouse\PenerimaanBarangImport::penerimaanBarangImport', ['filter' => 'Auth']);
