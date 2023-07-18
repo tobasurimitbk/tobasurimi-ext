@@ -138,7 +138,7 @@ class RMImportPOModel extends Model
         return $query->getResultArray();
     }
 
-    public function get_no($tgl, $bln, $thn, $warehouse, $thn2, $warehouse_id)
+    public function get_no($tgl, $bln, $thn, $warehouse, $thn2, $warehouse_id, $last_day)
     {
         $filt_no = $tgl . $bln . $thn . "-01/" . $warehouse . "/TOBA/" . $thn2;
 
@@ -148,7 +148,8 @@ class RMImportPOModel extends Model
         ];
 
         $no = $this->db->table('rm_import_pos')
-        ->like('rm_import_pos.createdAt', $thn . "-" . $bln . "-" . $tgl)
+        ->where('rm_import_pos.createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+        ->where('rm_import_pos.createdAt <=', $last_day . " 23:59:59")
         ->where($conditions)->countAllResults(false) + 1;
 
         if ($no != '') {

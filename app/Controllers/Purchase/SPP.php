@@ -13,12 +13,14 @@ class SPP extends BaseController
     protected $token;
     protected $role_id;
     protected $SppModel;
+    protected $SppDetailModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->role_id = session()->get("login")->this_role_id;
         $this->SppModel = new SppModel();
+        $this->SppDetailModel = new SppDetailModel();
     }
 
     public function spp()
@@ -78,10 +80,12 @@ class SPP extends BaseController
 
         if (!empty($id)) {
             $response = $this->SppModel->getSppById($id);
+            $responseDetail = $this->SppDetailModel->getSppDetailById($id);
             if ($response) {
                 $data = [
                     "status"  => true,
                     "data"  => $response,
+                    "detail" => $responseDetail
                 ];
                 echo json_encode($data);
             } else {
@@ -109,6 +113,7 @@ class SPP extends BaseController
             "pageSize"         => $this->request->getGet("length"),
             "currentPage"      => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"           => $this->request->getGet("search"),
+            "spp_type"         => $this->request->getGet("spp_type"),
             "sort"             => $this->request->getGet("sort"),
             "sortType"         => $this->request->getGet("sortType"),
             "dateStart"        => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
@@ -121,11 +126,13 @@ class SPP extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
+            "spp_type"      => $this->request->getGet("spp_type"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
         $sppData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);
@@ -136,21 +143,15 @@ class SPP extends BaseController
 
         foreach ($sppData['data'] as $data) {
             array_push($dataSPP, [
-                "no" => $no++,
-                "id" => $data->id,
-                "spp_type" => $data->spp_type,
-                "spp_no" => $data->spp_no,
+                "no"            => $no++,
+                "id"            => $data->id,
+                "spp_type"      => $data->spp_type,
+                "spp_no"        => $data->spp_no,
                 "warehouseName" => $data->warehouseName,
-                "total" => $data->total,
-                "request_date" => $data->request_date,
-                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName ?? "-",
-                "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
-                "approvedByDirectorName" => $data->approvedByDirectorName,
-                "is_posted" => $data->is_posted,
-                "createdAt" => $data->createdAt,
-                "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
-                "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
-                "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
+                "total"         => number_format($data->total),
+                "request_date"  => date('Y-m-d', strtotime($data->request_date)),
+                "is_posted"     => $data->is_posted,
+                "createdAt"     => date('Y-m-d', strtotime($data->createdAt)),
             ]);
         }
 
@@ -363,28 +364,28 @@ class SPP extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $SppModel = new SppModel();
 
-            $payload = json_encode([
-                "is_posted" => true
-            ]);
+            $payload = [
+                "is_posted" => "1"
+            ];
 
-            $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
+            if (!empty($id)) {
+                $SppModel->update($id, $payload);
 
-            if ($response["code"] === 200) {
                 $data = [
-                    "status"            => true,
+                    "status"    => true,
                     "message"   => "Data Berhasil diposting",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
                 $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Disimpan",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             }
@@ -439,34 +440,30 @@ class SPP extends BaseController
     public function deleteSPP()
     {
         try {
+            $SppModel = new SppModel();
+            $SppDetailModel = new SppDetailModel();
             $id = $this->request->getPost("id");
 
-            if (!empty($id)) {
-                $response = curl_request("DELETE", "/purchaseRequest/$id", $this->token);
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (empty($id)) {
                 $data = [
-                    "status"            => false,
+                    "status"     => false,
                     "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            $SppModel->delete($id);
+            $SppDetailModel->where('purchase_request_id', $id)->delete();
+
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil dihapus",
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,

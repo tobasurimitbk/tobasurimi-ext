@@ -128,7 +128,22 @@ class PenerimaanBarangModel extends Model
         ];
     }
 
-    public function get_no($tgl, $bln, $thn)
+    public function getById($id)
+    {
+        $selectQry = "penerimaan_barang.*, metadata.value aju_type_name, suppliers.name as supplier_name,
+        suppliers.address as supplier_address, suppliers.phone as supplier_phone
+        ";
+
+        $sppData = $this->asObject()
+            ->select($selectQry)
+            ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->find($id);
+
+        return $sppData;
+    }
+
+    public function get_no($tgl, $bln, $thn, $last_day)
     {
         $filt_no = "LPB/1/" . $thn . "/" . $bln;
 
@@ -137,7 +152,8 @@ class PenerimaanBarangModel extends Model
         ];
 
         $no = $this->db->table('penerimaan_barang')
-        ->like('rm_import_pos.createdAt', $thn . "-" . $bln . "-" . $tgl)
+        ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+        ->where('createdAt <=', $last_day . " 23:59:59")
         ->where($conditions)
         ->countAllResults(false) + 1;
 
@@ -145,5 +161,61 @@ class PenerimaanBarangModel extends Model
             $filt_no = "LPB/". $no . "/" . $thn . "/" . $bln;
         }
         return $filt_no;
+    }
+
+    public function getReceivedItemsBySupplier($supplierId, $condition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode'              => 'suppliers.kode',
+            'name'              => 'suppliers.name',
+            'address'           => 'suppliers.address',
+            'no_npwp'           => 'suppliers.no_npwp',
+            'phone'             => 'suppliers.phone',
+            'contact_person'    => 'suppliers.contact_person',
+            'no_rekening'       => 'suppliers.no_rekening',
+            'supplier_buyer'    => 'suppliers.supplier_buyer',
+            'province'          => 'provinces.province_name',
+            'city'              => 'cities.city_name',
+            'postal_code'       => 'cities.postal_code',
+            'createdAt'         => 'penerimaan_barang.createdAt',
+            'updatedAt'         => 'penerimaan_barang.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$condition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
+        $sortType = $availableSortType[$condition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "penerimaan_barang.id AS id,
+                      penerimaan_barang.validation_date AS lpb_date,
+                      penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      penerimaan_barang_detail.nama_barang_dok AS item_name,
+                      penerimaan_barang_detail.qty AS lpb_qty,
+                      penerimaan_barang_detail.harga AS price,
+                      satuans.kode_satuan AS unit";
+        $receiveDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where('penerimaan_barang.supplier_id', $supplierId)
+            ->where($condition)
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $receiveDataQry->countAllResults(false);
+
+        /* if ($condition['search']) {
+            $receiveDataQry->groupStart()
+                ->like('name', $condition['search'])
+                ->orLike('kode', $condition['search'])
+            ->groupEnd();
+        } */
+        
+        $totalFilteredData = $receiveDataQry->countAllResults(false);
+        $data = $receiveDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
     }
 }

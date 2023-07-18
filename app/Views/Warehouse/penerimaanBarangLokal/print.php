@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .w-50 {
+            width: 50%;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        html {
+            font-size: 10px;
+        }
+        
+        .table 
+        td {
+            border: 1px solid;
+            text-align: center;
+        }
+
+        .table tr td:last-child {
+            text-align: center;
+            border-right: none;
+        }
+        .table tr td:first-child {
+            text-align: center;
+            border-left: none;
+        }
+        .table {
+            border-left:1px solid;
+            border-right:1px solid;
+        }
+        .table td {
+            padding: 5px;
+        }
+
+        .note {
+            width: 50%;
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+    <?php if(!empty($dataPenerimaanBarang) && !empty($dataPenerimaanBarangDetail)){ ?>
+    <div class="header">
+        <table class="mt-1 w-100">
+            <tr>
+                <td>
+                    <div style="margin-top: -40px;">
+                        <div style="font-size:14pt"> <b> PT TOBA SURIMI INDUSTRIES, Tbk </b></div>
+                        <div style="white-space: wrap">Medan merdeka barat no 20, Medan Utara</div>
+                        <div style="white-space: wrap">021-327829</div>
+                        <div style="white-space: wrap"></div>
+                    </div>
+                </td>
+                <td>
+                    <table class="mt-1 w-100">
+                        <tr>
+                            <td>
+                                <div style="margin-top: -11px;">
+                                    <div style=""> <b> Laporan Barang Masuk </b></div>
+                                    <br />
+                                    <div style="white-space: wrap"><?= $dataPenerimaanBarang->aju_type_name; ?> / <?= $dataPenerimaanBarang->aju_no; ?></div>
+                                    <br />
+                                    <div style="white-space: wrap">Tanggal: <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></div>
+                                    <br />
+                                    <div style="white-space: wrap"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="margin-top: -11px;">
+                                    <div style=""> <b> From : <?= $dataPenerimaanBarang->supplier_name; ?></b></div>
+                                    <br />
+                                    <div style="white-space: wrap">Address : <?= $dataPenerimaanBarang->supplier_address; ?></div>
+                                    <br />
+                                    <div style="white-space: wrap">Phone : <?= $dataPenerimaanBarang->supplier_phone; ?></div>
+                                    <br />
+                                    <div style="white-space: wrap"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="inline" style="margin-top:3rem">
+        <br />
+        <div>Kemasan / Berat
+        : <?= $dataPenerimaanBarang->packaging; ?> / <?= $dataPenerimaanBarang->total_weight; ?>
+        </div>
+        <div class="inline" >
+        <br />
+        <div>No. Order
+        : <?= json_encode($dataPenerimaanBarang->multiple_po_no); ?>
+        </div>
+        <div class="inline" >
+        <br />
+        <div>File/Style No
+        : KREDIT,KREDIT,KREDIT
+        </div>
+
+        <div style="margin-top:1rem">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
+        <table class="table"
+        style="
+            border-collapse: collapse;
+            width: 100%;
+        "
+        >
+        <thead>
+            <tr>
+            <td><b>No.</b></td>
+            <td><b>Kode Barang</b></td>
+            <td><b>Nama Barang</b></td>
+            <td><b>Satuan</b></td>
+            <td><b>Jumlah Diterima</b></td>
+            <td><b>Jumlah Dokumen</b></td>
+            <td><b>Jumlah Order</b></td>
+            <td><b>Konversi</b></td>
+            <td><b>Harga</b></td>
+            <td><b>Penyerahan</b></td>
+            <td><b>Keterangan</b></td>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $no = 1;
+            $jml_masuk = 0;
+            $jml_dokumen = 0;
+            $jml_order = 0;
+            $jml_konversi = 0;
+            $jml_harga = 0;
+            $jml_penyerahan = 0;
+
+            foreach($dataPenerimaanBarangDetail as $detail){ 
+                $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_INT");
+                $jml_dokumen = $jml_dokumen + formatter($detail["doc_qty"], "STR_TO_INT");
+                $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_INT");
+                $jml_konversi = $jml_konversi + formatter($detail["konversi"], "STR_TO_INT");
+                $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
+                $jml_penyerahan = $jml_penyerahan + formatter($detail["penyerahan"], "STR_TO_INT");
+            ?>
+            <tr>
+                <td><?= $no++; ?></td>
+                <td><?= $detail["kode_barang"]; ?></td>
+                <td><?= $detail["nama_barang"]; ?></td>
+                <td></td>
+                <td><?= $detail["jml_masuk"]; ?></td>
+                <td><?= $detail["doc_qty"]; ?></td>
+                <td><?= $detail["qty"]; ?></td>
+                <td><?= $detail["konversi"]; ?></td>
+                <td><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
+                <td><?= number_format(formatter($detail["penyerahan"], "STR_TO_INT")); ?></td>
+                <td><?= $detail["keterangan"]; ?></td>
+            </tr>
+            <?php } ?>
+        </tbody>
+        <thead>
+            <tr>
+                <td colspan="4"></td>
+                <td><?= $jml_masuk; ?></td>
+                <td><?= $jml_dokumen; ?></td>
+                <td><?= $jml_order; ?></td>
+                <td><?= $jml_konversi; ?></td>
+                <td><?= number_format($jml_harga); ?></td>
+                <td><?= number_format($jml_penyerahan); ?></td>
+                <td></td>
+            </tr>
+        </thead>
+        </table>
+
+        <div class="inline" style="position: absolute ;bottom:3.5rem;">
+            <div  style="width:25%;height:0rem;border-top:1px solid" >Prepared by:</div>
+            <div  style="margin-left:2rem;width:25%;height:0rem;border-top:1px solid" >Checked by:</div>
+            <div  style="margin-left:2rem;width:25%;height:0rem;border-top:1px solid" >Approved by:</div>
+        </div>
+    </div>
+<?php } ?>
+</body>
+</html>

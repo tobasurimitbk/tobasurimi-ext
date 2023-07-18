@@ -12,6 +12,7 @@ use App\Models\RMPurchaseOrderModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuanModel;
+use Dompdf\Dompdf;
 
 class PenerimaanBarangLokal extends BaseController
 {
@@ -25,6 +26,7 @@ class PenerimaanBarangLokal extends BaseController
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
+    protected $dompdf;
     
     public function __construct()
     {
@@ -38,6 +40,7 @@ class PenerimaanBarangLokal extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuanModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function penerimaanBarangLokal()
@@ -261,7 +264,8 @@ class PenerimaanBarangLokal extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'));
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'), $last_day);
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
@@ -495,7 +499,8 @@ class PenerimaanBarangLokal extends BaseController
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
-                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'));
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'), $last_day);
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
@@ -816,6 +821,52 @@ class PenerimaanBarangLokal extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id = null) 
+    {
+        if($id)
+        {
+            $filename = "Penerimaan Barang Lokal";
+
+            $data = [];
+            $dataPenerimaanBarang = $this->penerimaanBarangModel->getById($id);
+
+            if($dataPenerimaanBarang)
+            {
+                $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
+
+                if($status_penerimaan === "LOKAL")
+                {
+                    $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
+
+                    // var_dump($dataPenerimaanBarang);
+                    // die;
+
+                    if($dataPenerimaanBarangDetail)
+                    {
+                        $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
+                    }
+                }
+            }
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangLokal/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Warehouse/penerimaanBarangLokal/print', $data);
+        }
     }
 
     public function dropdownPenerimaanBarangLokal()
