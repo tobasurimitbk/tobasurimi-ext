@@ -4,27 +4,33 @@ namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
 use Config\Services;
-use App\Models\SalesOrder;
+use App\Models\SalesOrderModel;
 use App\Models\CustomerModel;
 use App\Models\BarangModel;
+use App\Models\WarehousesModel;
+use App\Models\DetailStockBarang;
 
 class OrderForm extends BaseController
 {
     protected $token;
     protected $this_company_id;
     protected $encrypter;
-    protected $SalesOrder;
+    protected $SalesOrderModel;
     protected $CustomerModel;
     protected $BarangModel;
+    protected $WarehousesModel;
+    protected $DetailStockBarang;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
-        $this->SalesOrder = new SalesOrder();
+        $this->SalesOrderModel = new SalesOrderModel();
         $this->CustomerModel = new CustomerModel();
         $this->BarangModel = new BarangModel();
+        $this->WarehousesModel = new WarehousesModel();
+        $this->DetailStockBarang = new DetailStockBarang();
     }
 
     public function index()
@@ -257,7 +263,7 @@ class OrderForm extends BaseController
         }
 
 
-        $dataSalesOrder =  $this->SalesOrder->save($values);
+        $dataSalesOrder =  $this->SalesOrderModel->save($values);
     }
 
     public function getById($id = null)
@@ -355,12 +361,35 @@ class OrderForm extends BaseController
         if ($responseBarang["code"] === 200) {
             $dataBarang = json_decode($responseBarang["body"])->data;
         }*/
-        $dataBarang = $this->BarangModel->where('kategori_id', 29)->findAll();
+        $dataBarang = $this->BarangModel
+            ->join('warehouses', 'warehouses.id = barangs.warehouse_id', 'left')
+            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
+            ->select('barangs.*')
+            ->select('warehouses.warehouse_name')
+            ->select('satuans.nama_satuan')
+            ->where('kategori_id', 29)
+            ->findAll();
 
         $data = [
             "dataBarang" => $dataBarang,
         ];
 
+        echo json_encode($data);
+        return;
+    }
+
+    public function getAllWarehouse($id_barang)
+    {
+
+        $dataWarehouse = $this->DetailStockBarang
+            ->join('warehouses', 'warehouses.id = detail_stok_barang.warehouse_id')
+            ->where('barang_id', $id_barang)
+            ->where('stok >', 0)
+            ->findAll();
+
+        $data = [
+            "dataWarehouse" => $dataWarehouse,
+        ];
 
         echo json_encode($data);
         return;
