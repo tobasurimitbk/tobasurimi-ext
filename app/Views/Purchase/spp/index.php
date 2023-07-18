@@ -53,9 +53,10 @@
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
                                 <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
-                                <th>Order Oleh</th>
+                                <!-- <th>Order Oleh</th>
                                 <th>Disetujui</th>
-                                <th>Penerima</th>
+                                <th>Penerima</th> -->
+                                <th>Posting</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -145,44 +146,71 @@
                 className: "text-center"
             },
             {
-                data: "approvedByHeadwarehouseName",
+                data: "id",
                 className: "text-center actions",
-                orderable: false,
+                searchable: false,
+                sortable: false,
                 render: function(data, type, row) {
-                    if (row.isApproveWarehouse) {
-                        return `<input onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
-                    }
-                    if (data !== "false") {
-                        return data;
+                    let id = row?.id;
+                    let status = row?.is_posted
+                    if (status !== "1") {
+                        return `
+                            <div class="mt-0">
+                                <button onclick="postingSpp(${id})" class="btn btn-success posting-spp">
+                                    Posting
+                                </button>
+                            </div>
+                        `
+                    } else {
+                        return `
+                            <div class="mt-0">
+                                <label>
+                                    Posted
+                                </label>
+                            </div>
+                        `
                     }
                 }
             },
-            {
-                data: "approvedByDirectorName",
-                className: "text-center actions",
-                orderable: false,
-                render: function(data, type, row) {
-                    if (row.isApproveDirector) {
-                        return `<input onchange="approveDirector('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_director_${row.id}"/>`
-                    }
-                    if (data !== "false") {
-                        return data;
-                    }
-                }
-            },
-            {
-                data: "approvedByHeadofPurchasingName",
-                className: "text-center actions",
-                orderable: false,
-                render: function(data, type, row) {
-                    if (row.isApprovePurchasing) {
-                        return `<input onchange="approveHeadPurchasing('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_head_of_purchasing_${row.id}"/>`
-                    }
-                    if (data !== "false") {
-                        return data;
-                    }
-                }
-            }
+            // {
+            //     data: "approvedByHeadwarehouseName",
+            //     className: "text-center actions",
+            //     orderable: false,
+            //     render: function(data, type, row) {
+            //         if (row.isApproveWarehouse) {
+            //             return `<input onchange="approveHeadWarehouse('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_headwarehouse_${row.id}"/>`
+            //         }
+            //         if (data !== "false") {
+            //             return data;
+            //         }
+            //     }
+            // },
+            // {
+            //     data: "approvedByDirectorName",
+            //     className: "text-center actions",
+            //     orderable: false,
+            //     render: function(data, type, row) {
+            //         if (row.isApproveDirector) {
+            //             return `<input onchange="approveDirector('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_director_${row.id}"/>`
+            //         }
+            //         if (data !== "false") {
+            //             return data;
+            //         }
+            //     }
+            // },
+            // {
+            //     data: "approvedByHeadofPurchasingName",
+            //     className: "text-center actions",
+            //     orderable: false,
+            //     render: function(data, type, row) {
+            //         if (row.isApprovePurchasing) {
+            //             return `<input onchange="approveHeadPurchasing('${row.id}')" type="checkbox" ${data !== "false" ? "checked" : ""} id="approved_by_head_of_purchasing_${row.id}"/>`
+            //         }
+            //         if (data !== "false") {
+            //             return data;
+            //         }
+            //     }
+            // }
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -236,155 +264,210 @@
         })
     })
 
-    const approveHeadWarehouse = function(id) {
-        const csrf = $(`[name="${csrfToken}"]`);
-        let value = document.getElementById('approved_by_headwarehouse_' + id).checked ? true : false;
-
-        let data = {
-            id: id
-        }
-
-        if (value) {
-            data["status"] = true;
-        }
-
-        $.ajax({
-            url: "<?= base_url("spp/approve"); ?>",
-            data: data,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            success: function(response) {
-                csrf.val(response.token);
-                if (response.status) {
-                    Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                        .then(() => {
-                            table.ajax.reload()
-                        })
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                }
-            },
-            onError: function(response) {
-                csrf.val(response.token);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Approve Gagal Diubah, coba Lagi',
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-        });
-    }
-
-    const approveHeadPurchasing = function(id) {
-        const csrf = $(`[name="${csrfToken}"]`);
-        let value = document.getElementById('approved_by_head_of_purchasing_' + id).checked ? true : false;
-
-        let data = {
-            id: id
-        }
-
-        if (value) {
-            data["status"] = true;
-        }
-
-        $.ajax({
-            url: "<?= base_url("spp/approve"); ?>",
-            data: data,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            success: function(response) {
-                csrf.val(response.token);
-                if (response.status) {
-                    Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                        .then(() => {
-                            table.ajax.reload()
-                        })
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                }
-            },
-            onError: function(response) {
-                csrf.val(response.token);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Approve Gagal Diubah, coba Lagi',
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-        });
-    }
-
-    const approveDirector = function(id) {
-        const csrf = $(`[name="${csrfToken}"]`);
-        let value = document.getElementById('approved_by_director_' + id).checked ? true : false;
-
-        let data = {
-            id: id
-        }
-
-        if (value) {
-            data["status"] = true;
-
-            $.ajax({
-                url: "<?= base_url("spp/approve"); ?>",
-                data: data,
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                method: "POST",
-                dataType: "json",
-                success: function(response) {
-                    csrf.val(response.token);
-                    if (response.status) {
-                        Swal.fire({
-                                icon: 'success',
+    const postingSpp = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di Posting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("spp/update-status"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             })
-                            .then(() => {
-                                table.ajax.reload()
-                            })
-                    } else {
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
                         Swal.fire({
                             icon: 'error',
-                            title: response.message,
+                            title: 'Data Gagal Disimpan, coba Lagi',
                             confirmButtonColor: '#4e73df',
                         })
                     }
-                },
-                onError: function(response) {
-                    csrf.val(response.token);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Approve Gagal Diubah, coba Lagi',
-                        confirmButtonColor: '#4e73df',
-                    })
-                }
-            });
-        }
+                });
+            }
+        })
     }
+
+    // const approveHeadWarehouse = function(id) {
+    //     const csrf = $(`[name="${csrfToken}"]`);
+    //     let value = document.getElementById('approved_by_headwarehouse_' + id).checked ? true : false;
+
+    //     let data = {
+    //         id: id
+    //     }
+
+    //     if (value) {
+    //         data["status"] = true;
+    //     }
+
+    //     $.ajax({
+    //         url: "<?= base_url("spp/approve"); ?>",
+    //         data: data,
+    //         beforeSend: function(xhr) {
+    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //         },
+    //         method: "POST",
+    //         dataType: "json",
+    //         success: function(response) {
+    //             csrf.val(response.token);
+    //             if (response.status) {
+    //                 Swal.fire({
+    //                         icon: 'success',
+    //                         title: response.message,
+    //                         confirmButtonColor: '#4e73df',
+    //                     })
+    //                     .then(() => {
+    //                         table.ajax.reload()
+    //                     })
+    //             } else {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: response.message,
+    //                     confirmButtonColor: '#4e73df',
+    //                 })
+    //             }
+    //         },
+    //         onError: function(response) {
+    //             csrf.val(response.token);
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Approve Gagal Diubah, coba Lagi',
+    //                 confirmButtonColor: '#4e73df',
+    //             })
+    //         }
+    //     });
+    // }
+
+    // const approveHeadPurchasing = function(id) {
+    //     const csrf = $(`[name="${csrfToken}"]`);
+    //     let value = document.getElementById('approved_by_head_of_purchasing_' + id).checked ? true : false;
+
+    //     let data = {
+    //         id: id
+    //     }
+
+    //     if (value) {
+    //         data["status"] = true;
+    //     }
+
+    //     $.ajax({
+    //         url: "<?= base_url("spp/approve"); ?>",
+    //         data: data,
+    //         beforeSend: function(xhr) {
+    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //         },
+    //         method: "POST",
+    //         dataType: "json",
+    //         success: function(response) {
+    //             csrf.val(response.token);
+    //             if (response.status) {
+    //                 Swal.fire({
+    //                         icon: 'success',
+    //                         title: response.message,
+    //                         confirmButtonColor: '#4e73df',
+    //                     })
+    //                     .then(() => {
+    //                         table.ajax.reload()
+    //                     })
+    //             } else {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: response.message,
+    //                     confirmButtonColor: '#4e73df',
+    //                 })
+    //             }
+    //         },
+    //         onError: function(response) {
+    //             csrf.val(response.token);
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Approve Gagal Diubah, coba Lagi',
+    //                 confirmButtonColor: '#4e73df',
+    //             })
+    //         }
+    //     });
+    // }
+
+    // const approveDirector = function(id) {
+    //     const csrf = $(`[name="${csrfToken}"]`);
+    //     let value = document.getElementById('approved_by_director_' + id).checked ? true : false;
+
+    //     let data = {
+    //         id: id
+    //     }
+
+    //     if (value) {
+    //         data["status"] = true;
+
+    //         $.ajax({
+    //             url: "<?= base_url("spp/approve"); ?>",
+    //             data: data,
+    //             beforeSend: function(xhr) {
+    //                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //             },
+    //             method: "POST",
+    //             dataType: "json",
+    //             success: function(response) {
+    //                 csrf.val(response.token);
+    //                 if (response.status) {
+    //                     Swal.fire({
+    //                             icon: 'success',
+    //                             title: response.message,
+    //                             confirmButtonColor: '#4e73df',
+    //                         })
+    //                         .then(() => {
+    //                             table.ajax.reload()
+    //                         })
+    //                 } else {
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: response.message,
+    //                         confirmButtonColor: '#4e73df',
+    //                     })
+    //                 }
+    //             },
+    //             onError: function(response) {
+    //                 csrf.val(response.token);
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Approve Gagal Diubah, coba Lagi',
+    //                     confirmButtonColor: '#4e73df',
+    //                 })
+    //             }
+    //         });
+    //     }
+    // }
 
     const pdf = function() {
         window.open(`<?= getenv('apiURL'); ?>/purchaseRequest/print/all?search=${search}&currentPage=${currentPage}&pageSize=25&sort=${sort}&sortType=${sortType}`, "_blank");

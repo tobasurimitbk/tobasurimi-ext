@@ -147,14 +147,14 @@ class SPP extends BaseController
                 "warehouseName" => $data->warehouseName,
                 "total" => $data->total,
                 "request_date" => $data->request_date,
-                "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName ?? "-",
-                "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
-                "approvedByDirectorName" => $data->approvedByDirectorName,
+                // "approvedByHeadwarehouseName" => $data->approvedByHeadwarehouseName ?? "-",
+                // "approvedByHeadofPurchasingName" => $data->approvedByHeadofPurchasingName,
+                // "approvedByDirectorName" => $data->approvedByDirectorName,
                 "is_posted" => $data->is_posted,
                 "createdAt" => $data->createdAt,
-                "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
-                "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
-                "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
+                // "isApproveWarehouse" => ($this->role_id === '22' || $this->role_id === 22) ? ($data->is_posted === false && $data->approvedByHeadwarehouseName === "false" ? true : false) : false,
+                // "isApprovePurchasing" => ($this->role_id === '23' || $this->role_id === 23) ? ($data->is_posted === false && $data->approvedByHeadofPurchasingName === "false" ? true : false) : false,
+                // "isApproveDirector" => ($this->role_id === '21' || $this->role_id === 21) ? ($data->is_posted === false && $data->approvedByDirectorName === "false" ? true : false) : false
             ]);
         }
 
