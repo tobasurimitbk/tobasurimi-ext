@@ -254,7 +254,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control tax" name="tax" id="tax" placeholder="Total Pajak">
+                                <input type="text" class="form-control tax" name="tax" id="tax" placeholder="Total Pajak">
                                 <label for="floatingInput">Total Pajak</label>
                             </div>
                         </div>
@@ -268,14 +268,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control dept" name="dept" id="dept" placeholder="dept">
+                                <input type="text" class="form-control dept" name="dept" id="dept" placeholder="dept">
                                 <label for="floatingInput">dept</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control warehouse" name="warehouse" id="warehouse" placeholder="warehouse">
-                                <input type="hidden" class="form-control id_warehouse" name="id_warehouse" id="id_warehouse">
+                                <select class="form-select warehouse" name="warehouse" id="warehouse" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
                                 <label for="floatingInput">warehouse</label>
                             </div>
                         </div>
@@ -327,6 +328,36 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.id_customer')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // warehouse
+        $('.warehouse').select2({
+            placeholder: "Pilih warehouse",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            tags: true,
+            allowClear: true
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.warehouse')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.warehouse')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.warehouse')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -509,10 +540,10 @@
             success: function(res) {
                 $(".id_barang").empty();
 
-                $(".id_barang").append(`<option data-satuan="" data-warehouse="" value=""></option>`);
+                $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
 
                 res.dataBarang.forEach(function(item) {
-                    $(".id_barang").append(`<option data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" value="${item.id}">${item.nama_barang}</option>`);
+                    $(".id_barang").append(`<option data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
                 })
 
                 $(".id_barang").val("").change();
@@ -927,6 +958,54 @@
             $(".no_order").val("");
         }
     }
+
+    // change data model jika sudah ada datanya di pilih
+
+    $(".id_barang").change(function() {
+        if ($(".id_barang option:selected").val()) {
+            let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";
+            let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
+            let satuan = $(".id_barang option:selected").data("satuan") ? $(".id_barang option:selected").data("satuan") : "";
+            let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
+            let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
+            let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : "";
+
+            $(".nama_barang").attr("readonly", nama ? true : false);
+            console.log(idBarang)
+            $.ajax({
+                url: "<?= base_url('/order-form-lokal/warehouseAll'); ?>" + "/" + idBarang,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".warehouse").empty();
+                    $(".warehouse").append(`<option value=""></option>`);
+
+                    console.log(res.dataWarehouse)
+                    res.dataWarehouse.forEach(function(item) {
+                        $(".warehouse").append(`<option  value="${item.warehouse_id}">${item.warehouse_name}</option>`);
+                    })
+
+                    $(".warehouse").val("").change();
+                }
+            })
+
+            $(".nama_barang").val(nama);
+            $(".harga").val(harga ? harga.toLocaleString() : "");
+            // $(".id_warehouse").val(warehouseId);
+            // $(".warehouse").val(warehouseName);
+        } else {
+            $(".nama_barang").attr("readonly", false)
+            $(".harga").val("");
+            $(".qty").val("");
+            $(".amount").val("");
+            $(".keterangan").val("").change();
+            $(".tax").val("");
+            $(".discount_percentage").val("");
+            $(".dept").val("");
+            $(".warehouse").val("");
+            $(".id_warehouse").val("");
+        }
+    })
 </script>
 
 <?= $this->endSection(); ?>

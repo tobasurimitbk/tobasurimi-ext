@@ -13,12 +13,14 @@ class SPP extends BaseController
     protected $token;
     protected $role_id;
     protected $SppModel;
+    protected $SppDetailModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->role_id = session()->get("login")->this_role_id;
         $this->SppModel = new SppModel();
+        $this->SppDetailModel = new SppDetailModel();
     }
 
     public function spp()
@@ -78,10 +80,12 @@ class SPP extends BaseController
 
         if (!empty($id)) {
             $response = $this->SppModel->getSppById($id);
+            $responseDetail = $this->SppDetailModel->getSppDetailById($id);
             if ($response) {
                 $data = [
                     "status"  => true,
                     "data"  => $response,
+                    "detail" => $responseDetail
                 ];
                 echo json_encode($data);
             } else {

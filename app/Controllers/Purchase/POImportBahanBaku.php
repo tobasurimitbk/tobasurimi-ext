@@ -93,8 +93,6 @@ class POImportBahanBaku extends BaseController
         }
 
         return view('Purchase/poImportBahanBaku/form', $data);
-        
-        return;
     }
 
     public function allPOImportBahanBaku()
@@ -199,7 +197,8 @@ class POImportBahanBaku extends BaseController
             if ($this->validate($rules)) {
                 $warehouse_id = formatter($this->request->getPost("warehouse_id"), "STR_TO_INT");
                 $warehouse = $this->request->getPost("warehouse");
-                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $warehouse, date('y'), $warehouse_id);
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $warehouse, date('y'), $warehouse_id, $last_day);
                 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
@@ -251,7 +250,7 @@ class POImportBahanBaku extends BaseController
                                 "ar_id" => 1,
                                 "stok" => 0,
                                 "status" => "Aktif",
-                                "spek" => $data->spec
+                                "spek" => "[]"
                             ];
             
                             $responseBarang =  $this->barangModel->insert($payloadBarang);
@@ -379,7 +378,8 @@ class POImportBahanBaku extends BaseController
                 $id = $this->request->getPost("id");
                 $warehouse_id = formatter($this->request->getPost("warehouse_id"), "STR_TO_INT");
                 $warehouse_name = $this->request->getPost("warehouse_name");
-                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $warehouse_name, date('y'), $warehouse_id);
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->rmImportPOModel->get_no(date('d'), date('m'), date('Y'), $warehouse_name, date('y'), $warehouse_id, $last_day);
 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
@@ -431,7 +431,7 @@ class POImportBahanBaku extends BaseController
                                 "ar_id" => 1,
                                 "stok" => 0,
                                 "status" => "Aktif",
-                                "spek" => $data->spec
+                                "spek" => "[]"
                             ];
             
                             $responseBarang =  $this->barangModel->insert($payloadBarang);

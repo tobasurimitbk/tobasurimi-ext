@@ -922,4 +922,17 @@ class Account extends BaseController
         }
         return;
     }
+
+    public function dropdownAPAR()
+    {
+
+        $dataAPAR = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
+
+        $data = [
+            "data" => $dataAPAR
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }
