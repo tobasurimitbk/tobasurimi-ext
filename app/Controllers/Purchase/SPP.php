@@ -71,6 +71,8 @@ class SPP extends BaseController
             $data["dataSPP"]->purchase_request_details = $dataSppDetail;
         }
 
+        dd($data);
+
         return view('Purchase/spp/form', $data);
     }
 
