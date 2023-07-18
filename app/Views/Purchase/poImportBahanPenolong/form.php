@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1 class="title-name">Tambah</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-baku"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("po-import-bahan-penolong"); ?>">
                 Batal
             </a>
 
@@ -1115,7 +1115,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("po-import-bahan-baku"); ?>"
+                                        window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>"
                                     })
                             } else {
                                 Swal.fire({
@@ -1506,7 +1506,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>" + "/id/" + $(".id").val()
                                     })
                             } else {
                                 Swal.fire({
@@ -1642,7 +1642,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + id;
+                                                    window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>" + "/id/" + id;
                                                 })
                                         } else {
                                             Swal.fire({
@@ -1685,7 +1685,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + +response.id;
+                                                    window.location.href = "<?= base_url("po-import-bahan-penolong"); ?>" + "/id/" + +response.id;
                                                 })
                                         } else {
                                             Swal.fire({

@@ -93,8 +93,6 @@ class POImportBahanPenolong extends BaseController
         }
 
         return view('Purchase/poImportBahanPenolong/form', $data);
-        
-        return;
     }
 
     public function allPOImportBahanPenolong()

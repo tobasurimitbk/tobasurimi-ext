@@ -93,8 +93,6 @@ class POImportBahanBaku extends BaseController
         }
 
         return view('Purchase/poImportBahanBaku/form', $data);
-        
-        return;
     }
 
     public function allPOImportBahanBaku()
