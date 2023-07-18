@@ -147,4 +147,60 @@ class PenerimaanBarangModel extends Model
         }
         return $filt_no;
     }
+
+    public function getReceivedItemsBySupplier($supplierId, $condition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode'              => 'suppliers.kode',
+            'name'              => 'suppliers.name',
+            'address'           => 'suppliers.address',
+            'no_npwp'           => 'suppliers.no_npwp',
+            'phone'             => 'suppliers.phone',
+            'contact_person'    => 'suppliers.contact_person',
+            'no_rekening'       => 'suppliers.no_rekening',
+            'supplier_buyer'    => 'suppliers.supplier_buyer',
+            'province'          => 'provinces.province_name',
+            'city'              => 'cities.city_name',
+            'postal_code'       => 'cities.postal_code',
+            'createdAt'         => 'penerimaan_barang.createdAt',
+            'updatedAt'         => 'penerimaan_barang.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$condition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
+        $sortType = $availableSortType[$condition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "penerimaan_barang.id AS id,
+                      penerimaan_barang.validation_date AS lpb_date,
+                      penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      penerimaan_barang_detail.nama_barang_dok AS item_name,
+                      penerimaan_barang_detail.qty AS lpb_qty,
+                      penerimaan_barang_detail.harga AS price,
+                      satuans.kode_satuan AS unit";
+        $receiveDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where('penerimaan_barang.supplier_id', $supplierId)
+            ->where($condition)
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $receiveDataQry->countAllResults(false);
+
+        /* if ($condition['search']) {
+            $receiveDataQry->groupStart()
+                ->like('name', $condition['search'])
+                ->orLike('kode', $condition['search'])
+            ->groupEnd();
+        } */
+        
+        $totalFilteredData = $receiveDataQry->countAllResults(false);
+        $data = $receiveDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }
