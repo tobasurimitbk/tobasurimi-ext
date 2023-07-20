@@ -14,7 +14,21 @@ class RMPurchaseOrderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'status_penerimaan'];
+    protected $allowedFields    = [
+        'id',
+        'company_id',
+        'po_no',
+        'po_date',
+        'supplier_id',
+        'pph',
+        'potong_kg',
+        'cong_sebenarnya',
+        'cong_batasan',
+        'subsidi_langsung',
+        'is_posted',
+        'createdBy',
+        'status_penerimaan'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -53,7 +67,7 @@ class RMPurchaseOrderModel extends Model
         $builder = $this->db->table('rm_purchase_orders');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }
