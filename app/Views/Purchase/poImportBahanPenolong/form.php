@@ -1488,7 +1488,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("po-import-penolong/update-status"); ?>",
+                        url: "<?= base_url("po-import-bahan-penolong/update-status"); ?>",
                         data: {
                             id: $(".id").val()
                         },

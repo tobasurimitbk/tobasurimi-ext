@@ -141,6 +141,7 @@ class POImportBahanPenolong extends BaseController
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
                 "currency"      => $data->currency,
+                "is_posted"     => $data->is_posted
             ]);
         }
 
