@@ -136,6 +136,9 @@ class SupplierBahanBakuImport extends BaseController
                 "city_parent_id" => [
                     "rules" => "required"
                 ],
+                "postal_code" => [
+                    "rules" => "required|numeric"
+                ],
                 "ap_id" => [
                     "rules" => "required"
                 ],
@@ -188,6 +191,7 @@ class SupplierBahanBakuImport extends BaseController
                 "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
                 "province_id"       => $this->request->getPost("province_parent_id"),
                 "city_id"           => $this->request->getPost("city_parent_id"),
+                "postal_code"       => $this->request->getPost("postal_code"),
                 "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "kategori"          => "IMPORT",
@@ -267,6 +271,9 @@ class SupplierBahanBakuImport extends BaseController
                 "city_parent_id" => [
                     "rules" => "required"
                 ],
+                "postal_code" => [
+                    "rules" => "required|numeric"
+                ],
                 "ap_id" => [
                     "rules" => "required"
                 ],
@@ -302,6 +309,7 @@ class SupplierBahanBakuImport extends BaseController
                     "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
                     "province_id"       => $this->request->getPost("province_parent_id"),
                     "city_id"           => $this->request->getPost("city_parent_id"),
+                    "postal_code"       => $this->request->getPost("postal_code"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "kategori"          => "IMPORT",

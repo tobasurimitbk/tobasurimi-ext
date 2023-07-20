@@ -238,7 +238,7 @@ $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolon
 $routes->get('/terima-faktur-lokal/getBySupplier/(:num)', 'Purchase\TerimaFakturLokal::getBySupplierId/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimafakturLokal', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimafakturLokal', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/(:num)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
@@ -334,6 +334,10 @@ $routes->get('/order-form-internasional/all', 'SalesInternasional\OrderForm::all
 $routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::create', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm::delete', ['filter' => 'Auth']);
+
+// PRODUKSI
+// Rencana Produksi
+$routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
 
 
 // DROPDOWN

@@ -211,6 +211,7 @@ class POImportBahanPenolong extends BaseController
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "warehouse_id" => $warehouse_id,
+                    "po_type" => "Import",
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "total" => $this->request->getPost("total"),
@@ -382,15 +383,16 @@ class POImportBahanPenolong extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
                 $warehouse_id = formatter($this->request->getPost("warehouse_id"), "STR_TO_INT");
-                $warehouse_name = $this->request->getPost("warehouse_name");
+                $warehouse = $this->request->getPost("warehouse");
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $warehouse_name, date('y'), $warehouse_id, $last_day);
+                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $warehouse, date('y'), $warehouse_id, $last_day);
 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "warehouse_id" => $warehouse_id,
+                    "po_type" => "Import",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
