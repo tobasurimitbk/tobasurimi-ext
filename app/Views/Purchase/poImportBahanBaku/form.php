@@ -18,7 +18,7 @@
                     </button>
                 <?php } ?>
 
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/rawMaterialImportPO/print/<?= $dataPOImport->id ?>')">
+                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?><?= $dataPOImport->id; ?>')">
                     Print
                 </button>
 

@@ -107,15 +107,22 @@ class RMImportPOModel extends Model
         purchase_requests.spp_no AS spp_no,
         warehouses.warehouse_name AS warehouseName,
         suppliers.name AS supplierName,
-        users.name AS createdByName
+        suppliers.address AS supplierAddress,
+        suppliers.phone AS supplierPhone,
+        suppliers.no_npwp AS supplierNPWP,
+        users.name AS createdByName,
+        companies.company as companyName,
+        metadata.value as currencyName
         ";
 
         $sppData = $this->asObject()
             ->select($selectQry)
-            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id')
-            ->join('warehouses', 'warehouses.id = rm_import_pos.warehouse_id')
-            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
-            ->join('users', 'users.id = purchase_requests.createdBy')
+            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id', 'left')
+            ->join('warehouses', 'warehouses.id = rm_import_pos.warehouse_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->join('users', 'users.id = purchase_requests.createdBy', 'left')
+            ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
+            ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
             ->find($id);
 
         return $sppData;
