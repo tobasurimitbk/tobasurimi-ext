@@ -688,7 +688,7 @@ class POImportBahanBaku extends BaseController
             // die;
 
             // load HTML content
-            $this->dompdf->loadHtml(view('Purchase/POImportBahanBaku/print', $data));
+            $this->dompdf->loadHtml(view('Purchase/poImportBahanBaku/print', $data));
 
             // (optional) setup the paper size and orientation
             $this->dompdf->setPaper('A4', 'portrait');
@@ -701,7 +701,7 @@ class POImportBahanBaku extends BaseController
 
             exit(0);
 
-            // return view('Purchase/POImportBahanBaku/print', $data);
+            // return view('Purchase/poImportBahanBaku/print', $data);
         }
     }
 
