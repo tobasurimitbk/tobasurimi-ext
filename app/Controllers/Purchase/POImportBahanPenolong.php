@@ -9,6 +9,7 @@ use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
+use Dompdf\Dompdf;
 
 class POImportBahanPenolong extends BaseController
 {
@@ -21,6 +22,7 @@ class POImportBahanPenolong extends BaseController
     protected $amPurchaseOrderDetailModel;
     protected $sppModel;
     protected $supplierModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -33,6 +35,7 @@ class POImportBahanPenolong extends BaseController
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function poImportBahanPenolong()
@@ -138,6 +141,7 @@ class POImportBahanPenolong extends BaseController
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
                 "currency"      => $data->currency,
+                "is_posted"     => $data->is_posted
             ]);
         }
 
@@ -660,6 +664,47 @@ class POImportBahanPenolong extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id = null) 
+    {
+        if($id)
+        {
+            $filename = "PO Import Bahan Penolong";
+
+            $data = [];
+            $dataPO = $this->amPurchaseOrderModel->getPOById($id);
+
+            if($dataPO)
+            {
+                $dataPODetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+
+                if($dataPODetail)
+                {
+                    $data["dataPO"] = $dataPO;
+                    $data["dataPODetail"] = $dataPODetail;
+                }
+            }
+
+            // var_dump($dataPODetail);
+            // die;
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Purchase/poImportBahanPenolong/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
     }
 
     public function dropdownPOImportBahanPenolong()

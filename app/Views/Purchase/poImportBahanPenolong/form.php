@@ -18,7 +18,7 @@
                     </button>
                 <?php } ?>
 
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/auxiliaryMaterialPO/import/print/<?= $dataPOImport->id ?>')">
+                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-import-bahan-penolong/print/"); ?><?= $dataPOImport->id; ?>')">
                     Print
                 </button>
 
@@ -58,7 +58,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'readonly=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? ($dataPOImport->po_date ? date("d/m/Y", strtotime($dataPOImport->po_date)) : "")  : ""; ?>">
+                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOImport) ? ($dataPOImport->po_date ? date("d/m/Y", strtotime($dataPOImport->po_date)) : "")  : ""; ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -1488,7 +1488,7 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     $.ajax({
-                        url: "<?= base_url("po-import-penolong/update-status"); ?>",
+                        url: "<?= base_url("po-import-bahan-penolong/update-status"); ?>",
                         data: {
                             id: $(".id").val()
                         },

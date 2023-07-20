@@ -11,6 +11,7 @@
 </div>
 <div class="card">
     <div class="card-body">
+        <?= csrf_field() ?>
         <div class="row justify-content-end row-col-spp">
             <div class="col mb-3">
                 <div class="input-group input-group-password">
@@ -43,6 +44,7 @@
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
                             <th onclick="changeSort('currency')" class="sort">Valas</th>
+                            <th>Posting</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -56,6 +58,7 @@
 </section>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
     let sort = "poDate";
     let sortType = "asc";
 
@@ -116,7 +119,34 @@
         {
             data: "currency",
             className: "text-center"
-        }],
+        },
+        {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    let status = row?.is_posted
+                    if (status !== "1") {
+                        return `
+                            <div class="mt-0">
+                                <button onclick="posting(${id})" class="btn btn-success posting-spp">
+                                    Posting
+                                </button>
+                            </div>
+                        `
+                    } else {
+                        return `
+                            <div class="mt-0">
+                                <label>
+                                    Posted
+                                </label>
+                            </div>
+                        `
+                    }
+                }
+            }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -168,6 +198,61 @@
             location.replace(`<?= base_url("po-import-bahan-baku/id"); ?>/${data.id}`);
         })
     })
+
+    const posting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di Posting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("po-import-bahan-baku/update-status"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {
