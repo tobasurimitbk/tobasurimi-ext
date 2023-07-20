@@ -93,7 +93,7 @@
 <?php if(!empty($dataPO) && !empty($dataPODetail)){ ?>
     <div class="header">
         <div class="w-50">
-            <div class="txt-bold">PURCHASE ORDER IMPORT</div>
+            <div class="txt-bold">PURCHASE ORDER BAHAN PENOLONG IMPORT</div>
             <div class="mt-025 txt-bold">No. PO: <?= $dataPO->po_no; ?></div>
             <div class="w-100">
                 <table class="mt-1 w-100">
@@ -112,7 +112,7 @@
             <div>Kepada YTH: <span class="txt-bold"><?= $dataPO->supplierName; ?></span></div>
             <div>Alamat: <span class="txt-bold"><?= $dataPO->supplierAddress; ?></span></div>
             <div>Telepon: <span class="txt-bold"><?= $dataPO->supplierPhone; ?></span></div>
-            <div>NPMWP: <span class="txt-bold"><?= $dataPO->supplierNPWP; ?></span></div>
+            <div>NPWP: <span class="txt-bold"><?= $dataPO->supplierNPWP; ?></span></div>
         </div>
     </div>
 
