@@ -165,7 +165,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : "0"; ?>" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" disabled readonly>
+                        <input value="<?= $dataTerimaFaktur->item_total ?? 0; ?>" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" disabled readonly>
                         <label for="floatingInput">Nominal Faktur</label>
                     </div>
                 </div>
@@ -187,7 +187,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly disabled value="" type="text" class="form-control recipient" id="InvFinalAmt">
+                        <input readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= $dataTerimaFaktur->nominal_faktur ?? 0; ?>" />
                         <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
                     </div>
                 </div>

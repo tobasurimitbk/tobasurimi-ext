@@ -78,6 +78,8 @@ class TerimaFakturLokal extends BaseController
             ->where('tanda_terima_faktur_id', $id)
             ->findAll();
 
+        $data->item_total = $data->nominal_faktur + $data->potongan - $data->tambahan;
+
         $data = [
             "dataTerimaFaktur"  => $data,
             "dataSupplier"      => $supplierList,
