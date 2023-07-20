@@ -51,6 +51,10 @@ class POLokalBahanBaku extends BaseController
         $supplierModel = new SupplierModel();
         $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
+        foreach (array_keys($dataSupplier) as $key) {
+            $dataSupplier[$key] = (object)$dataSupplier[$key];
+        }
+
         $data = [
             "dataSupplier" => $dataSupplier
         ];
@@ -60,10 +64,13 @@ class POLokalBahanBaku extends BaseController
 
         if (!empty($id)) {
             $dataBBLokal = $RMPurchaseOrderModel->getPoBBLokalById($id);
+            // $dataBBLokal->supplier_id = intval($dataBBLokal->supplier_id);
             $dataBBLokalDetail = $RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
+
+        // dd($data);
 
         return view('Purchase/poLokalBahanBaku/form', $data);
 

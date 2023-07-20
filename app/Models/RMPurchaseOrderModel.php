@@ -129,12 +129,12 @@ class RMPurchaseOrderModel extends Model
     public function getPoBBLokalById($id)
     {
         $selectQry = "rm_purchase_orders.*,
-        createdBy.name AS createdByName
-        ";
+                users.name AS createdBy
+                ";
 
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
-            ->join('users AS createdBy', 'rm_purchase_orders.createdBy = createdBy.id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->find($id);
 
         return $poBBLokalData;
