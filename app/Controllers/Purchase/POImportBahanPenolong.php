@@ -383,9 +383,9 @@ class POImportBahanPenolong extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
                 $warehouse_id = formatter($this->request->getPost("warehouse_id"), "STR_TO_INT");
-                $warehouse_name = $this->request->getPost("warehouse_name");
+                $warehouse = $this->request->getPost("warehouse");
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $warehouse_name, date('y'), $warehouse_id, $last_day);
+                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $warehouse, date('y'), $warehouse_id, $last_day);
 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
