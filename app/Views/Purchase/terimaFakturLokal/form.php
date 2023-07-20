@@ -173,14 +173,28 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="information" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" placeholder="Keterangan">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" placeholder="Keterangan">
                         <label for="floatingInput">Potongan</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="information" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" placeholder="Keterangan">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" placeholder="Keterangan">
                         <label for="floatingInput">Tambahan</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly disabled value="" type="text" class="form-control recipient" id="InvFinalAmt">
+                        <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
+                        <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
             </div>
@@ -189,12 +203,6 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly="true" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3">
-                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
-                        <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
             </div>
@@ -1032,13 +1040,11 @@ $(document).ready(function() {
 
             });
 
-            console.log(selectedItemTable.rows().data().toArray())
             const selectedItemTotal = selectedItemTable.rows().data().toArray().reduce((total, obj) => {
                 return total += +obj.total;
             }, 0);
             $('#nominal_faktur').val(selectedItemTotal);
-            console.log(selectedItemTotal)
-
+            $('#nominal_faktur').trigger('change');
         }
         
     });
@@ -1046,6 +1052,12 @@ $(document).ready(function() {
     $('#selectedItemTable').on('click', '[data-action="delete-item"]', function() {
         const data = selectedItemTable.row($(this).parent().parent()).data();
         selectedItemTable.row($(this).parent().parent()).remove().draw();
+
+        const selectedItemTotal = selectedItemTable.rows().data().toArray().reduce((total, obj) => {
+            return total += +obj.total;
+        }, 0);
+        $('#nominal_faktur').val(selectedItemTotal);
+        $('#nominal_faktur').trigger('change');
     });
 
     $('#taxTable').on('click', '[data-action="delete-tax-item"]', function() {
@@ -1089,7 +1101,19 @@ $(document).ready(function() {
         taxStatus.val('');
         taxNote.val('');
     });
-})
+
+    $('#nominal_faktur').change(recalculateInvAmt);
+    $('#potongan,#tambahan').keyup(recalculateInvAmt);
+
+    function recalculateInvAmt() {
+        const invAmt = $('#nominal_faktur').val() || 0;
+        const potongan = $('#potongan').val() || 0;
+        const tambahan = $('#tambahan').val() || 0;
+
+        const total = +invAmt + +tambahan - +potongan;
+        $('#InvFinalAmt').val(total);
+    }
+});
 
 const changeTipeBahan = function()
 {
