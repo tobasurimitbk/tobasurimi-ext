@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input readonly="true" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Postal Code">
+                                        <input type="text" class="form-control parent_postal_code" id="parent_postal_code" name="postal_code" placeholder="Postal Code">
                                         <label for="floatingInput">Kode Pos</label>
                                     </div>
                                 </div>

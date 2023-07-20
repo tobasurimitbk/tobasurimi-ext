@@ -236,7 +236,7 @@ $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolon
 $routes->get('/terima-faktur-lokal/getBySupplier/(:num)', 'Purchase\TerimaFakturLokal::getBySupplierId/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimafakturLokal', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimafakturLokal', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/(:num)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
