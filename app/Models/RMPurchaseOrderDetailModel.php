@@ -14,7 +14,23 @@ class RMPurchaseOrderDetailModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        'rm_purchase_order_id',
+        'barang_id',
+        'spec',
+        'bagian',
+        'peti',
+        'quality',
+        'note',
+        'qty',
+        'general_price',
+        'daily_price',
+        'monthly_price',
+        'createdAt',
+        'updatedAt',
+        'deletedAt',
+        'qty_diterima'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -55,5 +71,31 @@ class RMPurchaseOrderDetailModel extends Model
         $query = $builder->get();
 
         return $query->getResultArray();
+    }
+
+    public function getPoBBLokalDetailById($id)
+    {
+        $selectQry = "rm_purchase_order_details.*,
+                        FORMAT(CEILING(rm_purchase_order_details.daily_price), 'N', 'en-us') AS daily_price,
+                        FORMAT(CEILING(rm_purchase_order_details.general_price), 'N', 'en-us') AS general_price,
+                        FORMAT(CEILING(rm_purchase_order_details.monthly_price), 'N', 'en-us') AS monthly_price,
+                        FORMAT(CEILING(rm_purchase_order_details.qty), 'N', 'en-us') AS qty,
+                        barangs.kode_barang AS kodeBarang,
+                        barangs.nama_barang AS barangName,
+                        warehouses.warehouse_name AS warehouseName
+                        ";
+
+        $condition = [
+            "rm_purchase_order_id" => $id,
+        ];
+
+        $poBBLokalDetailData = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('barangs', 'rm_purchase_order_details.barang_id = barangs.id', 'left')
+            ->join('warehouses', 'barangs.warehouse_id = warehouses.id', 'left')
+            ->findAll();
+
+        return $poBBLokalDetailData;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Controllers\Purchase;
 use App\Controllers\BaseController;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
+use App\Models\SupplierModel;
 
 
 class POLokalBahanBaku extends BaseController
@@ -47,29 +48,35 @@ class POLokalBahanBaku extends BaseController
     public function getByIdPOLokalBahanBaku($id = null)
     {
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
-
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
+        $supplierModel = new SupplierModel();
+        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
         $data = [
             "dataSupplier" => $dataSupplier
         ];
 
-        if (!empty($id)) {
-            $responsePOLokal = curl_request("GET", "/rawMaterialPO/$id", $this->token);
-            $dataPOLokal = [];
-            if ($responsePOLokal["code"] === 200) {
-                $dataPOLokal = json_decode($responsePOLokal["body"])->data;
-            }
-            $data["dataPOLokal"] = $dataPOLokal;
+        $RMPurchaseOrderModel = new RMPurchaseOrderModel();
+        $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
 
-            // var_dump($dataPOLokal);
-            // die;
+        if (!empty($id)) {
+            $dataBBLokal = $RMPurchaseOrderModel->getPoBBLokalById($id);
+            $dataBBLokalDetail = $RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
+            $data["dataPOLokal"] = $dataBBLokal;
+            // $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
+            $data["dataPODetailLokal"] = $dataBBLokalDetail;
         }
 
+
+        // if (!empty($id)) {
+        //     $responsePOLokal = curl_request("GET", "/rawMaterialPO/$id", $this->token);
+        //     $dataPOLokal = [];
+        //     if ($responsePOLokal["code"] === 200) {
+        //         $dataPOLokal = json_decode($responsePOLokal["body"])->data;
+        //     }
+        //     $data["dataPOLokal"] = $dataPOLokal;
+        // }
+
+        dd($data);
         return view('Purchase/poLokalBahanBaku/form', $data);
 
         return;
