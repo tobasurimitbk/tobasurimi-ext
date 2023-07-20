@@ -116,7 +116,7 @@ class SppModel extends Model
     public function getSppById($id)
     {
         $selectQry = "purchase_requests.*,
-        warehouses.warehouse_name AS warehouseName, 
+        warehouses.warehouse_name AS warehouseName,
         createdBy.name AS createdByName
         ";
 

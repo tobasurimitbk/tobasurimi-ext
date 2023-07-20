@@ -78,6 +78,8 @@ class TerimaFakturLokal extends BaseController
             ->where('tanda_terima_faktur_id', $id)
             ->findAll();
 
+        $data->item_total = $data->nominal_faktur + $data->potongan - $data->tambahan;
+
         $data = [
             "dataTerimaFaktur"  => $data,
             "dataSupplier"      => $supplierList,
@@ -296,7 +298,7 @@ class TerimaFakturLokal extends BaseController
             $tandaTerimaData = [
                 'supplier_id'       => $postData['supplier_id'],
                 'faktur_no'         => $fakturNo,
-                'nominal_faktur'    => $invAmt,
+                // 'nominal_faktur'    => $invAmt,
                 'invoice_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['invoice_date']))),
                 'receive_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['receive_date']))),
                 'potongan'          => $postData['potongan'] ?? 0,
@@ -308,6 +310,7 @@ class TerimaFakturLokal extends BaseController
                 'tipe_bahan'        => $postData['tipe_bahan'],
                 'user_id'           => $this->user_id
             ];
+            $tandaTerimaData['nominal_faktur'] = $invAmt + $tandaTerimaData['tambahan'] - $tandaTerimaData['potongan'];
             
             $insertedId = $tandaTerimaFakturModel->insert($tandaTerimaData);
 

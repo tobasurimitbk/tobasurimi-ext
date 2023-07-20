@@ -125,4 +125,18 @@ class RMPurchaseOrderModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getPoBBLokalById($id)
+    {
+        $selectQry = "rm_purchase_orders.*,
+                users.name AS createdBy
+                ";
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->find($id);
+
+        return $poBBLokalData;
+    }
 }
