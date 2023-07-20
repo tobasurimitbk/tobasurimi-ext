@@ -309,6 +309,14 @@ class SPP extends BaseController
                 $insertData["total"] = $totalPrice;
 
 
+                $WarehousesModel = new WarehousesModel();
+                $dataWarehouse = $WarehousesModel->find($insertData["warehouse_id"]);
+
+                if ($insertData["spp_no"] === "") {
+                    $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
+                }
+
+
                 // $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
 
                 if ($insertData) {
