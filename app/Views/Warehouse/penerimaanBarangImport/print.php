@@ -45,6 +45,11 @@
             padding: 5px;
         }
 
+        .sign-table 
+        td {
+            text-align: center;
+        }
+
         .note {
             width: 50%;
             text-align: justify;
@@ -183,11 +188,21 @@
         </thead>
         </table>
 
-        <div class="inline" style="position: absolute ;bottom:3.5rem;">
-            <div  style="width:25%;height:0rem;border-top:1px solid" >Prepared by:</div>
-            <div  style="margin-left:2rem;width:25%;height:0rem;border-top:1px solid" >Checked by:</div>
-            <div  style="margin-left:2rem;width:25%;height:0rem;border-top:1px solid" >Approved by:</div>
-        </div>
+        <div class="inline" style="position: absolute ;bottom:3.5rem;left:-6rem;">
+            <table class="sign-table"
+            style="
+                width: 100%;
+            "
+            >
+                <thead>
+                    <tr>
+                    <td><div style="text-align: left !important; margin-left:13rem;width:100%;height:0rem;border-top:1px solid">Prepared&nbsp;by:</div></td>
+                    <td><div style="text-align: left !important; margin-left:13rem;width:100%;height:0rem;border-top:1px solid">Checked&nbsp;by:</div></td>
+                    <td><div style="text-align: left !important; margin-left:13rem;width:100%;height:0rem;border-top:1px solid">Approved&nbsp;by:</div></td>
+                    </tr>
+                </thead>
+            </table>
+        </div>s
     </div>
 <?php } ?>
 </body>
