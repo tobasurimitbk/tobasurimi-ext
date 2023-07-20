@@ -119,12 +119,9 @@ class POLokalBahanBaku extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $SppModel = new SppModel();
+        $BBLokalModel = new RMPurchaseOrderModel();
 
-        $condition = [
-            // "spp_type"      => "Bahan Baku Lokal",
-            "is_posted"     => 1
-        ];
+        $condition = [];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -135,7 +132,7 @@ class POLokalBahanBaku extends BaseController
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $poData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);
+        $poData = $BBLokalModel->getPoBBList($condition, $addCondition, $limit, $offset);
 
         $dataPOLokal = [];
 
@@ -143,12 +140,12 @@ class POLokalBahanBaku extends BaseController
 
         foreach ($poData['data'] as $data) {
             array_push($dataPOLokal, [
-                "no" => $no++,
-                "id" => $data->id,
-                "po_date" => $data->po_date,
-                // "po_no" => $data->spp_no,
-                // "supplierName" => $data->supplierName,
-                // "itemCount" => $data->itemCount
+                "no"            => $no++,
+                "id"            => $data->id,
+                "po_date"       => date('Y-m-d', strtotime($data->po_date)),
+                "po_no"         => $data->po_no,
+                "supplierName"  => $data->supplierName,
+                "itemCount"     => $data->itemCount
             ]);
         }
 
