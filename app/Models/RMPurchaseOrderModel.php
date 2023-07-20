@@ -14,7 +14,21 @@ class RMPurchaseOrderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'status_penerimaan'];
+    protected $allowedFields    = [
+        'id',
+        'company_id',
+        'po_no',
+        'po_date',
+        'supplier_id',
+        'pph',
+        'potong_kg',
+        'cong_sebenarnya',
+        'cong_batasan',
+        'subsidi_langsung',
+        'is_posted',
+        'createdBy',
+        'status_penerimaan'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -53,7 +67,62 @@ class RMPurchaseOrderModel extends Model
         $builder = $this->db->table('rm_purchase_orders');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
+    }
+
+    public function getPoBBList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'po_date'          => 'rm_purchase_orders.po_date',
+            'po_no'            => 'rm_purchase_orders.po_no',
+            'supplier_name'    => 'suppliers.supplier_name',
+            'createdAt'         => 'rm_purchase_orders.createdAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "rm_purchase_orders.*, 
+            suppliers.name AS supplierName, 
+            COUNT(rm_purchase_order_details.id) AS itemCount";
+
+        $bbLokalDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id')
+            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'right')
+            ->groupBy(('rm_purchase_orders.id'))
+            ->orderBy($sort, $sortType);
+
+        $totalData = $bbLokalDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $bbLokalDataQry->groupStart();
+        }
+        if ($addCondition['search']) {
+            $bbLokalDataQry
+                ->like('po_no', $addCondition['search']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $bbLokalDataQry->where('rm_purchase_orders.request_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $bbLokalDataQry->where('rm_purchase_orders.request_date <=', $addCondition['dateEnd']);
+        }
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $bbLokalDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $bbLokalDataQry->countAllResults(false);
+        $data = $bbLokalDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
     }
 }
