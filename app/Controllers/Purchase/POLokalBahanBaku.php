@@ -62,21 +62,9 @@ class POLokalBahanBaku extends BaseController
             $dataBBLokal = $RMPurchaseOrderModel->getPoBBLokalById($id);
             $dataBBLokalDetail = $RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
             $data["dataPOLokal"] = $dataBBLokal;
-            // $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
-            $data["dataPODetailLokal"] = $dataBBLokalDetail;
+            $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
 
-
-        // if (!empty($id)) {
-        //     $responsePOLokal = curl_request("GET", "/rawMaterialPO/$id", $this->token);
-        //     $dataPOLokal = [];
-        //     if ($responsePOLokal["code"] === 200) {
-        //         $dataPOLokal = json_decode($responsePOLokal["body"])->data;
-        //     }
-        //     $data["dataPOLokal"] = $dataPOLokal;
-        // }
-
-        dd($data);
         return view('Purchase/poLokalBahanBaku/form', $data);
 
         return;
