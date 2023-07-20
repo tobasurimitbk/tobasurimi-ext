@@ -14,7 +14,7 @@ class AMPurchaseOrderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'company_id', 'purchase_request_id', 'po_no', 'po_date', 'warehouse_id',
+    protected $allowedFields    = ['id', 'company_id', 'purchase_request_id', 'po_no', 'po_date', 'warehouse_id', 'po_type',
     'currency', 'supplier_id', 'total', 'payment_term', 'payment_date', 'dpp', 'note', 'is_posted', 'createdBy', 'status_penerimaan'];
 
     // Dates
