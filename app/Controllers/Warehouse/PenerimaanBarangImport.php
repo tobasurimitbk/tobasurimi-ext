@@ -95,11 +95,12 @@ class PenerimaanBarangImport extends BaseController
             if($dataPenerimaanBarang)
             {
                 $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
+                $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
 
                 if($status_penerimaan === "IMPORT")
                 {
                     $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
-                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "IMPORT");
 
                     // var_dump($dataPenerimaanBarangDetail);
                     // die;
@@ -108,8 +109,6 @@ class PenerimaanBarangImport extends BaseController
                     {
                         $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
                     }
-
-                    $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
 
                     if($tipe_bahan === "BAKU")
                     {
@@ -781,10 +780,11 @@ class PenerimaanBarangImport extends BaseController
             if($dataPenerimaanBarang)
             {
                 $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
+                $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
 
                 if($status_penerimaan === "IMPORT")
                 {
-                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "IMPORT");
 
                     // var_dump($dataPenerimaanBarang);
                     // die;

@@ -124,6 +124,7 @@
             <td><b>No.</b></td>
             <td><b>Kode Barang</b></td>
             <td><b>Nama Barang</b></td>
+            <td><b>Spesifikasi</b></td>
             <td><b>Satuan</b></td>
             <td><b>Jumlah Diterima</b></td>
             <td><b>Jumlah Dokumen</b></td>
@@ -156,6 +157,7 @@
                 <td><?= $no++; ?></td>
                 <td><?= $detail["kode_barang"]; ?></td>
                 <td><?= $detail["nama_barang"]; ?></td>
+                <td><?= $detail["spec"]; ?></td>
                 <td><?= $detail["nama_satuan"]; ?></td>
                 <td><?= $detail["jml_masuk"]; ?></td>
                 <td><?= $detail["doc_qty"]; ?></td>
@@ -169,7 +171,7 @@
         </tbody>
         <thead>
             <tr>
-                <td colspan="4"></td>
+                <td colspan="5"></td>
                 <td><?= $jml_masuk; ?></td>
                 <td><?= $jml_dokumen; ?></td>
                 <td><?= $jml_order; ?></td>

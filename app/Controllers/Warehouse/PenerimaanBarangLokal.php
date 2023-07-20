@@ -91,6 +91,7 @@ class PenerimaanBarangLokal extends BaseController
 
         if (!empty($id)) {
             $dataPenerimaanBarang = $this->penerimaanBarangModel->asObject()->find($id);
+            $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
 
             if($dataPenerimaanBarang)
             {
@@ -99,7 +100,7 @@ class PenerimaanBarangLokal extends BaseController
                 if($status_penerimaan === "LOKAL")
                 {
                     $data["dataPenerimaanBarang"] = $dataPenerimaanBarang;
-                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
 
                     // var_dump($dataPenerimaanBarangDetail);
                     // die;
@@ -108,8 +109,6 @@ class PenerimaanBarangLokal extends BaseController
                     {
                         $data["dataPenerimaanBarangDetail"] = $dataPenerimaanBarangDetail;
                     }
-
-                    $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
 
                     if($tipe_bahan === "BAKU")
                     {
@@ -835,10 +834,11 @@ class PenerimaanBarangLokal extends BaseController
             if($dataPenerimaanBarang)
             {
                 $status_penerimaan = $dataPenerimaanBarang->status_penerimaan;
+                $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
 
                 if($status_penerimaan === "LOKAL")
                 {
-                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id);
+                    $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
 
                     // var_dump($dataPenerimaanBarang);
                     // die;
