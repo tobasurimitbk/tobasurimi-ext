@@ -30,7 +30,7 @@
                 </div>
             </div>
             <div class="col mb-3">
-                <input class="form-control search form-out-search" placeholder="Search" value="" />
+                <input class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
             </div>
         </div>
         <div class="row">

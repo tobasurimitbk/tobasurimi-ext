@@ -36,7 +36,7 @@
                 </select>
             </div>
             <div class="col">
-                <input class="form-control search form-out-search" placeholder="Search" value="" />
+                <input class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
             </div>
         </div>
         <div class="row">

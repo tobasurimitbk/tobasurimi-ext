@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use CodeIgniter\I18n\Time;
+
 use CodeIgniter\Model;
 
 class WorkOrdersModel extends Model
@@ -14,7 +16,15 @@ class WorkOrdersModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields = [
+        'id',
+        'wo_no',
+        'barang_id',
+        'production_amt',
+        'createdAt',
+        'updatedAt',
+        'deletedAt'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -43,7 +53,10 @@ class WorkOrdersModel extends Model
     public function getWorkOrderList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'wo_no' => 'work_orders.wo_no',
+            'wo_no'             => 'work_orders.wo_no',
+            'kode_barang'       => 'barangs.kode_barang',
+            'nama_barang'       => 'barangs.nama_barang',
+            'production_amt'    => 'work_orders.production_amt'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -51,7 +64,8 @@ class WorkOrdersModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "work_orders.*,
-            barangs.nama_barang
+            barangs.nama_barang,
+            barangs.kode_barang
         ";
 
         $workOrdersDataQry = $this->asObject()
@@ -67,7 +81,9 @@ class WorkOrdersModel extends Model
         }
         if ($addCondition['search']) {
             $workOrdersDataQry
-                ->like('wo_no', $addCondition['search']);
+                ->like('work_orders.wo_no', $addCondition['search'])
+                ->orLike('barangs.kode_barang', $addCondition['search'])
+                ->orLike('barangs.nama_barang', $addCondition['search']);
         }
         if ($addCondition['search']) {
             $workOrdersDataQry->groupEnd();
@@ -81,5 +97,50 @@ class WorkOrdersModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+
+    public function get_no()
+    {
+        $romanNumb = [
+            'I',
+            'II',
+            'III',
+            'IV',
+            'V',
+            'VI',
+            'VII',
+            'VIII',
+            'IX',
+            'X',
+            'XI',
+            'XII',
+        ];
+
+        $today = Time::today('America/Chicago', 'en_US');
+
+        $year = $today->getYear();
+        $month = $today->getMonth() - 1;
+
+        $lastStr =  $romanNumb[$month] . '/' . $year;
+
+        $builder = $this->db->table('work_orders');
+        $builder->select('*');
+        $builder->orderBy('wo_no', 'desc');
+        $builder->like('wo_no', $lastStr);
+        $query = $builder->get();
+
+        $kode = 'PRD';
+
+        $lastWO = '0001';
+        if ($query->getResultArray()) {
+            $lastWO = explode('/', $query->getResultArray()[0]['wo_no']);
+            $lastWO = intval($lastWO[0]) + 1;
+
+            $lastWO = sprintf("%04d", $lastWO);
+        };
+
+        $generatedNo = $kode . '/' . $lastStr . '/' . $lastWO;
+
+        return $generatedNo;
     }
 }
