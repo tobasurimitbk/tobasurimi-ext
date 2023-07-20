@@ -202,7 +202,7 @@
                     </tr>
                 </thead>
             </table>
-        </div>s
+        </div>
     </div>
 <?php } ?>
 </body>
