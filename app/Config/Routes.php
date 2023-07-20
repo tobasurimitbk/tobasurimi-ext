@@ -335,6 +335,10 @@ $routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::c
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm::delete', ['filter' => 'Auth']);
 
+// PRODUKSI
+// Rencana Produksi
+$routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
+
 
 // DROPDOWN
 
