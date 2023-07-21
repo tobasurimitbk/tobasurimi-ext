@@ -794,7 +794,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + id;
+                                                window.location.href = "<?= base_url("order-form-lokal"); ?>" + "/id/" + id;
                                             })
                                     } else {
                                         Swal.fire({
@@ -845,7 +845,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + +response.id;
+                                                window.location.href = "<?= base_url("order-form-lokal"); ?>" + "/id/" + +response.id;
                                             })
                                     } else {
                                         Swal.fire({

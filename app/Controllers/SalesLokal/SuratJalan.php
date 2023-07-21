@@ -102,7 +102,56 @@ class SuratJalan extends BaseController
     }
 
     public function delete()
-    {
+    { {
+            try {
+                $id = $this->request->getPost("id");
+
+                if (!empty($id)) {
+                    $findBarang = $this->rmImportPOModel->find($id);
+                    if ($findBarang) {
+                        $response =  $this->rmImportPOModel->delete($id);
+                        if ($response) {
+                            $data = [
+                                "status"            => true,
+                                "message"   => "Data Berhasil dihapus",
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        } else {
+                            $message = 'Data Gagal Dihapus';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    } else {
+                        $data = [
+                            "status"            => false,
+                            "message"    => "Data Tidak Ditemukan",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                } else {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Data Gagal Dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            } catch (\Exception $e) {
+                $data = [
+                    "status"            => false,
+                    "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+            return;
+        }
     }
 
     public function dropDownSalesOrder($idCustomer)

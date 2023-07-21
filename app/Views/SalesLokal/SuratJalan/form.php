@@ -51,7 +51,7 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select multiple_po_id id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
+                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {
@@ -165,7 +165,7 @@
             id_po: {
                 required: true
             },
-            id_so: {
+            'id_so[]': {
                 required: true
             },
             no_po: {
@@ -185,7 +185,7 @@
             id_po: {
                 required: "PO wajib diisi"
             },
-            id_so: {
+            'id_so[]': {
                 required: "SO wajib diisi"
             },
             no_po: {
@@ -268,7 +268,7 @@
                     // // UPDATE
                     if (id) {
                         $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/update"); ?>",
+                            url: "<?= base_url("surat-jalan/update"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -287,7 +287,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                                            window.location.href = "<?= base_url("surat_jalan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({
@@ -312,7 +312,7 @@
                     // CREATE
                     else {
                         $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/save"); ?>",
+                            url: "<?= base_url("surat-jalan/save"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -331,7 +331,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                                            window.location.href = "<?= base_url("surat_jalan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({
