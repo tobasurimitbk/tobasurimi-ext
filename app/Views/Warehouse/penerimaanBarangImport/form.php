@@ -2999,10 +2999,12 @@
 
         $(".foot-detail-table").append(tag_total);
 
+        $(".supplier_id").attr("disabled", "true");
+
         if($(".tipe_bahan").val() === "BAKU")
         {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+                url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -3013,6 +3015,7 @@
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
+                    $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }
@@ -3021,7 +3024,7 @@
         if($(".tipe_bahan").val() === "PENOLONG")
         {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+                url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -3032,6 +3035,7 @@
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
+                    $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }

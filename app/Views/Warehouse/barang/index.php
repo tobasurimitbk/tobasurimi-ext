@@ -144,7 +144,7 @@
     <div class="card-body">
         <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
             <div class="col mb-3">
-                <input class="form-control search form-out-search" placeholder="Search" value="" />
+                <input class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
             </div>
             <div class="col mb-3">
                 <select class="form-select kategori form-out-search" name="kategori" id="kategori" aria-label="Floating label select example">

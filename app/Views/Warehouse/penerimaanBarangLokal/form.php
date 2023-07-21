@@ -2998,6 +2998,8 @@
 
         $(".foot-detail-table").append(tag_total);
 
+        $(".supplier_id").attr("disabled", "true");
+
         if($(".tipe_bahan").val() === "BAKU")
         {
             $.ajax({
@@ -3012,6 +3014,7 @@
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
+                    $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }
@@ -3031,6 +3034,7 @@
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
+                    $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }
