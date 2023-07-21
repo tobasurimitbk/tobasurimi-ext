@@ -70,8 +70,8 @@
                     <div class="col-md-3">
                         <?php if (!empty($dataPOImport)) { ?>
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP (Opsional)">
-                                <label for="floatingInput">No. SPP (Opsional)</label>
+                                <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
+                                <label for="floatingInput">No. SPP</label>
                             </div>
                         <?php } else { ?>
                             <div class="form-floating mb-3" style="height: 50px;">
