@@ -10,6 +10,8 @@ use App\Models\BarangModel;
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
 use App\Models\SalesOrderDetailModel;
+use Error;
+use PhpParser\Node\Stmt\TryCatch;
 
 class OrderForm extends BaseController
 {
@@ -22,6 +24,7 @@ class OrderForm extends BaseController
     protected $WarehousesModel;
     protected $DetailStockBarang;
     protected $SalesOrderDetailModel;
+    protected $db;
 
     public function __construct()
     {
@@ -34,6 +37,7 @@ class OrderForm extends BaseController
         $this->WarehousesModel = new WarehousesModel();
         $this->DetailStockBarang = new DetailStockBarang();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
+        $this->db = \Config\Database::connect();
     }
 
     public function index()
@@ -48,7 +52,7 @@ class OrderForm extends BaseController
         $data = [
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
-            "name" => session()->get('login')->name,
+            "seller_name" => session()->get('login')->name,
 
         ];
 
@@ -252,25 +256,42 @@ class OrderForm extends BaseController
             "tipe_sales_order" => $this->request->getPost('tipe_sales_order'),
         ];
 
+        try {
+            $this->db->transBegin();
+            // Create a new validation instance
+            $dataSalesOrder =  $this->SalesOrderModel->insert($values);
+            foreach ($items as $row) {
+                $item = $this->DetailStockBarang
+                    ->where('barang_id', $row->id_barang)
+                    ->where('warehouse_id', $row->warehouse_id)
+                    ->first();
 
-        // Create a new validation instance
-        $dataSalesOrder =  $this->SalesOrderModel->insert($values);
-        foreach ($items as $row) {
-            $valueBarang = [
-                "id_sales_order" => $dataSalesOrder,
-                "id_barang" => $row->id_barang,
-                "qty" => $row->qty,
-                "amount" => $row->amount,
-                "keterangan" => $row->keterangan,
-                "tax" => $row->tax,
-                "discount_percentage" => $row->discount_percentage,
-                "dept" => $row->dept,
-                "id_warehouse" => $row->warehouse_id,
-            ];
-            $this->SalesOrderDetailModel->save($valueBarang);
-        }
+                echo $item;
 
-        if ($dataSalesOrder) {
+                if ($item->stok < $row->qty) {
+                    throw new Error('barang tidak boleh kurang dari stock');
+                    return;
+                }
+
+                $valueBarang = [
+                    "id_sales_order" => $dataSalesOrder,
+                    "id_barang" => $row->id_barang,
+                    "qty" => $row->qty,
+                    "amount" => $row->amount,
+                    "keterangan" => $row->keterangan,
+                    "tax" => $row->tax,
+                    "discount_percentage" => $row->discount_percentage,
+                    "dept" => $row->dept,
+                    "id_warehouse" => $row->warehouse_id,
+                ];
+                $this->SalesOrderDetailModel->save($valueBarang);
+                $stok = [
+                    "stok" => ($item->stok - $row->qty),
+                ];
+                $this->DetailStockBarang->update($item->id, $stok);
+            }
+            $this->db->transCommit();
+
             $data = [
                 "id" => $dataSalesOrder,
                 "status"            => true,
@@ -280,7 +301,275 @@ class OrderForm extends BaseController
             ];
             echo json_encode($data);
             return;
-        } else {
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            //echo "Transaction failed: " . $e->getMessage();
+            $data = [
+                "status"            => false,
+                "message"    => "Data Gagal Disimpan",
+                "payload"   => $values,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        };
+    }
+
+
+    public function getById($id = null)
+    {
+        //Get data sales order
+        $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
+        $customers = $this->CustomerModel->where('company_id', $this->this_company_id)->findAll();
+
+        $dataSalesOrder->order_date = date("d-m-Y", strtotime($dataSalesOrder->order_date));
+        $dataSalesOrder->shipping_date = date("d-m-Y", strtotime($dataSalesOrder->shipping_date));
+        $data = [
+            "data" => $dataSalesOrder,
+            "dataCustomers" => $customers,
+            "id_user" => $dataSalesOrder->id_user,
+            "seller_name" => $dataSalesOrder->seller_name,
+
+        ];
+        //echo json_encode($data);
+
+        return view('SalesLokal/OrderForm/form', $data);
+    }
+
+    public function update()
+    {
+        $payload = $this->request->getVar();
+        $items = json_decode($this->request->getPost("items"));
+
+
+        $data = [
+            "payload" => $payload,
+            //"items" => $items,
+            'token'   => csrf_hash()
+        ];
+        //echo json_encode($data);
+
+        $validate = $this->validate([
+            "id" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'id tidak boleh kosong',
+                ]
+            ],
+            "id_user" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'User tidak boleh kosong',
+                ]
+            ],
+            "id_customer" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'Customer tidak boleh kosong',
+                ]
+            ],
+            "destination" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'tujuan pengiriman tidak boleh kosong',
+                ]
+            ],
+            "order_date" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'tanggal pemesanan ID tidak boleh kosong',
+                ]
+            ],
+            "shipping_date" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
+            "tax_status" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'tax status tidak boleh kosong',
+                ]
+            ],
+            "include_pa" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'include pa tidak boleh kosong',
+                ]
+            ],
+            "total" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'total harga tidak boleh kosong',
+                ]
+            ],
+            "tipe_sales_order" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'tipe sales order tidak boleh kosong',
+                ],
+            ],
+            "items" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'barang tidak boleh kosong',
+                ],
+            ],
+            /*
+            "items" => 'is_array',
+            "items.id_barang" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Barang tidak boleh kosong',
+                ]
+            ],
+            "items.qty" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'qty tidak boleh kosong',
+                ]
+            ],
+            "items.amount" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'total harga tidak boleh kosong',
+                ]
+            ],
+            "items.warehouse_id" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'warehouse tidak boleh kosong',
+                ]
+            ],*/
+
+        ]);
+        if (!$validate) {
+            echo json_encode($payload);
+            return;
+            //return redirect()->to('/order-form-lokal/create')->back()->withInput();
+        }
+
+        $orderDate = $this->request->getPost('order_date');
+        $shippingDate = $this->request->getPost('shipping_date');
+
+        $values = [
+            "id_user" => $this->request->getPost('id_user'),
+            "id_po" => $this->request->getPost('id_po'),
+            "id_customer" => $this->request->getPost('id_customer'),
+            "destination" => $this->request->getPost('destination'),
+            "order_date" => $orderDate ? date("Y/m/d", strtotime(str_replace("/", "-", $orderDate))) : "",
+            "shipping_date" => $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
+            "payment_terms" => $this->request->getPost('payment_terms'),
+            "keterangan" => $this->request->getPost('parent_keterangan'),
+            "discount_rupiah" => $this->request->getPost('discount_rupiah'),
+            "discount_percentage" => $this->request->getPost('discount_percentage'),
+            "ppn" => $this->request->getPost('ppn'),
+            "estimated_freight" => $this->request->getPost('estimated_freight'),
+            "tax_status" => $this->request->getPost('tax_status'),
+            "include_pa" => $this->request->getPost('include_pa'),
+            "total_harga" => $this->request->getPost('total'),
+            "tipe_sales_order" => $this->request->getPost('tipe_sales_order'),
+        ];
+
+
+        $this->db->transBegin();
+        try {
+            // Create a new validation instance
+            $dataSalesOrder =  $this->SalesOrderModel->update($payload['id'], $values);
+            foreach ($items as $row) {
+                $item = $this->DetailStockBarang
+                    ->where('barang_id', $row->id_barang)
+                    ->where('warehouse_id', $row->warehouse_id)
+                    ->first();
+
+
+
+                if ($row->id && $row->isDeleted === false) {
+                    $dataBefore = $this->SalesOrderDetailModel->find($row->id);
+                    if ($dataBefore->qty > $row->qty) {
+                        $dataItems = $dataBefore->qty - $row->qty;
+                        $stok = [
+                            "stok" => ($item->stok + $dataItems),
+                        ];
+                    } else {
+                        $dataItems =  $row->qty - $dataBefore->qty;
+                        $checkItems = $item->stok - $dataItems;
+
+
+                        if ($checkItems < 0) {
+                            throw new Error('barang tidak boleh kurang dari stock');
+                        }
+                        $stok = [
+                            "stok" => ($item->stok - $dataItems),
+                        ];
+                    }
+
+                    $valueBarang = [
+                        "id_barang" => $row->id_barang,
+                        "qty" => $row->qty,
+                        "amount" => $row->amount,
+                        "keterangan" => $row->keterangan,
+                        "tax" => $row->tax,
+                        "discount_percentage" => $row->discount_percentage,
+                        "dept" => $row->dept,
+                        "id_warehouse" => $row->warehouse_id,
+                    ];
+
+                    $this->DetailStockBarang->update($item->id, $stok);
+
+                    $this->SalesOrderDetailModel->update($row->id, $valueBarang);
+                } else if ($row->id && $row->isDeleted === true) {
+                    $this->SalesOrderDetailModel->delete($row->id);
+                    $stok = [
+                        "stok" => ($item->stok + $row->qty),
+                    ];
+                    $this->DetailStockBarang->update($item->id, $stok);
+                } else {
+                    if ($item->stok > $row->qty) {
+                        throw new Error('barang tidak boleh kurang dari stock');
+                    }
+
+                    $valueBarang = [
+                        "id_sales_order" => $payload['id'],
+                        "id_barang" => $row->id_barang,
+                        "qty" => $row->qty,
+                        "amount" => $row->amount,
+                        "keterangan" => $row->keterangan,
+                        "tax" => $row->tax,
+                        "discount_percentage" => $row->discount_percentage,
+                        "dept" => $row->dept,
+                        "id_warehouse" => $row->warehouse_id,
+                    ];
+                    $this->SalesOrderDetailModel->save($valueBarang);
+                    $stok = [
+                        "stok" => ($item->stok - $row->qty),
+                    ];
+                    $this->DetailStockBarang->update($item->id, $stok);
+                }
+            }
+
+            $this->db->transCommit();
+            $data = [
+                "id" => $dataSalesOrder,
+                "status"            => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $values,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            //echo "Transaction failed: " . $e->getMessage();
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
@@ -290,45 +579,6 @@ class OrderForm extends BaseController
             echo json_encode($data);
             return;
         }
-    }
-
-
-    public function getById($id = null)
-    {
-        //Get Customers
-        $responseEmployee = curl_request("GET", "/customers/all?idCompany=$this->this_company_id", $this->token);
-
-        $dataCustomers = [];
-        if ($responseEmployee["code"] === 200) {
-            $dataCustomers = json_decode($responseEmployee["body"])->data;
-        }
-
-        $data = [
-            "dataCustomers" => $dataCustomers,
-        ];
-
-        //Get Detail
-        if (!empty($id)) {
-            $id = $this->encrypter->decrypt(hex2bin($id));
-            $responseDetail = curl_request("GET", "/salesOrderLokal/$id", $this->token);
-
-            $dataDetail = [];
-            if ($responseDetail["code"] === 200) {
-                $dataDetail = json_decode($responseDetail["body"])->data;
-            }
-
-            $data["data"] = $dataDetail;
-        }
-
-        // var_dump($data);
-        // exit;
-
-
-        return view('SalesLokal/OrderForm/form', $data);
-    }
-
-    public function update()
-    {
     }
 
     public function delete()

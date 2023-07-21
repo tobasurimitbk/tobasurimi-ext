@@ -3,9 +3,11 @@
 namespace App\models;
 
 use CodeIgniter\Model;
+use App\Models\SalesOrderDetailModel;
 
 class SalesOrderModel extends Model
 {
+    protected $SalesOrderDetailModel;
 
     protected $table      = 'sales_order';
     protected $primaryKey = 'id';
@@ -15,6 +17,12 @@ class SalesOrderModel extends Model
     protected $returnType     = 'array';
     protected $useSoftDeletes = true;
     protected $protectedField = true;
+
+
+    public function __construct()
+    {
+        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
+    }
 
     protected $allowedFields = [
         'id_user',
@@ -121,5 +129,28 @@ class SalesOrderModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+    public function getSalesOrderLokalById($id)
+    {
+        $selectQry = "sales_order.*,users.name as seller_name,customers.name as customer_name ,customers.address,customers.phone";
+
+        $dataSalesOrder = $this->asObject()
+            ->join('users', 'users.id = sales_order.id_user')
+            ->join('customers', 'customers.id = sales_order.id_customer ')
+            ->select($selectQry)
+            ->find($id);
+
+        $selectQueryDetail = "detail_sales_order.*,warehouses.warehouse_name,barangs.nama_barang,barangs.harga_barang,barangs.satuan_id,satuans.kode_satuan";
+        $detail = $this->SalesOrderDetailModel
+            ->where('id_sales_order', $id)
+            ->join('barangs', 'barangs.id = detail_sales_order.id_barang')
+            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->join('warehouses', 'warehouses.id = detail_sales_order.id_warehouse')
+            ->select($selectQueryDetail)
+            ->findAll();
+
+        $dataSalesOrder->detail = $detail;
+
+        return $dataSalesOrder;
     }
 }
