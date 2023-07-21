@@ -27,7 +27,7 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('production_amt')" class="sort">Hasil</th>
-                                <th>Permintaan Material</th>
+                                <th>Tambah Permintaan Material</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -115,7 +115,7 @@
                     return `
                         <div class="mt-0">
                             <button class="btn btn-success posting-spp">
-                                Permintaan Material
+                                Tambah Permintaan Material
                             </button>
                         </div>
                     `
