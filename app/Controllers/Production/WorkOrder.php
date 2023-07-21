@@ -4,6 +4,7 @@ namespace App\Controllers\Production;
 
 use App\Controllers\BaseController;
 use App\Models\BarangModel;
+use App\Models\SatuanModel;
 use App\Models\WorkOrdersModel;
 
 class WorkOrder extends BaseController
@@ -11,6 +12,7 @@ class WorkOrder extends BaseController
     protected $token;
     protected $this_company_id;
     protected $barangModel;
+    protected $satuanModel;
     protected $workOrdersModel;
 
     public function __construct()
@@ -18,6 +20,7 @@ class WorkOrder extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
+        $this->satuanModel = new SatuanModel();
         $this->workOrdersModel = new WorkOrdersModel();
     }
 
@@ -31,8 +34,12 @@ class WorkOrder extends BaseController
         //Get Barang
         $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
+        //Get Satuan
+        $dataSatuan = $this->satuanModel->asObject()->find();
+
         $data = [
-            "dataBarang" => $dataBarang
+            "dataBarang" => $dataBarang,
+            "dataSatuan" => $dataSatuan
         ];
 
         return view('Production/workOrder/form', $data);
@@ -43,8 +50,12 @@ class WorkOrder extends BaseController
         //Get Barang
         $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
 
+        //Get Satuan
+        $dataSatuan = $this->satuanModel->asObject()->find();
+
         $data = [
-            "dataBarang" => $dataBarang
+            "dataBarang" => $dataBarang,
+            "dataSatuan" => $dataSatuan
         ];
 
         if (!empty($id)) {
@@ -88,7 +99,9 @@ class WorkOrder extends BaseController
                 "wo_no"                 => $data->wo_no,
                 "kode_barang"           => $data->kode_barang,
                 "nama_barang"           => $data->nama_barang,
-                "production_amt"        => formatter($data->production_amt, "STR_TO_INT")
+                "production_amt"        => formatter($data->production_amt, "STR_TO_INT"),
+                "nama_satuan"           => $data->nama_satuan,
+                "target"                => formatter($data->target, "STR_TO_INT")
             ]);
         }
 
@@ -114,6 +127,12 @@ class WorkOrder extends BaseController
                 ],
                 "production_amt" => [
                     "rules" => "required"
+                ],
+                "satuan_id" => [
+                    "rules" => "required"
+                ],
+                "target" => [
+                    "rules" => "required"
                 ]
             ];
 
@@ -135,6 +154,8 @@ class WorkOrder extends BaseController
                 $payload = [
                     "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
                     "barang_id" => formatter($this->request->getPost("barang_id"), "STR_TO_INT"),
+                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                    "target" => $this->request->getPost("target"),
                     "production_amt" => $this->request->getPost("production_amt")
                 ];
 
@@ -188,6 +209,12 @@ class WorkOrder extends BaseController
                 ],
                 "production_amt" => [
                     "rules" => "required"
+                ],
+                "satuan_id" => [
+                    "rules" => "required"
+                ],
+                "target" => [
+                    "rules" => "required"
                 ]
             ];
 
@@ -210,6 +237,8 @@ class WorkOrder extends BaseController
                 $payload = [
                     "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
                     "barang_id" => formatter($this->request->getPost("barang_id"), "STR_TO_INT"),
+                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                    "target" => $this->request->getPost("target"),
                     "production_amt" => $this->request->getPost("production_amt")
                 ];
 
