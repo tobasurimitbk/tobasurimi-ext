@@ -57,6 +57,31 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
+                            <option value=""></option>
+                            <?php
+                                if (!empty($dataSatuan)) {
+                                    foreach ($dataSatuan as $satuan) {
+                                ?>
+                                        <option <?= !empty($dataWorkOrders) ? ($dataWorkOrders->satuan_id === $satuan->id ? "selected" : "") : ""; ?> value="<?= $satuan->id; ?>"><?= $satuan->nama_satuan; ?></option>
+                                <?php
+                                    }
+                                }
+                            ?>
+                        </select>
+                        <label for="floatingInput">Satuan</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control target" name="target" id="target" placeholder="Target">
+                        <label for="floatingInput">Target</label>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -66,7 +91,6 @@
 const csrfToken = '<?= csrf_token() ?>';
 
 $(document).ready(function() {
-    // AJU DOCUMENT TYPE
     $('.barang_id').select2({
         placeholder: "",
         theme: "bootstrap-5",
@@ -93,7 +117,28 @@ $(document).ready(function() {
         .find('label')
         .css('z-index', '1');
 
-    $('.barang_id')
+    $('.satuan_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+    })
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.satuan_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.satuan_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.satuan_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -105,6 +150,12 @@ $(document).ready(function() {
             },
             production_amt: {
                 required: true
+            },
+            satuan_id: {
+                required: true
+            },
+            target: {
+                required: true
             }
         },
         messages: {
@@ -113,6 +164,12 @@ $(document).ready(function() {
             },
             production_amt: {
                 required: "Hasil wajib diisi"
+            },
+            satuan_id: {
+                required: "Satuan wajib diisi"
+            },
+            target: {
+                required: "Target wajib diisi"
             }
         },
         errorElement: 'span',
