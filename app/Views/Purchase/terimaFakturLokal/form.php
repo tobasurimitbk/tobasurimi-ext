@@ -126,34 +126,25 @@
             <div class="row">
                 <div class="col-md-12">
                     Daftar penerimaan barang yang akan dibuat tanda terima
-                    <table class="table nowrap table-hover-tobasurimi" id="selectedItemTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No. PO</th>
-                                <th>Tgl. LPB</th>
-                                <th>No. LPB</th>
-                                <th>Nama Barang</th>
-                                <th>Qty</th>
-                                <th>satuan</th>
-                                <th>Total</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table">
-                            <?php foreach ($selectedItems ?? [] as $data): ?>
-                            <tr>
-                                <td>jugijagiju</td>
-                                <td><?= $data->lpb_date ?></td>
-                                <td><?= $data->lpb_no ?></td>
-                                <td><?= $data->item_name ?></td>
-                                <td><?= $data->qty ?></td>
-                                <td><?= $data->unit ?></td>
-                                <td><?= $data->qty * $data->price ?></td>
-                                <td></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi" id="selectedItemTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No. PO</th>
+                                    <th>Tgl. LPB</th>
+                                    <th>No. LPB</th>
+                                    <th>Nama Barang</th>
+                                    <th>Qty</th>
+                                    <th>satuan</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table">
+                                
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -264,34 +255,25 @@
             <button type="button" class="btn btn-primary" id="add-tax-btn">Tambah Pengenaan Pajak</button>
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table nowrap table-hover-tobasurimi" id="taxTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No.</th>
-                                <th>Tgl. Faktur Pajak</th>
-                                <th>No. Faktur Pajak</th>
-                                <th>Pajak</th>
-                                <th>Jumlah</th>
-                                <th>Status</th>
-                                <th>Keterangan</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table">
-                            <?php foreach ($taxData ?? [] as $data): ?>
-                            <tr>
-                                <td></td>
-                                <td><?= $data->tax_inv_date ?></td>
-                                <td><?= $data->tax_inv_no ?></td>
-                                <td><?= $data->tax_type ?></td>
-                                <td><?= $data->tax_amt ?></td>
-                                <td><?= $data->tax_status ?></td>
-                                <td><?= $data->tax_note ?></td>
-                                <td></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi" id="taxTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Tgl. Faktur Pajak</th>
+                                    <th>No. Faktur Pajak</th>
+                                    <th>Pajak</th>
+                                    <th>Jumlah</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table">
+                                
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             
@@ -301,6 +283,7 @@
 </section>
 
 <script>
+    const id = $(".id").val();
     let sort = "faktur_no";
     let sortType = "asc";
     const table = $('.dataTable').DataTable({
@@ -659,7 +642,6 @@ $(document).ready(function() {
                     const selectedTaxes = taxTable.rows().data().toArray();
                     data.append("pengenaan_pajak", JSON.stringify(selectedTaxes));
 
-                    let id = $(".id").val();
                     // UPDATE
                     if(id)
                     {
@@ -682,7 +664,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + id;
+                                        window.location.href = `<?= base_url("terima-faktur-lokal"); ?>/ ${id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -725,7 +707,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
+                                        window.location.href = `<?= base_url("terima-faktur-lokal"); ?>/${response.id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -799,7 +781,7 @@ $(document).ready(function() {
                                     })
                                     .then(() => {
                                         window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + id, "_blank");
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + id;
+                                        window.location.href = `<?= base_url("terima-faktur-lokal"); ?>/${id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -843,7 +825,7 @@ $(document).ready(function() {
                                     })
                                     .then(() => {
                                         window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + response.id, "_blank");
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
+                                        window.location.href = `<?= base_url("terima-faktur-lokal"); ?>/${response.id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -1112,6 +1094,15 @@ $(document).ready(function() {
 
         const total = +invAmt + +tambahan - +potongan;
         $('#InvFinalAmt').val(total);
+    }
+
+    if (id) {
+        const selectedItemData = <?= json_encode($selectedItems ?? []) ?>;
+        selectedItemTable.rows.add(selectedItemData).draw(false);
+
+        const taxList = <?= json_encode($taxData ?? []); ?>;
+        console.log(taxList)
+        taxTable.rows.add(taxList).draw(false);
     }
 });
 
