@@ -144,7 +144,7 @@ class SppModel extends Model
         return $query->getResultArray();
     }
 
-    public function genereteNoSpp($warehouse)
+    public function generateNoSpp($warehouse)
     {
         $romanNumb = [
             'I',

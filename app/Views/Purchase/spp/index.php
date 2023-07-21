@@ -43,6 +43,7 @@
                             <option value="">Pilih Tipe SPP</option>
                             <option value="Bahan Penolong Lokal">Bahan Penolong Lokal</option>
                             <option value="Bahan Penolong Import">Bahan Penolong Import</option>
+                            <option value="Bahan Baku Lokal">Bahan Baku Lokal</option>
                             <option value="Bahan Baku Import">Bahan Baku Import</option>
                         </select>
                         <label for="floatingInput">Tipe SPP</label>

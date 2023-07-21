@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use CodeIgniter\I18n\Time;
+
 use CodeIgniter\Model;
 
 class RMPurchaseOrderModel extends Model
@@ -138,5 +140,58 @@ class RMPurchaseOrderModel extends Model
             ->find($id);
 
         return $poBBLokalData;
+    }
+
+    public function generateNoPo()
+    {
+        $romanNumb = [
+            'I',
+            'II',
+            'III',
+            'IV',
+            'V',
+            'VI',
+            'VII',
+            'VIII',
+            'IX',
+            'X',
+            'XI',
+            'XII',
+        ];
+
+        $today = Time::today('America/Chicago', 'en_US');
+
+        $year = $today->getYear();
+        $year = substr($year, -2);
+        $month = $today->getMonth() - 1;
+
+        $lastStr =  '/P/' . $romanNumb[$month] . '/' . $year;
+
+        $builder = $this->db->table('rm_purchase_orders');
+        $builder->select('po_no');
+        $builder->orderBy('po_no', 'desc');
+        $builder->like('po_no', $lastStr);
+        $query = $builder->get();
+
+        $increment = '01';
+
+        if ($query->getResultArray()) {
+            $lastPo = explode('/', $query->getResultArray()[0]['po_no']);
+            $lastPo = intval($lastPo[0]) + 1;
+
+            if ($lastPo < 10) {
+                $lastPo = "00" . $lastPo . "";
+            } elseif ($lastPo > 9 && $lastPo < 100) {
+                $lastPo = "0" . $lastPo . "";
+            } else {
+                $lastPo = strval($lastPo);
+            }
+
+            $increment = $lastPo;
+        };
+
+        $generatedPoNo = $increment . '/' . $lastStr;
+
+        return $generatedPoNo;
     }
 }

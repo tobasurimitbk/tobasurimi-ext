@@ -31,11 +31,11 @@ class POLokalBahanBaku extends BaseController
     public function createPOLokalBahanBaku()
     {
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+        $supplierModel = new SupplierModel();
+        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        foreach (array_keys($dataSupplier) as $key) {
+            $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         $data = [
@@ -166,6 +166,9 @@ class POLokalBahanBaku extends BaseController
     public function savePOLokalBahanBaku()
     {
         try {
+            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
+            $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
             $rules = [
                 "po_date" => [
                     "rules" => "required"
@@ -176,7 +179,8 @@ class POLokalBahanBaku extends BaseController
             ];
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $insertData = [
+                    "company_id" => $this->this_company_id,
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "pph" => $this->request->getPost("pph"),
@@ -185,37 +189,38 @@ class POLokalBahanBaku extends BaseController
                     "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
                     "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
                     "subsidi_langsung" => $this->request->getPost("subsidi_langsung") ? formatter($this->request->getPost("subsidi_langsung"), "STR_TO_INT") : 0,
+                    "createdBy" => session()->get("login")->user_id,
                     "items" =>  json_decode($this->request->getPost("items"))
-                ]);
+                ];
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
+                $insertData["po_no"] = $RMPurchaseOrderModel->generateNoPo();
 
-                $response = curl_request("POST", "/rawMaterialPO", $this->token, $payload);
+                $payload = json_encode($insertData);
 
-                if ($response["code"] === 201) {
+                $insert = $RMPurchaseOrderModel->insert($insertData);
+
+                foreach ($insertData["items"] as $value) {
+                    $value->barang_id = $value->item_id;
+                    $value->rm_purchase_order_id = $insert;
+                }
+
+                $RMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
+
+                if ($insert) {
                     $data = [
-                        "id" => json_decode($response["body"])->createdId,
+                        "id" => $insert,
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
+                        "message"    => "Data Gagal Disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 }
