@@ -6,7 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangModel;
 use App\Models\WorkOrdersModel;
 
-class MaterialRequest extends BaseController
+class WorkOrder extends BaseController
 {
     protected $token;
     protected $this_company_id;
@@ -23,7 +23,7 @@ class MaterialRequest extends BaseController
 
     public function index()
     {
-        return view('Production/materialRequest/index');
+        return view('Production/workOrder/index');
     }
 
     public function createView()
@@ -35,7 +35,7 @@ class MaterialRequest extends BaseController
             "dataBarang" => $dataBarang
         ];
 
-        return view('Production/materialRequest/form', $data);
+        return view('Production/workOrder/form', $data);
     }
 
     public function getById($id = null)
@@ -52,7 +52,7 @@ class MaterialRequest extends BaseController
             $data["dataWorkOrders"] = $dataWorkOrders;
         }
 
-        return view('Production/materialRequest/form', $data);
+        return view('Production/workOrder/form', $data);
     }
 
     public function all()
@@ -129,34 +129,44 @@ class MaterialRequest extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $no = $this->workOrdersModel->get_no();
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+                // $no = $this->workOrdersModel->get_no();
                 $payload = [
                     "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
                     "barang_id" => formatter($this->request->getPost("barang_id"), "STR_TO_INT"),
                     "production_amt" => $this->request->getPost("production_amt")
                 ];
 
-                $response =  $this->workOrdersModel->insert($payload);
+                $data = [
+                    "status"     => false,
+                    "message"    => $payload,
+                    "payload"    => $payload,
+                    'token'      => csrf_hash()
+                ];
+                echo json_encode($data);
 
-                if ($response) {
-                    $data = [
-                        "id"        => $response,
-                        "status"    => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token'     => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Disimpan';
-                    $data = [
-                        "status"     => false,
-                        "message"    => $message,
-                        "payload"    => $payload,
-                        'token'      => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
+                // $response =  $this->workOrdersModel->insert($payload);
+
+                // if ($response) {
+                //     $data = [
+                //         "id"        => $response,
+                //         "status"    => true,
+                //         "message"   => "Data Berhasil disimpan",
+                //         "payload"   => $payload,
+                //         'token'     => csrf_hash()
+                //     ];
+                //     echo json_encode($data);
+                // } else {
+                //     $message =  'Data Gagal Disimpan';
+                //     $data = [
+                //         "status"     => false,
+                //         "message"    => $message,
+                //         "payload"    => $payload,
+                //         'token'      => csrf_hash()
+                //     ];
+                //     echo json_encode($data);
+                // }
             }
         } catch (\Exception $e) {
             $data = [
@@ -194,7 +204,9 @@ class MaterialRequest extends BaseController
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
-                $no = $this->workOrdersModel->get_no();
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->workOrdersModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+                // $no = $this->workOrdersModel->get_no();
                 $payload = [
                     "wo_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("wo_no"),
                     "barang_id" => formatter($this->request->getPost("barang_id"), "STR_TO_INT"),

@@ -145,22 +145,27 @@ class PenerimaanBarangModel extends Model
 
     public function get_no($tgl, $bln, $thn, $last_day)
     {
-        $filt_no = "LPB/1/" . $thn . "/" . $bln;
+        $lastStr =  $thn . '/' . $bln;
 
-        $conditions = [
-            'deletedAt' => null
-        ];
-
-        $no = $this->db->table('penerimaan_barang')
+        $builder = $this->db->table('penerimaan_barang');
+        $builder->select('no_penerimaan_barang');
+        $builder->orderBy('no_penerimaan_barang', 'desc')
         ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
-        ->where('createdAt <=', $last_day . " 23:59:59")
-        ->where($conditions)
-        ->countAllResults(false) + 1;
+        ->where('createdAt <=', $last_day . " 23:59:59");
+        $builder->like('no_penerimaan_barang', $lastStr);
+        $query = $builder->get();
 
-        if ($no != '') {
-            $filt_no = "LPB/". $no . "/" . $thn . "/" . $bln;
-        }
-        return $filt_no;
+        $kode = 'LPB';
+
+        $lastPenerimaan = '1';
+        if ($query->getResultArray()) {
+            $lastPenerimaan = explode('/', $query->getResultArray()[0]['no_penerimaan_barang']);
+            $lastPenerimaan = intval($lastPenerimaan[1]) + 1;
+        };
+
+        $generatedNo = $kode . '/' . $lastPenerimaan . '/' . $lastStr;
+
+        return $generatedNo;
     }
 
     public function getReceivedItemsBySupplier($supplierId, $condition = [], $limit = 10, $offset = 0)

@@ -126,7 +126,7 @@ class PenerimaanBarangImport extends BaseController
                     {
                         $supplier_id = $dataPenerimaanBarang->supplier_id;
 
-                        $dataNo = $this->amPurchaseOrderModel->getNoPenerimaanBarangPenolong("Import", $supplier_id, $this->this_company_id);
+                        $dataNo = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Import", $supplier_id, $this->this_company_id);
 
                         //Get Supplier
                         $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN PENOLONG', $this->this_company_id);
