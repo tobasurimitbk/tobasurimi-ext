@@ -70,8 +70,8 @@
                     <div class="col-md-3">
                         <?php if (!empty($dataPOImport)) { ?>
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP (Opsional)">
-                                <label for="floatingInput">No. SPP (Opsional)</label>
+                                <input type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
+                                <label for="floatingInput">No. SPP</label>
                             </div>
                         <?php } else { ?>
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -718,6 +718,9 @@
 
         var validator = $(".create-form").validate({
             rules: {
+                po_no: {
+                    required: true
+                },
                 purchase_request_id: {
                     required: true
                 },
@@ -741,6 +744,9 @@
                 }
             },
             messages: {
+                po_no: {
+                    required: "No. PO wajib diisi"
+                },
                 purchase_request_id: {
                     required: "No. SPP wajib diisi"
                 },

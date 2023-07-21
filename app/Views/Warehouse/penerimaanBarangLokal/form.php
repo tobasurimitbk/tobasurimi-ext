@@ -697,6 +697,9 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
+                no_penerimaan_barang: {
+                    required: true
+                },
                 supplier_id: {
                     required: true
                 },
@@ -744,6 +747,9 @@
                 }
             },
             messages: {
+                no_penerimaan_barang: {
+                    required: "No. Penerimaan wajib diisi"
+                },
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },

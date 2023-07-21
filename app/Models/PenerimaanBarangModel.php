@@ -16,6 +16,7 @@ class PenerimaanBarangModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'company_id',
         'supplier_id',
         'no_penerimaan_barang',
         'acceptance_type',
