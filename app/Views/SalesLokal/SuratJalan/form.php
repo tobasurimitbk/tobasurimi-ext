@@ -27,8 +27,8 @@
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php
-                                if (!empty($dataCustomer)) {
-                                    foreach ($dataCustomer as $customer) {
+                                if (!empty($dataCustomers)) {
+                                    foreach ($dataCustomers as $customer) {
                                 ?>
                                         <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php
@@ -67,23 +67,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_po" name="id_po" id="id_po" <?= !empty($data) ? ($data->id_po === true ? 'disabled=true' : '') : ''; ?>>
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataPo)) {
-                                    foreach ($dataPo as $po) {
-                                ?>
-                                        <option value="<?= $po->id; ?>" <?= !empty($data) ? ($data->po_id === $po->id ? "selected" : "") : ""; ?>><?= $po->name; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">PO</label>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row">
