@@ -69,12 +69,27 @@ class TerimaFakturLokal extends BaseController
             ->where($supplierCond)
             ->findAll();
 
+        $detSelectQry = "penerimaan_barang_detail_id AS id,
+                         'no_po' AS no_po, 
+                         DATE_FORMAT(lpb_date, '%d/%m/%Y') AS lpb_date, 
+                         lpb_no AS no_lpb,
+                         item_name,
+                         qty,
+                         unit,
+                         (qty * price) AS total";
         $detData = $tandaTerimaFakturDetModel->asObject()
-            ->select("tanda_terima_faktur_detail.*, DATE_FORMAT(lpb_date, '%d/%m/%Y') AS lpb_date")
+            ->select($detSelectQry)
             ->where('tanda_terima_faktur_id', $id)
             ->findAll();
 
+        $taxSelectQry = "DATE_FORMAT(tax_inv_date, '%d/%m/%Y') AS taxInvDate, 
+                         tax_inv_no AS taxInvNo, 
+                         tax_type AS taxType, 
+                         tax_amt AS taxAmt, 
+                         tax_status AS taxStatus, 
+                         tax_note AS taxNote";
         $taxData = $pajakTandaTerimaFakturModel->asObject()
+            ->select($taxSelectQry)
             ->where('tanda_terima_faktur_id', $id)
             ->findAll();
 
@@ -270,7 +285,7 @@ class TerimaFakturLokal extends BaseController
                 $detData[] = [
                     'penerimaan_barang_detail_id'   => $data['id'],
                     'po_no'                         => $data['no_po'],
-                    'lpb_date'                      => $data['lpb_date'],
+                    'lpb_date'                      => date("Y/m/d", strtotime(str_replace("/", "-", $data['lpb_date']))),
                     'lpb_no'                        => $data['no_lpb'],
                     'item_name'                     => $data['item_name'],
                     'qty'                           => $data['qty'],
@@ -291,18 +306,17 @@ class TerimaFakturLokal extends BaseController
             }
 
             // generate new inv number here
-            $fakturNo = '';
+            $fakturNo = $this->generateInvNumber();
             
             // save here
-            $tandaTerimaFakturModel->db->transStart(); // Query will be rolled back
+            $tandaTerimaFakturModel->db->transStart();
             $tandaTerimaData = [
                 'supplier_id'       => $postData['supplier_id'],
                 'faktur_no'         => $fakturNo,
-                // 'nominal_faktur'    => $invAmt,
                 'invoice_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['invoice_date']))),
                 'receive_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['receive_date']))),
-                'potongan'          => $postData['potongan'] ?? 0,
-                'tambahan'          => $postData['tambahan'] ?? 0,
+                'potongan'          => $postData['potongan'] ?: 0,
+                'tambahan'          => $postData['tambahan'] ?: 0,
                 // 'recipient'         => $postData['recipient'],
                 // 'sender'            => $postData['sender'],
                 'faktur_type'       => 'LOKAL',
@@ -346,9 +360,9 @@ class TerimaFakturLokal extends BaseController
         catch(\Exception $e)
         {
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
             ];
             echo json_encode($data);
         }
@@ -358,74 +372,167 @@ class TerimaFakturLokal extends BaseController
     public function updateTerimaFakturLokal()
     {
         try{
+            $postData = $this->request->getPost();
+            $postData["penerimaan_barang"] = json_decode($postData["penerimaan_barang"], true);
+            $postData["pengenaan_pajak"] = json_decode($postData["pengenaan_pajak"], true);
+
+            $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+            $tandaTerimaFakturDetModel = new TandaTerimaFakturDetailModel();
+            $penerimaanBarangDetModel = new PenerimaanBarangDetailModel();
+            $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
+
             $rules = [
+                "tipe_bahan" => [
+                    "rules" => "required|in_list[BAKU,PENOLONG]"
+                ],
                 "supplier_id" => [
                     "rules" => "required"
                 ],
-                "nominal_faktur" => [
+                "invoice_date" => [
+                    "rules" => "required|valid_date[d/m/Y]"
+                ],
+                "receive_date" => [
+                    "rules" => "required|valid_date[d/m/Y]"
+                ],
+                "potongan" => [
+                    "rules" => "permit_empty|is_natural"
+                ],
+                "tambahan" => [
+                    "rules" => "permit_empty|is_natural"
+                ],
+                "penerimaan_barang.*.id" => [
+                    "rules" => "required|is_natural_no_zero"
+                ],
+                "penerimaan_barang.*.no_po" => [
                     "rules" => "required"
                 ],
-                "due_date" => [
+                "penerimaan_barang.*.lpb_date" => [
+                    "rules" => "required|valid_date[d/m/Y]"
+                ],
+                "penerimaan_barang.*.no_lpb" => [
                     "rules" => "required"
                 ],
-                "date_of_receipt" => [
+                "penerimaan_barang.*.item_name" => [
                     "rules" => "required"
                 ],
+                "penerimaan_barang.*.qty" => [
+                    "rules" => "required|numeric"
+                ],
+                "penerimaan_barang.*.unit" => [
+                    "rules" => "required"
+                ],
+                "pengenaan_pajak.*.taxInvDate" => [
+                    "rules" => "permit_empty|valid_date[d/m/Y]"
+                ],
+                "pengenaan_pajak.*.taxInvNo" => [
+                    "rules" => "permit_empty"
+                ],
+                "pengenaan_pajak.*.taxType" => [
+                    "rules" => "permit_empty"
+                ],
+                "pengenaan_pajak.*.taxAmt" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "pengenaan_pajak.*.taxStatus" => [
+                    "rules" => "permit_empty"
+                ],
+                "pengenaan_pajak.*.taxNote" => [
+                    "rules" => "permit_empty"
+                ]
             ];
     
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $payload = json_encode([
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "multiple_po_id" => formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT"),
-                    "multiple_po_no" => json_decode($this->request->getPost("multiple_po_no")),
-                    "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
-                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
-                    "date_of_receipt" => $this->request->getPost("date_of_receipt") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("date_of_receipt")))) : "",
-                    "recipient" => $this->request->getPost("recipient"),
-                    "sender" => $this->request->getPost("sender"),
-                    "information" => $this->request->getPost("information"),
-                    "faktur_type" => "LOKAL",
-                    "tipe_bahan" => $this->request->getPost("tipe_bahan"),
-                    "user_id" => $this->user_id
-                ]);
-    
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
-                
-                $response = curl_request("PATCH", "/tandaTerimaFaktur/$id", $this->token, $payload);
-    
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (!$this->validateData($postData, $rules)) {
+                $errorList = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            $id = $postData["id"];
+            $detData = [];
+            $taxData = [];
+            $invAmt = 0;
+
+            $tandaTerimaFakturData = $tandaTerimaFakturModel->asObject()->find($id);
+
+            if (empty($tandaTerimaFakturData)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Data Tidak Ditemukan",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            foreach ($postData['penerimaan_barang'] as $data) {
+
+                $penDetData = $penerimaanBarangDetModel->asObject()
+                    ->find($data['penerimaan_barang_detail_id']);
+                $invAmt += $penDetData->harga * $data['qty'];
+
+                $detData[] = [
+                    'tanda_terima_faktur_id'        => $id,
+                    'penerimaan_barang_detail_id'   => $data['penerimaan_barang_detail_id'],
+                    'po_no'                         => $data['no_po'],
+                    'lpb_date'                      => date("Y/m/d", strtotime(str_replace("/", "-", $data['lpb_date']))),
+                    'lpb_no'                        => $data['no_lpb'],
+                    'item_name'                     => $data['item_name'],
+                    'qty'                           => $data['qty'],
+                    'unit'                          => $data['unit'],
+                    'price'                         => $penDetData->harga
+                ];
+            }
+
+            foreach ($postData['pengenaan_pajak'] as $data) {
+                $taxData[] = [
+                    'tax_inv_date'  => date("Y/m/d", strtotime(str_replace("/", "-", $data['taxInvDate']))),
+                    'tax_inv_no'    => $data['taxInvNo'],
+                    'tax_type'      => $data['taxType'],
+                    'tax_amt'       => $data['taxAmt'],
+                    'tax_status'    => $data['taxStatus'],
+                    'tax_note'      => $data['taxNote']
+                ];
+            }
+            
+            $tandaTerimaFakturModel->db->transStart();
+            $tandaTerimaData = [
+                'supplier_id'       => $postData['supplier_id'],
+                'invoice_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['invoice_date']))),
+                'receive_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['receive_date']))),
+                'potongan'          => $postData['potongan'] ?? 0,
+                'tambahan'          => $postData['tambahan'] ?? 0,
+                'faktur_type'       => 'LOKAL',
+                'information'       => $postData['information'],
+                'tipe_bahan'        => $postData['tipe_bahan']
+            ];
+            $tandaTerimaData['nominal_faktur'] = $invAmt + $tandaTerimaData['tambahan'] - $tandaTerimaData['potongan'];
+            $tandaTerimaFakturModel->update($id, $tandaTerimaData);
+
+            // delete all detail and insert the new one
+            $tandaTerimaFakturDetModel->where(['tanda_terima_faktur_id' => $id])->delete();
+
+            $tandaTerimaFakturDetModel->insertBatch($detData);
+
+            // delete all tax and insert the new one
+            $pajakTandaTerimaFakturModel->where(['tanda_terima_faktur_id' => $id])->delete();
+
+            if (count($taxData)) {
+
+                foreach ($taxData as &$data) {
+                    $data['tanda_terima_faktur_id'] = $id;
+                }
+    
+                // insert tax here
+                $pajakTandaTerimaFakturModel->insertBatch($taxData);
+            }
+
+            $tandaTerimaFakturModel->db->transComplete();
+            
         }
         catch(\Exception $e)
         {
@@ -481,6 +588,33 @@ class TerimaFakturLokal extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    private function generateInvNumber(): string
+    {
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+        
+        $month = idate('m');
+        $year = date('y');
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "/TT/$romanMonth/$year";
+        
+        $lastData = $tandaTerimaFakturModel->asObject()
+            ->like('faktur_no', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $invNumber = '001' . $numberTemplate;
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->faktur_no);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+
+        return $invNumber;
     }
 }
 ?>
