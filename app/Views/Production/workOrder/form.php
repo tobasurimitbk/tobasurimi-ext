@@ -6,7 +6,7 @@
 <div class="section-header">
     <h1 class="title-name">Tambah</h1>
     <div class="col-button-tambah-spp">
-        <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("material-request"); ?>">
+        <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("work-order"); ?>">
             Batal
         </a>
         <button class="btn btn-show-form btn-save float-right btn-submit-form">
@@ -163,7 +163,7 @@ $(document).ready(function() {
                     if(id)
                     {
                         $.ajax({
-                            url: "<?= base_url("material-request/update"); ?>",
+                            url: "<?= base_url("work-order/update"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -181,7 +181,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("material-request"); ?>" + "/id/" + id;
+                                        window.location.href = "<?= base_url("work-order"); ?>" + "/id/" + id;
                                     })
                                 } else {
                                     Swal.fire({
@@ -206,7 +206,7 @@ $(document).ready(function() {
                     else
                     {
                         $.ajax({
-                            url: "<?= base_url("material-request/save"); ?>",
+                            url: "<?= base_url("work-order/save"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -216,6 +216,7 @@ $(document).ready(function() {
                             processData: false,
                             contentType: false,
                             success: function(response) {
+                                console.log(response)
                                 csrf.val(response.token);
                                 if (response.status) {
                                     Swal.fire({
@@ -224,7 +225,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("material-request"); ?>" + "/id/" + response.id;
+                                        window.location.href = "<?= base_url("work-order"); ?>" + "/id/" + response.id;
                                     })
                                 } else {
                                     Swal.fire({
