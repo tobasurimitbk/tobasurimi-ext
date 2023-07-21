@@ -216,6 +216,7 @@ $routes->post('/po-lokal-bahan-penolong/delete', 'Purchase\POLokalBahanPenolong:
 $routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/all', 'Purchase\POImportBahanBaku::allPOImportBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/id/(:segment)', 'Purchase\POImportBahanBaku::getByIdPOImportBahanBaku/$1', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-baku/print/(:segment)', 'Purchase\POImportBahanBaku::print/$1', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-baku/create', 'Purchase\POImportBahanBaku::createPOImportBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-baku/save', 'Purchase\POImportBahanBaku::savePOImportBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-baku/update', 'Purchase\POImportBahanBaku::updatePOImportBahanBaku', ['filter' => 'Auth']);
@@ -226,6 +227,7 @@ $routes->post('/po-import-bahan-baku/delete', 'Purchase\POImportBahanBaku::delet
 $routes->get('/po-import-bahan-penolong', 'Purchase\POImportBahanPenolong::poImportBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/all', 'Purchase\POImportBahanPenolong::allPOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/id/(:segment)', 'Purchase\POImportBahanPenolong::getByIdPOImportBahanPenolong/$1', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/print/(:segment)', 'Purchase\POImportBahanPenolong::print/$1', ['filter' => 'Auth']);
 $routes->get('/po-import-bahan-penolong/create', 'Purchase\POImportBahanPenolong::createPOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-penolong/save', 'Purchase\POImportBahanPenolong::savePOImportBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-import-bahan-penolong/update', 'Purchase\POImportBahanPenolong::updatePOImportBahanPenolong', ['filter' => 'Auth']);
@@ -236,7 +238,7 @@ $routes->post('/po-import-bahan-penolong/delete', 'Purchase\POImportBahanPenolon
 $routes->get('/terima-faktur-lokal/getBySupplier/(:num)', 'Purchase\TerimaFakturLokal::getBySupplierId/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimafakturLokal', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimafakturLokal', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/(:num)', 'Purchase\TerimaFakturLokal::getByIdTerimafakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
@@ -332,6 +334,15 @@ $routes->get('/order-form-internasional/all', 'SalesInternasional\OrderForm::all
 $routes->post('/order-form-internasional/save', 'SalesInternasional\OrderForm::create', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm::delete', ['filter' => 'Auth']);
+
+// PRODUKSI
+// Rencana Produksi
+$routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
+$routes->get('/material-request/id/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
+$routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
+$routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
+$routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
+$routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
 
 
 // DROPDOWN

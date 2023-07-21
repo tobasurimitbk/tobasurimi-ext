@@ -5,6 +5,7 @@ namespace App\Controllers\Purchase;
 use App\Controllers\BaseController;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
+use App\Models\SupplierModel;
 
 
 class POLokalBahanBaku extends BaseController
@@ -47,28 +48,29 @@ class POLokalBahanBaku extends BaseController
     public function getByIdPOLokalBahanBaku($id = null)
     {
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+        $supplierModel = new SupplierModel();
+        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        foreach (array_keys($dataSupplier) as $key) {
+            $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         $data = [
             "dataSupplier" => $dataSupplier
         ];
 
-        if (!empty($id)) {
-            $responsePOLokal = curl_request("GET", "/rawMaterialPO/$id", $this->token);
-            $dataPOLokal = [];
-            if ($responsePOLokal["code"] === 200) {
-                $dataPOLokal = json_decode($responsePOLokal["body"])->data;
-            }
-            $data["dataPOLokal"] = $dataPOLokal;
+        $RMPurchaseOrderModel = new RMPurchaseOrderModel();
+        $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
 
-            // var_dump($dataPOLokal);
-            // die;
+        if (!empty($id)) {
+            $dataBBLokal = $RMPurchaseOrderModel->getPoBBLokalById($id);
+            // $dataBBLokal->supplier_id = intval($dataBBLokal->supplier_id);
+            $dataBBLokalDetail = $RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
+            $data["dataPOLokal"] = $dataBBLokal;
+            $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
+
+        // dd($data);
 
         return view('Purchase/poLokalBahanBaku/form', $data);
 
@@ -119,12 +121,9 @@ class POLokalBahanBaku extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $SppModel = new SppModel();
+        $BBLokalModel = new RMPurchaseOrderModel();
 
-        $condition = [
-            // "spp_type"      => "Bahan Baku Lokal",
-            "is_posted"     => 1
-        ];
+        $condition = [];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -135,7 +134,7 @@ class POLokalBahanBaku extends BaseController
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $poData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);
+        $poData = $BBLokalModel->getPoBBList($condition, $addCondition, $limit, $offset);
 
         $dataPOLokal = [];
 
@@ -143,12 +142,12 @@ class POLokalBahanBaku extends BaseController
 
         foreach ($poData['data'] as $data) {
             array_push($dataPOLokal, [
-                "no" => $no++,
-                "id" => $data->id,
-                "po_date" => $data->po_date,
-                // "po_no" => $data->spp_no,
-                // "supplierName" => $data->supplierName,
-                // "itemCount" => $data->itemCount
+                "no"            => $no++,
+                "id"            => $data->id,
+                "po_date"       => date('Y-m-d', strtotime($data->po_date)),
+                "po_no"         => $data->po_no,
+                "supplierName"  => $data->supplierName,
+                "itemCount"     => $data->itemCount
             ]);
         }
 

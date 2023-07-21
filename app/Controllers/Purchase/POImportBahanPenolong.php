@@ -9,6 +9,7 @@ use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
+use Dompdf\Dompdf;
 
 class POImportBahanPenolong extends BaseController
 {
@@ -21,6 +22,7 @@ class POImportBahanPenolong extends BaseController
     protected $amPurchaseOrderDetailModel;
     protected $sppModel;
     protected $supplierModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -33,6 +35,7 @@ class POImportBahanPenolong extends BaseController
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function poImportBahanPenolong()
@@ -138,6 +141,7 @@ class POImportBahanPenolong extends BaseController
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
                 "currency"      => $data->currency,
+                "is_posted"     => $data->is_posted
             ]);
         }
 
@@ -207,6 +211,7 @@ class POImportBahanPenolong extends BaseController
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "warehouse_id" => $warehouse_id,
+                    "po_type" => "Import",
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "total" => $this->request->getPost("total"),
@@ -378,15 +383,16 @@ class POImportBahanPenolong extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
                 $warehouse_id = formatter($this->request->getPost("warehouse_id"), "STR_TO_INT");
-                $warehouse_name = $this->request->getPost("warehouse_name");
+                $warehouse = $this->request->getPost("warehouse");
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $warehouse_name, date('y'), $warehouse_id, $last_day);
+                $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $warehouse, date('y'), $warehouse_id, $last_day);
 
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "warehouse_id" => $warehouse_id,
+                    "po_type" => "Import",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
@@ -660,6 +666,47 @@ class POImportBahanPenolong extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id = null) 
+    {
+        if($id)
+        {
+            $filename = "PO Import Bahan Penolong";
+
+            $data = [];
+            $dataPO = $this->amPurchaseOrderModel->getPOById($id);
+
+            if($dataPO)
+            {
+                $dataPODetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+
+                if($dataPODetail)
+                {
+                    $data["dataPO"] = $dataPO;
+                    $data["dataPODetail"] = $dataPODetail;
+                }
+            }
+
+            // var_dump($dataPODetail);
+            // die;
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Purchase/poImportBahanPenolong/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
     }
 
     public function dropdownPOImportBahanPenolong()

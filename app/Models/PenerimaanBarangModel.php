@@ -185,8 +185,8 @@ class PenerimaanBarangModel extends Model
         $sort = $availableSort[$condition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
         $sortType = $availableSortType[$condition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "penerimaan_barang.id AS id,
-                      penerimaan_barang.validation_date AS lpb_date,
+        $selectQry = "penerimaan_barang_detail.id AS id,
+                      DATE_FORMAT(penerimaan_barang.validation_date, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang.no_penerimaan_barang AS no_lpb,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       penerimaan_barang_detail.qty AS lpb_qty,

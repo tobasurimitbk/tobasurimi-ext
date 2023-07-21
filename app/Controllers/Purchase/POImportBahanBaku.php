@@ -9,6 +9,7 @@ use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
+use Dompdf\Dompdf;
 
 class POImportBahanBaku extends BaseController
 {
@@ -21,6 +22,7 @@ class POImportBahanBaku extends BaseController
     protected $rmImportPODetailModel;
     protected $sppModel;
     protected $supplierModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -33,6 +35,7 @@ class POImportBahanBaku extends BaseController
         $this->rmImportPODetailModel = new RMImportPODetailModel();
         $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function poImportBahanBaku()
@@ -137,6 +140,7 @@ class POImportBahanBaku extends BaseController
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
                 "currency"      => $data->currency,
+                "is_posted"     => $data->is_posted,
             ]);
         }
 
@@ -659,6 +663,47 @@ class POImportBahanBaku extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id = null) 
+    {
+        if($id)
+        {
+            $filename = "PO Import Bahan Baku";
+
+            $data = [];
+            $dataPO = $this->rmImportPOModel->getPOById($id);
+
+            if($dataPO)
+            {
+                $dataPODetail = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+
+                if($dataPODetail)
+                {
+                    $data["dataPO"] = $dataPO;
+                    $data["dataPODetail"] = $dataPODetail;
+                }
+            }
+
+            // var_dump($dataPODetail);
+            // die;
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Purchase/poImportBahanBaku/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanBaku/print', $data);
+        }
     }
 
     public function dropdownPOImportBahanBaku()

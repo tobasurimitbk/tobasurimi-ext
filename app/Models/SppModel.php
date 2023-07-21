@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use CodeIgniter\I18n\Time;
+
 use CodeIgniter\Model;
 
 class SppModel extends Model
@@ -114,7 +116,7 @@ class SppModel extends Model
     public function getSppById($id)
     {
         $selectQry = "purchase_requests.*,
-        warehouses.warehouse_name AS warehouseName, 
+        warehouses.warehouse_name AS warehouseName,
         createdBy.name AS createdByName
         ";
 
@@ -140,5 +142,59 @@ class SppModel extends Model
         $query = $builder->get();
 
         return $query->getResultArray();
+    }
+
+    public function genereteNoSpp($warehouse)
+    {
+        $romanNumb = [
+            'I',
+            'II',
+            'III',
+            'IV',
+            'V',
+            'VI',
+            'VII',
+            'VIII',
+            'IX',
+            'X',
+            'XI',
+            'XII',
+        ];
+
+        $today = Time::today('America/Chicago', 'en_US');
+
+        $year = $today->getYear();
+        $month = $today->getMonth() - 1;
+
+        $warehouse = str_replace(' ', '', $warehouse);
+
+        $lastStr =  $warehouse . '/' . $romanNumb[$month] . '/' . $year;
+
+        $builder = $this->db->table('purchase_requests');
+        $builder->select('spp_no');
+        $builder->orderBy('spp_no', 'desc');
+        $builder->like('spp_no', $lastStr);
+        $query = $builder->get();
+
+        $increment = '01';
+
+        if ($query->getResultArray()) {
+            $lastSpp = explode('/', $query->getResultArray()[0]['spp_no']);
+            $lastSpp = intval($lastSpp[0]) + 1;
+
+            if ($lastSpp < 10) {
+                $lastSpp = "0" . $lastSpp . "";
+            } else {
+                $lastSpp = strval($lastSpp);
+            }
+
+            $increment = $lastSpp;
+        };
+
+
+
+        $generatedSppNo = $increment . '/' . $lastStr;
+
+        return $generatedSppNo;
     }
 }

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class SupplierModel extends Model
+class TandaTerimaFakturModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'suppliers';
+    protected $table            = 'tanda_terima_faktur';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -15,27 +15,21 @@ class SupplierModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'company_id', 
-        'kode', 
-        'name', 
-        'address', 
-        'province_id', 
-        'city_id', 
-        'postal_code',
-        'no_npwp', 
-        'phone', 
-        'contact_person',
-        'email',
-        'no_rekening',
-        'supplier_buyer',
-        'type',
-        'kategori',
-        'ap_id',
-        'ar_id'
+        'supplier_id',
+        'faktur_no',
+        'nominal_faktur',
+        'invoice_date',
+        'receive_date',
+        'potongan',
+        'tambahan',
+        'faktur_type',
+        'information',
+        'tipe_bahan',
+        'user_id',
     ];
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -58,7 +52,7 @@ class SupplierModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getSupplierList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getInvoiceList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
             'kode'              => 'suppliers.kode',
@@ -71,35 +65,33 @@ class SupplierModel extends Model
             'supplier_buyer'    => 'suppliers.supplier_buyer',
             'province'          => 'provinces.province_name',
             'city'              => 'cities.city_name',
-            'postal_code'       => 'suppliers.postal_code',
-            'createdAt'         => 'suppliers.createdAt',
-            'updatedAt'         => 'suppliers.updatedAt',
+            'postal_code'       => 'cities.postal_code',
+            'createdAt'         => 'tanda_terima_faktur.createdAt',
+            'updatedAt'         => 'tanda_terima_faktur.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'tanda_terima_faktur.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "suppliers.*, 
-                      cities.city_name AS city_name, 
-                      provinces.province_name AS province_name,
-                      ap.nama_sub AS ap_name,
-                      ar.nama_sub AS ar_name";
+        $selectQry = "tanda_terima_faktur.*, 
+                      DATE_FORMAT(tanda_terima_faktur.invoice_date, '%d/%m/%Y') AS invoice_date, 
+                      DATE_FORMAT(tanda_terima_faktur.receive_date, '%d/%m/%Y') AS receive_date, 
+                      suppliers.name AS supplierName,
+                      users.name AS userName";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('cities', 'suppliers.city_id = cities.id')
-            ->join('provinces', 'suppliers.province_id = provinces.id')
-            ->join('sub_akuns AS ap', 'suppliers.ap_id = ap.id')
-            ->join('sub_akuns AS ar', 'suppliers.ar_id = ar.id')
+            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id')
+            ->join('users', 'users.id = tanda_terima_faktur.user_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
 
         if ($addCondition['search']) {
             $supplierDataQry->groupStart()
-                ->like('name', $addCondition['search'])
-                ->orLike('kode', $addCondition['search'])
+                ->like('suppliers.name', $addCondition['search'])
+                ->orLike('faktur_no', $addCondition['search'])
             ->groupEnd();
         }
         
@@ -111,32 +103,5 @@ class SupplierModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
-    }
-
-    public function getSupplierById($id)
-    {
-        $supplierData = $this->asObject()
-            ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name')
-            ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id')
-            ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id')
-            ->find($id);
-
-        return $supplierData;
-    }
-
-    public function getSupplierByKategoriAndType($kategori, $type, $company_id)
-    {
-        $arrCondition = [
-            'deletedAt' => null,
-            'kategori' => $kategori,
-            'type' => $type,
-            'company_id' => $company_id
-        ];
-
-        $builder = $this->db->table('suppliers');
-        $builder->where($arrCondition);
-        $query = $builder->get();
-        
-        return $query->getResultArray();
     }
 }
