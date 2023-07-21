@@ -51,7 +51,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so" id="id_so" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_so" name="id_so" id="id_so" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {
@@ -122,32 +122,7 @@
             .find('label')
             .css('z-index', '1');
 
-        // PO
-        $('.id_po').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.id_po')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.id_po')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_po')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
         // SO
         $('.id_so').select2({
@@ -170,6 +145,11 @@
             .children('span')
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.id_so')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $('.id_so')
             .parent('div')
@@ -240,6 +220,29 @@
         },
     });
 
+    $(".id_customer").change(function() {
+        if ($(".id_customer").val()) {
+            let customerId = $(".id_customer").val();
+            $.ajax({
+                url: "<?= base_url('/surat-jalan/sales-order'); ?>" + "/" + customerId,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".id_so").empty();
+                    $(".id_So").append(`<option value=""></option>`);
+
+                    // console.log(res.dataWarehouse)
+                    res.forEach(function(item) {
+                        $(".id_so").append(`<option  value="${item.id}">${item.no_sales_order}</option>`);
+                    })
+                }
+            })
+
+        } else {
+            $(".id_customer").attr("readonly", false)
+            $(".id_so").val("");
+        }
+    });
 
     $(".btn-submit").click(function() {
         if ($(".create-form").valid()) {
@@ -263,93 +266,93 @@
                     console.log(data.entries());
 
                     // // UPDATE
-                    // if (id) {
-                    //     $.ajax({
-                    //         url: "<?= base_url("pinjaman-karyawan/update"); ?>",
-                    //         data: data,
-                    //         beforeSend: function(xhr) {
-                    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    //         },
-                    //         method: "POST",
-                    //         dataType: "json",
-                    //         processData: false,
-                    //         contentType: false,
-                    //         success: function(response) {
-                    //             csrf.val(response.token);
-                    //             if (response.status) {
-                    //                 stopLoading()
-                    //                 Swal.fire({
-                    //                         icon: 'success',
-                    //                         title: response.message,
-                    //                         confirmButtonColor: '#4e73df',
-                    //                     })
-                    //                     .then(() => {
-                    //                         window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                    //                     })
-                    //             } else {
-                    //                 Swal.fire({
-                    //                     icon: 'error',
-                    //                     title: response.message,
-                    //                     confirmButtonColor: '#4e73df',
-                    //                 })
-                    //                 stopLoading()
-                    //             }
-                    //         },
-                    //         onError: function(response) {
-                    //             csrf.val(response.token);
-                    //             Swal.fire({
-                    //                 icon: 'error',
-                    //                 title: 'Data Gagal Disimpan, coba Lagi',
-                    //                 confirmButtonColor: '#4e73df',
-                    //             })
-                    //             stopLoading()
-                    //         }
-                    //     });
-                    // }
-                    // // CREATE
-                    // else {
-                    //     $.ajax({
-                    //         url: "<?= base_url("pinjaman-karyawan/save"); ?>",
-                    //         data: data,
-                    //         beforeSend: function(xhr) {
-                    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    //         },
-                    //         method: "POST",
-                    //         dataType: "json",
-                    //         processData: false,
-                    //         contentType: false,
-                    //         success: function(response) {
-                    //             csrf.val(response.token);
-                    //             if (response.status) {
-                    //                 stopLoading()
-                    //                 Swal.fire({
-                    //                         icon: 'success',
-                    //                         title: response.message,
-                    //                         confirmButtonColor: '#4e73df',
-                    //                     })
-                    //                     .then(() => {
-                    //                         window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                    //                     })
-                    //             } else {
-                    //                 Swal.fire({
-                    //                     icon: 'error',
-                    //                     title: response.message,
-                    //                     confirmButtonColor: '#4e73df',
-                    //                 })
-                    //                 stopLoading()
-                    //             }
-                    //         },
-                    //         onError: function(response) {
-                    //             csrf.val(response.token);
-                    //             Swal.fire({
-                    //                 icon: 'error',
-                    //                 title: 'Data Gagal Disimpan, coba Lagi',
-                    //                 confirmButtonColor: '#4e73df',
-                    //             })
-                    //             stopLoading()
-                    //         }
-                    //     });
-                    // }
+                    if (id) {
+                        $.ajax({
+                            url: "<?= base_url("pinjaman-karyawan/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+                    // CREATE
+                    else {
+                        $.ajax({
+                            url: "<?= base_url("pinjaman-karyawan/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
                 }
             })
         }
