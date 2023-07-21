@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use CodeIgniter\I18n\Time;
-
 use CodeIgniter\Model;
 
 class WorkOrdersModel extends Model
@@ -99,7 +97,7 @@ class WorkOrdersModel extends Model
         ];
     }
 
-    public function get_no()
+    public function get_no($tgl, $bln, $thn, $last_day)
     {
         $romanNumb = [
             'I',
@@ -116,16 +114,13 @@ class WorkOrdersModel extends Model
             'XII',
         ];
 
-        $today = Time::today('America/Chicago', 'en_US');
-
-        $year = $today->getYear();
-        $month = $today->getMonth() - 1;
-
-        $lastStr =  $romanNumb[$month] . '/' . $year;
+        $lastStr =  $romanNumb[$bln - 1] . '/' . $thn;
 
         $builder = $this->db->table('work_orders');
-        $builder->select('*');
-        $builder->orderBy('wo_no', 'desc');
+        $builder->select('wo_no');
+        $builder->orderBy('wo_no', 'desc')
+        ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+        ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('wo_no', $lastStr);
         $query = $builder->get();
 
@@ -134,7 +129,7 @@ class WorkOrdersModel extends Model
         $lastWO = '0001';
         if ($query->getResultArray()) {
             $lastWO = explode('/', $query->getResultArray()[0]['wo_no']);
-            $lastWO = intval($lastWO[0]) + 1;
+            $lastWO = intval($lastWO[3]) + 1;
 
             $lastWO = sprintf("%04d", $lastWO);
         };

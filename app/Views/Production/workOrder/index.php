@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1>Rencana Produksi</h1>
 
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request/create"); ?>">
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("work-order/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
@@ -27,7 +27,7 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('production_amt')" class="sort">Hasil</th>
-                                <th>Permintaan Material</th>
+                                <th>Tambah Permintaan Material</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -64,7 +64,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("material-request/all"); ?>",
+            url: "<?= base_url("work-order/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -115,7 +115,7 @@
                     return `
                         <div class="mt-0">
                             <button class="btn btn-success posting-spp">
-                                Permintaan Material
+                                Tambah Permintaan Material
                             </button>
                         </div>
                     `
@@ -144,10 +144,10 @@
             table.ajax.reload();
         })
 
-        // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        //     const data = table.row(this).data();
-        //     location.replace(`<?= base_url("material-request/id"); ?>/${data.id}`);
-        // })
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            location.replace(`<?= base_url("work-order/id"); ?>/${data.id}`);
+        })
     })
 
     const changeSort = function(val) {

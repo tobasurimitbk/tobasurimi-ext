@@ -148,21 +148,27 @@ class AMPurchaseOrderModel extends Model
 
     public function get_no($tgl, $bln, $thn, $warehouse, $thn2, $warehouse_id, $last_day)
     {
-        $filt_no = $tgl . $bln . $thn . "-01/" . $warehouse . "/TOBA/" . $thn2;
+        $lastStr =  $tgl . $bln . $thn;
 
-        $conditions = [
-            'warehouse_id' => $warehouse_id,
-            'deletedAt' => null
-        ];
+        $builder = $this->db->table('am_purchase_orders');
+        $builder->select('po_no');
+        $builder->orderBy('po_no', 'desc')
+        ->where('warehouse_id', $warehouse_id)
+        ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+        ->where('createdAt <=', $last_day . " 23:59:59");
+        $builder->like('po_no', $lastStr);
+        $query = $builder->get();
 
-        $no = $this->db->table('am_purchase_orders')
-        ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
-        ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
-        ->where($conditions)->countAllResults(false) + 1;
+        $lastPO = '1';
+        if ($query->getResultArray()) {
+            $lastFirst = explode('/', $query->getResultArray()[0]['po_no']);
+            $lastPO = explode('-', $lastFirst[0]);
+            $lastPO = intval($lastPO[1]) + 1;
+            $lastPO = sprintf("%02d", $lastPO);
+        };
 
-        if ($no != '') {
-            $filt_no = $tgl . $bln . $thn . "-". sprintf("%02d", $no). "/" . $warehouse . "/TOBA/" . $thn2;
-        }
-        return $filt_no;
+        $generatedNo =  $lastStr . '-' . $lastPO . '/' . $warehouse . '/TOBA/' . $thn2;
+
+        return $generatedNo;
     }
 }

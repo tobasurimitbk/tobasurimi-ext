@@ -698,6 +698,9 @@
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
+                no_penerimaan_barang: {
+                    required: true
+                },
                 supplier_id: {
                     required: true
                 },
@@ -745,6 +748,9 @@
                 }
             },
             messages: {
+                no_penerimaan_barang: {
+                    required: "No. Penerimaan wajib diisi"
+                },
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },
@@ -2223,6 +2229,61 @@
             $(".view-modal").modal("hide")
         })
 
+        $(".multiple_po_id").change(function() {
+            total_jml_order = 0;
+            total_jml_dokumen = 0;
+            total_jml_masuk = 0;
+            total_jml_selisih = 0;
+            total_jml_konversi = 0;
+            total_jml_harga = 0;
+            total_jml_penyerahan = 0;
+
+            list_items.map(item => {
+                list_delete.push(item)
+            })
+
+            row = 0;
+            list_items = [];
+            $(".body-detail-table").empty();
+
+            let tag_total = "";
+            $(".foot-detail-table").empty()
+            tag_total += `<tr>`;
+            tag_total += `<td>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += `TOTAL`;
+            tag_total += "</td>";
+            tag_total += `<td colspan='2'>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td colspan="2">`;
+            tag_total += "</td>";
+            tag_total += "</tr>";
+
+            $(".foot-detail-table").append(tag_total);
+        })
+
         $(".kode_barang").change(function() {
             if(trigger) {
                 list_warehouse = [];
@@ -2332,6 +2393,7 @@
         // })
 
         $(".supplier_id").change(function() {
+
             if($(".supplier_id option:selected").val())
             {
                 if($(".tipe_bahan").val() === "BAKU")
@@ -2952,6 +3014,10 @@
         total_jml_harga = 0;
         total_jml_penyerahan = 0;
 
+        list_items.map(item => {
+            list_delete.push(item)
+        })
+
         row = 0;
         list_items = [];
         $(".body-detail-table").empty();
@@ -2993,10 +3059,12 @@
 
         $(".foot-detail-table").append(tag_total);
 
+        $(".supplier_id").attr("disabled", "true");
+
         if($(".tipe_bahan").val() === "BAKU")
         {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+                url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -3007,6 +3075,7 @@
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
+                    $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }
@@ -3015,7 +3084,7 @@
         if($(".tipe_bahan").val() === "PENOLONG")
         {
             $.ajax({
-                url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+                url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -3026,6 +3095,7 @@
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
+                    $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }

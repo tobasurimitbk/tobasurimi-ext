@@ -10,8 +10,9 @@ use App\Models\BarangModel;
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
 use App\Models\SalesOrderDetailModel;
+use App\Models\AllNoModel;
 use Error;
-use PhpParser\Node\Stmt\TryCatch;
+
 
 class OrderForm extends BaseController
 {
@@ -25,6 +26,7 @@ class OrderForm extends BaseController
     protected $DetailStockBarang;
     protected $SalesOrderDetailModel;
     protected $db;
+    protected $AllNoModel;
 
     public function __construct()
     {
@@ -37,6 +39,7 @@ class OrderForm extends BaseController
         $this->WarehousesModel = new WarehousesModel();
         $this->DetailStockBarang = new DetailStockBarang();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
+        $this->AllNoModel = new AllNoModel();
         $this->db = \Config\Database::connect();
     }
 
@@ -74,11 +77,10 @@ class OrderForm extends BaseController
         ];
 
 
-        $condition = [];
+        $condition = ['deletedAt' => null];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "spp_type"      => $this->request->getGet("spp_type"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
@@ -232,47 +234,56 @@ class OrderForm extends BaseController
             //return redirect()->to('/order-form-lokal/create')->back()->withInput();
         }
 
-        $noSalesOrder = null;
-        $orderDate = $this->request->getPost('order_date');
-        $shippingDate = $this->request->getPost('shipping_date');
 
-        $values = [
-            "no_sales_order" => $noSalesOrder,
-            "id_user" => $this->request->getPost('id_user'),
-            "id_po" => $this->request->getPost('id_po'),
-            "id_customer" => $this->request->getPost('id_customer'),
-            "destination" => $this->request->getPost('destination'),
-            "order_date" => $orderDate ? date("Y/m/d", strtotime(str_replace("/", "-", $orderDate))) : "",
-            "shipping_date" => $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-            "payment_terms" => $this->request->getPost('payment_terms'),
-            "keterangan" => $this->request->getPost('parent_keterangan'),
-            "discount_rupiah" => $this->request->getPost('discount_rupiah'),
-            "discount_percentage" => $this->request->getPost('discount_percentage'),
-            "ppn" => $this->request->getPost('ppn'),
-            "estimated_freight" => $this->request->getPost('estimated_freight'),
-            "tax_status" => $this->request->getPost('tax_status'),
-            "include_pa" => $this->request->getPost('include_pa'),
-            "total_harga" => $this->request->getPost('total'),
-            "tipe_sales_order" => $this->request->getPost('tipe_sales_order'),
-        ];
 
         try {
             $this->db->transBegin();
+
+            $code = "SLL";
+            $currentYear = date('Y');
+            $currentMonth = date('m');
+            $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
+            $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
+            $noSalesOrder = "SLL/" . $number . "/" . $currentYear . "/" . $currentMonth;
+            $orderDate = $this->request->getPost('order_date');
+            $shippingDate = $this->request->getPost('shipping_date');
+
+            $values = [
+                "no_sales_order" => $noSalesOrder,
+                "id_user" => $this->request->getPost('id_user'),
+                "id_po" => $this->request->getPost('id_po'),
+                "id_customer" => $this->request->getPost('id_customer'),
+                "destination" => $this->request->getPost('destination'),
+                "order_date" => $orderDate ? date("Y/m/d", strtotime(str_replace("/", "-", $orderDate))) : "",
+                "shipping_date" => $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
+                "payment_terms" => $this->request->getPost('payment_terms'),
+                "keterangan" => $this->request->getPost('parent_keterangan'),
+                "discount_rupiah" => $this->request->getPost('discount_rupiah'),
+                "discount_percentage" => $this->request->getPost('discount_percentage'),
+                "ppn" => $this->request->getPost('ppn'),
+                "estimated_freight" => $this->request->getPost('estimated_freight'),
+                "tax_status" => $this->request->getPost('tax_status'),
+                "include_pa" => $this->request->getPost('include_pa'),
+                "total_harga" => $this->request->getPost('total'),
+                "tipe_sales_order" => $this->request->getPost('tipe_sales_order'),
+            ];
+
+
+
             // Create a new validation instance
             $dataSalesOrder =  $this->SalesOrderModel->insert($values);
+            $totalQty = 0;
             foreach ($items as $row) {
                 $item = $this->DetailStockBarang
                     ->where('barang_id', $row->id_barang)
                     ->where('warehouse_id', $row->warehouse_id)
                     ->first();
 
-                echo $item;
-
-                if ($item->stok < $row->qty) {
+                if ($item['stok'] < $row->qty) {
                     throw new Error('barang tidak boleh kurang dari stock');
                     return;
                 }
-
+                $totalQty = $totalQty + $row->qty;
                 $valueBarang = [
                     "id_sales_order" => $dataSalesOrder,
                     "id_barang" => $row->id_barang,
@@ -286,10 +297,12 @@ class OrderForm extends BaseController
                 ];
                 $this->SalesOrderDetailModel->save($valueBarang);
                 $stok = [
-                    "stok" => ($item->stok - $row->qty),
+                    "stok" => ($item['stok'] - $row->qty),
                 ];
-                $this->DetailStockBarang->update($item->id, $stok);
+                $this->DetailStockBarang->update($item['id'], $stok);
             }
+
+            $this->SalesOrderModel->update($dataSalesOrder, ['qty_barang' => $totalQty]);
             $this->db->transCommit();
 
             $data = [
@@ -306,7 +319,7 @@ class OrderForm extends BaseController
             //echo "Transaction failed: " . $e->getMessage();
             $data = [
                 "status"            => false,
-                "message"    => "Data Gagal Disimpan",
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 "payload"   => $values,
                 'token' => csrf_hash(),
             ];
@@ -485,6 +498,8 @@ class OrderForm extends BaseController
         try {
             // Create a new validation instance
             $dataSalesOrder =  $this->SalesOrderModel->update($payload['id'], $values);
+
+            $totalQty = 0;
             foreach ($items as $row) {
                 $item = $this->DetailStockBarang
                     ->where('barang_id', $row->id_barang)
@@ -498,20 +513,21 @@ class OrderForm extends BaseController
                     if ($dataBefore->qty > $row->qty) {
                         $dataItems = $dataBefore->qty - $row->qty;
                         $stok = [
-                            "stok" => ($item->stok + $dataItems),
+                            "stok" => ($item['stok'] + $dataItems),
                         ];
                     } else {
                         $dataItems =  $row->qty - $dataBefore->qty;
-                        $checkItems = $item->stok - $dataItems;
+                        $checkItems = $item['stok'] - $dataItems;
 
 
                         if ($checkItems < 0) {
                             throw new Error('barang tidak boleh kurang dari stock');
                         }
                         $stok = [
-                            "stok" => ($item->stok - $dataItems),
+                            "stok" => ($item['stok'] - $dataItems),
                         ];
                     }
+                    $totalQty = $totalQty + $row->qty;
 
                     $valueBarang = [
                         "id_barang" => $row->id_barang,
@@ -524,19 +540,20 @@ class OrderForm extends BaseController
                         "id_warehouse" => $row->warehouse_id,
                     ];
 
-                    $this->DetailStockBarang->update($item->id, $stok);
+                    $this->DetailStockBarang->update($item['id'], $stok);
 
                     $this->SalesOrderDetailModel->update($row->id, $valueBarang);
                 } else if ($row->id && $row->isDeleted === true) {
                     $this->SalesOrderDetailModel->delete($row->id);
                     $stok = [
-                        "stok" => ($item->stok + $row->qty),
+                        "stok" => ($item['stok'] + $row->qty),
                     ];
-                    $this->DetailStockBarang->update($item->id, $stok);
+                    $this->DetailStockBarang->update($item['id'], $stok);
                 } else {
-                    if ($item->stok > $row->qty) {
+                    if ($item['stok'] > $row->qty) {
                         throw new Error('barang tidak boleh kurang dari stock');
                     }
+                    $totalQty = $totalQty + $row->qty;
 
                     $valueBarang = [
                         "id_sales_order" => $payload['id'],
@@ -551,11 +568,13 @@ class OrderForm extends BaseController
                     ];
                     $this->SalesOrderDetailModel->save($valueBarang);
                     $stok = [
-                        "stok" => ($item->stok - $row->qty),
+                        "stok" => ($item['stok'] - $row->qty),
                     ];
-                    $this->DetailStockBarang->update($item->id, $stok);
+                    $this->DetailStockBarang->update($item['id'], $stok);
                 }
             }
+
+            $this->SalesOrderModel->update($payload['id'], ['qty_barang' => $totalQty]);
 
             $this->db->transCommit();
             $data = [
@@ -588,27 +607,29 @@ class OrderForm extends BaseController
 
 
             if (!empty($id)) {
-                $id = $this->encrypter->decrypt(hex2bin($id));
+                $this->db->transBegin();
 
+                $this->SalesOrderModel->delete($id);
+                $dataDetail = $this->SalesOrderDetailModel->where('id_sales_order', $id)->findAll();
 
-                $response = curl_request("DELETE", "/salesOrderLokal/$id", $this->token);
-
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                foreach ($dataDetail as $item) {
+                    $itemStock = $this->DetailStockBarang
+                        ->asObject()
+                        ->where('barang_id', $item['id_barang'])
+                        ->where('warehouse_id', $item['id_warehouse'])
+                        ->first();
+                    $stok = ['stok' => $itemStock->stok + $item['qty']];
+                    $this->DetailStockBarang->update($item['id'], $stok);
+                    $this->SalesOrderDetailModel->delete($item['id']);
                 }
+                $this->db->transCommit();
+
+                $data = [
+                    "status"            => true,
+                    "message"    => "Data Success Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
             } else {
                 $data = [
                     "status"            => false,
@@ -618,6 +639,8 @@ class OrderForm extends BaseController
                 echo json_encode($data);
             }
         } catch (\Exception $e) {
+            $this->db->transRollback();
+
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

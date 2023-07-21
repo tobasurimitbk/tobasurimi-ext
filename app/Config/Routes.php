@@ -337,12 +337,12 @@ $routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm:
 
 // PRODUKSI
 // Rencana Produksi
-$routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
-$routes->get('/material-request/id/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
-$routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
-$routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
-$routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
-$routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
+$routes->get('/work-order', 'Production\WorkOrder::index', ['filter' => 'Auth']);
+$routes->get('/work-order/id/(:segment)', 'Production\WorkOrder::getById/$1', ['filter' => 'Auth']);
+$routes->get('/work-order/create', 'Production\WorkOrder::createView', ['filter' => 'Auth']);
+$routes->get('/work-order/all', 'Production\WorkOrder::all', ['filter' => 'Auth']);
+$routes->post('/work-order/save', 'Production\WorkOrder::create', ['filter' => 'Auth']);
+$routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' => 'Auth']);
 
 
 // DROPDOWN
