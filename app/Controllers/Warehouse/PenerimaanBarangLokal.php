@@ -210,6 +210,9 @@ class PenerimaanBarangLokal extends BaseController
     {
         try{
             $rules = [
+                "no_penerimaan_barang" => [
+                    "rules" => "required"
+                ],
                 "supplier_id" => [
                     "rules" => "required"
                 ],
@@ -444,6 +447,9 @@ class PenerimaanBarangLokal extends BaseController
     {
         try{
             $rules = [
+                "no_penerimaan_barang" => [
+                    "rules" => "required"
+                ],
                 "supplier_id" => [
                     "rules" => "required"
                 ],

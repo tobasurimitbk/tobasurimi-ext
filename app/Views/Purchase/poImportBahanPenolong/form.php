@@ -718,6 +718,9 @@
 
         var validator = $(".create-form").validate({
             rules: {
+                po_no: {
+                    required: true
+                },
                 purchase_request_id: {
                     required: true
                 },
@@ -741,6 +744,9 @@
                 }
             },
             messages: {
+                po_no: {
+                    required: "No. PO wajib diisi"
+                },
                 purchase_request_id: {
                     required: "No. SPP wajib diisi"
                 },
