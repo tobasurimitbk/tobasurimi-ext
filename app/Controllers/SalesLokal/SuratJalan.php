@@ -104,4 +104,17 @@ class SuratJalan extends BaseController
     public function delete()
     {
     }
+
+    public function dropDownSalesOrder($idCustomer)
+    {
+        $data = $this->SalesOrderModel
+            ->asObject()
+            ->where(['id_customer' => $idCustomer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
+            ->select(['id', 'no_sales_order'])
+            ->findAll();
+
+
+        echo json_encode($data);
+        return;
+    }
 }
