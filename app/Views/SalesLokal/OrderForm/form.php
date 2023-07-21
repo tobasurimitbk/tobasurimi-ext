@@ -571,7 +571,6 @@
                 $(element).removeClass('select-class');
             },
         });
-        let warehouseId = null
         $(".id_barang").change(function() {
             if ($(".id_barang").val()) {
                 let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";

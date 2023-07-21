@@ -3,12 +3,14 @@
 namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
+use App\Models\CustomerModel;
 use Config\Services;
 
 class Invoice extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $CustomerModel;
     protected $encrypter;
 
     public function __construct()
@@ -16,6 +18,7 @@ class Invoice extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
+        $this->CustomerModel = new CustomerModel();
     }
 
     public function index()
@@ -25,7 +28,16 @@ class Invoice extends BaseController
 
     public function createView()
     {
-        return view('SalesLokal/Invoice/form');
+        //Get Customers
+        $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
+        $data = [
+            "dataCustomers" => $customers,
+            "id_user" => session()->get('login')->user_id,
+            "seller_name" => session()->get('login')->name,
+
+        ];
+        //echo json_encode($data);
+        return view('SalesLokal/Invoice/form', $data);
     }
 
     public function all()

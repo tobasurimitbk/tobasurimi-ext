@@ -27,8 +27,8 @@
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php
-                                if (!empty($dataCustomer)) {
-                                    foreach ($dataCustomer as $customer) {
+                                if (!empty($dataCustomers)) {
+                                    foreach ($dataCustomers as $customer) {
                                 ?>
                                         <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php

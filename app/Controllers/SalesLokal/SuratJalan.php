@@ -4,11 +4,15 @@ namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
 use Config\Services;
+use App\Models\SalesOrderModel;
+use App\Models\CustomerModel;
 
 class SuratJalan extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $CustomerModel;
+    protected $SalesOrderModel;
     protected $encrypter;
 
     public function __construct()
@@ -16,6 +20,8 @@ class SuratJalan extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
+        $this->CustomerModel = new CustomerModel();
+        $this->SalesOrderModel = new SalesOrderModel();
     }
 
     public function index()
@@ -25,7 +31,16 @@ class SuratJalan extends BaseController
 
     public function createView()
     {
-        return view('SalesLokal/SuratJalan/form');
+        //Get Customers
+        $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
+        $data = [
+            "dataCustomers" => $customers,
+            "id_user" => session()->get('login')->user_id,
+            "seller_name" => session()->get('login')->name,
+
+        ];
+
+        return view('SalesLokal/SuratJalan/form', $data);
     }
 
     public function all()
