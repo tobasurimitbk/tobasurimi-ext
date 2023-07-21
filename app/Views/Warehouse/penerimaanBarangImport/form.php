@@ -2229,6 +2229,61 @@
             $(".view-modal").modal("hide")
         })
 
+        $(".multiple_po_id").change(function() {
+            total_jml_order = 0;
+            total_jml_dokumen = 0;
+            total_jml_masuk = 0;
+            total_jml_selisih = 0;
+            total_jml_konversi = 0;
+            total_jml_harga = 0;
+            total_jml_penyerahan = 0;
+
+            list_items.map(item => {
+                list_delete.push(item)
+            })
+
+            row = 0;
+            list_items = [];
+            $(".body-detail-table").empty();
+
+            let tag_total = "";
+            $(".foot-detail-table").empty()
+            tag_total += `<tr>`;
+            tag_total += `<td>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += `TOTAL`;
+            tag_total += "</td>";
+            tag_total += `<td colspan='2'>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td colspan="2">`;
+            tag_total += "</td>";
+            tag_total += "</tr>";
+
+            $(".foot-detail-table").append(tag_total);
+        })
+
         $(".kode_barang").change(function() {
             if(trigger) {
                 list_warehouse = [];
@@ -2338,6 +2393,7 @@
         // })
 
         $(".supplier_id").change(function() {
+
             if($(".supplier_id option:selected").val())
             {
                 if($(".tipe_bahan").val() === "BAKU")
@@ -2957,6 +3013,10 @@
         total_jml_konversi = 0;
         total_jml_harga = 0;
         total_jml_penyerahan = 0;
+
+        list_items.map(item => {
+            list_delete.push(item)
+        })
 
         row = 0;
         list_items = [];
