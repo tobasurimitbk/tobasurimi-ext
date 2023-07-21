@@ -80,7 +80,7 @@ class SalesOrderModel extends Model
     public function getAllSalesOrderLokal($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_sales_order'          => 'sales_order.spp_type',
+            'no_sales_order'          => 'sales_order.no_sales_order',
             'destination'            => 'sales_order.destination',
             'qty_barang'             => 'sales_order.qty_barang',
             'total_harga'             => 'sales_order.total_harga',

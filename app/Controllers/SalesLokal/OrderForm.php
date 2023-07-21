@@ -81,7 +81,6 @@ class OrderForm extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "spp_type"      => $this->request->getGet("spp_type"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
