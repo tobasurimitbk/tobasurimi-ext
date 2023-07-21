@@ -10,7 +10,7 @@ use App\Models\BarangModel;
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
 use App\Models\SalesOrderDetailModel;
-use App\Models\AllNoMOdel;
+use App\Models\AllNoModel;
 use Error;
 
 
