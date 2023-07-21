@@ -81,6 +81,7 @@
                                 <option value="Bahan Penolong Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Lokal" ? "selected" : "") : ""; ?>>Bahan Penolong Lokal</option>
                                 <option value="Bahan Penolong Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Import" ? "selected" : "") : ""; ?>>Bahan Penolong Import</option>
                                 <option value="Bahan Baku Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Baku Import" ? "selected" : "") : ""; ?>>Bahan Baku Import</option>
+                                <option value="Bahan Baku Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Baku Lokal" ? "selected" : "") : ""; ?>>Bahan Baku Lokal</option>
                             </select>
 
                             <label for="floatingInput">Tipe SPP</label>
@@ -832,7 +833,7 @@
 
             validator_detail.resetForm();
             validator_detail.reset();
-            if ($(".spp_type option:selected").val() === "Bahan Baku Import") {
+            if ($(".spp_type option:selected").val() === "Bahan Baku Import" || $(".spp_type option:selected").val() === "Bahan Baku Lokal") {
                 $.ajax({
                     url: `<?= base_url("barang/dropdown/kategori"); ?>`,
                     method: "GET",
@@ -1580,7 +1581,7 @@
                 $(".spesifikasi").val(spesifikasi).change();
             }
         })
-        if ($(".spp_type option:selected").val() === "Bahan Baku Import") {
+        if ($(".spp_type option:selected").val() === "Bahan Baku Import" || $(".spp_type option:selected").val() === "Bahan Baku Lokal") {
             $.ajax({
                 url: `<?= base_url("barang/dropdown/kategori"); ?>`,
                 method: "GET",

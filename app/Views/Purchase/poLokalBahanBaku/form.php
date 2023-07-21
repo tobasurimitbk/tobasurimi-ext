@@ -711,7 +711,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-baku"
+                    kategori: "Bahan Baku"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -748,7 +748,8 @@
                     success: function(res) {
                         $(".spesifikasi").empty()
                         $(".spesifikasi").append(`<option value=""></option>`)
-                        res?.data?.spek.forEach(function(item) {
+                        res.data.spek = JSON.parse(res.data.spek)
+                        res.data.spek.forEach(function(item) {
                             $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                         })
 
@@ -1723,8 +1724,6 @@
         $(".kode").val(kode_barang)
         $(".keterangan").val(keterangan)
 
-        console.log(spesifikasi)
-
         $.ajax({
             url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
             method: "GET",
@@ -1745,7 +1744,7 @@
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "bahan-baku"
+                kategori: "Bahan Baku"
             },
             success: function(res) {
                 $(".kode_barang").empty();
