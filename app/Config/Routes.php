@@ -410,6 +410,7 @@ $routes->get('/tax/dropdown', 'Master\Tax::dropdownTax', ['filter' => 'Auth']);
 
 // BARANG
 $routes->get('/barang/dropdown', 'Warehouse\Barang::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/parent', 'Warehouse\Barang::dropdownParentBarang', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKategori', ['filter' => 'Auth']);
 
 // ACCOUNT

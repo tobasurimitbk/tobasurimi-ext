@@ -16,6 +16,7 @@ class BarangModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'parent_id',
         'company_id',
         'warehouse_id',
         'kode_barang',
@@ -61,6 +62,7 @@ class BarangModel extends Model
     public function getBarangList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'parent_barang'     => 'parent_barangs.nama_barang',
             'kode_barang'       => 'barangs.kode_barang',
             'nama_barang'       => 'barangs.nama_barang',
             'harga_barang'      => 'barangs.harga_barang',
@@ -80,6 +82,7 @@ class BarangModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "barangs.*, 
+                      parent_barangs.nama_barang AS parent_barang,
                       satuans.kode_satuan AS kode_satuan, 
                       metadata.value AS kategori,
                       hs_codes.code AS code_hs,
@@ -88,11 +91,12 @@ class BarangModel extends Model
         $barangDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
-            ->join('metadata', 'metadata.id = barangs.kategori_id')
-            ->join('hs_codes', 'hs_codes.id = barangs.hs_id')
-            ->join('sub_akuns AS ap', 'ap.id = barangs.ap_id')
-            ->join('sub_akuns AS ar', 'ar.id = barangs.ar_id')
+            ->join('barangs AS parent_barangs', 'parent_barangs.id = barangs.parent_id', 'left')
+            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
+            ->join('metadata', 'metadata.id = barangs.kategori_id', 'left')
+            ->join('hs_codes', 'hs_codes.id = barangs.hs_id', 'left')
+            ->join('sub_akuns AS ap', 'ap.id = barangs.ap_id', 'left')
+            ->join('sub_akuns AS ar', 'ar.id = barangs.ar_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $barangDataQry->countAllResults(false);
@@ -162,6 +166,21 @@ class BarangModel extends Model
         $builder->where($arrCondition)
             ->orderBy('nama_barang', 'ASC');
 
+        $query = $builder->get();
+
+        return $query->getResult();
+    }
+
+    public function getParentBarang($company_id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'company_id' => $company_id,
+            'parent_id' => 0
+        ];
+
+        $builder = $this->db->table('barangs');
+        $builder->where($arrCondition);
         $query = $builder->get();
 
         return $query->getResult();

@@ -49,9 +49,9 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so" id="id_so" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
+                            <select class="form-select multiple_po_id id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {
