@@ -316,9 +316,6 @@ class SPP extends BaseController
                     $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
                 }
 
-
-                // $response = curl_request("PATCH", "/purchaseRequest/$id", $this->token, $payload);
-
                 if ($insertData) {
                     $SppModel->update($id, $insertData);
 
@@ -337,8 +334,6 @@ class SPP extends BaseController
                             "note" => $value->note,
                         ];
 
-                        // $sql = $SppDetailModel->setData($value)->getCompiledUpsert();
-                        // echo $sql;
                         $SppDetailModel->upsert($dataDetail);
                     }
 

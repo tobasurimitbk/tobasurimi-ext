@@ -426,8 +426,6 @@
     <?php
     } ?>
 
-    console.log(list_items)
-
     var validator_detail = $(".detail-form").validate({
         rules: {
             kode_barang: {
@@ -897,7 +895,6 @@
                             cancelButtonText: 'Batal',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                console.log(id)
                                 let new_list_items = []
                                 let tag_html = "";
                                 let tag_total = "";
@@ -1454,7 +1451,6 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(id)
                 let new_list_items = []
                 let tag_html = "";
                 let tag_total = "";
@@ -1462,8 +1458,6 @@
                 $(".body-detail-table").empty()
 
                 row = 0;
-
-                console.log(list_items)
 
                 total_harga_barang = 0;
                 total_qty = 0;
@@ -1581,7 +1575,6 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(id)
                 let new_list_items = []
                 let tag_html = "";
                 let tag_total = "";
@@ -1593,8 +1586,6 @@
                 total_harga = 0;
 
                 row = 0;
-
-                console.log(list_items)
 
                 list_items.map(item => {
                     if (item.row != id) {
@@ -1731,7 +1722,8 @@
             success: function(res) {
                 $(".spesifikasi").empty()
                 $(".spesifikasi").append(`<option value=""></option>`)
-                res?.data?.spek.forEach(function(item) {
+                res.data.spek = JSON.parse(res.data.spek)
+                res.data.spek.forEach(function(item) {
                     $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                 })
 

@@ -246,6 +246,9 @@ class POLokalBahanBaku extends BaseController
     public function updatePOLokalBahanBaku()
     {
         try {
+            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
+            $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
             $rules = [
                 "po_date" => [
                     "rules" => "required"
@@ -258,41 +261,58 @@ class POLokalBahanBaku extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
+                $insertData = [
+                    "company_id" => $this->this_company_id,
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "pph" => $this->request->getPost("pph"),
                     "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
+                    "is_posted" => false,
                     "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
                     "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
                     "subsidi_langsung" => $this->request->getPost("subsidi_langsung") ? formatter($this->request->getPost("subsidi_langsung"), "STR_TO_INT") : 0,
+                    "createdBy" => session()->get("login")->user_id,
                     "items" =>  json_decode($this->request->getPost("items"))
-                ]);
+                ];
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
 
-                $response = curl_request("PATCH", "/rawMaterialPO/$id", $this->token, $payload);
+                if ($insertData) {
+                    $RMPurchaseOrderModel->update($id, $insertData);
 
-                if ($response["code"] === 200) {
+                    foreach ($insertData["items"] as $value) {
+                        $value->barang_id = $value->item_id;
+                        $value->rm_purchase_order_id = $id;
+
+                        $dataDetail = [
+                            "id" => $value->id ?? null,
+                            "rm_purchase_order_id" => $this->request->getPost("id"),
+                            "barang_id" => $value->item_id,
+                            "spec" => $value->spec,
+                            "bagian" => $value->bagian,
+                            "peti" => $value->peti,
+                            "quality" => $value->quality,
+                            "note" => $value->note,
+                            "qty" => $value->qty,
+                            "general_price" => $value->general_price,
+                            "daily_price" => $value->daily_price,
+                            "monthly_price" => $value->monthly_price,
+                        ];
+
+                        $RMPurchaseOrderDetailModel->upsert($dataDetail);
+                    }
+
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
+                        "payload"   =>  json_encode($insertData),
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
+                        "message"    => 'Data Gagal Diubah',
+                        "payload"   =>  json_encode($insertData),
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -359,34 +379,30 @@ class POLokalBahanBaku extends BaseController
     public function deletePOLokalBahanBaku()
     {
         try {
+            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
+            $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
             $id = $this->request->getPost("id");
 
-            if (!empty($id)) {
-                $response = curl_request("DELETE", "/rawMaterialPO/$id", $this->token);
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (empty($id)) {
                 $data = [
-                    "status"            => false,
+                    "status"     => false,
                     "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            $RMPurchaseOrderModel->delete($id);
+            $RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->delete();
+
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil dihapus",
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
