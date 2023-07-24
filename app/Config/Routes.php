@@ -243,6 +243,7 @@ $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createT
 $routes->post('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::saveTerimafakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/delete', 'Purchase\TerimaFakturLokal::deleteTerimaFakturLokal', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/print/(:num)', 'Purchase\TerimaFakturLokal::print/$1', ['filter' => 'Auth']);
 
 // TERIMA FAKTUR IMPORT
 $routes->get('/terima-faktur-import', 'Purchase\TerimaFakturImport::terimaFakturImport', ['filter' => 'Auth']);
