@@ -6,6 +6,9 @@ use App\Controllers\BaseController;
 
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\SupplierModel;
+use App\Models\SppModel;
+use App\Models\MetadataModel;
 
 class POLokalBahanPenolong extends BaseController
 {
@@ -30,27 +33,27 @@ class POLokalBahanPenolong extends BaseController
     public function createPOLokalBahanPenolong()
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Penolong%20Lokal", $this->token);
+        $SppModel = new SppModel();
+        $dataSPP = $SppModel->getNoSPP('Bahan Penolong Lokal');
 
-        $dataSPP = [];
-        if ($responseSPP["code"] === 200) {
-            $dataSPP = json_decode($responseSPP["body"])->data;
+        foreach (array_keys($dataSPP) as $key) {
+            $dataSPP[$key] = (object)$dataSPP[$key];
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
+        $supplierModel = new SupplierModel();
+        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        foreach (array_keys($dataSupplier) as $key) {
+            $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
+        $MetadataModel = new MetadataModel();
+        $dataValuta = $MetadataModel->get_by_name('Valuta Asing');
 
-        $dataValuta = [];
-        if ($responseValuta["code"] === 200) {
-            $dataValuta = json_decode($responseValuta["body"])->data;
+        foreach (array_keys($dataValuta) as $key) {
+            $dataValuta[$key] = (object)$dataValuta[$key];
         }
 
         $data = [
@@ -65,27 +68,27 @@ class POLokalBahanPenolong extends BaseController
     public function getByIdPOLokalBahanPenolong($id = null)
     {
         //Get SPP Number
-        $responseSPP = curl_request("GET", "/purchaseRequest/getByType/Bahan%20Penolong%20Lokal", $this->token);
+        $SppModel = new SppModel();
+        $dataSPP = $SppModel->getNoSPP('Bahan Penolong Lokal');
 
-        $dataSPP = [];
-        if ($responseSPP["code"] === 200) {
-            $dataSPP = json_decode($responseSPP["body"])->data;
+        foreach (array_keys($dataSPP) as $key) {
+            $dataSPP[$key] = (object)$dataSPP[$key];
         }
 
         //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20PENOLONG&idCompany=$this->this_company_id", $this->token);
+        $supplierModel = new SupplierModel();
+        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
+        foreach (array_keys($dataSupplier) as $key) {
+            $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         //Get Valuta Asing By Metadata
-        $responseValuta = curl_request("GET", "/metadata/all?name=valuta_asing", $this->token);
+        $MetadataModel = new MetadataModel();
+        $dataValuta = $MetadataModel->get_by_name('Valuta Asing');
 
-        $dataValuta = [];
-        if ($responseValuta["code"] === 200) {
-            $dataValuta = json_decode($responseValuta["body"])->data;
+        foreach (array_keys($dataValuta) as $key) {
+            $dataValuta[$key] = (object)$dataValuta[$key];
         }
 
         $data = [
@@ -101,9 +104,6 @@ class POLokalBahanPenolong extends BaseController
                 $dataPOLokal = json_decode($responsePOLokal["body"])->data;
             }
             $data["dataPOLokal"] = $dataPOLokal;
-
-            // var_dump($dataPOLokal);
-            // die;
         }
 
         return view('Purchase/poLokalBahanPenolong/form', $data);
