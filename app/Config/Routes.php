@@ -351,6 +351,7 @@ $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' =>
 
 // TERIMA FAKTUR
 $routes->get('/penerimaan-barang-lokal/dropdown', 'Warehouse\PenerimaanBarangLokal::dropdownpenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/dropdown/bySupplier/(:num)', 'Warehouse\PenerimaanBarangLokal::getReceivedNoBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/dropdown', 'Warehouse\PenerimaanBarangImport::dropdownpenerimaanBarangImport', ['filter' => 'Auth']);
 
 // SUPPLIER 

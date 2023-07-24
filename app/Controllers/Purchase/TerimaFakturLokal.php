@@ -10,14 +10,20 @@ use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PajakTandaTerimaFakturModel;
 use App\Models\SupplierModel;
 
+use Dompdf\Dompdf;
+
 class TerimaFakturLokal extends BaseController
 {
+    private $dompdf;
+
     private $token;
     private $user_id;
     private $this_company_id;
 
     public function __construct()
     {
+        $this->dompdf = new Dompdf();
+
         $this->token = session()->get("login")->token;
         $this->user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -587,6 +593,53 @@ class TerimaFakturLokal extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id) 
+    {
+        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+        $tandaTerimaFakturDetModel = new TandaTerimaFakturDetailModel();
+
+        $filename = "PO Import Bahan Baku";
+
+        $data = [];
+        $itemsList = [];
+        $itemTotal = 0;
+        $dataInv = $tandaTerimaFakturModel->asObject()->find($id);
+
+        $dataDet = $tandaTerimaFakturDetModel->asObject()
+            ->where('tanda_terima_faktur_id', $id)
+            ->findAll();
+
+        foreach ($dataDet as $det) {
+            $itemsList[] = "$det->qty $det->unit $det->item_name";
+            $itemTotal += $det->qty * $det->price;
+        }
+
+        $data["data"] = $dataInv;
+        $data['invNo'] = $dataInv->faktur_no;
+        $data["itemName"] = implode(', ', $itemsList);
+        $data["itemTotal"] = $itemTotal;
+        $data["potongan"] = $dataInv->potongan;
+        $data["tambahan"] = $dataInv->tambahan;
+
+        // var_dump($dataPODetail);
+        // die;
+        return view('Purchase/terimaFakturLokal/print', $data);
+
+        // load HTML content
+        $this->dompdf->loadHtml(view('Purchase/terimaFakturLokal/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $this->dompdf->setPaper('A5', 'landscape');
+
+        // render html as PDF
+        $this->dompdf->render();
+
+        // output the generated pdf
+        $this->dompdf->stream($filename, array("Attachment" => false));
+
+        exit(0);
     }
 
     private function generateInvNumber(): string
