@@ -10,80 +10,99 @@
             <div class="modal-body">
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
+                    <input type="hidden" class="parent" name="parent" id="parent" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select parent_id" name="parent_id" id="parent_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Parent Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control kode_barang" name="kode_barang" id="kode_barang" placeholder="Kode Barang">
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control nama_barang" name="nama_barang" id="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Satuan Barang</label>
+                    <div class="is_parent" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Satuan Barang</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" onkeyup="formatNumber(this)" class="form-control harga_barang" name="harga_barang" id="harga_barang" placeholder="Harga Barang">
+                                    <label for="floatingInput">Harga Barang</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" onkeyup="formatNumber(this)" class="form-control harga_barang" name="harga_barang" id="harga_barang" placeholder="Harga Barang">
-                                <label for="floatingInput">Harga Barang</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Kategori</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select hs_id" name="hs_id" id="hs_id">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Kode HS</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select ap_id" name="ap_id" id="ap_id">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Akun Pembelian</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select ar_id" name="ar_id" id="ar_id">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Akun Penjualan</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" class="form-control spec" name="spec" id="spec" placeholder="Spesifikasi">
+                                    <label for="floatingInput">Spesifikasi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
+                                    <label for="floatingInput">Stok</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Kategori</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select hs_id" name="hs_id" id="hs_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Kode HS</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select ap_id" name="ap_id" id="ap_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Akun Pembelian</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select ar_id" name="ar_id" id="ar_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Akun Penjualan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
-                                <label for="floatingInput">Stok</label>
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="mb-3" style="height: 50px;">
                                 <label for="floatingInput" class="label-modal-master-barang">Status</label>
@@ -97,7 +116,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="col-subtitle-modal">
+                <!-- <div class="col-subtitle-modal">
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <h5 class="modal-sub-title">Spesifikasi</h5>
@@ -121,7 +140,7 @@
 
                         </tbody>
                     </table>
-                </div>
+                </div> -->
             </div>
             <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
@@ -173,6 +192,7 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>
+                            <th onclick="changeSort('parent_barang')" class="sort">Parent Barang</th>
                             <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                             <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
                             <th onclick="changeSort('harga_barang')" class="sort">Harga Barang</th>
@@ -197,10 +217,11 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "kode_barang";
+    let sort = "parent_barang";
     let sortType = "asc";
     let list_spek = [];
     var row_detail = 0;
+    let changeParent = true;
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -239,6 +260,10 @@
             className: "text-center",
             sortable: false
         }, 
+        {
+            data: "parent_barang",
+            className: "text-center"
+        },
         {
             data: "kode_barang",
             className: "text-center"
@@ -319,6 +344,35 @@
             theme: "bootstrap-5",
             allowClear: true
         })
+
+         // PARENT BARANG
+         $('.parent_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".parent_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".parent_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         // SATUAN BARANG
         $('.satuan_id').select2({
@@ -490,28 +544,7 @@
 
         var validator = $(".create-form").validate({
             rules: {
-                kode_barang: {
-                    required: true
-                },
                 nama_barang: {
-                    required: true
-                },
-                harga_barang: {
-                    required: true
-                },
-                satuan_id: {
-                    required: true
-                },
-                kategori_id: {
-                    required: true
-                },
-                hs_id: {
-                    required: true
-                },
-                ap_id: {
-                    required: true
-                },
-                ar_id: {
                     required: true
                 }
             },
@@ -567,18 +600,45 @@
         });
 
         $(".btn-show-form").click(function() {
+            $(".parent_id").removeAttr('disabled');
             $(".body-detail-spek").empty()
             list_spek = [];
             row_detail = 0;
-            $('.stok').rules('add', {
+            $('.kode_barang').rules('add', {
                 required: true
             });
+            $(".is_parent").css("display", "none");
+            $('.stok').rules('remove', 'required');
+            $('.harga_barang').rules('remove', 'required');
+            $('.satuan_id').rules('remove', 'required');
+            $('.kategori_id').rules('remove', 'required');
+            $('.hs_id').rules('remove', 'required');
+            $('.ap_id').rules('remove', 'required');
+            $('.ar_id').rules('remove', 'required');
+            $('.parent').val();
+            $('.kode_barang').val();
+            $('.nama_barang').val();
+            $('.harga_barang').val();
             $(".id").val("");
             $(".title-name").text("Tambah");
-            $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
             $(".stok").attr("readonly", false);
             $(".kode_barang").attr("readonly", false);
+
+            $.ajax({
+                url: `<?= base_url("barang/dropdown/parent"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".parent_id").empty()
+                    $(".parent_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".parent_id").append(`<option value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                    })
+
+                    $(".parent_id").val("").change();
+                }
+            })
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -661,6 +721,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+            changeParent = false;
             $('.stok').rules('remove', 'required');
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', '');
@@ -671,6 +732,7 @@
             $(".body-detail-spek").empty()
             row_detail = 0;
             list_spek = [];
+            $(".parent_id").attr('disabled', 'true');
 
             $.ajax({
                 url: "<?= base_url("barang/id"); ?>" + "/" + id,
@@ -678,35 +740,94 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        let new_spek = JSON.parse(res?.data?.spek);
-                        let tag_html = "";
-                        console.log(new_spek);
-                        new_spek.forEach((item) => {
-                            row_detail++;
-                            list_spek.push(
-                            {
-                                row: row_detail,
-                                display: "",
-                            })
-                            tag_html += `<tr class="table_${row_detail}">`;
-                            tag_html += `<td>`;
-                            tag_html += `<input type="text" onkeypress="return lettersOnly(event)" value="${item}" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
-                            tag_html += `</td>`;
-                            tag_html += `<td>`;
-                            tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
-                            tag_html += `</td>`;
-                            tag_html += `</tr>`;
-                        })
+                        // let new_spek = JSON.parse(res?.data?.spek);
+                        // let tag_html = "";
+                        // console.log(new_spek);
+                        // new_spek.forEach((item) => {
+                        //     row_detail++;
+                        //     list_spek.push(
+                        //     {
+                        //         row: row_detail,
+                        //         display: "",
+                        //     })
+                        //     tag_html += `<tr class="table_${row_detail}">`;
+                        //     tag_html += `<td>`;
+                        //     tag_html += `<input type="text" onkeypress="return lettersOnly(event)" value="${item}" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
+                        //     tag_html += `</td>`;
+                        //     tag_html += `<td>`;
+                        //     tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
+                        //     tag_html += `</td>`;
+                        //     tag_html += `</tr>`;
+                        // })
 
-                        $(".body-detail-spek").append(tag_html)
+                        // $(".body-detail-spek").append(tag_html)
 
                         $(".id").val(id);
+                        $('.parent').val(res?.data?.parent_id);
+                        $('.kode_barang').rules('remove', 'required');
+                        if(res?.data?.parent_id !== "0")
+                        {
+                            $(".is_parent").css("display", "");
+                            $('.stok').rules('add', {
+                                required: true
+                            });
+                            $('.harga_barang').rules('add', {
+                                required: true
+                            });
+                            $('.satuan_id').rules('add', {
+                                required: true
+                            });
+                            $('.kategori_id').rules('add', {
+                                required: true
+                            });
+                            $('.hs_id').rules('add', {
+                                required: true
+                            });
+                            $('.ap_id').rules('add', {
+                                required: true
+                            });
+                            $('.ar_id').rules('add', {
+                                required: true
+                            });
+                        }
+                        else
+                        {
+                            $(".is_parent").css("display", "none");
+                            $('.stok').rules('remove', 'required');
+                            $('.harga_barang').rules('remove', 'required');
+                            $('.satuan_id').rules('remove', 'required');
+                            $('.kategori_id').rules('remove', 'required');
+                            $('.hs_id').rules('remove', 'required');
+                            $('.ap_id').rules('remove', 'required');
+                            $('.ar_id').rules('remove', 'required');
+                        }
+
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".nama_barang").val(res?.data?.nama_barang);
                         $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
                         console.log()
                         validator.resetForm();
                         validator.reset();
+
+                        $.ajax({
+                            url: `<?= base_url("barang/dropdown/parent"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".parent_id").empty()
+                                $(".parent_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    if(item.id == Number(res?.data?.parent_id))
+                                    {
+                                        $(".parent_id").append(`<option selected value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                                    }
+                                    else
+                                    {
+                                        $(".parent_id").append(`<option value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                                    }
+                                })
+                            }
+                        })
 
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -778,6 +899,7 @@
                                 })
 
                                 $(".hs_id").val(res?.data?.hs_id).change();
+                                changeParent = true;
                                 $(".add-modal").modal("show")
                             }
                         })
@@ -800,6 +922,58 @@
             table.ajax.reload();
         })
 
+        $(".parent_id").change(function () {
+            if(changeParent){
+            $(".kode_barang").val("");
+            $(".nama_barang").val("");
+            $(".satuan_id").val("").change();
+            $(".harga_barang").val("");
+            $(".kategori_id").val("").change();
+            $(".hs_id").val("").change();
+            $(".ap_id").val("").change();
+            $(".ar_id").val("").change();
+            $(".spec").val("");
+            $(".stok").val("");
+
+            if($(".parent_id").val())
+            {
+                $(".is_parent").css("display", "");
+                $('.stok').rules('add', {
+                    required: true
+                });
+                $('.harga_barang').rules('add', {
+                    required: true
+                });
+                $('.satuan_id').rules('add', {
+                    required: true
+                });
+                $('.kategori_id').rules('add', {
+                    required: true
+                });
+                $('.hs_id').rules('add', {
+                    required: true
+                });
+                $('.ap_id').rules('add', {
+                    required: true
+                });
+                $('.ar_id').rules('add', {
+                    required: true
+                });
+            }
+            else
+            {
+                $(".is_parent").css("display", "none");
+                $('.stok').rules('remove', 'required');
+                $('.harga_barang').rules('remove', 'required');
+                $('.satuan_id').rules('remove', 'required');
+                $('.kategori_id').rules('remove', 'required');
+                $('.hs_id').rules('remove', 'required');
+                $('.ap_id').rules('remove', 'required');
+                $('.ar_id').rules('remove', 'required');
+            }
+            }
+        })
+
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
@@ -819,16 +993,16 @@
 
                         let id = $(".id").val();
 
-                        let update_list_spek = [];
-                        console.log(list_spek)
-                        list_spek.forEach((item) => {
-                            if(item.display != "none")
-                            {
-                                update_list_spek.push($(".spek_" + item.row).val());
-                            }
-                        })
+                        // let update_list_spek = [];
+                        // console.log(list_spek)
+                        // list_spek.forEach((item) => {
+                        //     if(item.display != "none")
+                        //     {
+                        //         update_list_spek.push($(".spek_" + item.row).val());
+                        //     }
+                        // })
 
-                        data.append("spek", JSON.stringify(update_list_spek));
+                        // data.append("spek", JSON.stringify(update_list_spek));
 
                         // UPDATE
                         if(id)

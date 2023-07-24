@@ -4,11 +4,15 @@ namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
 use Config\Services;
+use App\Models\SalesOrderModel;
+use App\Models\CustomerModel;
 
 class SuratJalan extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $CustomerModel;
+    protected $SalesOrderModel;
     protected $encrypter;
 
     public function __construct()
@@ -16,6 +20,8 @@ class SuratJalan extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
+        $this->CustomerModel = new CustomerModel();
+        $this->SalesOrderModel = new SalesOrderModel();
     }
 
     public function index()
@@ -25,7 +31,16 @@ class SuratJalan extends BaseController
 
     public function createView()
     {
-        return view('SalesLokal/SuratJalan/form');
+        //Get Customers
+        $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
+        $data = [
+            "dataCustomers" => $customers,
+            "id_user" => session()->get('login')->user_id,
+            "seller_name" => session()->get('login')->name,
+
+        ];
+
+        return view('SalesLokal/SuratJalan/form', $data);
     }
 
     public function all()
@@ -87,6 +102,68 @@ class SuratJalan extends BaseController
     }
 
     public function delete()
+    { {
+            try {
+                $id = $this->request->getPost("id");
+
+                if (!empty($id)) {
+                    $findBarang = $this->rmImportPOModel->find($id);
+                    if ($findBarang) {
+                        $response =  $this->rmImportPOModel->delete($id);
+                        if ($response) {
+                            $data = [
+                                "status"            => true,
+                                "message"   => "Data Berhasil dihapus",
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        } else {
+                            $message = 'Data Gagal Dihapus';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    } else {
+                        $data = [
+                            "status"            => false,
+                            "message"    => "Data Tidak Ditemukan",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                } else {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Data Gagal Dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            } catch (\Exception $e) {
+                $data = [
+                    "status"            => false,
+                    "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+            return;
+        }
+    }
+
+    public function dropDownSalesOrder($idCustomer)
     {
+        $data = $this->SalesOrderModel
+            ->asObject()
+            ->where(['id_customer' => $idCustomer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
+            ->select(['id', 'no_sales_order'])
+            ->findAll();
+
+
+        echo json_encode($data);
+        return;
     }
 }

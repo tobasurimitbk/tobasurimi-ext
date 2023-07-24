@@ -27,8 +27,8 @@
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php
-                                if (!empty($dataCustomer)) {
-                                    foreach ($dataCustomer as $customer) {
+                                if (!empty($dataCustomers)) {
+                                    foreach ($dataCustomers as $customer) {
                                 ?>
                                         <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php
@@ -49,9 +49,9 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so" id="id_so" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {
@@ -67,23 +67,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_po" name="id_po" id="id_po" <?= !empty($data) ? ($data->id_po === true ? 'disabled=true' : '') : ''; ?>>
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataPo)) {
-                                    foreach ($dataPo as $po) {
-                                ?>
-                                        <option value="<?= $po->id; ?>" <?= !empty($data) ? ($data->po_id === $po->id ? "selected" : "") : ""; ?>><?= $po->name; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">PO</label>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row">
@@ -139,32 +122,7 @@
             .find('label')
             .css('z-index', '1');
 
-        // PO
-        $('.id_po').select2({
-            placeholder: "",
-            theme: "bootstrap-5"
-        })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.id_po')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.id_po')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.id_po')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
         // SO
         $('.id_so').select2({
@@ -192,6 +150,11 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        $('.id_so')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
     })
 
     var validator = $(".create-form").validate({
@@ -202,7 +165,7 @@
             id_po: {
                 required: true
             },
-            id_so: {
+            'id_so[]': {
                 required: true
             },
             no_po: {
@@ -222,7 +185,7 @@
             id_po: {
                 required: "PO wajib diisi"
             },
-            id_so: {
+            'id_so[]': {
                 required: "SO wajib diisi"
             },
             no_po: {
@@ -257,6 +220,29 @@
         },
     });
 
+    $(".id_customer").change(function() {
+        if ($(".id_customer").val()) {
+            let customerId = $(".id_customer").val();
+            $.ajax({
+                url: "<?= base_url('/surat-jalan/sales-order'); ?>" + "/" + customerId,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".id_so").empty();
+                    $(".id_So").append(`<option value=""></option>`);
+
+                    // console.log(res.dataWarehouse)
+                    res.forEach(function(item) {
+                        $(".id_so").append(`<option  value="${item.id}">${item.no_sales_order}</option>`);
+                    })
+                }
+            })
+
+        } else {
+            $(".id_customer").attr("readonly", false)
+            $(".id_so").val("");
+        }
+    });
 
     $(".btn-submit").click(function() {
         if ($(".create-form").valid()) {
@@ -280,93 +266,93 @@
                     console.log(data.entries());
 
                     // // UPDATE
-                    // if (id) {
-                    //     $.ajax({
-                    //         url: "<?= base_url("pinjaman-karyawan/update"); ?>",
-                    //         data: data,
-                    //         beforeSend: function(xhr) {
-                    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    //         },
-                    //         method: "POST",
-                    //         dataType: "json",
-                    //         processData: false,
-                    //         contentType: false,
-                    //         success: function(response) {
-                    //             csrf.val(response.token);
-                    //             if (response.status) {
-                    //                 stopLoading()
-                    //                 Swal.fire({
-                    //                         icon: 'success',
-                    //                         title: response.message,
-                    //                         confirmButtonColor: '#4e73df',
-                    //                     })
-                    //                     .then(() => {
-                    //                         window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                    //                     })
-                    //             } else {
-                    //                 Swal.fire({
-                    //                     icon: 'error',
-                    //                     title: response.message,
-                    //                     confirmButtonColor: '#4e73df',
-                    //                 })
-                    //                 stopLoading()
-                    //             }
-                    //         },
-                    //         onError: function(response) {
-                    //             csrf.val(response.token);
-                    //             Swal.fire({
-                    //                 icon: 'error',
-                    //                 title: 'Data Gagal Disimpan, coba Lagi',
-                    //                 confirmButtonColor: '#4e73df',
-                    //             })
-                    //             stopLoading()
-                    //         }
-                    //     });
-                    // }
-                    // // CREATE
-                    // else {
-                    //     $.ajax({
-                    //         url: "<?= base_url("pinjaman-karyawan/save"); ?>",
-                    //         data: data,
-                    //         beforeSend: function(xhr) {
-                    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    //         },
-                    //         method: "POST",
-                    //         dataType: "json",
-                    //         processData: false,
-                    //         contentType: false,
-                    //         success: function(response) {
-                    //             csrf.val(response.token);
-                    //             if (response.status) {
-                    //                 stopLoading()
-                    //                 Swal.fire({
-                    //                         icon: 'success',
-                    //                         title: response.message,
-                    //                         confirmButtonColor: '#4e73df',
-                    //                     })
-                    //                     .then(() => {
-                    //                         window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
-                    //                     })
-                    //             } else {
-                    //                 Swal.fire({
-                    //                     icon: 'error',
-                    //                     title: response.message,
-                    //                     confirmButtonColor: '#4e73df',
-                    //                 })
-                    //                 stopLoading()
-                    //             }
-                    //         },
-                    //         onError: function(response) {
-                    //             csrf.val(response.token);
-                    //             Swal.fire({
-                    //                 icon: 'error',
-                    //                 title: 'Data Gagal Disimpan, coba Lagi',
-                    //                 confirmButtonColor: '#4e73df',
-                    //             })
-                    //             stopLoading()
-                    //         }
-                    //     });
-                    // }
+                    if (id) {
+                        $.ajax({
+                            url: "<?= base_url("surat-jalan/update"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("surat_jalan"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+                    // CREATE
+                    else {
+                        $.ajax({
+                            url: "<?= base_url("surat-jalan/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("surat_jalan"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
                 }
             })
         }

@@ -26,8 +26,10 @@
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('nama_satuan')" class="sort">Nama Satuan</th>
+                                <th onclick="changeSort('target')" class="sort">Target</th>
                                 <th onclick="changeSort('production_amt')" class="sort">Hasil</th>
-                                <th>Tambah Permintaan Material</th>
+                                <th>Permintaan Material</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -103,6 +105,14 @@
                 className: "text-center"
             },
             {
+                data: "nama_satuan",
+                className: "text-center"
+            },
+            {
+                data: "target",
+                className: "text-center"
+            },
+            {
                 data: "production_amt",
                 className: "text-center"
             },
@@ -114,8 +124,8 @@
                 render: function(data, type, row) {
                     return `
                         <div class="mt-0">
-                            <button class="btn btn-success posting-spp">
-                                Tambah Permintaan Material
+                            <button class="btn btn-success posting-spp" onclick="spp()">
+                                Permintaan Material
                             </button>
                         </div>
                     `
@@ -149,6 +159,10 @@
             location.replace(`<?= base_url("work-order/id"); ?>/${data.id}`);
         })
     })
+
+    const spp = function() {
+        location.replace(`<?= base_url("spp/create"); ?>`);
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {

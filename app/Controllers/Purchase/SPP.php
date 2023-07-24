@@ -212,7 +212,7 @@ class SPP extends BaseController
                 $dataWarehouse = $WarehousesModel->find($insertData["warehouse_id"]);
 
                 if ($insertData["spp_no"] === "") {
-                    $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
+                    $insertData["spp_no"] = $SppModel->generateNoSpp($dataWarehouse["warehouse_name"]);
                 }
 
 

@@ -10,7 +10,7 @@ use App\Models\BarangModel;
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
 use App\Models\SalesOrderDetailModel;
-use App\Models\AllNoMOdel;
+use App\Models\AllNoModel;
 use Error;
 
 
@@ -272,6 +272,7 @@ class OrderForm extends BaseController
 
             // Create a new validation instance
             $dataSalesOrder =  $this->SalesOrderModel->insert($values);
+            $totalQty = 0;
             foreach ($items as $row) {
                 $item = $this->DetailStockBarang
                     ->where('barang_id', $row->id_barang)
@@ -282,7 +283,7 @@ class OrderForm extends BaseController
                     throw new Error('barang tidak boleh kurang dari stock');
                     return;
                 }
-
+                $totalQty = $totalQty + $row->qty;
                 $valueBarang = [
                     "id_sales_order" => $dataSalesOrder,
                     "id_barang" => $row->id_barang,
@@ -300,6 +301,8 @@ class OrderForm extends BaseController
                 ];
                 $this->DetailStockBarang->update($item['id'], $stok);
             }
+
+            $this->SalesOrderModel->update($dataSalesOrder, ['qty_barang' => $totalQty]);
             $this->db->transCommit();
 
             $data = [
@@ -495,6 +498,8 @@ class OrderForm extends BaseController
         try {
             // Create a new validation instance
             $dataSalesOrder =  $this->SalesOrderModel->update($payload['id'], $values);
+
+            $totalQty = 0;
             foreach ($items as $row) {
                 $item = $this->DetailStockBarang
                     ->where('barang_id', $row->id_barang)
@@ -522,6 +527,7 @@ class OrderForm extends BaseController
                             "stok" => ($item['stok'] - $dataItems),
                         ];
                     }
+                    $totalQty = $totalQty + $row->qty;
 
                     $valueBarang = [
                         "id_barang" => $row->id_barang,
@@ -547,6 +553,7 @@ class OrderForm extends BaseController
                     if ($item['stok'] > $row->qty) {
                         throw new Error('barang tidak boleh kurang dari stock');
                     }
+                    $totalQty = $totalQty + $row->qty;
 
                     $valueBarang = [
                         "id_sales_order" => $payload['id'],
@@ -566,6 +573,8 @@ class OrderForm extends BaseController
                     $this->DetailStockBarang->update($item['id'], $stok);
                 }
             }
+
+            $this->SalesOrderModel->update($payload['id'], ['qty_barang' => $totalQty]);
 
             $this->db->transCommit();
             $data = [

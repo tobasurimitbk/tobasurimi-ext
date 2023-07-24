@@ -9,7 +9,7 @@
 
             <?php if (!empty($dataPOLokal)) { ?>
 
-                <?php if ($dataPOLokal->is_posted === false) { ?>
+                <?php if ($dataPOLokal->is_posted === "0") { ?>
                     <button class="btn btn-hapus delete-parent float-right">
                         Hapus
                     </button>
@@ -19,7 +19,7 @@
                     Print
                 </button>
 
-                <?php if ($dataPOLokal->is_posted === false) { ?>
+                <?php if ($dataPOLokal->is_posted === "0") { ?>
                     <button class="btn btn-success posting-spp float-right">
                         Posting
                     </button>
@@ -32,7 +32,7 @@
             </a>
 
             <?php if (!empty($dataPOLokal)) {
-                if ($dataPOLokal->is_posted === false) { ?>
+                if ($dataPOLokal->is_posted === "0") { ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
@@ -65,7 +65,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOLokal) ? $dataPOLokal->po_date : ""; ?>">
+                                    <input <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOLokal) ? $dataPOLokal->po_date : ""; ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -76,7 +76,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSupplier)) {
@@ -95,7 +95,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> class="form-select pph" id="pph" name="pph" aria-label="Floating label select example">
+                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select pph" id="pph" name="pph" aria-label="Floating label select example">
                                 <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "None" ? "selected" : "") : ""; ?> value="None">Pph tidak ditanggung</option>
                                 <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "Supplier" ? "selected" : "") : ""; ?> value="Supplier">Pph ditanggung supplier</option>
                                 <option <?= !empty($dataPOLokal) ? ($dataPOLokal->pph === "Company" ? "selected" : "") : ""; ?> value="Company">Pph ditanggung perusahaan</option>
@@ -107,7 +107,7 @@
                         <div class="ffloat mb-3" style="height: 50px;">
                             <label for="floatingInput">Potong KG</label>
                             <div>
-                                <input <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> <?= !empty($dataPOLokal) ? ($dataPOLokal->potong_kg ? "checked" : "") : ""; ?> class="potong_kg" name="potong_kg" id="potong_kg" type="checkbox">
+                                <input <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> <?= !empty($dataPOLokal) ? ($dataPOLokal->potong_kg ? "checked" : "") : ""; ?> class="potong_kg" name="potong_kg" id="potong_kg" type="checkbox">
                             </div>
                         </div>
                     </div>
@@ -121,19 +121,19 @@
                 <div class="row">
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya">
+                            <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_sebenarnya : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_sebenarnya" name="cong_sebenarnya" id="cong_sebenarnya" placeholder="Cong Sebenarnya">
                             <label for="floatingInput">Cong Sebenarnya</label>
                         </div>
                     </div>
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan">
+                            <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->cong_batasan : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control cong_batasan" name="cong_batasan" id="cong_batasan" placeholder="Cong Batasan">
                             <label for="floatingInput">Cong Batasan</label>
                         </div>
                     </div>
                     <div class="col md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === true ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung">
+                            <input value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung">
                             <label for="floatingInput">Subsidi Langsung</label>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                     </div>
                     <div class="col-md-6">
                         <?php if (!empty($dataPOLokal)) {
-                            if ($dataPOLokal->is_posted === false) { ?>
+                            if ($dataPOLokal->is_posted === "0") { ?>
                                 <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
                                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                 </button>
@@ -194,7 +194,7 @@
                             ?>
 
                                     <tr>
-                                        <?php if ($dataPOLokal->is_posted === false) { ?>
+                                        <?php if ($dataPOLokal->is_posted === "0") { ?>
 
                                             <td class="edit-table-detail" data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
                                             <td class="edit-table-detail" data-total="<?= number_format(formatter($details->general_price, "CURR_TO_INT") * $details->qty); ?>" data-monthly_price="<?= $details->monthly_price; ?>" data-daily_price="<?= $details->daily_price; ?>" data-quality="<?= $details->quality; ?>" data-peti="<?= $details->peti; ?>" data-bagian="<?= $details->bagian; ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->general_price; ?>" data-qty="<?= $details->qty; ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->kodeBarang; ?></td>
@@ -711,7 +711,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-baku"
+                    kategori: "Bahan Baku"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -748,7 +748,8 @@
                     success: function(res) {
                         $(".spesifikasi").empty()
                         $(".spesifikasi").append(`<option value=""></option>`)
-                        res?.data?.spek.forEach(function(item) {
+                        res.data.spek = JSON.parse(res.data.spek)
+                        res.data.spek.forEach(function(item) {
                             $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
                         })
 
@@ -1723,8 +1724,6 @@
         $(".kode").val(kode_barang)
         $(".keterangan").val(keterangan)
 
-        console.log(spesifikasi)
-
         $.ajax({
             url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
             method: "GET",
@@ -1745,7 +1744,7 @@
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "bahan-baku"
+                kategori: "Bahan Baku"
             },
             success: function(res) {
                 $(".kode_barang").empty();

@@ -310,6 +310,7 @@ $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', [
 // Surat Jalan
 $routes->get('/surat-jalan', 'SalesLokal\SuratJalan::index', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/id/(:segment)', 'SalesLokal\SuratJalan::getById/$1', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/sales-order/(:segment)', 'SalesLokal\SuratJalan::dropDownSalesOrder/$1', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/create', 'SalesLokal\SuratJalan::createView', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/all', 'SalesLokal\SuratJalan::all', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::create', ['filter' => 'Auth']);
@@ -410,6 +411,7 @@ $routes->get('/tax/dropdown', 'Master\Tax::dropdownTax', ['filter' => 'Auth']);
 
 // BARANG
 $routes->get('/barang/dropdown', 'Warehouse\Barang::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/parent', 'Warehouse\Barang::dropdownParentBarang', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKategori', ['filter' => 'Auth']);
 
 // ACCOUNT

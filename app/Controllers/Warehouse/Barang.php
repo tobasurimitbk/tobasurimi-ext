@@ -70,6 +70,7 @@ class Barang extends BaseController
             array_push($dataBarang, [
                 "no"            => $no++,
                 "id"            => $data->id,
+                "parent_barang"   => $data->parent_barang,
                 "kode_barang"   => $data->kode_barang,
                 "nama_barang"   => $data->nama_barang,
                 "harga_barang"  => number_format($data->harga_barang),
@@ -106,27 +107,6 @@ class Barang extends BaseController
                 ],
                 "nama_barang" => [
                     "rules" => "required"
-                ],
-                "harga_barang" => [
-                    "rules" => "required"
-                ],
-                "satuan_id" => [
-                    "rules" => "required"
-                ],
-                "kategori_id" => [
-                    "rules" => "required"
-                ],
-                "hs_id" => [
-                    "rules" => "required"
-                ],
-                "ap_id" => [
-                    "rules" => "required"
-                ],
-                "ar_id" => [
-                    "rules" => "required"
-                ],
-                "stok" => [
-                    "rules" => "required"
                 ]
             ];
 
@@ -142,20 +122,35 @@ class Barang extends BaseController
             }
 
             if ($this->validate($rules)) {
-                $payload = [
-                    "company_id" => $this->this_company_id,
-                    "kode_barang" => $this->request->getPost("kode_barang"),
-                    "nama_barang" => $this->request->getPost("nama_barang"),
-                    "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                    "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                    "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    "spek" => $this->request->getPost("spek")
-                ];
+                $parent_id = formatter($this->request->getPost("parent_id"), "STR_TO_INT");
+                if($parent_id)
+                {
+                    $payload = [
+                        "company_id" => $this->this_company_id,
+                        "parent_id" => formatter($this->request->getPost("parent_id"), "STR_TO_INT"),
+                        "kode_barang" => $this->request->getPost("kode_barang"),
+                        "nama_barang" => $this->request->getPost("nama_barang"),
+                        "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                        "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                        "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                        "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
+                        "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                        "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                        "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                        "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                        "spek" => $this->request->getPost("spek")
+                    ];
+                }
+                else
+                {
+                    $payload = [
+                        "company_id" => $this->this_company_id,
+                        "parent_id" => 0,
+                        "kode_barang" => $this->request->getPost("kode_barang"),
+                        "nama_barang" => $this->request->getPost("nama_barang"),
+                        "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                    ];
+                }
 
                 $response =  $this->barangModel->insert($payload);
 
@@ -195,24 +190,6 @@ class Barang extends BaseController
             $rules = [
                 "nama_barang" => [
                     "rules" => "required"
-                ],
-                "harga_barang" => [
-                    "rules" => "required"
-                ],
-                "satuan_id" => [
-                    "rules" => "required"
-                ],
-                "kategori_id" => [
-                    "rules" => "required"
-                ],
-                "hs_id" => [
-                    "rules" => "required"
-                ],
-                "ap_id" => [
-                    "rules" => "required"
-                ],
-                "ar_id" => [
-                    "rules" => "required"
                 ]
             ];
 
@@ -230,18 +207,31 @@ class Barang extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = [
-                    "company_id" => $this->this_company_id,
-                    "nama_barang" => $this->request->getPost("nama_barang"),
-                    "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                    "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                    "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    "spek" => $this->request->getPost("spek")
-                ];
+                $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
+                if($parent_id)
+                {
+                    $payload = [
+                        "company_id" => $this->this_company_id,
+                        "nama_barang" => $this->request->getPost("nama_barang"),
+                        "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                        "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                        "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                        "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
+                        "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                        "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                        "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                        "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                        "spek" => $this->request->getPost("spek")
+                    ];
+                }
+                else
+                {
+                    $payload = [
+                        "company_id" => $this->this_company_id,
+                        "nama_barang" => $this->request->getPost("nama_barang"),
+                        "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                    ];
+                }
 
                 // $data = [
                 //     "status"            => false,
@@ -422,6 +412,18 @@ class Barang extends BaseController
     public function dropdownBarang()
     {
         $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownParentBarang()
+    {
+        $dataBarang = $this->barangModel->getParentBarang($this->this_company_id);
 
         $data = [
             "data" => $dataBarang

@@ -19,6 +19,8 @@ class WorkOrdersModel extends Model
         'wo_no',
         'barang_id',
         'production_amt',
+        'satuan_id',
+        'target',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -54,6 +56,8 @@ class WorkOrdersModel extends Model
             'wo_no'             => 'work_orders.wo_no',
             'kode_barang'       => 'barangs.kode_barang',
             'nama_barang'       => 'barangs.nama_barang',
+            'nama_satuan'       => 'satuans.nama_satuan',
+            'target'            => 'work_orders.target',
             'production_amt'    => 'work_orders.production_amt'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -63,13 +67,15 @@ class WorkOrdersModel extends Model
 
         $selectQry = "work_orders.*,
             barangs.nama_barang,
-            barangs.kode_barang
+            barangs.kode_barang,
+            satuans.nama_satuan
         ";
 
         $workOrdersDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('barangs', 'barangs.id = work_orders.barang_id')
+            ->join('satuans', 'satuans.id = work_orders.satuan_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $workOrdersDataQry->countAllResults(false);

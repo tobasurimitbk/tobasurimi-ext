@@ -571,7 +571,6 @@
                 $(element).removeClass('select-class');
             },
         });
-        let warehouseId = null
         $(".id_barang").change(function() {
             if ($(".id_barang").val()) {
                 let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";
@@ -795,7 +794,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + id;
+                                                window.location.href = "<?= base_url("order-form-lokal"); ?>" + "/id/" + id;
                                             })
                                     } else {
                                         Swal.fire({
@@ -846,7 +845,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + +response.id;
+                                                window.location.href = "<?= base_url("order-form-lokal"); ?>" + "/id/" + +response.id;
                                             })
                                     } else {
                                         Swal.fire({
