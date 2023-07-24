@@ -43,6 +43,17 @@
     let list_delete = [];
     var row = 0;
 
+    $(document).ready(function() {
+        $(".search").keyup(function() {
+            table.ajax.reload();
+        })
+
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            location.replace(`<?= base_url("surat-jalan/id"); ?>/${data.id}`);
+        })
+    })
+
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
@@ -86,7 +97,7 @@
             data: "nama_pelanggan",
             className: "text-center"
         }, {
-            data: "multiple_no_so",
+            data: "no_so",
             className: "text-center"
         }, {
             data: "no_surat_jalan",

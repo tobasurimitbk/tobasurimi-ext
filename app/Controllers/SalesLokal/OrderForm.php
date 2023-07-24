@@ -77,7 +77,7 @@ class OrderForm extends BaseController
         ];
 
 
-        $condition = ['deletedAt' => null];
+        $condition = [];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -229,9 +229,9 @@ class OrderForm extends BaseController
 
         ]);
         if (!$validate) {
-            echo json_encode($payload);
-            return;
-            //return redirect()->to('/order-form-lokal/create')->back()->withInput();
+            // echo json_encode($payload);
+            //return;
+            return redirect()->to('/order-form-lokal/create')->back()->withInput();
         }
 
 

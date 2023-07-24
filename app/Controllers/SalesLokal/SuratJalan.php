@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use Config\Services;
 use App\Models\SalesOrderModel;
 use App\Models\CustomerModel;
+use App\Models\SuratJalanModel;
 
 class SuratJalan extends BaseController
 {
@@ -14,6 +15,7 @@ class SuratJalan extends BaseController
     protected $CustomerModel;
     protected $SalesOrderModel;
     protected $encrypter;
+    protected $SuratJalanModel;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class SuratJalan extends BaseController
         $this->encrypter = Services::encrypter();
         $this->CustomerModel = new CustomerModel();
         $this->SalesOrderModel = new SalesOrderModel();
+        $this->SuratJalanModel = new SuratJalanModel();
     }
 
     public function index()
@@ -45,44 +48,56 @@ class SuratJalan extends BaseController
 
     public function all()
     {
+        $pageSize = $this->request->getGet("length");
+        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
+        $offset = $currentPage - 1;
+
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "pageSize" => $pageSize,
+            "currentPage" => $currentPage,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $response = curl_request("GET", "/suratJalan", $this->token, $payload);
-        $dataOrderForm = [];
-        $totalRecords = 0;
+        $condition = ['surat_jalan_so.deletedAt' => null];
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            foreach ($body as $data) {
-                array_push($dataOrderForm, [
-                    "no" => $no++,
-                    "id" =>  bin2hex($this->encrypter->encrypt($data->id)),
-                    "kode_pelanggan" => $data->kode_pelanggan,
-                    "nama_pelanggan" => $data->nama_pelanggan,
-                    "multiple_no_so" => $data->multiple_no_so,
-                    "no_surat_jalan" => $data->no_surat_jalan,
-                    "shipping_date" => $data->shipping_date,
-                ]);
-            }
+        $dataSuratJalan = $this->SuratJalanModel
+            ->getAllSuratJalan($condition, $addCondition, $pageSize, $offset);
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        //dd($dataSuratJalan);
+        $dataAllSuratJalan = [];
+        foreach ($dataSuratJalan['data'] as $data) {
+            $dataNo = json_decode($data->multiple_no_so, true);
+            array_push($dataAllSuratJalan, [
+                "no"            => $no++,
+                "id"            => $data->id,
+                "no_surat_jalan"      => $data->no_surat_jalan,
+                "no_so"      => implode(', ', $dataNo),
+                "kode_pelanggan"        => $data->kode_pelanggan,
+                "nama_pelanggan" => $data->nama_pelanggan,
+                "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date))
+            ]);
         }
+        //dd($dataAllSuratJalan);
+
 
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataOrderForm,
-            "response" => $response,
-            "payload" => $payload
+            "recordsTotal"    => $dataSuratJalan['totalData'],
+            "recordsFiltered" => $dataSuratJalan['totalFilteredData'],
+            "data"              => $dataAllSuratJalan,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -91,6 +106,16 @@ class SuratJalan extends BaseController
 
     public function save()
     {
+        $payload = $this->request->getVar();
+        $items = json_decode($this->request->getPost("items"));
+
+
+        $data = [
+            "payload" => $payload,
+            "items" => $items,
+            'token'   => csrf_hash()
+        ];
+        echo json_encode($data);
     }
 
     public function getById()
@@ -102,34 +127,26 @@ class SuratJalan extends BaseController
     }
 
     public function delete()
-    { {
-            try {
-                $id = $this->request->getPost("id");
+    {
+        try {
+            $id = $this->request->getPost("id");
 
-                if (!empty($id)) {
-                    $findBarang = $this->rmImportPOModel->find($id);
-                    if ($findBarang) {
-                        $response =  $this->rmImportPOModel->delete($id);
-                        if ($response) {
-                            $data = [
-                                "status"            => true,
-                                "message"   => "Data Berhasil dihapus",
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                        } else {
-                            $message = 'Data Gagal Dihapus';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                        }
+            if (!empty($id)) {
+                $findBarang = $this->rmImportPOModel->find($id);
+                if ($findBarang) {
+                    $response =  $this->rmImportPOModel->delete($id);
+                    if ($response) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil dihapus",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
                     } else {
+                        $message = 'Data Gagal Dihapus';
                         $data = [
                             "status"            => false,
-                            "message"    => "Data Tidak Ditemukan",
+                            "message"    => $message,
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
@@ -137,21 +154,28 @@ class SuratJalan extends BaseController
                 } else {
                     $data = [
                         "status"            => false,
-                        "message"    => "Data Gagal Dihapus",
+                        "message"    => "Data Tidak Ditemukan",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
-            } catch (\Exception $e) {
+            } else {
                 $data = [
                     "status"            => false,
-                    "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-            return;
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
         }
+        return;
     }
 
     public function dropDownSalesOrder($idCustomer)
