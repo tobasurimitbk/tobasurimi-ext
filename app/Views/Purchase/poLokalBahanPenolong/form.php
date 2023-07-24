@@ -939,7 +939,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "bahan-penolong"
+                    kategori: "Bahan Penolong"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -2086,7 +2086,7 @@
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "bahan-penolong"
+                kategori: "Bahan Penolong"
             },
             success: function(res) {
                 $(".kode_barang").empty();
