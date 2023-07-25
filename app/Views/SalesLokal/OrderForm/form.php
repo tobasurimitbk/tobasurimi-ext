@@ -103,7 +103,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating ff-ket mb-3" style="height: 50px;">
                             <textarea <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control parent_keterangan text-area-all" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
