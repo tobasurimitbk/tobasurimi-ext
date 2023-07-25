@@ -46,7 +46,7 @@
                                         <option value="BAHAN BAKU LOKAL">Bahan Baku Lokal</option>
                                     </select>
 
-                                    <label for="floatingInput">Tipe SPP</label>
+                                    <label for="floatingInput">Tipe Supplier</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -615,7 +615,7 @@
                     required: "Harga wajib diisi"
                 },
                 type: {
-                    required: "Type wajib diisi"
+                    required: "Tipe Supplier wajib diisi"
                 },
                 satuan_id: {
                     required: "Satuan wajib diisi"
