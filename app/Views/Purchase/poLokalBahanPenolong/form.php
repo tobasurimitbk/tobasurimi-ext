@@ -284,9 +284,9 @@
                                         <?php } else { ?>
 
                                             <td><?= $no; ?></td>
-                                            <td><?= $details->kodeBarang; ?></td>
-                                            <td><?= $details->barangName; ?></td>
-                                            <td><?= $details->satuanName; ?></td>
+                                            <td><?= $details->kode_barang; ?></td>
+                                            <td><?= $details->nama_barang; ?></td>
+                                            <td><?= $details->nama_satuan; ?></td>
                                             <td><?= $details->spec; ?></td>
                                             <td><?= $details->price; ?></td>
                                             <td><?= $details->qty; ?></td>
@@ -480,9 +480,9 @@
                 id: <?= $details->id; ?>,
                 row: row,
                 barang_id: '<?= $details->barang_id; ?>',
-                kode_barang: '<?= $details->kodeBarang; ?>',
-                nama_barang: '<?= $details->barangName; ?>',
-                nama_satuan: '<?= $details->satuanName; ?>',
+                kode_barang: '<?= $details->kode_barang; ?>',
+                nama_barang: '<?= $details->nama_barang; ?>',
+                nama_satuan: '<?= $details->nama_satuan; ?>',
                 satuan: <?= $details->unit; ?>,
                 spesifikasi: '<?= $details->spec; ?>',
                 harga: '<?= $details->price; ?>',

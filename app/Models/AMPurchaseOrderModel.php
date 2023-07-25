@@ -14,8 +14,25 @@ class AMPurchaseOrderModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'company_id', 'purchase_request_id', 'po_no', 'po_date', 'warehouse_id', 'po_type',
-    'currency', 'supplier_id', 'total', 'payment_term', 'payment_date', 'dpp', 'note', 'is_posted', 'createdBy', 'status_penerimaan'];
+    protected $allowedFields    = [
+        'id',
+        'company_id',
+        'purchase_request_id',
+        'po_no',
+        'po_date',
+        'warehouse_id',
+        'po_type',
+        'currency',
+        'supplier_id',
+        'total',
+        'payment_term',
+        'payment_date',
+        'dpp',
+        'note',
+        'is_posted',
+        'createdBy',
+        'status_penerimaan'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -88,7 +105,7 @@ class AMPurchaseOrderModel extends Model
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $poDataQry->groupEnd();
         }
-        
+
         $totalFilteredData = $poDataQry->countAllResults(false);
         $data = $poDataQry->findAll($limit, $offset);
 
@@ -142,7 +159,7 @@ class AMPurchaseOrderModel extends Model
         $builder = $this->db->table('am_purchase_orders');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 
@@ -153,13 +170,13 @@ class AMPurchaseOrderModel extends Model
         $builder = $this->db->table('am_purchase_orders');
         $builder->select('po_no');
         $builder->orderBy('po_no', 'desc')
-        ->where('warehouse_id', $warehouse_id)
-        ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
-        ->where('createdAt <=', $last_day . " 23:59:59");
+            ->where('warehouse_id', $warehouse_id)
+            ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+            ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
         $query = $builder->get();
 
-        $lastPO = '1';
+        $lastPO = '01';
         if ($query->getResultArray()) {
             $lastFirst = explode('/', $query->getResultArray()[0]['po_no']);
             $lastPO = explode('-', $lastFirst[0]);
