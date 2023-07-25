@@ -73,6 +73,8 @@ class Barang extends BaseController
                 "parent_barang"   => $data->parent_barang,
                 "kode_barang"   => $data->kode_barang,
                 "nama_barang"   => $data->nama_barang,
+                "supplier_name"   => $data->supplier_name,
+                "type"          => $data->type,
                 "harga_barang"  => number_format($data->harga_barang),
                 "kode_satuan"   => $data->kode_satuan,
                 "kategori"      => $data->kategori,

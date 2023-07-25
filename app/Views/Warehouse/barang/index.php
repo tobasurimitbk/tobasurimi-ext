@@ -218,6 +218,8 @@
                             <th onclick="changeSort('parent_barang')" class="sort">Parent Barang</th>
                             <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                             <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                            <th onclick="changeSort('supplier_name')" class="sort">Nama Supplier</th>
+                            <th onclick="changeSort('type')" class="sort">Tipe Supplier</th>
                             <th onclick="changeSort('harga_barang')" class="sort">Harga Barang</th>
                             <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
                             <th onclick="changeSort('kategori')" class="sort">Kategori</th>
@@ -293,6 +295,14 @@
         },
         {
             data: "nama_barang",
+            className: "text-center"
+        },
+        {
+            data: "supplier_name",
+            className: "text-center"
+        },
+        {
+            data: "type",
             className: "text-center"
         },
         {

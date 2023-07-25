@@ -19,7 +19,7 @@ class BarangModel extends Model
         'parent_id',
         'company_id',
         'supplier_id',
-        'tipe',
+        'type',
         'warehouse_id',
         'kode_barang',
         'nama_barang',
@@ -67,6 +67,8 @@ class BarangModel extends Model
             'parent_barang'     => 'parent_barangs.nama_barang',
             'kode_barang'       => 'barangs.kode_barang',
             'nama_barang'       => 'barangs.nama_barang',
+            'type'              => 'barangs.type',
+            'supplier_name'     => 'suppliers.name',
             'harga_barang'      => 'barangs.harga_barang',
             'kode_satuan'       => 'satuans.kode_satuan',
             'kategori'          => 'metadata.value',
@@ -85,6 +87,7 @@ class BarangModel extends Model
 
         $selectQry = "barangs.*, 
                       parent_barangs.nama_barang AS parent_barang,
+                      suppliers.name AS supplier_name, 
                       satuans.kode_satuan AS kode_satuan, 
                       metadata.value AS kategori,
                       hs_codes.code AS code_hs,
@@ -94,6 +97,7 @@ class BarangModel extends Model
             ->select($selectQry)
             ->where($condition)
             ->join('barangs AS parent_barangs', 'parent_barangs.id = barangs.parent_id', 'left')
+            ->join('suppliers', 'suppliers.id = barangs.supplier_id', 'left')
             ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
             ->join('metadata', 'metadata.id = barangs.kategori_id', 'left')
             ->join('hs_codes', 'hs_codes.id = barangs.hs_id', 'left')
