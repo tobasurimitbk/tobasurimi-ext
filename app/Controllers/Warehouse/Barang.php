@@ -130,6 +130,8 @@ class Barang extends BaseController
                         "parent_id" => formatter($this->request->getPost("parent_id"), "STR_TO_INT"),
                         "kode_barang" => $this->request->getPost("kode_barang"),
                         "nama_barang" => $this->request->getPost("nama_barang"),
+                        "tipe" => $this->request->getPost("tipe"),
+                        "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                         "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
                         "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
                         "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
@@ -208,9 +210,11 @@ class Barang extends BaseController
                 $id = $this->request->getPost("id");
 
                 $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
-                if($parent_id)
+                if($parent)
                 {
                     $payload = [
+                        "tipe" => $this->request->getPost("tipe"),
+                        "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                         "company_id" => $this->this_company_id,
                         "nama_barang" => $this->request->getPost("nama_barang"),
                         "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),

@@ -18,6 +18,8 @@ class BarangModel extends Model
         'id',
         'parent_id',
         'company_id',
+        'supplier_id',
+        'tipe',
         'warehouse_id',
         'kode_barang',
         'nama_barang',

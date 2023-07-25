@@ -345,6 +345,14 @@ $routes->get('/work-order/all', 'Production\WorkOrder::all', ['filter' => 'Auth'
 $routes->post('/work-order/save', 'Production\WorkOrder::create', ['filter' => 'Auth']);
 $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' => 'Auth']);
 
+// Permintaan Material
+$routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
+$routes->get('/material-request/all', 'Production\MaterialRequest::allMaterialRequest', ['filter' => 'Auth']);
+$routes->get('/material-request/id/(:segment)', 'Production\MaterialRequest::getByIdMaterialRequest/$1', ['filter' => 'Auth']);
+$routes->get('/material-request/create', 'Production\MaterialRequest::createMaterialRequest', ['filter' => 'Auth']);
+$routes->post('/material-request/save', 'Production\MaterialRequest::saveMaterialRequest', ['filter' => 'Auth']);
+$routes->post('/material-request/update', 'Production\MaterialRequest::updateMaterialRequest', ['filter' => 'Auth']);
+$routes->post('/material-request/update-status', 'Production\MaterialRequest::updateStatusMaterialRequest', ['filter' => 'Auth']);
 
 // DROPDOWN
 
