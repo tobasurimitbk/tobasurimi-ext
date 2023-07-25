@@ -5651,6 +5651,25 @@ table.dataTable td .label-finish {
   padding: 25px 12px;
 }
 
+table.dataTable .body-table tr td .btn.btn-success.posting-spp {
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.modal .modal-dialog .modal-content .modal-header .btn.btn-add-barang {
+  background: #4e8a00;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0px !important;
+  letter-spacing: 0;
+  padding: 10px 15px;
+  border: 1px #4e8a00 solid;
+  border-radius: 4px;
+  min-width: 120px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
