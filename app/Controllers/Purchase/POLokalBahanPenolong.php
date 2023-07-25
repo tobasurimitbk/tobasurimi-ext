@@ -184,13 +184,13 @@ class POLokalBahanPenolong extends BaseController
 
         foreach ($poData['data'] as $data) {
             array_push($dataPOLokal, [
-                "no" => $no++,
-                "id" => $data->id,
-                "po_date" => $data->po_date,
-                "po_no" => $data->po_no,
-                "supplierName" => $data->supplierName,
-                "total" => $data->total,
-                "currency" => $data->currency,
+                "no"            => $no++,
+                "id"            => $data->id,
+                "po_date"       => $data->po_date,
+                "po_no"         => $data->po_no,
+                "supplierName"  => $data->supplierName,
+                "total"         => number_format($data->total),
+                "currency"      => $data->currency,
             ]);
         }
 

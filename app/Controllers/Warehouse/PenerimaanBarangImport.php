@@ -5,6 +5,7 @@ namespace App\Controllers\Warehouse;
 use App\Controllers\BaseController;
 
 use App\Models\AMPurchaseOrderModel;
+use App\Models\BarangModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
@@ -19,6 +20,7 @@ class PenerimaanBarangImport extends BaseController
     protected $token;
     protected $this_company_id;
     protected $amPurchaseOrderModel;
+    protected $barangModel;
     protected $metadataModel;
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
@@ -33,6 +35,7 @@ class PenerimaanBarangImport extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->barangModel = new BarangModel();
         $this->metadataModel = new MetadataModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
@@ -408,6 +411,36 @@ class PenerimaanBarangImport extends BaseController
                             ];
                             echo json_encode($data);
                         }
+
+                        // ADD STOK
+                        if($status_post === "FINISH")
+                        {
+                            $find = $this->barangModel->find(formatter($data->barang_id, "STR_TO_INT"));
+
+                            if($find)
+                            {
+                                $conditionUpdateStok = [
+                                    'id' => formatter($data->barang_id, "STR_TO_INT")
+                                ];
+    
+                                $payloadupdateStok = [
+                                    'stok' => formatter($find["stok"], "STR_TO_INT") + formatter($data->jml_masuk, "STR_TO_INT")
+                                ];
+                
+                                $responseStok = $this->barangModel->where($conditionUpdateStok)->set($payloadupdateStok)->update();    
+
+                                if(!$responseStok) {
+                                    $message =  'Gagal Tambah Stok';
+                                    $data = [
+                                        "status"            => false,
+                                        "message"    => $message,
+                                        "payload"   => $payload,
+                                        'token' => csrf_hash()
+                                    ];
+                                    echo json_encode($data);
+                                }
+                            }
+                        }
                     }
 
                     $data = [
@@ -673,6 +706,36 @@ class PenerimaanBarangImport extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                            }
+
+                            // ADD STOK
+                            if($status_post === "FINISH")
+                            {
+                                $find = $this->barangModel->find(formatter($data->barang_id, "STR_TO_INT"));
+
+                                if($find)
+                                {
+                                    $conditionUpdateStok = [
+                                        'id' => formatter($data->barang_id, "STR_TO_INT")
+                                    ];
+        
+                                    $payloadupdateStok = [
+                                        'stok' => formatter($find["stok"], "STR_TO_INT") + formatter($data->jml_masuk, "STR_TO_INT")
+                                    ];
+                    
+                                    $responseStok = $this->barangModel->where($conditionUpdateStok)->set($payloadupdateStok)->update();    
+
+                                    if(!$responseStok) {
+                                        $message =  'Gagal Tambah Stok';
+                                        $data = [
+                                            "status"            => false,
+                                            "message"    => $message,
+                                            "payload"   => $payload,
+                                            'token' => csrf_hash()
+                                        ];
+                                        echo json_encode($data);
+                                    }
+                                }
                             }
                         }
 

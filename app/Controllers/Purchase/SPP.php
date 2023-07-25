@@ -323,6 +323,10 @@ class SPP extends BaseController
                         $value->barang_id = $value->item_id;
                         $value->purchase_request_id = $id;
 
+                        if (!empty($value->isDeleted)) {
+                            $SppDetailModel->where('id', $value->id)->delete();
+                        }
+
                         $dataDetail = [
                             "id" => $value->id ?? null,
                             "purchase_request_id" => $this->request->getPost("id"),
@@ -346,26 +350,26 @@ class SPP extends BaseController
                     echo json_encode($data);
                 } else {
                     $data = [
-                        "status"            => false,
-                        "message"    => 'Data Gagal Diubah',
+                        "status"    => false,
+                        "message"   => 'Data Gagal Diubah',
                         "payload"   =>  json_encode($insertData),
-                        'token' => csrf_hash()
+                        'token'     => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
             } else {
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Diubah",
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             }
         } catch (\Exception $e) {
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
             ];
             echo json_encode($data);
         }

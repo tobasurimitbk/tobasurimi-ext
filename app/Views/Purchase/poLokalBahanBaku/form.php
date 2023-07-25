@@ -536,10 +536,10 @@
 
         // KODE BARANG
         $('.kode_barang').select2({
-            placeholder: "Pilih Kode Barang / Buat Baru",
+            placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
+            tags: false,
             allowClear: true
         })
 
