@@ -64,6 +64,9 @@ class AMPurchaseOrderDetailModel extends Model
 
         $selectQry = "am_purchase_order_details.*,
             FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price), 'N', 'en-us') AS totalPrice,
+            FORMAT(CEILING(am_purchase_order_details.qty), 'N', 'en-us') AS qty,
+            FORMAT(CEILING(am_purchase_order_details.price), 'N', 'en-us') AS price,
+            FORMAT(CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS additional_cost,
             barangs.nama_barang, 
             barangs.kode_barang, 
             satuans.id as id_satuan, 
