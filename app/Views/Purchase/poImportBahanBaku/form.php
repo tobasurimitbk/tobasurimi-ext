@@ -350,7 +350,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
+                                <select class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
                                 <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
@@ -565,6 +567,34 @@
             .find('label')
             .css('z-index', '1');
 
+        // SPESIFIKASI
+        $('.spesifikasi').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.spesifikasi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.spesifikasi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.spesifikasi')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         // SUPPLIER
         $('.supplier_id').select2({
             placeholder: "",
@@ -764,7 +794,7 @@
             $(".nama_barang").val('')
             $(".qty").val('')
             $(".satuan").val('')
-            $(".spesifikasi").val('')
+            $(".spesifikasi").val('').change()
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
@@ -1028,7 +1058,13 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".spesifikasi").val(res?.data?.spek);
+                        $(".spesifikasi").empty()
+                        $(".spesifikasi").append(`<option value=""></option>`)
+                        res.data.spek.forEach(function(item) {
+                            $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
+                        })
+
+                        $(".spesifikasi").val("").change();
                     }
                 })
 
@@ -1042,7 +1078,8 @@
             }
             else
             {
-                $(".spesifikasi").val("")
+                $(".spesifikasi").empty()
+                $(".spesifikasi").val("").change()
                 $(".nama_barang").attr("readonly", false)
                 $(".kode").val("");
                 $(".nama_barang").val("");
@@ -1121,7 +1158,7 @@
             let nama_barang = $(".nama_barang").val()
             let nama_satuan = $(".satuan option:selected").text()
             let satuan = $(".satuan option:selected").val()
-            let spesifikasi = $(".spesifikasi").val()
+            let spesifikasi = $(".spesifikasi option:selected").val() ? $(".spesifikasi option:selected").val() : ""
             let keterangan = $(".keterangan").val()
             let harga = $(".harga").val()
             let qty = $(".qty").val()
@@ -1854,7 +1891,13 @@
             method: "GET",
             dataType: "json",
             success: function(res) {
-                $(".spesifikasi").val(res?.data?.spek).change();
+                $(".spesifikasi").empty()
+                $(".spesifikasi").append(`<option value=""></option>`)
+                res.data.spek.forEach(function(item) {
+                    $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
+                })
+
+                $(".spesifikasi").val(spesifikasi).change();
             }
         })
 
