@@ -289,9 +289,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
+                                <input type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
                                 <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
@@ -567,11 +565,11 @@
             .css('z-index', '1');
 
         // SPESIFIKASI
-        $('.spesifikasi').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        })
+        // $('.spesifikasi').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".detail-modal .modal-content")
+        // })
 
         //CSS SELECT2 FLOATING LABEL
         $('.spesifikasi')
@@ -744,14 +742,8 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".spesifikasi").empty()
-                        $(".spesifikasi").append(`<option value=""></option>`)
-                        res.data.spek = JSON.parse(res.data.spek)
-                        res.data.spek.forEach(function(item) {
-                            $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                        })
-
-                        $(".spesifikasi").val("").change();
+                        let spek = res?.data?.spek;
+                        $(".spesifikasi").val(spek);
                     }
                 })
 
@@ -1720,14 +1712,8 @@
             method: "GET",
             dataType: "json",
             success: function(res) {
-                $(".spesifikasi").empty()
-                $(".spesifikasi").append(`<option value=""></option>`)
-                res.data.spek = JSON.parse(res.data.spek)
-                res.data.spek.forEach(function(item) {
-                    $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                })
-
-                $(".spesifikasi").val(spesifikasi).change();
+                let spek = res?.data?.spek;
+                $(".spesifikasi").val(spek);
             }
         })
 
