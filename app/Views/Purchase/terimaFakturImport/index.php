@@ -41,7 +41,7 @@
                             <th onclick="changeSort('faktur_no')" class="sort">No. Terima Faktur</th>
                             <th onclick="changeSort('sender')" class="sort">Supplier</th>
                             <th onclick="changeSort('nominal_faktur')" class="sort">Nominal Faktur</th>
-                            <th onclick="changeSort('due_date')" class="sort">Jatuh Tempo</th>
+                            <th onclick="changeSort('due_date')" class="sort">Tanggal Faktur</th>
                             <th onclick="changeSort('date_of')" class="sort">Tanggal Penerimaan</th>
                             <th onclick="changeSort('recipient')" class="sort">Penerima</th>
                         </tr>
@@ -105,7 +105,7 @@ const table = $('.dataTable').DataTable({
         className: "text-center"
     },
     {
-        data: "sender",
+        data: "supplier_name",
         className: "text-center"
     },
     {
@@ -113,11 +113,11 @@ const table = $('.dataTable').DataTable({
         className: "text-center"
     },
     {
-        data: "due_date",
+        data: "invoice_date",
         className: "text-center"
     },
     {
-        data: "date_of_receipt",
+        data: "receive_date",
         className: "text-center"
     },
     {
@@ -173,7 +173,7 @@ $(document).ready(function() {
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("terima-faktur-import/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("terima-faktur-import/"); ?>${data.id}`);
     })
 })
 </script>

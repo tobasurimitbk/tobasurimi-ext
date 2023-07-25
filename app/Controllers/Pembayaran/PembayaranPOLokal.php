@@ -4,6 +4,10 @@ namespace App\Controllers\Pembayaran;
 
 use App\Controllers\BaseController;
 
+use App\Models\SupplierModel;
+use App\Models\LocalPOPaymentModel;
+use App\Models\LocalPOInvSummaryModel;
+
 class PembayaranPOLokal extends BaseController
 {
     protected $token;
@@ -22,12 +26,12 @@ class PembayaranPOLokal extends BaseController
 
     public function createPembayaranPOLokal()
     {   
-        $supplierList = [];
-        $responseSupplierList = curl_request("GET", "/suppliers/all?kategori=lokal", $this->token);
-        
-        if ($responseSupplierList['code'] === 200) {
-            $supplierList = json_decode($responseSupplierList['body'])->data;
-        }
+        $supplierModel = new SupplierModel();
+
+        $supplierList = $supplierModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->where('kategori', 'LOKAL')
+            ->findAll();
 
         $data = [
             "suppliers"=> $supplierList
@@ -120,12 +124,15 @@ class PembayaranPOLokal extends BaseController
     
     public function savePembayaranPOLokal()
     {
-        try { 
+        try {
+            $localPOPaymentModel = new LocalPOPaymentModel();
+            $localPOInvSumModel = new LocalPOInvSummaryModel();
+            
             $rules = [
                 "supplier_id" => [
                     "rules" => "required|is_natural_no_zero"
                 ],
-                "summaries.*" => [
+                "summary_id" => [
                     "rules" => "required|is_natural_no_zero"
                 ],
                 "due_date" => [
@@ -153,45 +160,50 @@ class PembayaranPOLokal extends BaseController
                 return;
             }
 
-            $payload = json_encode([
-                "supplier_id"   => (int)$this->request->getPost("supplier_id"),
-                "summaries"     => $this->request->getPost("summaries"),
-                "payment_date"  => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
-                "due_date"      => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
-                "payment_method"=> $this->request->getPost("payment_method"),
-                "payment_status"=> $this->request->getPost("payment_status"),
-            ]);
+            $summaryId = $this->request->getPost("summary_id");
+            $summaryData = $localPOInvSumModel->asObject()
+                ->find($summaryId);
 
-            $response = curl_request("POST", "/localPOPayment", $this->token, $payload);
-
-            if ($response["code"] === 201) {
+            if (empty($summaryData)) {
                 $data = [
-                    "id" => json_decode($response["body"])->createdId,
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
+                    "status"    => false,
+                    "message"   => 'Rekap tidak ditemukan!',
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash(),
-                    'code' => $response["code"]
-                ];
-                echo json_encode($data);
+                return;
             }
+
+            $data = [
+                "supplier_id"               => (int)$this->request->getPost("supplier_id"),
+                "local_po_inv_summary_id"   => $summaryId,
+                "payment_no"                => $this->generatePaymentNo(),
+                "amount"                    => $summaryData->total,
+                "payment_date"              => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
+                "due_date"                  => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
+                "payment_method"            => $this->request->getPost("payment_method"),
+                "payment_status"            => $this->request->getPost("payment_status"),
+            ];
+
+            $insertedId = $localPOPaymentModel->insert($data);
+
+            $data = [
+                "id"        => $insertedId,
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $data,
+                'token'     => csrf_hash(),
+                'code'      => 201
+            ];
+            echo json_encode($data);
+            return;
         }
         catch(\Exception $e)
         {
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
             ];
             echo json_encode($data);
         }
@@ -308,6 +320,33 @@ class PembayaranPOLokal extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    private function generatePaymentNo()
+    {
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
+        $month = idate('m');
+        $year = date('Y');
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "PAY/$romanMonth/$year/";
+
+        $lastData = $localPOPaymentModel->asObject()
+            ->like('payment_no', $numberTemplate, 'after')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $paymentNo = "{$numberTemplate}0001";
+        
+        if (!empty($lastData)) {
+            $exploded = explode('/', $lastData->payment_no);
+            $lastIncrement = (int)$exploded[3] + 1;
+
+            $paddedNumber = str_pad($lastIncrement, 4, 0, STR_PAD_LEFT);
+            $paymentNo = $numberTemplate . $paddedNumber;
+        }
+
+        return $paymentNo;
     }
 }
 

@@ -55,7 +55,7 @@
 
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select" name="summaries[]" id="supplier-faktur">
+                        <select class="form-select" name="summary_id" id="supplier-faktur">
                             <?php foreach ($summaryList ?? [] as $summary): ?>
                             <option value="<?= $summary->id ?>" data-amount="<?= floatval($summary->amount) ?>" <?= (in_array($summary->id, $selectedFaktur)) ? 'selected' : '' ?>><?= $summary->summary_no ?></option>
                             <?php endforeach ?>
@@ -73,7 +73,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->due_date ?? '' ?>">
+                        <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->due_date ?? '' ?>" readonly>
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
@@ -172,7 +172,7 @@ $(document).ready(function() {
         },
     });
 
-    $(".due_date").datepicker({
+    $("#payment_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -186,8 +186,7 @@ $(document).ready(function() {
     }).change(function(e) {
         $("#supplier-faktur").empty();
         $("#supplier-faktur").select2({
-            multiple: true,
-            placeholder: "Pilih Bro",
+            // placeholder: "Pilih Bro",
             theme: "bootstrap-5",
             ajax: {
                 url: '<?= base_url() . 'rekap-faktur/supplier/' ?>' + $(this).val(),
@@ -198,15 +197,16 @@ $(document).ready(function() {
                             return {
                                 id: item.id,
                                 text: item.summary_no,
-                                amount: +item.amount
+                                amount: +item.total,
+                                dueDate: item.due_date
                             }
                         })
                     };
                 }
             },
             templateSelection: function(container) {
-                // console.log('goblokkkkkkkkkkkkkkkkkk')
                 $(container.element).attr("data-amount", container.amount);
+                $(container.element).attr("data-dueDate", container.dueDate);
                 return container.text;
             }
         });
@@ -214,12 +214,15 @@ $(document).ready(function() {
 
     $("#supplier-faktur").change(function(e) {
         let total = 0;
+        let dueDate = '';
         
         $(this).select2('data').map(function(data) {
             total += data.amount;
+            dueDate = data.dueDate;
         });
         
         $('#nominal_pembayaran').val(total);
+        $('#due_date').val(dueDate);
     });
 
     //CSS SELECT2 FLOATING LABEL
