@@ -5,6 +5,7 @@ namespace App\Controllers\Warehouse;
 use App\Controllers\BaseController;
 
 use App\Models\BarangModel;
+use App\Models\BarangSupplierModel;
 use App\Models\MetadataModel;
 
 class Barang extends BaseController
@@ -12,6 +13,7 @@ class Barang extends BaseController
     protected $token;
     protected $this_company_id;
     protected $barangModel;
+    protected $barangSupplierModel;
     protected $metadataModel;
 
     public function __construct()
@@ -19,6 +21,7 @@ class Barang extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
+        $this->barangSupplierModel = new BarangSupplierModel();
         $this->metadataModel = new MetadataModel();
     }
 
@@ -73,7 +76,6 @@ class Barang extends BaseController
                 "parent_barang"   => $data->parent_barang,
                 "kode_barang"   => $data->kode_barang,
                 "nama_barang"   => $data->nama_barang,
-                "supplier_name"   => $data->supplier_name,
                 "type"          => $data->type,
                 "harga_barang"  => number_format($data->harga_barang),
                 "kode_satuan"   => $data->kode_satuan,
@@ -132,7 +134,7 @@ class Barang extends BaseController
                         "parent_id" => formatter($this->request->getPost("parent_id"), "STR_TO_INT"),
                         "kode_barang" => $this->request->getPost("kode_barang"),
                         "nama_barang" => $this->request->getPost("nama_barang"),
-                        "tipe" => $this->request->getPost("tipe"),
+                        "type" => $this->request->getPost("type"),
                         "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                         "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
                         "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
@@ -156,9 +158,31 @@ class Barang extends BaseController
                     ];
                 }
 
+                $supplier_id = json_decode($this->request->getPost("supplier_id"));
+
                 $response =  $this->barangModel->insert($payload);
 
                 if ($response) {
+                    foreach ($supplier_id as $item) 
+                    {
+                        $payload_supplier = [
+                            "barang_id" => $response,
+                            "supplier_id" => $item
+                        ];
+                        $responseSupplier =  $this->barangSupplierModel->insert($payload_supplier);
+
+                        if (!$responseSupplier){
+                            $message =  'Data Gagal Disimpan';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload_supplier,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    }
+
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
@@ -215,7 +239,7 @@ class Barang extends BaseController
                 if($parent)
                 {
                     $payload = [
-                        "tipe" => $this->request->getPost("tipe"),
+                        "type" => $this->request->getPost("type"),
                         "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                         "company_id" => $this->this_company_id,
                         "nama_barang" => $this->request->getPost("nama_barang"),
@@ -253,14 +277,51 @@ class Barang extends BaseController
 
                 $response = $this->barangModel->where($condition)->set($payload)->update();
 
+                $supplier_id = json_decode($this->request->getPost("supplier_id"));
+
                 if ($response) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                    $responseDelete =  $this->barangSupplierModel->deleteByBarangId($id);
+
+                    if($responseDelete)
+                    {
+                        foreach ($supplier_id as $item) 
+                        {
+                            $payload_supplier = [
+                                "barang_id" => $id,
+                                "supplier_id" => $item
+                            ];
+                            $responseSupplier =  $this->barangSupplierModel->insert($payload_supplier);
+
+                            if (!$responseSupplier){
+                                $message =  'Data Gagal Diubah';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload_supplier,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil diubah",
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                    else
+                    {
+                        $data = [
+                            "status"            => false,
+                            "message"    => "Data Gagal Diubah",
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
                 } else {
                     $message = 'Data Gagal Diubah';
                     $data = [
@@ -340,11 +401,22 @@ class Barang extends BaseController
         if (!empty($id)) {
             $response =  $this->barangModel->find($id);
             if ($response) {
-                $data = [
-                    "status"  => true,
-                    "data"  => $response,
-                ];
-                echo json_encode($data);
+                $responseSupplier =  $this->barangSupplierModel->getByBarangId($id);
+                if ($responseSupplier) {
+                    $data = [
+                        "status"  => true,
+                        "data"  => $response,
+                        "dataSupplier"  => $responseSupplier
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $data = [
+                        "status"  => true,
+                        "data"  => $response,
+                        "dataSupplier"  => []
+                    ];
+                    echo json_encode($data);
+                }
             } else {
                 $message = 'Data Gagal Ditemukan';
                 $data = [
