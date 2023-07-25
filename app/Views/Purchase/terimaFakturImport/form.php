@@ -49,20 +49,20 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->date_of_receipt : ""; ?>" class="form-control input-picker date_of_receipt" id="date_of_receipt" name="date_of_receipt" placeholder="Tanggal Penerimaan">
-                        <label for="floatingInput">Tanggal Penerimaan</label>
+                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->invoice_date ?? ""; ?>" class="form-control input-picker datepicker" id="invoice_date" name="invoice_date" placeholder="Tanggal Faktur">
+                        <label for="floatingInput">Tanggal Faktur</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->faktur_no : ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur">
+                                <input value="<?=  $dataTerimaFaktur->faktur_no ?? ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur" disabled readonly>
                                 <label for="floatingInput">No. Terima Faktur</label>
                             </div>
-                            <div style="<?= !empty($dataTerimaFaktur) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                            <!-- <div style="<?= !empty($dataTerimaFaktur) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                 <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -71,6 +71,7 @@
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
+                            <option value="" disabled <?= empty($dataTerimaFaktur) ? 'selected' : '' ?>></option>
                             <option value="BAKU" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "BAKU" ? "selected" : "") : ""; ?>>Bahan Baku</option>
                             <option value="PENOLONG" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "PENOLONG" ? "selected" : "") : ""; ?>>Bahan Penolong</option>
                         </select>
@@ -85,7 +86,7 @@
                             if (!empty($dataSupplier)) {
                                 foreach ($dataSupplier as $supplier) {
                             ?>
-                                    <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->supplier_id === $supplier->id ? "selected" : "") : ""; ?>><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
+                                    <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->supplier_id === $supplier->id ? "selected" : "") : ""; ?>><?= "$supplier->kode - $supplier->name"; ?></option>
                             <?php
                                 }
                             }
@@ -96,27 +97,95 @@
                 </div>
             </div>
             <div class="row">
+                <div class="col-md-12">
+                    Daftar Penerimaan Barang
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th onclick="changeSort('faktur_no')" class="sort">No. PO</th>
+                                    <th onclick="changeSort('sender')" class="sort">Tgl. LPB</th>
+                                    <th onclick="changeSort('nominal_faktur')" class="sort">No. LPB</th>
+                                    <th onclick="changeSort('due_date')" class="sort">Nama Barang</th>
+                                    <th onclick="changeSort('date_of')" class="sort">Qty LPB</th>
+                                    <th onclick="changeSort('date_of')" class="sort">Qty Retur</th>
+                                    <th onclick="changeSort('date_of')" class="sort">Qty telah terima</th>
+                                    <th onclick="changeSort('date_of')" class="sort">Qty akan diterima</th>
+                                    <th onclick="changeSort('recipient')" class="sort">satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    Daftar penerimaan barang yang akan dibuat tanda terima
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi" id="selectedItemTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No. PO</th>
+                                    <th>Tgl. LPB</th>
+                                    <th>No. LPB</th>
+                                    <th>Nama Barang</th>
+                                    <th>Qty</th>
+                                    <th>satuan</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select multiple <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : "disabled=true"; ?> class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataNo)) {
-                                foreach ($dataNo as $no) {
-                            ?>
-                                    <option value="<?= $no->id; ?>" <?= (!empty($dataTerimaFaktur) ? (in_array($no->id, $dataTerimaFaktur->multiple_po_id) ? "selected" : "") : ""); ?>><?= $no->po_no; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                        <label for="floatingInput">No. PO</label>
+                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker datepicker" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
+                        <label for="floatingInput">Tanggal Penerimaan</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->due_date : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
-                        <label for="floatingInput">Tanggal Jatuh Tempo</label>
+                        <input value="<?= $dataTerimaFaktur->item_total ?? 0; ?>" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" disabled readonly>
+                        <label for="floatingInput">Total Nominal Faktur</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" placeholder="Keterangan">
+                        <label for="floatingInput">Potongan</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" placeholder="Keterangan">
+                        <label for="floatingInput">Tambahan</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= $dataTerimaFaktur->nominal_faktur ?? 0; ?>" />
+                        <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
+                        <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
             </div>
@@ -127,27 +196,298 @@
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
+            </div>
+
+            <div class="row"><div class="col-md-12">Pengenaan Pajak</div></div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
-                        <label for="floatingInput">Nominal Faktur</label>
+                        <input class="form-control input-picker datepicker" id="tax_inv_date" name="tax_inv_date" placeholder="Tanggal Faktur Pajak">
+                        <label for="floatingInput">Tanggal Faktur Pajak</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input type="text" class="form-control" id="tax_inv_no" name="tax_inv_no" placeholder="No. Faktur Pajak">
+                        <label for="floatingInput">No. Faktur Pajak</label>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-floating mb-3">
-                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->information : ""; ?></textarea>
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select" name="tax_type" id="tax_type">
+                            <option value="" disabled selected></option>
+                            <option value="PPN Masukan">PPN Masukan</option>
+                            <option value="PPN Masukan 11%">PPN Masukan 11%</option>
+                            <option value="PPh Pasal 21">PPh Pasal 21</option>
+                            <option value="PPh Pasal 23">PPh Pasal 23</option>
+                            <option value="PPh Pasal 4 (2)">PPh Pasal 4 (2)</option>
+                        </select>
+                        <label for="floatingInput">Pilih Pajak</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
+                        <label for="floatingInput">Jumlah</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select" name="tax_status" id="tax_status">
+                            <option value="" disabled selected></option>
+                            <option value="Pajak dipungut oleh negara">Pajak dipungut oleh negara</option>
+                            <option value="Pajak dikembalikan lagi">Pajak dikembalikan lagi</option>
+                        </select>
+                        <label for="floatingInput">Status</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <textarea class="form-control information text-area-all" id="tax_note" name="tax_note" placeholder="Keterangan"></textarea>
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
             </div>
+            <button type="button" class="btn btn-primary" id="add-tax-btn">Tambah Pengenaan Pajak</button>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi" id="taxTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Tgl. Faktur Pajak</th>
+                                    <th>No. Faktur Pajak</th>
+                                    <th>Pajak</th>
+                                    <th>Jumlah</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
         </form>
     </div>
 </div>
 </section>
 
 <script>
+    const id = $(".id").val();
+    let sort = "faktur_no";
+    let sortType = "asc";
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        deferLoading: true,
+        ordering: false,
+        order: [
+            [1, 'asc']
+        ],
+
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 10,
+        ajax: {
+            url: "/",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        // scrollX: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "id",
+            className: "text-center",
+            orderable: false
+        },
+        {
+            data: "no_po",
+            className: "text-center"
+        },
+        {
+            data: "lpb_date",
+            className: "text-center"
+        },
+        {
+            data: "no_lpb",
+            className: "text-center"
+        },
+        {
+            data: "item_name",
+            className: "text-center"
+        },
+        {
+            data: "lpb_qty",
+            className: "text-center"
+        },
+        {
+            data: "return_qty",
+            className: "text-center"
+        },
+        {
+            data: "received_qty",
+            className: "text-center"
+        },
+        {
+            data: "qty_will_be_received",
+            className: "text-center"
+        },
+        {
+            data: "unit",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        },
+        {
+            render: function(data, type, row) {
+                return `<div class="form-check"><input class="form-check-input" type="checkbox" ></div>`
+            },
+            targets: 0
+        },
+        {
+            render: function(data, type, row) {
+                return `<input class="form-control" type="text" value="${data}">`
+            },
+            targets: 8
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    const selectedItemTable = $('#selectedItemTable').DataTable({
+        lengthChange: true,
+        info: false,
+        paging: false,
+        searching: false,
+        ordering: false,
+        language: {
+            emptyTable: "Tidak Ada Data"
+        },
+        columns: [{
+            data: "no_po",
+            className: "text-center"
+        },
+        {
+            data: "lpb_date",
+            className: "text-center"
+        },
+        {
+            data: "no_lpb",
+            className: "text-center"
+        },
+        {
+            data: "item_name",
+            className: "text-center"
+        },
+        {
+            data: "qty",
+            className: "text-center"
+        },
+        {
+            data: "unit",
+            className: "text-center"
+        },
+        {
+            data: "total",
+            className: "text-center"
+        },
+        {
+            className: "text-center"
+        }],
+        columnDefs: [{
+            render: function(data, type, row) {
+                return `<button type="button" class="btn btn-danger" data-action="delete-item">Delete</button>`;
+            },
+            targets: -1
+        }]
+    });
+
+    const taxTable = $('#taxTable').DataTable({
+        lengthChange: true,
+        info: false,
+        paging: false,
+        searching: false,
+        ordering: false,
+        language: {
+            emptyTable: "Tidak Ada Data"
+        },
+        columns: [{
+            data: "nol",
+            className: "text-center",
+            render: function (data, type, row, meta) {
+                return meta.row + meta.settings._iDisplayStart + 1;
+            }
+        },
+        {
+            data: "taxInvDate",
+            className: "text-center"
+        },
+        {
+            data: "taxInvNo",
+            className: "text-center"
+        },
+        {
+            data: "taxType",
+            className: "text-center"
+        },
+        {
+            data: "taxAmt",
+            className: "text-center"
+        },
+        {
+            data: "taxStatus",
+            className: "text-center"
+        },
+        {
+            data: "taxNote",
+            className: "text-center"
+        },
+        {
+            className: "text-center"
+        }],
+        columnDefs: [{
+            render: function(data, type, row) {
+                return `<button type="button" class="btn btn-danger" data-action="delete-tax-item">Delete</button>`;
+            },
+            targets: -1
+        }]
+    });
+
 $(document).ready(function() {
     const csrfToken = '<?= csrf_token() ?>';
 
@@ -218,14 +558,7 @@ $(document).ready(function() {
         },
     });
 
-    $(".date_of_receipt").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    })
-
-    $(".due_date").datepicker({
+    $(".datepicker").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -303,13 +636,12 @@ $(document).ready(function() {
                     setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
 
-                    data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
-                    var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
-                        return elem.text 
-                    });
-                    data.append("multiple_po_no", JSON.stringify(arr_no));
+                    const selectedItems = selectedItemTable.rows().data().toArray();
+                    data.append("penerimaan_barang", JSON.stringify(selectedItems));
 
-                    let id = $(".id").val();
+                    const selectedTaxes = taxTable.rows().data().toArray();
+                    data.append("pengenaan_pajak", JSON.stringify(selectedTaxes));
+
                     // UPDATE
                     if(id)
                     {
@@ -332,7 +664,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("terima-faktur-import"); ?>" + "/id/" + id;
+                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>/ ${id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -357,7 +689,7 @@ $(document).ready(function() {
                     else
                     {
                         $.ajax({
-                            url: "<?= base_url("terima-faktur-import/save"); ?>",
+                            url: "<?= base_url("terima-faktur-import/create"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -375,7 +707,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("terima-faktur-import"); ?>" + "/id/" + response.id;
+                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>/${response.id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -449,7 +781,7 @@ $(document).ready(function() {
                                     })
                                     .then(() => {
                                         window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + id, "_blank");
-                                        window.location.href = "<?= base_url("terima-faktur-import"); ?>" + "/id/" + id;
+                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>/${id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -493,7 +825,7 @@ $(document).ready(function() {
                                     })
                                     .then(() => {
                                         window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + response.id, "_blank");
-                                        window.location.href = "<?= base_url("terima-faktur-import"); ?>" + "/id/" + response.id;
+                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>/${response.id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -515,7 +847,6 @@ $(document).ready(function() {
                             }
                         });
                     }
-                    
                 }
             })
         }
@@ -587,7 +918,7 @@ $(document).ready(function() {
         $(".sender").val(name);
         if($(".supplier_id option:selected").val())
         {
-            if($(".tipe_bahan").val() === "BAKU")
+            /* if($(".tipe_bahan").val() === "BAKU")
             {
                 $.ajax({
                     url: `<?= base_url("penerimaan-barang-import/dropdown"); ?>`,
@@ -632,7 +963,11 @@ $(document).ready(function() {
                         $(".multiple_po_id").val([]);
                     }
                 })
-            }
+            } */
+            // console.log(table.settings())
+            // table.settings.ordering = true;
+            table.ajax.url(`<?= base_url("penerimaan-barang-import/receivedItemsBySupplier/"); ?>${$(this).val()}`);
+            table.ajax.reload();
         }
         else
         {
@@ -641,8 +976,135 @@ $(document).ready(function() {
             $(".multiple_po_id").append(`<option value=""></option>`)
             $(".multiple_po_id").val([]);
         }
-    })
-})
+    });
+
+    $('#select-item-btn').click(() => {
+        const selectedRow = $('#dataTable tbody tr td input:checked').closest("tr");
+        /* const data = table.row(selectedRow[0]).data();
+        console.log(data) */
+        
+        if (selectedRow.length) {
+            selectedRow.each((i, el) => {
+                const qtyVal = $(el).find('input[type="text"]').first().val();
+
+                const data = table.row(el).data();
+                const selectedData = selectedItemTable.rows().data().toArray().map((obj) => {
+                    return obj.id;
+                });
+
+                if (selectedData.includes(data.id)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Sudah dipilih!',
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                    return;
+                }
+
+                if (qtyVal > 0) {
+                // if (qtyVal > 0) {
+                    const qty = (+qtyVal > +data.qty_will_be_received) ? data.qty_will_be_received : qtyVal;
+                    const elColumn = $(el).find('td');
+
+                    const obj = {
+                        id: data.id,
+                        no_po: data.no_po,
+                        lpb_date: data.lpb_date,
+                        no_lpb: data.no_lpb,
+                        item_name: data.item_name,
+                        qty: qty,
+                        unit: data.unit,
+                        total: data.price * qty,
+                    };
+                    selectedItemTable.row.add(obj).draw(false);
+                }
+
+            });
+
+            const selectedItemTotal = selectedItemTable.rows().data().toArray().reduce((total, obj) => {
+                return total += +obj.total;
+            }, 0);
+            $('#nominal_faktur').val(selectedItemTotal);
+            $('#nominal_faktur').trigger('change');
+        }
+        
+    });
+
+    $('#selectedItemTable').on('click', '[data-action="delete-item"]', function() {
+        const data = selectedItemTable.row($(this).parent().parent()).data();
+        selectedItemTable.row($(this).parent().parent()).remove().draw();
+
+        const selectedItemTotal = selectedItemTable.rows().data().toArray().reduce((total, obj) => {
+            return total += +obj.total;
+        }, 0);
+        $('#nominal_faktur').val(selectedItemTotal);
+        $('#nominal_faktur').trigger('change');
+    });
+
+    $('#taxTable').on('click', '[data-action="delete-tax-item"]', function() {
+        // const data = taxTable.row($(this).parent().parent()).data();
+        taxTable.row($(this).parent().parent()).remove().draw();
+    });
+
+    $('#add-tax-btn').click(() => {
+        const taxInvDate = $('#tax_inv_date');
+        const taxInvNo = $('#tax_inv_no');
+        const taxType = $('#tax_type');
+        const taxAmt = $('#tax_amt');
+        const taxStatus = $('#tax_status');
+        const taxNote = $('#tax_note');
+
+        if (!taxInvDate.val() || !taxInvNo.val() || !taxType.val() || !taxAmt.val() || !taxStatus.val()) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Data harus diisi!',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+            return;
+        }
+
+        const obj = {
+            no: 1,
+            taxInvDate: taxInvDate.val(),
+            taxInvNo: taxInvNo.val(),
+            taxType: taxType.val(),
+            taxAmt: taxAmt.val(),
+            taxStatus: taxStatus.val(),
+            taxNote: taxNote.val()
+        };
+        taxTable.row.add(obj).draw(false);
+        
+        taxInvDate.val('');
+        taxInvNo.val('');
+        taxType.val('');
+        taxAmt.val('');
+        taxStatus.val('');
+        taxNote.val('');
+    });
+
+    $('#nominal_faktur').change(recalculateInvAmt);
+    $('#potongan,#tambahan').keyup(recalculateInvAmt);
+
+    function recalculateInvAmt() {
+        const invAmt = $('#nominal_faktur').val() || 0;
+        const potongan = $('#potongan').val() || 0;
+        const tambahan = $('#tambahan').val() || 0;
+
+        const total = +invAmt + +tambahan - +potongan;
+        $('#InvFinalAmt').val(total);
+    }
+
+    if (id) {
+        const selectedItemData = <?= json_encode($selectedItems ?? []) ?>;
+        selectedItemTable.rows.add(selectedItemData).draw(false);
+
+        const taxList = <?= json_encode($taxData ?? []); ?>;
+        console.log(taxList)
+        taxTable.rows.add(taxList).draw(false);
+    }
+});
 
 const changeTipeBahan = function()
 {

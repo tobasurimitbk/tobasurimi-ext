@@ -24,9 +24,6 @@ class PenerimaanBarangDetailModel extends Model
         'harga',
         'penyerahan',
         'keterangan',
-        'createdAt',
-        'updatedAt',
-        'deletedAt',
         'barang_id',
         'warehouse',
         'qty',
@@ -34,7 +31,11 @@ class PenerimaanBarangDetailModel extends Model
         'pph',
         'unit',
         'nama_barang_dok',
-        'jml_masuk'
+        'jml_masuk',
+        'summarized_qty',
+        'createdAt',
+        'updatedAt',
+        'deletedAt'
     ];
 
     // Dates

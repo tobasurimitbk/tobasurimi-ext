@@ -201,14 +201,14 @@ class RekapFaktur extends BaseController
 
     public function getRekapFakturBySupplier($supplierId)
     {
-        $response = curl_request("GET", "/localPOInvSummary/supplier/$supplierId", $this->token);
+        
+        $localPOInvSumModel = new LocalPOInvSummaryModel();
 
-        $fakturList = [];
-        $totalRecords = 0;
-
-        if ($response["code"] === 200) {
-            $fakturList = json_decode($response["body"])->data;
-        }
+        $fakturList = $localPOInvSumModel->asObject()
+            ->select("id, summary_no, total, DATE_FORMAT(due_date, '%d/%m/%Y') AS due_date")
+            ->where('company_id', $this->this_company_id)
+            ->where('supplier_id', $supplierId)
+            ->findAll();
 
         $data = [
             'data'=> $fakturList
