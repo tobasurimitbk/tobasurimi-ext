@@ -672,8 +672,7 @@
             $(".kode").val('')
             $(".nama_barang").val('')
             $(".qty").val('')
-            $(".spesifikasi").empty()
-            $(".spesifikasi").val('').change()
+            $(".spesifikasi").val('')
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
@@ -754,8 +753,7 @@
                 $(".harga").val(harga ? harga.toLocaleString() : "");
                 $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
             } else {
-                $(".spesifikasi").empty()
-                $(".spesifikasi").val("").change()
+                $(".spesifikasi").val("")
                 $(".nama_barang").attr("readonly", false)
                 $(".kode").val("");
                 $(".nama_barang").val("");
@@ -831,7 +829,7 @@
             let barang_id = $(".barang_id").val()
             let kode_barang = $(".kode").val()
             let nama_barang = $(".nama_barang").val()
-            let spesifikasi = $(".spesifikasi option:selected").val() ? $(".spesifikasi option:selected").val() : ""
+            let spesifikasi = $(".spesifikasi").val()
             let keterangan = $(".keterangan").val()
             let harga = $(".harga").val()
             let qty = $(".qty").val()
