@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\RawSql;
 use CodeIgniter\Model;
 use PhpParser\Node\Expr\Cast\Object_;
 
@@ -196,15 +197,17 @@ class PenerimaanBarangModel extends Model
                       DATE_FORMAT(penerimaan_barang.validation_date, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang.no_penerimaan_barang AS no_lpb,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
-                      penerimaan_barang_detail.qty AS lpb_qty,
+                      (`penerimaan_barang_detail`.`qty` - `penerimaan_barang_detail`.`summarized_qty`) AS lpb_qty,
                       penerimaan_barang_detail.harga AS price,
                       satuans.kode_satuan AS unit";
         $receiveDataQry = $this->asObject()
             ->select($selectQry)
             ->where('penerimaan_barang.supplier_id', $supplierId)
             ->where($condition)
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
-            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            ->where('(`penerimaan_barang_detail`.`qty` - `penerimaan_barang_detail`.`summarized_qty`) > 0')
+            ->where("penerimaan_barang_detail.summarized_qty <", 'penerimaan_barang_detail.qty', false)
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit AND satuans.deletedAt IS NULL')
             ->orderBy($sort, $sortType);
 
         $totalData = $receiveDataQry->countAllResults(false);

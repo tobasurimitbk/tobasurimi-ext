@@ -917,8 +917,9 @@ class PenerimaanBarangLokal extends BaseController
 
         $condition = [
             // "suppliers.company_id"  => $this->this_company_id,
-            "penerimaan_barang.status_penerimaan"   => "LOKAL",
-            "penerimaan_barang.tipe_bahan"          => "BAKU",
+            "penerimaan_barang.status_penerimaan"       => "LOKAL",
+            "penerimaan_barang.tipe_bahan"              => "BAKU",
+            // "penerimaan_barang_detail.summarized_qty <" => 'penerimaan_barang_detail.qty'
 
             // "search"                                => $this->request->getGet("search"),
             // "sort"                                  => $this->request->getGet("sort"),
