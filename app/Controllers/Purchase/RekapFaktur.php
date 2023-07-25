@@ -262,6 +262,35 @@ class RekapFaktur extends BaseController
         return view('Purchase/rekapFaktur/form', $data);
     }
 
+    public function getInvItemsBySummaryId($summaryId)
+    {
+        
+        $localPOInvSumModel = new LocalPOInvSummaryModel();
+
+        $selectQry = "penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
+                      penerimaan_barang_detail.nama_barang_dok AS item_name,
+                      penerimaan_barang_detail.qty AS qty,
+                      (penerimaan_barang_detail.qty * penerimaan_barang_detail.harga) AS total,
+                      satuans.kode_satuan AS unit";
+        $fakturList = $localPOInvSumModel->asObject()
+            ->select($selectQry)
+            ->join('local_po_inv_sum_details', 'local_po_inv_sum_details.local_po_inv_summary_id = local_po_inv_summaries.id')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = local_po_inv_sum_details.penerimaan_barang_id')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            // ->where('company_id', $this->this_company_id)
+            ->where('local_po_inv_summaries.id', $summaryId)
+            ->findAll();
+
+        $data = [
+            'data'=> $fakturList
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function updateRekap()
     {
         try{

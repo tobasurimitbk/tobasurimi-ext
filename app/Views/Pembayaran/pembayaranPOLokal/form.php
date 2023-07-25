@@ -108,6 +108,30 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Item List</h4>
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Tanggal LPB</th>
+                                    <th>No. LPB</th>
+                                    <th>Item Name</th>
+                                    <th>Qty</th>
+                                    <th>Unit</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
 </div>
@@ -172,6 +196,59 @@ $(document).ready(function() {
         },
     });
 
+    // data table start
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        info: false,
+        fixedHeader: true,
+        lengthChange: false,
+        paging: false,
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "lpb_date",
+            className: "text-center"
+        },
+        {
+            data: "no_lpb",
+            className: "text-center"
+        },
+        {
+            data: "item_name",
+            className: "text-center"
+        },
+        {
+            data: "qty",
+            className: "text-center"
+        },
+        {
+            data: "unit",
+            className: "text-center"
+        },
+        {
+            data: "total",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+    // data table end
+
     $("#payment_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
@@ -184,6 +261,7 @@ $(document).ready(function() {
         placeholder: "",
         theme: "bootstrap-5"
     }).change(function(e) {
+        table.clear().draw();
         $("#supplier-faktur").empty();
         $("#supplier-faktur").select2({
             // placeholder: "Pilih Bro",
@@ -212,7 +290,7 @@ $(document).ready(function() {
         });
     });
 
-    $("#supplier-faktur").change(function(e) {
+    $("#supplier-faktur").change(async function(e) {
         let total = 0;
         let dueDate = '';
         
@@ -223,6 +301,11 @@ $(document).ready(function() {
         
         $('#nominal_pembayaran').val(total);
         $('#due_date').val(dueDate);
+
+        // populate data table here
+        const itemList = await getItemList($(this).val());
+        table.clear();
+        table.rows.add(itemList.data).draw();
     });
 
     //CSS SELECT2 FLOATING LABEL
@@ -302,6 +385,29 @@ $(document).ready(function() {
             })
         }
     })
+
+    function getItemList(invId) {
+        return $.ajax({
+            url: `<?= base_url("rekap-faktur/getItemList/"); ?>${invId}`,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "GET",
+            dataType: "json",
+            success: function(response) {
+                return response.data;
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Gagal Diambil, coba Lagi',
+                    confirmButtonColor: '#4e73df',
+                })
+                stopLoading()
+            }
+        });
+    }
 })
 
 const changeStatus = function()
