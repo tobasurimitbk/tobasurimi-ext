@@ -8,7 +8,7 @@
                 <h5 class="modal-title"><label class="title-name"></label> Barang</h5>
             </div>
             <div class="modal-body">
-            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <input type="hidden" class="parent" name="parent" id="parent" />
                     <?= csrf_field() ?>
