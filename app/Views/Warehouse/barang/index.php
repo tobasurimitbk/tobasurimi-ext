@@ -51,7 +51,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                                    <select multiple class="form-select supplier_id" name="supplier_id[]" id="supplier_id[]">
                                         <option value=""></option>
                                     </select>
                                     <label for="floatingInput">Supplier</label>
@@ -113,7 +113,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="text" class="form-control spec" name="spec" id="spec" placeholder="Spesifikasi">
+                                    <input type="text" class="form-control spek" name="spek" id="spek" placeholder="Spesifikasi">
                                     <label for="floatingInput">Spesifikasi</label>
                                 </div>
                             </div>
@@ -218,7 +218,6 @@
                             <th onclick="changeSort('parent_barang')" class="sort">Parent Barang</th>
                             <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                             <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                            <th onclick="changeSort('supplier_name')" class="sort">Nama Supplier</th>
                             <th onclick="changeSort('type')" class="sort">Tipe Supplier</th>
                             <th onclick="changeSort('harga_barang')" class="sort">Harga Barang</th>
                             <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
@@ -295,10 +294,6 @@
         },
         {
             data: "nama_barang",
-            className: "text-center"
-        },
-        {
-            data: "supplier_name",
             className: "text-center"
         },
         {
@@ -382,7 +377,6 @@
         $('.supplier_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true,
             dropdownParent: $(".add-modal .modal-content")
         })
 
@@ -623,9 +617,6 @@
                 type: {
                     required: "Type wajib diisi"
                 },
-                supplier_id: {
-                    required: "Supplier wajib diisi"
-                },
                 satuan_id: {
                     required: "Satuan wajib diisi"
                 },
@@ -669,9 +660,9 @@
 
         $(".btn-show-form").click(function() {
             $(".parent_id").removeAttr('disabled');
-            $(".body-detail-spek").empty()
-            list_spek = [];
-            row_detail = 0;
+            // $(".body-detail-spek").empty()
+            // list_spek = [];
+            // row_detail = 0;
             $('.kode_barang').rules('add', {
                 required: true
             });
@@ -680,13 +671,13 @@
             $('.harga_barang').rules('remove', 'required');
             $('.satuan_id').rules('remove', 'required');
             $('.type').rules('remove', 'required');
-            $('.supplier_id').rules('remove', 'required');
             $('.kategori_id').rules('remove', 'required');
             $('.hs_id').rules('remove', 'required');
             $('.ap_id').rules('remove', 'required');
             $('.ar_id').rules('remove', 'required');
             $(".type").val();
-            $(".supplier_id").val('').change();
+            $('.spek').val();
+            $(".supplier_id").val([]).change();
             $(".supplier_id").empty();
             $('.parent').val();
             $('.kode_barang').val();
@@ -802,9 +793,9 @@
             $(".title-name").text("Update");
             $(".stok").attr("readonly", true);
             $(".kode_barang").attr("readonly", true);
-            $(".body-detail-spek").empty()
-            row_detail = 0;
-            list_spek = [];
+            // $(".body-detail-spek").empty()
+            // row_detail = 0;
+            // list_spek = [];
             $(".parent_id").attr('disabled', 'true');
 
             $.ajax({
@@ -845,9 +836,6 @@
                             $('.harga_barang').rules('add', {
                                 required: true
                             });
-                            $('.supplier_id').rules('add', {
-                                required: true
-                            });
                             $('.type').rules('add', {
                                 required: true
                             });
@@ -872,7 +860,6 @@
                             $(".is_parent").css("display", "none");
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('remove', 'required');
-                            $('.supplier_id').rules('remove', 'required');
                             $('.type').rules('remove', 'required');
                             $('.satuan_id').rules('remove', 'required');
                             $('.kategori_id').rules('remove', 'required');
@@ -882,6 +869,7 @@
                         }
 
                         $(".kode_barang").val(res?.data?.kode_barang);
+                        $(".spek").val(res?.data?.spek);
                         $(".nama_barang").val(res?.data?.nama_barang);
                         $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
                         console.log()
@@ -950,6 +938,11 @@
                         $(".supplier_id").empty()
                         $(".type").val(res?.data?.type)
 
+                        let arr_supplier_id = []
+                        res?.dataSupplier.forEach(function(item) {
+                            arr_supplier_id.push(Number(item.supplier_id));
+                        })
+
                         if(res?.data?.type === "BAHAN BAKU LOKAL")
                         {
                             $.ajax({
@@ -957,13 +950,14 @@
                                 method: "GET",
                                 dataType: "json",
                                 success: function(result) {
+                                    $(".supplier_id").empty()
                                     $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                                     })
 
-                                    $(".supplier_id").val(res?.data?.supplier_id).change();
+                                    $(".supplier_id").val(arr_supplier_id).change();
                                 }
                             })
                         }
@@ -974,13 +968,14 @@
                                 method: "GET",
                                 dataType: "json",
                                 success: function(result) {
+                                    $(".supplier_id").empty()
                                     $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                                     })
 
-                                    $(".supplier_id").val(res?.data?.supplier_id).change();
+                                    $(".supplier_id").val(arr_supplier_id).change();
                                 }
                             })
                         }
@@ -991,13 +986,14 @@
                                 method: "GET",
                                 dataType: "json",
                                 success: function(result) {
+                                    $(".supplier_id").empty()
                                     $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                                     })
 
-                                    $(".supplier_id").val(res?.data?.supplier_id).change();
+                                    $(".supplier_id").val(arr_supplier_id).change();
                                 }
                             })
                         }
@@ -1008,13 +1004,14 @@
                                 method: "GET",
                                 dataType: "json",
                                 success: function(result) {
+                                    $(".supplier_id").empty()
                                     $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                                     })
 
-                                    $(".supplier_id").val(res?.data?.supplier_id).change();
+                                    $(".supplier_id").val(arr_supplier_id).change();
                                 }
                             })
                         }
@@ -1079,13 +1076,13 @@
             $(".nama_barang").val("");
             $(".satuan_id").val("").change();
             $(".harga_barang").val("");
-            $(".supplier_id").val("").change();
+            $(".supplier_id").val([]).change();
             $(".kategori_id").val("").change();
             $(".hs_id").val("").change();
             $(".ap_id").val("").change();
             $(".ar_id").val("").change();
             $(".type").val("");
-            $(".spec").val("");
+            $(".spek").val("");
             $(".stok").val("");
 
             if($(".parent_id").val())
@@ -1095,9 +1092,6 @@
                     required: true
                 });
                 $('.harga_barang').rules('add', {
-                    required: true
-                });
-                $('.supplier_id').rules('add', {
                     required: true
                 });
                 $('.type').rules('add', {
@@ -1124,7 +1118,6 @@
                 $(".is_parent").css("display", "none");
                 $('.stok').rules('remove', 'required');
                 $('.harga_barang').rules('remove', 'required');
-                $('.supplier_id').rules('remove', 'required');
                 $('.type').rules('remove', 'required');
                 $('.satuan_id').rules('remove', 'required');
                 $('.kategori_id').rules('remove', 'required');
@@ -1151,6 +1144,8 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
+
+                        data.append("supplier_id", JSON.stringify($('.supplier_id').val()));
 
                         let id = $(".id").val();
 
@@ -1420,7 +1415,7 @@
         let value = $(".type").val();
         $(".type").val()
         $(".supplier_id").empty()
-        $(".supplier_id").val('').change()
+        $(".supplier_id").val([]).change()
 
         if(value === "BAHAN BAKU LOKAL")
         {
@@ -1429,13 +1424,14 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
+                    $(".supplier_id").empty()
                     $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                     })
 
-                    $(".supplier_id").val("").change();
+                    $(".supplier_id").val([]).change();
                 }
             })
         }
@@ -1446,13 +1442,14 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
+                    $(".supplier_id").empty()
                     $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                     })
 
-                    $(".supplier_id").val("").change();
+                    $(".supplier_id").val([]).change();
                 }
             })
         }
@@ -1463,13 +1460,14 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
+                    $(".supplier_id").empty()
                     $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                     })
 
-                    $(".supplier_id").val("").change();
+                    $(".supplier_id").val([]).change();
                 }
             })
         }
@@ -1480,13 +1478,14 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
+                    $(".supplier_id").empty()
                     $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
                     })
 
-                    $(".supplier_id").val("").change();
+                    $(".supplier_id").val([]).change();
                 }
             })
         }
