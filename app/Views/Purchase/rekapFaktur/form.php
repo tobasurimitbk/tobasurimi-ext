@@ -15,6 +15,10 @@
             <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
         <?php endif; ?>
 
+        <?php if(empty($rekapData)): ?> 
+            <button class="btn btn-success posting-rekap">Simpan & Posting</button>
+        <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
+        <?php endif; ?>
     </div>
 </div>
 <div class="card">
@@ -39,10 +43,10 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select" name="invoices[]" id="supplier-faktur" multiple>
                             <?php foreach ($fakturList ?? [] as $faktur): ?>
-                            <option value="<?= $faktur->id ?>" <?= (in_array($faktur->id, $selectedFaktur)) ? 'selected' : '' ?>><?= $faktur->faktur_no ?></option>
+                            <option value="<?= $faktur->id ?>" <?= (in_array($faktur->id, $selectedFaktur)) ? 'selected' : '' ?>><?= $faktur->no_penerimaan_barang ?></option>
                             <?php endforeach ?>
                         </select>
-                        <label for="floatingInput" style="z-index: 1;">Faktur</label>
+                        <label for="floatingInput" style="z-index: 1;">No. LPB</label>
                     </div>
                 </div>
             </div>
@@ -141,14 +145,15 @@ $(document).ready(function() {
             multiple: true,
             theme: "bootstrap-5",
             ajax: {
-                url: '<?= base_url() . 'terima-faktur-lokal/getBySupplier/' ?>' + $(this).val(),
+                // url: '<?= base_url() . 'terima-faktur-lokal/getBySupplier/' ?>' + $(this).val(),
+                url: '<?= base_url() . 'penerimaan-barang-lokal/dropdown/bySupplier/' ?>' + $(this).val(),
                 dataType: 'json',
                 processResults: function (res) {
                     return {
                         results: $.map(res.data, function (item) {
                             return {
                                 id: item.id,
-                                text: item.faktur_no
+                                text: item.no_penerimaan_barang
                             }
                         })
                     };
@@ -197,11 +202,14 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 // const csrf = $(`[name="${csrfToken}"]`);
+                const id = $(".id").val();
+                const ajaxUrl = id ? `<?= base_url("rekap-faktur/update"); ?>` : '<?= base_url("rekap-faktur/create"); ?>';
+                const formData = $(".create-form").serializeArray();
+                formData.push({ name: 'is_posted', value: 1 });
+
                 $.ajax({
-                    url: "<?= base_url("rekap-faktur/update-status"); ?>",
-                    data: {
-                        id: $(".id").val()
-                    },
+                    url: ajaxUrl,
+                    data: formData,
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                     },
@@ -320,7 +328,7 @@ $(document).ready(function() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     const id = $(".id").val();
-                    let ajaxUrl = id ? `<?= base_url("rekap-faktur/update"); ?>` : '<?= base_url("rekap-faktur/create"); ?>';
+                    const ajaxUrl = id ? `<?= base_url("rekap-faktur/update"); ?>` : '<?= base_url("rekap-faktur/create"); ?>';
                     $.ajax({
                         url: ajaxUrl,
                         data: $(".create-form").serialize(),

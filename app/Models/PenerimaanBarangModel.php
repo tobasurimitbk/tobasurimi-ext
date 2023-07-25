@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PhpParser\Node\Expr\Cast\Object_;
 
 class PenerimaanBarangModel extends Model
 {
@@ -224,4 +225,17 @@ class PenerimaanBarangModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getReceivedNoBySupplier($supplierId, $condition): array
+    {
+        $receiveDataQry = $this->asObject()
+            ->select('id, no_penerimaan_barang')
+            ->where('penerimaan_barang.supplier_id', $supplierId)
+            ->where($condition)
+            // ->orderBy($sort, $sortType)
+            ->findAll();
+
+        return $receiveDataQry;
+    }
+
 }

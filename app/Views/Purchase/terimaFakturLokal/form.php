@@ -57,12 +57,12 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->faktur_no : ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur">
+                                <input value="<?=  $dataTerimaFaktur->faktur_no ?? ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur" disabled readonly>
                                 <label for="floatingInput">No. Terima Faktur</label>
                             </div>
-                            <div style="<?= !empty($dataTerimaFaktur) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                            <!-- <div style="<?= !empty($dataTerimaFaktur) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                 <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= $dataTerimaFaktur->item_total ?? 0; ?>" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" disabled readonly>
-                        <label for="floatingInput">Nominal Faktur</label>
+                        <label for="floatingInput">Total Nominal Faktur</label>
                     </div>
                 </div>
             </div>

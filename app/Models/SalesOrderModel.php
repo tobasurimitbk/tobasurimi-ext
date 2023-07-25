@@ -86,6 +86,7 @@ class SalesOrderModel extends Model
             'total_harga'             => 'sales_order.total_harga',
             'keterangan'      => 'sales_order.keterangan',
             'createdAt'         => 'sales_order.createdAt',
+            'updatedAt'         => 'sales_order.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

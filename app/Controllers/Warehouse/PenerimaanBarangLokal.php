@@ -960,4 +960,23 @@ class PenerimaanBarangLokal extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function getReceivedNoBySupplier($supplierId)
+    {
+        $condition = [
+            "penerimaan_barang.company_id"          => $this->this_company_id,
+            "penerimaan_barang.status_post"         => "FINISH",
+            "penerimaan_barang.status_penerimaan"   => "LOKAL",
+        ];
+
+        $itemData = $this->penerimaanBarangModel
+            ->getReceivedNoBySupplier($supplierId, $condition);
+
+        $data = [
+            "data"  => $itemData
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

@@ -39,10 +39,11 @@
                         <tr>
                             <th>#</th>
                             <th>No. Rekap Faktur</th>
+                            <th>Supplier Name</th>
                             <th>Tanggal Jatuh Tempo</th>
                             <th>Total</th>
                             <th>Status Rekap</th>
-                            <th>Posted</th>
+                            <!-- <th>Posted</th> -->
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -104,6 +105,10 @@
             className: "text-center"
         },
         {
+            data: "supplier_name",
+            className: "text-center"
+        },
+        {
             data: "due_date",
             className: "text-center"
         },
@@ -115,10 +120,10 @@
             data: "summary_status",
             className: "text-center"
         },
-        {
+        /* {
             data: "is_posted",
             className: "text-center"
-        },
+        }, */
         /* {
             data: "createdBy",
             className: "text-center"
