@@ -235,6 +235,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+                <a href="/barang"><button type="button" class="btn btn-hide-detail mr-3">+ Barang</button></a>
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -481,10 +482,10 @@
 
         // KODE BARANG
         $('.kode_barang').select2({
-            placeholder: "Pilih Kode Barang / Buat Baru",
+            placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
+            tags: false,
             allowClear: true
         })
 
@@ -1443,7 +1444,6 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(id)
                 let new_list_items = []
                 let tag_html = "";
                 let tag_total = "";
