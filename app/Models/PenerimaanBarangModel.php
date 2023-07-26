@@ -37,6 +37,8 @@ class PenerimaanBarangModel extends Model
         'updatedAt',
         'deletedAt',
         'ppnbm',
+        'ppn',
+        'pph',
         'tipe_bahan',
         'biaya_masuk',
         'status_post',
