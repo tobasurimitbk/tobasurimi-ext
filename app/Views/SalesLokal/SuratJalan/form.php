@@ -57,7 +57,7 @@
                                 if (!empty($dataSo)) {
                                     foreach ($dataSo as $so) {
                                 ?>
-                                        <option value="<?= $so->id; ?>" <?= !empty($data) ? ($data->so_id === $so->id ? "selected" : "") : ""; ?>><?= $so->name; ?></option>
+                                        <option value="<?= $so->id; ?>,<? $so->name ?>" <?= !empty($data) ? ($data->so_id === $so->id ? "selected" : "") : ""; ?>><?= $so->name; ?></option>
                                 <?php
                                     }
                                 }
@@ -83,6 +83,7 @@
                             <label for="floatingInput">No Surat Jalan</label>
                         </div>
                     </div>
+                    <input type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
                 </div>
         </div>
         </form>
@@ -233,7 +234,7 @@
 
                     // console.log(res.dataWarehouse)
                     res.forEach(function(item) {
-                        $(".id_so").append(`<option  value="${item.id}">${item.no_sales_order}</option>`);
+                        $(".id_so").append(`<option  value="${item.id},${item.no_sales_order}">${item.no_sales_order}</option>`);
                     })
                 }
             })
@@ -287,7 +288,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("surat_jalan"); ?>";
+                                            window.location.href = "<?= base_url("surat-jalan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({
@@ -331,7 +332,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("surat_jalan"); ?>";
+                                            window.location.href = "<?= base_url("surat-jalan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({
