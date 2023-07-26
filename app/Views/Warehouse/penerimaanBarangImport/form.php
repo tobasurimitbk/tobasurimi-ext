@@ -2165,7 +2165,7 @@
                                 console.log(res)
                                 
                                 res.data.forEach(function(item) {
-                                    $(".kode_barang").append(`<option data-unit="${item.id_satuan}" data-harga="${Number(item.price ? item.price : 0).toLocaleString()}" data-nama="${item.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${Number(item.qty ? item.qty : 0)}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                                    $(".kode_barang").append(`<option data-unit="${item.id_satuan}" data-harga="${item.price}" data-nama="${item.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${Number(item.qty ? item.qty.replaceAll(",", "") : 0)}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`)
                                 })
                             }
                         })
@@ -2807,11 +2807,11 @@
                         
                         if(Number(barang_id) === Number(item.barang_id))
                         {
-                            $(".kode_barang").append(`<option selected data-unit="${item.id_satuan}" data-harga="${Number(item.general_price ? item.general_price : 0).toLocaleString()}" data-nama="${item.nama_barang}" data-barang_id="${item.barang_id}" data-note="${item.note}" data-id="${item.id}" data-qty="${Number(item.qty ? item.qty : 0)}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                            $(".kode_barang").append(`<option selected data-unit="${item.id_satuan}" data-harga="${item.price}" data-nama="${item.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${Number(item.qty ? item.qty.replaceAll(",", "") : 0)}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`)
                         }
                         else
                         {
-                            $(".kode_barang").append(`<option data-unit="${item.id_satuan}" data-harga="${Number(item.general_price ? item.general_price : 0).toLocaleString()}" data-nama="${item.nama_barang}" data-barang_id="${item.barang_id}" data-note="${item.note}" data-id="${item.id}" data-qty="${Number(item.qty ? item.qty : 0)}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                            $(".kode_barang").append(`<option data-unit="${item.id_satuan}" data-harga="${item.price}" data-nama="${item.nama_barang}" data-note="${item.note}" data-id="${item.id}" data-barang_id="${item.barang_id}" data-qty="${Number(item.qty ? item.qty.replaceAll(",", "") : 0)}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`)
                         }
                     }
                 })
