@@ -966,4 +966,64 @@ class PenerimaanBarangImport extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function getReceivedItemsBySupplier($supplierId)
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "idCompany"     => $this->this_company_id,
+            "kategori"      => "LOKAL",
+            "type"          => "BAHAN BAKU"
+        ];
+
+        $condition = [
+            // "suppliers.company_id"  => $this->this_company_id,
+            "penerimaan_barang.status_penerimaan"       => "IMPORT",
+            "penerimaan_barang.tipe_bahan"              => "BAKU",
+            // "penerimaan_barang_detail.summarized_qty <" => 'penerimaan_barang_detail.qty'
+
+            // "search"                                => $this->request->getGet("search"),
+            // "sort"                                  => $this->request->getGet("sort"),
+            // "sortType"                              => $this->request->getGet("sortType")
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $itemData = $this->penerimaanBarangModel
+            ->getReceivedItemsBySupplier($supplierId, $condition, $limit, $offset);
+
+        $receivedData = [];
+
+        foreach ($itemData['data'] as $data) {
+            array_push($receivedData, [
+                "id"                    => $data->id,
+                "no_po"                 => "jugijagiju",
+                "lpb_date"              => $data->lpb_date,
+                "no_lpb"                => $data->no_lpb,
+                "item_name"             => $data->item_name,
+                "lpb_qty"               => $data->lpb_qty,
+                "price"                 => floatval($data->price),
+                "return_qty"            => 0, 
+                "received_qty"          => 0,
+                "qty_will_be_received"  => $data->lpb_qty,
+                "unit"                  => $data->unit
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $itemData['totalData'],
+            "recordsFiltered"   => $itemData['totalFilteredData'],
+            "data"              => $receivedData,
+            // "response" => $response,
+            // "payload"           => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

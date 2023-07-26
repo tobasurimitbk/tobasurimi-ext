@@ -10,33 +10,16 @@
             Batal
         </a>
         <?php if(!empty($dataTerimaFaktur)){ ?> 
-            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
-            <button class="btn btn-hapus delete-parent float-right">
-                Hapus
-            </button>
-            <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/tandaTerimaFaktur/print/<?= $dataTerimaFaktur->id ?>')">
-                Print
-            </button>
-            <?php } ?> 
-
-            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
-                Simpan dan Cetak
-            </button>
-            <?php
-            }
-            ?> 
+            
+            <button class="btn btn-hapus delete-parent float-right">Hapus</button>
+            <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/tandaTerimaFaktur/print/<?= $dataTerimaFaktur->id ?>')">Print</button>
+            
+            <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
+            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">Simpan dan Cetak</button>
 
             <?php } else { ?> 
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
-                Simpan dan Cetak
-            </button>
+            <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
+            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">Simpan dan Cetak</button>
             <?php } ?> 
     </div>
 </div>
@@ -44,12 +27,11 @@
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
             <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->id : ""; ?>" type="hidden" class="id" name="id" id="id" />
-            <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->sender : ""; ?>" type="hidden" class="sender" name="sender" id="sender" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->date_of_receipt : ""; ?>" class="form-control input-picker date_of_receipt" id="date_of_receipt" name="date_of_receipt" placeholder="Tanggal Penerimaan">
+                        <input value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker receive_date" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
                         <label for="floatingInput">Tanggal Penerimaan</label>
                     </div>
                 </div>
@@ -57,11 +39,8 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->faktur_no : ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur">
+                                <input value="<?= $dataTerimaFaktur->inv_no ?? "AUTO GENERATE"; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur" disabled>
                                 <label for="floatingInput">No. Terima Faktur</label>
-                            </div>
-                            <div style="<?= !empty($dataTerimaFaktur) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
                     </div>
@@ -70,74 +49,40 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
-                            <option value="BAKU" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "BAKU" ? "selected" : "") : ""; ?>>Bahan Baku</option>
-                            <option value="PENOLONG" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "PENOLONG" ? "selected" : "") : ""; ?>>Bahan Penolong</option>
-                        </select>
-                        <label for="floatingInput">Tipe</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                        <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
                             <option value=""></option>
-                            <?php
-                            if (!empty($dataSupplier)) {
-                                foreach ($dataSupplier as $supplier) {
-                            ?>
-                                    <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->supplier_id === $supplier->id ? "selected" : "") : ""; ?>><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
+                            <?php foreach ($dataSupplier as $supplier): ?>
+                            <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->supplier_id === $supplier->id ? "selected" : "") : ""; ?>><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
+                            <?php endforeach; ?>
                         </select>
                         <label for="floatingInput">Supplier</label>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input value="<?= $dataTerimaFaktur->inv_total ?? ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control" name="inv_total" id="inv_total" placeholder="Total Nominal Faktur">
+                        <label for="floatingInput">Total Nominal Faktur</label>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select multiple <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : "disabled=true"; ?> class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
-                            <option value=""></option>
-                            <?php
-                            if (!empty($dataNo)) {
-                                foreach ($dataNo as $no) {
-                            ?>
-                                    <option value="<?= $no->id; ?>" <?= (!empty($dataTerimaFaktur) ? (in_array($no->id, $dataTerimaFaktur->multiple_po_id) ? "selected" : "") : ""); ?>><?= $no->po_no; ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                        <label for="floatingInput">No. PO</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->due_date : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
+                        <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->due_date : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly="true" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
+                        <input readonly="true" value="<?= $dataTerimaFaktur->createdBy ?? session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->nominal_faktur : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" placeholder="Nominal Faktur">
-                        <label for="floatingInput">Nominal Faktur</label>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->information : ""; ?></textarea>
+                        <textarea class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
@@ -218,14 +163,14 @@ $(document).ready(function() {
         },
     });
 
-    $(".date_of_receipt").datepicker({
+    $("#receive_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
     })
 
-    $(".due_date").datepicker({
+    $("#due_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -236,28 +181,7 @@ $(document).ready(function() {
     $('.multiple_po_id').select2({
         placeholder: "",
         theme: "bootstrap-5"
-    })
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.multiple_po_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.multiple_po_id')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.multiple_po_id')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+    });
 
     // SUPPLIER ID
     $('.supplier_id').select2({
@@ -301,15 +225,12 @@ $(document).ready(function() {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     setLoading()
-                    let data = new FormData(document.querySelector(".create-form"));
+                    const data = new FormData(document.querySelector(".create-form"));
 
-                    data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
-                    var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
-                        return elem.text 
-                    });
-                    data.append("multiple_po_no", JSON.stringify(arr_no));
+                    const invTotalAmt = $('#inv_total').val().replace(/\D/g, '');
+                    data.append('inv_total', invTotalAmt);
 
-                    let id = $(".id").val();
+                    const id = $(".id").val();
                     // UPDATE
                     if(id)
                     {
@@ -332,7 +253,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + id;
+                                        window.location.href = "<?= base_url("terima-faktur-lokal/"); ?>" + id;
                                     })
                                 } else {
                                     Swal.fire({
@@ -375,7 +296,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
+                                        window.location.href = "<?= base_url("terima-faktur-lokal/"); ?>" + response.id;
                                     })
                                 } else {
                                     Swal.fire({
@@ -449,7 +370,7 @@ $(document).ready(function() {
                                     })
                                     .then(() => {
                                         window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + id, "_blank");
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + id;
+                                        window.location.href = "<?= base_url("terima-faktur-lokal/"); ?>" + id;
                                     })
                                 } else {
                                     Swal.fire({
@@ -493,7 +414,7 @@ $(document).ready(function() {
                                     })
                                     .then(() => {
                                         window.open("<?= getenv('apiURL'); ?>" + "/tandaTerimaFaktur/print/" + response.id, "_blank");
-                                        window.location.href = "<?= base_url("terima-faktur-lokal"); ?>" + "/id/" + response.id;
+                                        window.location.href = "<?= base_url("terima-faktur-lokal/"); ?>" + response.id;
                                     })
                                 } else {
                                     Swal.fire({
@@ -582,110 +503,7 @@ $(document).ready(function() {
         })
     })
 
-    $(".supplier_id").change(function() {
-        let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
-        $(".sender").val(name);
-        if($(".supplier_id option:selected").val())
-        {
-            if($(".tipe_bahan").val() === "BAKU")
-            {
-                $.ajax({
-                    url: `<?= base_url("penerimaan-barang-lokal/dropdown"); ?>`,
-                    method: "GET",
-                    data: {
-                        id: $(".supplier_id option:selected").val(),
-                        tipe: "BAKU"
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        console.log(res.data)
-                        $(".multiple_po_id").attr("disabled", true)
-                        $(".multiple_po_id").empty()
-                        $(".multiple_po_id").append(`<option value=""></option>`)
-                        res.data.forEach(function(item) {
-                            $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-                        })
-                        $(".multiple_po_id").attr("disabled", false)
-                        $(".multiple_po_id").val([]);
-                    }
-                })
-            }
-            if($(".tipe_bahan").val() === "PENOLONG")
-            {
-                $.ajax({
-                    url: `<?= base_url("penerimaan-barang-lokal/dropdown"); ?>`,
-                    method: "GET",
-                    data: {
-                        id: $(".supplier_id option:selected").val(),
-                        tipe: "PENOLONG"
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        console.log(res)
-                        $(".multiple_po_id").attr("disabled", true)
-                        $(".multiple_po_id").empty()
-                        $(".multiple_po_id").append(`<option value=""></option>`)
-                        res.data.forEach(function(item) {
-                            $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
-                        })
-                        $(".multiple_po_id").attr("disabled", false)
-                        $(".multiple_po_id").val([]);
-                    }
-                })
-            }
-        }
-        else
-        {
-            $(".multiple_po_id").attr("disabled", true)
-            $(".multiple_po_id").empty()
-            $(".multiple_po_id").append(`<option value=""></option>`)
-            $(".multiple_po_id").val([]);
-        }
-    })
 })
-
-const changeTipeBahan = function()
-{
-    $(".sender").val("");
-    if($(".tipe_bahan").val() === "BAKU")
-    {
-        $.ajax({
-            url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                $(".supplier_id").empty();
-
-                $(".supplier_id").append(`<option value=""></option>`);
-
-                res.data.forEach(function(item) {
-                    $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
-                })
-
-                $(".supplier_id").val("").change();
-            }
-        })
-    }
-    if($(".tipe_bahan").val() === "PENOLONG")
-    {
-        $.ajax({
-            url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                $(".supplier_id").empty();
-
-                $(".supplier_id").append(`<option value=""></option>`);
-
-                res.data.forEach(function(item) {
-                    $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
-                })
-
-                $(".supplier_id").val("").change();
-            }
-        })
-    }
-}
 
 const changeStatus = function()
 {

@@ -36,16 +36,20 @@ class TerimaFakturImport extends BaseController
 
     public function createTerimaFakturImport()
     {   
-        //Get Supplier
-        $responseSupplier = curl_request("GET", "/suppliers/all?kategori=LOKAL&type=BAHAN%20BAKU&idCompany=$this->this_company_id", $this->token);
+        $supplierModel = new SupplierModel();
 
-        $dataSupplier = [];
-        if ($responseSupplier["code"] === 200) {
-            $dataSupplier = json_decode($responseSupplier["body"])->data;
-        }
+        //Get Supplier
+        $supplierCond = [
+            'company_id'        => $this->this_company_id,
+            'supplier_buyer'    => 'SUPPLIER',
+            'kategori'          => 'IMPORT'
+        ];
+        $supplierList = $supplierModel->asObject()
+            ->where($supplierCond)
+            ->findAll();
 
         $data = [
-            "dataSupplier" => $dataSupplier
+            "dataSupplier" => $supplierList
         ];
 
         return view('Purchase/terimaFakturImport/form', $data);
@@ -73,7 +77,7 @@ class TerimaFakturImport extends BaseController
             'company_id'        => $this->this_company_id,
             'type'              => ($data->tipe_bahan === 'BAKU') ? 'BAHAN BAKU' : 'BAHAN PENOLONG',
             'supplier_buyer'    => 'SUPPLIER',
-            'kategori'          => 'LOKAL'
+            'kategori'          => 'IMPORT'
         ];
         $supplierList = $supplierModel->asObject()
             ->where($supplierCond)
@@ -346,7 +350,7 @@ class TerimaFakturImport extends BaseController
                 'tambahan'          => $postData['tambahan'] ?: 0,
                 // 'recipient'         => $postData['recipient'],
                 // 'sender'            => $postData['sender'],
-                'faktur_type'       => 'LOKAL',
+                'faktur_type'       => 'IMPORT',
                 'information'       => $postData['information'],
                 'tipe_bahan'        => $postData['tipe_bahan'],
                 'user_id'           => $this->user_id
@@ -537,7 +541,7 @@ class TerimaFakturImport extends BaseController
                 'receive_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['receive_date']))),
                 'potongan'          => $postData['potongan'] ?? 0,
                 'tambahan'          => $postData['tambahan'] ?? 0,
-                'faktur_type'       => 'LOKAL',
+                'faktur_type'       => 'IMPORT',
                 'information'       => $postData['information'],
                 'tipe_bahan'        => $postData['tipe_bahan']
             ];
