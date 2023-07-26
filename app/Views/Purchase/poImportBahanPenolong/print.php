@@ -87,6 +87,14 @@
         .w-100 {
             width: 100%;
         }
+
+        .border-collapse {
+            border-collapse: collapse;
+        }
+
+        .sign-table td:not(:last-child) {
+            border: 1px solid;
+        }
     </style>
 </head>
 <body>
@@ -140,10 +148,10 @@
             $total = 0;
 
             foreach($dataPODetail as $detail){ 
-                $value_disc = (formatter($detail["qty"], "STR_TO_INT") * formatter($detail["price"], "STR_TO_INT")) - (formatter($detail["disc"], "STR_TO_INT") * (formatter($detail["qty"], "STR_TO_INT") * formatter($detail["price"], "STR_TO_INT")) / 100);
+                $value_disc = (formatter($detail["totalPrice"], "CURR_TO_INT")) - (formatter($detail["disc"], "STR_TO_INT") * (formatter($detail["qty"], "CURR_TO_INT") * formatter($detail["price"], "CURR_TO_INT")) / 100);
                 $total_disc = $total_disc + $value_disc;
                 $persentase_disc = $persentase_disc + formatter($detail["disc"], "STR_TO_INT"); 
-                $total = $total + formatter($value_disc, "STR_TO_INT") + formatter($detail["additional_cost"], "STR_TO_INT"); 
+                $total = $total + formatter($value_disc, "STR_TO_INT") + formatter($detail["additional_cost"], "CURR_TO_INT"); 
             ?>
             <tr>
                 <td><?= $no++; ?></td>
@@ -151,11 +159,11 @@
                 <td><?= $detail["nama_barang"]; ?></td>
                 <td><?= $detail["spec"]; ?></td>
                 <td><?= $detail["nama_satuan"]; ?></td>
-                <td><?= number_format(formatter($detail["price"], "STR_TO_INT")); ?></td>
-                <td><?= formatter($detail["qty"], "STR_TO_INT"); ?></td>
+                <td><?= $detail["price"]; ?></td>
+                <td><?= formatter($detail["qty"], "CURR_TO_INT"); ?></td>
                 <td><?= formatter($detail["disc"], "STR_TO_INT"); ?></td>
-                <td><?= number_format(formatter($detail["additional_cost"], "STR_TO_INT")); ?></td>
-                <td><?= number_format(formatter($value_disc, "STR_TO_INT") + formatter($detail["additional_cost"], "STR_TO_INT")); ?></td>
+                <td><?= $detail["additional_cost"]; ?></td>
+                <td><?= number_format(formatter($value_disc, "STR_TO_INT") + formatter($detail["additional_cost"], "CURR_TO_INT")); ?></td>
             </tr>
             <?php } ?>
         </tbody>
@@ -182,36 +190,41 @@
         </div>
     </div>
 
-    <table class="sign-table">
-        <thead>
-            <tr>
-                <th>
-                    <div class="sign-row">
-                        <div>Warehouse</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Purchase</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Head of Purchase</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Audit</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Director</div>
-                    </div>
-                </th>
-            </tr>
-        </thead>
+    <table class="w-100 sign-table border-collapse">
+        <tr>
+            <td style="height: 50px;"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                <div class="sign-row">
+                    <div>Warehouse</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Purchase</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Head of Purchase</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Audit</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Director</div>
+                </div>
+            </th>
+        </tr>
     </table>
 <?php } ?>
 </body>
