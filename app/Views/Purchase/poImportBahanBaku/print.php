@@ -87,6 +87,14 @@
         .w-100 {
             width: 100%;
         }
+
+        .border-collapse {
+            border-collapse: collapse;
+        }
+
+        .sign-table td:not(:last-child) {
+            border: 1px solid;
+        }
     </style>
 </head>
 <body>
@@ -182,36 +190,41 @@
         </div>
     </div>
 
-    <table class="sign-table">
-        <thead>
-            <tr>
-                <th>
-                    <div class="sign-row">
-                        <div>Warehouse</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Purchase</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Head of Purchase</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Audit</div>
-                    </div>
-                </th>
-                <th>
-                    <div class="sign-row">
-                        <div>Director</div>
-                    </div>
-                </th>
-            </tr>
-        </thead>
+    <table class="w-100 sign-table border-collapse">
+        <tr>
+            <td style="height: 50px;"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                <div class="sign-row">
+                    <div>Warehouse</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Purchase</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Head of Purchase</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Audit</div>
+                </div>
+            </th>
+            <th>
+                <div class="sign-row">
+                    <div>Director</div>
+                </div>
+            </th>
+        </tr>
     </table>
 <?php } ?>
 </body>
