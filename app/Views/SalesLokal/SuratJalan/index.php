@@ -16,12 +16,13 @@
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th>Kode Pelanggan</th>
-                                <th>Nama Pelanggan</th>
-                                <th>No So</th>
-                                <th>No Surat Jalan</th>
-                                <th>Shipping Date</th>
+                                <th onclick="changeSort('no')" class="sort">No.</th>
+                                <th onclick="changeSort('kode_pelanggan')" class="sort">Kode Pelanggan</th>
+                                <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Pelanggan</th>
+                                <th onclick="changeSort('no_so')" class="sort">No So</th>
+                                <th onclick="changeSort('no_surat_jalan')" class="sort">No Surat Jalan</th>
+                                <th onclick="changeSort('shipping_date')" class="sort">Shipping Date</th>
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -35,6 +36,8 @@
 </section>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
+
     let sort = "";
     let sortType = "asc";
     let trigger = true;
@@ -105,16 +108,16 @@
         }, {
             data: "shipping_date",
             className: "text-center"
-            // }, {
-            //     data: "id",
-            //     className: "text-center actions",
-            //     searchable: false,
-            //     sortable: false,
-            //     render: function(data, type, row) {
-            //         let id = row?.id;
-            //         return row.is_posted ? "-" : `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
-            //         `
-            //     }
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                `
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -129,5 +132,76 @@
             }
         }
     });
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("surat-jalan/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
+    }
+
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 <?= $this->endSection(); ?>

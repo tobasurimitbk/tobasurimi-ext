@@ -466,9 +466,9 @@ class OrderForm extends BaseController
 
         ]);
         if (!$validate) {
-            echo json_encode($payload);
-            return;
-            //return redirect()->to('/order-form-lokal/create')->back()->withInput();
+            //echo json_encode($payload);
+            //return;
+            return redirect()->to('/order-form-lokal/id/' . $payload['id'])->back()->withInput();
         }
 
         $orderDate = $this->request->getPost('order_date');
@@ -493,7 +493,6 @@ class OrderForm extends BaseController
             "tipe_sales_order" => $this->request->getPost('tipe_sales_order'),
         ];
 
-
         $this->db->transBegin();
         try {
             // Create a new validation instance
@@ -509,7 +508,7 @@ class OrderForm extends BaseController
 
 
                 if ($row->id && $row->isDeleted === false) {
-                    $dataBefore = $this->SalesOrderDetailModel->find($row->id);
+                    $dataBefore = $this->SalesOrderDetailModel->asObject()->find($row->id);
                     if ($dataBefore->qty > $row->qty) {
                         $dataItems = $dataBefore->qty - $row->qty;
                         $stok = [
@@ -592,6 +591,9 @@ class OrderForm extends BaseController
             $data = [
                 "status"            => false,
                 "message"    => "Data Gagal Disimpan",
+                "items" => $items,
+                "error" => $e->getMessage(),
+                "error-line" => $e->getLine(),
                 "payload"   => $values,
                 'token' => csrf_hash(),
             ];

@@ -103,6 +103,12 @@ class SuratJalanModel extends Model
             ->select($selectQry)
             ->find($id);
 
+        $dataMultpleid = json_decode($dataSuratJalan->multiple_id_so);
+        $dataMultpleNo = json_decode($dataSuratJalan->multiple_no_so);
+
+        $dataSuratJalan->multiple_id_so = $dataMultpleid;
+        $dataSuratJalan->multiple_no_so = $dataMultpleNo;
+
         return $dataSuratJalan;
     }
 }
