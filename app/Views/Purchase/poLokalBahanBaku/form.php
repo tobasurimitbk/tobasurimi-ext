@@ -1705,15 +1705,7 @@
         $(".kode").val(kode_barang)
         $(".keterangan").val(keterangan)
 
-        $.ajax({
-            url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                let spek = res?.data?.spek;
-                $(".spesifikasi").val(spek);
-            }
-        })
+        $(".spesifikasi").val(spesifikasi);
 
         $.ajax({
             url: `<?= base_url("barang/dropdown/type"); ?>`,

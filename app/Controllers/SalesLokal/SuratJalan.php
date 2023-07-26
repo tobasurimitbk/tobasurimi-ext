@@ -116,7 +116,7 @@ class SuratJalan extends BaseController
         ];
         //echo json_encode($payload);
 
-        /*
+
         $validate = $this->validate([
             "id_customer" => [
                 "rules" => "required",
@@ -144,7 +144,7 @@ class SuratJalan extends BaseController
             // echo json_encode($payload);
             //return;
             return redirect()->to('/surat-jalan/create')->back()->withInput();
-        }*/
+        }
 
         $dataSo = $this->request->getPost('id_so');
 
@@ -200,56 +200,142 @@ class SuratJalan extends BaseController
     public function getById($id = null)
     {
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
-        $customers = $this->CustomerModel->where('company_id', $this->this_company_id)->findAll();
+        $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
 
-        $dataSuratJalan->shipping_date = date("d-m-Y", strtotime($dataSuratJalan->shipping_date));
+        $dataSuratJalan->shipping_date = date("m/d/Y", strtotime($dataSuratJalan->shipping_date));
+        $dataSo = $this->SalesOrderModel
+            ->asObject()
+            ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
+            ->select(['id', 'no_sales_order'])
+            ->findAll();
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
             "id_user" => $dataSuratJalan->id_user,
+            "dataSo" => $dataSo
 
         ];
-        echo json_encode($data);
-        //return view('SalesLokal/SuratJalan/form', $data);
+        //echo json_encode($data);
+        return view('SalesLokal/SuratJalan/form', $data);
     }
 
     public function update()
     {
+
+        $payload = $this->request->getVar();
+
+        $data = [
+            "payload" => $payload,
+            //"items" => $items,
+            'token'   => csrf_hash()
+        ];
+        //echo json_encode($data);
+
+        $validate = $this->validate([
+            "id" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'id tidak boleh kosong',
+                ]
+            ],
+            "id_customer" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'Customer tidak boleh kosong',
+                ]
+            ],
+            "id_so" => 'is_array',
+            "shipping_date" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
+            "no_surat_jalan" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'tax status tidak boleh kosong',
+                ]
+            ],
+        ]);
+
+        $id = $this->request->getPost('id');
+        if (!$validate) {
+            // echo json_encode($payload);
+            //return;
+            return redirect()->to('/surat-jalan/id/' . $id)->back()->withInput();
+        }
+
+        $dataSo = $this->request->getPost('id_so');
+
+        $idArray = array();
+        $noArray = array();
+
+        foreach ($dataSo as $payload) {
+            $delimiter = ",";
+            $parts = explode($delimiter, $payload);
+            array_push($idArray, $parts[0]);
+            array_push($noArray, $parts[1]);
+        }
+
+        $shippingDate = $this->request->getPost('shipping_date');
+
+        $values = [
+            "id_user" => $this->request->getPost('id_user'),
+            "id_customer" => $this->request->getPost('id_customer'),
+            "id_customer" => $this->request->getPost('id_customer'),
+            "shipping_date" =>  $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
+            "no_surat_jalan" => $this->request->getPost('no_surat_jalan'),
+            "no_po" => $this->request->getPost('no_po'),
+            'multiple_id_so' => json_encode($idArray),
+            'multiple_no_so' => json_encode($noArray),
+        ];
+        try {
+
+            // Create a new validation instance
+            $dataSuratJalan =  $this->SuratJalanModel->update($id, $values);
+
+            $data = [
+                "id" => $dataSuratJalan,
+                "status"            => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $values,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            //echo "Transaction failed: " . $e->getMessage();
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                "payload"   => $values,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        };
     }
 
     public function delete()
     {
-        try {
-            $id = $this->request->getPost("id");
 
+        $id = $this->request->getPost("id");
+        //echo json_encode($id);
+
+
+        try {
             if (!empty($id)) {
-                $findBarang = $this->rmImportPOModel->find($id);
-                if ($findBarang) {
-                    $response =  $this->rmImportPOModel->delete($id);
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil dihapus",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Dihapus';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Tidak Ditemukan",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
+                $this->SuratJalanModel->delete($id);
+                $data = [
+                    "status"            => true,
+                    "message"    => "Data success Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
             } else {
                 $data = [
                     "status"            => false,
@@ -271,7 +357,7 @@ class SuratJalan extends BaseController
 
     public function dropDownSalesOrder($idCustomer)
     {
-        $data = $this->SuratJalanModel
+        $data = $this->SalesOrderModel
             ->asObject()
             ->where(['id_customer' => $idCustomer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
             ->select(['id', 'no_sales_order'])

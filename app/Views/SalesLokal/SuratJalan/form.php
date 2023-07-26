@@ -30,7 +30,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php
                                     }
                                 }
@@ -51,13 +51,13 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
+                            <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->multiple_id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataSo)) {
                                     foreach ($dataSo as $so) {
                                 ?>
-                                        <option value="<?= $so->id; ?>,<? $so->name ?>" <?= !empty($data) ? ($data->so_id === $so->id ? "selected" : "") : ""; ?>><?= $so->name; ?></option>
+                                        <option value="<?= $so->id; ?>,<?= $so->no_sales_order ?>" <?= !empty($data) ? (in_array($so->id, $data->multiple_id_so) ? "selected" : "") : ""; ?>><?= $so->no_sales_order; ?></option>
                                 <?php
                                     }
                                 }
@@ -72,7 +72,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="date" class="form-control shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> placeholder="Tanggal Pengiriman" value="<?= !empty($data) ? $data->shipping_date : ""; ?>">
+                            <input " class=" form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> placeholder="Tanggal Pengiriman" value="<?= !empty($data) ? $data->shipping_date : ""; ?>">
                             <label for="floatingInput">Tanggal Pengiriman</label>
                         </div>
                     </div>
@@ -156,6 +156,14 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        $(".shipping_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
     })
 
     var validator = $(".create-form").validate({
@@ -265,6 +273,7 @@
                     let id = $(".id").val();
 
                     console.log(data.entries());
+                    console.log(id)
 
                     // // UPDATE
                     if (id) {

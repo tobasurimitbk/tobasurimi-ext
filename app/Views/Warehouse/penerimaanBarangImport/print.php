@@ -136,7 +136,7 @@
             <td><b>Jumlah Order</b></td>
             <td><b>Konversi</b></td>
             <td><b>Harga</b></td>
-            <td><b>Penyerahan</b></td>
+            <td><b>Total Harga</b></td>
             <td><b>Keterangan</b></td>
             </tr>
         </thead>
