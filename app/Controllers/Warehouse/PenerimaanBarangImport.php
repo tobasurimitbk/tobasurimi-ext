@@ -13,6 +13,7 @@ use App\Models\RMImportPOModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuanModel;
+use App\Models\TaxModel;
 use Dompdf\Dompdf;
 
 class PenerimaanBarangImport extends BaseController
@@ -28,6 +29,7 @@ class PenerimaanBarangImport extends BaseController
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
+    protected $taxModel;
     protected $dompdf;
     
     public function __construct()
@@ -43,6 +45,7 @@ class PenerimaanBarangImport extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuanModel();
+        $this->taxModel = new TaxModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -65,11 +68,17 @@ class PenerimaanBarangImport extends BaseController
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
 
+        $dataPPN = $this->taxModel->getTaxByType('ppn');
+
+        $dataPPH = $this->taxModel->getTaxByType('pph');
+
         $data = [
             "dataSatuan" => $dataSatuan,
             "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => $dataSupplier,
-            "dataAJU" => $dataAJU
+            "dataAJU" => $dataAJU,
+            "dataPPN" => $dataPPN,
+            "dataPPH" => $dataPPH
         ];
 
         return view('Warehouse/penerimaanBarangImport/form', $data);
@@ -86,11 +95,19 @@ class PenerimaanBarangImport extends BaseController
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
 
+        $dataPPN = $this->taxModel->getTaxByType('ppn');
+
+        $dataPPH = $this->taxModel->getTaxByType('pph');
+
         $data["dataAJU"] = $dataAJU;
 
         $data["dataWarehouse"] = $dataWarehouse;
 
         $data["dataSatuan"] = $dataSatuan;
+
+        $data["dataPPN"] = $dataPPN;
+
+        $data["dataPPH"] = $dataPPH;
 
         if (!empty($id)) {
             $dataPenerimaanBarang = $this->penerimaanBarangModel->asObject()->find($id);
@@ -234,9 +251,6 @@ class PenerimaanBarangImport extends BaseController
                 "no_registration" => [
                     "rules" => "required"
                 ],
-                "letter_no" => [
-                    "rules" => "required"
-                ],
                 "invoice_no" => [
                     "rules" => "required"
                 ],
@@ -246,13 +260,7 @@ class PenerimaanBarangImport extends BaseController
                 "total_weight" => [
                     "rules" => "required"
                 ],
-                "shipping_cost" => [
-                    "rules" => "required"
-                ],
                 "biaya_masuk" => [
-                    "rules" => "required"
-                ],
-                "ppnbm" => [
                     "rules" => "required"
                 ]
             ];
@@ -287,13 +295,15 @@ class PenerimaanBarangImport extends BaseController
                     "aju_no" => $this->request->getPost("aju_no"),
                     "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
                     "no_registration" => $this->request->getPost("no_registration"),
-                    "letter_no" => $this->request->getPost("letter_no"),
+                    "letter_no" => "",
                     "invoice_no" => $this->request->getPost("invoice_no"),
                     "packaging" => $this->request->getPost("packaging"),
                     "total_weight" => $this->request->getPost("total_weight"),
-                    "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
+                    "shipping_cost" => $this->request->getPost("shipping_cost") ? formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT") : 0,
                     "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
-                    "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
+                    "ppnbm" => 0,
+                    "ppn" => $this->request->getPost("ppn"),
+                    "pph" => $this->request->getPost("pph"),
                     "status_post" => $status_post,
                     "status_penerimaan" => "IMPORT",
                 ];
@@ -501,9 +511,6 @@ class PenerimaanBarangImport extends BaseController
                 "no_registration" => [
                     "rules" => "required"
                 ],
-                "letter_no" => [
-                    "rules" => "required"
-                ],
                 "invoice_no" => [
                     "rules" => "required"
                 ],
@@ -513,13 +520,7 @@ class PenerimaanBarangImport extends BaseController
                 "total_weight" => [
                     "rules" => "required"
                 ],
-                "shipping_cost" => [
-                    "rules" => "required"
-                ],
                 "biaya_masuk" => [
-                    "rules" => "required"
-                ],
-                "ppnbm" => [
                     "rules" => "required"
                 ]
             ];
@@ -555,15 +556,16 @@ class PenerimaanBarangImport extends BaseController
                     "aju_no" => $this->request->getPost("aju_no"),
                     "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
                     "no_registration" => $this->request->getPost("no_registration"),
-                    "letter_no" => $this->request->getPost("letter_no"),
                     "invoice_no" => $this->request->getPost("invoice_no"),
                     "packaging" => $this->request->getPost("packaging"),
                     "total_weight" => $this->request->getPost("total_weight"),
-                    "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
+                    "shipping_cost" => $this->request->getPost("shipping_cost") ? formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT") : 0,
                     "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
-                    "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
+                    "ppnbm" => 0,
                     "status_post" => $status_post,
                     "status_penerimaan" => "IMPORT",
+                    "ppn" => $this->request->getPost("ppn"),
+                    "pph" => $this->request->getPost("pph"),
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
