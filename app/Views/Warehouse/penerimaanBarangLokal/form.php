@@ -2392,6 +2392,46 @@
         // })
 
         $(".supplier_id").change(function() {
+            let tag_total = "";
+
+            $(".body-detail-table").empty();
+            $(".foot-detail-table").empty();
+
+            tag_total += `<tr>`;
+            tag_total += `<td>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += `TOTAL`;
+            tag_total += "</td>";
+            tag_total += `<td colspan='2'>`;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += total_jml_order;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td colspan="2">`;
+            tag_total += "</td>";
+            tag_total += "</tr>";
+
+            $(".foot-detail-table").append(tag_total);
+            
             if($(".supplier_id option:selected").val())
             {
                 if($(".tipe_bahan").val() === "BAKU")
