@@ -235,6 +235,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+                <a href="/barang"><button type="button" class="btn btn-hide-detail mr-3">+ Barang</button></a>
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -268,9 +269,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
+                                <input type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
                                 <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
@@ -425,11 +424,11 @@
         })
 
         // SPESIFIKASI
-        $('.spesifikasi').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        })
+        // $('.spesifikasi').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".detail-modal .modal-content")
+        // })
 
         //CSS SELECT2 FLOATING LABEL
         $('.spesifikasi')
@@ -481,10 +480,10 @@
 
         // KODE BARANG
         $('.kode_barang').select2({
-            placeholder: "Pilih Kode Barang / Buat Baru",
+            placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
+            tags: false,
             allowClear: true
         })
 
@@ -825,8 +824,7 @@
             $(".nama_barang").val('')
             $(".qty").val('')
             $(".satuan").val('')
-            $(".spesifikasi").empty()
-            $(".spesifikasi").val('').change()
+            $(".spesifikasi").val('')
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
@@ -912,14 +910,8 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".spesifikasi").empty()
-                        $(".spesifikasi").append(`<option value=""></option>`)
-                        res.data.spek = JSON.parse(res.data.spek)
-                        res.data.spek.forEach(function(item) {
-                            $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                        })
-
-                        $(".spesifikasi").val("").change();
+                        let spek = res?.data?.spek;
+                        $(".spesifikasi").val(spek);
                     }
                 })
 
@@ -933,6 +925,7 @@
                 $(".harga").val(harga ? harga.toLocaleString() : "");
                 $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
             } else {
+                $(".spesifikasi").val("")
                 $(".nama_barang").attr("readonly", false)
                 $(".kode").val("");
                 $(".nama_barang").val("");
@@ -1020,7 +1013,7 @@
             let nama_barang = $(".nama_barang").val()
             let nama_satuan = $(".satuan option:selected").text()
             let satuan = $(".satuan option:selected").val()
-            let spesifikasi = $(".spesifikasi option:selected").val() ? $(".spesifikasi option:selected").val() : ""
+            let spesifikasi = $(".spesifikasi").val()
             let harga = $(".harga").val()
             let qty = $(".qty").val()
             let total = $(".total").val()
@@ -1443,7 +1436,6 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(id)
                 let new_list_items = []
                 let tag_html = "";
                 let tag_total = "";
@@ -1571,14 +1563,8 @@
             method: "GET",
             dataType: "json",
             success: function(res) {
-                $(".spesifikasi").empty()
-                $(".spesifikasi").append(`<option value=""></option>`)
-                res.data.spek = JSON.parse(res.data.spek)
-                res.data.spek.forEach(function(item) {
-                    $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                })
-
-                $(".spesifikasi").val(spesifikasi).change();
+                let spek = res?.data?.spek;
+                $(".spesifikasi").val(spek);
             }
         })
         if ($(".spp_type option:selected").val() === "Bahan Baku Import" || $(".spp_type option:selected").val() === "Bahan Baku Lokal") {

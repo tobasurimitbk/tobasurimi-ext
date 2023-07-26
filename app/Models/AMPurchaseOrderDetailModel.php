@@ -14,8 +14,22 @@ class AMPurchaseOrderDetailModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'am_purchase_order_id', 'barang_id', 'item_desc', 'spec', 'note', 'unit', 'qty', 'price',
-    'disc', 'additional_cost', 'ppn', 'pph', 'qty_diterima'];
+    protected $allowedFields    = [
+        'id',
+        'am_purchase_order_id',
+        'barang_id',
+        'item_desc',
+        'spec',
+        'note',
+        'unit',
+        'qty',
+        'price',
+        'disc',
+        'additional_cost',
+        'ppn',
+        'pph',
+        'qty_diterima'
+    ];
 
     // Dates
     protected $useTimestamps = true;
@@ -48,13 +62,23 @@ class AMPurchaseOrderDetailModel extends Model
             'am_purchase_order_details.am_purchase_order_id' => $id
         ];
 
+        $selectQry = "am_purchase_order_details.*,
+            FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price), 'N', 'en-us') AS totalPrice,
+            FORMAT(CEILING(am_purchase_order_details.qty), 'N', 'en-us') AS qty,
+            FORMAT(CEILING(am_purchase_order_details.price), 'N', 'en-us') AS price,
+            FORMAT(CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS additional_cost,
+            barangs.nama_barang, 
+            barangs.kode_barang, 
+            satuans.id as id_satuan, 
+            satuans.nama_satuan";
+
         $builder = $this->db->table('am_purchase_order_details')
-        ->select('am_purchase_order_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
-        ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
-        ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left');
+            ->select($selectQry)
+            ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }

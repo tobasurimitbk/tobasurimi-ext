@@ -18,6 +18,7 @@ class BarangModel extends Model
         'id',
         'parent_id',
         'company_id',
+        'type',
         'warehouse_id',
         'kode_barang',
         'nama_barang',
@@ -65,6 +66,7 @@ class BarangModel extends Model
             'parent_barang'     => 'parent_barangs.nama_barang',
             'kode_barang'       => 'barangs.kode_barang',
             'nama_barang'       => 'barangs.nama_barang',
+            'type'              => 'barangs.type',
             'harga_barang'      => 'barangs.harga_barang',
             'kode_satuan'       => 'satuans.kode_satuan',
             'kategori'          => 'metadata.value',
@@ -106,7 +108,7 @@ class BarangModel extends Model
         }
 
         if ($addCondition['search']) {
-            $barangDataQry->like('nama_barang', $addCondition['search'])->orLike('kode_barang', $addCondition['search']);
+            $barangDataQry->like('barangs.nama_barang', $addCondition['search'])->orLike('barangs.kode_barang', $addCondition['search']);
         }
 
         if ($addCondition['kategori']) {
@@ -137,6 +139,7 @@ class BarangModel extends Model
     {
         $arrCondition = [
             'deletedAt' => null,
+            'parent_id !=' => 0,
             'company_id' => $company_id
         ];
 
@@ -152,11 +155,13 @@ class BarangModel extends Model
         if ($id) {
             $arrCondition = [
                 'deletedAt' => null,
+                'parent_id !=' => 0,
                 'kode_barang' => $kode,
                 'id !=' => $id
             ];
         } else {
             $arrCondition = [
+                'parent_id !=' => 0,
                 'deletedAt' => null,
                 'kode_barang' => $kode
             ];
@@ -190,6 +195,7 @@ class BarangModel extends Model
     {
         $arrCondition = [
             'barangs.deletedAt' => null,
+            'barangs.parent_id !=' => 0,
             'metadata.deletedAt' => null,
             'metadata.value' => $kategori
         ];

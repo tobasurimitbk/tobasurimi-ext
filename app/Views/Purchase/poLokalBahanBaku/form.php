@@ -289,9 +289,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi" name="spesifikasi" id="spesifikasi" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
+                                <input type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
                                 <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
@@ -538,10 +536,10 @@
 
         // KODE BARANG
         $('.kode_barang').select2({
-            placeholder: "Pilih Kode Barang / Buat Baru",
+            placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
+            tags: false,
             allowClear: true
         })
 
@@ -567,11 +565,11 @@
             .css('z-index', '1');
 
         // SPESIFIKASI
-        $('.spesifikasi').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        })
+        // $('.spesifikasi').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".detail-modal .modal-content")
+        // })
 
         //CSS SELECT2 FLOATING LABEL
         $('.spesifikasi')
@@ -674,8 +672,7 @@
             $(".kode").val('')
             $(".nama_barang").val('')
             $(".qty").val('')
-            $(".spesifikasi").empty()
-            $(".spesifikasi").val('').change()
+            $(".spesifikasi").val('')
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
@@ -744,14 +741,8 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".spesifikasi").empty()
-                        $(".spesifikasi").append(`<option value=""></option>`)
-                        res.data.spek = JSON.parse(res.data.spek)
-                        res.data.spek.forEach(function(item) {
-                            $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                        })
-
-                        $(".spesifikasi").val("").change();
+                        let spek = res?.data?.spek;
+                        $(".spesifikasi").val(spek);
                     }
                 })
 
@@ -762,8 +753,7 @@
                 $(".harga").val(harga ? harga.toLocaleString() : "");
                 $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
             } else {
-                $(".spesifikasi").empty()
-                $(".spesifikasi").val("").change()
+                $(".spesifikasi").val("")
                 $(".nama_barang").attr("readonly", false)
                 $(".kode").val("");
                 $(".nama_barang").val("");
@@ -839,7 +829,7 @@
             let barang_id = $(".barang_id").val()
             let kode_barang = $(".kode").val()
             let nama_barang = $(".nama_barang").val()
-            let spesifikasi = $(".spesifikasi option:selected").val() ? $(".spesifikasi option:selected").val() : ""
+            let spesifikasi = $(".spesifikasi").val()
             let keterangan = $(".keterangan").val()
             let harga = $(".harga").val()
             let qty = $(".qty").val()
@@ -1720,14 +1710,8 @@
             method: "GET",
             dataType: "json",
             success: function(res) {
-                $(".spesifikasi").empty()
-                $(".spesifikasi").append(`<option value=""></option>`)
-                res.data.spek = JSON.parse(res.data.spek)
-                res.data.spek.forEach(function(item) {
-                    $(".spesifikasi").append(`<option value="${item}">${item}</option>`)
-                })
-
-                $(".spesifikasi").val(spesifikasi).change();
+                let spek = res?.data?.spek;
+                $(".spesifikasi").val(spek);
             }
         })
 

@@ -279,6 +279,10 @@ class POLokalBahanBaku extends BaseController
                         $value->barang_id = $value->item_id;
                         $value->rm_purchase_order_id = $id;
 
+                        if (!empty($value->isDeleted)) {
+                            $RMPurchaseOrderDetailModel->where('id', $value->id)->delete();
+                        }
+
                         $dataDetail = [
                             "id" => $value->id ?? null,
                             "rm_purchase_order_id" => $this->request->getPost("id"),
@@ -336,28 +340,28 @@ class POLokalBahanBaku extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
 
-            $payload = json_encode([
-                "is_posted" => true
-            ]);
+            $payload = [
+                "is_posted" => "1"
+            ];
 
-            $response = curl_request("PATCH", "/rawMaterialPO/$id", $this->token, $payload);
+            if (!empty($id)) {
+                $RMPurchaseOrderModel->update($id, $payload);
 
-            if ($response["code"] === 200) {
                 $data = [
-                    "status"            => true,
+                    "status"    => true,
                     "message"   => "Data Berhasil diposting",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diposting';
                 $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Disimpan",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             }

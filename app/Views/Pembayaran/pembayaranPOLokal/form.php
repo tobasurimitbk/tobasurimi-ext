@@ -55,7 +55,7 @@
 
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select" name="summaries[]" id="supplier-faktur">
+                        <select class="form-select" name="summary_id" id="supplier-faktur">
                             <?php foreach ($summaryList ?? [] as $summary): ?>
                             <option value="<?= $summary->id ?>" data-amount="<?= floatval($summary->amount) ?>" <?= (in_array($summary->id, $selectedFaktur)) ? 'selected' : '' ?>><?= $summary->summary_no ?></option>
                             <?php endforeach ?>
@@ -73,7 +73,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->due_date ?? '' ?>">
+                        <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->due_date ?? '' ?>" readonly>
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
@@ -108,6 +108,30 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Item List</h4>
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Tanggal LPB</th>
+                                    <th>No. LPB</th>
+                                    <th>Item Name</th>
+                                    <th>Qty</th>
+                                    <th>Unit</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
 </div>
@@ -172,7 +196,60 @@ $(document).ready(function() {
         },
     });
 
-    $(".due_date").datepicker({
+    // data table start
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        info: false,
+        fixedHeader: true,
+        lengthChange: false,
+        paging: false,
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "lpb_date",
+            className: "text-center"
+        },
+        {
+            data: "no_lpb",
+            className: "text-center"
+        },
+        {
+            data: "item_name",
+            className: "text-center"
+        },
+        {
+            data: "qty",
+            className: "text-center"
+        },
+        {
+            data: "unit",
+            className: "text-center"
+        },
+        {
+            data: "total",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+    // data table end
+
+    $("#payment_date").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -184,10 +261,10 @@ $(document).ready(function() {
         placeholder: "",
         theme: "bootstrap-5"
     }).change(function(e) {
+        table.clear().draw();
         $("#supplier-faktur").empty();
         $("#supplier-faktur").select2({
-            multiple: true,
-            placeholder: "Pilih Bro",
+            // placeholder: "Pilih Bro",
             theme: "bootstrap-5",
             ajax: {
                 url: '<?= base_url() . 'rekap-faktur/supplier/' ?>' + $(this).val(),
@@ -198,28 +275,37 @@ $(document).ready(function() {
                             return {
                                 id: item.id,
                                 text: item.summary_no,
-                                amount: +item.amount
+                                amount: +item.total,
+                                dueDate: item.due_date
                             }
                         })
                     };
                 }
             },
             templateSelection: function(container) {
-                // console.log('goblokkkkkkkkkkkkkkkkkk')
                 $(container.element).attr("data-amount", container.amount);
+                $(container.element).attr("data-dueDate", container.dueDate);
                 return container.text;
             }
         });
     });
 
-    $("#supplier-faktur").change(function(e) {
+    $("#supplier-faktur").change(async function(e) {
         let total = 0;
+        let dueDate = '';
         
         $(this).select2('data').map(function(data) {
             total += data.amount;
+            dueDate = data.dueDate;
         });
         
         $('#nominal_pembayaran').val(total);
+        $('#due_date').val(dueDate);
+
+        // populate data table here
+        const itemList = await getItemList($(this).val());
+        table.clear();
+        table.rows.add(itemList.data).draw();
     });
 
     //CSS SELECT2 FLOATING LABEL
@@ -299,6 +385,29 @@ $(document).ready(function() {
             })
         }
     })
+
+    function getItemList(invId) {
+        return $.ajax({
+            url: `<?= base_url("rekap-faktur/getItemList/"); ?>${invId}`,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "GET",
+            dataType: "json",
+            success: function(response) {
+                return response.data;
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Gagal Diambil, coba Lagi',
+                    confirmButtonColor: '#4e73df',
+                })
+                stopLoading()
+            }
+        });
+    }
 })
 
 const changeStatus = function()

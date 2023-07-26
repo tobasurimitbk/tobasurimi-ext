@@ -8,7 +8,7 @@
                 <h5 class="modal-title"><label class="title-name"></label> Barang</h5>
             </div>
             <div class="modal-body">
-            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <input type="hidden" class="parent" name="parent" id="parent" />
                     <?= csrf_field() ?>
@@ -35,6 +35,29 @@
                         </div>
                     </div>
                     <div class="is_parent" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select type" onchange="changeType()" name="type" id="type" aria-label="Floating label select example">
+                                        <option value="">Pilih Tipe</option>
+                                        <option value="BAHAN PENOLONG LOKAL">Bahan Penolong Lokal</option>
+                                        <option value="BAHAN PENOLONG IMPORT">Bahan Penolong Import</option>
+                                        <option value="BAHAN BAKU IMPORT">Bahan Baku Import</option>
+                                        <option value="BAHAN BAKU LOKAL">Bahan Baku Lokal</option>
+                                    </select>
+
+                                    <label for="floatingInput">Tipe Supplier</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select multiple class="form-select supplier_id" name="supplier_id[]" id="supplier_id[]">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Supplier</label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -90,7 +113,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="text" class="form-control spec" name="spec" id="spec" placeholder="Spesifikasi">
+                                    <input type="text" class="form-control spek" name="spek" id="spek" placeholder="Spesifikasi">
                                     <label for="floatingInput">Spesifikasi</label>
                                 </div>
                             </div>
@@ -195,6 +218,7 @@
                             <th onclick="changeSort('parent_barang')" class="sort">Parent Barang</th>
                             <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                             <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                            <th onclick="changeSort('type')" class="sort">Tipe Supplier</th>
                             <th onclick="changeSort('harga_barang')" class="sort">Harga Barang</th>
                             <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
                             <th onclick="changeSort('kategori')" class="sort">Kategori</th>
@@ -273,6 +297,10 @@
             className: "text-center"
         },
         {
+            data: "type",
+            className: "text-center"
+        },
+        {
             data: "harga_barang",
             className: "text-center"
         },
@@ -344,6 +372,34 @@
             theme: "bootstrap-5",
             allowClear: true
         })
+
+        // SUPPLIER
+        $('.supplier_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".supplier_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".supplier_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".supplier_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
          // PARENT BARANG
          $('.parent_id').select2({
@@ -558,6 +614,9 @@
                 harga_barang: {
                     required: "Harga wajib diisi"
                 },
+                type: {
+                    required: "Tipe Supplier wajib diisi"
+                },
                 satuan_id: {
                     required: "Satuan wajib diisi"
                 },
@@ -601,9 +660,9 @@
 
         $(".btn-show-form").click(function() {
             $(".parent_id").removeAttr('disabled');
-            $(".body-detail-spek").empty()
-            list_spek = [];
-            row_detail = 0;
+            // $(".body-detail-spek").empty()
+            // list_spek = [];
+            // row_detail = 0;
             $('.kode_barang').rules('add', {
                 required: true
             });
@@ -611,10 +670,15 @@
             $('.stok').rules('remove', 'required');
             $('.harga_barang').rules('remove', 'required');
             $('.satuan_id').rules('remove', 'required');
+            $('.type').rules('remove', 'required');
             $('.kategori_id').rules('remove', 'required');
             $('.hs_id').rules('remove', 'required');
             $('.ap_id').rules('remove', 'required');
             $('.ar_id').rules('remove', 'required');
+            $(".type").val();
+            $('.spek').val();
+            $(".supplier_id").val([]).change();
+            $(".supplier_id").empty();
             $('.parent').val();
             $('.kode_barang').val();
             $('.nama_barang').val();
@@ -729,9 +793,9 @@
             $(".title-name").text("Update");
             $(".stok").attr("readonly", true);
             $(".kode_barang").attr("readonly", true);
-            $(".body-detail-spek").empty()
-            row_detail = 0;
-            list_spek = [];
+            // $(".body-detail-spek").empty()
+            // row_detail = 0;
+            // list_spek = [];
             $(".parent_id").attr('disabled', 'true');
 
             $.ajax({
@@ -768,10 +832,11 @@
                         if(res?.data?.parent_id !== "0")
                         {
                             $(".is_parent").css("display", "");
-                            $('.stok').rules('add', {
+                            $('.stok').rules('remove', 'required');
+                            $('.harga_barang').rules('add', {
                                 required: true
                             });
-                            $('.harga_barang').rules('add', {
+                            $('.type').rules('add', {
                                 required: true
                             });
                             $('.satuan_id').rules('add', {
@@ -795,6 +860,7 @@
                             $(".is_parent").css("display", "none");
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('remove', 'required');
+                            $('.type').rules('remove', 'required');
                             $('.satuan_id').rules('remove', 'required');
                             $('.kategori_id').rules('remove', 'required');
                             $('.hs_id').rules('remove', 'required');
@@ -803,6 +869,7 @@
                         }
 
                         $(".kode_barang").val(res?.data?.kode_barang);
+                        $(".spek").val(res?.data?.spek);
                         $(".nama_barang").val(res?.data?.nama_barang);
                         $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
                         console.log()
@@ -868,6 +935,87 @@
                             }
                         })
 
+                        $(".supplier_id").empty()
+                        $(".type").val(res?.data?.type)
+
+                        let arr_supplier_id = []
+                        res?.dataSupplier.forEach(function(item) {
+                            arr_supplier_id.push(Number(item.supplier_id));
+                        })
+
+                        if(res?.data?.type === "BAHAN BAKU LOKAL")
+                        {
+                            $.ajax({
+                                url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+                                method: "GET",
+                                dataType: "json",
+                                success: function(result) {
+                                    $(".supplier_id").empty()
+                                    $(".supplier_id").append(`<option value=""></option>`);
+
+                                    result.data.forEach(function(item) {
+                                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                                    })
+
+                                    $(".supplier_id").val(arr_supplier_id).change();
+                                }
+                            })
+                        }
+                        if(res?.data?.type === "BAHAN BAKU IMPORT")
+                        {
+                            $.ajax({
+                                url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
+                                method: "GET",
+                                dataType: "json",
+                                success: function(result) {
+                                    $(".supplier_id").empty()
+                                    $(".supplier_id").append(`<option value=""></option>`);
+
+                                    result.data.forEach(function(item) {
+                                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                                    })
+
+                                    $(".supplier_id").val(arr_supplier_id).change();
+                                }
+                            })
+                        }
+                        if(res?.data?.type === "BAHAN PENOLONG LOKAL")
+                        {
+                            $.ajax({
+                                url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+                                method: "GET",
+                                dataType: "json",
+                                success: function(result) {
+                                    $(".supplier_id").empty()
+                                    $(".supplier_id").append(`<option value=""></option>`);
+
+                                    result.data.forEach(function(item) {
+                                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                                    })
+
+                                    $(".supplier_id").val(arr_supplier_id).change();
+                                }
+                            })
+                        }
+                        if(res?.data?.type === "BAHAN PENOLONG IMPORT")
+                        {
+                            $.ajax({
+                                url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
+                                method: "GET",
+                                dataType: "json",
+                                success: function(result) {
+                                    $(".supplier_id").empty()
+                                    $(".supplier_id").append(`<option value=""></option>`);
+
+                                    result.data.forEach(function(item) {
+                                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                                    })
+
+                                    $(".supplier_id").val(arr_supplier_id).change();
+                                }
+                            })
+                        }
+
                         $.ajax({
                             url: `<?= base_url("satuan/dropdown"); ?>`,
                             method: "GET",
@@ -928,11 +1076,13 @@
             $(".nama_barang").val("");
             $(".satuan_id").val("").change();
             $(".harga_barang").val("");
+            $(".supplier_id").val([]).change();
             $(".kategori_id").val("").change();
             $(".hs_id").val("").change();
             $(".ap_id").val("").change();
             $(".ar_id").val("").change();
-            $(".spec").val("");
+            $(".type").val("");
+            $(".spek").val("");
             $(".stok").val("");
 
             if($(".parent_id").val())
@@ -942,6 +1092,9 @@
                     required: true
                 });
                 $('.harga_barang').rules('add', {
+                    required: true
+                });
+                $('.type').rules('add', {
                     required: true
                 });
                 $('.satuan_id').rules('add', {
@@ -965,6 +1118,7 @@
                 $(".is_parent").css("display", "none");
                 $('.stok').rules('remove', 'required');
                 $('.harga_barang').rules('remove', 'required');
+                $('.type').rules('remove', 'required');
                 $('.satuan_id').rules('remove', 'required');
                 $('.kategori_id').rules('remove', 'required');
                 $('.hs_id').rules('remove', 'required');
@@ -990,6 +1144,8 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
+
+                        data.append("supplier_id", JSON.stringify($('.supplier_id').val()));
 
                         let id = $(".id").val();
 
@@ -1253,6 +1409,86 @@
         })
 
         list_spek = new_list_spek;
+    }
+
+    const changeType = function() {
+        let value = $(".type").val();
+        $(".type").val()
+        $(".supplier_id").empty()
+        $(".supplier_id").val([]).change()
+
+        if(value === "BAHAN BAKU LOKAL")
+        {
+            $.ajax({
+                url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".supplier_id").empty()
+                    $(".supplier_id").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                    })
+
+                    $(".supplier_id").val([]).change();
+                }
+            })
+        }
+        if(value === "BAHAN BAKU IMPORT")
+        {
+            $.ajax({
+                url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".supplier_id").empty()
+                    $(".supplier_id").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                    })
+
+                    $(".supplier_id").val([]).change();
+                }
+            })
+        }
+        if(value === "BAHAN PENOLONG LOKAL")
+        {
+            $.ajax({
+                url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".supplier_id").empty()
+                    $(".supplier_id").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                    })
+
+                    $(".supplier_id").val([]).change();
+                }
+            })
+        }
+        if(value === "BAHAN PENOLONG IMPORT")
+        {
+            $.ajax({
+                url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".supplier_id").empty()
+                    $(".supplier_id").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
+                    })
+
+                    $(".supplier_id").val([]).change();
+                }
+            })
+        }
     }
 
     const changeSort = function(val) {
