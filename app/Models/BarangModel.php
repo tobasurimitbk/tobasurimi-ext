@@ -213,4 +213,28 @@ class BarangModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function getBarangByType($type)
+    {
+        $arrCondition = [
+            'barangs.deletedAt' => null,
+            'barangs.status' => 'Aktif',
+            'barangs.parent_id !=' => 0,
+            'metadata.deletedAt' => null,
+            'barangs.type' => $type
+        ];
+
+        $selectQry = "barangs.*,
+        metadata.value AS value, 
+        ";
+
+        $builder = $this->db->table('barangs')
+            ->select($selectQry)
+            ->join('metadata', 'metadata.id = barangs.kategori_id');
+        $builder->where($arrCondition)
+            ->orderBy('barangs.nama_barang', 'ASC');
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }
