@@ -324,9 +324,9 @@ class SuratJalan extends BaseController
     {
 
         $id = $this->request->getPost("id");
-        echo json_encode($id);
+        //echo json_encode($id);
 
-        /*
+
         try {
             if (!empty($id)) {
                 $this->SuratJalanModel->delete($id);
@@ -351,7 +351,7 @@ class SuratJalan extends BaseController
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
-        }*/
+        }
         return;
     }
 
