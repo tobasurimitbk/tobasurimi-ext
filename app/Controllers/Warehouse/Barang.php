@@ -127,8 +127,7 @@ class Barang extends BaseController
 
             if ($this->validate($rules)) {
                 $parent_id = formatter($this->request->getPost("parent_id"), "STR_TO_INT");
-                if($parent_id)
-                {
+                if ($parent_id) {
                     $payload = [
                         "company_id" => $this->this_company_id,
                         "parent_id" => formatter($this->request->getPost("parent_id"), "STR_TO_INT"),
@@ -146,9 +145,7 @@ class Barang extends BaseController
                         "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                         "spek" => $this->request->getPost("spek")
                     ];
-                }
-                else
-                {
+                } else {
                     $payload = [
                         "company_id" => $this->this_company_id,
                         "parent_id" => 0,
@@ -163,15 +160,14 @@ class Barang extends BaseController
                 $response =  $this->barangModel->insert($payload);
 
                 if ($response) {
-                    foreach ($supplier_id as $item) 
-                    {
+                    foreach ($supplier_id as $item) {
                         $payload_supplier = [
                             "barang_id" => $response,
                             "supplier_id" => $item
                         ];
                         $responseSupplier =  $this->barangSupplierModel->insert($payload_supplier);
 
-                        if (!$responseSupplier){
+                        if (!$responseSupplier) {
                             $message =  'Data Gagal Disimpan';
                             $data = [
                                 "status"            => false,
@@ -236,8 +232,7 @@ class Barang extends BaseController
                 $id = $this->request->getPost("id");
 
                 $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
-                if($parent)
-                {
+                if ($parent) {
                     $payload = [
                         "type" => $this->request->getPost("type"),
                         "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
@@ -253,9 +248,7 @@ class Barang extends BaseController
                         "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                         "spek" => $this->request->getPost("spek")
                     ];
-                }
-                else
-                {
+                } else {
                     $payload = [
                         "company_id" => $this->this_company_id,
                         "nama_barang" => $this->request->getPost("nama_barang"),
@@ -282,17 +275,15 @@ class Barang extends BaseController
                 if ($response) {
                     $responseDelete =  $this->barangSupplierModel->deleteByBarangId($id);
 
-                    if($responseDelete)
-                    {
-                        foreach ($supplier_id as $item) 
-                        {
+                    if ($responseDelete) {
+                        foreach ($supplier_id as $item) {
                             $payload_supplier = [
                                 "barang_id" => $id,
                                 "supplier_id" => $item
                             ];
                             $responseSupplier =  $this->barangSupplierModel->insert($payload_supplier);
 
-                            if (!$responseSupplier){
+                            if (!$responseSupplier) {
                                 $message =  'Data Gagal Diubah';
                                 $data = [
                                     "status"            => false,
@@ -311,9 +302,7 @@ class Barang extends BaseController
                             'token' => csrf_hash()
                         ];
                         echo json_encode($data);
-                    }
-                    else
-                    {
+                    } else {
                         $data = [
                             "status"            => false,
                             "message"    => "Data Gagal Diubah",
@@ -515,6 +504,19 @@ class Barang extends BaseController
     {
         $kategori = $this->request->getGet("kategori");
         $dataBarang = $this->barangModel->getBarangByKategori($kategori);
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownBarangType()
+    {
+        $type = $this->request->getGet("type");
+        $dataBarang = $this->barangModel->getBarangByType($type);
 
         $data = [
             "data" => $dataBarang

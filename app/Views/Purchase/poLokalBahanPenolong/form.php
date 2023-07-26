@@ -934,11 +934,11 @@
             })
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "Bahan Penolong"
+                    type: "Bahan Penolong Lokal"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -2023,15 +2023,7 @@
         $(".kode").val(kode_barang)
         $(".keterangan").val(keterangan)
 
-        $.ajax({
-            url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                let spek = res?.data?.spek;
-                $(".spesifikasi").val(spek);
-            }
-        })
+        $(".spesifikasi").val(spesifikasi);
 
         $.ajax({
             url: `<?= base_url("tax/dropdown"); ?>`,
@@ -2070,11 +2062,11 @@
         })
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+            url: `<?= base_url("barang/dropdown/type"); ?>`,
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "Bahan Penolong"
+                type: "Bahan Penolong Lokal"
             },
             success: function(res) {
                 $(".kode_barang").empty();

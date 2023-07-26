@@ -190,7 +190,7 @@
                         csrf.val(response.token);
                         Swal.fire({
                             icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
+                            title: 'Data Gagal Dihapus, coba Lagi',
                             confirmButtonColor: '#4e73df',
                         })
                         stopLoading()

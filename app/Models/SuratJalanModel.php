@@ -92,4 +92,23 @@ class SuratJalanModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getSuratJalanById($id)
+    {
+        $selectQry = "surat_jalan_so.*,users.name as seller_name,customers.name as customer_name ,customers.address,customers.phone";
+
+        $dataSuratJalan = $this->asObject()
+            ->join('users', 'users.id = surat_jalan_so.id_user')
+            ->join('customers', 'customers.id = surat_jalan_so.id_customer ')
+            ->select($selectQry)
+            ->find($id);
+
+        $dataMultpleid = json_decode($dataSuratJalan->multiple_id_so);
+        $dataMultpleNo = json_decode($dataSuratJalan->multiple_no_so);
+
+        $dataSuratJalan->multiple_id_so = $dataMultpleid;
+        $dataSuratJalan->multiple_no_so = $dataMultpleNo;
+
+        return $dataSuratJalan;
+    }
 }
