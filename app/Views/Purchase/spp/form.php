@@ -235,7 +235,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
-                <a href="/barang"><button type="button" class="btn btn-hide-detail mr-3">+ Barang</button></a>
+                <button type="button" onclick="addBarang('<?= base_url("barang"); ?>')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button>
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -295,7 +295,7 @@
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-5">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <textarea class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
@@ -1560,15 +1560,8 @@
         $(".kode").val(kode_barang)
         $(".keterangan").val(keterangan)
 
-        $.ajax({
-            url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                let spek = res?.data?.spek;
-                $(".spesifikasi").val(spek);
-            }
-        })
+        $(".spesifikasi").val(spesifikasi);
+
         if ($(".spp_type option:selected").val() === "Bahan Baku Import" || $(".spp_type option:selected").val() === "Bahan Baku Lokal") {
             $.ajax({
                 url: `<?= base_url("barang/dropdown/type"); ?>`,
@@ -1686,6 +1679,9 @@
         $(".foot-detail-table").append(tag_total);
     }
 
+    const addBarang = function(url) {
+        window.open(url, "_blank");
+    }
     const print = function(url) {
         window.open(url, "_blank");
     }

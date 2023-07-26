@@ -784,11 +784,11 @@
             validator_detail.reset();
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "Bahan Penolong"
+                    type: "Bahan Penolong Import"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1832,11 +1832,11 @@
         $(".spesifikasi").val(spesifikasi);
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+            url: `<?= base_url("barang/dropdown/type"); ?>`,
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "Bahan Penolong"
+                type: "Bahan Penolong Import"
             },
             success: function(res) {
                 $(".kode_barang").empty();
