@@ -1112,7 +1112,7 @@ const changeTipeBahan = function()
     if($(".tipe_bahan").val() === "BAKU")
     {
         $.ajax({
-            url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
+            url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
             method: "GET",
             dataType: "json",
             success: function(res) {
@@ -1131,7 +1131,7 @@ const changeTipeBahan = function()
     if($(".tipe_bahan").val() === "PENOLONG")
     {
         $.ajax({
-            url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
+            url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
             method: "GET",
             dataType: "json",
             success: function(res) {
