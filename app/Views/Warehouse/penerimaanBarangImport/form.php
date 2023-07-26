@@ -284,7 +284,7 @@
                             <th>Selisih</th>
                             <th>Konversi</th>
                             <th>Harga</th>
-                            <th>Penyerahan</th>
+                            <th>Total Harga</th>
                             <th>Keterangan</th>
                             <?php if(!empty($dataPenerimaanBarang)){ 
                             if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
@@ -2640,7 +2640,7 @@
             tag_total += "</tr>";
 
             $(".foot-detail-table").append(tag_total);
-            
+
             if($(".supplier_id option:selected").val())
             {
                 if($(".tipe_bahan").val() === "BAKU")
