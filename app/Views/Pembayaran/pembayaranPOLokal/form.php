@@ -17,7 +17,7 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" class="id" name="id" id="id" />
+            <input type="hidden" class="id" name="id" id="id" value="<?= $dataPembayaranPOLokal->id ?? '' ?>" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
@@ -56,8 +56,9 @@
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select" name="summary_id" id="supplier-faktur">
+                            <option value=""></option>
                             <?php foreach ($summaryList ?? [] as $summary): ?>
-                            <option value="<?= $summary->id ?>" data-amount="<?= floatval($summary->amount) ?>" <?= (in_array($summary->id, $selectedFaktur)) ? 'selected' : '' ?>><?= $summary->summary_no ?></option>
+                            <option value="<?= $summary->id ?>" data-amount="<?= floatval($summary->total) ?>" <?= ($summary->id === $dataPembayaranPOLokal->local_po_inv_summary_id) ? 'selected' : '' ?>><?= $summary->summary_no ?></option>
                             <?php endforeach ?>
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Rekap Faktur</label>
@@ -67,7 +68,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input onkeyup="formatNumber(this)" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" value="0" readonly disabled>
+                        <input onkeyup="formatNumber(this)" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" value="<?= $dataPembayaranPOLokal->amount ?? 0 ?>" readonly disabled>
                         <label for="floatingInput">Nominal Pembayaran</label>
                     </div>
                 </div>
@@ -93,18 +94,6 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
                         <label for="floatingInput">Pembayaran Oleh</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select " name="payment_status" id="payment_status">
-                            <option disabled selected value=""></option>
-                            <option value="Unpaid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Unpaid' ? 'selected' : '' ?>>Unpaid</option>
-                            <option value="Paid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Paid' ? 'selected' : '' ?>>Paid</option>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                     </div>
                 </div>
             </div>
@@ -139,6 +128,7 @@
 
 <script>
 $(document).ready(function() {
+    const id = $(".id").val();
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
     var validator = $(".create-form").validate({
@@ -385,6 +375,11 @@ $(document).ready(function() {
             })
         }
     })
+
+    if (id) {
+        const itemList = <?= json_encode($itemList ?? []) ?>;
+        table.rows.add(itemList).draw(false);
+    }
 
     function getItemList(invId) {
         return $.ajax({
