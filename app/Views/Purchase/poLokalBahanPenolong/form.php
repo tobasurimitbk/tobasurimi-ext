@@ -934,11 +934,11 @@
             })
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "Bahan Penolong"
+                    type: "Bahan Penolong Lokal"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -2070,11 +2070,11 @@
         })
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+            url: `<?= base_url("barang/dropdown/type"); ?>`,
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "Bahan Penolong"
+                type: "Bahan Penolong Lokal"
             },
             success: function(res) {
                 $(".kode_barang").empty();

@@ -702,11 +702,11 @@
             })
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "Bahan Baku"
+                    type: "Bahan Baku Lokal"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1716,11 +1716,11 @@
         })
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+            url: `<?= base_url("barang/dropdown/type"); ?>`,
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "Bahan Baku"
+                type: "Bahan Baku Lokal"
             },
             success: function(res) {
                 $(".kode_barang").empty();

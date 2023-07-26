@@ -833,11 +833,12 @@
             validator_detail.reset();
             if ($(".spp_type option:selected").val() === "Bahan Baku Import" || $(".spp_type option:selected").val() === "Bahan Baku Lokal") {
                 $.ajax({
-                    url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                    url: `<?= base_url("barang/dropdown/type"); ?>`,
                     method: "GET",
                     dataType: "json",
                     data: {
-                        kategori: "Bahan Baku"
+                        // kategori: "Bahan Baku"
+                        type: $(".spp_type option:selected").val()
                     },
                     success: function(res) {
                         $(".kode_barang").empty();
@@ -853,11 +854,12 @@
                 })
             } else if ($(".spp_type option:selected").val() === "Bahan Penolong Lokal" || $(".spp_type option:selected").val() === "Bahan Penolong Import") {
                 $.ajax({
-                    url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                    url: `<?= base_url("barang/dropdown/type"); ?>`,
                     method: "GET",
                     dataType: "json",
                     data: {
-                        kategori: "Bahan Penolong"
+                        // kategori: "Bahan Penolong"
+                        type: $(".spp_type option:selected").val()
                     },
                     success: function(res) {
 
@@ -1569,11 +1571,12 @@
         })
         if ($(".spp_type option:selected").val() === "Bahan Baku Import" || $(".spp_type option:selected").val() === "Bahan Baku Lokal") {
             $.ajax({
-                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "Bahan Baku"
+                    // kategori: "Bahan Baku"
+                    type: $(".spp_type option:selected").val()
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1595,11 +1598,12 @@
             })
         } else if ($(".spp_type option:selected").val() === "Bahan Penolong Lokal" || $(".spp_type option:selected").val() === "Bahan Penolong Import") {
             $.ajax({
-                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "Bahan Penolong"
+                    // kategori: "Bahan Penolong"
+                    type: $(".spp_type option:selected").val()
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
