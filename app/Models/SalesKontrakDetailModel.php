@@ -23,7 +23,6 @@ class SalesKontrakDetailModel extends Model
         'remark',
         'price',
         'total_price',
-        'grand_total',
         'createdAt',
         'updatedAt',
         'deletedAt'

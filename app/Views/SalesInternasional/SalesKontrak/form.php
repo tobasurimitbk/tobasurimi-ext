@@ -117,11 +117,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-5">
+                <div class="row mt-4">
                     <div class="col-md-12">
                         <div class="form-floating">
                             <textarea class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"></textarea>
                             <label for="floatingInput">Special Instructions</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <input readonly type="text" value="0" class="form-control total_amount" id="total_amount" name="total_amount" placeholder="Grand Total" />
+                            <label for="floatingInput">Grand Total</label>
                         </div>
                     </div>
                 </div>
@@ -151,7 +159,6 @@
                                 <th>Qty</th>
                                 <th>Harga</th>
                                 <th>Total Harga</th>
-                                <th>Grand Total</th>
                                 <th>Hapus</th>
                             </tr>
                         </thead>
@@ -163,7 +170,6 @@
                                 <td colspan="2"></td>
                                 <td><b>TOTAL</b></td>
                                 <td colspan="2"></td>
-                                <td><b>0</b></td>
                                 <td><b>0</b></td>
                                 <td><b>0</b></td>
                                 <td><b>0</b></td>
@@ -600,9 +606,6 @@
                                         tag_html += `<td class="edit-table-detail" data-remark="${remark}" data-total="${total}" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-id="${item.id}" data-row="${row + 1}">`;
                                         tag_html += total;
                                         tag_html += "</td>";
-                                        tag_html += `<td class="edit-table-detail" data-remark="${remark}" data-total="${total}" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-id="${item.id}" data-row="${row + 1}">`;
-                                        tag_html += 0;
-                                        tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
                                         tag_html += "</td>";
@@ -653,9 +656,6 @@
                                         tag_html += `<td class="edit-table-detail"  data-remark="${item.remark}" data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
                                         tag_html += item.total;
                                         tag_html += "</td>";
-                                        tag_html += `<td class="edit-table-detail"  data-remark="${item.remark}" data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
-                                        tag_html += 0;
-                                        tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
                                         tag_html += "</td>";
@@ -696,12 +696,11 @@
                                 tag_total += "<td>";
                                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                                 tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>0</b>`;
-                                tag_total += "</td>";
                                 tag_total += "<td colspan=''>";
                                 tag_total += "</td>";
                                 tag_total += "</tr>";
+
+                                $(".total_amount").val(total_harga.toLocaleString());
 
                                 $(".foot-detail-table").append(tag_total);
 
@@ -770,9 +769,6 @@
                                 tag_html += `<td class="edit-table-detail" data-remark="${remark}" data-total="${total}" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-id="" data-row="${row + 1}">`;
                                 tag_html += total;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-remark="${remark}" data-total="${total}" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-id="" data-row="${row + 1}">`;
-                                tag_html += 0;
-                                tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
                                 tag_html += "</td>";
@@ -798,12 +794,11 @@
                                 tag_total += "<td>";
                                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                                 tag_total += "</td>";
-                                tag_total += "<td>";
-                                tag_total += `<b>0</b>`;
-                                tag_total += "</td>";
                                 tag_total += "<td colspan=''>";
                                 tag_total += "</td>";
                                 tag_total += "</tr>";
+
+                                $(".total_amount").val(total_harga.toLocaleString());
 
                                 $(".foot-detail-table").append(tag_total);
 
@@ -956,11 +951,11 @@
             $(".keterangan").val('')
 
             $.ajax({
-                url: `<?= base_url("barang/dropdown/type"); ?>`,
+                url: `<?= base_url("barang/dropdown/kategori"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    type: "Bahan Baku Import"
+                    kategori: "Barang Jadi"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1036,6 +1031,120 @@
         })
     })
 
+    $(document).on('click', '.delete-detail', function() {
+        let id = $(".id_detail").val()
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(id)
+                let new_list_items = []
+                let tag_html = "";
+                let tag_total = "";
+
+                $(".body-detail-table").empty()
+
+                total_harga_barang = 0;
+                total_qty = 0;
+                total_harga = 0;
+
+                row = 0;
+
+                console.log(list_items)
+
+                list_items.map(item => {
+                    if (item.row != id) {
+                        tag_html += `<tr>`;
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += row + 1;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += item.kode_barang;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += item.nama_barang;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += item.nama_satuan;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += item.remark;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += item.qty;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += item.harga;
+                        tag_html += "</td>";
+                        tag_html += `<td class="edit-table-detail"  data-total="${item.total}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-id="${item.id}" data-row="${row + 1}">`;
+                        tag_html += item.total;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_list_items.push({
+                            ...item,
+                            row: row + 1
+                        });
+
+                        row = row + 1;
+
+                        total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
+                        total_qty = total_qty + Number(item.qty);
+                        total_harga = total_harga + Number(item.total.replaceAll(",", ""));
+                    } else {
+                        // sent parameter isDelete if have customer id and id
+                        if (item.id) {
+                            list_delete.push(item)
+                        }
+                    }
+                })
+
+                list_items = [];
+
+                list_items = new_list_items;
+
+                $(".body-detail-table").append(tag_html)
+
+                $(".foot-detail-table").empty()
+
+                tag_total += `<tr>`;
+                tag_total += "<td colspan='4'>";
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += "<b>TOTAL</b>";
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_qty}</b>`;
+                tag_total += "</td>";
+                tag_total += "<td>";
+                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                tag_total += "</td>";
+                tag_total += "<td colspan='6'>";
+                tag_total += "</td>";
+                tag_total += "</tr>";
+
+                $(".total_amount").val(total_harga.toLocaleString());
+
+                $(".foot-detail-table").append(tag_total);
+
+                $(".detail-modal").modal("hide")
+            }
+        })
+    })
+
     $(document).on('click', '.edit-table-detail', function(evt) {
         $(".title-detail-name").text("Update")
         $(".delete-detail").css('display', '');
@@ -1062,11 +1171,11 @@
         $(".remark").val(remark);
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown/type"); ?>`,
+            url: `<?= base_url("barang/dropdown/kategori"); ?>`,
             method: "GET",
             dataType: "json",
             data: {
-                type: "Bahan Baku Import"
+                kategori: "Barang Jadi"
             },
             success: function(res) {
                 $(".kode_barang").empty();
