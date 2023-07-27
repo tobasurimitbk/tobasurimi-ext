@@ -89,6 +89,7 @@ class SalesKontrakModel extends Model
 
         if ($addCondition['search']) {
             $salesDataQry->like('sales_contract.sales_contract_no', $addCondition['search'])
+                ->orLike('sales_contract.customer_po_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search']);
         }
 

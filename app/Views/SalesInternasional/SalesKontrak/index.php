@@ -10,6 +10,13 @@
         </a>
     </div>
     <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-4 mb-3">
+                    <input class="form-control search form-out-search" placeholder="Cari No. SC / No. PO / Buyer" value="" />
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row">
         <div class="table-responsive">
@@ -17,9 +24,10 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>No.</th>
-                        <th onclick="changeSort('sales_contract_no')" class="sort">No. Penawaran</th>
-                        <th onclick="changeSort('customer_name')" class="sort">Nama Customer</th>
-                        <th onclick="changeSort('due_date')" class="sort">Due Date</th>
+                        <th onclick="changeSort('sales_contract_no')" class="sort">No. SC</th>
+                        <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th>
+                        <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
+                        <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
                         <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
                         <th onclick="changeSort('crreatedAt')" class="sort">Tanggal Pembuatan</th>
                     </tr>
@@ -80,10 +88,13 @@ const table = $('.dataTable').DataTable({
         data: "sales_contract_no",
         className: "text-center"
     },{
+        data: "customer_po_no",
+        className: "text-center"
+    },{
         data: "customer_name",
         className: "text-center"
     },{
-        data: "due_date",
+        data: "dicharge_port",
         className: "text-center"
     },{
         data: "shipment_date",

@@ -256,6 +256,10 @@ textarea.form-control {
   height: 64px;
 }
 
+.full-textarea {
+  height: 88px !important;
+}
+
 .custom-control {
   line-height: 1.6rem;
 }
