@@ -186,7 +186,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? ($dataPOImport->dpp ? number_format(formatter($dataPOImport->dpp, "STR_TO_INT")) : "") : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
+                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? ($dataPOImport->dpp ? $dataPOImport->dpp : "") : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
                             <label for="floatingInput">DPP</label>
                         </div>
                     </div>
