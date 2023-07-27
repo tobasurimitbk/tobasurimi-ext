@@ -1,0 +1,675 @@
+<?= $this->extend('layouts/template'); ?>
+<?= $this->Section('content'); ?>
+
+<!-- Begin Page Content -->
+<section class="section">
+    <div class="section-header">
+        <h1 class="title-name">Tambah</h1>
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("sales-kontrak"); ?>">
+                Batal
+            </a>
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan
+            </button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <label for="floatingInput">No. SC</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataCustomer)) {
+                                    foreach ($dataCustomer as $customer) {
+                                ?>
+                                        <option value="<?= $customer["id"]; ?>"><?= $customer["name"]; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput">Buyer</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
+                            <label for="floatingInput">No. PO</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
+                            <label for="floatingInput">Loading Port</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
+                            <label for="floatingInput">Dicharge Port</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
+                                    <label for="floatingInput">Due Date</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-due-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
+                            <label for="floatingInput">Payment Term (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
+                            <label for="floatingInput">Tolerance</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
+                                    <label for="floatingInput">Shipment Date</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-shipment-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <textarea class="full-textarea form-control document_required" id="document_required" name="document_required" placeholder="Document Required"></textarea>
+                            <label for="floatingInput">Document Required</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <textarea class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"></textarea>
+                            <label for="floatingInput">Special Instructions</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="col-subtitle-modal mt-5">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Nama Satuan</th>
+                                <th>Qty</th>
+                                <th>Remark</th>
+                                <th>Harga</th>
+                                <th>Total Harga</th>
+                                <th>Grand Total</th>
+                                <th>Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+            </div>
+            <div class="modal-body">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
+                    <div class="row">
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Barang</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="hidden" class="kode" name="kode" id="kode" />
+                                <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
+                                    <option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>
+                                </select>
+                                <label for="floatingInput">Kode Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
+                                <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col mb-3">
+                            <h5 class="title-tambah-barang">Data Harga</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">Qty</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
+                                <label for="floatingInput">Harga</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                                <label for="floatingInput">Total</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <button type="button" class="btn btn-discard delete-detail">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let list_items = [];
+    $(document).ready(function() {
+        $(".due_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".shipment_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-due-date').click(function() {
+            $(".due_date").focus();
+        });
+
+        $('.icon-shipment-date').click(function() {
+            $(".shipment_date").focus();
+        });
+
+        // CUSTOMER
+        $('.customer_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.customer_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.customer_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.customer_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // KODE BARANG
+        $('.kode_barang').select2({
+            placeholder: "Pilih Kode Barang",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content"),
+            tags: false,
+            allowClear: true
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.kode_barang')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.kode_barang')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // SATUAN
+        $('.satuan').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.satuan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.satuan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.satuan')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        var validator = $(".create-form").validate({
+            rules: {
+                sales_contract_no: {
+                    required: true
+                },
+                customer_id: {
+                    required: true
+                },
+                customer_po_no: {
+                    required: true
+                },
+                loading_port: {
+                    required: true
+                },
+                dicharge_port: {
+                    required: true,
+                },
+                due_date: {
+                    required: true,
+                },
+                tolerance: {
+                    required: true,
+                },
+                shipment_date: {
+                    required: true,
+                },
+                documents_required: {
+                    required: true,
+                },
+                special_instructions: {
+                    required: true,
+                }
+            },
+            messages: {
+                sales_contract_no: {
+                    required: "No. SC wajib diisi"
+                },
+                customer_id: {
+                    required: "Buyer wajib diisi"
+                },
+                customer_po_no: {
+                    required: "No. PO wajib diisi"
+                },
+                loading_port: {
+                    required: "Loading Port wajib diisi"
+                },
+                dicharge_port: {
+                    required: "Dicharge Port wajib diisi"
+                },
+                due_date: {
+                    required: "Due Date wajib diisi"
+                },
+                tolerance: {
+                    required: "Tolerance wajib diisi"
+                },
+                shipment_date: {
+                    required: "Shipment Date wajib diisi"
+                },
+                documents_required: {
+                    required: "Dokumen Required wajib diisi"
+                },
+                special_instructions: {
+                    required: "Special Instructions wajib diisi"
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $(".btn-submit-parent").click(function() {
+            $(".detail-modal").modal("hide")
+
+            // CHECK IF NO BARANG
+            if (list_items.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Barang Tidak Boleh Kosong",
+                    confirmButtonColor: '#4e73df',
+                })
+            } else {
+                if ($(".create-form").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading()
+                            let data = new FormData(document.querySelector(".create-form"));
+                            var total = 0;
+
+                            let update_list_items = [];
+
+                            data.append("items", JSON.stringify(update_list_items))
+
+                            let id = $(".id").val();
+                            // UPDATE
+                            if (id) {
+                                $.ajax({
+                                    url: "<?= base_url("sales-kontrak/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + id;
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                            // CREATE
+                            else {
+                                $.ajax({
+                                    url: "<?= base_url("sales-kontrak/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + +response.id;
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
+                        }
+                    })
+                }
+            }
+        })
+
+        $(".btn-show-detail").click(function() {
+            $(".delete-detail").css('display', 'none');
+
+            $(".title-detail-name").text("Tambah");
+            $(".id_detail").val('');
+
+            $(".kode").val('')
+            $(".nama_barang").val('')
+            $(".qty").val('')
+            $(".satuan").val('')
+            $(".harga").val('')
+            $(".total").val('')
+            $(".keterangan").val('')
+
+            $.ajax({
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    type: "Bahan Baku Import"
+                },
+                success: function(res) {
+                    $(".kode_barang").empty();
+
+                    $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${item.harga_barang}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                    })
+
+                    $(".kode_barang").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("satuan/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".satuan").empty();
+
+                    $(".satuan").append(`<option value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".satuan").append(`<option value="${item.id}">${item.nama_satuan}</option>`);
+                    })
+
+                    $(".satuan").val("").change();
+                    $(".detail-modal").modal("show");
+                }
+            })
+        })
+
+        $(".harga, .qty").keyup(function() {
+            let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
+            let qty = $(".qty").val() ? parseInt($(".qty").val()) : 0;
+
+            let total = (harga * qty).toLocaleString();
+            $(".total").val(total);
+        })
+
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
+        })
+
+        $(".kode_barang").change(function() {
+            if ($(".kode_barang option:selected").val()) {
+                let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
+                let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
+                let stok = $(".kode_barang option:selected").data("stok") ? $(".kode_barang option:selected").data("stok") : "";
+                let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
+                let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
+
+                $(".nama_barang").attr("readonly", nama ? true : false);
+
+                $(".kode").val($(".kode_barang option:selected").val());
+                $(".nama_barang").val(nama);
+                $(".barang_id").val(barang_id);
+                $(".satuan").val(satuan).change();
+                $(".qty").val(stok);
+                $(".harga").val(harga ? Number(harga).toLocaleString() : "");
+                $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
+            } else {
+                $(".nama_barang").attr("readonly", false)
+                $(".kode").val("");
+                $(".nama_barang").val("");
+                $(".barang_id").val("");
+                $(".satuan").val("").change();
+                $(".qty").val("");
+                $(".harga").val("");
+                $(".total").val("");
+            }
+        })
+    })
+
+    const changeStatus = function() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+
+        if (value) {
+            $(".sales_contract_no").attr("readonly", true);
+            $(".sales_contract_no").val("AUTO GENERATE");
+        } else {
+            $(".sales_contract_no").attr("readonly", false);
+            $(".sales_contract_no").val("");
+        }
+    }
+</script>
+<?= $this->endSection(); ?>

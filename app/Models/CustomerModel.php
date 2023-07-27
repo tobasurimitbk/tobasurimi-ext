@@ -79,4 +79,17 @@ class CustomerModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getCustomer()
+    {
+        $arrCondition = [
+            'deletedAt' => null
+        ];
+
+        $builder = $this->db->table('customers');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }

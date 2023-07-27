@@ -1,0 +1,280 @@
+<?php
+
+namespace App\Controllers\SalesInternasional;
+
+use App\Controllers\BaseController;
+use Config\Services;
+
+use App\Models\CustomerModel;
+use App\Models\SalesKontrakModel;
+use App\Models\SalesKontrakDetailModel;
+
+class SalesKontrak extends BaseController
+{
+    protected $token;
+    protected $this_company_id;
+    protected $encrypter;
+    protected $customerModel;
+    protected $salesKontrakModel;
+    protected $salesKontrakDetailModel;
+
+    public function __construct()
+    {
+        $this->token = session()->get("login")->token;
+        $this->this_company_id = session()->get("login")->this_company_id;
+        $this->encrypter = Services::encrypter();
+        $this->customerModel = new CustomerModel();
+        $this->salesKontrakModel = new SalesKontrakModel();
+        $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
+    }
+
+    public function index()
+    {
+        return view('SalesInternasional/SalesKontrak/index');
+    }
+
+    public function createView()
+    {
+        //Get Valuta Asing By Metadata
+        $dataCustomer = $this->customerModel->getCustomer();
+        
+        $data = [
+            "dataCustomer" => $dataCustomer
+        ];
+
+        return view('SalesInternasional/SalesKontrak/form', $data);
+    }
+
+    public function all()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "idCompany"     => $this->this_company_id
+        ];
+
+        $condition = [
+            "sales_contract.company_id"    => $this->this_company_id
+        ];
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType")
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $salesKontrakData = $this->salesKontrakModel->getList($condition, $addCondition, $limit, $offset);
+
+        $dataSalesKontrak = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($salesKontrakData['data'] as $data) {
+            array_push($dataSalesKontrak, [
+                "no"                    => $no++,
+                "sales_contract_id"     => $data->sales_contract_id,
+                "sales_contract_no"      => $data->sales_contract_no,
+                "customer_po_no"        => $data->customer_po_no,
+                "customer_name"         => $data->customer_name,
+                "dicharge_port"         => $data->dicharge_port,
+                "shipment_date"         => $data->shipment_date,
+                "createdAt"             => date('Y-m-d', strtotime($data->createdAt))
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $salesKontrakData['totalData'],
+            "recordsFiltered"   => $salesKontrakData['totalFilteredData'],
+            "data"              => $dataSalesKontrak,
+            // "response" => $response,
+            "payload"           => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function save()
+    {
+        try{
+            $rules = [
+                "sales_contract_no" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. SC tidak boleh kosong',
+                    ]
+                ],
+                "customer_id" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Buyer tidak boleh kosong',
+                    ]
+                ],
+                "customer_po_no" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. PO boleh kosong',
+                    ]
+                ],
+                "loading_port" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Loading Port tidak boleh kosong',
+                    ]
+                ],
+                "dicharge_port" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Dicharge Port tidak boleh kosong',
+                    ]
+                ],
+                "due_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Due Date tidak boleh kosong',
+                    ]
+                ],
+                "tolerance" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tolerance tidak boleh kosong',
+                    ]
+                ],
+                "shipment_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Shipment Date tidak boleh kosong',
+                    ]
+                ],
+                "documents_required" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Document Required tidak boleh kosong',
+                    ]
+                ],
+                "special_instructions" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Special Instructions tidak boleh kosong',
+                    ]
+                ],
+            ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            if ($this->validate($rules)) {
+
+                $payload = [
+                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
+                    "sales_contract_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("sales_contract_no"),
+                    "customer_id" => formatter($this->request->getPost("customer_id"), "STR_TO_INT"),
+                    "customer_po_no" => $this->request->getPost("customer_po_no"),
+                    "loading_port" => $this->request->getPost("loading_port"),
+                    "dicharge_port" => $this->request->getPost("dicharge_port"),
+                    "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
+                    "total_amount" => 0,
+                    "tolerance" => $this->request->getPost("tolerance"),
+                    "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("shipment_date")))) : "",
+                    "payment_term" => $this->request->getPost("payment_term"),
+                    "documents_required" => $this->request->getPost("documents_required"),
+                    "special_instructions" => $this->request->getPost("special_instructions"),
+                ];
+
+                $items = json_decode($this->request->getPost("items"));
+
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
+                
+                $response =  $this->salesKontrakModel->insert($payload);
+
+                if ($response) {
+                    foreach($items as $data)
+                    {
+                        $detailPayload = [];
+
+                        $barang_id = $data->item_id;
+
+                        $detailPayload = [
+                            'sales_contract_id' => $response,
+                            'barang_id' =>$barang_id,
+                            'unit' => $data->unit,
+                            'qty' => $data->qty,
+                            'price' => $data->price,
+                            'total_price' => $data->total_price,
+                            'grand_total' => $data->grand_total
+                        ];
+
+                        // $data = [
+                        //     "status"            => false,
+                        //     "message"    => $detailPayload,
+                        //     "payload"   => $detailPayload,
+                        //     'token' => csrf_hash()
+                        // ];
+                        // echo json_encode($data);
+
+                        $responseDetail = $this->salesKontrakDetailModel->insert($detailPayload);
+
+                        if(!$responseDetail) {
+                            $message =  'Data Gagal Disimpan';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    }
+
+                    $data = [
+                        "id" => $response,
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        "response" => $response,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message =  'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+}

@@ -75,12 +75,15 @@ class RekapFaktur extends BaseController
 
             $totalSummary = 0;
             $detData = [];
+            $invoiceIds = $this->request->getPost('invoices');
 
             // validate here
-            foreach ($this->request->getPost('invoices') as $invoice) {
+            foreach ($invoiceIds as $invoice) {
                 $penerimaanData = $penerimaanBarangModel->asObject()
+                    ->select('penerimaan_barang.*, SUM(penerimaan_barang_detail.harga * penerimaan_barang_detail.qty) AS itemTotal')
                     ->where('status_post', 'FINISH')
                     ->where('status_penerimaan', 'LOKAL')
+                    ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
                     ->find($invoice);
 
                 if (empty($penerimaanData)) {
@@ -93,10 +96,11 @@ class RekapFaktur extends BaseController
                     return;
                 }
 
-                $totalSummary += $penerimaanData->shipping_cost;
+                $totalReceiveAmt = $penerimaanData->shipping_cost + $penerimaanData->biaya_masuk + $penerimaanData->ppnbm + $penerimaanData->itemTotal;
+                $totalSummary += $totalReceiveAmt;
                 $detData[] = [
                     'penerimaan_barang_id'  => $invoice,
-                    'inv_amt'               => $penerimaanData->shipping_cost
+                    'inv_amt'               => $totalReceiveAmt
                 ];
             }
 
@@ -106,10 +110,10 @@ class RekapFaktur extends BaseController
                 'supplier_id'   => $this->request->getPost("supplier_id"),
                 'due_date'      => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
                 'total'         => $totalSummary,
-                'is_posted'     => $this->request->getPost('is_posted')
+                'is_posted'     => $this->request->getPost('is_posted') ?? 0
             ];
 
-            $localPOInvSum->db->transStart();
+            $localPOInvSum->db->transException(true)->transStart();
             $insertedId = $localPOInvSum->insert($insertdata);
 
             foreach ($detData as &$detail) {
@@ -117,6 +121,10 @@ class RekapFaktur extends BaseController
             }
 
             $localPOInvSumDet->insertBatch($detData);
+
+            $penerimaanBarangModel->set('is_summarized', 1);
+            $penerimaanBarangModel->whereIn('id', $invoiceIds)
+                ->update();
             $localPOInvSum->db->transComplete();
 
             $data = [
@@ -230,7 +238,8 @@ class RekapFaktur extends BaseController
         $summaryData = $localPOInvSum->asObject()
             ->select($selectQry)
             ->join('local_po_inv_sum_details', 'local_po_inv_sum_details.local_po_inv_summary_id = local_po_inv_summaries.id')
-            ->where('company_id', $this->this_company_id)    
+            ->where('company_id', $this->this_company_id)   
+            ->groupBy('local_po_inv_summaries.id') // if this line is commented, $summaryData will return object instead of null (because of GROUP_CONCAT)
             ->find($id);
 
         if (empty($summaryData)) {
