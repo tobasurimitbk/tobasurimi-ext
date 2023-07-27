@@ -35,12 +35,39 @@ class SalesKontrak extends BaseController
 
     public function createView()
     {
-        //Get Valuta Asing By Metadata
+        //Get Buyer From Customer
         $dataCustomer = $this->customerModel->getCustomer();
         
         $data = [
             "dataCustomer" => $dataCustomer
         ];
+
+        return view('SalesInternasional/SalesKontrak/form', $data);
+    }
+
+    public function getById($id = null)
+    {
+        //Get Buyer From Customer
+        $dataCustomer = $this->customerModel->getCustomer();
+        
+        $data = [
+            "dataCustomer" => $dataCustomer
+        ];
+
+        if (!empty($id)) {
+            $dataSO = $this->salesKontrakModel->getById($id);
+            $data["dataSO"] = $dataSO;
+
+            $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
+
+            if($dataSODetail)
+            {
+                $data["dataSODetail"] = $dataSODetail;
+            }
+
+            // var_dump($dataPOImport);
+            // die;
+        }
 
         return view('SalesInternasional/SalesKontrak/form', $data);
     }
@@ -76,7 +103,7 @@ class SalesKontrak extends BaseController
         foreach ($salesKontrakData['data'] as $data) {
             array_push($dataSalesKontrak, [
                 "no"                    => $no++,
-                "sales_contract_id"     => $data->sales_contract_id,
+                "id"                    => $data->sales_contract_id,
                 "sales_contract_no"      => $data->sales_contract_no,
                 "customer_po_no"        => $data->customer_po_no,
                 "customer_name"         => $data->customer_name,
@@ -177,7 +204,8 @@ class SalesKontrak extends BaseController
             }
 
             if ($this->validate($rules)) {
-
+                $no = $this->salesKontrakModel->get_no(date('Y'), date('y'));
+                
                 $payload = [
                     "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
                     "sales_contract_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("sales_contract_no"),
@@ -186,7 +214,7 @@ class SalesKontrak extends BaseController
                     "loading_port" => $this->request->getPost("loading_port"),
                     "dicharge_port" => $this->request->getPost("dicharge_port"),
                     "due_date" => $this->request->getPost("due_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))) : "",
-                    "total_amount" => 0,
+                    "total_amount" => $this->request->getPost("total_amount") ? formatter($this->request->getPost("total_amount"), "CURR_TO_INT") : 0,
                     "tolerance" => $this->request->getPost("tolerance"),
                     "shipment_date" => $this->request->getPost("shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("shipment_date")))) : "",
                     "payment_term" => $this->request->getPost("payment_term"),
@@ -211,16 +239,14 @@ class SalesKontrak extends BaseController
                     {
                         $detailPayload = [];
 
-                        $barang_id = $data->item_id;
-
                         $detailPayload = [
                             'sales_contract_id' => $response,
-                            'barang_id' =>$barang_id,
+                            'barang_id' =>$data->barang_id,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
+                            'remark' => $data->remark,
                             'price' => $data->price,
-                            'total_price' => $data->total_price,
-                            'grand_total' => $data->grand_total
+                            'total_price' => $data->total_price
                         ];
 
                         // $data = [
@@ -264,6 +290,60 @@ class SalesKontrak extends BaseController
                     ];
                     echo json_encode($data);
                 }
+            }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function delete()
+    {
+        try{
+            $id = $this->request->getPost("id");
+
+            if (!empty($id)) {
+                $find = $this->salesKontrakModel->find($id);
+                if ($find) {
+                    $response =  $this->salesKontrakModel->delete($id);
+                    if ($response) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil dihapus",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message = 'Data Gagal Dihapus';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                } else {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Data Tidak Ditemukan",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+            } else {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
             }
         }
         catch(\Exception $e)
