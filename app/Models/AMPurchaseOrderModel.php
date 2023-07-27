@@ -129,7 +129,8 @@ class AMPurchaseOrderModel extends Model
         suppliers.no_npwp AS supplierNPWP,
         users.name AS createdByName,
         companies.company as companyName,
-        metadata.value as currencyName
+        metadata.value as currencyName,
+        FORMAT(CEILING(am_purchase_orders.dpp), 'N', 'en-us') AS dpp,
         ";
 
         $sppData = $this->asObject()
