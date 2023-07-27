@@ -1325,7 +1325,6 @@
                             cancelButtonText: 'Batal',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                console.log(id)
                                 let new_list_items = []
                                 let tag_html = "";
                                 let tag_total = "";
