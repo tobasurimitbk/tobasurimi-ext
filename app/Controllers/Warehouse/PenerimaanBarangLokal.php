@@ -1031,6 +1031,7 @@ class PenerimaanBarangLokal extends BaseController
             "penerimaan_barang.company_id"          => $this->this_company_id,
             "penerimaan_barang.status_post"         => "FINISH",
             "penerimaan_barang.status_penerimaan"   => "LOKAL",
+            "penerimaan_barang.is_summarized"       => 0
         ];
 
         $itemData = $this->penerimaanBarangModel
