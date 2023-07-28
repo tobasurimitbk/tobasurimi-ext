@@ -331,8 +331,12 @@ $routes->post('/retur/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth'])
 // SALES INTERNASIONAL
 // Sales Kontrak
 $routes->get('/sales-kontrak', 'SalesInternasional\SalesKontrak::index', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/id/(:segment)', 'SalesInternasional\SalesKontrak::getById/$1', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/create', 'SalesInternasional\SalesKontrak::createView', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/all', 'SalesInternasional\SalesKontrak::all', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/save', 'SalesInternasional\SalesKontrak::save', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/update', 'SalesInternasional\SalesKontrak::update', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete', ['filter' => 'Auth']);
 
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);

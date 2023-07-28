@@ -8,7 +8,7 @@ class SalesKontrakModel extends Model
 {
     protected $DBGroup          = 'default';
     protected $table            = 'sales_contract';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'sales_contract_id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
@@ -107,5 +107,41 @@ class SalesKontrakModel extends Model
             'sort'  => $sort,
             'sortType'  => $sortType
         ];
+    }
+
+    public function getById($id)
+    {
+        $selectQry = "sales_contract.*";
+
+        $sppData = $this->asObject()
+            ->select($selectQry)
+            ->find($id);
+
+        return $sppData;
+    }
+
+    public function get_no($thn, $thn2)
+    {
+        $lastStr =  "/TOBA/CN/EM/" . $thn2;
+
+        $builder = $this->db->table('sales_contract');
+        $builder->select('sales_contract_no');
+        $builder->orderBy('sales_contract_no', 'desc')
+        ->where('createdAt >=', $thn . "-01-01 00:00:00")
+        ->where('createdAt <=', $thn . "-12-31 23:59:59");
+        $builder->like('sales_contract_no', $lastStr);
+        $query = $builder->get();
+
+        $lastSO = '001';
+        if ($query->getResultArray()) {
+            $lastFirst = explode('/', $query->getResultArray()[0]['sales_contract_no']);
+            $lastSO = explode('-', $lastFirst[0]);
+            $lastSO = intval($lastSO[0]) + 1;
+            $lastSO = sprintf("%03d", $lastSO);
+        };
+
+        $generatedNo =  $lastSO . $lastStr;
+
+        return $generatedNo;
     }
 }

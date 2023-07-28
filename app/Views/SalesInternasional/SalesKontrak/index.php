@@ -16,29 +16,27 @@
                     <input class="form-control search form-out-search" placeholder="Cari No. SC / No. PO / Buyer" value="" />
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>No.</th>
-                        <th onclick="changeSort('sales_contract_no')" class="sort">No. SC</th>
-                        <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th>
-                        <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
-                        <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
-                        <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
-                        <th onclick="changeSort('crreatedAt')" class="sort">Tanggal Pembuatan</th>
-                    </tr>
-                </thead>
-                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('sales_contract_no')" class="sort">No. SC</th>
+                                <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th>
+                                <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
+                                <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
+                                <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
+                                <th onclick="changeSort('crreatedAt')" class="sort">Tanggal Pembuatan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
-    </div>
     </div>
 </section>
 
