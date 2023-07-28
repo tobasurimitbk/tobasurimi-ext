@@ -39,11 +39,11 @@
                         <tr>
                             <th>No.</th>
                             <th>No. Pembayaran</th>
+                            <th>Supplier</th>
                             <th>Tanggal Jatuh Tempo</th>
                             <th>Tanggal Pembayaran</th>
                             <th>Metode Pembayaran</th>
                             <th>Jumlah</th>
-                            <th>Status Pembayaran</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -105,6 +105,10 @@
             className: "text-center"
         },
         {
+            data: "supplier",
+            className: "text-center"
+        },
+        {
             data: "due_date",
             className: "text-center"
         },
@@ -118,10 +122,6 @@
         },
         {
             data: "amount",
-            className: "text-center"
-        },
-        {
-            data: "payment_status",
             className: "text-center"
         }],
         columnDefs: [{

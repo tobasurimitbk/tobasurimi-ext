@@ -33,6 +33,7 @@ class PenerimaanBarangModel extends Model
         'packaging',
         'total_weight',
         'shipping_cost',
+        'is_summarized',
         'createdAt',
         'updatedAt',
         'deletedAt',

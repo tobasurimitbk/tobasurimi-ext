@@ -54,6 +54,14 @@
             width: 50%;
             text-align: justify;
         }
+
+        .border-collapse {
+            border-collapse: collapse;
+        }
+
+        .sign-table td:not(:last-child) {
+            border: 1px solid;
+        }
     </style>
 </head>
 <body>
@@ -173,36 +181,31 @@
                 <td><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
-        </tbody>
-        <thead>
-            <tr>
-                <td colspan="5"></td>
-                <td><?= $jml_masuk; ?></td>
-                <td><?= $jml_dokumen; ?></td>
-                <td><?= $jml_order; ?></td>
-                <td><?= $jml_konversi; ?></td>
-                <td><?= number_format($jml_harga); ?></td>
-                <td><?= number_format($jml_penyerahan); ?></td>
-                <td></td>
-            </tr>
-        </thead>
+                <tr>
+                    <td colspan="5"></td>
+                    <td><?= $jml_masuk; ?></td>
+                    <td><?= $jml_dokumen; ?></td>
+                    <td><?= $jml_order; ?></td>
+                    <td><?= $jml_konversi; ?></td>
+                    <td><?= number_format($jml_harga); ?></td>
+                    <td><?= number_format($jml_penyerahan); ?></td>
+                    <td></td>
+                </tr>
+            </tbody>
         </table>
 
-        <div class="inline" style="position: absolute ;bottom:3.5rem;left:-6rem;">
-            <table class="sign-table"
-            style="
-                width: 100%;
-            "
-            >
-                <thead>
-                    <tr>
-                    <td><div style="text-align: left !important; margin-left:13rem;width:100%;height:0rem;border-top:1px solid">Prepared&nbsp;by:</div></td>
-                    <td><div style="text-align: left !important; margin-left:13rem;width:100%;height:0rem;border-top:1px solid">Checked&nbsp;by:</div></td>
-                    <td><div style="text-align: left !important; margin-left:13rem;width:100%;height:0rem;border-top:1px solid">Approved&nbsp;by:</div></td>
-                    </tr>
-                </thead>
-            </table>
-        </div>
+        <table class="w-100 sign-table border-collapse">
+            <tr>
+                <td style="height: 50px;"></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Prepared&nbsp;by:</div></td>
+            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Checked&nbsp;by:</div></td>
+            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Approved&nbsp;by:</div></td>
+            </tr>
+        </table>
     </div>
 <?php } ?>
 </body>

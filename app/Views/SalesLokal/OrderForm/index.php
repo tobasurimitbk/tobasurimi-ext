@@ -11,6 +11,11 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-4 mb-3">
+                    <input class="form-control search form-out-search" placeholder="Cari No. SO" value="" />
+                </div>
+            </div>
             <div class="row">
                 <div class="table-responsive">
                     <?= csrf_field() ?>

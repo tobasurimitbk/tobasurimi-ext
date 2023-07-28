@@ -42,32 +42,51 @@ class PembayaranPOLokal extends BaseController
 
     public function getByIdPembayaranPOLokal($id)
     {   
-        $data = [];
+        $localPOPaymentModel = new LocalPOPaymentModel();
+        $supplierModel = new SupplierModel();
+        $localPOInvSummaryModel = new LocalPOInvSummaryModel();
 
-        $responsePembayaranPOLokal = curl_request("GET", "/localPOPayment/$id", $this->token);
-        $dataPembayaranPOLokal = [];
-        if ($responsePembayaranPOLokal["code"] === 200) {
-            $dataPembayaranPOLokal = json_decode($responsePembayaranPOLokal["body"])->data;
-        }
-        $selectedFaktur = array_column($dataPembayaranPOLokal->local_po_payment_details, 'local_po_inv_summary_id');
+        $selectQry = "local_po_payments.*,
+                      DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y') AS payment_date,
+                      DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y') AS due_date
+                      ";
+        $paymentData = $localPOPaymentModel->asObject()
+            ->select($selectQry)
+            ->find($id);
 
-        $responseSupplier = curl_request("GET", "/suppliers/all?idCompany=$this->this_company_id&kategori=lokal", $this->token);
-        $supplierList = [];
-        if ($responseSupplier["code"] === 200) {
-            $supplierList = json_decode($responseSupplier["body"])->data;
-        }
+        $supplierList = $supplierModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->where('kategori', 'LOKAL')
+            ->findAll();
 
-        $summaryResponse = curl_request("GET", "/localPOInvSummary/supplier/$dataPembayaranPOLokal->supplier_id", $this->token);
-        $summaryList = [];
-        if ($summaryResponse["code"] === 200) {
-            $summaryList = json_decode($summaryResponse["body"])->data;
-        }
+        $summaryList = $localPOInvSummaryModel->asObject()
+            ->select("id, summary_no, total, DATE_FORMAT(due_date, '%d/%m/%Y') AS due_date")
+            ->where('company_id', $this->this_company_id)
+            ->where('supplier_id', $paymentData->supplier_id)
+            ->where('is_posted', 1)
+            ->findAll();
+
+        $selectQry = "penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
+                      penerimaan_barang_detail.nama_barang_dok AS item_name,
+                      penerimaan_barang_detail.qty AS qty,
+                      (penerimaan_barang_detail.qty * penerimaan_barang_detail.harga) AS total,
+                      satuans.kode_satuan AS unit";
+        $itemList = $localPOInvSummaryModel->asObject()
+            ->select($selectQry)
+            ->join('local_po_inv_sum_details', 'local_po_inv_sum_details.local_po_inv_summary_id = local_po_inv_summaries.id')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = local_po_inv_sum_details.penerimaan_barang_id')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            // ->where('company_id', $this->this_company_id)
+            ->where('local_po_inv_summaries.id', $paymentData->local_po_inv_summary_id)
+            ->findAll();
 
         $data = [
-            'dataPembayaranPOLokal' => $dataPembayaranPOLokal,
+            'dataPembayaranPOLokal' => $paymentData,
             'suppliers'             => $supplierList,
             'summaryList'           => $summaryList,
-            "selectedFaktur"        => $selectedFaktur
+            "itemList"              => $itemList
         ];
 
         return view('Pembayaran/pembayaranPOLokal/form', $data);
@@ -75,6 +94,8 @@ class PembayaranPOLokal extends BaseController
 
     public function allPembayaranPOLokal()
     {
+        $localPOPaymentModel = new LocalPOPaymentModel();
+
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -85,37 +106,42 @@ class PembayaranPOLokal extends BaseController
             "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/localPOPayment", $this->token, $payload);
         $dataPembayaranPOLokal = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $condition = [
+            "suppliers.company_id"  => $this->this_company_id
+        ];
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType")
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $paymentData = $localPOPaymentModel->getPaymentList($condition, $addCondition, $limit, $offset);
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            foreach ($body as $data) {
-                array_push($dataPembayaranPOLokal, [
-                    "no"                => $no++,
-                    "id"                => $data->id,
-                    "payment_no"        => $data->payment_no,
-                    "due_date"          => $data->due_date,
-                    "payment_date"      => $data->payment_date,
-                    "payment_method"    => $data->payment_method,
-                    "payment_status"    => $data->payment_status,
-                    "amount"            => $data->amount
-                ]);
-            }
+        foreach ($paymentData['data'] as $data) {
+            array_push($dataPembayaranPOLokal, [
+                "no"                => $no++,
+                "id"                => $data->id,
+                "payment_no"        => $data->payment_no,
+                "supplier"          => $data->supplierName,
+                "due_date"          => $data->due_date,
+                "payment_date"      => $data->payment_date,
+                "payment_method"    => $data->payment_method,
+                "amount"            => $data->amount
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataPembayaranPOLokal,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $paymentData['totalData'],
+            "recordsFiltered"   => $paymentData['totalFilteredData'],
+            "data"              => $dataPembayaranPOLokal,
+            // "response"          => $response,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -181,8 +207,7 @@ class PembayaranPOLokal extends BaseController
                 "amount"                    => $summaryData->total,
                 "payment_date"              => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
                 "due_date"                  => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
-                "payment_method"            => $this->request->getPost("payment_method"),
-                "payment_status"            => $this->request->getPost("payment_status"),
+                "payment_method"            => $this->request->getPost("payment_method")
             ];
 
             $insertedId = $localPOPaymentModel->insert($data);

@@ -244,35 +244,35 @@ class POImportBahanPenolong extends BaseController
                         // buat barang baru jika id kosong
                         if(!$barang_id)
                         {
-                            $payloadBarang = [
-                                "company_id" => $this->this_company_id,
-                                "kode_barang" => $data->item_code,
-                                "nama_barang" => $data->item_name,
-                                "harga_barang" => $data->price,
-                                "satuan_id" => $data->unit,
-                                "kategori_id" => 26,
-                                "hs_id" => 1,
-                                "ap_id" => 1,
-                                "ar_id" => 1,
-                                "stok" => 0,
-                                "status" => "Aktif",
-                                "spek" => "[]"
-                            ];
+                            // $payloadBarang = [
+                            //     "company_id" => $this->this_company_id,
+                            //     "kode_barang" => $data->item_code,
+                            //     "nama_barang" => $data->item_name,
+                            //     "harga_barang" => $data->price,
+                            //     "satuan_id" => $data->unit,
+                            //     "kategori_id" => 26,
+                            //     "hs_id" => 1,
+                            //     "ap_id" => 1,
+                            //     "ar_id" => 1,
+                            //     "stok" => 0,
+                            //     "status" => "Aktif",
+                            //     "spek" => "[]"
+                            // ];
             
-                            $responseBarang =  $this->barangModel->insert($payloadBarang);
+                            // $responseBarang =  $this->barangModel->insert($payloadBarang);
 
-                            $barang_id = $responseBarang;
+                            // $barang_id = $responseBarang;
 
-                            if(!$responseBarang) {
-                                $message =  'Data Gagal Disimpan';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
+                            // if(!$responseBarang) {
+                            //     $message =  'Data Gagal Disimpan';
+                            //     $data = [
+                            //         "status"            => false,
+                            //         "message"    => $message,
+                            //         "payload"   => $payload,
+                            //         'token' => csrf_hash()
+                            //     ];
+                            //     echo json_encode($data);
+                            // }
                         }
 
                         $detailPayload = [
@@ -426,35 +426,35 @@ class POImportBahanPenolong extends BaseController
                         // buat barang baru jika id kosong
                         if(!$barang_id)
                         {
-                            $payloadBarang = [
-                                "company_id" => $this->this_company_id,
-                                "kode_barang" => $data->item_code,
-                                "nama_barang" => $data->item_name,
-                                "harga_barang" => $data->price,
-                                "satuan_id" => $data->unit,
-                                "kategori_id" => 26,
-                                "hs_id" => 1,
-                                "ap_id" => 1,
-                                "ar_id" => 1,
-                                "stok" => 0,
-                                "status" => "Aktif",
-                                "spek" => "[]"
-                            ];
+                            // $payloadBarang = [
+                            //     "company_id" => $this->this_company_id,
+                            //     "kode_barang" => $data->item_code,
+                            //     "nama_barang" => $data->item_name,
+                            //     "harga_barang" => $data->price,
+                            //     "satuan_id" => $data->unit,
+                            //     "kategori_id" => 26,
+                            //     "hs_id" => 1,
+                            //     "ap_id" => 1,
+                            //     "ar_id" => 1,
+                            //     "stok" => 0,
+                            //     "status" => "Aktif",
+                            //     "spek" => "[]"
+                            // ];
             
-                            $responseBarang =  $this->barangModel->insert($payloadBarang);
+                            // $responseBarang =  $this->barangModel->insert($payloadBarang);
 
-                            $barang_id = $responseBarang;
+                            // $barang_id = $responseBarang;
 
-                            if(!$responseBarang) {
-                                $message =  'Data Gagal Disimpan';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
+                            // if(!$responseBarang) {
+                            //     $message =  'Data Gagal Disimpan';
+                            //     $data = [
+                            //         "status"            => false,
+                            //         "message"    => $message,
+                            //         "payload"   => $payload,
+                            //         'token' => csrf_hash()
+                            //     ];
+                            //     echo json_encode($data);
+                            // }
                         }
 
                         $detailPayload = [];

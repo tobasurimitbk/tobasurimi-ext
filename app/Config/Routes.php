@@ -248,7 +248,7 @@ $routes->get('/terima-faktur-import/print/(:num)', 'Purchase\TerimaFakturImport:
 // TERIMA FAKTUR IMPORT
 $routes->get('/terima-faktur-lokal', 'Purchase\TerimaFakturLokal::terimaFakturLokal', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/all', 'Purchase\TerimaFakturLokal::allTerimaFakturLokal', ['filter' => 'Auth']);
-$routes->get('/terima-faktur-lokal/id/(:segment)', 'Purchase\TerimaFakturLokal::getByIdTerimaFakturLokal/$1', ['filter' => 'Auth']);
+$routes->get('/terima-faktur-lokal/(:num)', 'Purchase\TerimaFakturLokal::getByIdTerimaFakturLokal/$1', ['filter' => 'Auth']);
 $routes->get('/terima-faktur-lokal/create', 'Purchase\TerimaFakturLokal::createTerimaFakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/save', 'Purchase\TerimaFakturLokal::saveTerimaFakturLokal', ['filter' => 'Auth']);
 $routes->post('/terima-faktur-lokal/update', 'Purchase\TerimaFakturLokal::updateTerimaFakturLokal', ['filter' => 'Auth']);
@@ -277,7 +277,7 @@ $routes->post('/pembayaran-po-lokal/update', 'Pembayaran\PembayaranPOLokal::upda
 $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::deletePembayaranPOLokal', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO IMPORT
-$routes->get('/pembayaran-po-import', 'Pembayaran\PembayarzanPOImport::pembayaranPOImport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import', 'Pembayaran\PembayaranPOImport::pembayaranPOImport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all', 'Pembayaran\PembayaranPOImport::allPembayaranPOImport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/id/(:segment)', 'Pembayaran\PembayaranPOImport::getByIdPembayaranPOImport/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::createPembayaranPOImport', ['filter' => 'Auth']);
@@ -331,6 +331,16 @@ $routes->post('/retur/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth'])
 
 
 // SALES INTERNASIONAL
+// Sales Kontrak
+$routes->get('/sales-kontrak', 'SalesInternasional\SalesKontrak::index', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/id/(:segment)', 'SalesInternasional\SalesKontrak::getById/$1', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/print/(:segment)', 'SalesInternasional\SalesKontrak::print/$1', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/create', 'SalesInternasional\SalesKontrak::createView', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/all', 'SalesInternasional\SalesKontrak::all', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/save', 'SalesInternasional\SalesKontrak::save', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/update', 'SalesInternasional\SalesKontrak::update', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete', ['filter' => 'Auth']);
+
 // Order Form Internasional
 $routes->get('/order-form-internasional', 'SalesInternasional\OrderForm::index', ['filter' => 'Auth']);
 $routes->get('/order-form-internasional/id/(:segment)', 'SalesInternasional\OrderForm::getById/$1', ['filter' => 'Auth']);
@@ -456,6 +466,7 @@ $routes->post('/penerimaan-barang-import/save', 'Warehouse\PenerimaanBarangImpor
 $routes->post('/penerimaan-barang-import/update', 'Warehouse\PenerimaanBarangImport::updatePenerimaanBarangImport', ['filter' => 'Auth']);
 // $routes->post('/penerimaan-barang-import/update-status', 'Warehouse\PenerimaanBarangImport::updateStatusPenerimaanBarangImport', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImport::deletePenerimaanBarangImport', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 
 // HUMAN RESOURCE
 // Attendance

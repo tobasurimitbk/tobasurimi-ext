@@ -660,6 +660,8 @@
 
         $(".btn-show-form").click(function() {
             $(".parent_id").removeAttr('disabled');
+            validator.resetForm();
+            validator.reset();
             // $(".body-detail-spek").empty()
             // list_spek = [];
             // row_detail = 0;

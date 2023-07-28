@@ -101,11 +101,11 @@ const table = $('.dataTable').DataTable({
         orderable: false
     },
     {
-        data: "faktur_no",
+        data: "inv_no",
         className: "text-center"
     },
     {
-        data: "sender",
+        data: "supplier",
         className: "text-center"
     },
     {
@@ -117,7 +117,7 @@ const table = $('.dataTable').DataTable({
         className: "text-center"
     },
     {
-        data: "date_of_receipt",
+        data: "receive_date",
         className: "text-center"
     },
     {
@@ -173,7 +173,7 @@ $(document).ready(function() {
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("terima-faktur-lokal/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("terima-faktur-lokal/"); ?>${data.id}`);
     })
 })
 </script>
