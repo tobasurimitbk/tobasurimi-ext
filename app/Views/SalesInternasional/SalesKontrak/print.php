@@ -174,18 +174,18 @@
         <thead>
             <tr>
                 <th style="width: 350px;">
-                    THE BUYER,
+                    <label class="label-header">THE BUYER,<label>
                 </th>
                 <th>
-                    THE SELLER,
+                    <label class="label-header">THE SELLER,<label>
                 </th>
             </tr>
             <tr>
                 <th style="width: 350px;">
-                    <?= $dataSO->customer_name; ?>
+                    <label class="label-header"><?= $dataSO->customer_name; ?><label>
                 </th>
                 <th>
-                    PT. TOBA SURIMI INDUSTRIES
+                    <label class="label-header">PT. TOBA SURIMI INDUSTRIES<label>
                 </th>
             </tr>
         </thead>
