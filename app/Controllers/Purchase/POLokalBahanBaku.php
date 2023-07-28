@@ -51,8 +51,6 @@ class POLokalBahanBaku extends BaseController
             "dataSupplier" => $dataSupplier
         ];
 
-        dd($data);
-
         return view('Purchase/poLokalBahanBaku/form', $data);
     }
 
