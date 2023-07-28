@@ -141,10 +141,10 @@
                 $total_amount = $total_amount + formatter($detail["total_price"], "STR_TO_INT");
             ?>
             <tr>
-                <td><?= $detail["kode_barang"]; ?> <?= $detail["nama_barang"]; ?> (Unit: <?= $detail["nama_satuan"]; ?>) (Remark: <?= $detail["remark"]; ?>)</td>
-                <td><?= formatter($detail["qty"], "STR_TO_INT"); ?></td>
-                <td><?= number_format(formatter($detail["price"], "STR_TO_INT")); ?></td>
-                <td><?= number_format(formatter($detail["total_price"], "STR_TO_INT")); ?></td>
+                <td><label class="label-header"><?= $detail["kode_barang"]; ?> <?= $detail["nama_barang"]; ?> (Unit: <?= $detail["nama_satuan"]; ?>) (Remark: <?= $detail["remark"]; ?>)</label></td>
+                <td><label class="label-header"><?= formatter($detail["qty"], "STR_TO_INT"); ?></label></td>
+                <td><label class="label-header"><?= number_format(formatter($detail["price"], "STR_TO_INT")); ?></label></td>
+                <td><label class="label-header"><?= number_format(formatter($detail["total_price"], "STR_TO_INT")); ?></label></td>
             </tr>
             <?php } ?>
             <tr>
