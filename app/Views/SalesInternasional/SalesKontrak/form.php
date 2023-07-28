@@ -289,9 +289,9 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <textarea class="full-textarea form-control remark" id="remark" name="remark" placeholder="Remark"></textarea>
+                                <input type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
                                 <label for="floatingInput">Remark</label>
                             </div>
                         </div>
