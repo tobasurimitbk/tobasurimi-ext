@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Invoice Lokal</h1>
+        <h1>Surat Jalan</h1>
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("surat-jalan/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>

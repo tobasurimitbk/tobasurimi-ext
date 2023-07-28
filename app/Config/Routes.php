@@ -304,7 +304,7 @@ $routes->get('/invoice-penjualan-lokal', 'SalesLokal\Invoice::index', ['filter' 
 $routes->get('/invoice-penjualan-lokal/id/(:segment)', 'SalesLokal\Invoice::getById/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/create', 'SalesLokal\Invoice::createView', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/all', 'SalesLokal\Invoice::all', ['filter' => 'Auth']);
-$routes->post('/invoice-penjualan-lokal/save', 'SalesLokal\Invoice::create', ['filter' => 'Auth']);
+$routes->post('/invoice-penjualan-lokal/save', 'SalesLokal\Invoice::save', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/update', 'SalesLokal\Invoice::update', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', ['filter' => 'Auth']);
 
@@ -312,6 +312,8 @@ $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', [
 $routes->get('/surat-jalan', 'SalesLokal\SuratJalan::index', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/id/(:segment)', 'SalesLokal\SuratJalan::getById/$1', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/sales-order/(:segment)', 'SalesLokal\SuratJalan::dropDownSalesOrder/$1', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/sales-invoice/(:segment)', 'SalesLokal\SuratJalan::dropDownSuratJalan/$1', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/detail/(:segment)', 'SalesLokal\SuratJalan::dataSuratJalanDetail/$1', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/create', 'SalesLokal\SuratJalan::createView', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/all', 'SalesLokal\SuratJalan::all', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::save', ['filter' => 'Auth']);
@@ -337,6 +339,7 @@ $routes->get('/sales-kontrak/create', 'SalesInternasional\SalesKontrak::createVi
 $routes->get('/sales-kontrak/all', 'SalesInternasional\SalesKontrak::all', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/save', 'SalesInternasional\SalesKontrak::save', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/update', 'SalesInternasional\SalesKontrak::update', ['filter' => 'Auth']);
+$routes->post('/sales-kontrak/update-status', 'SalesInternasional\SalesKontrak::updateStatus', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/delete', 'SalesInternasional\SalesKontrak::delete', ['filter' => 'Auth']);
 
 // Order Form Internasional

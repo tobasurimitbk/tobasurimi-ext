@@ -11,8 +11,15 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4 mb-3">
+            <div class="row justify-content-end row-col-spp mb-3">
+                <div class="col-md-3">
+                    <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                        <option value="NEW">NEW</option>
+                        <option value="UNPOSTED">UNPOSTED</option>
+                        <option value="POSTED">POSTED</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <input class="form-control search form-out-search" placeholder="Cari No. SC / No. PO / Buyer" value="" />
                 </div>
             </div>
@@ -65,6 +72,7 @@ const table = $('.dataTable').DataTable({
         dataSrc: "data",
         data: function(data) {
             data.search = $(".search").val();
+            data.status = $(".status").val();
             data.sort = sort;
             data.sortType = sortType;
         }
@@ -117,6 +125,10 @@ const table = $('.dataTable').DataTable({
 
 $(document).ready(function() {
     $(".dataTable_info").addClass("pt-0");
+
+    $(".status").change(function() {
+        table.ajax.reload();
+    })
 
     $(".search").keyup(function() {
         table.ajax.reload();
