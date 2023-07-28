@@ -9,6 +9,11 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("sales-kontrak"); ?>">
                 Batal
             </a>
+            <?php if (!empty($dataSO)) { ?>
+                <button class="btn btn-hapus delete-parent float-right">
+                    Hapus
+                </button>
+            <?php } ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
             </button>
@@ -592,6 +597,66 @@
                 $(element).removeClass('select-class');
             },
         });
+
+        // delete
+        $(".delete-parent").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $(".id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("sales-kontrak/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("sales-kontrak"); ?>"
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Dihapus, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+        })
 
         $(".btn-submit-detail").click(function() {
             let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
