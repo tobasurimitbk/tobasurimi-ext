@@ -8,6 +8,7 @@ use Config\Services;
 use App\Models\CustomerModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
+use Dompdf\Dompdf;
 
 class SalesKontrak extends BaseController
 {
@@ -17,6 +18,7 @@ class SalesKontrak extends BaseController
     protected $customerModel;
     protected $salesKontrakModel;
     protected $salesKontrakDetailModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -26,6 +28,7 @@ class SalesKontrak extends BaseController
         $this->customerModel = new CustomerModel();
         $this->salesKontrakModel = new SalesKontrakModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function index()
@@ -581,5 +584,46 @@ class SalesKontrak extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id = null) 
+    {
+        if($id)
+        {
+            $filename = "Sales Kontrak";
+
+            $data = [];
+            $dataSO = $this->salesKontrakModel->getById($id);
+
+            if($dataSO)
+            {
+                $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
+
+                // var_dump($dataSO);
+                // die;
+
+                if($dataSODetail)
+                {
+                    $data["dataSO"] = $dataSO;
+                    $data["dataSODetail"] = $dataSODetail;
+                }
+            }
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
     }
 }

@@ -332,6 +332,7 @@ $routes->post('/retur/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth'])
 // Sales Kontrak
 $routes->get('/sales-kontrak', 'SalesInternasional\SalesKontrak::index', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/id/(:segment)', 'SalesInternasional\SalesKontrak::getById/$1', ['filter' => 'Auth']);
+$routes->get('/sales-kontrak/print/(:segment)', 'SalesInternasional\SalesKontrak::print/$1', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/create', 'SalesInternasional\SalesKontrak::createView', ['filter' => 'Auth']);
 $routes->get('/sales-kontrak/all', 'SalesInternasional\SalesKontrak::all', ['filter' => 'Auth']);
 $routes->post('/sales-kontrak/save', 'SalesInternasional\SalesKontrak::save', ['filter' => 'Auth']);

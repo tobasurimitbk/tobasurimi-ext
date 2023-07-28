@@ -111,10 +111,11 @@ class SalesKontrakModel extends Model
 
     public function getById($id)
     {
-        $selectQry = "sales_contract.*";
+        $selectQry = "sales_contract.*, customers.name as customer_name";
 
         $sppData = $this->asObject()
             ->select($selectQry)
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'LEFT')
             ->find($id);
 
         return $sppData;
