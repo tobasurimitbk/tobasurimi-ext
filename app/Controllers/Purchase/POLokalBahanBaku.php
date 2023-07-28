@@ -6,7 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
-
+use App\Models\SppModel;
 
 class POLokalBahanBaku extends BaseController
 {
@@ -30,6 +30,14 @@ class POLokalBahanBaku extends BaseController
 
     public function createPOLokalBahanBaku()
     {
+        //Get SPP Number
+        $SppModel = new SppModel();
+        $dataSPP = $SppModel->getNoSPP('Bahan Penolong Lokal');
+
+        foreach (array_keys($dataSPP) as $key) {
+            $dataSPP[$key] = (object)$dataSPP[$key];
+        }
+
         //Get Supplier
         $supplierModel = new SupplierModel();
         $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
@@ -39,6 +47,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         $data = [
+            "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier
         ];
 
@@ -177,6 +186,7 @@ class POLokalBahanBaku extends BaseController
             if ($this->validate($rules)) {
                 $insertData = [
                     "company_id" => $this->this_company_id,
+                    "purchase_request_id"   => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "pph" => $this->request->getPost("pph"),
@@ -259,6 +269,7 @@ class POLokalBahanBaku extends BaseController
 
                 $insertData = [
                     "company_id" => $this->this_company_id,
+                    "purchase_request_id"   => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "pph" => $this->request->getPost("pph"),

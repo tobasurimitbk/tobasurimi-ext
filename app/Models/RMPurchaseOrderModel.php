@@ -18,6 +18,7 @@ class RMPurchaseOrderModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'purchase_request_id',
         'company_id',
         'po_no',
         'po_date',
@@ -131,11 +132,13 @@ class RMPurchaseOrderModel extends Model
     public function getPoBBLokalById($id)
     {
         $selectQry = "rm_purchase_orders.*,
-                users.name AS createdBy
-                ";
+                            purchase_requests.spp_no AS spp_no,
+                            users.name AS createdBy
+                            ";
 
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
+            ->join('purchase_requests', 'purchase_requests.id = rm_purchase_orders.purchase_request_id', 'left')
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->find($id);
 

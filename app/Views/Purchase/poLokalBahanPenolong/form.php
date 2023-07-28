@@ -1018,7 +1018,7 @@
 
                             $(".body-detail-table").empty()
 
-                            res?.data?.purchase_request_details.map(item => {
+                            res?.detail.map(item => {
                                 tag_html += `<tr>`;
                                 tag_html += `<td class="edit-table-detail" data-ppn="" data-pph="" data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${item.qty}" data-keterangan"${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += row + 1;
