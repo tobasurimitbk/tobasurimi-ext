@@ -13,6 +13,9 @@
                 <button class="btn btn-hapus delete-parent float-right">
                     Hapus
                 </button>
+                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("sales-kontrak/print/"); ?><?= $dataSO->sales_contract_id; ?>')">
+                    Print
+                </button>
             <?php } ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
@@ -1305,6 +1308,8 @@
                 tag_total += "</td>";
                 tag_total += "</tr>";
 
+                $(".total_amount").val(total_harga.toLocaleString());
+
                 $(".foot-detail-table").append(tag_total);
 
                 $(".detail-modal").modal("hide")
@@ -1510,6 +1515,10 @@
             }
         })
     })
+
+    const print = function(url) {
+        window.open(url, "_blank");
+    }
 
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
