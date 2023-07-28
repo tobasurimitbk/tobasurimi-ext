@@ -197,12 +197,12 @@ class SalesOrderModel extends Model
             ->select($selectQry)
             ->find($id);
 
-        $selectQueryDetail = "detail_sales_order.*,warehouses.warehouse_name,barangs.nama_barang,barangs.harga_barang,barangs.satuan_id,satuans.kode_satuan";
+        $selectQueryDetail = "sales_order_detail.*,warehouses.warehouse_name,barangs.nama_barang,barangs.harga_barang,barangs.satuan_id,satuans.kode_satuan";
         $detail = $this->SalesOrderDetailModel
             ->where('id_sales_order', $id)
-            ->join('barangs', 'barangs.id = detail_sales_order.id_barang')
+            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
             ->join('satuans', 'satuans.id = barangs.satuan_id')
-            ->join('warehouses', 'warehouses.id = detail_sales_order.id_warehouse')
+            ->join('warehouses', 'warehouses.id = sales_order_detail.id_warehouse')
             ->select($selectQueryDetail)
             ->findAll();
 

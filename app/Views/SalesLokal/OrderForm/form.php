@@ -760,8 +760,8 @@
                         })
 
                         data.append("total", total)
-                        data.append("include_pa", $('.include_pa').val() === 'on' ? true : false)
-                        data.append("tax_status", $('.tax_status').val() === 'on' ? true : false)
+                        data.append("include_pa", $('.include_pa').val() === 'on' ? 'true' : 'false')
+                        data.append("tax_status", $('.tax_status').val() === 'on' ? 'true' : 'false')
                         data.append("items", JSON.stringify(update_list_items))
                         // data.append("items", update_list_items)
 
