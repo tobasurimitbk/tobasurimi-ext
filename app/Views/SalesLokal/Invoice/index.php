@@ -13,15 +13,17 @@
         <div class="card-body">
             <div class="row">
                 <div class="table-responsive">
+                    <?= csrf_field() ?>
                     <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th>Nama Pelanggan</th>
-                                <th>Kode Pelanggan</th>
-                                <th>No Faktur</th>
-                                <th>Total Invoice</th>
-                                <th>Keterangan</th>
+                                <th onclick="changeSort('no')" class="sort">No.</th>
+                                <th onclick="changeSort('kode_pelanggan')" class="sort">Kode Pelanggan</th>
+                                <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Pelanggan</th>
+                                <th onclick="changeSort('no_faktur')" class="sort">No Faktur</th>
+                                <th onclick="changeSort('total_invoice')" class="sort">Total Invoice</th>
+                                <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -35,6 +37,8 @@
 </section>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
+
     let sort = "";
     let sortType = "asc";
     let trigger = true;
@@ -42,6 +46,17 @@
     let list_address = [];
     let list_delete = [];
     var row = 0;
+
+    $(document).ready(function() {
+        $(".search").keyup(function() {
+            table.ajax.reload();
+        })
+
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            location.replace(`<?= base_url("invoice-penjualan-lokal/id"); ?>/${data.id}`);
+        })
+    })
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -80,10 +95,10 @@
             className: "text-center",
             sortable: false
         }, {
-            data: "nama_pelanggan",
+            data: "kode_pelanggan",
             className: "text-center"
         }, {
-            data: "kode_pelanggan",
+            data: "nama_pelanggan",
             className: "text-center"
         }, {
             data: "no_faktur",
@@ -94,16 +109,16 @@
         }, {
             data: "keterangan",
             className: "text-center"
-            // }, {
-            //     data: "id",
-            //     className: "text-center actions",
-            //     searchable: false,
-            //     sortable: false,
-            //     render: function(data, type, row) {
-            //         let id = row?.id;
-            //         return row.is_posted ? "-" : `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
-            //         `
-            //     }
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                `
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -118,5 +133,76 @@
             }
         }
     });
+
+    // delete
+    function handleDelete(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("invoice-penjualan-lokal/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
+            }
+        })
+    }
+
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 <?= $this->endSection(); ?>

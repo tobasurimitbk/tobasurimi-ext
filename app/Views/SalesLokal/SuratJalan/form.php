@@ -40,15 +40,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control no_po" id="no_po" name="no_po" <?= !empty($data) ? ($data->no_po === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->no_po : ""; ?>" placeholder="No PO">
-                            <label for="floatingInput">No PO</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->multiple_id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
@@ -66,8 +57,8 @@
                             <label for="floatingInput">SO</label>
                         </div>
                     </div>
-
                 </div>
+
 
                 <div class="row">
                     <div class="col-md-6">
@@ -79,7 +70,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" <?= !empty($data) ? ($data->no_surat_jalan === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->no_surat_jalan : ""; ?>" placeholder="No surat jalan">
+                            <input type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" disabled="true" value=" <?= !empty($data) ? $data->no_surat_jalan : ""; ?>" placeholder="No surat jalan">
                             <label for="floatingInput">No Surat Jalan</label>
                         </div>
                     </div>

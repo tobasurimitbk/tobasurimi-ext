@@ -12,7 +12,7 @@ use App\Models\DetailStockBarang;
 use App\Models\SalesOrderDetailModel;
 use App\Models\AllNoModel;
 use Error;
-
+use ErrorException;
 
 class OrderForm extends BaseController
 {
@@ -280,7 +280,7 @@ class OrderForm extends BaseController
                     ->first();
 
                 if ($item['stok'] < $row->qty) {
-                    throw new Error('barang tidak boleh kurang dari stock');
+                    throw new ErrorException('barang tidak boleh kurang dari stock');
                     return;
                 }
                 $totalQty = $totalQty + $row->qty;
@@ -520,7 +520,7 @@ class OrderForm extends BaseController
 
 
                         if ($checkItems < 0) {
-                            throw new Error('barang tidak boleh kurang dari stock');
+                            throw new ErrorException('barang tidak boleh kurang dari stock');
                         }
                         $stok = [
                             "stok" => ($item['stok'] - $dataItems),
@@ -550,7 +550,7 @@ class OrderForm extends BaseController
                     $this->DetailStockBarang->update($item['id'], $stok);
                 } else {
                     if ($item['stok'] > $row->qty) {
-                        throw new Error('barang tidak boleh kurang dari stock');
+                        throw new ErrorException('barang tidak boleh kurang dari stock');
                     }
                     $totalQty = $totalQty + $row->qty;
 
