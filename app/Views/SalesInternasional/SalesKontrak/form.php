@@ -17,6 +17,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+                <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSO) ? $dataSO->sales_contract_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -182,8 +183,8 @@
                                             <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_barang"]; ?></td>
                                             <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_satuan"]; ?></td>
                                             <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["remark"]; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["price"], "STR_TO_INT")); ?></td>
                                             <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= formatter($details["qty"], "STR_TO_INT"); ?></td>
+                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["price"], "STR_TO_INT")); ?></td>
                                             <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?></td>
                                             <td><button onclick='deleteRow("<?= $no; ?>")'>X</button></td>
                                     </tr>
@@ -308,6 +309,37 @@
     var total_harga = 0;
     var priceEdit = 0;
     var totalPriceEdit = 0;
+
+    <?php if (!empty($dataSODetail)) {
+        foreach ($dataSODetail as $details) {
+    ?>
+
+            priceEdit = Number('<?= $details["price"]; ?>');
+            totalPriceEdit = Number('<?= $details["total_price"]; ?>');
+            row = row + 1;
+
+            total_harga_barang = total_harga_barang + priceEdit;
+            total_qty = total_qty + Number('<?= $details["qty"]; ?>');
+            total_harga = total_harga + totalPriceEdit;
+
+            list_items.push({
+                id: <?= $details["sales_contract_detail_id"]; ?>,
+                row: row,
+                barang_id: '<?= $details["barang_id"]; ?>',
+                kode_barang: '<?= $details["kode_barang"]; ?>',
+                nama_barang: '<?= $details["nama_barang"]; ?>',
+                nama_satuan: '<?= $details["nama_satuan"]; ?>',
+                satuan: <?= $details["id_satuan"]; ?>,
+                remark: '<?= $details["remark"]; ?>',
+                harga: Number('<?= $details["price"]; ?>').toLocaleString(),
+                qty: Number('<?= $details["qty"]; ?>'),
+                total: (Number('<?= $details["total_price"]; ?>')).toLocaleString()
+            })
+        <?php
+        }
+        ?>
+    <?php
+    } ?>
 
     var validator_detail = $(".detail-form").validate({
         rules: {
