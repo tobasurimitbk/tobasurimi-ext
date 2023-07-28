@@ -1190,7 +1190,7 @@
                 $(".barang_id").val(barang_id);
                 $(".satuan").val(satuan).change();
                 $(".qty").val(stok);
-                $(".harga").val(harga ? harga.toLocaleString() : "");
+                $(".harga").val(harga ? Number(harga).toLocaleString() : "");
                 $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
             } else {
                 $(".spesifikasi").val("")
