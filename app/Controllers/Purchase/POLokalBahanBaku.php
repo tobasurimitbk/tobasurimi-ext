@@ -32,7 +32,7 @@ class POLokalBahanBaku extends BaseController
     {
         //Get SPP Number
         $SppModel = new SppModel();
-        $dataSPP = $SppModel->getNoSPP('Bahan Penolong Lokal');
+        $dataSPP = $SppModel->getNoSPP('Bahan Baku Lokal');
 
         foreach (array_keys($dataSPP) as $key) {
             $dataSPP[$key] = (object)$dataSPP[$key];
@@ -50,6 +50,8 @@ class POLokalBahanBaku extends BaseController
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier
         ];
+
+        dd($data);
 
         return view('Purchase/poLokalBahanBaku/form', $data);
     }

@@ -63,6 +63,8 @@ class POLokalBahanPenolong extends BaseController
             "dataValuta" => $dataValuta
         ];
 
+        dd($data);
+
         return view('Purchase/poLokalBahanPenolong/form', $data);
     }
 
