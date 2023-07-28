@@ -5578,6 +5578,19 @@ table.dataTable td .label-finish {
   color: #4e8a00 !important;
 }
 
+.btn-success,
+.btn-success.disabled {
+  background-color: #4e8a00 !important;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+  background-color: #4e8a00 !important;
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
 .form-add-spp
   .form-floating
   .select2
@@ -5673,6 +5686,10 @@ table.dataTable .body-table tr td .btn.btn-success.posting-spp {
   border: 1px #4e8a00 solid;
   border-radius: 4px;
   min-width: 120px;
+}
+
+.create-form.form-add-spp .form-floating .full-textarea.form-control {
+  padding-top: 25px;
 }
 
 /* ===== RESPONSIVE ===== */
