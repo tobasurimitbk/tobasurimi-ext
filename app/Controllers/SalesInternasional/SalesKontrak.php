@@ -83,7 +83,8 @@ class SalesKontrak extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "idCompany"     => $this->this_company_id
+            "idCompany"     => $this->this_company_id,
+            "status"      => $this->request->getGet("status")
         ];
 
         $condition = [
@@ -92,7 +93,8 @@ class SalesKontrak extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType")
+            "sortType"      => $this->request->getGet("sortType"),
+            "status"      => $this->request->getGet("status")
         ];
 
         $limit = $this->request->getGet("length");
@@ -223,6 +225,7 @@ class SalesKontrak extends BaseController
                     "payment_term" => $this->request->getPost("payment_term"),
                     "documents_required" => $this->request->getPost("documents_required"),
                     "special_instructions" => $this->request->getPost("special_instructions"),
+                    "status" => "NEW"
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
@@ -532,6 +535,53 @@ class SalesKontrak extends BaseController
         return;
     }
 
+    public function updateStatus()
+    {
+        try{
+            $id = $this->request->getPost("id");
+            $status = $this->request->getPost("status");
+
+            $payload = [
+                "status" => $status
+            ];
+            
+            $condition = [
+                'sales_contract_id' => $id
+            ];
+
+            $response = $this->salesKontrakModel->where($condition)->set($payload)->update();
+
+            if ($response) {
+                $data = [
+                    "status"            => true,
+                    "message"   => $status === "POSTED" ? "Data Berhasil diposting" : "Data Berhasil diunposting",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = $status === "POSTED" ? "Data Gagal diposting" : "Data Gagal diunposting";
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
     public function delete()
     {
         try{
@@ -625,5 +675,17 @@ class SalesKontrak extends BaseController
 
             // return view('Purchase/poImportBahanPenolong/print', $data);
         }
+    }
+
+    public function dropdownSC()
+    {
+        $dataSO = $this->salesKontrakModel->getNo($this->this_company_id);
+
+        $data = [
+            "data" => $dataSO
+        ];
+
+        echo json_encode($data);
+        return;
     }
 }

@@ -29,6 +29,7 @@ class SalesKontrakModel extends Model
         'shipment_date',
         'documents_required',
         'special_instructions',
+        'status',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -83,7 +84,7 @@ class SalesKontrakModel extends Model
 
         $totalData = $salesDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['status']) {
             $salesDataQry->groupStart();
         }
 
@@ -93,7 +94,12 @@ class SalesKontrakModel extends Model
                 ->orLike('customers.name', $addCondition['search']);
         }
 
-        if ($addCondition['search']) {
+        if ($addCondition['status']) {
+            $salesDataQry
+                ->where('status', $addCondition['status']);
+        }
+
+        if ($addCondition['search'] || $addCondition['status']) {
             $salesDataQry->groupEnd();
         }
 
