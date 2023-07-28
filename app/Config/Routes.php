@@ -277,7 +277,7 @@ $routes->post('/pembayaran-po-lokal/update', 'Pembayaran\PembayaranPOLokal::upda
 $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::deletePembayaranPOLokal', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO IMPORT
-$routes->get('/pembayaran-po-import', 'Pembayaran\PembayarzanPOImport::pembayaranPOImport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-import', 'Pembayaran\PembayaranPOImport::pembayaranPOImport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/all', 'Pembayaran\PembayaranPOImport::allPembayaranPOImport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/id/(:segment)', 'Pembayaran\PembayaranPOImport::getByIdPembayaranPOImport/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::createPembayaranPOImport', ['filter' => 'Auth']);
