@@ -2015,6 +2015,7 @@
     const addBarang = function(url) {
         window.open(url, "_blank");
     }
+    
     const print = function(url) {
         window.open(url, "_blank");
     }

@@ -283,6 +283,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+                <button type="button" onclick="addBarang('<?= base_url("barang"); ?>')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button>
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -1986,6 +1987,10 @@
             }
         })
     })
+
+    const addBarang = function(url) {
+        window.open(url, "_blank");
+    }
 
     const print = function(url) {
         window.open(url, "_blank");

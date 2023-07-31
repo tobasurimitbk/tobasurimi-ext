@@ -83,22 +83,16 @@
                             <td>
                                 <div style="margin-top: -11px;">
                                     <div style=""> <b> Laporan Barang Masuk </b></div>
-                                    <br />
                                     <div style="white-space: wrap"><?= $dataPenerimaanBarang->aju_type_name; ?> / <?= $dataPenerimaanBarang->aju_no; ?></div>
-                                    <br />
                                     <div style="white-space: wrap">Tanggal: <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></div>
-                                    <br />
                                     <div style="white-space: wrap"></div>
                                 </div>
                             </td>
                             <td>
                                 <div style="margin-top: -11px;">
                                     <div style=""> <b> From : <?= $dataPenerimaanBarang->supplier_name; ?></b></div>
-                                    <br />
                                     <div style="white-space: wrap">Address : <?= $dataPenerimaanBarang->supplier_address; ?></div>
-                                    <br />
                                     <div style="white-space: wrap">Phone : <?= $dataPenerimaanBarang->supplier_phone; ?></div>
-                                    <br />
                                     <div style="white-space: wrap"></div>
                                 </div>
                             </td>
@@ -109,23 +103,16 @@
         </table>
     </div>
 
-    <div class="inline" style="margin-top:3rem">
+    <div class="inline" style="margin-top:1rem">
         <br />
         <div>Kemasan / Berat
         : <?= $dataPenerimaanBarang->packaging; ?> / <?= $dataPenerimaanBarang->total_weight; ?>
         </div>
         <div class="inline" >
-        <br />
         <div>No. Order
         : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?>
         </div>
-        <div class="inline" >
-        <br />
-        <div>File/Style No
-        : KREDIT,KREDIT,KREDIT
-        </div>
-
-        <div style="margin-top:1rem">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
+        <div>Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
         <table class="table"
         style="
             border-collapse: collapse;
@@ -196,7 +183,7 @@
 
         <table class="w-100 sign-table border-collapse">
             <tr>
-                <td style="height: 50px;"></td>
+                <td style="height: 80px;"></td>
                 <td></td>
                 <td></td>
             </tr>
