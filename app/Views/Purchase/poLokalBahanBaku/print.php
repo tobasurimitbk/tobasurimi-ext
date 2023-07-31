@@ -57,7 +57,6 @@
         }
 
         .signed-info {
-            display: flex;
             justify-content: space-around;
             text-align: center;
         }
@@ -88,6 +87,27 @@
 
         .table-border {
             border: 1px solid black;
+        }
+
+        .border-collapse {
+            border-collapse: collapse;
+        }
+
+        .sign-table td:not(:last-child) {
+            border: 1px solid;
+        }
+
+        .sign-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2.5rem;
+            width: 100%;
+        }
+
+        .sign-row>div {
+            width: 250px;
+            border-top: 1px solid;
+            margin-top: 5rem
         }
     </style>
 </head>
@@ -144,38 +164,48 @@
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">PPH</td>
-                    <td class="txt-right">@TotalPriceTax@</td>
+                    <td class="txt-right"><?= $dataPO->totalPph ?></td>
                 </tr>
                 <tr class="table-border">
                     <td class="skip" colspan="5">DIBAYARKAN</td>
-                    <td class="txt-right">@TotalPricePaid@</td>
+                    <td class="txt-right"><?= $dataPO->totalPaid ?></td>
                 </tr>
             </table>
-            <!-- <div class="mt-2 signed-info">
-                <div>
-                    <div>TTD Penerima Bahan Baku</div>
-                    <div class="mt-4">(Nama Penerima)</div>
-                </div>
-                <div>
-                    <div>Diketahui</div>
-                    <div class="mt-4">(&emsp;&emsp;&emsp;&emsp;)</div>
-                </div>
-                <div>
-                    <div>Yang Menerima</div>
-                    <div class="mt-4">(&emsp;&emsp;&emsp;&emsp;)</div>
-                </div>
-            </div> -->
+            <table class="w-100 sign-table border-collapse signed-info">
+                <tr>
+                    <td style="height: 50px;"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>
+                        <div class="sign-row">
+                            <div>TTD Penerima Bahan Baku</div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row">
+                            <div>Diketahui</div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row">
+                            <div>Yang Menerima</div>
+                        </div>
+                    </th>
+                </tr>
+            </table>
         </div>
 
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 30%;padding: 1.2rem;">
-                    @CompanyHolding@<br>
-                    @CompanyAddress@
+                    <?= $dataPO->companyName ?><br>
+                    <?= $dataPO->companyAddress ?>
                 </div>
                 <div style="padding: 1.2rem">
                     Kwitansi<br>
-                    No. PO : @PONo@
+                    No. PO : <?= $dataPO->po_no ?>
                 </div>
             </div>
 
@@ -188,12 +218,12 @@
                 <tr>
                     <td>BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">@Amount@</td>
+                    <td style="vertical-align: top;"><?= $dataPO->amount ?></td>
                 </tr>
                 <tr>
                     <td>UNTUK PEMBAYARAN (FOR PAYMENT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">PEMBELIAN @ItemName@ SEBANYAK @TotalQty@ KG DARI @SupplierName@</td>
+                    <td style="vertical-align: top;">PEMBELIAN <?= $dataPO->itemName ?> SEBANYAK <?= $dataPO->totalQty ?> KG DARI <?= $dataPO->supplierName ?></td>
                 </tr>
             </table>
 
@@ -201,17 +231,17 @@
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
-                    <td class="txt-right">@TotalPrice@</td>
+                    <td class="txt-right"><?= $dataPO->totalPrice ?></td>
                 </tr>
                 <tr>
                     <td>PPh</td>
                     <td>Rp.</td>
-                    <td class="txt-right">@TotalPriceTax@</td>
+                    <td class="txt-right"><?= $dataPO->totalPph ?></td>
                 </tr>
                 <tr>
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
-                    <td class="txt-right">@TotalPricePaid@</td>
+                    <td class="txt-right"><?= $dataPO->totalPaid ?></td>
                 </tr>
             </table>
 
@@ -219,7 +249,7 @@
                 <div class="txt-center" style="margin-left: auto;margin-right: 0;padding: 1rem;width: 25%;">
                     <div>Medan, 31-12-2022</div>
                     <div>Yang Menerima</div>
-                    <div class="mt-4">(@SupplierName@)</div>
+                    <div class="mt-4">(<?= $dataPO->supplierName ?>)</div>
                 </div>
             </div>
         </div>
@@ -227,12 +257,12 @@
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
                 <div style="border: 3px solid;border-style: double;width: 30%;padding: 1.2rem;">
-                    @CompanyHolding@<br>
-                    @CompanyAddress@
+                    <?= $dataPO->companyName ?><br>
+                    <?= $dataPO->companyAddress ?>
                 </div>
                 <div style="padding: 1.2rem">
                     Kwitansi Harian<br>
-                    No. PO : @PONo@
+                    No. PO : <?= $dataPO->po_no ?>
                 </div>
             </div>
 
@@ -245,12 +275,12 @@
                 <tr>
                     <td>BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">@DailyAmount@</td>
+                    <td style="vertical-align: top;"><?= $dataPO->amountDaily ?></td>
                 </tr>
                 <tr>
                     <td>UNTUK PEMBAYARAN (FOR PAYMENT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">PEMBELIAN @ItemName@ SEBANYAK @TotalQty@ KG DARI @SupplierName@</td>
+                    <td style="vertical-align: top;">PEMBELIAN <?= $dataPO->itemName ?> SEBANYAK <?= $dataPO->totalQty ?> KG DARI <?= $dataPO->supplierName ?></td>
                 </tr>
             </table>
 
@@ -258,17 +288,17 @@
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
-                    <td class="txt-right">@TotalDailyPrice@</td>
+                    <td class="txt-right"><?= $dataPO->totalDailyPrice ?></td>
                 </tr>
                 <tr>
                     <td>PPh</td>
                     <td>Rp.</td>
-                    <td class="txt-right">@DailyAmountTax@</td>
+                    <td class="txt-right"><?= $dataPO->totalDailyPph ?></td>
                 </tr>
                 <tr>
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
-                    <td class="txt-right">@DailyAmountPaid@</td>
+                    <td class="txt-right"><?= $dataPO->totalDailyPaid ?></td>
                 </tr>
             </table>
 
@@ -276,7 +306,7 @@
                 <div class="txt-center" style="margin-left: auto;margin-right: 0;padding: 1rem;width: 25%;">
                     <div>Medan, 31-12-2022</div>
                     <div>Yang Menerima</div>
-                    <div class="mt-4">(@SupplierName@)</div>
+                    <div class="mt-4">(<?= $dataPO->supplierName ?>)</div>
                 </div>
             </div>
         </div>
@@ -285,22 +315,22 @@
             <table class="w-100">
                 <tr>
                     <td colspan="2"></td>
-                    <td class="txt-bold txt-right txt-underline">Tanggal: @PODate@</td>
+                    <td class="txt-bold txt-right txt-underline">Tanggal: <?= $dataPO->po_date ?></td>
                 </tr>
                 <tr>
                     <td class="txt-underline txt-bold">KWITANSI TAMBAHAN</td>
-                    <td colspan="2">NO. NOTA : @PONo@</td>
+                    <td colspan="2">NO. NOTA : <?= $dataPO->po_no ?></td>
                 </tr>
             </table>
 
             <table>
                 <tr>
                     <td>Supplier</td>
-                    <td>: @SupplierName@</td>
+                    <td>: <?= $dataPO->supplierName ?></td>
                 </tr>
                 <tr>
                     <td>Bahan Baku</td>
-                    <td>:@ItemName@</td>
+                    <td>: <?= $dataPO->itemName ?></td>
                 </tr>
             </table>
 
@@ -313,42 +343,51 @@
                     <th>TOTAL TAMBAHAN</th>
                 </tr>
                 <tr>
-                    <td>@TotalQty@</td>
-                    <td>@CongSebenarnya@</td>
-                    <td>@CongBatasan@</td>
-                    <td>@Selisih@</td>
-                    <td>@TotalTambahan@</td>
+                    <td><?= $dataPO->totalQty ?></td>
+                    <td><?= $dataPO->cong_sebenarnya ?></td>
+                    <td><?= $dataPO->cong_batasan ?></td>
+                    <td><?= $dataPO->selisih ?></td>
+                    <td><?= $dataPO->totalTambahan ?></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                     <td></td>
                     <td>PPH</td>
-                    <td>@PphTambahan@</td>
+                    <td><?= $dataPO->pphTambahan ?></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                     <td></td>
                     <td>DIBAYARKAN</td>
-                    <td>@SubsidiLangsung@</td>
+                    <td><?= $dataPO->subsidi_langsung ?></td>
                 </tr>
             </table>
-
-            <div class="mt-2 signed-info">
-                <div>
-                    <div>TTD Penerima Bahan Baku</div>
-                    <div class="mt-4">(&emsp;&emsp;&emsp;&emsp;)</div>
-                </div>
-                <div>
-                    <div>Diketahui</div>
-                    <div class="mt-4">(&emsp;&emsp;&emsp;&emsp;)</div>
-                </div>
-                <div>
-                    <div>Yang Menerima</div>
-                    <div class="mt-4">(&emsp;&emsp;&emsp;&emsp;)</div>
-                </div>
-            </div>
+            <table class="w-100 sign-table border-collapse signed-info">
+                <tr>
+                    <td style="height: 50px;"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>
+                        <div class="sign-row">
+                            <div>TTD Penerima Bahan Baku</div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row">
+                            <div>Diketahui</div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row">
+                            <div>Yang Menerima</div>
+                        </div>
+                    </th>
+                </tr>
+            </table>
         </div>
     <?php } ?>
 </body>
