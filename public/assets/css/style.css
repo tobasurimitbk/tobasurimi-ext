@@ -5692,6 +5692,17 @@ form .form-floating textarea {
   padding-top: 22px !important;
 }
 
+/* .form-floating > .form-control:not(:placeholder-shown) ~ label {
+  padding: 2px 0px 0px 10px !important;
+  height: 20px;
+  background: #fff;
+  margin-top: 1px;
+  margin-left: 2px;
+  opacity: 1 !important;
+  transform: scale(0.97) translateY(0rem) translateX(0rem);
+  color: #dddddd;
+} */
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
