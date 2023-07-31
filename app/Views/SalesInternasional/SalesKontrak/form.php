@@ -20,7 +20,7 @@
                         Posting
                     </button>
                 <?php } ?>
-                <?php if ($dataSO->status === "POSTED") { ?>
+                <?php if ($dataSO->status === "POSTED" && $dataSO->so_export_status !== "POSTED") { ?>
                     <button class="btn btn-success posting-spp unposting-so float-right">
                         Unposting
                     </button>

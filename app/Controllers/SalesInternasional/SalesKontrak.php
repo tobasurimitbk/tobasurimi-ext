@@ -59,12 +59,6 @@ class SalesKontrak extends BaseController
 
     public function getById($id = null)
     {
-         // CHECK SALES ORDER EXPORT DATA
-        // $find = $this->salesOrderExportModel->getBySalesContractId('2');
-
-        // var_dump($find[0]->sales_order_export_id);
-        // die;
-
         //Get Buyer From Customer
         $dataCustomer = $this->customerModel->getCustomer();
         
@@ -83,8 +77,8 @@ class SalesKontrak extends BaseController
                 $data["dataSODetail"] = $dataSODetail;
             }
 
-            // var_dump($dataPOImport);
-            // die;
+            // var_dump($dataSO);
+            // die ;
         }
 
         return view('SalesInternasional/SalesKontrak/form', $data);
