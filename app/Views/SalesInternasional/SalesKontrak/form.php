@@ -15,7 +15,7 @@
                         Hapus
                     </button>
                 <?php } ?>
-                <?php if ($dataSO->status === "NEW" || $dataSO->status === "UNPOSTED") { ?>
+                <?php if ($dataSO->status === "NEW") { ?>
                     <button class="btn btn-success posting-spp posting-so float-right">
                         Posting
                     </button>
@@ -28,7 +28,7 @@
                 <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("sales-kontrak/print/"); ?><?= $dataSO->sales_contract_id; ?>')">
                     Print
                 </button>
-                <?php if ($dataSO->status === "NEW" || $dataSO->status === "UNPOSTED") { ?>>
+                <?php if ($dataSO->status === "NEW") { ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
@@ -138,15 +138,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-floating">
                             <textarea <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSO) ? $dataSO->documents_required : ""; ?></textarea>
                             <label for="floatingInput">Document Required</label>
                         </div>
                     </div>
-                </div>
-                <div class="row mt-4">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-floating">
                             <textarea <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSO) ? $dataSO->special_instructions : ""; ?></textarea>
                             <label for="floatingInput">Special Instructions</label>
@@ -168,9 +166,17 @@
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
+                        <?php if (!empty($dataSO)) { ?>
+                            <?php if ($dataSO->status === "NEW") { ?>
+                                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
@@ -1151,7 +1157,7 @@
                         url: "<?= base_url("sales-kontrak/update-status"); ?>",
                         data: {
                             id: $(".id").val(),
-                            status: "UNPOSTED"
+                            status: "NEW"
                         },
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());

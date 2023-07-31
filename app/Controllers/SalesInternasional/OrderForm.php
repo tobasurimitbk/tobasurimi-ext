@@ -7,6 +7,7 @@ use Config\Services;
 use App\Models\CustomerModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportDetailModel;
+use Dompdf\Dompdf;
 
 class OrderForm extends BaseController
 {
@@ -16,6 +17,7 @@ class OrderForm extends BaseController
     protected $customerModel;
     protected $salesOrderExportModel;
     protected $salesOrderExportDetailModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class OrderForm extends BaseController
         $this->customerModel = new CustomerModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function index()
@@ -213,5 +216,46 @@ class OrderForm extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id = null) 
+    {
+        if($id)
+        {
+            $filename = "ORDER FORM";
+
+            $data = [];
+            $dataSO = $this->salesOrderExportModel->getById($id);
+
+            if($dataSO)
+            {
+                $dataSODetail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
+
+                // var_dump($dataSO);
+                // die;
+
+                if($dataSODetail)
+                {
+                    $data["dataSO"] = $dataSO;
+                    $data["dataSODetail"] = $dataSODetail;
+                }
+            }
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('SalesInternasional/OrderForm/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
     }
 }

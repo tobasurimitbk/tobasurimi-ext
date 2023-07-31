@@ -100,8 +100,8 @@
 <body>
 <?php if(!empty($dataSO) && !empty($dataSODetail)){ ?>
     <div class="header">
-        <div class="txt-center"><label class="label-header">SALES CONTRACT</label></div>
-        <div class="txt-center"><label class="label-header">NO. <?= $dataSO->sales_contract_no; ?></label></div>
+        <div class="txt-center"><label class="label-header">ORDER FORM</label></div>
+        <div class="txt-center"><label class="label-header">NO. <?= $dataSO->sales_order_export_no; ?></label></div>
         <div class="d-flex flex-column">
             <div class="txt-left">
                 <label class="label-header">DATE: <?= date('d M Y', strtotime($dataSO->createdAt)); ?></label>
@@ -173,30 +173,38 @@
     <table class="mt-2 sign-table border-collapse">
         <thead>
             <tr>
-                <th style="width: 350px;">
-                    <label class="label-header">THE BUYER,</label>
+                <th style="width: 110px;">
+                    <label class="label-header">M. Director,</label>
+                </th>
+                <th style="width: 110px;">
+                    <label class="label-header">Marketing,</label>
+                </th>
+                <th style="width: 110px;">
+                    <label class="label-header">Exim,</label>
+                </th>
+                <th style="width: 110px;">
+                    <label class="label-header">Procure,</label>
+                </th>
+                <th style="width: 110px;">
+                    <label class="label-header">Production,</label>
                 </th>
                 <th>
-                    <label class="label-header">THE SELLER,</label>
-                </th>
-            </tr>
-            <tr>
-                <th style="width: 350px;">
-                    <label class="label-header"><?= $dataSO->customer_name; ?></label>
-                </th>
-                <th>
-                    <label class="label-header">PT. TOBA SURIMI INDUSTRIES</label>
+                    <label class="label-header">QC,</label>
                 </th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td style="height: 100px;"></td>
+                <td style="height: 80px;"></td>
                 <td></td>
             </tr>
             <tr>
-                <td style="width: 350px;"><div style="border-top: 1px solid !important; width: 80%;"></div></td>
-                <td><div style="border-top: 1px solid !important; width: 80%;"></div></td>
+                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->director_name; ?></label></div></td>
+                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->marketing_name; ?></label></div></td>
+                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->exim_name; ?></label></div></td>
+                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->procurement_name; ?></label></div></td>
+                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->production_name; ?></label></div></td>
+                <td style="width: 110px;"><div style="border-bottom: 1px solid !important; width: 80%;"><label class="label-header"><?= $dataSO->qc_name; ?></label></div></td>
             </tr>
         </tbody>
     </table>
