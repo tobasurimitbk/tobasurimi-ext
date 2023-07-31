@@ -111,21 +111,14 @@
 
     <div class="inline" style="margin-top:3rem">
         <br />
-        <div>Kemasan / Berat
-        : <?= $dataPenerimaanBarang->packaging; ?> / <?= $dataPenerimaanBarang->total_weight; ?>
+        <div>Kemasan/Berat : <?= $dataPenerimaanBarang->packaging; ?> / <?= $dataPenerimaanBarang->total_weight; ?>
         </div>
         <div class="inline" >
         <br />
-        <div>No. Order
-        : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?>
+        <div>No. Penerimaan : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?>
         </div>
         <div class="inline" >
-        <br />
-        <div>File/Style No
-        : KREDIT,KREDIT,KREDIT
-        </div>
-
-        <div style="margin-top:1rem">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
+        <div style="margin-top:1rem">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div><br />
         <table class="table"
         style="
             border-collapse: collapse;
