@@ -47,7 +47,6 @@
     </div>
 </section>
 
-
 <script>
 let sort = "sales_contract_no";
 let sortType = "asc";
