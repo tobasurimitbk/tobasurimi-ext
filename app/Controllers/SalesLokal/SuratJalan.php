@@ -133,12 +133,13 @@ class SuratJalan extends BaseController
                     'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
             ],
+            /*
             "no_surat_jalan" => [
                 "rules" => "required",
                 'errors' => [
-                    'required' => 'tax status tidak boleh kosong',
+                    'required' => 'no surat jalan tidak boleh kosong',
                 ]
-            ],
+            ],*/
         ]);
         if (!$validate) {
             // echo json_encode($payload);
@@ -158,6 +159,14 @@ class SuratJalan extends BaseController
             array_push($noArray, $parts[1]);
         }
 
+
+        $code = "SJ";
+        $currentYear = date('Y');
+        $currentMonth = date('m');
+        $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
+        $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
+        $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
+
         $shippingDate = $this->request->getPost('shipping_date');
 
         $values = [
@@ -165,7 +174,7 @@ class SuratJalan extends BaseController
             "id_customer" => $this->request->getPost('id_customer'),
             "id_customer" => $this->request->getPost('id_customer'),
             "shipping_date" =>  $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-            "no_surat_jalan" => $this->request->getPost('no_surat_jalan'),
+            "no_surat_jalan" => $noSuratJalan,
             "no_po" => $this->request->getPost('no_po'),
             'multiple_id_so' => json_encode($idArray),
             'multiple_no_so' => json_encode($noArray),
@@ -365,6 +374,47 @@ class SuratJalan extends BaseController
 
 
         echo json_encode($data);
+        return;
+    }
+    public function dropDownSuratJalan($id_customer)
+    {
+        $data = $this->SuratJalanModel
+            ->asObject()
+            ->where(['id_customer' => $id_customer])
+            ->select(['id', 'no_surat_jalan'])
+            ->findAll();
+
+
+        echo json_encode($data);
+        return;
+    }
+    public function dataSuratJalanDetail($id_surat_jalan)
+    {
+        $data = $this->SuratJalanModel
+            ->asObject()
+            ->select(['id', 'no_surat_jalan', 'multiple_id_so'])
+            ->find($id_surat_jalan);
+
+        $dataIdSo = json_decode($data->multiple_id_so);
+
+        $detailSo = array();
+        $detailBarang = array();
+
+        foreach ($dataIdSo as $id) {
+            $dataSo = $this->SalesOrderModel->getSalesOrderLokalById($id);
+            $detailSo[] = ["id" => $dataSo->id, "no_so" => $dataSo->no_sales_order];
+            foreach ($dataSo->detail as $detail) {
+                $detail['no_so'] = $dataSo->no_sales_order;
+                $detail['no_surat_jalan'] = $data->no_surat_jalan;
+                $detailBarang[] = $detail;
+            }
+        }
+
+        $allData = [
+            "detail_so" => $detailSo,
+            "detail_barang" => $detailBarang
+        ];
+        echo json_encode($allData);
         return;
     }
 }

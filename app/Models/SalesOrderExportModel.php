@@ -4,19 +4,20 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class SalesKontrakModel extends Model
+class SalesOrderExportModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'sales_contract';
-    protected $primaryKey       = 'sales_contract_id';
+    protected $table            = 'sales_order_export';
+    protected $primaryKey       = 'sales_order_export_id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
+        'sales_order_export_id',
+        'sales_order_export_no',
         'sales_contract_id',
-        'sales_contract_no',
         'company_id',
         'customer_id',
         'customer_po_no',
@@ -29,6 +30,12 @@ class SalesKontrakModel extends Model
         'shipment_date',
         'documents_required',
         'special_instructions',
+        'director_name',
+        'marketing_name',
+        'exim_name',
+        'procurement_name',
+        'production_name',
+        'qc_name',
         'status',
         'createdAt',
         'updatedAt',
@@ -62,24 +69,24 @@ class SalesKontrakModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'sales_contract_no'     => 'sales_contract.sales_contract_no',
+            'sales_order_export_no' => 'sales_order_export.sales_order_export_no',
             'customer_name'         => 'customers.name',
-            'due_date'              => 'sales_contract.due_date',
-            'shipment_date'         => 'sales_contract.shipment_date',
-            'createdAt'             => 'sales_contract.createdAt',
-            'updatedAt'             => 'sales_contract.updatedAt',
+            'due_date'              => 'sales_order_export.due_date',
+            'shipment_date'         => 'sales_order_export.shipment_date',
+            'createdAt'             => 'sales_order_export.createdAt',
+            'updatedAt'             => 'sales_order_export.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_contract.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_contract.*, 
+        $selectQry = "sales_order_export.*, 
                       customers.name AS customer_name";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('customers', 'customers.id = sales_order_export.customer_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -89,8 +96,8 @@ class SalesKontrakModel extends Model
         }
 
         if ($addCondition['search']) {
-            $salesDataQry->like('sales_contract.sales_contract_no', $addCondition['search'])
-                ->orLike('sales_contract.customer_po_no', $addCondition['search'])
+            $salesDataQry->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+                ->orLike('sales_order_export.customer_po_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search']);
         }
 
@@ -117,40 +124,25 @@ class SalesKontrakModel extends Model
 
     public function getById($id)
     {
-        $selectQry = "sales_contract.*, customers.name as customer_name, sales_order_export.status as so_export_status";
+        $selectQry = "sales_order_export.*, customers.name as customer_name";
 
         $salesData = $this->asObject()
             ->select($selectQry)
-            ->join('customers', 'customers.id = sales_contract.customer_id', 'LEFT')
-            ->join('sales_order_export', 'sales_order_export.sales_contract_id = sales_contract.sales_contract_id', 'LEFT')
-            ->where('sales_order_export.deletedAt', NULL)
+            ->join('customers', 'customers.id = sales_order_export.customer_id', 'LEFT')
             ->find($id);
 
         return $salesData;
     }
 
-    public function get_no($thn, $thn2)
+    public function getBySalesContractId($id)
     {
-        $lastStr =  "/TOBA/CN/EM/" . $thn2;
+        $selectQry = "sales_order_export.*, customers.name as customer_name";
 
-        $builder = $this->db->table('sales_contract');
-        $builder->select('sales_contract_no');
-        $builder->orderBy('sales_contract_no', 'desc')
-        ->where('createdAt >=', $thn . "-01-01 00:00:00")
-        ->where('createdAt <=', $thn . "-12-31 23:59:59");
-        $builder->like('sales_contract_no', $lastStr);
+        $builder = $this->select($selectQry)
+            ->join('customers', 'customers.id = sales_order_export.customer_id', 'LEFT')
+            ->where('sales_contract_id', $id);
         $query = $builder->get();
-
-        $lastSO = '001';
-        if ($query->getResultArray()) {
-            $lastFirst = explode('/', $query->getResultArray()[0]['sales_contract_no']);
-            $lastSO = explode('-', $lastFirst[0]);
-            $lastSO = intval($lastSO[0]) + 1;
-            $lastSO = sprintf("%03d", $lastSO);
-        };
-
-        $generatedNo =  $lastSO . $lastStr;
-
-        return $generatedNo;
+        
+        return $query->getResult();
     }
 }

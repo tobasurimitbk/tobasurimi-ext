@@ -720,6 +720,30 @@ class POImportBahanBaku extends BaseController
         return;
     }
 
+    public function purchaseOrderPaymentDropdown($id)
+    {
+        $condition = [
+            'company_id'    => $this->this_company_id,
+            'supplier_id'   => $id,
+            'is_posted'     => 1
+        ];
+
+        $selectQry = "rm_import_pos.*,
+                      metadata.value AS currency";
+        $dataPOImport = $this->rmImportPOModel->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('metadata', 'metadata.id = rm_import_pos.currency')
+            ->findAll();
+
+        $data = [
+            "data" => $dataPOImport
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function dropdownBarangPOImportBahanBaku()
     {
         $id = $this->request->getGet("id");

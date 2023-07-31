@@ -8,6 +8,8 @@ use Config\Services;
 use App\Models\CustomerModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
+use App\Models\SalesOrderExportModel;
+use App\Models\SalesOrderExportDetailModel;
 use Dompdf\Dompdf;
 
 class SalesKontrak extends BaseController
@@ -18,6 +20,8 @@ class SalesKontrak extends BaseController
     protected $customerModel;
     protected $salesKontrakModel;
     protected $salesKontrakDetailModel;
+    protected $salesOrderExportModel;
+    protected $salesOrderExportDetailModel;
     protected $dompdf;
 
     public function __construct()
@@ -28,11 +32,16 @@ class SalesKontrak extends BaseController
         $this->customerModel = new CustomerModel();
         $this->salesKontrakModel = new SalesKontrakModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
+        $this->salesOrderExportModel = new SalesOrderExportModel();
+        $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->dompdf = new Dompdf();
     }
 
     public function index()
     {
+        // $dataSO = $this->salesKontrakModel->getById(2);
+        // var_dump($dataSO->sales_contract_id);
+        // die;
         return view('SalesInternasional/SalesKontrak/index');
     }
 
@@ -68,8 +77,8 @@ class SalesKontrak extends BaseController
                 $data["dataSODetail"] = $dataSODetail;
             }
 
-            // var_dump($dataPOImport);
-            // die;
+            // var_dump($dataSO);
+            // die ;
         }
 
         return view('SalesInternasional/SalesKontrak/form', $data);
@@ -83,7 +92,8 @@ class SalesKontrak extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "idCompany"     => $this->this_company_id
+            "idCompany"     => $this->this_company_id,
+            "status"      => $this->request->getGet("status")
         ];
 
         $condition = [
@@ -92,7 +102,8 @@ class SalesKontrak extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType")
+            "sortType"      => $this->request->getGet("sortType"),
+            "status"      => $this->request->getGet("status")
         ];
 
         $limit = $this->request->getGet("length");
@@ -223,6 +234,7 @@ class SalesKontrak extends BaseController
                     "payment_term" => $this->request->getPost("payment_term"),
                     "documents_required" => $this->request->getPost("documents_required"),
                     "special_instructions" => $this->request->getPost("special_instructions"),
+                    "status" => "NEW"
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
@@ -532,6 +544,142 @@ class SalesKontrak extends BaseController
         return;
     }
 
+    public function updateStatus()
+    {
+        try{
+            $id = $this->request->getPost("id");
+            $status = $this->request->getPost("status");
+
+            $payload = [
+                "status" => $status
+            ];
+            
+            $condition = [
+                'sales_contract_id' => $id
+            ];
+
+            if($status === "POSTED")
+            {
+                // CREATE SALES ORDER EXPORT
+                $dataSO = $this->salesKontrakModel->getById($id);
+                
+                $payloadExport = [
+                    "sales_order_export_no" => "SC/" . $dataSO->sales_contract_no,
+                    "sales_contract_id" => $id,
+                    "company_id" => $this->this_company_id,
+                    "customer_id" => $dataSO->customer_id,
+                    "customer_po_no" => $dataSO->customer_po_no,
+                    "loading_port" => $dataSO->loading_port,
+                    "dicharge_port" => $dataSO->dicharge_port,
+                    "due_date" => $dataSO->due_date,
+                    "total_amount" => $dataSO->total_amount,
+                    "tolerance" => $dataSO->tolerance,
+                    "shipment_date" => $dataSO->shipment_date,
+                    "payment_term" => $dataSO->payment_term,
+                    "documents_required" => $dataSO->documents_required,
+                    "special_instructions" => $dataSO->special_instructions
+                ];
+
+                $responseExport = $this->salesOrderExportModel->insert($payloadExport);
+
+                if(!$responseExport)
+                {
+                    $message =  'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+
+                $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
+
+                if($dataSODetail)
+                {
+                    foreach($dataSODetail as $detail)
+                    {
+                        $detailPayloadExport = [];
+
+                        $detailPayloadExport = [
+                            'sales_order_export_id' => $responseExport,
+                            'barang_id' =>$detail["barang_id"],
+                            'unit' => $detail["unit"],
+                            'qty' => $detail["qty"],
+                            'remark' => $detail["remark"],
+                            'price' => $detail["price"],
+                            'total_price' => $detail["total_price"]
+                        ];
+
+                        $responseDetailExport = $this->salesOrderExportDetailModel->insert($detailPayloadExport);
+
+                        if(!$responseDetailExport) {
+                            $message =  'Data Gagal Disimpan';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    }
+                }
+            }
+            if($status === "NEW")
+            {
+                // CHECK SALES ORDER EXPORT DATA
+                $find = $this->salesOrderExportModel->getBySalesContractId($id);
+
+                if($find)
+                {
+                    foreach($find as $item)
+                    {
+                        $this->salesOrderExportModel->delete($item->sales_order_export_id);
+                        
+                        $find_detail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
+                        foreach($find_detail as $item_detail)
+                        {
+                            $this->salesOrderExportDetailModel->delete($item_detail["sales_order_export_detail_id"]);
+                        }
+                    }
+                }
+            }
+
+            $response = $this->salesKontrakModel->where($condition)->set($payload)->update();
+
+            if ($response) {
+                $data = [
+                    "status"            => true,
+                    "message"   => $status === "POSTED" ? "Data Berhasil diposting" : "Data Berhasil diunposting",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = $status === "POSTED" ? "Data Gagal diposting" : "Data Gagal diunposting";
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
     public function delete()
     {
         try{
@@ -625,5 +773,17 @@ class SalesKontrak extends BaseController
 
             // return view('Purchase/poImportBahanPenolong/print', $data);
         }
+    }
+
+    public function dropdownSC()
+    {
+        $dataSO = $this->salesKontrakModel->getNo($this->this_company_id);
+
+        $data = [
+            "data" => $dataSO
+        ];
+
+        echo json_encode($data);
+        return;
     }
 }

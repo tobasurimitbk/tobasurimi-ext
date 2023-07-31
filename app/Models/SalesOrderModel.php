@@ -100,7 +100,7 @@ class SalesOrderModel extends Model
             ->where($condition)
             ->orderBy($sort, $sortType);
 
-        $totalData = $salesOrderLokal->where('tipe_sales_order', 'LOKAL');
+        $totalData = $salesOrderLokal->countAllResults(false);
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $salesOrderLokal->groupStart();
@@ -131,6 +131,7 @@ class SalesOrderModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
     public function getSalesOrderLokalById($id)
     {
         $selectQry = "sales_order.*,users.name as seller_name,customers.name as customer_name ,customers.address,customers.phone";
@@ -141,12 +142,12 @@ class SalesOrderModel extends Model
             ->select($selectQry)
             ->find($id);
 
-        $selectQueryDetail = "detail_sales_order.*,warehouses.warehouse_name,barangs.nama_barang,barangs.harga_barang,barangs.satuan_id,satuans.kode_satuan";
+        $selectQueryDetail = "sales_order_detail.*,warehouses.warehouse_name,barangs.nama_barang,barangs.harga_barang,barangs.satuan_id,satuans.kode_satuan";
         $detail = $this->SalesOrderDetailModel
             ->where('id_sales_order', $id)
-            ->join('barangs', 'barangs.id = detail_sales_order.id_barang')
+            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
             ->join('satuans', 'satuans.id = barangs.satuan_id')
-            ->join('warehouses', 'warehouses.id = detail_sales_order.id_warehouse')
+            ->join('warehouses', 'warehouses.id = sales_order_detail.id_warehouse')
             ->select($selectQueryDetail)
             ->findAll();
 

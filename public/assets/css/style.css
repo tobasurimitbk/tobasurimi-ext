@@ -257,7 +257,7 @@ textarea.form-control {
 }
 
 .full-textarea {
-  height: 88px !important;
+  height: 118px !important;
 }
 
 .custom-control {
@@ -5578,6 +5578,19 @@ table.dataTable td .label-finish {
   color: #4e8a00 !important;
 }
 
+.btn-success,
+.btn-success.disabled {
+  background-color: #4e8a00 !important;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+  background-color: #4e8a00 !important;
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
 .form-add-spp
   .form-floating
   .select2
@@ -5673,6 +5686,29 @@ table.dataTable .body-table tr td .btn.btn-success.posting-spp {
   border: 1px #4e8a00 solid;
   border-radius: 4px;
   min-width: 120px;
+}
+
+form .form-floating textarea {
+  padding-top: 22px !important;
+}
+
+/* .form-floating > .form-control:not(:placeholder-shown) ~ label {
+  padding: 2px 0px 0px 10px !important;
+  height: 20px;
+  background: #fff;
+  margin-top: 1px;
+  margin-left: 2px;
+  opacity: 1 !important;
+  transform: scale(0.97) translateY(0rem) translateX(0rem);
+  color: #dddddd;
+} */
+
+.select2.select2-container--default
+  .selection
+  .select2-selection.select2-selection--single
+  .select2-selection__rendered {
+  padding-top: 15px;
+  padding-left: 12px;
 }
 
 /* ===== RESPONSIVE ===== */

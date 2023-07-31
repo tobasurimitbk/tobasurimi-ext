@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class SalesOrderDetailModel extends Model
 {
 
-    protected $table      = 'detail_sales_order';
+    protected $table      = 'sales_order_detail';
     protected $primaryKey = 'id';
 
     protected $useAutoIncrement = true;

@@ -10,16 +10,34 @@
                 Batal
             </a>
             <?php if (!empty($dataSO)) { ?>
-                <button class="btn btn-hapus delete-parent float-right">
-                    Hapus
-                </button>
+                <?php if ($dataSO->status === "NEW") { ?>
+                    <button class="btn btn-hapus delete-parent float-right">
+                        Hapus
+                    </button>
+                <?php } ?>
+                <?php if ($dataSO->status === "NEW") { ?>
+                    <button class="btn btn-success posting-spp posting-so float-right">
+                        Posting
+                    </button>
+                <?php } ?>
+                <?php if ($dataSO->status === "POSTED" && $dataSO->so_export_status !== "POSTED") { ?>
+                    <button class="btn btn-success posting-spp unposting-so float-right">
+                        Unposting
+                    </button>
+                <?php } ?>
                 <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("sales-kontrak/print/"); ?><?= $dataSO->sales_contract_id; ?>')">
                     Print
                 </button>
-            <?php } ?>
+                <?php if ($dataSO->status === "NEW") { ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                        Simpan
+                    </button>
+                <?php } ?>
+            <?php } else { ?>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
             </button>
+            <?php } ?>
         </div>
     </div>
     <div class="card">
@@ -32,10 +50,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
                                     <label for="floatingInput">No. SC</label>
                                 </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -43,7 +61,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
+                            <select <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?>  class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataCustomer)) {
@@ -60,7 +78,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataSO) ? $dataSO->customer_po_no : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
+                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->customer_po_no : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
                             <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
@@ -68,13 +86,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataSO) ? $dataSO->loading_port : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
+                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->loading_port : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
                             <label for="floatingInput">Loading Port</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataSO) ? $dataSO->dicharge_port : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
+                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->dicharge_port : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
                             <label for="floatingInput">Dicharge Port</label>
                         </div>
                     </div>
@@ -82,7 +100,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= !empty($dataSO) ? ($dataSO->due_date ? date("d/m/Y", strtotime($dataSO->due_date)) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
+                                    <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSO) ? ($dataSO->due_date ? date("d/m/Y", strtotime($dataSO->due_date)) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
                                     <label for="floatingInput">Due Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -95,13 +113,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
+                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
                             <label for="floatingInput">Payment Term (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataSO) ? $dataSO->tolerance : ""; ?>"  type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
+                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->tolerance : ""; ?>"  type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
                             <label for="floatingInput">Tolerance</label>
                         </div>
                     </div>
@@ -109,7 +127,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input value="<?= !empty($dataSO) ? ($dataSO->shipment_date ? date("d/m/Y", strtotime($dataSO->shipment_date)) : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
+                                    <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSO) ? ($dataSO->shipment_date ? date("d/m/Y", strtotime($dataSO->shipment_date)) : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
                                     <label for="floatingInput">Shipment Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -120,17 +138,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSO) ? $dataSO->documents_required : ""; ?></textarea>
+                            <textarea <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSO) ? $dataSO->documents_required : ""; ?></textarea>
                             <label for="floatingInput">Document Required</label>
                         </div>
                     </div>
-                </div>
-                <div class="row mt-4">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSO) ? $dataSO->special_instructions : ""; ?></textarea>
+                            <textarea <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSO) ? $dataSO->special_instructions : ""; ?></textarea>
                             <label for="floatingInput">Special Instructions</label>
                         </div>
                     </div>
@@ -150,9 +166,17 @@
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
+                        <?php if (!empty($dataSO)) { ?>
+                            <?php if ($dataSO->status === "NEW") { ?>
+                                <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
@@ -184,21 +208,32 @@
                                     $total_harga_barang = $total_harga_barang + ($details["price"] ? formatter($details["price"], "STR_TO_INT") : 0);
                                     $total_qty = $total_qty + ($details["qty"] ? formatter($details["qty"], "STR_TO_INT") : 0);
                                     $total_harga = $total_harga + ($details["total_price"] ? (formatter($details["total_price"], "STR_TO_INT")) : 0);
+                                    if($dataSO->status === "NEW"){
                             ?>
-                                    <tr>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["kode_barang"]; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_barang"]; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_satuan"]; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["remark"]; ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= formatter($details["qty"], "STR_TO_INT"); ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["price"], "STR_TO_INT")); ?></td>
-                                            <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?></td>
-                                            <td><button onclick='deleteRow("<?= $no; ?>")'>X</button></td>
-                                    </tr>
-
-
-                            <?php
+                                <tr>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["kode_barang"]; ?></td>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_barang"]; ?></td>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["nama_satuan"]; ?></td>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= $details["remark"]; ?></td>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= formatter($details["qty"], "STR_TO_INT"); ?></td>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["price"], "STR_TO_INT")); ?></td>
+                                    <td class="edit-table-detail" data-total="<?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?>"  data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-remark="<?= $details["remark"]; ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_INT")); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_INT"); ?>" data-id="<?= formatter($details["sales_contract_detail_id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>"><?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?></td>
+                                    <td><button onclick='deleteRow("<?= $no; ?>")'>X</button></td>
+                                </tr>
+                            <?php } else {  ?>
+                                <tr>
+                                    <td><?= $no; ?></td>
+                                    <td><?= $details["kode_barang"]; ?></td>
+                                    <td><?= $details["nama_barang"]; ?></td>
+                                    <td><?= $details["nama_satuan"]; ?></td>
+                                    <td><?= $details["remark"]; ?></td>
+                                    <td><?= formatter($details["qty"], "STR_TO_INT"); ?></td>
+                                    <td><?= number_format(formatter($details["price"], "STR_TO_INT")); ?></td>
+                                    <td><?= number_format(formatter($details["total_price"], "STR_TO_INT")); ?></td>
+                                    <td></td>
+                                </tr>
+                            <?php } 
                                     $no++;
                                 }
                             } ?>
@@ -966,7 +1001,6 @@
                             const csrf = $(`[name="${csrfToken}"]`);
                             setLoading()
                             let data = new FormData(document.querySelector(".create-form"));
-                            var total = 0;
 
                             let update_list_items = [];
 
@@ -1104,6 +1138,122 @@
                     })
                 }
             }
+        })
+
+        $(".unposting-so").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di Unposting?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Unposting',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("sales-kontrak/update-status"); ?>",
+                        data: {
+                            id: $(".id").val(),
+                            status: "NEW"
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + $(".id").val()
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Diubah, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+        })
+
+        $(".posting-so").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di Posting?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Posting',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("sales-kontrak/update-status"); ?>",
+                        data: {
+                            id: $(".id").val(),
+                            status: "POSTED"
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + $(".id").val()
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Diubah, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
         })
 
         $(".btn-show-detail").click(function() {
