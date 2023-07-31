@@ -7,6 +7,7 @@ use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\SppModel;
+use Dompdf\Dompdf;
 
 class POLokalBahanBaku extends BaseController
 {
@@ -14,6 +15,7 @@ class POLokalBahanBaku extends BaseController
     protected $this_company_id;
     protected $RMPurchaseOrderModel;
     protected $RMPurchaseOrderDetailModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class POLokalBahanBaku extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->RMPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function poLokalBahanBaku()
@@ -423,6 +426,64 @@ class POLokalBahanBaku extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id = null)
+    {
+        if ($id) {
+            $filename = "PO Bahan Baku Lokal";
+
+            $data = [];
+            $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
+
+            if ($dataPO) {
+                $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
+
+                $totalPrice = 0;
+                $totalQty = 0;
+                $totalPph = 0;
+                $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
+
+                $objPph = (object)[
+                    "none" => 0,
+                    "supplier" => 1,
+                    "company" => -1,
+                ];
+
+                foreach ($dataPODetail as $value) {
+                    $dataPO->itemName = $value->barangName;
+                    $totalPrice += formatter($value->general_price, "CURR_TO_INT");
+                    $totalQty += formatter($value->qty, "CURR_TO_INT");
+                }
+
+                $dataPO->totalPrice = number_format($totalPrice);
+                $dataPO->totalQty = number_format($totalQty);
+                $dataPO->totalQty = number_format($totalPph);
+
+                if ($dataPODetail) {
+                    $data["dataPO"] = $dataPO;
+                    $data["dataPODetail"] = $dataPODetail;
+                }
+            }
+
+            // dd($data);
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'portrait');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
     }
 
     public function dropdownPOLokalBahanBaku()
