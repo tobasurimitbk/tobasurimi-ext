@@ -5703,6 +5703,14 @@ form .form-floating textarea {
   color: #dddddd;
 } */
 
+.select2.select2-container--default
+  .selection
+  .select2-selection.select2-selection--single
+  .select2-selection__rendered {
+  padding-top: 15px;
+  padding-left: 12px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {

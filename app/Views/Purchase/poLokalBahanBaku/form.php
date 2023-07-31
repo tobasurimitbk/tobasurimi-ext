@@ -15,7 +15,7 @@
                     </button>
                 <?php } ?>
 
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/rawMaterialPO/print/<?= $dataPOLokal->id ?>')">
+                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("po-lokal-bahan-baku/print/"); ?><?= $dataPOLokal->id ?>')">
                     Print
                 </button>
 

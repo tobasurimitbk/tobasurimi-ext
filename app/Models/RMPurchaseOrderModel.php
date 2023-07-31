@@ -132,6 +132,12 @@ class RMPurchaseOrderModel extends Model
     public function getPoBBLokalById($id)
     {
         $selectQry = "rm_purchase_orders.*,
+                            companies.holding_company AS companyName,
+                            companies.address AS companyAddress,
+                            suppliers.name AS supplierName,
+                            suppliers.address AS supplierAddress,
+                            suppliers.phone AS supplierPhone,
+                            suppliers.no_npwp AS supplierNPWP,
                             purchase_requests.spp_no AS spp_no,
                             users.name AS createdBy
                             ";
@@ -139,6 +145,8 @@ class RMPurchaseOrderModel extends Model
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
             ->join('purchase_requests', 'purchase_requests.id = rm_purchase_orders.purchase_request_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->find($id);
 
