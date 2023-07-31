@@ -23,7 +23,7 @@
                         Unposting
                     </button>
                 <?php } ?>
-                <button class="btn btn-warning btn-print float-right">
+                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("order-form-internasional/print/"); ?><?= $dataSO->sales_order_export_id; ?>')">
                     Print
                 </button>
             <?php } else { ?>
@@ -124,15 +124,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-floating">
                             <textarea readonly="true" class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSO) ? $dataSO->documents_required : ""; ?></textarea>
                             <label for="floatingInput">Document Required</label>
                         </div>
                     </div>
-                </div>
-                <div class="row mt-4">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-floating">
                             <textarea readonly="true" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSO) ? $dataSO->special_instructions : ""; ?></textarea>
                             <label for="floatingInput">Special Instructions</label>
@@ -442,5 +440,9 @@
             }
         })
     })
+
+    const print = function(url) {
+        window.open(url, "_blank");
+    }
 </script>
 <?= $this->endSection(); ?>

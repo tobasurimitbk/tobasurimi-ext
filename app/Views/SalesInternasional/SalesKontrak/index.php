@@ -15,7 +15,6 @@
                 <div class="col-md-3">
                     <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                         <option value="NEW">NEW</option>
-                        <option value="UNPOSTED">UNPOSTED</option>
                         <option value="POSTED">POSTED</option>
                     </select>
                 </div>

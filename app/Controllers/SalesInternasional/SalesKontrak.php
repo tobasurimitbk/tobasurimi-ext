@@ -59,6 +59,12 @@ class SalesKontrak extends BaseController
 
     public function getById($id = null)
     {
+         // CHECK SALES ORDER EXPORT DATA
+        // $find = $this->salesOrderExportModel->getBySalesContractId('2');
+
+        // var_dump($find[0]->sales_order_export_id);
+        // die;
+
         //Get Buyer From Customer
         $dataCustomer = $this->customerModel->getCustomer();
         
@@ -558,10 +564,7 @@ class SalesKontrak extends BaseController
                 'sales_contract_id' => $id
             ];
 
-            // CHECK SALES ORDER EXPORT DATA
-            $find = $this->salesOrderExportModel->getBySalesContractId($id);
-
-            if(!$find)
+            if($status === "POSTED")
             {
                 // CREATE SALES ORDER EXPORT
                 $dataSO = $this->salesKontrakModel->getById($id);
@@ -626,6 +629,25 @@ class SalesKontrak extends BaseController
                                 'token' => csrf_hash()
                             ];
                             echo json_encode($data);
+                        }
+                    }
+                }
+            }
+            if($status === "NEW")
+            {
+                // CHECK SALES ORDER EXPORT DATA
+                $find = $this->salesOrderExportModel->getBySalesContractId($id);
+
+                if($find)
+                {
+                    foreach($find as $item)
+                    {
+                        $this->salesOrderExportModel->delete($item->sales_order_export_id);
+                        
+                        $find_detail = $this->salesOrderExportDetailModel->getSalesOrderExportDetailBySalesOrderExportId($id);
+                        foreach($find_detail as $item_detail)
+                        {
+                            $this->salesOrderExportDetailModel->delete($item_detail["sales_order_export_detail_id"]);
                         }
                     }
                 }

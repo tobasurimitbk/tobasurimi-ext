@@ -138,11 +138,11 @@ class SalesOrderExportModel extends Model
     {
         $selectQry = "sales_order_export.*, customers.name as customer_name";
 
-        $sppData = $this->asObject()
-            ->select($selectQry)
+        $builder = $this->select($selectQry)
             ->join('customers', 'customers.id = sales_order_export.customer_id', 'LEFT')
-            ->find($id);
-
-        return $sppData;
+            ->where('sales_contract_id', $id);
+        $query = $builder->get();
+        
+        return $query->getResult();
     }
 }
