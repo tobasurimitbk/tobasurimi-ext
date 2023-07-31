@@ -140,3 +140,32 @@ function romanMonthNumber(int $number): string {
    
    return $returnValue;
 }
+
+function penyebut(int $nilai): string {
+   $huruf = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+   $temp = "";
+
+   if ($nilai < 12) {
+       $temp = " ". $huruf[floor($nilai)];
+   } elseif ($nilai <20) {
+       $temp = penyebut($nilai - 10). " belas";
+   } elseif ($nilai < 100) {
+       $temp = penyebut($nilai/10)." puluh". penyebut(floor($nilai) % 10);
+   } elseif ($nilai < 200) {
+       $temp = " seratus" . penyebut($nilai - 100);
+   } else if ($nilai < 1000) {
+       $temp = penyebut($nilai/100) . " ratus" . penyebut(floor($nilai) % 100);
+   } else if ($nilai < 2000) {
+       $temp = " seribu" . penyebut($nilai - 1000);
+   } else if ($nilai < 1000000) {
+       $temp = penyebut($nilai/1000) . " ribu" . penyebut($nilai % 1000);
+   } else if ($nilai < 1000000000) {
+      $temp = penyebut($nilai/1000000) . " juta" . penyebut($nilai % 1000000);
+   } else if ($nilai < 1000000000000) {
+      $temp = penyebut($nilai/1000000000) . " milyar" . penyebut(fmod($nilai,1000000000));
+   } else if ($nilai < 1000000000000000) {
+      $temp = penyebut($nilai/1000000000000) . " trilyun" . penyebut(fmod($nilai,1000000000000));
+   }
+
+   return $temp;
+}

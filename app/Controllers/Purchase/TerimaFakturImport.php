@@ -634,7 +634,10 @@ class TerimaFakturImport extends BaseController
         $data = [];
         $itemsList = [];
         $itemTotal = 0;
-        $dataInv = $tandaTerimaFakturModel->asObject()->find($id);
+        $dataInv = $tandaTerimaFakturModel->asObject()
+            ->select("tanda_terima_faktur.*, DATE_FORMAT(tanda_terima_faktur.invoice_date, '%d/%m/%Y') AS invoice_date, suppliers.name AS supplier_name")
+            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id')
+            ->find($id);
 
         $dataDet = $tandaTerimaFakturDetModel->asObject()
             ->where('tanda_terima_faktur_id', $id)
@@ -645,16 +648,20 @@ class TerimaFakturImport extends BaseController
             $itemTotal += $det->qty * $det->price;
         }
 
+        $total = $itemTotal;
+
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
         $data["itemName"] = implode(', ', $itemsList);
         $data["itemTotal"] = $itemTotal;
         $data["potongan"] = $dataInv->potongan;
         $data["tambahan"] = $dataInv->tambahan;
+        $data['total'] = $total;
+        $data['terbilang'] = penyebut($total);
 
         // var_dump($dataPODetail);
         // die;
-        return view('Purchase/terimaFakturImport/print', $data);
+        // return view('Purchase/terimaFakturImport/print', $data);
 
         // load HTML content
         $this->dompdf->loadHtml(view('Purchase/terimaFakturImport/print', $data));

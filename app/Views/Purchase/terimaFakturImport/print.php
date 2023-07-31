@@ -26,12 +26,17 @@
             width: 20px;
         }
 
+        .bukti-pengeluaran {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
         .d-flex {
-            display: flex;
+            /* display: flex; */
         }
 
         .flex-1 {
-            flex: 1;
+            /* flex: 1; */
         }
 
         .flex-column {
@@ -50,8 +55,12 @@
             justify-content: space-evenly;
         }
 
-        .sign-table td:not(:last-child) {
+        .sign-table td {
             border: 1px solid;
+        }
+
+        .sign-table td:last-child {
+            border: none;
         }
 
         .txt-center {
@@ -72,67 +81,62 @@
     </style>
 </head>
 
-<body style="border: 1px solid;font-size: 11px">
+<body style="border: 0px solid;font-size: 11px">
 
-    <div class="d-flex">
-        <div class="d-flex align-items-center flex-1">
-            <table>
-                <tr>
-                    <td>BUKTI PENGELUARAN</td>
-                    <td>
-                        <div>
-                            <div class="box-sm"></div>
-                            <div>KAS</div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            <!-- <div>BUKTI PENGELUARAN</div>
-            <div class="d-flex flex-column justify-content-even">
-                <div class="d-flex">
-                    <div class="box-sm"></div>
-                    KAS
-                </div>
-                <div class="d-flex">
-                    <div class="box-sm"></div>
-                    BANK
-                </div>
-            </div> -->
-        </div>
-        <div class="flex-1 d-flex justify-content-end">
-            <table class="bank-table border-collapse">
-                <tr>
-                    <th colspan="2">NO</th>
-                    <th>BANK</th>
-                </tr>
-                <tr>
-                    <td>CEK</td>
-                    <td style="width: 95px;"></td>
-                    <td style="width: 95px;">Bank Mandiri</td>
-                </tr>
-                <tr>
-                    <td>GIRO</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-    </div>
+    <table class="w-100">
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td>BUKTI PENGELUARAN</td>
+                        <td>
+                            <div style="margin-bottom: 0.25rem;">
+                                <div class="box-sm bukti-pengeluaran"></div>
+                                <div class="bukti-pengeluaran">KAS</div>
+                            </div>
+                            <div>
+                                <div class="box-sm bukti-pengeluaran"></div>
+                                <div class="bukti-pengeluaran">BANK</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="bank-table border-collapse" style="float: right;">
+                    <tr>
+                        <th colspan="2">NO</th>
+                        <th>BANK</th>
+                    </tr>
+                    <tr>
+                        <td>CEK</td>
+                        <td style="width: 95px;"></td>
+                        <td style="width: 95px;">Bank Mandiri</td>
+                    </tr>
+                    <tr>
+                        <td>GIRO</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-    <div class="d-flex">
-        <div>
+    <div class="d-flex w-100">
+        <div style="display: inline-block;">
             <table>
                 <tr>
                     <td>TGL</td>
-                    <td>: kapan ya</td>
+                    <td>: <?= $data->invoice_date ?></td>
                 </tr>
                 <tr>
                     <td>DIBAYAR KEPADA</td>
-                    <td>: ARYA</td>
+                    <td>: <?= $data->supplier_name ?></td>
                 </tr>
             </table>
         </div>
-        <div>
+        <div style="display: inline-block;vertical-align: top;float: right;">
             <table>
                 <tr>
                     <td>NO BUKTI:</td>
@@ -169,15 +173,15 @@
             <td></td>
         </tr>
         <tr>
-            <th>TOTAL</th>
+            <th class="txt-right">TOTAL</th>
             <th class="txt-right">RP. 298.200</th>
             <th></th>
         </tr>
     </table>
 
-    <div>
+    <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
         <span>TERBILANG:</span>
-        <span>SEPULUH JUTA</span>
+        <span><?= $terbilang . ' rupiah' ?></span>
     </div>
 
     <table class="w-100 sign-table border-collapse">
