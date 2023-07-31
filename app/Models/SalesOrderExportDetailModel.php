@@ -55,7 +55,8 @@ class SalesOrderExportDetailModel extends Model
     public function getSalesOrderExportDetailBySalesOrderExportId($id)
     {
         $arrCondition = [
-            'sales_order_detail_export.deletedAt' => null
+            'sales_order_detail_export.deletedAt' => null,
+            'sales_order_export_id' => $id
         ];
 
         $builder = $this->db->table('sales_order_detail_export')

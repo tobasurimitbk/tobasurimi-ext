@@ -55,7 +55,8 @@ class SalesKontrakDetailModel extends Model
     public function getSalesContractDetailBySalesContractId($id)
     {
         $arrCondition = [
-            'sales_contract_detail.deletedAt' => null
+            'sales_contract_detail.deletedAt' => null,
+            'sales_contract_id' => $id
         ];
 
         $builder = $this->db->table('sales_contract_detail')
