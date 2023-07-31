@@ -8,6 +8,8 @@ use Config\Services;
 use App\Models\CustomerModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
+use App\Models\SalesOrderExportModel;
+use App\Models\SalesOrderExportDetailModel;
 use Dompdf\Dompdf;
 
 class SalesKontrak extends BaseController
@@ -18,6 +20,8 @@ class SalesKontrak extends BaseController
     protected $customerModel;
     protected $salesKontrakModel;
     protected $salesKontrakDetailModel;
+    protected $salesOrderExportModel;
+    protected $salesOrderExportDetailModel;
     protected $dompdf;
 
     public function __construct()
@@ -28,11 +32,16 @@ class SalesKontrak extends BaseController
         $this->customerModel = new CustomerModel();
         $this->salesKontrakModel = new SalesKontrakModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
+        $this->salesOrderExportModel = new SalesOrderExportModel();
+        $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->dompdf = new Dompdf();
     }
 
     public function index()
     {
+        // $dataSO = $this->salesKontrakModel->getById(2);
+        // var_dump($dataSO->sales_contract_id);
+        // die;
         return view('SalesInternasional/SalesKontrak/index');
     }
 
@@ -548,6 +557,79 @@ class SalesKontrak extends BaseController
             $condition = [
                 'sales_contract_id' => $id
             ];
+
+            // CHECK SALES ORDER EXPORT DATA
+            $find = $this->salesOrderExportModel->getBySalesContractId($id);
+
+            if(!$find)
+            {
+                // CREATE SALES ORDER EXPORT
+                $dataSO = $this->salesKontrakModel->getById($id);
+                
+                $payloadExport = [
+                    "sales_order_export_no" => "SC/" . $dataSO->sales_contract_no,
+                    "sales_contract_id" => $id,
+                    "company_id" => $this->this_company_id,
+                    "customer_id" => $dataSO->customer_id,
+                    "customer_po_no" => $dataSO->customer_po_no,
+                    "loading_port" => $dataSO->loading_port,
+                    "dicharge_port" => $dataSO->dicharge_port,
+                    "due_date" => $dataSO->due_date,
+                    "total_amount" => $dataSO->total_amount,
+                    "tolerance" => $dataSO->tolerance,
+                    "shipment_date" => $dataSO->shipment_date,
+                    "payment_term" => $dataSO->payment_term,
+                    "documents_required" => $dataSO->documents_required,
+                    "special_instructions" => $dataSO->special_instructions
+                ];
+
+                $responseExport = $this->salesOrderExportModel->insert($payloadExport);
+
+                if(!$responseExport)
+                {
+                    $message =  'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
+
+                $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
+
+                if($dataSODetail)
+                {
+                    foreach($dataSODetail as $detail)
+                    {
+                        $detailPayloadExport = [];
+
+                        $detailPayloadExport = [
+                            'sales_order_export_id' => $responseExport,
+                            'barang_id' =>$detail["barang_id"],
+                            'unit' => $detail["unit"],
+                            'qty' => $detail["qty"],
+                            'remark' => $detail["remark"],
+                            'price' => $detail["price"],
+                            'total_price' => $detail["total_price"]
+                        ];
+
+                        $responseDetailExport = $this->salesOrderExportDetailModel->insert($detailPayloadExport);
+
+                        if(!$responseDetailExport) {
+                            $message =  'Data Gagal Disimpan';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    }
+                }
+            }
 
             $response = $this->salesKontrakModel->where($condition)->set($payload)->update();
 

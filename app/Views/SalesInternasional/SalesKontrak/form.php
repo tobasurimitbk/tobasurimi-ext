@@ -995,7 +995,6 @@
                             const csrf = $(`[name="${csrfToken}"]`);
                             setLoading()
                             let data = new FormData(document.querySelector(".create-form"));
-                            var total = 0;
 
                             let update_list_items = [];
 

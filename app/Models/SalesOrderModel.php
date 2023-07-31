@@ -132,61 +132,6 @@ class SalesOrderModel extends Model
         ];
     }
 
-    public function getAllSalesOrderImport($condition, $addCondition, $limit = 10, $offset = 0)
-    {
-        $availableSort = [
-            'no_sales_order'          => 'sales_order.no_sales_order',
-            'destination'            => 'sales_order.destination',
-            'qty_barang'             => 'sales_order.qty_barang',
-            'total_harga'             => 'sales_order.total_harga',
-            'keterangan'      => 'sales_order.keterangan',
-            'createdAt'         => 'sales_order.createdAt',
-            'updatedAt'         => 'sales_order.updatedAt',
-        ];
-        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'sales_order.updatedAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-
-        $selectQry = "sales_order.*";
-
-        $salesOrderImport = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $salesOrderImport->countAllResults(false);
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
-            $salesOrderImport->groupStart();
-        }
-        if ($addCondition['search']) {
-            $salesOrderImport
-                ->like('no_sales_order', $addCondition['search']);
-        }
-
-        $salesOrderImport->where('tipe_sales_order', 'IMPORT');
-
-        if ($addCondition['dateStart']) {
-            $salesOrderImport->where('purchase_requests.order_date >=',  $addCondition['dateStart']);
-        }
-        if ($addCondition['dateEnd']) {
-            $salesOrderImport->where('purchase_requests.order_date <=', $addCondition['dateEnd']);
-        }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
-            $salesOrderImport->groupEnd();
-        }
-
-        $totalFilteredData = $salesOrderImport->countAllResults(false);
-        $data = $salesOrderImport->findAll($limit, $offset);
-
-        return [
-            'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData
-        ];
-    }
-
     public function getSalesOrderLokalById($id)
     {
         $selectQry = "sales_order.*,users.name as seller_name,customers.name as customer_name ,customers.address,customers.phone";
