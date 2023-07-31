@@ -123,6 +123,7 @@ class SalesKontrakModel extends Model
             ->select($selectQry)
             ->join('customers', 'customers.id = sales_contract.customer_id', 'LEFT')
             ->join('sales_order_export', 'sales_order_export.sales_contract_id = sales_contract.sales_contract_id', 'LEFT')
+            ->where('sales_order_export.deletedAt', NULL)
             ->find($id);
 
         return $salesData;
