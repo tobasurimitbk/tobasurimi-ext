@@ -189,6 +189,9 @@ $routes->post('/spp/update', 'Purchase\SPP::updateSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update-status', 'Purchase\SPP::updateStatusSPP', ['filter' => 'Auth']);
 $routes->post('/spp/approve', 'Purchase\SPP::approveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
+$routes->get('/spp/print-table', 'Purchase\SPP::printTable', ['filter' => 'Auth']);
+$routes->get('/spp/print/(:segment)', 'Purchase\SPP::print/$1', ['filter' => 'Auth']);
+
 
 // BAHAN BAKU PO LOKAL
 $routes->get('/po-lokal-bahan-baku', 'Purchase\POLokalBahanBaku::poLokalBahanBaku', ['filter' => 'Auth']);
