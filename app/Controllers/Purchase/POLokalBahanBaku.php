@@ -440,25 +440,37 @@ class POLokalBahanBaku extends BaseController
                 $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
 
                 $totalPrice = 0;
+                $totalDailyPrice = 0;
                 $totalQty = 0;
-                $totalPph = 0;
                 $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
 
-                $objPph = (object)[
-                    "none" => 0,
-                    "supplier" => 1,
-                    "company" => -1,
+                $objPph = [
+                    "None" => 0,
+                    "Supplier" => 1,
+                    "Company" => -1,
                 ];
+
+                $pphTax *= $objPph[$dataPO->pph];
 
                 foreach ($dataPODetail as $value) {
                     $dataPO->itemName = $value->barangName;
-                    $totalPrice += formatter($value->general_price, "CURR_TO_INT");
+                    $totalPrice += formatter($value->general_price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT");
+                    $totalDailyPrice += formatter($value->daily_price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT");
                     $totalQty += formatter($value->qty, "CURR_TO_INT");
                 }
 
                 $dataPO->totalPrice = number_format($totalPrice);
+                $dataPO->totalDailyPrice = number_format($totalDailyPrice);
                 $dataPO->totalQty = number_format($totalQty);
-                $dataPO->totalQty = number_format($totalPph);
+                $dataPO->totalPph = number_format($totalPrice * $pphTax);
+                $dataPO->totalDailyPph = number_format($totalDailyPrice * $pphTax);
+                $dataPO->totalPaid = number_format($totalPrice + $totalPrice * $pphTax);
+                $dataPO->totalDailyPaid = number_format($totalDailyPrice + $totalDailyPrice * $pphTax);
+                $dataPO->amount = terbilang($totalPrice);
+                $dataPO->amountDaily = terbilang($totalDailyPrice);
+                $dataPO->selisih = formatter($dataPO->cong_batasan, "CURR_TO_INT") - formatter($dataPO->cong_sebenarnya, "CURR_TO_INT");
+                $dataPO->totalTambahan = $dataPO->selisih * $totalQty;
+                $dataPO->pphTambahan = $dataPO->totalTambahan * $pphTax;
 
                 if ($dataPODetail) {
                     $data["dataPO"] = $dataPO;

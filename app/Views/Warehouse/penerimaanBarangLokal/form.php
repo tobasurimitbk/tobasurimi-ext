@@ -1164,10 +1164,10 @@
                 //     }
                 // })
 
-                // if(total_masuk_sementara > doc_qty)
-                // {
-                //     validate_jml_masuk = true;
-                // }
+                if(total_masuk_sementara > qty)
+                {
+                    validate_jml_masuk = true;
+                }
 
                 // if(validate_same)
                 // {
