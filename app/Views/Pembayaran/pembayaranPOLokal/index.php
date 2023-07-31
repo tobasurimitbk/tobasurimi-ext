@@ -6,7 +6,7 @@
 <div class="section-header">
     <h1>Pembayaran PO Lokal</h1>
     <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal/create"); ?>">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Rekap
     </a>
 </div>
 <div class="card">
