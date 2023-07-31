@@ -450,5 +450,33 @@ class Invoice extends BaseController
 
     public function delete()
     {
+        try {
+            $id = $this->request->getPost("id");
+            if (!empty($id)) {
+                $this->SalesOrderInvoiceModel->delete($id);
+                $data = [
+                    "status"            => true,
+                    "message"    => "Data Success Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 }
