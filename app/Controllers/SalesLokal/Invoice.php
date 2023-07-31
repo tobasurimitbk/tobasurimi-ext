@@ -10,6 +10,7 @@ use App\Models\SalesOrderModel;
 use App\Models\SuratJalanModel;
 use App\Models\AllNoMOdel;
 use Config\Services;
+use ErrorException;
 
 class Invoice extends BaseController
 {
@@ -187,14 +188,14 @@ class Invoice extends BaseController
 
 
         ]);
+        if (!$validate) {
+            //$error = validation_errors();
+            //echo json_encode($error);
+            //throw new ErrorException(json_encode($error));
+            //return;
+            return redirect()->to('/invoice-penjualan-lokal/create')->back()->withInput();
+        }
         try {
-            if (!$validate) {
-                //$error = validation_errors();
-                //echo json_encode($error);
-                //throw new ErrorException(json_encode($error));
-                //return;
-                return redirect()->to('/invoice-penjualan-lokal/create')->back()->withInput();
-            }
 
             $code = "LKL/INV";
             $currentYear = date('Y');
@@ -267,18 +268,36 @@ class Invoice extends BaseController
                 $detailBarang[] = $detail;
             }
         }
-        return $detailBarang;
+        $allData = [
+            "detail_barang" => $detailBarang,
+            "detail_so" => $detailSo
+        ];
+        return $allData;
     }
+    public function dropDownSuratJalan($id_customer)
+    {
+        $data = $this->SuratJalanModel
+            ->asObject()
+            ->where(['id_customer' => $id_customer])
+            ->select(['id', 'no_surat_jalan'])
+            ->findAll();
 
+
+
+        return $data;
+    }
 
     public function getById($id = null)
     {
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
-        $customers = $this->CustomerModel->where('company_id', $this->this_company_id)->select(['id', 'name'])->findAll();
+        $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->select(['id', 'name'])->findAll();
         $dataSalesInvoiceOrder->tanggal_faktur = date("d-m-Y", strtotime($dataSalesInvoiceOrder->tanggal_faktur));
         $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
-        $dataSalesInvoiceOrder->detail = $this->dataSuratJalanDetail($dataSalesInvoiceOrder->id_surat_jalan);
+        $detailSoBarang = $this->dataSuratJalanDetail($dataSalesInvoiceOrder->id_surat_jalan);
+        $dataSalesInvoiceOrder->detail = $detailSoBarang['detail_barang'];
+        $dataSo = $detailSoBarang['detail_so'];
+        $dataSuratJalan = $this->dropDownSuratJalan($dataSalesInvoiceOrder->id_customer);
 
         $data = [
             "data" => $dataSalesInvoiceOrder,
@@ -286,18 +305,178 @@ class Invoice extends BaseController
             "id_user" => $dataSalesInvoiceOrder->id_user,
             "seller_name" => $dataSalesInvoiceOrder->seller_name,
             "via" => $tipeShipping,
+            'dataSuratJalan' => $dataSuratJalan,
+            'dataSo' => $dataSo
 
         ];
-        echo json_encode($data);
+        //echo json_encode($data);
 
-        //return view('SalesLokal/Invoice/form', $data);
+        return view('SalesLokal/Invoice/form', $data);
     }
 
     public function update()
     {
+        $payload =  $this->request->getVar();
+        //echo json_encode($payload);
+        //return;
+
+        $validate = $this->validate([
+            "id" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'User tidak boleh kosong',
+                ]
+            ],
+            "id_user" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'User tidak boleh kosong',
+                ]
+            ],
+            "id_customer" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'Customer tidak boleh kosong',
+                ]
+            ],
+            "id_surat_jalan" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'surat jalan tidak boleh kosong',
+                ]
+            ],
+
+            "tipe_invoice" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'tanggal pemesanan ID tidak boleh kosong',
+                ]
+            ],
+            /*
+            "tanggal_faktur" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],*/
+            "no_surat_jalan" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'no surat jalan tidak boleh kosong',
+                ]
+            ],
+            "terms" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'terms tidak boleh kosong',
+                ]
+            ],
+            "total_invoice" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'total harga tidak boleh kosong',
+                ]
+            ],
+            "ppn" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'ppn tidak boleh kosong',
+                ],
+            ],
+            "dpp" => [
+                "rules" => "required",
+                'errors' =>
+                [
+                    'required' => 'dpp tidak boleh kosong',
+                ],
+            ],
+
+
+        ]);
+        try {
+            if (!$validate) {
+                $error = validation_errors();
+                //echo json_encode($error);
+                throw new ErrorException(json_encode($error));
+                //return;
+                // return redirect()->to('/invoice-penjualan-lokal/create')->back()->withInput();
+            }
+
+            $values = [
+                "id_user" => $this->request->getPost('id_user'),
+                "id_customer" => $this->request->getPost('id_customer'),
+                "id_surat_jalan" => $this->request->getPost('id_surat_jalan'),
+                "no_surat_jalan" => $this->request->getPost('no_surat_jalan'),
+                "tanggal_faktur" => $this->request->getPost('tanggal_faktur'),
+                "terms" => $this->request->getPost('terms'),
+                "ship_via_id" => $this->request->getPost('ship_via'),
+                "keterangan" => $this->request->getPost('keterangan'),
+                "dpp" => $this->request->getPost('dpp'),
+                "ppn" => $this->request->getPost('ppn'),
+                "total_invoice" => $this->request->getPost('total_invoice'),
+                "termasuk_pa" => $this->request->getPost('include_pa') ? 'true' : 'false',
+                "status_tax" => $this->request->getPost('tax_status') ? 'true' : 'false',
+                "tipe_invoice" => $this->request->getPost('tipe_invoice'),
+            ];
+
+            $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
+            $data = [
+                "id" => $payload['id'],
+                "status"            => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => $dataSalesOrderInvoice,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                "payload"   => $payload,
+                'token' => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        };
     }
 
     public function delete()
     {
+        try {
+            $id = $this->request->getPost("id");
+            if (!empty($id)) {
+                $this->SalesOrderInvoiceModel->delete($id);
+                $data = [
+                    "status"            => true,
+                    "message"    => "Data Success Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
     }
 }

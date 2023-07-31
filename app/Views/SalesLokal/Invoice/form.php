@@ -45,7 +45,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php
                                     }
                                 }
@@ -70,7 +70,7 @@
                                             <label for="floatingInput">Pajak</label>
                                             <div class="switch-form-pinjaman-karyawan">
                                                 <label class="switch">
-                                                    <input class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->tax_status == 'true' ? 'true' : 'false') : 'false'; ?>">
+                                                    <input class="tax_status" <?= !empty($data) ? ($data->status_tax === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->status_tax == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->status_tax == 'true' ? 'true' : 'false') : 'false'; ?>">
                                                     <span class="slider round"></span>
                                                 </label>
                                             </div>
@@ -81,7 +81,7 @@
                                             <label for="floatingInput">Include pa</label>
                                             <div class="switch-form-pinjaman-karyawan">
                                                 <label class="switch">
-                                                    <input class="include_pa" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : 'disabled=true'; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->include_pa == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->include_pa == 'true' ? 'true' : 'false') : 'false'; ?>">
+                                                    <input class="include_pa" <?= !empty($data) ? ($data->termasuk_pa === true ? 'disabled=true' : '') : 'disabled=true'; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'true' : 'false') : 'false'; ?>">
                                                     <span class="slider round"></span>
                                                 </label>
                                             </div>
@@ -104,7 +104,7 @@
                                 if (!empty($dataSuratJalan)) {
                                     foreach ($dataSuratJalan as $surat) {
                                 ?>
-                                        <option value="<?= $surat->id; ?>" <?= !empty($data) ? ($data->surat_id === $surat->id ? "selected" : "") : ""; ?>><?= $surat->name; ?></option>
+                                        <option value="<?= $surat->id; ?>" <?= !empty($data) ? ($data->id_surat_jalan === $surat->id ? "selected" : "") : ""; ?>><?= $surat->no_surat_jalan; ?></option>
                                 <?php
                                     }
                                 }
@@ -118,10 +118,10 @@
                             <select class="form-select id_so" name="id_so[]" id="id_so[]" disabled="true" multiple>
                                 <option value=""></option>
                                 <?php
-                                if (!empty($dataSO)) {
-                                    foreach ($dataSO as $so) {
+                                if (!empty($dataSo)) {
+                                    foreach ($dataSo as $so) {
                                 ?>
-                                        <option value="<?= $so->id; ?>" <?= !empty($data) ? ($data->so_id === $so->id ? "selected" : "") : ""; ?>><?= $so->name; ?></option>
+                                        <option value="<?= $so['id']; ?>" selected><?= $so['no_so']; ?></option>
                                 <?php
                                     }
                                 }
@@ -135,13 +135,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via_id === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($via)) {
                                     foreach ($via as $payload) {
                                 ?>
-                                        <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via) ? ($payload->id === $data->ship_via->id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
+                                        <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via_id) ? ($payload->id === $data->ship_via_id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
                                 <?php
                                     }
                                 }
@@ -153,7 +153,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea <?= !empty($data) ? ($data->Keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="Keterangan" name="Keterangan" placeholder="Keterangan"><?= !empty($data) ? $data->Keterangan : ""; ?></textarea>
+                            <textarea <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="Keterangan" name="Keterangan" placeholder="Keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -162,9 +162,9 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="hidden" class="form-control dpp" id="dpp" name="dpp" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? $data->dpp : ""; ?>">
-                            <input type="hidden" class="form-control ppn" id="ppn" name="ppn" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? $data->ppn : ""; ?>">
-                            <input type="number" class="form-control total_invoice" id="total_invoice" name="total_invoice" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? $data->total_invoice : ""; ?>">
+                            <input type="hidden" class="form-control dpp" id="dpp" name="dpp" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->dpp)  : ""; ?>">
+                            <input type="hidden" class="form-control ppn" id="ppn" name="ppn" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->ppn) : ""; ?>">
+                            <input type="number" class="form-control total_invoice" id="total_invoice" name="total_invoice" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->total_invoice) : ""; ?>">
                             <label for="floatingInput">Total Invoice</label>
                         </div>
                     </div>
@@ -213,12 +213,18 @@
                                 $total_harga = $total_harga + formatter(str_replace(",", "", $d['amount']), "STR_TO_INT");
                         ?>
                                 <tr>
-                                    <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $no; ?></td>
-                                    <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['nama_barang']; ?></td>
-                                    <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['harga_barang']; ?></td>
-                                    <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['qty']; ?></td>
-                                    <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['amount']; ?></td>
-                                    <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['keterangan']; ?></td>
+                                    <td><?= $no ?></td>
+                                    <td><?= $d['nama_barang'] ?></td>
+                                    <td><?= $d['qty'] ?></td>
+                                    <td><?= $d['kode_satuan'] ?></td>
+                                    <td><?= number_format($d['harga_barang']) ?></td>
+                                    <td><?= $d['discount_percentage'] ?></td>
+                                    <td><?= number_format($d['amount']) ?></td>
+                                    <td><?= $d['dept'] ?></td>
+                                    <td><?= $d['warehouse_name'] ?></td>
+                                    <td><?= $d['keterangan'] ?></td>
+                                    <td><?= $d['no_so'] ?></td>
+                                    <td><?= $d['no_surat_jalan'] ?></td>
                                 </tr>
 
                         <?php
@@ -230,19 +236,19 @@
                         <tr>
                             <td colspan="5"></td>
                             <td><b>DPP</b></td>
-                            <td><b><?= number_format(0); ?></b></td>
+                            <td><b><?= number_format($data->dpp)  ?></b></td>
                             <td colspan="5"></td>
                         </tr>
                         <tr>
                             <td colspan="5"></td>
                             <td><b>PPN</b></td>
-                            <td><b><?= number_format(0); ?></b></td>
+                            <td><b><?= number_format($data->ppn) ?></b></td>
                             <td colspan="5"></td>
                         </tr>
                         <tr>
                             <td colspan="5"></td>
                             <td><b>Total Invoice</b></td>
-                            <td><b><?= number_format(0); ?></b></td>
+                            <td><b><?= number_format($data->total_invoice) ?></b></td>
                             <td colspan="5"></td>
                         </tr>
                     </tfoot>
@@ -783,8 +789,10 @@
                     data.append("total_invoice", totalInvoice)
                     data.append("ppn", ppn)
                     data.append("dpp", dpp)
-                    data.append("tanggal_faktur", tanggalFaktur)
                     data.append("no_surat_jalan", noSuratJalan)
+                    if (!id) {
+                        data.append("tanggal_faktur", tanggalFaktur)
+                    }
 
                     // UPDATE
                     if (id) {
@@ -808,7 +816,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
+                                            window.location.href = "<?= base_url("invoice-penjualan-lokal/id/"); ?>" + res.id;
                                         })
                                 } else {
                                     Swal.fire({
@@ -852,7 +860,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
+                                            window.location.href = "<?= base_url("invoice-penjualan-lokal/id/"); ?>" + res.id;
                                         })
                                 } else {
                                     Swal.fire({
