@@ -68,10 +68,13 @@ class PembayaranPOImport extends BaseController
 
         $poData = $this->checkPO($paymentData->supplier_id, $paymentData->po_id, $paymentData->po_type);
 
+        $poList = $this->getPOList($paymentData->supplier_id, $paymentData->po_type);
+
         $data = [
             'paymentData'   => $paymentData,
             'supplierList'  => $supplierList,
-            'poData'        => $poData
+            'poData'        => $poData,
+            'poList'        => $poList
         ];
 
         return view('Pembayaran/pembayaranPOImport/form', $data);
@@ -79,7 +82,8 @@ class PembayaranPOImport extends BaseController
 
     public function allPembayaranPOImport()
     {
-        // TODO
+        $importPOPaymentModel = new ImportPOPaymentModel();
+        
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
@@ -90,36 +94,43 @@ class PembayaranPOImport extends BaseController
             "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $response = curl_request("GET", "/buktiPembayaran", $this->token, $payload);
         $dataPembayaranPOImport = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $condition = [
+            "suppliers.company_id"  => $this->this_company_id
+        ];
+        $addCondition = [
+            "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType")
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $paymentList = $importPOPaymentModel->getPaymentList($condition, $addCondition, $limit, $offset);
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            foreach ($body as $data) {
-                array_push($dataPembayaranPOImport, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "payment_no" => $data->payment_no,
-                    "multiple_faktur_no" => $data->multiple_faktur_no,
-                    "nominal_faktur" => $data->nominal_faktur,
-                    "payment_date" => $data->payment_date,
-                    "createdBy" => ""
-                ]);
-            }
+        foreach ($paymentList['data'] as $data) {
+            array_push($dataPembayaranPOImport, [
+                "no"                => $no++,
+                "id"                => $data->id,
+                "payment_no"        => $data->payment_no,
+                "supplier_name"     => $data->supplier_name,
+                "currency"          => $data->currency,
+                "amount"            => $data->payment_amt,
+                "payment_date"      => $data->payment_date
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataPembayaranPOImport,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $paymentList['totalData'],
+            "recordsFiltered"   => $paymentList['totalFilteredData'],
+            "data"              => $dataPembayaranPOImport,
+            // "response"          => $response,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -213,6 +224,7 @@ class PembayaranPOImport extends BaseController
             }
 
             $payload = [
+                'company_id'            => $this->this_company_id,
                 'payment_no'            => $this->generatePaymentNo(),
                 'payment_type'          => $this->request->getPost('payment_type'),
                 'po_type'               => $poType,
@@ -411,6 +423,44 @@ class PembayaranPOImport extends BaseController
             $poData = $aMPurchaseOrderModel->asObject()
                 ->where('supplier_id', $supplierId)
                 ->find($POId);
+
+            return $poData;
+        }
+
+        return null;
+    }
+
+    private function getPOList(int $supplierId, string $poType): array
+    {
+        $condition = [
+            'company_id'    => $this->this_company_id,
+            'supplier_id'   => $supplierId,
+            'is_posted'     => 1
+        ];
+
+        if ($poType == 'BAKU') {
+            $rmImportPOModel = new RMImportPOModel();
+            $selectQry = "rm_import_pos.*,
+                      metadata.value AS currency";
+
+            $poData = $rmImportPOModel->asObject()
+                ->select($selectQry)
+                ->join('metadata', 'metadata.id = rm_import_pos.currency')
+                ->where($condition)
+                ->findAll();
+
+            return $poData;
+
+        } else if ($poType == 'PENOLONG') {
+            $aMPurchaseOrderModel = new AMPurchaseOrderModel();
+            $selectQry = "am_purchase_orders.*,
+                      metadata.value AS currency";
+
+            $poData = $aMPurchaseOrderModel->asObject()
+                ->select($selectQry)
+                ->join('metadata', 'metadata.id = am_purchase_orders.currency')
+                ->where($condition)
+                ->findAll();
 
             return $poData;
         }

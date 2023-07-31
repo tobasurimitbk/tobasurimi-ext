@@ -69,8 +69,8 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select " name="import_po" id="import_po">
                             <option disabled selected value=""></option>
-                            <?php foreach ($supplierList ?? [] as $supplier): ?>
-                            <option value="<?= $supplier->id ?>" <?= (!empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->supplier_id == $supplier->id) ? 'selected' : '' ?>><?= $supplier->name ?></option>
+                            <?php foreach ($poList ?? [] as $po): ?>
+                            <option value="<?= $po->id ?>" <?= (!empty($paymentData) && $paymentData->po_id == $po->id) ? 'selected' : '' ?>><?= $po->po_no ?></option>
                             <?php endforeach ?>
                         </select>
                         <label for="floatingInput" style="z-index: 1;">PO Import</label>
@@ -80,7 +80,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control no_bukti_pembayaran" id="currency" value="<?= $paymentData->currency ?>" placeholder="Currency" disabled>
+                                <input type="text" class="form-control no_bukti_pembayaran" id="currency" value="<?= $paymentData->currency ?? '' ?>" placeholder="Currency" disabled>
                                 <label for="floatingInput">Currency</label>
                             </div>
                         </div>
@@ -281,7 +281,7 @@ $(document).ready(function() {
         placeholder: "",
         theme: "bootstrap-5"
     }).change(function(e) {
-        const url = ($('#po_type').val() == 'BAKU') ? '<?= base_url('/po-import-bahan-baku/payment-dropdown/'); ?>' : '<?= base_url('/po-import-bahan-penolong/dropdown/'); ?>';
+        const url = ($('#po_type').val() == 'BAKU') ? '<?= base_url('/po-import-bahan-baku/payment-dropdown/'); ?>' : '<?= base_url('/po-import-bahan-penolong/payment-dropdown/'); ?>';
         const supplierId = $(this).val();
 
         $("#import_po").empty();

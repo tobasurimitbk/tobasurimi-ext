@@ -730,7 +730,6 @@ class POImportBahanBaku extends BaseController
 
         $selectQry = "rm_import_pos.*,
                       metadata.value AS currency";
-        $dataPOImport = $this->rmImportPOModel->getNoPenerimaanBarang($id, $this->this_company_id);
         $dataPOImport = $this->rmImportPOModel->asObject()
             ->select($selectQry)
             ->where($condition)

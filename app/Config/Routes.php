@@ -379,7 +379,7 @@ $routes->get('/po-import-bahan-baku/dropdown', 'Purchase\POImportBahanBaku::drop
 $routes->get('/po-import-bahan-penolong/dropdown', 'Purchase\POImportBahanPenolong::dropdownPOImportBahanPenolong', ['filter' => 'Auth']);
 
 $routes->get('/po-import-bahan-baku/payment-dropdown/(:num)', 'Purchase\POImportBahanBaku::purchaseOrderPaymentDropdown/$1', ['filter' => 'Auth']);
-$routes->get('/po-import-bahan-penolong/dropdown-payment', 'Purchase\POImportBahanPenolong::dropdownPOImportBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/po-import-bahan-penolong/payment-dropdown/(:num)', 'Purchase\POImportBahanPenolong::purchaseOrderPaymentDropdown/$1', ['filter' => 'Auth']);
 
 $routes->get('/po-lokal-bahan-baku/multi/dropdown', 'Purchase\POLokalBahanBaku::dropdownBarangPOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/multi/dropdown', 'Purchase\POLokalBahanPenolong::dropdownBarangPOLokalBahanPenolong', ['filter' => 'Auth']);

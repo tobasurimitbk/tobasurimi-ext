@@ -15,6 +15,7 @@ class ImportPOPaymentModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
+        'company_id',
         'payment_no',
         'supplier_id',
         'po_type',
@@ -52,4 +53,58 @@ class ImportPOPaymentModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getPaymentList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode'              => 'import_po_payments.payment_no',
+            'name'              => 'suppliers.name',
+            'postal_code'       => 'suppliers.postal_code',
+            'createdAt'         => 'import_po_payments.createdAt'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'import_po_payments.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "import_po_payments.*, 
+                      DATE_FORMAT(import_po_payments.payment_date, '%d/%m/%Y') AS payment_date,
+                      metadata.value AS currency,
+                      suppliers.name AS supplier_name";
+        $paymentDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('metadata', 'metadata.id = import_po_payments.currency')
+            ->join('suppliers', 'suppliers.id = import_po_payments.supplier_id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $paymentDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $paymentDataQry->groupStart()
+                ->like('suppliers.name', $addCondition['search'])
+                ->orLike('import_po_payments.payment_no', $addCondition['search'])
+                ->orLike('metadata.value', $addCondition['search'])
+            ->groupEnd();
+        }
+
+        // date filter start
+        if ($addCondition['startDate']) {
+            $paymentDataQry->where('import_po_payments.payment_date >=', $addCondition['startDate']);
+        }
+
+        if ($addCondition['lastDate']) {
+            $paymentDataQry->where('import_po_payments.payment_date <=', $addCondition['lastDate']);
+        }
+        // date filter end
+        
+        $totalFilteredData = $paymentDataQry->countAllResults(false);
+        $data = $paymentDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

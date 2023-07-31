@@ -5688,8 +5688,8 @@ table.dataTable .body-table tr td .btn.btn-success.posting-spp {
   min-width: 120px;
 }
 
-.create-form.form-add-spp .form-floating .full-textarea.form-control {
-  padding-top: 25px;
+form .form-floating textarea {
+  padding-top: 22px !important;
 }
 
 /* ===== RESPONSIVE ===== */

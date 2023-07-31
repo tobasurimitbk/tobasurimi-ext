@@ -736,4 +736,30 @@ class POImportBahanPenolong extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function purchaseOrderPaymentDropdown($id)
+    {
+        $condition = [
+            'company_id'    => $this->this_company_id,
+            'supplier_id'   => $id,
+            'po_type'       => 'Import',
+            'is_posted'     => 1
+        ];
+
+        $selectQry = "am_purchase_orders.*,
+                      metadata.value AS currency";
+        // $dataPOImport = $this->rmImportPOModel->getNoPenerimaanBarang($id, $this->this_company_id);
+        $dataPOImport = $this->amPurchaseOrderModel->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('metadata', 'metadata.id = am_purchase_orders.currency')
+            ->findAll();
+
+        $data = [
+            "data" => $dataPOImport
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }
