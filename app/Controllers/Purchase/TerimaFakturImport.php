@@ -49,7 +49,7 @@ class TerimaFakturImport extends BaseController
             ->findAll();
 
         $data = [
-            "dataSupplier" => $supplierList
+            // "dataSupplier" => $supplierList
         ];
 
         return view('Purchase/terimaFakturImport/form', $data);
@@ -628,12 +628,15 @@ class TerimaFakturImport extends BaseController
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
         $tandaTerimaFakturDetModel = new TandaTerimaFakturDetailModel();
+        $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
 
         $filename = "PO Import Bahan Baku";
 
         $data = [];
         $itemsList = [];
+        $taxList = [];
         $itemTotal = 0;
+        $taxTotal = 0;
         $dataInv = $tandaTerimaFakturModel->asObject()
             ->select("tanda_terima_faktur.*, DATE_FORMAT(tanda_terima_faktur.invoice_date, '%d/%m/%Y') AS invoice_date, suppliers.name AS supplier_name")
             ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id')
@@ -643,20 +646,30 @@ class TerimaFakturImport extends BaseController
             ->where('tanda_terima_faktur_id', $id)
             ->findAll();
 
+        $taxData = $pajakTandaTerimaFakturModel->asObject()
+            ->findAll();
+
         foreach ($dataDet as $det) {
             $itemsList[] = "$det->qty $det->unit $det->item_name";
             $itemTotal += $det->qty * $det->price;
         }
 
-        $total = $itemTotal;
+        foreach ($taxData as $tax) {
+            $taxList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
+            $taxTotal += $tax->tax_amt;
+        }
+
+        $total = $itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan;
 
         $data["data"] = $dataInv;
         $data['invNo'] = $dataInv->faktur_no;
         $data["itemName"] = implode(', ', $itemsList);
+        $data['taxList'] = implode(', ', $taxList);
         $data["itemTotal"] = $itemTotal;
         $data["potongan"] = $dataInv->potongan;
         $data["tambahan"] = $dataInv->tambahan;
         $data['total'] = $total;
+        $data['taxTotal'] = $taxTotal;
         $data['terbilang'] = penyebut($total);
 
         // var_dump($dataPODetail);
