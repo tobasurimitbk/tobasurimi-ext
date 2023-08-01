@@ -2148,13 +2148,13 @@
         })
 
         $(".harga_barang_jasa").keyup(function() {
-            let qty = $(".doc_qty").val() ? Number($(".doc_qty").val()) : 0;
+            let qty = $(".qty").val() ? Number($(".qty").val()) : 0;
             let harga = $(".harga_barang_jasa").val() ? Number($(".harga_barang_jasa").val().replaceAll(",", "")) : 0;
             $(".nilai_penyerahan").val((qty * harga).toLocaleString())
         })
 
         $(".nilai_penyerahan").keyup(function() {
-            let qty = $(".doc_qty").val() ? Number($(".doc_qty").val()) : 0;
+            let qty = $(".qty").val() ? Number($(".qty").val()) : 0;
             let harga = $(".nilai_penyerahan").val() ? Number($(".nilai_penyerahan").val().replaceAll(",", "")) : 0;
             $(".harga_barang_jasa").val(parseInt(harga / qty).toLocaleString())
         })
