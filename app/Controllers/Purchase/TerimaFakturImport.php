@@ -647,6 +647,7 @@ class TerimaFakturImport extends BaseController
             ->findAll();
 
         $taxData = $pajakTandaTerimaFakturModel->asObject()
+            ->where('tanda_terima_faktur_id', $id)
             ->findAll();
 
         foreach ($dataDet as $det) {
