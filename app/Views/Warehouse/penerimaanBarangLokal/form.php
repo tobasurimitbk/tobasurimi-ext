@@ -283,7 +283,7 @@
                             <th>Selisih</th>
                             <th>Konversi</th>
                             <th>Harga</th>
-                            <th>Penyerahan</th>
+                            <th>Total Harga</th>
                             <th>Keterangan</th>
                             <?php if(!empty($dataPenerimaanBarang)){ 
                             if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
@@ -462,8 +462,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control nilai_penyerahan" name="nilai_penyerahan" id="nilai_penyerahan" placeholder="Nilai Penyerahan">
-                                <label for="floatingInput">Nilai Penyerahan</label>
+                                <input onkeyup="formatNumber(this)" type="text" class="form-control nilai_penyerahan" name="nilai_penyerahan" id="nilai_penyerahan" placeholder="Total Harga">
+                                <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
                     </div>
@@ -2218,6 +2218,18 @@
                     confirmButtonColor: '#4e73df',
                 })
             }
+        })
+
+        $(".harga_barang_jasa").keyup(function() {
+            let qty = $(".qty").val() ? Number($(".qty").val()) : 0;
+            let harga = $(".harga_barang_jasa").val() ? Number($(".harga_barang_jasa").val().replaceAll(",", "")) : 0;
+            $(".nilai_penyerahan").val((qty * harga).toLocaleString())
+        })
+
+        $(".nilai_penyerahan").keyup(function() {
+            let qty = $(".qty").val() ? Number($(".qty").val()) : 0;
+            let harga = $(".nilai_penyerahan").val() ? Number($(".nilai_penyerahan").val().replaceAll(",", "")) : 0;
+            $(".harga_barang_jasa").val(parseInt(harga / qty).toLocaleString())
         })
 
         $(".multiple_po_id").change(function() {
