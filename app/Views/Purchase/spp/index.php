@@ -10,7 +10,7 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item" onclick="pdf()">PDF</button></li>
+            <li><button class="dropdown-item" onclick="pdf('<?= base_url("spp/print-table"); ?>')">PDF</button></li>
         </ul>
 
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
@@ -484,8 +484,8 @@
     //     }
     // }
 
-    const pdf = function() {
-        window.open(`<?= getenv('apiURL'); ?>/purchaseRequest/print/all?search=${search}&currentPage=${currentPage}&pageSize=25&sort=${sort}&sortType=${sortType}`, "_blank");
+    const pdf = function(url) {
+        window.open(url, "_blank");
     }
 
     const changeSort = function(val) {

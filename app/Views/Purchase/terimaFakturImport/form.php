@@ -14,7 +14,7 @@
             <button class="btn btn-hapus delete-parent float-right">
                 Hapus
             </button>
-            <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/tandaTerimaFaktur/print/<?= $dataTerimaFaktur->id ?>')">
+            <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("terima-faktur-import/print/{$dataTerimaFaktur->id}")?>')">
                 Print
             </button>
             <?php } ?> 
