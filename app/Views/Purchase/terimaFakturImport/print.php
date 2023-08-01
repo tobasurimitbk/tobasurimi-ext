@@ -55,6 +55,11 @@
             justify-content: space-evenly;
         }
 
+        .pagebreak {
+            clear: both;
+            page-break-after: always;
+        }
+
         .sign-table td {
             border: 1px solid;
         }
@@ -83,133 +88,245 @@
 
 <body style="border: 0px solid;font-size: 11px">
 
-    <table class="w-100">
-        <tr>
-            <td>
+    <div class="pagebreak">
+        <table class="w-100">
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>BUKTI PENGELUARAN</td>
+                            <td>
+                                <div style="margin-bottom: 0.25rem;">
+                                    <div class="box-sm bukti-pengeluaran"></div>
+                                    <div class="bukti-pengeluaran">KAS</div>
+                                </div>
+                                <div>
+                                    <div class="box-sm bukti-pengeluaran"></div>
+                                    <div class="bukti-pengeluaran">BANK</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="bank-table border-collapse" style="float: right;">
+                        <tr>
+                            <th colspan="2">NO</th>
+                            <th>BANK</th>
+                        </tr>
+                        <tr>
+                            <td>CEK</td>
+                            <td style="width: 95px;"></td>
+                            <td style="width: 95px;"></td>
+                        </tr>
+                        <tr>
+                            <td>GIRO</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <div class="d-flex w-100">
+            <div style="display: inline-block;">
                 <table>
                     <tr>
-                        <td>BUKTI PENGELUARAN</td>
-                        <td>
-                            <div style="margin-bottom: 0.25rem;">
-                                <div class="box-sm bukti-pengeluaran"></div>
-                                <div class="bukti-pengeluaran">KAS</div>
-                            </div>
-                            <div>
-                                <div class="box-sm bukti-pengeluaran"></div>
-                                <div class="bukti-pengeluaran">BANK</div>
-                            </div>
-                        </td>
+                        <td>TGL</td>
+                        <td>: <?= $data->invoice_date ?></td>
+                    </tr>
+                    <tr>
+                        <td>DIBAYAR KEPADA</td>
+                        <td>: <?= $data->supplier_name ?></td>
                     </tr>
                 </table>
-            </td>
-            <td>
-                <table class="bank-table border-collapse" style="float: right;">
+            </div>
+            <div style="display: inline-block;vertical-align: top;float: right;">
+                <table>
                     <tr>
-                        <th colspan="2">NO</th>
-                        <th>BANK</th>
-                    </tr>
-                    <tr>
-                        <td>CEK</td>
-                        <td style="width: 95px;"></td>
-                        <td style="width: 95px;">Bank Mandiri</td>
-                    </tr>
-                    <tr>
-                        <td>GIRO</td>
-                        <td></td>
-                        <td></td>
+                        <td>NO BUKTI:</td>
+                        <td><?= $invNo ?></td>
                     </tr>
                 </table>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
 
-    <div class="d-flex w-100">
-        <div style="display: inline-block;">
-            <table>
-                <tr>
-                    <td>TGL</td>
-                    <td>: <?= $data->invoice_date ?></td>
-                </tr>
-                <tr>
-                    <td>DIBAYAR KEPADA</td>
-                    <td>: <?= $data->supplier_name ?></td>
-                </tr>
-            </table>
+        <table class="w-100 bank-table border-collapse">
+            <tr>
+                <th class="txt-left" style="width: 450px;">KETERANGAN</th>
+                <th class="txt-right">JUMLAH</th>
+                <th class="txt-left">NO. PERKIRAAN</th>
+            </tr>
+            <tr>
+                <td><?= $itemName ?></td>
+                <td class="txt-right">RP. <?= $itemTotal ?></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>POTONGAN</td>
+                <td class="txt-right">RP. <?= $potongan ?></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>TAMBAHAN</td>
+                <td class="txt-right">RP. <?= $tambahan ?></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><?= $taxList ?></td>
+                <td class="txt-right">RP. <?= $taxTotal ?></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th class="txt-right">TOTAL</th>
+                <th class="txt-right">RP. <?= $total ?></th>
+                <th></th>
+            </tr>
+        </table>
+
+        <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
+            <span>TERBILANG:</span>
+            <span><?= $terbilang . ' rupiah' ?></span>
         </div>
-        <div style="display: inline-block;vertical-align: top;float: right;">
-            <table>
-                <tr>
-                    <td>NO BUKTI:</td>
-                    <td><?= $invNo ?></td>
-                </tr>
-            </table>
-        </div>
+
+        <table class="w-100 sign-table border-collapse">
+            <tr>
+                <td class="txt-center">DISETUJUI</td>
+                <td class="txt-center">DIKETAHUI</td>
+                <td class="txt-center">DIPERIKSA</td>
+                <td class="txt-center">KASIR</td>
+                <td class="txt-center">DIBUKUKAN</td>
+                <td class="txt-center">DITERIMA OLEH</td>
+            </tr>
+            <tr>
+                <td style="height: 50px;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td class="txt-center">NAMA JELAS & STEMPEL</td>
+            </tr>
+        </table>
     </div>
 
-    <table class="w-100 bank-table border-collapse">
-        <tr>
-            <th class="txt-left" style="width: 450px;">KETERANGAN</th>
-            <th class="txt-right">JUMLAH</th>
-            <th class="txt-left">NO. PERKIRAAN</th>
-        </tr>
-        <tr>
-            <td><?= $itemName ?></td>
-            <td class="txt-right">RP. <?= $itemTotal ?></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>POTONGAN</td>
-            <td class="txt-right">RP. <?= $potongan ?></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>TAMBAHAN</td>
-            <td class="txt-right">RP. <?= $tambahan ?></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>PPN MASUKAN</td>
-            <td class="txt-right">RP. 29.590</td>
-            <td></td>
-        </tr>
-        <tr>
-            <th class="txt-right">TOTAL</th>
-            <th class="txt-right">RP. 298.200</th>
-            <th></th>
-        </tr>
-    </table>
+    <div>
+        <table class="w-100">
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>BUKTI PENERIMAAN</td>
+                            <td>
+                                <div style="margin-bottom: 0.25rem;">
+                                    <div class="box-sm bukti-pengeluaran"></div>
+                                    <div class="bukti-pengeluaran">KAS</div>
+                                </div>
+                                <div>
+                                    <div class="box-sm bukti-pengeluaran"></div>
+                                    <div class="bukti-pengeluaran">BANK</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="bank-table border-collapse" style="float: right;">
+                        <tr>
+                            <th colspan="2">NO</th>
+                            <th>BANK</th>
+                        </tr>
+                        <tr>
+                            <td>CEK</td>
+                            <td style="width: 95px;"></td>
+                            <td style="width: 95px;"></td>
+                        </tr>
+                        <tr>
+                            <td>GIRO</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
 
-    <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
-        <span>TERBILANG:</span>
-        <span><?= $terbilang . ' rupiah' ?></span>
+        <div class="d-flex w-100">
+            <div style="display: inline-block;">
+                <table>
+                    <tr>
+                        <td>TGL</td>
+                        <td>: <?= $data->invoice_date ?></td>
+                    </tr>
+                    <tr>
+                        <td>DIBAYAR KEPADA</td>
+                        <td>: <?= $data->supplier_name ?></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="display: inline-block;vertical-align: top;float: right;">
+                <table>
+                    <tr>
+                        <td>NO BUKTI:</td>
+                        <td><?= $invNo ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <table class="w-100 bank-table border-collapse">
+            <tr>
+                <th class="txt-left" style="width: 450px;">KETERANGAN</th>
+                <th class="txt-right">JUMLAH</th>
+                <th class="txt-left">NO. PERKIRAAN</th>
+            </tr>
+            <tr>
+                <th class="txt-right">TOTAL</th>
+                <th class="txt-right">RP. <?= $total ?></th>
+                <th></th>
+            </tr>
+        </table>
+
+        <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
+            <span>TERBILANG:</span>
+            <span><?= $terbilang . ' rupiah' ?></span>
+        </div>
+
+        <table class="w-100 sign-table border-collapse">
+            <tr>
+                <td class="txt-center">DISETUJUI</td>
+                <td class="txt-center">DIKETAHUI</td>
+                <td class="txt-center">DIPERIKSA</td>
+                <td class="txt-center">KASIR</td>
+                <td class="txt-center">DIBUKUKAN</td>
+                <td class="txt-center">DITERIMA OLEH</td>
+            </tr>
+            <tr>
+                <td style="height: 50px;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td>TGL</td>
+                <td class="txt-center">NAMA JELAS & STEMPEL</td>
+            </tr>
+        </table>
     </div>
-
-    <table class="w-100 sign-table border-collapse">
-        <tr>
-            <td class="txt-center">DISETUJUI</td>
-            <td class="txt-center">DIKETAHUI</td>
-            <td class="txt-center">DIPERIKSA</td>
-            <td class="txt-center">KASIR</td>
-            <td class="txt-center">DIBUKUKAN</td>
-            <td class="txt-center">DITERIMA OLEH</td>
-        </tr>
-        <tr>
-            <td style="height: 50px;"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>TGL</td>
-            <td>TGL</td>
-            <td>TGL</td>
-            <td>TGL</td>
-            <td>TGL</td>
-            <td class="txt-center">NAMA JELAS & STEMPEL</td>
-        </tr>
-    </table>
 
 </body>
 

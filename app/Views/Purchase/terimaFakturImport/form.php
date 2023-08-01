@@ -966,7 +966,7 @@ $(document).ready(function() {
             } */
             // console.log(table.settings())
             // table.settings.ordering = true;
-            table.ajax.url(`<?= base_url("penerimaan-barang-import/receivedItemsBySupplier/"); ?>${$(this).val()}`);
+            table.ajax.url(`<?= base_url("penerimaan-barang-lokal/receivedItemsBySupplier/"); ?>${$(this).val()}`);
             table.ajax.reload();
         }
         else
@@ -1112,7 +1112,7 @@ const changeTipeBahan = function()
     if($(".tipe_bahan").val() === "BAKU")
     {
         $.ajax({
-            url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
+            url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
             method: "GET",
             dataType: "json",
             success: function(res) {
@@ -1131,7 +1131,7 @@ const changeTipeBahan = function()
     if($(".tipe_bahan").val() === "PENOLONG")
     {
         $.ajax({
-            url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
+            url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
             method: "GET",
             dataType: "json",
             success: function(res) {
