@@ -144,6 +144,14 @@ $routes->post('/shift/save', 'Master\Shift::save', ['filter' => 'Auth']);
 $routes->post('/shift/update', 'Master\Shift::update', ['filter' => 'Auth']);
 // $routes->post('/shift/delete', 'Master\Shift::delete', ['filter' => 'Auth']);
 
+// KURS
+$routes->get('/kurs', 'Master\Kurs::index', ['filter' => 'Auth']);
+$routes->get('/kurs/all', 'Master\Kurs::all', ['filter' => 'Auth']);
+$routes->get('/kurs/id/(:segment)', 'Master\Kurs::getById/$1', ['filter' => 'Auth']);
+$routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
+$routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
+$routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
+
 // SUPPLIER
 // BAHAN BAKU LOKAL
 $routes->get('/supplier-bahan-baku', 'Supplier\SupplierBahanBaku::supplierBahanBaku', ['filter' => 'Auth']);
@@ -189,6 +197,9 @@ $routes->post('/spp/update', 'Purchase\SPP::updateSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update-status', 'Purchase\SPP::updateStatusSPP', ['filter' => 'Auth']);
 $routes->post('/spp/approve', 'Purchase\SPP::approveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
+$routes->get('/spp/print-table', 'Purchase\SPP::printTable', ['filter' => 'Auth']);
+$routes->get('/spp/print/(:segment)', 'Purchase\SPP::print/$1', ['filter' => 'Auth']);
+
 
 // BAHAN BAKU PO LOKAL
 $routes->get('/po-lokal-bahan-baku', 'Purchase\POLokalBahanBaku::poLokalBahanBaku', ['filter' => 'Auth']);
