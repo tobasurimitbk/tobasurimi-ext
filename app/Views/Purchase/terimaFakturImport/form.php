@@ -96,6 +96,7 @@
                     </div>
                 </div>
             </div>
+            <?php if ($isUpdate ?? false): ?>
             <div class="row">
                 <div class="col-md-12">
                     Daftar Penerimaan Barang
@@ -276,7 +277,7 @@
                     </div>
                 </div>
             </div>
-            
+            <?php endif; ?>
         </form>
     </div>
 </div>

@@ -113,7 +113,8 @@ class TerimaFakturImport extends BaseController
             "dataTerimaFaktur"  => $data,
             "dataSupplier"      => $supplierList,
             "selectedItems"     => $detData,
-            "taxData"           => $taxData
+            "taxData"           => $taxData,
+            "isUpdate"          => true
         ];
 
         return view('Purchase/terimaFakturImport/form', $data);
