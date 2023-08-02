@@ -44,7 +44,6 @@
             border-color: #000;
             border-width: 0;
             border-top-width: 1px;
-
         }
 
         .hr-black {
@@ -193,8 +192,9 @@
             </tbody>
             <thead>
                 <tr>
-                    <td colspan="5">TOTAL</td>
-                    <td><?= $dataSPP->totalPrice ?></td>
+                    <!-- <td colspan="5">TOTAL</td> -->
+                    <td colspan="6">TOTAL</td>
+                    <!-- <td><?= $dataSPP->totalPrice ?></td> -->
                     <td><?= $dataSPP->totalQty ?></td>
                     <td><?= $dataSPP->totalAll ?></td>
                     <td></td>

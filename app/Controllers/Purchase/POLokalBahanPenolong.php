@@ -10,6 +10,7 @@ use App\Models\SupplierModel;
 use App\Models\SppModel;
 use App\Models\MetadataModel;
 use App\Models\WarehousesModel;
+use Dompdf\Dompdf;
 
 class POLokalBahanPenolong extends BaseController
 {
@@ -17,6 +18,7 @@ class POLokalBahanPenolong extends BaseController
     protected $this_company_id;
     protected $AMPurchaseOrderModel;
     protected $AMPurchaseOrderDetailModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class POLokalBahanPenolong extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->AMPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function poLokalBahanPenolong()
@@ -542,5 +545,66 @@ class POLokalBahanPenolong extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function print($id = null)
+    {
+        if ($id) {
+            $filename = "PO Lokal Bahan Penolong";
+
+            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
+            $AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+
+
+            if (!empty($id)) {
+                $dataBPLokal = $AMPurchaseOrderModel->getPOById($id);
+                $dataBPLokalDetail = $AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+                foreach (array_keys($dataBPLokalDetail) as $key) {
+                    $dataBPLokalDetail[$key] = (object)$dataBPLokalDetail[$key];
+                }
+
+                $no = 0;
+                $totalPrice = 0;
+                $totalDisc = 0;
+                $totalPpn = 0;
+
+                foreach ($dataBPLokalDetail as $value) {
+                    $no++;
+                    $value->no = $no;
+                    $totalan = formatter($value->price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT") +  formatter($value->additional_cost, "CURR_TO_INT");
+                    $value->nilaiPpn = number_format($totalan * (float)$value->ppnValue / 100);
+                    $value->nilaiPph = number_format($totalan * (float)$value->pphValue / 100);
+                    $totalPrice += $totalan;
+                    $totalDisc += $totalan * (float)$value->disc / 100;
+                    $totalPpn += $totalan * (float)$value->ppnValue / 100;
+                }
+
+                $dataBPLokal->totalPrice = number_format($totalPrice);
+                $dataBPLokal->totalDisc = number_format($totalDisc);
+                $dataBPLokal->totalPpn = number_format($totalPpn);
+                $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
+
+                $data["dataPOLokal"] = $dataBPLokal;
+                $data["dataPOLokal"]->am_purchase_order_details = $dataBPLokalDetail;
+            }
+
+            // dd($data);
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Purchase/poLokalBahanPenolong/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'landscape');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
     }
 }
