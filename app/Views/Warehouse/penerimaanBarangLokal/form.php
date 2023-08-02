@@ -281,7 +281,7 @@
                             <th>Jml. Masuk</th>
                             <th>Selisih</th>
                             <th>Harga</th>
-                            <th>Total Harga</th>
+                            <th>Sub Total</th>
                             <th>Keterangan</th>
                             <?php if(!empty($dataPenerimaanBarang)){ 
                             if($dataPenerimaanBarang->status_post === "WAITING"){ ?> 
@@ -349,7 +349,7 @@
                     <tfoot class="foot-detail-table" id="foot-detail-table">
                         <tr>
                             <td></td>
-                            <td>TOTAL</td>
+                            <td>GRAND TOTAL</td>
                             <td colspan="2"></td>
                             <td><b><?= $total_jml_order; ?></b></td>
                             <td><b><?= $total_jml_masuk; ?></b></td>
@@ -1321,7 +1321,7 @@
                                             tag_total += `<td>`;
                                             tag_total += "</td>";
                                             tag_total += `<td>`;
-                                            tag_total += `TOTAL`;
+                                            tag_total += `GRAND TOTAL`;
                                             tag_total += "</td>";
                                             tag_total += `<td colspan='2'>`;
                                             tag_total += "</td>";
@@ -1444,7 +1444,7 @@
                                             tag_total += `<td>`;
                                             tag_total += "</td>";
                                             tag_total += `<td>`;
-                                            tag_total += `TOTAL`;
+                                            tag_total += `GRAND TOTAL`;
                                             tag_total += "</td>";
                                             tag_total += `<td colspan='2'>`;
                                             tag_total += "</td>";
@@ -2157,7 +2157,7 @@
             tag_total += `<td>`;
             tag_total += "</td>";
             tag_total += `<td>`;
-            tag_total += `TOTAL`;
+            tag_total += `GRAND TOTAL`;
             tag_total += "</td>";
             tag_total += `<td colspan='2'>`;
             tag_total += "</td>";
@@ -2313,7 +2313,7 @@
             tag_total += `<td>`;
             tag_total += "</td>";
             tag_total += `<td>`;
-            tag_total += `TOTAL`;
+            tag_total += `GRAND TOTAL`;
             tag_total += "</td>";
             tag_total += `<td colspan='2'>`;
             tag_total += "</td>";
@@ -2535,7 +2535,7 @@
                 tag_total += `<td>`;
                 tag_total += "</td>";
                 tag_total += `<td>`;
-                tag_total += `TOTAL`;
+                tag_total += `GRAND TOTAL`;
                 tag_total += "</td>";
                 tag_total += `<td colspan='2'>`;
                 tag_total += "</td>";
@@ -2892,7 +2892,7 @@
                 tag_total += `<td>`;
                 tag_total += "</td>";
                 tag_total += `<td>`;
-                tag_total += `TOTAL`;
+                tag_total += `GRAND TOTAL`;
                 tag_total += "</td>";
                 tag_total += `<td colspan='2'>`;
                 tag_total += "</td>";
@@ -2944,7 +2944,7 @@
         tag_total += `<td>`;
         tag_total += "</td>";
         tag_total += `<td>`;
-        tag_total += `TOTAL`;
+        tag_total += `GRAND TOTAL`;
         tag_total += "</td>";
         tag_total += `<td colspan='2'>`;
         tag_total += "</td>";
