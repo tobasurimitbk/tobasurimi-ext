@@ -5692,9 +5692,9 @@ form .form-floating textarea {
   padding-top: 22px !important;
 }
 
-.btn.btn-submit-form.btn-generate {
-  background: #007ae0;
-  color: #ffffff;
+.btn.btn-generate {
+  background: #007ae0 !important;
+  color: #ffffff !important;
   font-size: 13px;
   font-weight: 500;
   border-radius: 4px;
@@ -5703,13 +5703,14 @@ form .form-floating textarea {
   margin: 0px;
   min-width: 100px;
   height: 50px;
+  box-shadow: none !important;
 }
 
-.btn.btn-submit-form.btn-generate:hover,
-.btn.btn-submit-form.btn-generate:focus,
-.btn.btn-submit-form.btn-generate:active {
-  background: #007ae0;
-  color: #ffffff;
+.btn.btn-generate:hover,
+.btn.btn-generate:focus,
+.btn.btn-generate:active {
+  background: #007ae0 !important;
+  color: #ffffff !important;
   font-size: 13px;
   font-weight: 500;
   border-radius: 4px;
@@ -5718,6 +5719,7 @@ form .form-floating textarea {
   margin: 0px;
   min-width: 100px;
   height: 50px;
+  box-shadow: none !important;
   opacity: 0.72;
   transition: 0.3s ease-in;
 }

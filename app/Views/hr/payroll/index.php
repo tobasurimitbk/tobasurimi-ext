@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="col">
-                    <button class="btn btn-submit-form btn-generate">
+                    <button class="btn btn-primary btn-generate">
                         Generate
                     </button>
                 </div>
