@@ -10,7 +10,7 @@
             Batal
         </a>
         <?php if(!empty($dataTerimaFaktur)){ ?> 
-            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
+            <?php if($statusUpdate){ ?> 
             <button class="btn btn-hapus delete-parent float-right">
                 Hapus
             </button>
@@ -19,7 +19,7 @@
             </button>
             <?php } ?> 
 
-            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
+            <?php if(!$statusUpdate){ ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
@@ -33,9 +33,6 @@
             <?php } else { ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
-                Simpan dan Cetak
             </button>
             <?php } ?> 
     </div>
@@ -96,6 +93,15 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= $dataTerimaFaktur->nominal_faktur ?? ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" onkeyup="formatNumber(this)" placeholder="Nominal Faktur">
+                        <label for="floatingInput">Nominal Faktur</label>
+                    </div>
+                </div>
+            </div>
+
             <?php if ($isUpdate ?? false): ?>
             <div class="row">
                 <div class="col-md-12">
@@ -165,13 +171,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" placeholder="Keterangan">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Potongan</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" placeholder="Keterangan">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Tambahan</label>
                     </div>
                 </div>
@@ -291,7 +297,7 @@
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
-        deferLoading: true,
+        <?= ($statusUpdate ?? true) ? 'deferLoading: true,' : '' ?>
         ordering: false,
         order: [
             [1, 'asc']
@@ -304,7 +310,7 @@
         ],
         pageLength: 10,
         ajax: {
-            url: "/",
+            url: `<?= base_url("penerimaan-barang-lokal/receivedItemsBySupplier/"); ?>${$(".supplier_id").val()}`,
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -665,7 +671,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>/ ${id}`;
+                                        window.location.href = `<?= base_url("terima-faktur-import/"); ?>${id}`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -1093,7 +1099,11 @@ $(document).ready(function() {
         const potongan = $('#potongan').val() || 0;
         const tambahan = $('#tambahan').val() || 0;
 
-        const total = +invAmt + +tambahan - +potongan;
+        const invAmtNumber = invAmt.replace(/\D/g, '');
+        const potonganNumber = potongan.replace(/\D/g, '');
+        const tambahanNumber = tambahan.replace(/\D/g, '');
+
+        const total = +invAmtNumber + +potonganNumber - +tambahanNumber;
         $('#InvFinalAmt').val(total);
     }
 

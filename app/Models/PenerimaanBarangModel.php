@@ -20,6 +20,7 @@ class PenerimaanBarangModel extends Model
         'id',
         'company_id',
         'supplier_id',
+        'warehouse_id',
         'no_penerimaan_barang',
         'acceptance_type',
         'multiple_po_id',
@@ -74,9 +75,10 @@ class PenerimaanBarangModel extends Model
     {
         $availableSort = [
             'no_penerimaan_barang'      => 'penerimaan_barang.no_penerimaan_barang',
+            'warehouse_name'            => 'warehouses.warehouse_name',
             'tipe_bahan'                => 'penerimaan_barang.tipe_bahan',
             'validation_date'           => 'penerimaan_barang.validation_date',
-            'supplier_name'               => 'suppliers.name',
+            'supplier_name'             => 'suppliers.name',
             'createdAt'                 => 'penerimaan_barang.createdAt',
             'updatedAt'                 => 'penerimaan_barang.updatedAt',
         ];
@@ -85,11 +87,12 @@ class PenerimaanBarangModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "penerimaan_barang.*, metadata.value as aju_type, suppliers.name as supplier_name, COUNT(penerimaan_barang_detail.id) AS itemCount";
+        $selectQry = "penerimaan_barang.*, warehouses.warehouse_name, metadata.value as aju_type, suppliers.name as supplier_name, COUNT(penerimaan_barang_detail.id) AS itemCount";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
             ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type')
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
