@@ -18,11 +18,9 @@ class PenerimaanBarangDetailModel extends Model
         'id',
         'purchase_order_details_id',
         'penerimaan_barang_id',
-        'doc_qty',
         'selisih',
-        'konversi',
         'harga',
-        'penyerahan',
+        'sub_total',
         'keterangan',
         'barang_id',
         'warehouse',
@@ -83,14 +81,16 @@ class PenerimaanBarangDetailModel extends Model
                 penerimaan_barang_detail.pph as id_pph,
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
-                rm_purchase_order_details.spec'
+                rm_purchase_order_details.spec,
+                rm_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
-                ->join('rm_purchase_order_details', 'rm_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT');
+                ->join('rm_purchase_order_details', 'rm_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT')
+                ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'LEFT');
                 $query = $builder->get();
             }
             if($tipe_bahan === "PENOLONG")
@@ -103,14 +103,16 @@ class PenerimaanBarangDetailModel extends Model
                 penerimaan_barang_detail.pph as id_pph,
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
-                am_purchase_order_details.spec'
+                am_purchase_order_details.spec,
+                am_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
-                ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT');
+                ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT')
+                ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'LEFT');
                 $query = $builder->get();
             }
         }
@@ -127,14 +129,16 @@ class PenerimaanBarangDetailModel extends Model
                 penerimaan_barang_detail.pph as id_pph,
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
-                rm_import_po_details.spec'
+                rm_import_po_details.spec,
+                rm_import_pos.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
-                ->join('rm_import_po_details', 'rm_import_po_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT');
+                ->join('rm_import_po_details', 'rm_import_po_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT')
+                ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'LEFT');
                 $query = $builder->get();
             }
             if($tipe_bahan === "PENOLONG")
@@ -147,14 +151,16 @@ class PenerimaanBarangDetailModel extends Model
                 penerimaan_barang_detail.pph as id_pph,
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
-                am_purchase_order_details.spec'
+                am_purchase_order_details.spec,
+                am_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
-                ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT');
+                ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT')
+                ->join('am_purchase_orders', 'am_purchase_orders.id = am_ourchase_order_details.am_purchase_order_id', 'LEFT');
                 $query = $builder->get();
             }
         }

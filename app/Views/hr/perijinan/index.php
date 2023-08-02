@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col mb-3">
                     <input class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>

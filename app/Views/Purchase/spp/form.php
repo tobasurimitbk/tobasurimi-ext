@@ -60,7 +60,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? $dataSPP->request_date : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? ($dataSPP->request_date ? date("d/m/Y", strtotime($dataSPP->request_date)) : "") : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
                                     <label for="floatingInput">Tanggal Order</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">

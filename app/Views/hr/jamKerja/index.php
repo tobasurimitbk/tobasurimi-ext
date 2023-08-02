@@ -12,10 +12,10 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp mb-3">
+            <div class="row justify-content-end row-col-spp">
                 <?= csrf_field() ?>
                 <div class="col-3">
-                    <div class="form-floating" style="height: 50px;">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select divisi" name="divisi" id="divisi" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?>>
                             <option value=""></option>
                             <?php
@@ -34,7 +34,7 @@
 
 
                 <div class="col-3">
-                    <div class="form-floating" style="height: 50px;">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select shift" name="shift" id="shift" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?>>
                             <option value=""></option>
                             <?php
@@ -52,12 +52,12 @@
                 </div>
 
                 <div class="col-3">
-                    <button type="button" class="btn btn-discard delete-btn">Simpan</button>
+                    <button type="button" class="btn btn-primary btn-generate mb-3">Simpan</button>
                 </div>
 
 
                 <div class="col-md-3">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input class="form-control search form-out-search fos-jk mb-3" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">
