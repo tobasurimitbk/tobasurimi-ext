@@ -160,7 +160,7 @@ class PenerimaanBarangDetailModel extends Model
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
                 ->join('am_purchase_order_details', 'am_purchase_order_details.id = penerimaan_barang_detail.purchase_order_details_id', 'LEFT')
-                ->join('am_purchase_orders', 'am_purchase_orders.id = am_ourchase_order_details.am_purchase_order_id', 'LEFT');
+                ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'LEFT');
                 $query = $builder->get();
             }
         }
