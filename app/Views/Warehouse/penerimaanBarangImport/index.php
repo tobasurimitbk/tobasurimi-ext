@@ -31,8 +31,8 @@
             </div>
             <div class="col">
                 <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                    <option value="waiting">Waiting</option>
-                    <option value="finish">Finish</option>
+                    <option value="waiting">New</option>
+                    <option value="finish">Done</option>
                 </select>
             </div>
             <div class="col">
@@ -45,14 +45,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>
+                            <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
                             <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
-                            <th onclick="changeSort('no_po')" class="sort">No. PO</th>
-                            <th onclick="changeSort('acceptance_type')" class="sort">Single/Multiple</th>
-                            <th onclick="changeSort('aju_type')" class="sort">Jenis Dokumen</th>
-                            <th onclick="changeSort('aju_no')" class="sort">No. AJU</th>
                             <th onclick="changeSort('validation_date')" class="sort">Tanggal Daftar</th>
-                            <th onclick="changeSort('sender_name')" class="sort">Pengirim</th>
-                            <th>Status</th>
+                            <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
+                            <th>Jumlah Item</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -67,7 +65,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "no_penerimaan_barang";
+    let sort = "tipe_bahan";
     let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
@@ -109,23 +107,11 @@
             orderable: false
         },
         {
+            data: "tipe_bahan",
+            className: "text-center"
+        },
+        {
             data: "no_penerimaan_barang",
-            className: "text-center"
-        },
-        {
-            data: "multiple_po_no",
-            className: "text-center"
-        },
-        {
-            data: "acceptance_type",
-            className: "text-center"
-        },
-        {
-            data: "aju_type",
-            className: "text-center"
-        },
-        {
-            data: "aju_no",
             className: "text-center"
         },
         {
@@ -133,31 +119,29 @@
             className: "text-center"
         },
         {
-            data: "sender_name",
+            data: "supplier_name",
             className: "text-center"
         },
         {
-            data: "status_post",
+            data: "itemCount",
             className: "text-center",
+            searchable: false,
+            sortable: false
+        },
+        {
+            data: "id",
+            className: "text-center actions",
             searchable: false,
             sortable: false,
             render: function(data, type, row) {
-                if(data === "WAITING")
-                {
-                    return `
-                    <label class="label-waiting">
-                    ${data}
-                    </label>
-                    `
-                }
-                if(data === "FINISH")
-                {
-                    return `
-                    <label class="label-finish">
-                    ${data}
-                    </label>
-                    `
-                }
+                let id = row?.id;
+                return `
+                    <div class="mt-0">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')">
+                        <i class="fa fa-print fa-sm mr-2" aria-hidden="true"></i>Print
+                    </button>
+                    </div>
+                `
             }
         }],
         columnDefs: [{
@@ -211,6 +195,11 @@
             location.replace(`<?= base_url("penerimaan-barang-import/id"); ?>/${data.id}`);
         })
     })
+
+    const print = function(url) 
+    {
+        window.open(url, "_blank");
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {
