@@ -5724,23 +5724,16 @@ form .form-floating textarea {
   transition: 0.3s ease-in;
 }
 
-/* .form-floating > .form-control:not(:placeholder-shown) ~ label {
-  padding: 2px 0px 0px 10px !important;
-  height: 20px;
-  background: #fff;
-  margin-top: 1px;
-  margin-left: 2px;
-  opacity: 1 !important;
-  transform: scale(0.97) translateY(0rem) translateX(0rem);
-  color: #dddddd;
-} */
-
 .select2.select2-container--default
   .selection
   .select2-selection.select2-selection--single
   .select2-selection__rendered {
   padding-top: 15px;
   padding-left: 12px;
+}
+
+.form-control.search.form-out-search.fos-jk {
+  height: 50px;
 }
 
 /* ===== RESPONSIVE ===== */
