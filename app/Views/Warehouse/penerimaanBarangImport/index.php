@@ -47,6 +47,7 @@
                             <th>No.</th>
                             <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
                             <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
+                            <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                             <th onclick="changeSort('validation_date')" class="sort">Tanggal Daftar</th>
                             <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                             <th>Jumlah Item</th>
@@ -112,6 +113,10 @@
         },
         {
             data: "no_penerimaan_barang",
+            className: "text-center"
+        },
+        {
+            data: "warehouse_name",
             className: "text-center"
         },
         {

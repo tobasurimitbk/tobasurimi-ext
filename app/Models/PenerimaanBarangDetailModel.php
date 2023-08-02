@@ -23,7 +23,6 @@ class PenerimaanBarangDetailModel extends Model
         'sub_total',
         'keterangan',
         'barang_id',
-        'warehouse',
         'qty',
         'ppn', 
         'pph',

@@ -186,6 +186,7 @@ class PenerimaanBarangLokal extends BaseController
                 "id"                    => $data->id,
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
                 "tipe_bahan"            => $data->tipe_bahan,
+                "warehouse_name"        => $data->warehouse_name,
                 "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount
