@@ -93,6 +93,15 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= $dataTerimaFaktur->nominal_faktur ?? ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" onkeyup="formatNumber(this)" placeholder="Nominal Faktur">
+                        <label for="floatingInput">Nominal Faktur</label>
+                    </div>
+                </div>
+            </div>
+
             <?php if ($isUpdate ?? false): ?>
             <div class="row">
                 <div class="col-md-12">
@@ -162,13 +171,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" placeholder="Keterangan">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Potongan</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" placeholder="Keterangan">
+                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Tambahan</label>
                     </div>
                 </div>
@@ -1090,7 +1099,11 @@ $(document).ready(function() {
         const potongan = $('#potongan').val() || 0;
         const tambahan = $('#tambahan').val() || 0;
 
-        const total = +invAmt + +tambahan - +potongan;
+        const invAmtNumber = invAmt.replace(/\D/g, '');
+        const potonganNumber = potongan.replace(/\D/g, '');
+        const tambahanNumber = tambahan.replace(/\D/g, '');
+
+        const total = +invAmtNumber + +potonganNumber - +tambahanNumber;
         $('#InvFinalAmt').val(total);
     }
 

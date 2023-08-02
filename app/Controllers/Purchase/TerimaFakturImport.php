@@ -207,6 +207,9 @@ class TerimaFakturImport extends BaseController
                 "tipe_bahan" => [
                     "rules" => "required|in_list[BAKU,PENOLONG]"
                 ],
+                "nominal_faktur" => [
+                    "rules" => "required|numeric|greater_than[0]"
+                ],
                 "supplier_id" => [
                     "rules" => "required"
                 ],
@@ -232,6 +235,7 @@ class TerimaFakturImport extends BaseController
             // save here
             $tandaTerimaFakturModel->db->transException(true)->transStart();
             $tandaTerimaData = [
+                'nominal_faktur'    => $postData['nominal_faktur'],
                 'supplier_id'       => $postData['supplier_id'],
                 'faktur_no'         => $fakturNo,
                 'faktur_type'       => 'LOKAL',
@@ -663,7 +667,7 @@ class TerimaFakturImport extends BaseController
                 // 'tipe_bahan'        => $postData['tipe_bahan'],
                 'status_update'     => 1
             ];
-            $tandaTerimaData['nominal_faktur'] = $invAmt + $tandaTerimaData['tambahan'] - $tandaTerimaData['potongan'];
+            // $tandaTerimaData['nominal_faktur'] = $invAmt + $tandaTerimaData['tambahan'] - $tandaTerimaData['potongan'];
             $tandaTerimaFakturModel->update($id, $tandaTerimaData);
 
             // delete all detail and insert the new one
