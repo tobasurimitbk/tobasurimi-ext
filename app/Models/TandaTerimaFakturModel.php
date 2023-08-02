@@ -26,6 +26,7 @@ class TandaTerimaFakturModel extends Model
         'information',
         'tipe_bahan',
         'user_id',
+        'status_update'
     ];
 
     // Dates

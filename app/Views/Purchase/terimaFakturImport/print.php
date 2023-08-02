@@ -288,16 +288,23 @@
                 <th class="txt-right">JUMLAH</th>
                 <th class="txt-left">NO. PERKIRAAN</th>
             </tr>
+            <?php if (!empty($taxReturnList)): ?>
+            <tr>
+                <td><?= $taxReturnList ?></td>
+                <td class="txt-right"><?= $taxReturnTotal ?></td>
+                <td></td>
+            </tr>
+            <?php endif; ?>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right">RP. <?= $total ?></th>
+                <th class="txt-right">RP. <?= $taxReturnTotal ?></th>
                 <th></th>
             </tr>
         </table>
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span><?= $terbilang . ' rupiah' ?></span>
+            <span><?= $taxReturnTerbilang . ' rupiah' ?></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">

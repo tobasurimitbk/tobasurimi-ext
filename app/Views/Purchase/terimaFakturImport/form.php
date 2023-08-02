@@ -10,7 +10,7 @@
             Batal
         </a>
         <?php if(!empty($dataTerimaFaktur)){ ?> 
-            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
+            <?php if($statusUpdate){ ?> 
             <button class="btn btn-hapus delete-parent float-right">
                 Hapus
             </button>
@@ -19,7 +19,7 @@
             </button>
             <?php } ?> 
 
-            <?php if($dataTerimaFaktur->status_update !== 2){ ?> 
+            <?php if(!$statusUpdate){ ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
             </button>
@@ -33,9 +33,6 @@
             <?php } else { ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-form">
                 Simpan
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-cetak bsc">
-                Simpan dan Cetak
             </button>
             <?php } ?> 
     </div>
@@ -291,7 +288,7 @@
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
-        deferLoading: true,
+        <?= ($statusUpdate ?? true) ? 'deferLoading: true,' : '' ?>
         ordering: false,
         order: [
             [1, 'asc']
@@ -304,7 +301,7 @@
         ],
         pageLength: 10,
         ajax: {
-            url: "/",
+            url: `<?= base_url("penerimaan-barang-lokal/receivedItemsBySupplier/"); ?>${$(".supplier_id").val()}`,
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -665,7 +662,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>/ ${id}`;
+                                        window.location.href = `<?= base_url("terima-faktur-import/"); ?>${id}`;
                                     })
                                 } else {
                                     Swal.fire({
