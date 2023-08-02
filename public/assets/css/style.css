@@ -4578,6 +4578,13 @@ footer.main-footer .footer-right a {
   color: #2f4858 !important;
 }
 
+.ff-supplier
+  .select2-container
+  .select2-selection--single
+  .select2-selection__rendered {
+  padding-left: 0px !important;
+}
+
 .select2-container--bootstrap-5
   .select2-dropdown
   .select2-results__options
@@ -5669,6 +5676,7 @@ table.dataTable td .label-finish {
   padding: 25px 12px;
 }
 
+<<<<<<< HEAD
 table.dataTable .body-table tr td .btn.btn-success.posting-spp {
   box-shadow: none;
   font-size: 13px;
@@ -5730,6 +5738,10 @@ form .form-floating textarea {
   .select2-selection__rendered {
   padding-top: 15px;
   padding-left: 12px;
+=======
+.form-floating.ff-ket .form-control {
+  padding-top: 22px;
+>>>>>>> d565039151e87013d15bb33275a01483115b996f
 }
 
 .form-control.search.form-out-search.fos-jk {

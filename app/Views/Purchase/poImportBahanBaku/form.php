@@ -334,7 +334,11 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+<<<<<<< HEAD
                             <div class="form-floating mb-3" style="height: 50px;">
+=======
+                            <div class="form-floating mb-3">
+>>>>>>> d565039151e87013d15bb33275a01483115b996f
                                 <textarea class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
