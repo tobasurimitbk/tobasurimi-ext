@@ -202,14 +202,10 @@ class PenerimaanBarangImport extends BaseController
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
-                "invoice_no"            => $data->invoice_no,
-                "multiple_po_no"        => json_decode($data->multiple_po_no),
-                "acceptance_type"       => $data->acceptance_type,
-                "aju_type"              => $data->aju_type,
-                "aju_no"                => $data->aju_no,
+                "tipe_bahan"            => $data->tipe_bahan,
                 "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
-                "sender_name"           => $data->sender_name,
-                "status_post"           => $data->status_post
+                "supplier_name"         => $data->supplier_name,
+                "itemCount"             => $data->itemCount
             ]);
         }
 
@@ -385,9 +381,7 @@ class PenerimaanBarangImport extends BaseController
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $response,
-                            'doc_qty' => $data->doc_qty,
                             'selisih' => $data->selisih,
-                            'konversi' => $data->konversi,
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
@@ -649,9 +643,7 @@ class PenerimaanBarangImport extends BaseController
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $id,
-                            'doc_qty' => $data->doc_qty,
                             'selisih' => $data->selisih,
-                            'konversi' => $data->konversi,
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
