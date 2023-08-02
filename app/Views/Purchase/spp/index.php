@@ -485,7 +485,12 @@
     // }
 
     const pdf = function(url) {
-        window.open(url, "_blank");
+        let search = $(".search").val();
+        let spp_type = $(".spp_type").val();
+        let dateStart = $(".dateStart").val();
+        let dateEnd = $(".dateEnd").val();
+
+        window.open(url + `?search=${search}&spp_type=${spp_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 
     const changeSort = function(val) {

@@ -7,6 +7,7 @@ use App\Models\SppModel;
 use App\Models\SppDetailModel;
 use App\Models\MetadataModel;
 use App\Models\WarehousesModel;
+use Dompdf\Dompdf;
 
 class SPP extends BaseController
 {
@@ -14,6 +15,7 @@ class SPP extends BaseController
     protected $role_id;
     protected $SppModel;
     protected $SppDetailModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class SPP extends BaseController
         $this->role_id = session()->get("login")->this_role_id;
         $this->SppModel = new SppModel();
         $this->SppDetailModel = new SppDetailModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function spp()
@@ -119,6 +122,7 @@ class SPP extends BaseController
             "dateStart"        => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
+
 
         $SppModel = new SppModel();
 
@@ -489,5 +493,124 @@ class SPP extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function printTable()
+    {
+        $filename = "Data SPP";
+
+        $payload = [
+            "search"           => $this->request->getGet("search"),
+            "spp_type"         => $this->request->getGet("spp_type"),
+            "sort"             => $this->request->getGet("sort"),
+            "sortType"         => $this->request->getGet("sortType"),
+            "dateStart"        => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        $SppModel = new SppModel();
+
+        $condition = [];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "spp_type"      => $this->request->getGet("spp_type"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        $sppData = $SppModel->getSppList($condition, $addCondition, 100000000, 0);
+
+        $dataSPP = [];
+
+        $no = 1;
+
+        foreach ($sppData['data'] as $data) {
+            array_push($dataSPP, [
+                "no"            => $no++,
+                "id"            => $data->id,
+                "spp_type"      => $data->spp_type,
+                "spp_no"        => $data->spp_no,
+                "warehouseName" => $data->warehouseName,
+                "total"         => number_format($data->total),
+                "request_date"  => date('Y-m-d', strtotime($data->request_date)),
+                "is_posted"     => $data->is_posted,
+                "createdAt"     => date('Y-m-d', strtotime($data->createdAt)),
+            ]);
+        }
+
+        $data = [
+            "dataSPP"  => $dataSPP,
+        ];
+
+        // load HTML content
+        $this->dompdf->loadHtml(view('Purchase/spp/print-table', $data));
+
+        // (optional) setup the paper size and orientation
+        $this->dompdf->setPaper('A4', 'landscape');
+
+        // render html as PDF
+        $this->dompdf->render();
+
+        // output the generated pdf
+        $this->dompdf->stream($filename, array("Attachment" => false));
+
+        exit(0);
+
+        // return view('Purchase/poImportBahanPenolong/print', $data);
+    }
+
+    public function print($id = null)
+    {
+        if ($id) {
+            $filename = "SPP";
+
+            $SppModel = new SppModel();
+            $SppDetailModel = new SppDetailModel();
+
+            if (!empty($id)) {
+                $dataSPP = $SppModel->getSppById($id);
+                $dataSppDetail = $SppDetailModel->getSppDetailById($id);
+
+                $no = 0;
+                $totalPrice = 0;
+                $totalQty = 0;
+                $totalAll = 0;
+
+                foreach ($dataSppDetail as $value) {
+                    $no++;
+                    $value->no = $no;
+                    $totalPrice += formatter($value->price, "CURR_TO_INT");
+                    $totalQty += formatter($value->qty, "CURR_TO_INT");
+                    $totalAll += formatter($value->totalPrice, "CURR_TO_INT");
+                }
+                $dataSPP->totalPrice = number_format($totalPrice);
+                $dataSPP->totalQty = number_format($totalQty);
+                $dataSPP->totalAll = number_format($totalAll);
+
+                $data["dataSPP"] = $dataSPP;
+                $data["dataSPP"]->purchase_request_details = $dataSppDetail;
+            }
+
+            // dd($data);
+
+            // load HTML content
+            $this->dompdf->loadHtml(view('Purchase/spp/print', $data));
+
+            // (optional) setup the paper size and orientation
+            $this->dompdf->setPaper('A4', 'landscape');
+
+            // render html as PDF
+            $this->dompdf->render();
+
+            // output the generated pdf
+            $this->dompdf->stream($filename, array("Attachment" => false));
+
+            exit(0);
+
+            // return view('Purchase/poImportBahanPenolong/print', $data);
+        }
     }
 }
