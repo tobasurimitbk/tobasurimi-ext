@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="col">
-                    <button class="btn btn-primary mt-2">
+                    <button class="btn btn-submit-form btn-generate">
                         Generate
                     </button>
                 </div>
