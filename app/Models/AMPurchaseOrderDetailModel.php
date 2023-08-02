@@ -63,19 +63,23 @@ class AMPurchaseOrderDetailModel extends Model
         ];
 
         $selectQry = "am_purchase_order_details.*,
-            FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price), 'N', 'en-us') AS totalPrice,
+            FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price) + CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS totalPrice,
             FORMAT(CEILING(am_purchase_order_details.qty), 'N', 'en-us') AS qty,
             FORMAT(CEILING(am_purchase_order_details.price), 'N', 'en-us') AS price,
             FORMAT(CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS additional_cost,
             barangs.nama_barang, 
-            barangs.kode_barang, 
+            barangs.kode_barang,
+            taxppn.tax_value as ppnValue, 
+            taxpph.tax_value as pphValue, 
             satuans.id as id_satuan, 
             satuans.nama_satuan";
 
         $builder = $this->db->table('am_purchase_order_details')
             ->select($selectQry)
             ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
-            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left');
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
+            ->join('taxes AS taxpph', 'taxpph.id = am_purchase_order_details.pph', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
 
