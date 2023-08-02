@@ -140,17 +140,13 @@
             <?php 
             $no = 1;
             $jml_masuk = 0;
-            $jml_dokumen = 0;
             $jml_order = 0;
-            $jml_konversi = 0;
             $jml_harga = 0;
             $jml_sub_total = 0;
 
             foreach($dataPenerimaanBarangDetail as $detail){ 
                 $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_INT");
-                $jml_dokumen = $jml_dokumen + formatter($detail["doc_qty"], "STR_TO_INT");
                 $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_INT");
-                $jml_konversi = $jml_konversi + formatter($detail["konversi"], "STR_TO_INT");
                 $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
                 $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>

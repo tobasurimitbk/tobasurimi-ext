@@ -385,9 +385,7 @@ class PenerimaanBarangImport extends BaseController
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $response,
-                            'doc_qty' => $data->doc_qty,
                             'selisih' => $data->selisih,
-                            'konversi' => $data->konversi,
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
@@ -649,9 +647,7 @@ class PenerimaanBarangImport extends BaseController
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $id,
-                            'doc_qty' => $data->doc_qty,
                             'selisih' => $data->selisih,
-                            'konversi' => $data->konversi,
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
