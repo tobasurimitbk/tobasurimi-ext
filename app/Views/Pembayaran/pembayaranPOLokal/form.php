@@ -99,6 +99,7 @@
             </div>
             
             <div class="row">
+<<<<<<< HEAD
                 <div class="col-md-12">
                     <h4>Item List</h4>
                     <div class="table-responsive">
@@ -117,6 +118,16 @@
 
                             </tbody>
                         </table>
+=======
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select " name="payment_status" id="payment_status">
+                            <option disabled selected value=""></option>
+                            <option value="Unpaid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Unpaid' ? 'selected' : '' ?>>Unpaid</option>
+                            <option value="Paid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Paid' ? 'selected' : '' ?>>Paid</option>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Status Pembayaran</label>
+>>>>>>> d565039151e87013d15bb33275a01483115b996f
                     </div>
                 </div>
             </div>
