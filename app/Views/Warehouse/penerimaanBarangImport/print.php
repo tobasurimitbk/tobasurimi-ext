@@ -130,11 +130,8 @@
             <td><b>Spesifikasi</b></td>
             <td><b>Satuan</b></td>
             <td><b>Jumlah Diterima</b></td>
-            <td><b>Jumlah Dokumen</b></td>
             <td><b>Jumlah Order</b></td>
-            <td><b>Konversi</b></td>
-            <td><b>Harga</b></td>
-            <td><b>Total Harga</b></td>
+            <td><b>Sub Total</b></td>
             <td><b>No. PO</b></td>
             <td><b>Keterangan</b></td>
             </tr>
@@ -147,7 +144,7 @@
             $jml_order = 0;
             $jml_konversi = 0;
             $jml_harga = 0;
-            $jml_penyerahan = 0;
+            $jml_sub_total = 0;
 
             foreach($dataPenerimaanBarangDetail as $detail){ 
                 $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_INT");
@@ -155,7 +152,7 @@
                 $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_INT");
                 $jml_konversi = $jml_konversi + formatter($detail["konversi"], "STR_TO_INT");
                 $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
-                $jml_penyerahan = $jml_penyerahan + formatter($detail["penyerahan"], "STR_TO_INT");
+                $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>
             <tr>
                 <td><?= $no++; ?></td>
@@ -164,28 +161,24 @@
                 <td><?= $detail["spec"]; ?></td>
                 <td><?= $detail["nama_satuan"]; ?></td>
                 <td><?= $detail["jml_masuk"]; ?></td>
-                <td><?= $detail["doc_qty"]; ?></td>
                 <td><?= $detail["qty"]; ?></td>
-                <td><?= $detail["konversi"]; ?></td>
-                <td><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
-                <td><?= number_format(formatter($detail["penyerahan"], "STR_TO_INT")); ?></td>
+                <td><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
                 <td><?= $detail["po_no"]; ?></td>
                 <td><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
                 <tr>
-                    <td style="text-align:center" colspan="5">Total</td>
+                    <td style="text-align:center" colspan="5">Grand Total</td>
                     <td><?= $jml_masuk; ?></td>
-                    <td><?= $jml_dokumen; ?></td>
                     <td><?= $jml_order; ?></td>
-                    <td><?= $jml_konversi; ?></td>
-                    <td><?= number_format($jml_harga); ?></td>
-                    <td><?= number_format($jml_penyerahan); ?></td>
+                    <td><?= number_format($jml_sub_total); ?></td>
                     <td></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td style="text-align:center" colspan="10">Ongkos Kirim</td>
+                    <td style="text-align:center" colspan="5">Ongkos Kirim</td>
+                    <td></td>
+                    <td></td>
                     <td><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
                     <td></td>
                     <td></td>

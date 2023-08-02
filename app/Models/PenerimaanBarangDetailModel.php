@@ -22,7 +22,7 @@ class PenerimaanBarangDetailModel extends Model
         'selisih',
         'konversi',
         'harga',
-        'penyerahan',
+        'sub_total',
         'keterangan',
         'barang_id',
         'warehouse',
