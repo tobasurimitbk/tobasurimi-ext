@@ -13,7 +13,7 @@
                     </button>
                 <?php } ?>
 
-                <button class="btn btn-warning btn-print float-right" onclick="print('<?= getenv('apiURL'); ?>/purchaseRequest/print/<?= $dataSPP->id ?>')">
+                <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("spp/print/"); ?><?= $dataSPP->id ?>')">
                     Print
                 </button>
 
@@ -60,7 +60,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? $dataSPP->request_date : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? ($dataSPP->request_date ? date("d/m/Y", strtotime($dataSPP->request_date)) : "") : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
                                     <label for="floatingInput">Tanggal Order</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -295,8 +295,8 @@
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-5">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
                                 <textarea class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>

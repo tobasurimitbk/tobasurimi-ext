@@ -202,14 +202,11 @@ class PenerimaanBarangImport extends BaseController
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
-                "invoice_no"            => $data->invoice_no,
-                "multiple_po_no"        => json_decode($data->multiple_po_no),
-                "acceptance_type"       => $data->acceptance_type,
-                "aju_type"              => $data->aju_type,
-                "aju_no"                => $data->aju_no,
+                "warehouse_name"        => $data->warehouse_name,
+                "tipe_bahan"            => $data->tipe_bahan,
                 "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
-                "sender_name"           => $data->sender_name,
-                "status_post"           => $data->status_post
+                "supplier_name"         => $data->supplier_name,
+                "itemCount"             => $data->itemCount
             ]);
         }
 
@@ -234,6 +231,9 @@ class PenerimaanBarangImport extends BaseController
                     "rules" => "required"
                 ],
                 "supplier_id" => [
+                    "rules" => "required"
+                ],
+                "warehouse_id" => [
                     "rules" => "required"
                 ],
                 "aju_document_type" => [
@@ -287,6 +287,7 @@ class PenerimaanBarangImport extends BaseController
                     "company_id" => $this->this_company_id,
                     "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
@@ -385,13 +386,10 @@ class PenerimaanBarangImport extends BaseController
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $response,
-                            'doc_qty' => $data->doc_qty,
                             'selisih' => $data->selisih,
-                            'konversi' => $data->konversi,
                             'harga' => $data->harga,
-                            'penyerahan' => $data->penyerahan,
+                            'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
-                            'warehouse' => $data->warehouse,
                             'barang_id' => $data->barang_id,
                             'qty' => $data->qty,
                             'pph' => $data->ppn,
@@ -496,6 +494,9 @@ class PenerimaanBarangImport extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
+                "warehouse_id" => [
+                    "rules" => "required"
+                ],
                 "aju_document_type" => [
                     "rules" => "required"
                 ],
@@ -548,6 +549,7 @@ class PenerimaanBarangImport extends BaseController
                     "company_id" => $this->this_company_id,
                     "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
@@ -649,13 +651,10 @@ class PenerimaanBarangImport extends BaseController
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $id,
-                            'doc_qty' => $data->doc_qty,
                             'selisih' => $data->selisih,
-                            'konversi' => $data->konversi,
                             'harga' => $data->harga,
-                            'penyerahan' => $data->penyerahan,
+                            'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
-                            'warehouse' => $data->warehouse,
                             'barang_id' => $data->barang_id,
                             'qty' => $data->qty,
                             'pph' => $data->ppn,

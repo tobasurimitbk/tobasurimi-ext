@@ -144,6 +144,14 @@ $routes->post('/shift/save', 'Master\Shift::save', ['filter' => 'Auth']);
 $routes->post('/shift/update', 'Master\Shift::update', ['filter' => 'Auth']);
 // $routes->post('/shift/delete', 'Master\Shift::delete', ['filter' => 'Auth']);
 
+// KURS
+$routes->get('/kurs', 'Master\Kurs::index', ['filter' => 'Auth']);
+$routes->get('/kurs/all', 'Master\Kurs::all', ['filter' => 'Auth']);
+$routes->get('/kurs/id/(:segment)', 'Master\Kurs::getById/$1', ['filter' => 'Auth']);
+$routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
+$routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
+$routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
+
 // SUPPLIER
 // BAHAN BAKU LOKAL
 $routes->get('/supplier-bahan-baku', 'Supplier\SupplierBahanBaku::supplierBahanBaku', ['filter' => 'Auth']);
@@ -189,6 +197,9 @@ $routes->post('/spp/update', 'Purchase\SPP::updateSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update-status', 'Purchase\SPP::updateStatusSPP', ['filter' => 'Auth']);
 $routes->post('/spp/approve', 'Purchase\SPP::approveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/delete', 'Purchase\SPP::deleteSPP', ['filter' => 'Auth']);
+$routes->get('/spp/print-table', 'Purchase\SPP::printTable', ['filter' => 'Auth']);
+$routes->get('/spp/print/(:segment)', 'Purchase\SPP::print/$1', ['filter' => 'Auth']);
+
 
 // BAHAN BAKU PO LOKAL
 $routes->get('/po-lokal-bahan-baku', 'Purchase\POLokalBahanBaku::poLokalBahanBaku', ['filter' => 'Auth']);
@@ -200,6 +211,7 @@ $routes->post('/po-lokal-bahan-baku/save', 'Purchase\POLokalBahanBaku::savePOLok
 $routes->post('/po-lokal-bahan-baku/update', 'Purchase\POLokalBahanBaku::updatePOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/update-status', 'Purchase\POLokalBahanBaku::updateStatusPOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/delete', 'Purchase\POLokalBahanBaku::deletePOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/print/(:segment)', 'Purchase\POLokalBahanBaku::print/$1', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);
@@ -211,6 +223,8 @@ $routes->post('/po-lokal-bahan-penolong/save', 'Purchase\POLokalBahanPenolong::s
 $routes->post('/po-lokal-bahan-penolong/update', 'Purchase\POLokalBahanPenolong::updatePOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-penolong/update-status', 'Purchase\POLokalBahanPenolong::updateStatusPOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-penolong/delete', 'Purchase\POLokalBahanPenolong::deletePOLokalBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-penolong/print/(:segment)', 'Purchase\POLokalBahanPenolong::print/$1', ['filter' => 'Auth']);
+
 
 // BAHAN BAKU PO IMPORT
 $routes->get('/po-import-bahan-baku', 'Purchase\POImportBahanBaku::poImportBahanBaku', ['filter' => 'Auth']);

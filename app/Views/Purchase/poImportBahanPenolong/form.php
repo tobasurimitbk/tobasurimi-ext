@@ -167,41 +167,20 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran / Bulan">
-                            <label for="floatingInput">Termin Pembayaran / Bulan</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "") : ""; ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
-                                    <label for="floatingInput">Tanggal Pembayaran</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-payment-date"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? ($dataPOImport->dpp ? $dataPOImport->dpp : "") : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
-                            <label for="floatingInput">DPP</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
-                            <label for="floatingInput">Catatan (Opsional)</label>
+                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran / Bulan">
+                            <label for="floatingInput">Termin Pembayaran</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOImport) ? $dataPOImport->createdByName : session()->get("login")->name; ?>">
                             <label for="floatingInput">Order Oleh</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
+                            <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -355,7 +334,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="form-floating mb-3">
                                 <textarea class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
@@ -533,13 +512,6 @@
             autoclose: true
         })
 
-        $(".payment_date").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
         // PURCHASE REQUEST ID
         $('.purchase_request_id').select2({
             placeholder: "",
@@ -683,10 +655,6 @@
             $(".po_date").focus();
         });
 
-        $('.icon-payment-date').click(function() {
-            $(".payment_date").focus();
-        });
-
         var validator = $(".create-form").validate({
             rules: {
                 po_no: {
@@ -707,12 +675,6 @@
                 currency: {
                     required: true,
                 },
-                payment_date: {
-                    required: true,
-                },
-                dpp: {
-                    required: true,
-                }
             },
             messages: {
                 po_no: {
@@ -728,16 +690,10 @@
                     required: "Supplier wajib diisi"
                 },
                 payment_term: {
-                    required: "Termin Pembayaran / Bulan wajib diisi"
+                    required: "Termin Pembayaran wajib diisi"
                 },
                 currency: {
                     required: "Valas wajib diisi"
-                },
-                payment_date: {
-                    required: "Tanggal Pembayaran wajib diisi"
-                },
-                dpp: {
-                    required: "DPP wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -2015,6 +1971,7 @@
     const addBarang = function(url) {
         window.open(url, "_blank");
     }
+    
     const print = function(url) {
         window.open(url, "_blank");
     }

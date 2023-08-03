@@ -12,13 +12,16 @@
         <?php if(!empty($rekapData) && $rekapData->is_posted === false): ?> 
             <button class="btn btn-success posting-rekap">Posting</button>
             <button class="btn btn-hapus delete-parent float-right">Hapus</button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
         <?php endif; ?>
+<<<<<<< HEAD
 
         <?php if(empty($rekapData)): ?> 
             <button class="btn btn-success posting-rekap">Simpan & Posting</button>
         <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
         <?php endif; ?>
+=======
+        <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
+>>>>>>> d565039151e87013d15bb33275a01483115b996f
     </div>
 </div>
 <div class="card">
@@ -28,7 +31,7 @@
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating ff-supplier mb-3" style="height: 50px;">
                         <select class="form-select " name="supplier_id" id="supplier">
                             <option disabled selected value=""></option>
                             <?php foreach ($supplierList as $supplier): ?>
