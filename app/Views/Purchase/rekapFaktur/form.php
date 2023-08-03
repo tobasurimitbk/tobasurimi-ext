@@ -13,15 +13,12 @@
             <button class="btn btn-success posting-rekap">Posting</button>
             <button class="btn btn-hapus delete-parent float-right">Hapus</button>
         <?php endif; ?>
-<<<<<<< HEAD
 
         <?php if(empty($rekapData)): ?> 
             <button class="btn btn-success posting-rekap">Simpan & Posting</button>
         <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
         <?php endif; ?>
-=======
-        <button class="btn btn-show-form btn-save float-right btn-submit-form">Simpan</button>
->>>>>>> d565039151e87013d15bb33275a01483115b996f
+
     </div>
 </div>
 <div class="card">
