@@ -538,6 +538,9 @@
             kode_barang: {
                 required: true
             },
+            nilai_jml_masuk: {
+                required: true
+            },
             qty: {
                 required: true
             },
@@ -554,6 +557,9 @@
         messages: {
             kode_barang: {
                 required: "Kode wajib diisi"
+            },
+            nilai_jml_masuk: {
+                required: "Jumlah diterima wajib diisi"
             },
             qty: {
                 required: "Qty wajib diisi"
@@ -1941,6 +1947,9 @@
             tag_total += `<td>`;
             tag_total += 0;
             tag_total += "</td>";
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
             tag_total += `<td colspan="2">`;
             tag_total += "</td>";
             tag_total += "</tr>";
@@ -2125,12 +2134,6 @@
                                 tag_html += 0;
                                 tag_html += "</td>";
                                 tag_html += `<td class="edit-table-detail" data-jml_masuk="${qty_sementara}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-jml_masuk="${qty_sementara}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
-                                tag_html += qty_sementara;
-                                tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-jml_masuk="${qty_sementara}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
                                 tag_html += harga_sementara;
                                 tag_html += "</td>";
                                 tag_html += `<td class="edit-table-detail" data-jml_masuk="${qty_sementara}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
@@ -2218,7 +2221,7 @@
                     $(".keterangan").val(note);
                     
                     $(".nama_barang_dokumen").val(nama);
-                    $(".harga_barang_jasa").val(harga);
+                    $(".harga_barang_jasa").val(Number(harga.replaceAll(",", "")).toLocaleString());
                     $(".nilai_sub_total").val(((harga ? harga.replaceAll(",", "") : 0) * Number(qty)).toLocaleString());
                 }
                 else
@@ -2741,12 +2744,6 @@
         tag_total += `GRAND TOTAL`;
         tag_total += "</td>";
         tag_total += `<td colspan='2'>`;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
-        tag_total += "</td>";
-        tag_total += `<td>`;
-        tag_total += 0;
         tag_total += "</td>";
         tag_total += `<td>`;
         tag_total += 0;

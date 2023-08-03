@@ -216,6 +216,9 @@ class PenerimaanBarangLokal extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
+                "warehouse_id" => [
+                    "rules" => "required"
+                ],
                 "aju_document_type" => [
                     "rules" => "required"
                 ],
@@ -276,6 +279,7 @@ class PenerimaanBarangLokal extends BaseController
                     "company_id" => $this->this_company_id,
                     "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
@@ -376,7 +380,6 @@ class PenerimaanBarangLokal extends BaseController
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
-                            'warehouse' => $data->warehouse,
                             'barang_id' => $data->barang_id,
                             'qty' => $data->qty,
                             'pph' => $data->ppn,
@@ -481,6 +484,9 @@ class PenerimaanBarangLokal extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
+                "warehouse_id" => [
+                    "rules" => "required"
+                ],
                 "aju_document_type" => [
                     "rules" => "required"
                 ],
@@ -542,6 +548,7 @@ class PenerimaanBarangLokal extends BaseController
                     "company_id" => $this->this_company_id,
                     "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
@@ -646,7 +653,6 @@ class PenerimaanBarangLokal extends BaseController
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
-                            'warehouse' => $data->warehouse,
                             'barang_id' => $data->barang_id,
                             'qty' => $data->qty,
                             'pph' => $data->ppn,
