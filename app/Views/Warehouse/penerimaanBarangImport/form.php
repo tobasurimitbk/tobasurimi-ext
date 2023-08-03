@@ -490,8 +490,6 @@
     let total_jml_sub_total = 0;
     var priceEdit = 0;
     var sub_totalEdit = 0;
-    let data_satuan = [];
-    let data_warehouse = [];
 
     <?php if(!empty($dataPenerimaanBarangDetail)){ 
         foreach($dataPenerimaanBarangDetail as $details){  
@@ -523,7 +521,6 @@
         harga: Number('<?= $details["harga"] ? $details["harga"] : 0; ?>').toLocaleString(),
         sub_total: Number('<?= $details["sub_total"] ? $details["sub_total"] : 0; ?>').toLocaleString(),
         keterangan: '<?= $details["keterangan"]; ?>',
-        warehouse: <?= $details["warehouse"]; ?>,
     })
     <?php 
         }
@@ -860,17 +857,6 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
-
-        // $.ajax({
-        //     url: `<?= base_url("warehouse/dropdown"); ?>`,
-        //     method: "GET",
-        //     dataType: "json",
-        //     success: function(res) {
-        //         data_warehouse = res?.data;
-        //     }
-        // })
-        data_warehouse = <?= json_encode($dataWarehouse); ?>;
-        data_satuan = <?= json_encode($dataSatuan); ?>;
 
         // delete
         $(".delete-parent").click(function() {
