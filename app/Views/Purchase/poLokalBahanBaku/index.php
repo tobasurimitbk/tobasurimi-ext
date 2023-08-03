@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Data PO Lokal Bahan Baku</h1>
+    <h1>PO Lokal Bahan Baku</h1>
     <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal-bahan-baku/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>

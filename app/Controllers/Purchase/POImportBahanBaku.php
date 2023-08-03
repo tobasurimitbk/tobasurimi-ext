@@ -272,6 +272,8 @@ class POImportBahanBaku extends BaseController
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
+                            'remaining_qty' => $data->qty,
+                            'qty_diterima' => 0,
                             'price' => $data->price,
                             'disc' => $data->disc,
                             'additional_cost' => $data->additional_cost
@@ -447,6 +449,8 @@ class POImportBahanBaku extends BaseController
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
+                            'remaining_qty' => $data->qty,
+                            'qty_diterima' => 0,
                             'price' => $data->price,
                             'disc' => $data->disc,
                             'additional_cost' => $data->additional_cost

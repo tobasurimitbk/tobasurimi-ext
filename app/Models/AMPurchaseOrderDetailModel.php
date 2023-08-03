@@ -28,6 +28,7 @@ class AMPurchaseOrderDetailModel extends Model
         'additional_cost',
         'ppn',
         'pph',
+        'remaining_qty',
         'qty_diterima'
     ];
 

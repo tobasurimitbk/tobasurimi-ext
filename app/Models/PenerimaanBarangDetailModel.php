@@ -81,6 +81,8 @@ class PenerimaanBarangDetailModel extends Model
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
                 rm_purchase_order_details.spec,
+                rm_purchase_order_details.qty_diterima,
+                rm_purchase_order_details.remaining_qty,
                 rm_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
@@ -103,6 +105,8 @@ class PenerimaanBarangDetailModel extends Model
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
                 am_purchase_order_details.spec,
+                am_purchase_order_details.qty_diterima,
+                am_purchase_order_details.remaining_qty,
                 am_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
@@ -129,6 +133,8 @@ class PenerimaanBarangDetailModel extends Model
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
                 rm_import_po_details.spec,
+                rm_import_po_details.qty_diterima,
+                rm_import_po_details.remaining_qty,
                 rm_import_pos.po_no'
                 )
                 ->where($arrCondition)
@@ -151,6 +157,8 @@ class PenerimaanBarangDetailModel extends Model
                 ppn.tax_value as ppn,
                 pph.tax_value as pph,
                 am_purchase_order_details.spec,
+                am_purchase_order_details.qty_diterima,
+                am_purchase_order_details.remaining_qty,
                 am_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
