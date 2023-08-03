@@ -5747,10 +5747,6 @@ form .form-floating textarea {
   height: 50px;
 }
 
-.select2-container .select2-selection--single .select2-selection__rendered {
-  padding-left: 0px !important;
-}
-
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
