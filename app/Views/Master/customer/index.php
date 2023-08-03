@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label>Data Customer</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Customer</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -74,7 +74,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
-                                <label for="floatingInput">Nomor NPWP</label>
+                                <label for="floatingInput"> NPWP</label>
                             </div>
                         </div>
                         <div class="col-md-6">
