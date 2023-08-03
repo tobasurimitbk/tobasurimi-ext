@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Data Penerimaan Barang Lokal</h1>
+    <h1>Penerimaan Barang Lokal</h1>
     <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-lokal/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
@@ -142,7 +142,7 @@
                 let id = row?.id;
                 return `
                     <div class="mt-0">
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal/print/"); ?>${id}')">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
                         <i class="fa fa-print fa-sm mr-2" aria-hidden="true"></i>Print
                     </button>
                     </div>

@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title modal-title-kategori"><label class="title-name-kategori"></label>Data Kategori Akun</h5>
+                <h5 class="modal-title modal-title-kategori"><label class="title-name-kategori"></label> Kategori Akun</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form-kategori" role="form" method="POST" enctype="multipart/form-data">

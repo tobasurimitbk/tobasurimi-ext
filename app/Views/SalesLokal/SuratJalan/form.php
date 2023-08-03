@@ -40,7 +40,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_so" name="id_so[]" id="id_so[]" <?= !empty($data) ? ($data->multiple_id_so === true ? 'disabled=true' : '') : ''; ?> multiple>
                                 <option value=""></option>
@@ -67,9 +67,6 @@
                             <label for="floatingInput">Tanggal Pengiriman</label>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" disabled="true" value=" <?= !empty($data) ? $data->no_surat_jalan : ""; ?>" placeholder="No surat jalan">

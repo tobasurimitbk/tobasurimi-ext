@@ -211,6 +211,7 @@ class POLokalBahanBaku extends BaseController
                 foreach ($insertData["items"] as $value) {
                     $value->barang_id = $value->item_id;
                     $value->rm_purchase_order_id = $insert;
+                    $value->remaining_qty = $value->qty;
                 }
 
                 $RMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
