@@ -76,9 +76,11 @@ class PembayaranPOImport extends BaseController
             $poData = $this->checkPO($paymentData->supplier_id, $paymentData->po_id, $paymentData->po_type);
             $poList = $this->getPOList($paymentData->supplier_id, $paymentData->po_type);
         } else {
-            $poData = (object)[ // TODO here
-                'total'=>5000
-            ];
+            $poData = $penerimaanBarangModel->asObject()
+                ->select("SUM(penerimaan_barang_detail.harga * penerimaan_barang_detail.qty) AS total")
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL')
+                ->groupBy('penerimaan_barang_id')
+                ->find($paymentData->penerimaan_barang_id);
 
             $selectQry = "penerimaan_barang.id AS id,
                           no_penerimaan_barang AS lpb_no, 
