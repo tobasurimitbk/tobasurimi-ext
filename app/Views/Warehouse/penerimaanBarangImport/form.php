@@ -21,12 +21,12 @@
                 if($dataPenerimaanBarang->status_post === "WAITING"){ 
             ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
-                Close PO
+                Close (PO & Penerimaan)
             </button>
             <?php }
             } else { ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
-                Simpan & Close PO
+                Simpan & Close (PO & Penerimaan)
             </button>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
