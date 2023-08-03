@@ -780,7 +780,7 @@ class PenerimaanBarangImport extends BaseController
         return;
     }
 
-    public function getReceivedItemsBySupplier($supplierId)
+    /* public function getReceivedItemsBySupplier($supplierId)
     {
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
@@ -837,6 +837,26 @@ class PenerimaanBarangImport extends BaseController
         ];
 
         echo json_encode($data);
+        return;
+    } */
+
+    public function getReceivedItemsBySupplier($supplierId, )
+    {
+        $selectQry = "penerimaan_barang.id AS id,
+                      no_penerimaan_barang AS lpb_no, 
+                      'USD' AS currency,
+                      SUM(penerimaan_barang_detail.harga * penerimaan_barang_detail.qty) AS total";
+
+        $receiveDataQry = $this->penerimaanBarangModel->asObject()
+            ->select($selectQry)
+            ->where('penerimaan_barang.supplier_id', $supplierId)
+            // ->where('(`penerimaan_barang_detail`.`qty` - `penerimaan_barang_detail`.`summarized_qty`) > 0')
+            // ->where("penerimaan_barang_detail.summarized_qty <", 'penerimaan_barang_detail.qty', false)
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL')
+            ->groupBy('penerimaan_barang_id')
+            ->findAll();
+
+        echo json_encode(['data' => $receiveDataQry]);
         return;
     }
 }
