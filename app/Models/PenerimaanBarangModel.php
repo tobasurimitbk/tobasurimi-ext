@@ -139,13 +139,14 @@ class PenerimaanBarangModel extends Model
     public function getById($id)
     {
         $selectQry = "penerimaan_barang.*, metadata.value aju_type_name, suppliers.name as supplier_name,
-        suppliers.address as supplier_address, suppliers.phone as supplier_phone
+        suppliers.address as supplier_address, suppliers.phone as supplier_phone, warehouses.warehouse_name
         ";
 
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type', 'left')
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->find($id);
 
         return $sppData;
