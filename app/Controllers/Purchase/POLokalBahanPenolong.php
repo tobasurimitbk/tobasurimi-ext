@@ -283,6 +283,7 @@ class POLokalBahanPenolong extends BaseController
                 foreach ($insertData["items"] as $value) {
                     $value->barang_id = $value->item_id;
                     $value->am_purchase_order_id = $insert;
+                    $value->remaining_qty = $value->qty;
                 }
 
                 $AMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
@@ -396,6 +397,7 @@ class POLokalBahanPenolong extends BaseController
                             "note"                  => $value->note,
                             "unit"                  => $value->unit,
                             "qty"                   => $value->qty,
+                            "remaining_qty"         => $value->remaining_qty,
                             "price"                 => $value->price,
                             "disc"                  => $value->disc,
                             "additional_cost"       => $value->additional_cost,
