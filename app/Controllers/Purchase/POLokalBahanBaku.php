@@ -308,6 +308,7 @@ class POLokalBahanBaku extends BaseController
                             "quality" => $value->quality,
                             "note" => $value->note,
                             "qty" => $value->qty,
+                            "remaining_qty" => $value->remaining_qty,
                             "general_price" => $value->general_price,
                             "daily_price" => $value->daily_price,
                             "monthly_price" => $value->monthly_price,
