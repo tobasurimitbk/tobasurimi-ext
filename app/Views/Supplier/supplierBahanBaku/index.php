@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Supplier Bahan Baku</h5>
+                <h5 class="modal-title"><label class="title-name"></label>Data Supplier Bahan Baku</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
