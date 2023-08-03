@@ -99,17 +99,28 @@
             </div>
             
             <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select " name="payment_status" id="payment_status">
-                            <option disabled selected value=""></option>
-                            <option value="Unpaid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Unpaid' ? 'selected' : '' ?>>Unpaid</option>
-                            <option value="Paid" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_status == 'Paid' ? 'selected' : '' ?>>Paid</option>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Status Pembayaran</label>
+                <div class="col-md-12">
+                    <h4>Item List</h4>
+                    <div class="table-responsive">
+                        <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Tanggal LPB</th>
+                                    <th>No. LPB</th>
+                                    <th>Item Name</th>
+                                    <th>Qty</th>
+                                    <th>Unit</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table">
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
 
         </form>
     </div>
