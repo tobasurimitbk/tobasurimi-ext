@@ -90,37 +90,63 @@
         .w-100 {
             width: 100%;
         }
+
+        .test {
+            display: inline-block;
+            width: 100%;
+        }
     </style>
 </head>
 
 <body>
     <?php if (!empty($dataPOLokal)) { ?>
-        <div>
-            <div class="w-50" style="float: left;">
-                <div class="txt-bold">PO LOKAL BAHAN PENOLONG</div>
-                <div class="mt-025 txt-bold">No. PO: <?= $dataPOLokal->po_no ?></div>
-                <div class="w-100">
-                    <table class="mt-1 w-100">
-                        <tr>
-                            <td>Tanggal: <?= $dataPOLokal->po_date ?></td>
-                            <td>Departmen: <?= $dataPOLokal->warehouseName ?></td>
-                        </tr>
-                        <tr>
-                            <td>No. SPP: <?= $dataPOLokal->spp_no ?></td>
-                            <td>Lokasi: <?= $dataPOLokal->companyName ?></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="w-50 txt-right txt-top" style="margin-left: 50%;">
-                <div>Kepada YTH: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
-                <div>Alamat: <span class="txt-bold"><?= $dataPOLokal->supplierAddress ?></span></div>
-                <div>Telepon: <span class="txt-bold"><?= $dataPOLokal->supplierPhone ?></span></div>
-                <div>NPMWP: <span class="txt-bold"><?= $dataPOLokal->supplierNPWP ?></span></div>
-            </div>
-        </div>
+        <table class="w-100">
+            <tr>
+                <td colspan="2">
+                    <div class="txt-bold">PO LOKAL BAHAN PENOLONG</div>
+                </td>
+                <td class="txt-right">
+                    <div>Kepada YTH: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="mt-025 txt-bold">No. PO: <?= $dataPOLokal->po_no ?></div>
+                </td>
+                <td class="txt-right">
+                    <div>Alamat: <span class="txt-bold"><?= $dataPOLokal->supplierAddress ?></span></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    &nbsp;
+                </td>
+                <td class="txt-right">
+                    <div>Telepon: <span class="txt-bold"><?= $dataPOLokal->supplierPhone ?></span></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Tanggal: <?= $dataPOLokal->po_date ?>
+                </td>
+                <td>
+                    No. SPP: <?= $dataPOLokal->spp_no ?>
+                </td>
+                <td class="txt-right">
+                    <div>NPMWP: <span class="txt-bold"><?= $dataPOLokal->supplierNPWP ?></span></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Departmen: <?= $dataPOLokal->warehouseName ?>
+                </td>
+                <td colspan="2">
+                    Lokasi: <?= $dataPOLokal->companyName ?>
+                </td>
+            </tr>
+        </table>
 
-        <div class="mt-1 txt-bold">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
+        <div class="mt-1 txt-bold" style="margin-bottom: 15px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
         <table class="item-table">
             <tr>
                 <th>#</th>

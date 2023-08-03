@@ -23,13 +23,14 @@ class RMPurchaseOrderDetailModel extends Model
         'quality',
         'note',
         'qty',
+        'qty_diterima',
+        'remaining_qty',
         'general_price',
         'daily_price',
         'monthly_price',
         'createdAt',
         'updatedAt',
         'deletedAt',
-        'qty_diterima'
     ];
 
     // Dates

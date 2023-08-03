@@ -83,6 +83,15 @@
             <tr>
                 <td>
                     <div>
+                        <div style=""> <b> Gudang : <?= $dataPenerimaanBarang->warehouse_name; ?></b></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table class="mt-5 w-100">
+            <tr>
+                <td>
+                    <div>
                         <div style=""> <b> From : <?= $dataPenerimaanBarang->supplier_name; ?></b></div>
                         <div style="white-space: wrap">Address : <?= $dataPenerimaanBarang->supplier_address; ?></div>
                         <div style="white-space: wrap">Phone : <?= $dataPenerimaanBarang->supplier_phone; ?></div>

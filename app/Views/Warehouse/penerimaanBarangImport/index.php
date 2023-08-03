@@ -142,7 +142,7 @@
                 let id = row?.id;
                 return `
                     <div class="mt-0">
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')" style="box-shadow: none !important;">
                         <i class="fa fa-print fa-sm mr-2" aria-hidden="true"></i>Print
                     </button>
                     </div>
