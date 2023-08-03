@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="">Pilih Tipe SPP</option>
                             <option value="Bahan Penolong Lokal">Bahan Penolong Lokal</option>
@@ -46,7 +46,7 @@
                             <option value="Bahan Baku Lokal">Bahan Baku Lokal</option>
                             <option value="Bahan Baku Import">Bahan Baku Import</option>
                         </select>
-                        <label for="floatingInput">Tipe SPP</label>
+                        <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
                     </div>
                 </div>
                 <div class="col mb-3">
