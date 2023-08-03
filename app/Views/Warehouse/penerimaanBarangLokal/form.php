@@ -525,9 +525,6 @@
             qty: {
                 required: true
             },
-            selisih: {
-                required: true
-            },
             harga: {
                 required: true
             },
@@ -544,9 +541,6 @@
             },
             qty: {
                 required: "Qty wajib diisi"
-            },
-            selisih: {
-                required: "Selisih wajib diisi"
             },
             harga: {
                 required: "Harga wajib diisi"

@@ -498,9 +498,6 @@ var validator_detail = $(".detail-form").validate({
             qty: {
                 required: true
             },
-            nilai_jml_masuk: {
-                required: true
-            },
             harga: {
                 required: true
             },
@@ -517,9 +514,6 @@ var validator_detail = $(".detail-form").validate({
             },
             qty: {
                 required: "Qty wajib diisi"
-            },
-            nilai_jml_masuk: {
-                required: "Jumlah Masuk wajib diisi"
             },
             harga: {
                 required: "Harga wajib diisi"
