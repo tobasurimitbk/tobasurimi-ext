@@ -589,6 +589,7 @@ class POLokalBahanPenolong extends BaseController
             }
 
             // dd($data);
+            // return view('Purchase/poLokalBahanPenolong/print', $data);
 
             // load HTML content
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanPenolong/print', $data));
