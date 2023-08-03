@@ -512,8 +512,6 @@
     let total_jml_sub_total = 0;
     var priceEdit = 0;
     var sub_totalEdit = 0;
-    let data_satuan = [];
-    let data_warehouse = [];
 
     <?php if(!empty($dataPenerimaanBarangDetail)){ 
         foreach($dataPenerimaanBarangDetail as $details){  
@@ -549,7 +547,6 @@
         nilai_ppn: '<?= $details["ppn"]; ?>',
         pph: Number(<?= $details["id_pph"] ? $details["id_pph"] : 0; ?>),
         nilai_pph: '<?= $details["pph"]; ?>',
-        warehouse: <?= $details["warehouse"]; ?>,
     })
     <?php 
         }
@@ -967,17 +964,6 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
-
-        // $.ajax({
-        //     url: `<?= base_url("warehouse/dropdown"); ?>`,
-        //     method: "GET",
-        //     dataType: "json",
-        //     success: function(res) {
-        //         data_warehouse = res?.data;
-        //     }
-        // })
-        data_warehouse = <?= json_encode($dataWarehouse); ?>;
-        data_satuan = <?= json_encode($dataSatuan); ?>;
 
         // delete
         $(".delete-parent").click(function() {
@@ -2070,10 +2056,6 @@
 
         $(".kode_barang").change(function() {
             if(trigger) {
-                list_warehouse = [];
-                row_detail = 0;
-                $(".body-detail-warehouse").empty()
-
                 if($(".kode_barang option:selected").val())
                 {
                     let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
@@ -2434,9 +2416,6 @@
         let id = $(this).data('id')
         let barang_id = $(this).data('barang_id')
         let jml_masuk = $(this).data('jml_masuk')
-
-        row_detail = 0;
-        list_warehouse = [];
 
         validator_detail.resetForm();
         validator_detail.reset();
