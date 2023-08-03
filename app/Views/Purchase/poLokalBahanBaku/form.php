@@ -956,6 +956,8 @@
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
 
+                console.log(harga)
+
                 $.ajax({
                     url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
                     method: "GET",

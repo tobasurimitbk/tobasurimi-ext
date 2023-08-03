@@ -389,6 +389,7 @@ class Barang extends BaseController
     {
         if (!empty($id)) {
             $response =  $this->barangModel->find($id);
+
             if ($response) {
                 $responseSupplier =  $this->barangSupplierModel->getByBarangId($id);
                 if ($responseSupplier) {
