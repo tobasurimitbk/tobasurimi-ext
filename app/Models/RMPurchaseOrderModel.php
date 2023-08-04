@@ -176,7 +176,7 @@ class RMPurchaseOrderModel extends Model
         $year = substr($year, -2);
         $month = $today->getMonth() - 1;
 
-        $lastStr =  '/P/' . $romanNumb[$month] . '/' . $year;
+        $lastStr =  'P/' . $romanNumb[$month] . '/' . $year;
 
         $builder = $this->db->table('rm_purchase_orders');
         $builder->select('po_no');
@@ -184,7 +184,7 @@ class RMPurchaseOrderModel extends Model
         $builder->like('po_no', $lastStr);
         $query = $builder->get();
 
-        $increment = '01';
+        $increment = '001';
 
         if ($query->getResultArray()) {
             $lastPo = explode('/', $query->getResultArray()[0]['po_no']);
