@@ -5,11 +5,13 @@ namespace App\Controllers\Warehouse;
 use App\Controllers\BaseController;
 
 use App\Models\AMPurchaseOrderModel;
+use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\BarangModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\RMPurchaseOrderModel;
+use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuanModel;
@@ -20,11 +22,13 @@ class PenerimaanBarangLokal extends BaseController
     protected $token;
     protected $this_company_id;
     protected $amPurchaseOrderModel;
+    protected $amPurchaseOrderDetailModel;
     protected $barangModel;
     protected $metadataModel;
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
     protected $rmPurchaseOrderModel;
+    protected $rmPurchaseOrderDetailModel;
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
@@ -35,11 +39,13 @@ class PenerimaanBarangLokal extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->barangModel = new BarangModel();
         $this->metadataModel = new MetadataModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $this->rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuanModel();
@@ -234,9 +240,6 @@ class PenerimaanBarangLokal extends BaseController
                 "no_registration" => [
                     "rules" => "required"
                 ],
-                "letter_no" => [
-                    "rules" => "required"
-                ],
                 "invoice_no" => [
                     "rules" => "required"
                 ],
@@ -246,13 +249,7 @@ class PenerimaanBarangLokal extends BaseController
                 "total_weight" => [
                     "rules" => "required"
                 ],
-                "shipping_cost" => [
-                    "rules" => "required"
-                ],
                 "biaya_masuk" => [
-                    "rules" => "required"
-                ],
-                "ppnbm" => [
                     "rules" => "required"
                 ]
             ];
@@ -352,7 +349,7 @@ class PenerimaanBarangLokal extends BaseController
                             $responseStatusPenerimaan = $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
 
                             if(!$responseStatusPenerimaan) {
-                                $message =  'Data Ubah Status Penerimaan';
+                                $message =  'Gagal Ubah Status Penerimaan';
                                 $data = [
                                     "status"            => false,
                                     "message"    => $message,
@@ -366,7 +363,6 @@ class PenerimaanBarangLokal extends BaseController
                 }
                 
                 $response =  $this->penerimaanBarangModel->insert($payload);
-                // $response =  '';
 
                 if ($response) {
                     foreach($items as $data)
@@ -376,7 +372,6 @@ class PenerimaanBarangLokal extends BaseController
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
                             'penerimaan_barang_id' => $response,
-                            'selisih' => $data->selisih,
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
@@ -388,14 +383,6 @@ class PenerimaanBarangLokal extends BaseController
                             'nama_barang_dok' => $data->nama_barang_dok,
                             'jml_masuk' => $data->jml_masuk
                         ];
-
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
 
                         $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
 
@@ -410,9 +397,59 @@ class PenerimaanBarangLokal extends BaseController
                             echo json_encode($data);
                         }
 
-                        // ADD STOK
-                        if($status_post === "FINISH")
+                        // UPDATE REMAINING QTY AND JML DITERIMA
+                        if($tipe_bahan === "BAKU")
                         {
+                            $conditionRemain = [
+                                'id' => $data->purchase_order_details_id
+                            ];
+
+                            $payloadRemain = [
+                                'qty_diterima' => $data->qty_diterima,
+                                'remaining_qty' => $data->remaining_qty
+                            ];
+            
+                            $responseDet = $this->rmPurchaseOrderDetailModel->where($conditionRemain)->set($payloadRemain)->update();
+
+                            if(!$responseDet) {
+                                $message =  'Gagal Ubah Remaining';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+                        if($tipe_bahan === "PENOLONG")
+                        {
+                            $conditionRemain = [
+                                'id' => $data->purchase_order_details_id
+                            ];
+
+                            $payloadRemain = [
+                                'qty_diterima' => $data->qty_diterima,
+                                'remaining_qty' => $data->remaining_qty
+                            ];
+            
+                            $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)->set($payloadRemain)->update();
+
+                            if(!$responseDet) {
+                                $message =  'Gagal Ubah Remaining';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+
+                        // ADD STOK
+                        // if($status_post === "FINISH")
+                        // {
                             $find = $this->barangModel->find(formatter($data->barang_id, "STR_TO_INT"));
 
                             if($find)
@@ -438,7 +475,7 @@ class PenerimaanBarangLokal extends BaseController
                                     echo json_encode($data);
                                 }
                             }
-                        }
+                        // }
                     }
 
                     $data = [
@@ -477,111 +514,20 @@ class PenerimaanBarangLokal extends BaseController
     public function updatePenerimaanBarangLokal()
     {
         try{
-            $rules = [
-                "no_penerimaan_barang" => [
-                    "rules" => "required"
-                ],
-                "supplier_id" => [
-                    "rules" => "required"
-                ],
-                "warehouse_id" => [
-                    "rules" => "required"
-                ],
-                "aju_document_type" => [
-                    "rules" => "required"
-                ],
-                "tipe_bahan" => [
-                    "rules" => "required"
-                ],
-                "aju_no" => [
-                    "rules" => "required"
-                ],
-                "validation_date" => [
-                    "rules" => "required"
-                ],
-                "no_registration" => [
-                    "rules" => "required"
-                ],
-                "letter_no" => [
-                    "rules" => "required"
-                ],
-                "invoice_no" => [
-                    "rules" => "required"
-                ],
-                "packaging" => [
-                    "rules" => "required"
-                ],
-                "total_weight" => [
-                    "rules" => "required"
-                ],
-                "shipping_cost" => [
-                    "rules" => "required"
-                ],
-                "biaya_masuk" => [
-                    "rules" => "required"
-                ],
-                "ppnbm" => [
-                    "rules" => "required"
-                ]
-            ];
+            $id = $this->request->getPost("id");
+            $status_post = $this->request->getPost("status_post");
+            $tipe_bahan = $this->request->getPost("tipe");
+            $get = $this->penerimaanBarangModel->asObject()->find($id);
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'), $last_day);
-                $status_post = $this->request->getPost("status_post");
-                $tipe_bahan = $this->request->getPost("tipe_bahan");
-                $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
-
-                $payload = [
-                    "company_id" => $this->this_company_id,
-                    "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
-                    "acceptance_type" => $this->request->getPost("acceptance_type"),
-                    "multiple_po_id" => json_encode($multiple_po_id),
-                    "multiple_po_no" => $this->request->getPost("multiple_po_no"),
-                    "tipe_bahan" => $tipe_bahan,
-                    "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
-                    "aju_no" => $this->request->getPost("aju_no"),
-                    "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
-                    "no_registration" => $this->request->getPost("no_registration"),
-                    "letter_no" => $this->request->getPost("letter_no"),
-                    "invoice_no" => $this->request->getPost("invoice_no"),
-                    "packaging" => $this->request->getPost("packaging"),
-                    "total_weight" => $this->request->getPost("total_weight"),
-                    "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
-                    "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
-                    "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
-                    "status_post" => $status_post,
-                    "status_penerimaan" => "LOKAL",
-                ];
-
-                $items = json_decode($this->request->getPost("items"));
-
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
+            if($get)
+            {
+                $multiple_po_id = json_decode($get->multiple_po_id);
 
                 if($status_post === "FINISH")
                 {
                     if($tipe_bahan === "BAKU")
                     {
+                       
                         foreach($multiple_po_id as $po_id)
                         {
                             $conditionUpdate = [
@@ -593,13 +539,13 @@ class PenerimaanBarangLokal extends BaseController
                             ];
             
                             $responseStatusPenerimaan = $this->rmPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
-
+                            
                             if(!$responseStatusPenerimaan) {
                                 $message =  'Data Ubah Status Penerimaan';
                                 $data = [
                                     "status"            => false,
                                     "message"    => $message,
-                                    "payload"   => $payload,
+                                    "payload"   => "",
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
@@ -619,164 +565,59 @@ class PenerimaanBarangLokal extends BaseController
                             ];
             
                             $responseStatusPenerimaan = $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
-
+                        
                             if(!$responseStatusPenerimaan) {
                                 $message =  'Data Ubah Status Penerimaan';
                                 $data = [
                                     "status"            => false,
                                     "message"    => $message,
-                                    "payload"   => $payload,
+                                    "payload"   => "",
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
                             }
                         }
                     }
-                }
-                
-                $condition = [
-                    'id' => $id
-                ];
 
-                $response = $this->penerimaanBarangModel->where($condition)->set($payload)->update();
-                // $response = '';
+                    $condition = [
+                        'id' => $id
+                    ];
+    
+                    $response = $this->penerimaanBarangModel->where($condition)->set(['status_post' => 'FINISH'])->update();
 
-                if ($response) {
-                    foreach($items as $data)
+                    if($response)
                     {
-                        $detailPayload = [];
-
-                        $detailPayload = [
-                            'purchase_order_details_id' => $data->purchase_order_details_id,
-                            'penerimaan_barang_id' => $id,
-                            'selisih' => $data->selisih,
-                            'harga' => $data->harga,
-                            'sub_total' => $data->sub_total,
-                            'keterangan' => $data->keterangan,
-                            'barang_id' => $data->barang_id,
-                            'qty' => $data->qty,
-                            'pph' => $data->ppn,
-                            'ppn' => $data->pph,
-                            'unit' => $data->unit,
-                            'nama_barang_dok' => $data->nama_barang_dok,
-                            'jml_masuk' => $data->jml_masuk
+                        $data = [
+                            "id" => "",
+                            "status"            => true,
+                            "message"   => "Data Berhasil diubah",
+                            "payload"   => "",
+                            "response" => $response,
+                            'token' => csrf_hash()
                         ];
-
-                        // $data = [
-                        //     "status"            => false,
-                        //     "message"    => $detailPayload,
-                        //     "payload"   => $detailPayload,
-                        //     'token' => csrf_hash()
-                        // ];
-                        // echo json_encode($data);
-
-                        // kalau hapus
-                        if($data->is_delete)
-                        {
-                            $responseDetail = $this->penerimaanBarangDetailModel->delete($data->id);
-
-                            if(!$responseDetail) {
-                                $message =  'Data Gagal Dihapus';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
-                        }
-
-                         // kalau update
-                        if($data->id)
-                        {
-                            $conditionDetail = [
-                                'id' => $data->id
-                            ];
-
-                            $responseDetail = $this->penerimaanBarangDetailModel->where($conditionDetail)->set($detailPayload)->update();
-
-                            if(!$responseDetail) {
-                                $message =  'Data Gagal Disimpan';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
-
-                            // ADD STOK
-                            if($status_post === "FINISH")
-                            {
-                                $find = $this->barangModel->find(formatter($data->barang_id, "STR_TO_INT"));
-
-                                if($find)
-                                {
-                                    $conditionUpdateStok = [
-                                        'id' => formatter($data->barang_id, "STR_TO_INT")
-                                    ];
-        
-                                    $payloadupdateStok = [
-                                        'stok' => formatter($find["stok"], "STR_TO_INT") + formatter($data->jml_masuk, "STR_TO_INT")
-                                    ];
-                    
-                                    $responseStok = $this->barangModel->where($conditionUpdateStok)->set($payloadupdateStok)->update();    
-
-                                    if(!$responseStok) {
-                                        $message =  'Gagal Tambah Stok';
-                                        $data = [
-                                            "status"            => false,
-                                            "message"    => $message,
-                                            "payload"   => $payload,
-                                            'token' => csrf_hash()
-                                        ];
-                                        echo json_encode($data);
-                                    }
-                                }
-                            }
-                        }
-
-                        // kalau create
-                        else
-                        {
-                            $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
-
-                            if(!$responseDetail) {
-                                $message =  'Data Gagal Diubah';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                            }
-                        }
+                        echo json_encode($data);
+                    } else {
+                        $message =  'Data Gagal Diubah';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => "",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
                     }
-                    
-                    $data = [
-                        "id" => "",
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
-                    ];
-                    echo json_encode($data);
                 }
-            } 
+            }
+            else
+            {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Penerimaan Barang Tidak Ditemukan",
+                    "payload"   => "",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
         }
         catch(\Exception $e)
         {

@@ -5747,6 +5747,10 @@ form .form-floating textarea {
   height: 50px;
 }
 
+.form-floating.spp-ptspp .l-spp-ptspp {
+  display: none;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {

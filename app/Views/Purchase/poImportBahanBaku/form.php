@@ -822,6 +822,11 @@
                             let tag_html = "";
                             let tag_total = "";
 
+                            list_items = [];
+                            total_harga_barang = 0;
+                            total_qty = 0;
+                            total_harga = 0;
+
                             row = 0;
 
                             $(".body-detail-table").empty()

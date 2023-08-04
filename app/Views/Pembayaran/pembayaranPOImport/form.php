@@ -33,7 +33,7 @@
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select" name="payment_type" id="payment_type">
-                            <option value=""></option>
+                            <option value="" disabled selected></option>
                             <option value="DP" <?= (!empty($paymentData) && $paymentData->payment_type == 'DP') ? 'selected' : '' ?>>DP</option>
                             <option value="Pelunasan" <?= (!empty($paymentData) && $paymentData->payment_type == 'Pelunasan') ? 'selected' : '' ?>>Pelunasan</option>
                         </select>
@@ -67,7 +67,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select " name="import_po" id="import_po">
+                        <select class="form-select " name="import_po" id="import_po" disabled>
                             <option disabled selected value=""></option>
                             <?php foreach ($poList ?? [] as $po): ?>
                             <option value="<?= $po->id ?>" <?= (!empty($paymentData) && $paymentData->po_id == $po->id) ? 'selected' : '' ?>><?= $po->po_no ?></option>
@@ -78,6 +78,19 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select " name="import_lpb" id="import_lpb" disabled>
+                            <option disabled selected value=""></option>
+                            <?php foreach ($lpbList ?? [] as $lpb): ?>
+                            <option value="<?= $lpb->id ?>" <?= (!empty($paymentData) && $paymentData->penerimaan_barang_id == $lpb->id) ? 'selected' : '' ?>><?= $lpb->lpb_no ?></option>
+                            <?php endforeach ?>
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">LPB Import</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_bukti_pembayaran" id="currency" value="<?= $paymentData->currency ?? '' ?>" placeholder="Currency" disabled>
@@ -86,14 +99,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" class="form-control" id="po_amt" name="po_amt" value="<?= $poData->total ?? '' ?>" disabled>
                         <label for="floatingInput">PO Amount</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
@@ -104,14 +117,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" class="form-control" id="current_exchange_rate" name="current_exchange_rate" value="<?= $paymentData->current_exchange_rate ?? '' ?>" onkeyup="formatNumber(this)">
                         <label for="floatingInput">Kurs saat ini</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
@@ -122,8 +135,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
@@ -134,6 +145,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <select class="form-select " name="payment_method" id="payment_method">
@@ -145,8 +158,6 @@
                         <label for="floatingInput" style="z-index: 1;">Payment Method</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
@@ -157,14 +168,14 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
                         <textarea name="note" class="form-control information text-area-all"><?= $paymentData->note ?? '' ?></textarea>
                         <label for="floatingInput">Note</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
@@ -242,7 +253,19 @@ $(document).ready(function() {
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
+    });
+
+    $("#payment_type").change(function() {
+
+        if ($(this).val() == 'DP') {
+            $('#import_lpb').prop('disabled', true);
+            $('#import_po').prop('disabled', false);
+        } else {
+            $('#import_lpb').prop('disabled', false);
+            $('#import_po').prop('disabled', true);
+        }
+
+    });
 
     $('#po_type').select2({
         placeholder: "",
@@ -281,8 +304,19 @@ $(document).ready(function() {
         placeholder: "",
         theme: "bootstrap-5"
     }).change(function(e) {
-        const url = ($('#po_type').val() == 'BAKU') ? '<?= base_url('/po-import-bahan-baku/payment-dropdown/'); ?>' : '<?= base_url('/po-import-bahan-penolong/payment-dropdown/'); ?>';
         const supplierId = $(this).val();
+        const paymentType = $('#payment_type').val();
+        
+        if (paymentType == 'DP') {
+            gokilDP(supplierId);
+        } else {
+            console.log('hahaha')
+            gokilPelunasan(supplierId);
+        }
+    });
+
+    function gokilDP(supplierId) {
+        const url = ($('#po_type').val() == 'BAKU') ? '<?= base_url('/po-import-bahan-baku/payment-dropdown/'); ?>' : '<?= base_url('/po-import-bahan-penolong/payment-dropdown/'); ?>';
 
         $("#import_po").empty();
         $("#import_po").select2({
@@ -310,9 +344,40 @@ $(document).ready(function() {
                 return container.text;
             }
         });
-    });
+    }
 
-    $('#import_po').select2({
+    function gokilPelunasan(supplierId) {
+        $("#import_lpb").empty();
+        $("#import_lpb").select2({
+            // placeholder: "Pilih Bro",
+            theme: "bootstrap-5",
+            ajax: {
+                url: `<?= base_url('/penerimaan-barang-import/receivedItemsBySupplier/') ?>${supplierId}`,
+                dataType: 'json',
+                processResults: function (res) {
+                    console.log('whyyyyyyyyyyyyyyyyyyyy')
+                    return {
+                        results: $.map(res.data, function (item) {
+                            console.log('heheheheheheheh')
+                            return {
+                                id: item.id,
+                                text: item.lpb_no,
+                                amount: +item.total,
+                                currency: item.currency
+                            }
+                        })
+                    };
+                }
+            },
+            templateSelection: function(container) {
+                $(container.element).attr("data-amount", container.amount);
+                $(container.element).attr("data-currency", container.currency);
+                return container.text;
+            }
+        });
+    }
+
+    $('#import_po, #import_lpb').select2({
         placeholder: "",
         theme: "bootstrap-5"
     }).change(function () {
