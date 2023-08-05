@@ -309,9 +309,9 @@ class Invoice extends BaseController
             'dataSo' => $dataSo
 
         ];
-        //echo json_encode($data);
+        echo json_encode($data);
 
-        return view('SalesLokal/Invoice/form', $data);
+        //return view('SalesLokal/Invoice/form', $data);
     }
 
     public function update()
