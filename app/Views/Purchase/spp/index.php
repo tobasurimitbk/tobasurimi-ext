@@ -4,13 +4,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Surat Permintaan Pembelian</h1>
+        <h1>Permintaan Pembelian</h1>
 
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item" onclick="pdf()">PDF</button></li>
+            <li><button class="dropdown-item" onclick="pdf('<?= base_url("spp/print-table"); ?>')">PDF</button></li>
         </ul>
 
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("spp/create"); ?>">
@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="">Pilih Tipe SPP</option>
                             <option value="Bahan Penolong Lokal">Bahan Penolong Lokal</option>
@@ -46,7 +46,7 @@
                             <option value="Bahan Baku Lokal">Bahan Baku Lokal</option>
                             <option value="Bahan Baku Import">Bahan Baku Import</option>
                         </select>
-                        <label for="floatingInput">Tipe SPP</label>
+                        <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
                     </div>
                 </div>
                 <div class="col mb-3">
@@ -484,8 +484,13 @@
     //     }
     // }
 
-    const pdf = function() {
-        window.open(`<?= getenv('apiURL'); ?>/purchaseRequest/print/all?search=${search}&currentPage=${currentPage}&pageSize=25&sort=${sort}&sortType=${sortType}`, "_blank");
+    const pdf = function(url) {
+        let search = $(".search").val();
+        let spp_type = $(".spp_type").val();
+        let dateStart = $(".dateStart").val();
+        let dateEnd = $(".dateEnd").val();
+
+        window.open(url + `?search=${search}&spp_type=${spp_type}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 
     const changeSort = function(val) {

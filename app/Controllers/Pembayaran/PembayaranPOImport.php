@@ -8,6 +8,7 @@ use App\Models\ImportPOPaymentModel;
 use App\Models\SupplierModel;
 use App\Models\RMImportPOModel;
 use App\Models\AMPurchaseOrderModel;
+use App\Models\PenerimaanBarangModel;
 
 class PembayaranPOImport extends BaseController
 {
@@ -44,6 +45,7 @@ class PembayaranPOImport extends BaseController
     {   
         $importPOPaymentModel = new ImportPOPaymentModel();
         $supplierModel = new SupplierModel();
+        $penerimaanBarangModel = new PenerimaanBarangModel();
 
         $selectQry = "import_po_payments.*, 
                       DATE_FORMAT(import_po_payments.payment_date, '%d/%m/%Y') AS payment_date,
@@ -66,17 +68,41 @@ class PembayaranPOImport extends BaseController
             ->where($supplierCondition)
             ->findAll();
 
-        $poData = $this->checkPO($paymentData->supplier_id, $paymentData->po_id, $paymentData->po_type);
+        $poData = null;
+        $poList = null;
+        $lpbList = null;
 
-        $poList = $this->getPOList($paymentData->supplier_id, $paymentData->po_type);
+        if ($paymentData->payment_type == 'DP') {
+            $poData = $this->checkPO($paymentData->supplier_id, $paymentData->po_id, $paymentData->po_type);
+            $poList = $this->getPOList($paymentData->supplier_id, $paymentData->po_type);
+        } else {
+            $poData = $penerimaanBarangModel->asObject()
+                ->select("SUM(penerimaan_barang_detail.harga * penerimaan_barang_detail.qty) AS total")
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL')
+                ->groupBy('penerimaan_barang_id')
+                ->find($paymentData->penerimaan_barang_id);
+
+            $selectQry = "penerimaan_barang.id AS id,
+                          no_penerimaan_barang AS lpb_no, 
+                          'USD' AS currency,
+                          SUM(penerimaan_barang_detail.harga * penerimaan_barang_detail.qty) AS total";
+
+            $lpbList = $penerimaanBarangModel->asObject()
+                ->select($selectQry)
+                ->where('penerimaan_barang.supplier_id', $paymentData->supplier_id)
+                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL')
+                ->groupBy('penerimaan_barang_id')
+                ->findAll();
+        }
 
         $data = [
             'paymentData'   => $paymentData,
             'supplierList'  => $supplierList,
             'poData'        => $poData,
-            'poList'        => $poList
+            'poList'        => $poList,
+            'lpbList'        => $lpbList
         ];
-
+// dd($data);
         return view('Pembayaran/pembayaranPOImport/form', $data);
     }
 
@@ -154,10 +180,10 @@ class PembayaranPOImport extends BaseController
                     "rules" => "required|is_natural"
                 ],
                 "import_po" => [
-                    "rules" => "required|is_natural"
+                    "rules" => "permit_empty|is_natural"
                 ],
-                "import_po" => [
-                    "rules" => "required|is_natural"
+                "import_lpb" => [
+                    "rules" => "permit_empty|is_natural"
                 ],
                 "payment_amt" => [
                     "rules" => "required|numeric"
@@ -193,6 +219,19 @@ class PembayaranPOImport extends BaseController
                 return;
             }
 
+            $poId = (int)$this->request->getPost('import_po');
+            $penerimaanBarangId = (int)$this->request->getPost('import_lpb');
+
+            if (empty($poId) && empty($penerimaanBarangId)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'PO or LPB is required!',
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             $supplierId = (int)$this->request->getPost('supplier_id');
             $supplierData = $supplierModel->asObject()
                 ->where('id', $supplierId)
@@ -208,19 +247,22 @@ class PembayaranPOImport extends BaseController
                 return;
             }
 
-            // validate PO here
             $poType = (string)$this->request->getPost('po_type');
-            $poId = (int)$this->request->getPost('import_po');
-            $poData = $this->checkPO($supplierId, $poId, $poType);
+            $poData = null;
 
-            if (empty($poData)) {
-                $data = [
-                    "status"    => false,
-                    "message"   => 'PO not Found!',
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
+            // validate PO here
+            if ($poId) {
+                $poData = $this->checkPO($supplierId, $poId, $poType);
+
+                if (empty($poData)) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => 'PO not Found!',
+                        'token'     => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
             }
 
             $payload = [
@@ -230,8 +272,9 @@ class PembayaranPOImport extends BaseController
                 'po_type'               => $poType,
                 'supplier_id'           => $supplierId,
                 'po_id'                 => $poId,
+                'penerimaan_barang_id'  => $penerimaanBarangId,
                 'voucher_no'            => $this->request->getPost('voucher_no'),
-                'currency'              => $poData->currency,
+                'currency'              => $poData->currency ?? 32,
                 'payment_amt'           => $this->request->getPost('payment_amt'),
                 'current_exchange_rate' => $this->request->getPost('current_exchange_rate'),
                 'payment_date'          => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
@@ -398,7 +441,7 @@ class PembayaranPOImport extends BaseController
         $summaryNo = "{$numberTemplate}0001";
         
         if (!empty($lastData)) {
-            $exploded = explode('/', $lastData->summary_no);
+            $exploded = explode('/', $lastData->payment_no);
             $lastIncrement = (int)$exploded[4] + 1;
 
             $paddedNumber = str_pad($lastIncrement, 4, 0, STR_PAD_LEFT);

@@ -110,33 +110,90 @@ if (!function_exists('formatter')) {
    }
 }
 
-function romanMonthNumber(int $number): string {
+function romanMonthNumber(int $number): string
+{
    $map = [
-      'M'   => 1000, 
-      'CM'  => 900, 
-      'D'   => 500, 
-      'CD'  => 400, 
-      'C'   => 100, 
-      'XC'  => 90, 
-      'L'   => 50, 
-      'XL'  => 40, 
-      'X'   => 10, 
-      'IX'  => 9, 
-      'V'   => 5, 
-      'IV'  => 4, 
+      'M'   => 1000,
+      'CM'  => 900,
+      'D'   => 500,
+      'CD'  => 400,
+      'C'   => 100,
+      'XC'  => 90,
+      'L'   => 50,
+      'XL'  => 40,
+      'X'   => 10,
+      'IX'  => 9,
+      'V'   => 5,
+      'IV'  => 4,
       'I'   => 1
    ];
    $returnValue = '';
 
    while ($number > 0) {
       foreach ($map as $roman => $int) {
-         if($number >= $int) {
-               $number -= $int;
-               $returnValue .= $roman;
-               break;
+         if ($number >= $int) {
+            $number -= $int;
+            $returnValue .= $roman;
+            break;
          }
       }
    }
-   
+
    return $returnValue;
+}
+
+function penyebut(int $nilai): string {
+   $huruf = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+   $temp = "";
+
+   if ($nilai < 12) {
+       $temp = " ". $huruf[floor($nilai)];
+   } elseif ($nilai <20) {
+       $temp = penyebut($nilai - 10). " belas";
+   } elseif ($nilai < 100) {
+       $temp = penyebut($nilai/10)." puluh". penyebut(floor($nilai) % 10);
+   } elseif ($nilai < 200) {
+       $temp = " seratus" . penyebut($nilai - 100);
+   } else if ($nilai < 1000) {
+       $temp = penyebut($nilai/100) . " ratus" . penyebut(floor($nilai) % 100);
+   } else if ($nilai < 2000) {
+       $temp = " seribu" . penyebut($nilai - 1000);
+   } else if ($nilai < 1000000) {
+       $temp = penyebut($nilai/1000) . " ribu" . penyebut($nilai % 1000);
+   } else if ($nilai < 1000000000) {
+      $temp = penyebut($nilai/1000000) . " juta" . penyebut($nilai % 1000000);
+   } else if ($nilai < 1000000000000) {
+      $temp = penyebut($nilai/1000000000) . " milyar" . penyebut(fmod($nilai,1000000000));
+   } else if ($nilai < 1000000000000000) {
+      $temp = penyebut($nilai/1000000000000) . " trilyun" . penyebut(fmod($nilai,1000000000000));
+   }
+
+   return $temp;
+}
+
+function terbilang($x)
+{
+   $angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+
+   if ($x < 12)
+      return " " . $angka[$x];
+   elseif ($x < 20)
+      return terbilang($x - 10) . " Belas";
+   elseif ($x < 100)
+      return terbilang($x / 10) . " Puluh" . terbilang($x % 10);
+   elseif ($x < 200)
+      return "Seratus" . terbilang($x - 100);
+   elseif ($x < 1000)
+      return terbilang($x / 100) . " Ratus" . terbilang($x % 100);
+   elseif ($x < 2000)
+      return "Seribu" . terbilang($x - 1000);
+   elseif ($x < 1000000)
+      return terbilang($x / 1000) . " Ribu" . terbilang($x % 1000);
+   elseif ($x < 1000000000)
+      return terbilang($x / 1000000) . " Juta" . terbilang($x % 1000000);
+   elseif ($x < 1000000000000)
+      return terbilang($x / 1000000000) . " Miliar" . " " . terbilang($x % 1000000000);
+   elseif ($x < 1000000000000000)
+      return terbilang($x / 1000000000000) . " Triliun" . " " . terbilang($x % 1000000000000);
+
 }

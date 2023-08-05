@@ -178,12 +178,6 @@ class POImportBahanBaku extends BaseController
                 ],
                 "currency" => [
                     "rules" => "required"
-                ],
-                "payment_date" => [
-                    "rules" => "required"
-                ],
-                "dpp" => [
-                    "rules" => "required"
                 ]
             ];
 
@@ -213,9 +207,7 @@ class POImportBahanBaku extends BaseController
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "total" => $this->request->getPost("total"),
-                    "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                    "payment_term" => $this->request->getPost("payment_term"),
                     "note" => $this->request->getPost("note"),
                     "createdBy" => $this->user_id,
                     "is_posted" => 0,
@@ -280,6 +272,8 @@ class POImportBahanBaku extends BaseController
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
+                            'remaining_qty' => $data->qty,
+                            'qty_diterima' => 0,
                             'price' => $data->price,
                             'disc' => $data->disc,
                             'additional_cost' => $data->additional_cost
@@ -358,12 +352,6 @@ class POImportBahanBaku extends BaseController
                 ],
                 "currency" => [
                     "rules" => "required"
-                ],
-                "payment_date" => [
-                    "rules" => "required"
-                ],
-                "dpp" => [
-                    "rules" => "required"
                 ]
             ];
 
@@ -391,10 +379,8 @@ class POImportBahanBaku extends BaseController
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "warehouse_id" => $warehouse_id,
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "payment_term" => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                    "payment_term" => $this->request->getPost("payment_term"),
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "dpp" => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note" => $this->request->getPost("note"),
                     "createdBy" => $this->user_id,
                     "total" => $this->request->getPost("total")
@@ -463,6 +449,8 @@ class POImportBahanBaku extends BaseController
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
+                            'remaining_qty' => $data->qty,
+                            'qty_diterima' => 0,
                             'price' => $data->price,
                             'disc' => $data->disc,
                             'additional_cost' => $data->additional_cost

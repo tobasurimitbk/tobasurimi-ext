@@ -17,9 +17,11 @@ class ImportPOPaymentModel extends Model
     protected $allowedFields    = [
         'company_id',
         'payment_no',
+        'payment_type',
         'supplier_id',
         'po_type',
         'po_id',
+        'penerimaan_barang_id',
         'voucher_no',
         'currency',
         'payment_amt',

@@ -74,7 +74,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
-                                <label for="floatingInput">Nomor NPWP</label>
+                                <label for="floatingInput"> NPWP</label>
                             </div>
                         </div>
                         <div class="col-md-6">

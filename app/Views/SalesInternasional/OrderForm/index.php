@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Order Form Internasional</h1>
+        <h1>Sales Order Internasional</h1>
     </div>
     <div class="card">
         <div class="card-body">

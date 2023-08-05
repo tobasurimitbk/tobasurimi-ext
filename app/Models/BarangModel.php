@@ -223,6 +223,7 @@ class BarangModel extends Model
             'metadata.deletedAt' => null,
             'barangs.type' => $type
         ];
+        // FORMAT(CEILING(barangs.harga_barang), 'N', 'en-us') AS harga_barang,
 
         $selectQry = "barangs.*,
         metadata.value AS value, 

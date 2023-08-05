@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Purchase Order Lokal Bahan Penolong</h1>
+    <h1>PO Lokal Bahan Penolong</h1>
     <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal-bahan-penolong/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>

@@ -70,62 +70,52 @@
         <table class="mt-1 w-100">
             <tr>
                 <td>
-                    <div style="margin-top: -40px;">
-                        <div style="font-size:14pt"> <b> PT TOBA SURIMI INDUSTRIES, Tbk </b></div>
-                        <div style="white-space: wrap">Medan merdeka barat no 20, Medan Utara</div>
-                        <div style="white-space: wrap">021-327829</div>
+                    <div>
+                        <div><b> Laporan Barang Masuk </b></div>
+                        <div style="white-space: wrap"><?= $dataPenerimaanBarang->aju_type_name; ?> / <?= $dataPenerimaanBarang->aju_no; ?></div>
+                        <div style="white-space: wrap">Tanggal: <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></div>
                         <div style="white-space: wrap"></div>
                     </div>
                 </td>
+            </tr>
+        </table>
+        <table class="mt-5 w-100">
+            <tr>
                 <td>
-                    <table class="mt-1 w-100">
-                        <tr>
-                            <td>
-                                <div style="margin-top: -11px;">
-                                    <div style=""> <b> Laporan Barang Masuk </b></div>
-                                    <br />
-                                    <div style="white-space: wrap"><?= $dataPenerimaanBarang->aju_type_name; ?> / <?= $dataPenerimaanBarang->aju_no; ?></div>
-                                    <br />
-                                    <div style="white-space: wrap">Tanggal: <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></div>
-                                    <br />
-                                    <div style="white-space: wrap"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div style="margin-top: -11px;">
-                                    <div style=""> <b> From : <?= $dataPenerimaanBarang->supplier_name; ?></b></div>
-                                    <br />
-                                    <div style="white-space: wrap">Address : <?= $dataPenerimaanBarang->supplier_address; ?></div>
-                                    <br />
-                                    <div style="white-space: wrap">Phone : <?= $dataPenerimaanBarang->supplier_phone; ?></div>
-                                    <br />
-                                    <div style="white-space: wrap"></div>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                    <div>
+                        <div style=""> <b> Gudang : <?= $dataPenerimaanBarang->warehouse_name; ?></b></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table class="mt-5 w-100">
+            <tr>
+                <td>
+                    <div>
+                        <div style=""> <b> From : <?= $dataPenerimaanBarang->supplier_name; ?></b></div>
+                        <div style="white-space: wrap">Address : <?= $dataPenerimaanBarang->supplier_address; ?></div>
+                        <div style="white-space: wrap">Phone : <?= $dataPenerimaanBarang->supplier_phone; ?></div>
+                        <div style="white-space: wrap"></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table class="mt-5 w-100">
+            <tr>
+                <td>
+                    <div>
+                        <div style=""><b>Kemasan / Berat : <?= $dataPenerimaanBarang->packaging; ?> / <?= $dataPenerimaanBarang->total_weight; ?></b></div>
+                        <div style="white-space: wrap">No. LPB : <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></div>
+                        <div style="white-space: wrap">No. Order : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?></div>
+                        <div style="white-space: wrap"></div>
+                    </div>
                 </td>
             </tr>
         </table>
     </div>
 
-    <div class="inline" style="margin-top:3rem">
+    <div class="inline" style="margin-top:1rem">
         <br />
-        <div>Kemasan / Berat
-        : <?= $dataPenerimaanBarang->packaging; ?> / <?= $dataPenerimaanBarang->total_weight; ?>
-        </div>
-        <div class="inline" >
-        <br />
-        <div>No. Order
-        : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?>
-        </div>
-        <div class="inline" >
-        <br />
-        <div>File/Style No
-        : KREDIT,KREDIT,KREDIT
-        </div>
-
-        <div style="margin-top:1rem">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
         <table class="table"
         style="
             border-collapse: collapse;
@@ -135,16 +125,11 @@
         <thead>
             <tr>
             <td><b>No.</b></td>
-            <td><b>Kode Barang</b></td>
             <td><b>Nama Barang</b></td>
-            <td><b>Spesifikasi</b></td>
+            <td><b>No. PO</b></td>
             <td><b>Satuan</b></td>
-            <td><b>Jumlah Diterima</b></td>
-            <td><b>Jumlah Dokumen</b></td>
-            <td><b>Jumlah Order</b></td>
-            <td><b>Konversi</b></td>
-            <td><b>Harga</b></td>
-            <td><b>Penyerahan</b></td>
+            <td><b>Jumlah</b></td>
+            <td><b>Sub Total</b></td>
             <td><b>Keterangan</b></td>
             </tr>
         </thead>
@@ -152,43 +137,36 @@
             <?php 
             $no = 1;
             $jml_masuk = 0;
-            $jml_dokumen = 0;
             $jml_order = 0;
-            $jml_konversi = 0;
             $jml_harga = 0;
-            $jml_penyerahan = 0;
+            $jml_sub_total = 0;
 
             foreach($dataPenerimaanBarangDetail as $detail){ 
                 $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_INT");
-                $jml_dokumen = $jml_dokumen + formatter($detail["doc_qty"], "STR_TO_INT");
                 $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_INT");
-                $jml_konversi = $jml_konversi + formatter($detail["konversi"], "STR_TO_INT");
                 $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
-                $jml_penyerahan = $jml_penyerahan + formatter($detail["penyerahan"], "STR_TO_INT");
+                $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $detail["kode_barang"]; ?></td>
                 <td><?= $detail["nama_barang"]; ?></td>
-                <td><?= $detail["spec"]; ?></td>
+                <td><?= $detail["po_no"]; ?></td>
                 <td><?= $detail["nama_satuan"]; ?></td>
                 <td><?= $detail["jml_masuk"]; ?></td>
-                <td><?= $detail["doc_qty"]; ?></td>
-                <td><?= $detail["qty"]; ?></td>
-                <td><?= $detail["konversi"]; ?></td>
-                <td><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
-                <td><?= number_format(formatter($detail["penyerahan"], "STR_TO_INT")); ?></td>
+                <td><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
                 <td><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
                 <tr>
-                    <td colspan="5"></td>
+                    <td style="text-align:center" colspan="4">Grand Total</td>
                     <td><?= $jml_masuk; ?></td>
-                    <td><?= $jml_dokumen; ?></td>
-                    <td><?= $jml_order; ?></td>
-                    <td><?= $jml_konversi; ?></td>
-                    <td><?= number_format($jml_harga); ?></td>
-                    <td><?= number_format($jml_penyerahan); ?></td>
+                    <td><?= number_format($jml_sub_total); ?></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center" colspan="4">Ongkos Kirim</td>
+                    <td></td>
+                    <td><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
                     <td></td>
                 </tr>
             </tbody>
@@ -196,14 +174,13 @@
 
         <table class="w-100 sign-table border-collapse">
             <tr>
-                <td style="height: 50px;"></td>
+                <td style="height: 80px;"></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr>
-            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Prepared&nbsp;by:</div></td>
-            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Checked&nbsp;by:</div></td>
-            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Approved&nbsp;by:</div></td>
+            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Pembelian:</div></td>
+            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Accounting:</div></td>
             </tr>
         </table>
     </div>
