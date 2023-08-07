@@ -5,6 +5,7 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
+use App\Models\UserModel;
 
 class Employee extends BaseController
 {
@@ -12,6 +13,7 @@ class Employee extends BaseController
     protected $this_company_id;
     protected $ProvincesModel;
     protected $EmployeesModel;
+    protected $UserModel;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class Employee extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->ProvincesModel = new ProvincesModel();
         $this->EmployeesModel = new EmployeesModel();
+        $this->UserModel = new UserModel();
     }
 
     public function employee()
@@ -367,6 +370,27 @@ class Employee extends BaseController
                 $payload = '';
 
                 $id = $this->request->getPost("id");
+                $status = $this->request->getPost("status");
+
+                // update status user when employee status changed
+                if($status === "AKTIF")
+                {
+                    $user = $this->UserModel->getByEmployeeId($id);
+
+                    if($user)
+                    {
+                        $this->UserModel->where(['id' => $user[0]->id])->set(['status' => 'Aktif'])->update();
+                    }
+                }
+                else
+                {
+                    $user = $this->UserModel->getByEmployeeId($id);
+
+                    if($user)
+                    {
+                        $this->UserModel->where(['id' => $user[0]->id])->set(['status' => 'Non Aktif'])->update();
+                    }
+                }
 
                 $values = [
                     "company_id" => $this->this_company_id,

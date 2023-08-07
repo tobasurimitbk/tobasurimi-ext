@@ -10,6 +10,7 @@
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
+                    <input type="hidden" class="create_name" name="create_name" id="create_name" />
                     <!-- <input type="hidden" class="company_role" name="company_role" id="company_role" /> -->
                     <?= csrf_field() ?>
                     <div class="row">
@@ -37,19 +38,17 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Name" maxlength="30">
-                                <label for="floatingInput">Nama</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
+                        <div class="col col-create">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select employee_id" name="employee_id" id="employee_id">
-                                    <option value=""></option>
+                                    <option value="" data-name=""></option>
                                 </select>
+                                <label for="floatingInput">Employee</label>
+                            </div>
+                        </div>
+                        <div class="col col-edit">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly type="text" class="form-control name" id="name" name="name" placeholder="Employee">
                                 <label for="floatingInput">Employee</label>
                             </div>
                         </div>
@@ -287,6 +286,13 @@
     });
     
     $(document).ready(function() {
+        $('.create-form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13) {
+                e.preventDefault();
+                return false;
+            }
+        });
 
         $('.employee_id').select2({
             placeholder: "",
@@ -370,9 +376,6 @@
 
         var validator = $(".create-form").validate({
             rules: {
-                name: {
-                    required: true
-                },
                 username: {
                     required: true
                 },
@@ -382,9 +385,6 @@
                 }
             },
             messages: {
-                name: {
-                    required: "Nama wajib diisi"
-                },
                 username: {
                     required: "Username wajib diisi"
                 },
@@ -466,6 +466,9 @@
 
             $(".company_role").val('');
 
+            $(".col-create").css("display", "");
+            $(".col-edit").css("display", "none");
+
             $(".company_id").val("").change();
             $(".role_id").val("").change();
             $(".body-detail-table").empty()
@@ -485,9 +488,9 @@
                 success: function(res) {
                     $(".employee_id").empty()
                     $(".employee_id").val("").change()
-                    $(".employee_id").append(`<option value=""></option>`)
+                    $(".employee_id").append(`<option value="" data-name=""></option>`)
                     res.data.forEach(function(item) {
-                        $(".employee_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+                        $(".employee_id").append(`<option data-name="${item.name}" value="${item.id}">${item.nip} - ${item.name}</option>`)
                     })
                     $(".add-modal").modal("show")
                 }
@@ -506,6 +509,18 @@
 
         $(".search").keyup(function () {
             table.ajax.reload();
+        })
+
+        $(".employee_id").change(function() {
+            let name = $(".employee_id option:selected").data('name')
+            console.log(name)
+            if ($(".employee_id option:selected").val()) {
+                $(".create_name").val(name)
+            }
+            else
+            {
+                $(".create_name").val("")
+            }
         })
 
         $(".btn-submit-detail").click(function() {
@@ -760,6 +775,8 @@
                             // CREATE
                             else
                             {
+                                data.append("name", $(".create_name").val())
+
                                 $.ajax({
                                     url: "<?= base_url("user/save"); ?>",
                                     data: data,
@@ -880,6 +897,9 @@
             let id = data.id;
             $(".title-name").text("Update");
 
+            $(".col-create").css("display", "none");
+            $(".col-edit").css("display", "");
+
             validator.resetForm();
             validator.reset();
 
@@ -890,7 +910,7 @@
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
+                        $(".name").val(res?.data?.nip + " - " + res?.data?.name);
                         $(".username").val(res?.data?.username);
                         $(".status").val(res?.data?.status);
 
@@ -921,22 +941,7 @@
                         })
 
                         $(".body-detail-table").append(tag_html)
-
-                        $.ajax({
-                            url: `<?= base_url("employee/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".employee_id").empty()
-                                $(".employee_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".employee_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
-                                })
-                                console.log("tes", res?.data?.employee_id)
-                                $(".employee_id").val(res?.data?.employee_id).change();
-                                $(".add-modal").modal("show")
-                            }
-                        })
+                        $(".add-modal").modal("show")
                     }
                     else
                     {
