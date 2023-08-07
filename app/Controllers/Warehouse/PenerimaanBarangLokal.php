@@ -292,7 +292,8 @@ class PenerimaanBarangLokal extends BaseController
                     "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
                     "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
                     "ppnbm" => formatter($this->request->getPost("ppnbm"), "CURR_TO_INT"),
-                    "status_post" => $status_post,
+                    "status_post" => "FINISH",
+                    "status_po" => $status_post === "WAITING" ? "OPEN" : "CLOSED",
                     "status_penerimaan" => "LOKAL",
                 ];
 
@@ -583,7 +584,7 @@ class PenerimaanBarangLokal extends BaseController
                         'id' => $id
                     ];
     
-                    $response = $this->penerimaanBarangModel->where($condition)->set(['status_post' => 'FINISH'])->update();
+                    $response = $this->penerimaanBarangModel->where($condition)->set(['status_po' => 'CLOSED'])->update();
 
                     if($response)
                     {

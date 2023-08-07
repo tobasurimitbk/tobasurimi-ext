@@ -2,10 +2,10 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal add-modal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Role</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Tunjangan</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -14,8 +14,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Role</label>
+                                <input type="text" class="form-control name" id="nama" name="nama" placeholder="Nama">
+                                <label for="floatingInput">Nama</label>
                             </div>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Role</h1>
+        <h1>Tunjangan</h1>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -51,7 +51,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('name')" class="sort">Role</th>
+                                <th onclick="changeSort('name')" class="sort">Nama</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -66,7 +66,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "name";
+    let sort = "nomor";
     let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
@@ -84,7 +84,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("role/all"); ?>",
+            url: "<?= base_url("tunjangan/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -102,14 +102,15 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "name",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                sortable: false
+            },
+            {
+                data: "name",
+                className: "text-center"
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -125,18 +126,16 @@
     });
 
     $(document).ready(function() {
-        // $('.division_id').select2({
-        //     theme: 'bootstrap4'
-        // })
+
         var validator = $(".create-form").validate({
             rules: {
-                name: {
+                nama: {
                     required: true
                 }
             },
             messages: {
-                name: {
-                    required: "Role wajib diisi"
+                nama: {
+                    required: "Nama wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -188,14 +187,13 @@
             validator.reset();
 
             $.ajax({
-                url: "<?= base_url("role/id"); ?>" + "/" + id,
+                url: "<?= base_url("tunjangan/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    console.log(res);
                     if (res.status) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
+                        $("#nama").val(res?.data?.name);
 
                         $(".add-modal").modal("show")
                     } else {
@@ -234,7 +232,7 @@
                         // UPDATE
                         if (id) {
                             $.ajax({
-                                url: "<?= base_url("role/update"); ?>",
+                                url: "<?= base_url("tunjangan/update"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -279,7 +277,7 @@
                         // CREATE
                         else {
                             $.ajax({
-                                url: "<?= base_url("role/save"); ?>",
+                                url: "<?= base_url("tunjangan/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -342,7 +340,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("role/delete"); ?>",
+                        url: "<?= base_url("tunjangan/delete"); ?>",
                         data: {
                             id: id
                         },

@@ -158,7 +158,7 @@ class RMImportPOModel extends Model
         $builder->like('po_no', $lastStr);
         $query = $builder->get();
 
-        $lastPO = '1';
+        $lastPO = '01';
         if ($query->getResultArray()) {
             $lastFirst = explode('/', $query->getResultArray()[0]['po_no']);
             $lastPO = explode('-', $lastFirst[0]);
