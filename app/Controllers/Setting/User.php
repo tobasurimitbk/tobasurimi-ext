@@ -5,6 +5,7 @@ namespace App\Controllers\Setting;
 use App\Controllers\BaseController;
 use App\Models\CompaniesModel;
 use App\Models\AccessListsModel;
+use App\Models\UserModel;
 
 use DateTime;
 
@@ -16,6 +17,7 @@ class User extends BaseController
     protected $session;
     protected $CompaniesModel;
     protected $AccessListsModel;
+    protected $UserModel;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class User extends BaseController
         $this->session = session()->get("login");
         $this->CompaniesModel = new CompaniesModel();
         $this->AccessListsModel = new AccessListsModel();
+        $this->UserModel = new UserModel();
     }
 
     public function changeCompany()
@@ -110,35 +113,42 @@ class User extends BaseController
             "idCompany" => $this->this_company_id
         ];
 
-        $response = curl_request("GET", "/users", $this->token, $payload);
+        $condition = [
+            "company_id" => $this->this_company_id
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType")
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $userData = $this->UserModel->getList($condition, $addCondition, $limit, $offset);
+
         $dataUser = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataUser, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "username" => $data->username,
-                    "name" => $data->name,
-                    "employeeName" => $data->employeeName,
-                    "status" => $data->status,
-                ]);
-            }
+        foreach ($userData['data'] as $data) {
+            array_push($dataUser, [
+                "no" => $no++,
+                "id" => $data->id,
+                "username" => $data->username,
+                "name" => $data->name,
+                "employeeName" => $data->employeeName,
+                "status" => $data->status,
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataUser,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $userData['totalData'],
+            "recordsFiltered"   => $userData['totalFilteredData'],
+            "data"              => $dataUser,
+            // "response" => $response,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -294,9 +304,21 @@ class User extends BaseController
         if (!empty($id)) {
             $response = curl_request("GET", "/users/$id?idCompany=$this->this_company_id", $this->token);
             if ($response["code"] === 200) {
+                // $company_role = [];
+                // $result_company_role = json_decode(json_decode($response["body"])->data->company_role);
+
+                // foreach($result_company_role as $value)
+                // {
+                //     // $join = $;
+                //     // if($join)
+                //     // {
+                //     //     array_push($company_role, $join);
+                //     // }
+                // }
                 $data = [
                     "status"  => true,
                     "data"  => json_decode($response["body"])->data,
+                    // "company_role" => $company_role
                 ];
                 echo json_encode($data);
             } else {
