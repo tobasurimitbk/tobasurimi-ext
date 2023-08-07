@@ -71,4 +71,17 @@ class CompaniesModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getCompanies()
+    {
+        $arrCondition = [
+            'deletedAt' => null
+        ];
+
+        $builder = $this->db->table('companies');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResultArray();
+    }
 }

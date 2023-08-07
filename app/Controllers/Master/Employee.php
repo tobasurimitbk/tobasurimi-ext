@@ -35,10 +35,7 @@ class Employee extends BaseController
     public function dropdownEmployee()
     {
         $dataEmployee = [];
-        // $responseEmployee = curl_request("GET", "/employees/selectOption?idCompany=$this->this_company_id", $this->token);
-        // if ($responseEmployee["code"] === 200) {
-        //     $dataEmployee = json_decode($responseEmployee["body"])->data;
-        // }
+        $dataEmployee = $this->EmployeesModel->getEmployees($this->this_company_id);
 
         $data = [
             "data" => $dataEmployee

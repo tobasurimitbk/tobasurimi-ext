@@ -148,8 +148,8 @@
 <div class="card">
     <div class="card-body">
         <div class="row justify-content-end mb-3">
-            <div class="col-md-2">
-                <input class="form-control search form-out-search" placeholder="Search" value="" />
+            <div class="col-md-4">
+                <input class="form-control search form-out-search" placeholder="Ketik Username / Name" value="" />
             </div>
         </div>
         <div class="row">
@@ -889,7 +889,7 @@
                         company_role = []
                         let tag_html = "" 
 
-                        res.data.company_role.map((item) => {
+                        res?.company_role.map((item) => {
                             tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-companyid ="${item.company_id}" data-roleid ="${item.role_id}">`;
                             tag_html += "<td>";
                             tag_html += item.company_name;
