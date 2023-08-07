@@ -162,22 +162,40 @@ class POImportBahanBaku extends BaseController
         try{
             $rules = [
                 "purchase_request_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'SPP tidak boleh kosong'
+                    ]
                 ],
                 "po_no" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. PO tidak boleh kosong'
+                    ]
                 ],
                 "po_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal tidak boleh kosong'
+                    ]
                 ],
                 "supplier_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Supplier tidak boleh kosong'
+                    ]
                 ],
                 "payment_term" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Termin Pembayaran tidak boleh kosong'
+                    ]
                 ],
                 "currency" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Valas tidak boleh kosong'
+                    ]
                 ]
             ];
 
@@ -339,19 +357,34 @@ class POImportBahanBaku extends BaseController
         try{
             $rules = [
                 "po_no" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. PO tidak boleh kosong'
+                    ]
                 ],
                 "po_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal tidak boleh kosong'
+                    ]
                 ],
                 "supplier_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Supplier tidak boleh kosong'
+                    ]
                 ],
                 "payment_term" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Termin Pembayaran tidak boleh kosong'
+                    ]
                 ],
                 "currency" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Valas tidak boleh kosong'
+                    ]
                 ]
             ];
 

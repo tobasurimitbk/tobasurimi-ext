@@ -107,10 +107,16 @@ class Barang extends BaseController
             $rules = [
                 "kode_barang" => [
                     "rules" => "required|is_unique[barangs.kode_barang]",
-                    'errors' => ['is_unique' => 'kode Barang sudah ada!']
+                    'errors' => [
+                        'required' => 'Kode Barang tidak boleh kosong',
+                        'is_unique' => 'kode Barang sudah ada'
+                    ]
                 ],
                 "nama_barang" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama Barang tidak boleh kosong'
+                    ]
                 ]
             ];
 
@@ -213,7 +219,10 @@ class Barang extends BaseController
         try {
             $rules = [
                 "nama_barang" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama Barang tidak boleh kosong'
+                    ]
                 ]
             ];
 

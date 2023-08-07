@@ -217,40 +217,76 @@ class PenerimaanBarangLokal extends BaseController
         try{
             $rules = [
                 "no_penerimaan_barang" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. Penerimaan Barang tidak boleh kosong'
+                    ]
                 ],
                 "supplier_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Supplier tidak boleh kosong'
+                    ]
                 ],
                 "warehouse_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Warehouse tidak boleh kosong'
+                    ]
                 ],
                 "aju_document_type" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Jenis Dokumen tidak boleh kosong'
+                    ]
                 ],
                 "tipe_bahan" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tipe Bahan tidak boleh kosong'
+                    ]
                 ],
                 "aju_no" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. AJU tidak boleh kosong'
+                    ]
                 ],
                 "validation_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Pendaftaran tidak boleh kosong'
+                    ]
                 ],
                 "no_registration" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. Pendaftaran tidak boleh kosong'
+                    ]
                 ],
                 "invoice_no" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. Invoice tidak boleh kosong'
+                    ]
                 ],
                 "packaging" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Kemasan tidak boleh kosong'
+                    ]
                 ],
                 "total_weight" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Berat tidak boleh kosong'
+                    ]
                 ],
                 "biaya_masuk" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Biaya Masuk tidak boleh kosong'
+                    ]
                 ]
             ];
 
