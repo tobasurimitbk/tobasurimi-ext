@@ -127,7 +127,7 @@
     $(document).ready(function() {
         $('.create-form').on('keyup keypress', function(e) {
             var keyCode = e.keyCode || e.which;
-            if (keyCode === 13) { 
+            if (keyCode === 13) {
                 e.preventDefault();
                 return false;
             }
@@ -216,15 +216,6 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
-
-        $('#name').keypress(function(event) {
-            // event.preventDefault()
-            const keycode = (event.keyCode ? event.keyCode : event.which);
-            if (keyCode === 13) {
-                console.log(keycode)
-                event.preventDefault()
-            }
-        });
 
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
