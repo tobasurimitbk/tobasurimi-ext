@@ -116,10 +116,12 @@
         columns: [{
                 data: "no",
                 className: "text-center",
-                sortable: false
+                sortable: false,
+                width: "5%"
             }, {
                 data: "date",
-                className: "text-center"
+                className: "text-center",
+                width: "10%"
             },
             {
                 data: "name",
