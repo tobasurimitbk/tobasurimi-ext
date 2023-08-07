@@ -89,4 +89,21 @@ class EmployeesModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getEmployees($company_id)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id
+        ];
+
+        $builder = $this->db->table('employees')
+        ->select("employees.*, users.name as users_name")
+        ->join('users', 'users.employee_id = employees.id', 'left')
+        ->where('users.name', NULL);
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResultArray();
+    }
 }

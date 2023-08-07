@@ -365,6 +365,10 @@ $routes->post('/order-form-internasional/update', 'SalesInternasional\OrderForm:
 $routes->post('/order-form-internasional/update-status', 'SalesInternasional\OrderForm::updateStatus', ['filter' => 'Auth']);
 
 // PRODUKSI
+// Production Result
+$routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
+$routes->get('/production-result/create', 'Production\ProductionResult::createProductionResult', ['filter' => 'Auth']);
+
 // Rencana Produksi
 $routes->get('/work-order', 'Production\WorkOrder::index', ['filter' => 'Auth']);
 $routes->get('/work-order/id/(:segment)', 'Production\WorkOrder::getById/$1', ['filter' => 'Auth']);

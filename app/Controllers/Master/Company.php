@@ -362,7 +362,8 @@ class Company extends BaseController
     public function dropdownCompany()
     {
         //$responseCompany = curl_request("GET", "/companies/all", $this->token);
-        $dataCompany = $this->CompaniesModel->search_list(array(), "value");
+        $dataCompany = [];
+        $dataCompany = $this->CompaniesModel->getCompanies();
 
         $data = [
             "data" => $dataCompany
