@@ -125,9 +125,14 @@
     });
 
     $(document).ready(function() {
-        // $('.division_id').select2({
-        //     theme: 'bootstrap4'
-        // })
+        $('.create-form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13) { 
+                e.preventDefault();
+                return false;
+            }
+        });
+
         var validator = $(".create-form").validate({
             rules: {
                 name: {
