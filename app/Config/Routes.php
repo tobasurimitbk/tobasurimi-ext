@@ -431,6 +431,9 @@ $routes->get('/company/dropdown', 'Master\Company::dropdownCompany', ['filter' =
 // ROLE
 $routes->get('/role/dropdown', 'Setting\Role::dropdownRole', ['filter' => 'Auth']);
 
+// JABATAN
+$routes->get('/jabatan/dropdown', 'Personalia\Jabatan::dropdownJabatan', ['filter' => 'Auth']);
+
 // USER
 $routes->get('/user/dropdown', 'Setting\User::dropdownUser', ['filter' => 'Auth']);
 
@@ -562,12 +565,12 @@ $routes->post('/role/update', 'Setting\Role::updateRole', ['filter' => 'Auth']);
 $routes->post('/role/delete', 'Setting\Role::deleteRole', ['filter' => 'Auth']);
 
 // JABATAN
-$routes->get('/jabatan', 'Setting\Role::role', ['filter' => 'Auth']);
-$routes->get('/jabatan/all', 'Setting\Role::allRole', ['filter' => 'Auth']);
-$routes->get('/jabatan/id/(:segment)', 'Setting\Role::getByIdRole/$1', ['filter' => 'Auth']);
-$routes->post('/jabatan/save', 'Setting\Role::saveRole', ['filter' => 'Auth']);
-$routes->post('/jabatan/update', 'Setting\Role::updateRole', ['filter' => 'Auth']);
-$routes->post('/jabatan/delete', 'Setting\Role::deleteRole', ['filter' => 'Auth']);
+$routes->get('/jabatan', 'Personalia\Jabatan::jabatan', ['filter' => 'Auth']);
+$routes->get('/jabatan/all', 'Personalia\Jabatan::allJabatan', ['filter' => 'Auth']);
+$routes->get('/jabatan/id/(:segment)', 'Personalia\Jabatan::getByIdJabatan/$1', ['filter' => 'Auth']);
+$routes->post('/jabatan/save', 'Personalia\Jabatan::saveJabatan', ['filter' => 'Auth']);
+$routes->post('/jabatan/update', 'Personalia\Jabatan::updateJabatan', ['filter' => 'Auth']);
+$routes->post('/jabatan/delete', 'Personalia\Jabatan::deleteJabatan', ['filter' => 'Auth']);
 
 // AKSES
 $routes->get('/akses', 'Setting\Akses::akses', ['filter' => 'Auth']);

@@ -15,12 +15,12 @@ class Jabatan extends BaseController
         $this->token = session()->get("login")->token;
     }
 
-    public function role()
+    public function jabatan()
     {
-        return view('Setting/role/index');
+        return view('Personalia/jabatan/index');
     }
 
-    public function allRole()
+    public function allJabatan()
     {
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
@@ -42,25 +42,25 @@ class Jabatan extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $roleData = $JabatanModel->getRoleList($condition, $addCondition, $limit, $offset);
+        $JabatanData = $JabatanModel->getJabatanList($condition, $addCondition, $limit, $offset);
 
-        $dataRole = [];
+        $dataJabatan = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($roleData['data'] as $data) {
-            array_push($dataRole, [
+        foreach ($JabatanData['data'] as $data) {
+            array_push($dataJabatan, [
                 "no"            => $no++,
                 "id"            => $data->id,
-                "name"          => $data->name,
+                "jabatan_name"  => $data->jabatan_name,
             ]);
         }
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $roleData['totalData'],
-            "recordsFiltered"   => $roleData['totalFilteredData'],
-            "data"              => $dataRole,
+            "recordsTotal"      => $JabatanData['totalData'],
+            "recordsFiltered"   => $JabatanData['totalFilteredData'],
+            "data"              => $dataJabatan,
             "payload"           => $payload
         ];
 
@@ -68,11 +68,11 @@ class Jabatan extends BaseController
         return;
     }
 
-    public function saveRole()
+    public function saveJabatan()
     {
         try {
             $rules = [
-                "name" => [
+                "jabatan_name" => [
                     "rules" => "required"
                 ]
             ];
@@ -81,7 +81,7 @@ class Jabatan extends BaseController
 
             if ($this->validate($rules)) {
                 $insertData = [
-                    "name" => $this->request->getPost("name")
+                    "jabatan_name" => $this->request->getPost("jabatan_name")
                 ];
 
                 $payload = json_encode($insertData);
@@ -125,11 +125,11 @@ class Jabatan extends BaseController
         return;
     }
 
-    public function updateRole()
+    public function updateJabatan()
     {
         try {
             $rules = [
-                "name" => [
+                "jabatan_name" => [
                     "rules" => "required"
                 ]
             ];
@@ -140,7 +140,7 @@ class Jabatan extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
-                    "name" => $this->request->getPost("name")
+                    "jabatan_name" => $this->request->getPost("jabatan_name")
                 ];
 
                 $JabatanModel->update($id, $payload);
@@ -171,22 +171,22 @@ class Jabatan extends BaseController
         return;
     }
 
-    public function getByIdRole($id = null)
+    public function getByIdJabatan($id = null)
     {
         $JabatanModel = new JabatanModel();
 
         if (!empty($id)) {
-            $dataRole = $JabatanModel->find($id);
+            $dataJabatan = $JabatanModel->find($id);
             $data = [
                 "status"  => true,
-                "data"    => $dataRole,
+                "data"    => $dataJabatan,
             ];
             echo json_encode($data);
         }
         return;
     }
 
-    public function deleteRole()
+    public function deleteJabatan()
     {
         try {
             $id = $this->request->getPost("id");
@@ -222,14 +222,14 @@ class Jabatan extends BaseController
         return;
     }
 
-    public function dropdownRole()
+    public function dropdownJabatan()
     {
         $JabatanModel = new JabatanModel();
 
-        $dataRole = $JabatanModel->getRoleDropdown();
+        $dataJabatan = $JabatanModel->getJabatanDropdown();
 
         $data = [
-            "data" => $dataRole
+            "data" => $dataJabatan
         ];
 
         echo json_encode($data);
