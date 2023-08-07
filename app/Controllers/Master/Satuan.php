@@ -5,19 +5,15 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\SatuansModel;
 
-use App\Models\SatuanModel;
-
 class Satuan extends BaseController
 {
     protected $token;
-    protected $satuanModel;
     protected $SatuansModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->SatuansModel = new SatuansModel();
-        $this->satuanModel = new satuanModel();
     }
 
     public function satuan()
@@ -264,7 +260,7 @@ class Satuan extends BaseController
     public function dropdownSatuan()
     {
 
-        $dataSatuan = $this->satuanModel->asObject()->find();
+        $dataSatuan = $this->SatuansModel->asObject()->find();
 
         $data = [
             "data" => $dataSatuan
