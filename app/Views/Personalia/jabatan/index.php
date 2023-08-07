@@ -104,7 +104,8 @@
         columns: [{
             data: "no",
             className: "text-center",
-            sortable: false
+            sortable: false,
+            width: "5%"
         }, {
             data: "jabatan_name",
             className: "text-center"
@@ -124,9 +125,7 @@
     });
 
     $(document).ready(function() {
-        // $('.division_id').select2({
-        //     theme: 'bootstrap4'
-        // })
+        
         var validator = $(".create-form").validate({
             rules: {
                 jabatan_name: {
@@ -206,6 +205,14 @@
                 }
             })
         })
+
+        $('.create-form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13) {
+                e.preventDefault();
+                $(".btn-submit-form").trigger('click');
+            }
+        });
 
         $(".search").keyup(function() {
             table.ajax.reload();
