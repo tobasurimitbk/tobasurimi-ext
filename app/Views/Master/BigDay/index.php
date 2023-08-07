@@ -13,20 +13,25 @@
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker date_create" value="<?= !empty($dataSPP) ? $dataSPP->request_date : ""; ?>" id="date_create" name="date_create" placeholder="Tanggal">
-                                    <label for="floatingInput">Tanggal</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-request-date"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input type="text" class="form-control name" id="nama" name="nama" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input class="form-control input-picker date_create" id="date_create" name="date_create" placeholder="Tanggal">
+                                        <label for="floatingInput">Tanggal Mulai</label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar icon-start-date icon-form"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
