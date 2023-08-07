@@ -561,6 +561,14 @@ $routes->post('/role/save', 'Setting\Role::saveRole', ['filter' => 'Auth']);
 $routes->post('/role/update', 'Setting\Role::updateRole', ['filter' => 'Auth']);
 $routes->post('/role/delete', 'Setting\Role::deleteRole', ['filter' => 'Auth']);
 
+// JABATAN
+$routes->get('/jabatan', 'Setting\Role::role', ['filter' => 'Auth']);
+$routes->get('/jabatan/all', 'Setting\Role::allRole', ['filter' => 'Auth']);
+$routes->get('/jabatan/id/(:segment)', 'Setting\Role::getByIdRole/$1', ['filter' => 'Auth']);
+$routes->post('/jabatan/save', 'Setting\Role::saveRole', ['filter' => 'Auth']);
+$routes->post('/jabatan/update', 'Setting\Role::updateRole', ['filter' => 'Auth']);
+$routes->post('/jabatan/delete', 'Setting\Role::deleteRole', ['filter' => 'Auth']);
+
 // AKSES
 $routes->get('/akses', 'Setting\Akses::akses', ['filter' => 'Auth']);
 $routes->get('/akses/id', 'Setting\Akses::getAkses', ['filter' => 'Auth']);

@@ -104,8 +104,7 @@
         columns: [{
             data: "no",
             className: "text-center",
-            sortable: false,
-            width: "5%"
+            sortable: false
         }, {
             data: "name",
             className: "text-center"
@@ -125,14 +124,9 @@
     });
 
     $(document).ready(function() {
-        $('.create-form').on('keyup keypress', function(e) {
-            var keyCode = e.keyCode || e.which;
-            if (keyCode === 13) {
-                e.preventDefault();
-                return false;
-            }
-        });
-
+        // $('.division_id').select2({
+        //     theme: 'bootstrap4'
+        // })
         var validator = $(".create-form").validate({
             rules: {
                 name: {
@@ -216,6 +210,15 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
+
+        $('#name').keypress(function(event) {
+            // event.preventDefault()
+            const keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keyCode === 13) {
+                console.log(keycode)
+                event.preventDefault()
+            }
+        });
 
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
