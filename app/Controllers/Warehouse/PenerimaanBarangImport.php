@@ -78,6 +78,9 @@ class PenerimaanBarangImport extends BaseController
 
         $dataPPH = $this->taxModel->getTaxByType('pph');
 
+        // var_dump($dataWarehouse);
+        // die;
+
         $data = [
             "dataSatuan" => $dataSatuan,
             "dataWarehouse" => $dataWarehouse,
@@ -311,7 +314,8 @@ class PenerimaanBarangImport extends BaseController
                     "ppnbm" => 0,
                     "ppn" => $this->request->getPost("ppn"),
                     "pph" => $this->request->getPost("pph"),
-                    "status_post" => $status_post,
+                    "status_post" => "FINISH",
+                    "status_po" => $status_post === "WAITING" ? "OPEN" : "CLOSED",
                     "status_penerimaan" => "IMPORT",
                 ];
 
@@ -602,7 +606,7 @@ class PenerimaanBarangImport extends BaseController
                         'id' => $id
                     ];
     
-                    $response = $this->penerimaanBarangModel->where($condition)->set(['status_post' => 'FINISH'])->update();
+                    $response = $this->penerimaanBarangModel->where($condition)->set(['status_po' => 'CLOSED'])->update();
 
                     if($response)
                     {

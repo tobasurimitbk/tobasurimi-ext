@@ -18,15 +18,15 @@
             }
             ?> 
             <?php if(!empty($dataPenerimaanBarang)){ 
-                if($dataPenerimaanBarang->status_post === "WAITING"){ 
+                if($dataPenerimaanBarang->status_po === "OPEN"){ 
             ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
-                Close (PO & Penerimaan)
+                Close PO
             </button>
             <?php }
             } else { ?> 
             <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
-                Simpan & Close (PO & Penerimaan)
+                Simpan & Close PO
             </button>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Simpan
@@ -1344,7 +1344,7 @@ var validator_detail = $(".detail-form").validate({
 
                                 data.append("items", JSON.stringify(update_list_items))
 
-                                data.append("status_post", "FINISH");
+                                data.append("status_post", "WAITING");
 
                                 // validasi jumlah masuk kosong
                                 if(validate_jml_masuk)

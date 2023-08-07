@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BigDaysModel extends Model
+class TunjanganModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'big_days';
+    protected $table            = 'tunjangan';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -17,7 +17,6 @@ class BigDaysModel extends Model
     protected $allowedFields    = [
         'company_id',
         'name',
-        'date',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -47,20 +46,19 @@ class BigDaysModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getBigDayList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getTunjanganList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'name'              => 'big_days.name',
-            'date'              => 'big_days.date',
-            'createdAt'         => 'big_days.createdAt',
-            'updatedAt'         => 'big_days.updatedAt',
+            'name'              => 'tunjangan.name',
+            'createdAt'         => 'tunjangan.createdAt',
+            'updatedAt'         => 'tunjangan.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'big_days.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'tunjangan.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "big_days.*";
+        $selectQry = "tunjangan.*";
         $DataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
@@ -88,7 +86,7 @@ class BigDaysModel extends Model
     public function getById($id)
     {
         $supplierData = $this->asObject()
-            ->select('big_days.*')
+            ->select('tunjangan.*')
             ->find($id);
 
         return $supplierData;
