@@ -266,55 +266,100 @@ class Employee extends BaseController
         try {
             $rules = [
                 "nip" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'NIP Tidak Boleh Kosong',
+                    ]
                 ],
                 "name" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama Karyawan Tidak Boleh Kosong',
+                    ]
                 ],
                 "gender" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Jenis Kelamin Tidak Boleh Kosong',
+                    ]
                 ],
                 "dob" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Lahir Tidak Boleh Kosong',
+                    ]
                 ],
                 "address" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Alamat Tidak Boleh Kosong',
+                    ]
                 ],
                 "division_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Divisi Tidak Boleh Kosong',
+                    ]
                 ],
                 "acc_no" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No Rekening Tidak Boleh Kosong',
+                    ]
                 ],
                 "nik" => [
-                    "rules" => "required"
-                ],
-                "child" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'NIK Tidak Boleh Kosong',
+                    ]
                 ],
                 "religion_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Agama Tidak Boleh Kosong',
+                    ]
                 ],
                 "marriage_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Status Kawin Tidak Boleh Kosong',
+                    ]
                 ],
                 "child" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Jumlah Anak Tidak Boleh Kosong',
+                    ]
                 ],
                 "province_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Provinsi Tidak Boleh Kosong',
+                    ]
                 ],
                 "city_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Kota Tidak Boleh Kosong',
+                    ]
                 ],
                 "join_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Bergabung Tidak Boleh Kosong',
+                    ]
                 ],
                 "bank_name" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama Bank Tidak Boleh Kosong',
+                    ]
                 ],
                 "owner_name" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Owner Name Tidak Boleh Kosong',
+                    ]
                 ]
             ];
 
@@ -332,7 +377,6 @@ class Employee extends BaseController
                     "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
                     "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
                     "phone_no" => $this->request->getPost("phone_no"),
-                    "acc_no" => $this->request->getPost("acc_no"),
                     "email" => $this->request->getPost("email"),
                     "address" => $this->request->getPost("address"),
                     "status" => $this->request->getPost("status"),
@@ -344,6 +388,7 @@ class Employee extends BaseController
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
                     "jabatan" => $this->request->getPost("jabatan"),
+                    "acc_no" => $this->request->getPost("acc_no"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
                 ];
@@ -359,7 +404,7 @@ class Employee extends BaseController
                 if (isset($values)) {
                     if ($this->EmployeesModel->update($id, $values)) {
                         $data = [
-                            "status"            => true,
+                            "status"    => true,
                             "message"   => "Data Berhasil diubah",
                             "payload"   => "",
                             'token' => csrf_hash()
@@ -368,8 +413,8 @@ class Employee extends BaseController
                     } else {
                         $message = 'Data Gagal Diubah';
                         $data = [
-                            "status"            => false,
-                            "message"    => $message,
+                            "status"    => false,
+                            "message"   => $message,
                             "payload"   => "",
                             'token' => csrf_hash()
                         ];
@@ -385,9 +430,10 @@ class Employee extends BaseController
                     echo json_encode($data);
                 }
             } else {
+                $errorMsgs = $this->validator->getErrors();
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
+                    "status"     => false,
+                    "message"    => $errorMsgs[array_key_first($errorMsgs)],
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);

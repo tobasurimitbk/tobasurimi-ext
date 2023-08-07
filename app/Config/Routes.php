@@ -492,6 +492,23 @@ $routes->get('/list-attendance', 'HR\Attendance::ListAttendance', ['filter' => '
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
 $routes->post('/check-pin-employee', 'HR\Attendance::CheckPinEmployee', ['filter' => 'Auth']);
 
+// Big Day
+$routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
+$routes->get('/big-days/all', 'Master\BigDays::allBigDay', ['filter' => 'Auth']);
+$routes->get('/big-days/id/(:segment)', 'Master\BigDays::getById/$1', ['filter' => 'Auth']);
+$routes->post('/big-days/save', 'Master\BigDays::saveBigDay', ['filter' => 'Auth']);
+$routes->post('/big-days/update', 'Master\BigDays::updateBigDay', ['filter' => 'Auth']);
+$routes->post('/big-days/delete', 'Master\BigDays::deleteBigDay', ['filter' => 'Auth']);
+
+// Tunjangan
+$routes->get('/tunjangan', 'Master\Tunjangan::ListTunjangan', ['filter' => 'Auth']);
+$routes->get('/tunjangan/all', 'Master\Tunjangan::allTunjangan', ['filter' => 'Auth']);
+$routes->get('/tunjangan/id/(:segment)', 'Master\Tunjangan::getById/$1', ['filter' => 'Auth']);
+$routes->post('/tunjangan/save', 'Master\Tunjangan::saveTunjangan', ['filter' => 'Auth']);
+$routes->post('/tunjangan/update', 'Master\Tunjangan::updateTunjangan', ['filter' => 'Auth']);
+$routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter' => 'Auth']);
+
+
 // payroll
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 // $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);

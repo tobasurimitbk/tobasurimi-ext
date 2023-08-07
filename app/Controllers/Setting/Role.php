@@ -3,10 +3,12 @@
 namespace App\Controllers\Setting;
 
 use App\Controllers\BaseController;
+use App\Models\RolesModel;
 
 class Role extends BaseController
 {
     protected $token;
+    protected $RolesModel;
 
     public function __construct()
     {
@@ -21,39 +23,45 @@ class Role extends BaseController
     public function allRole()
     {
         $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType")
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType")
         ];
 
-        $response = curl_request("GET", "/roles", $this->token, $payload);
+        $RolesModel = new RolesModel();
+
+        $condition = [];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $roleData = $RolesModel->getRoleList($condition, $addCondition, $limit, $offset);
+
         $dataRole = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataRole, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "name" => $data->name,
-                ]);
-            }
+        foreach ($roleData['data'] as $data) {
+            array_push($dataRole, [
+                "no"            => $no++,
+                "id"            => $data->id,
+                "name"          => $data->name,
+            ]);
         }
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataRole,
-            "response" => $response,
-            "payload" => $payload
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $roleData['totalData'],
+            "recordsFiltered"   => $roleData['totalFilteredData'],
+            "data"              => $dataRole,
+            "payload"           => $payload
         ];
 
         echo json_encode($data);
@@ -62,48 +70,51 @@ class Role extends BaseController
 
     public function saveRole()
     {
-        try{
-        $rules = [
-            "name" => [
-                "rules" => "required"
-            ]
-        ];
+        try {
+            $rules = [
+                "name" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $payload = json_encode([
-                "name" => $this->request->getPost("name")
-            ]);
-                $response = curl_request("POST", "/roles", $this->token, $payload);
+            $RolesModel = new RolesModel();
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+            if ($this->validate($rules)) {
+                $insertData = [
+                    "name" => $this->request->getPost("name")
                 ];
-                echo json_encode($data);
+
+                $payload = json_encode($insertData);
+
+                $insert = $RolesModel->insert($insertData);
+
+                if ($insert) {
+                    $data = [
+                        "id" => $insert,
+                        "status"            => true,
+                        "message"   => "Data Berhasil disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Data Gagal Disimpan",
+                        "payload"   => $payload,
+                        'token' => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Disimpan",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Disimpan",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -116,51 +127,40 @@ class Role extends BaseController
 
     public function updateRole()
     {
-        try{
-        $rules = [
-            "name" => [
-                "rules" => "required"
-            ]
-        ];
+        try {
+            $rules = [
+                "name" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
+            $RolesModel = new RolesModel();
 
-            $payload = json_encode([
-                "name" => $this->request->getPost("name")
-            ]);
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
 
-            $response = curl_request("PATCH", "/roles/$id", $this->token, $payload);
+                $payload = [
+                    "name" => $this->request->getPost("name")
+                ];
 
-            if ($response["code"] === 200) {
+                $RolesModel->update($id, $payload);
+
                 $data = [
-                    "status"            => true,
+                    "status"    => true,
                     "message"   => "Data Berhasil disimpan",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Diubah",
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -173,26 +173,13 @@ class Role extends BaseController
 
     public function getByIdRole($id = null)
     {
+        $RolesModel = new RolesModel();
+
         if (!empty($id)) {
-            $response = curl_request("GET", "/roles/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
+            $dataRole = $RolesModel->find($id);
             $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
+                "status"  => true,
+                "data"    => $dataRole,
             ];
             echo json_encode($data);
         }
@@ -201,38 +188,30 @@ class Role extends BaseController
 
     public function deleteRole()
     {
-        try{
-        $id = $this->request->getPost("id");
+        try {
+            $id = $this->request->getPost("id");
+            $RolesModel = new RolesModel();
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/roles/$id", $this->token);
-            if ($response["code"] === 200) {
+            if (empty($id)) {
                 $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
+                    "status"     => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token'      => csrf_hash()
                 ];
                 echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                return;
             }
-        } else {
+
+            $RolesModel->delete($id);
+
             $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
+                "status"    => true,
+                "message"   => "Data Berhasil dihapus",
+                'token'     => csrf_hash()
             ];
             echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+            return;
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -245,12 +224,9 @@ class Role extends BaseController
 
     public function dropdownRole()
     {
-        $responseRole = curl_request("GET", "/roles/selectOption", $this->token);
+        $RolesModel = new RolesModel();
 
-        $dataRole = [];
-        if ($responseRole["code"] === 200) {
-            $dataRole = json_decode($responseRole["body"])->data;
-        }
+        $dataRole = $RolesModel->getRoleDropdown();
 
         $data = [
             "data" => $dataRole

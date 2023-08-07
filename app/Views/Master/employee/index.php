@@ -743,7 +743,7 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
-
+                        console.log(data)
                         let id = $(".id").val();
                         // UPDATE
                         if (id) {
