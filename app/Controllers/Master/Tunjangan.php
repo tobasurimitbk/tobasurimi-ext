@@ -3,27 +3,27 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
-use App\Models\BigDaysModel;
+use App\Models\TunjanganModel;
 
-class BigDays extends BaseController
+class Tunjangan extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    protected $BigDaysModel;
+    protected $TunjanganModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->BigDaysModel = new BigDaysModel();
+        $this->TunjanganModel = new TunjanganModel();
     }
 
-    public function ListBigDay()
+    public function ListTunjangan()
     {
-        return view('Master/BigDay/index');
+        return view('Master/Tunjangan/index');
     }
 
-    public function allBigDay()
+    public function allTunjangan()
     {
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -45,7 +45,7 @@ class BigDays extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $res = $this->BigDaysModel->getBigDayList($condition, $addCondition, $limit, $offset);
+        $res = $this->TunjanganModel->getTunjanganList($condition, $addCondition, $limit, $offset);
 
         $rdata = [];
 
@@ -73,13 +73,10 @@ class BigDays extends BaseController
         return;
     }
 
-    public function saveBigDay()
+    public function saveTunjangan()
     {
         try {
             $rules = [
-                "date_create" => [
-                    "rules" => "required"
-                ],
                 "nama" => [
                     "rules" => "required"
                 ]
@@ -90,9 +87,8 @@ class BigDays extends BaseController
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
-                    "date" => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("date_create"))))
                 ];
-                if ($this->BigDaysModel->insert($values)) {
+                if ($this->TunjanganModel->insert($values)) {
                     $data = [
                         "status"    => true,
                         "message"   => "Data Berhasil disimpan",
@@ -129,13 +125,10 @@ class BigDays extends BaseController
         return;
     }
 
-    public function updateBigDay()
+    public function updateTunjangan()
     {
         try {
             $rules = [
-                "date_create" => [
-                    "rules" => "required"
-                ],
                 "nama" => [
                     "rules" => "required"
                 ]
@@ -148,10 +141,10 @@ class BigDays extends BaseController
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
-                    "date" => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("date_create"))))
+
                 ];
 
-                if ($this->BigDaysModel->update($id, $values)) {
+                if ($this->TunjanganModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
@@ -191,7 +184,7 @@ class BigDays extends BaseController
     public function getById($id = null)
     {
         if (!empty($id)) {
-            $res = $this->BigDaysModel->getById($id);
+            $res = $this->TunjanganModel->getById($id);
             if ($res) {
                 $res->date = date("d/m/Y", strtotime($res->date));
                 $data = [
@@ -217,7 +210,7 @@ class BigDays extends BaseController
         return;
     }
 
-    public function deleteBigDay()
+    public function deleteTunjangan()
     {
         try {
             $id = $this->request->getPost("id");
@@ -226,7 +219,7 @@ class BigDays extends BaseController
                 $values = [
                     "deletedAt" => date("Y-m-d H:i:s")
                 ];
-                if ($this->BigDaysModel->update($id, $values)) {
+                if ($this->TunjanganModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -261,9 +254,9 @@ class BigDays extends BaseController
         return;
     }
 
-    public function dropdownBigDay()
+    public function dropdownTunjangan()
     {
-        $dataDivisi = $this->BigDaysModel->get_by_company_id($this->this_company_id);
+        $dataDivisi = $this->TunjanganModel->get_by_company_id($this->this_company_id);
 
         /*
         $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
