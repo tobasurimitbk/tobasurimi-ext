@@ -5,6 +5,7 @@ namespace App\Controllers\Setting;
 use App\Controllers\BaseController;
 use App\Models\CompaniesModel;
 use App\Models\AccessListsModel;
+use App\Models\RolesModel;
 use App\Models\UserModel;
 
 use DateTime;
@@ -17,6 +18,7 @@ class User extends BaseController
     protected $session;
     protected $CompaniesModel;
     protected $AccessListsModel;
+    protected $RolesModel;
     protected $UserModel;
 
     public function __construct()
@@ -27,6 +29,7 @@ class User extends BaseController
         $this->session = session()->get("login");
         $this->CompaniesModel = new CompaniesModel();
         $this->AccessListsModel = new AccessListsModel();
+        $this->RolesModel = new RolesModel();
         $this->UserModel = new UserModel();
     }
 
@@ -160,10 +163,12 @@ class User extends BaseController
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[users.name]",
+                    'errors' => ['is_unique' => 'Nama sudah ada!']
                 ],
                 "username" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[users.username]",
+                    'errors' => ['is_unique' => 'Username sudah ada!']
                 ],
                 "password" => [
                     "rules" => "required"
@@ -173,20 +178,39 @@ class User extends BaseController
                 ]
             ];
 
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $payload = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("name"),
                     "username" => $this->request->getPost("username"),
-                    "password" => $this->request->getPost("password"),
+                    "user_pass" => password_hash($this->request->getPost("password"), PASSWORD_BCRYPT),
                     "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                    "company_role" => json_decode($this->request->getPost("company_role")),
-                    "status" => $this->request->getPost("status")
-                ]);
+                    "company_role" => $this->request->getPost("company_role"),
+                    "status" => $this->request->getPost("status"),
+                    "current_company_id" => $this->request->getPost("current_company_id")
+                ];
 
-                $response = curl_request("POST", "/users", $this->token, $payload);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
+                $response =  $this->UserModel->insert($payload);
 
-                if ($response["code"] === 200) {
+                if ($response) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
@@ -195,7 +219,7 @@ class User extends BaseController
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
+                    $message =  'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
                         "message"    => $message,
@@ -204,13 +228,6 @@ class User extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
             }
         } catch (\Exception $e) {
             $data = [
@@ -235,58 +252,127 @@ class User extends BaseController
                 ]
             ];
 
+             if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                if ($this->request->getPost("employee_id")) {
-                    $payload = json_encode([
-                        "company_id" => $this->this_company_id,
-                        "name" => $this->request->getPost("name"),
-                        "username" => $this->request->getPost("username"),
-                        "password" => $this->request->getPost("password"),
-                        "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
-                        "company_role" => json_decode($this->request->getPost("company_role")),
-                        "status" => $this->request->getPost("status")
-                    ]);
-                } else {
-                    $payload = json_encode([
-                        "company_id" => $this->this_company_id,
-                        "name" => $this->request->getPost("name"),
-                        "username" => $this->request->getPost("username"),
-                        "password" => $this->request->getPost("password"),
-                        "company_role" => json_decode($this->request->getPost("company_role")),
-                        "status" => $this->request->getPost("status")
-                    ]);
+                $password = $this->request->getPost("password");
+
+                // check name exist except id
+                $check_current_name = $this->UserModel->check_current_name($id, $this->request->getPost("name"));
+
+                if($check_current_name == 0)
+                {
+                    // check username exist except id
+                    $check_current_username = $this->UserModel->check_current_username($id, $this->request->getPost("username"));
+
+                    if($check_current_username == 0)
+                    {
+                        if($password)
+                        {
+                            if ($this->request->getPost("employee_id")) {
+                                $payload = [
+                                    "company_id" => $this->this_company_id,
+                                    "name" => $this->request->getPost("name"),
+                                    "username" => $this->request->getPost("username"),
+                                    "user_pass" => password_hash($this->request->getPost("password"), PASSWORD_BCRYPT),
+                                    "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                                    "company_role" => $this->request->getPost("company_role"),
+                                    "status" => $this->request->getPost("status"),
+                                    "current_company_id" => $this->request->getPost("current_company_id")
+                                ];
+                            } else {
+                                $payload = [
+                                    "company_id" => $this->this_company_id,
+                                    "name" => $this->request->getPost("name"),
+                                    "username" => $this->request->getPost("username"),
+                                    "user_pass" => password_hash($this->request->getPost("password"), PASSWORD_BCRYPT),
+                                    "company_role" => $this->request->getPost("company_role"),
+                                    "status" => $this->request->getPost("status"),
+                                    "current_company_id" => $this->request->getPost("current_company_id")
+                                ];
+                            }
+                        }
+                        else
+                        {
+                            if ($this->request->getPost("employee_id")) {
+                                $payload = [
+                                    "company_id" => $this->this_company_id,
+                                    "name" => $this->request->getPost("name"),
+                                    "username" => $this->request->getPost("username"),
+                                    "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
+                                    "company_role" => $this->request->getPost("company_role"),
+                                    "status" => $this->request->getPost("status"),
+                                    "current_company_id" => $this->request->getPost("current_company_id")
+                                ];
+                            } else {
+                                $payload = [
+                                    "company_id" => $this->this_company_id,
+                                    "name" => $this->request->getPost("name"),
+                                    "username" => $this->request->getPost("username"),
+                                    "company_role" => $this->request->getPost("company_role"),
+                                    "status" => $this->request->getPost("status"),
+                                    "current_company_id" => $this->request->getPost("current_company_id")
+                                ];
+                            }
+                        }
+
+                        $condition = [
+                            'id' => $id
+                        ];
+
+                        $response = $this->UserModel->where($condition)->set($payload)->update();
+
+                        if ($response) {
+                            $data = [
+                                "status"            => true,
+                                "message"   => "Data Berhasil diubah",
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        } else {
+                            $message = 'Data Gagal Diubah';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
                 }
-
-
-                $response = curl_request("PATCH", "/users/$id", $this->token, $payload);
-
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    }
+                    else
+                    {
+                        $data = [
+                            "status"            => false,
+                            "message"    => "Username sudah ada!",
+                            "payload"   => "",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
+                }
+                else
+                {
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
+                        "message"    => "Nama sudah ada!",
+                        "payload"   => "",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
             }
         } catch (\Exception $e) {
             $data = [
@@ -302,27 +388,32 @@ class User extends BaseController
     public function getByIdUser($id = null)
     {
         if (!empty($id)) {
-            $response = curl_request("GET", "/users/$id?idCompany=$this->this_company_id", $this->token);
-            if ($response["code"] === 200) {
-                // $company_role = [];
-                // $result_company_role = json_decode(json_decode($response["body"])->data->company_role);
+            $response =  $this->UserModel->find($id);
 
-                // foreach($result_company_role as $value)
-                // {
-                //     // $join = $;
-                //     // if($join)
-                //     // {
-                //     //     array_push($company_role, $join);
-                //     // }
-                // }
+            if ($response) {
+                $company_role = json_decode($response["company_role"]);
+                $new_company_role = [];
+
+                foreach($company_role as $item)
+                {
+                    $company_name = $this->CompaniesModel->find($item->company_id);
+                    $role_name = $this->RolesModel->find($item->role_id);
+
+                    array_push($new_company_role, [
+                        "company_id" => $item->company_id,
+                        "role_id" => $item->role_id,
+                        "company_name" => $company_name ? $company_name["company"] : "",
+                        "role_name" => $role_name ? $role_name["name"] : ""
+                    ]);
+                }
                 $data = [
                     "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                    // "company_role" => $company_role
+                    "data"  => $response,
+                    "company_role" => $new_company_role
                 ];
                 echo json_encode($data);
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
+                $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
                     "message"  => $message
@@ -345,19 +436,29 @@ class User extends BaseController
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
-                $response = curl_request("DELETE", "/users/$id", $this->token);
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                $find = $this->UserModel->find($id);
+                if ($find) {
+                    $response =  $this->UserModel->delete($id);
+                    if ($response) {
+                        $data = [
+                            "status"            => true,
+                            "message"   => "Data Berhasil dihapus",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    } else {
+                        $message = 'Data Gagal Dihapus';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                    }
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
+                        "message"    => "Data Tidak Ditemukan",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
@@ -383,12 +484,8 @@ class User extends BaseController
 
     public function dropdownUser()
     {
-        $responseUser = curl_request("GET", "/users/selectOption", $this->token);
-
         $dataUser = [];
-        if ($responseUser["code"] === 200) {
-            $dataUser = json_decode($responseUser["body"])->data;
-        }
+        $dataUser = $this->UserModel->getUserDropdown();
 
         $data = [
             "data" => $dataUser

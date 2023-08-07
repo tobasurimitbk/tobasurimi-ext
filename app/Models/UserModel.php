@@ -99,6 +99,51 @@ class UserModel extends Model
         ];
     }
 
+    public function getUserDropdown()
+    {
+        $arrCondition = [
+            'deletedAt' => null
+        ];
+
+        $builder = $this->asObject()
+        ->select("users.*");
+        $builder->where($arrCondition);
+
+        $data = $builder->findAll();
+
+        return [
+            'data' => $data,
+        ];
+    }
+
+    public function check_current_name($id, $name)
+    {
+        $selectQry = "users.*";
+
+
+        $data = $this->select($selectQry)
+        ->where('id !=', $id)
+        ->where('name', $name)
+        ->where('deletedAt', NULL)       
+        ->countAllResults();
+
+        return $data;
+    }
+
+    public function check_current_username($id, $username)
+    {
+        $selectQry = "users.*";
+
+
+        $data = $this->select($selectQry)
+        ->where('id !=', $id)
+        ->where('username', $username)
+        ->where('deletedAt', NULL)       
+        ->countAllResults();
+
+        return $data;
+    }
+
     public function update_status($data)
     {
         $requete = "UPDATE user_ SET status='" . $data['status'] . "', date_update='" . $data['date_update'] . "', user_update='" . $data['user_update'] . "' where user_id='" . $data['id'] . "'";

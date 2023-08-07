@@ -448,7 +448,7 @@
                 success: function(res) {
                     $(".role_id").empty()
                     $(".role_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
+                    res.data.data.forEach(function(item) {
                         $(".role_id").append(`<option value="${item.id}">${item.name}</option>`)
                     })
 
@@ -698,7 +698,17 @@
                             setLoading()
                             let data = new FormData(document.querySelector(".create-form"));
 
-                            data.append("company_role", JSON.stringify(company_role))
+                            data.append("current_company_id", company_role[0]["company_id"])
+                            let new_company_role = [];
+                            company_role.forEach((item) => {
+                                new_company_role.push(
+                                    {
+                                        "company_id": item.company_id,
+                                        "role_id": item.role_id
+                                    }
+                                )
+                            })
+                            data.append("company_role", JSON.stringify(new_company_role))
 
                             let id = $(".id").val();
                             // UPDATE
@@ -1033,7 +1043,7 @@
             success: function(res) {
                 $(".role_id").empty()
                 $(".role_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
+                res.data.data.forEach(function(item) {
                     $(".role_id").append(`<option value="${item.id}">${item.name}</option>`)
                 })
 
