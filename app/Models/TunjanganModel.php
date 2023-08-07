@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class RolesModel extends Model
+class TunjanganModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'roles';
+    protected $table            = 'tunjangan';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -15,7 +15,7 @@ class RolesModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'id',
+        'company_id',
         'name',
         'createdAt',
         'updatedAt',
@@ -46,56 +46,35 @@ class RolesModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get_by_in_id($id)
-    {
-        $requete = "SELECT * FROM roles WHERE deletedAt is null and id in (" . $id . ")";
-        //echo $requete;
-        $query = $this->db->query($requete);
-        return $query->getResultArray();
-    }
-
-    public function get_by_id($id)
-    {
-        $requete = "SELECT * FROM roles WHERE deletedAt is null and id='" . $id . "'";
-        //echo $requete;
-        $query = $this->db->query($requete);
-        return $query->getResultArray();
-    }
-
-    public function getRoleList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getTunjanganList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'name'          => 'roles.name',
+            'name'              => 'tunjangan.name',
+            'createdAt'         => 'tunjangan.createdAt',
+            'updatedAt'         => 'tunjangan.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'roles.updatedAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'tunjangan.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "roles.* ";
-
-        $rolesDataQry = $this->asObject()
+        $selectQry = "tunjangan.*";
+        $DataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->orderBy($sort, $sortType);
 
-        $totalData = $rolesDataQry->countAllResults(false);
+        $totalData = $DataQry->countAllResults(false);
 
         if ($addCondition['search']) {
-            $rolesDataQry->groupStart();
+            $DataQry->groupStart()
+                ->like('name', $addCondition['search'])
+                ->orLike('date', $addCondition['search'])
+                ->groupEnd();
         }
 
-        if ($addCondition['search']) {
-            $rolesDataQry
-                ->like('name', $addCondition['search']);
-        }
-
-        if ($addCondition['search']) {
-            $rolesDataQry->groupEnd();
-        }
-
-        $totalFilteredData = $rolesDataQry->countAllResults(false);
-        $data = $rolesDataQry->findAll($limit, $offset);
+        $totalFilteredData = $DataQry->countAllResults(false);
+        $data = $DataQry->findAll($limit, $offset);
 
         return [
             'data'              => $data,
@@ -104,17 +83,12 @@ class RolesModel extends Model
         ];
     }
 
-    public function getRoleDropdown()
+    public function getById($id)
     {
-        $selectQry = "roles.* ";
+        $supplierData = $this->asObject()
+            ->select('tunjangan.*')
+            ->find($id);
 
-        $rolesDataQry = $this->asObject()
-            ->select($selectQry);
-
-        $data = $rolesDataQry->findAll();
-
-        return [
-            'data'              => $data,
-        ];
+        return $supplierData;
     }
 }
