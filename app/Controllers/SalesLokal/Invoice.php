@@ -8,7 +8,7 @@ use App\Models\MetadataModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SalesOrderModel;
 use App\Models\SuratJalanModel;
-use App\Models\AllNoMOdel;
+use App\Models\AllNoModel;
 use Config\Services;
 use ErrorException;
 

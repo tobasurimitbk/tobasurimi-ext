@@ -104,10 +104,12 @@
 
             <?php if ($isUpdate ?? false): ?>
             <div class="row">
-                <div class="col-md-12">
-                    Daftar Penerimaan Barang
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Daftar Penerimaan Barang</label>
+                </div>
+                <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
-                        <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <table class="table nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>No.</th>
@@ -131,10 +133,12 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
-                    Daftar penerimaan barang yang akan dibuat tanda terima
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Daftar penerimaan barang yang akan dibuat tanda terima</label>
+                </div>
+                <div class="col-md-12 mb-5">
                     <div class="table-responsive">
-                        <table class="table nowrap table-hover-tobasurimi" id="selectedItemTable" width="100%" cellspacing="0">
+                        <table class="table nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>No. PO</th>
@@ -161,38 +165,30 @@
                         <label for="floatingInput">Tanggal Penerimaan</label>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <!-- <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= $dataTerimaFaktur->item_total ?? 0; ?>" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" disabled readonly>
                         <label for="floatingInput">Total Nominal Faktur</label>
                     </div>
-                </div>
-            </div>
-            <div class="row">
+                </div> -->
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
                         <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Potongan</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
                         <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Tambahan</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= $dataTerimaFaktur->nominal_faktur ?? 0; ?>" />
                         <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3">
-                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
-                        <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
             </div>
@@ -203,9 +199,19 @@
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <textarea <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
+                        <label for="floatingInput">Keterangan</label>
+                    </div>
+                </div>
             </div>
 
-            <div class="row"><div class="col-md-12">Pengenaan Pajak</div></div>
+            <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label font-weight-bold lable-title">Pengenaan Pajak</label>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
@@ -259,11 +265,15 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-primary" id="add-tax-btn">Tambah Pengenaan Pajak</button>
+            <div class="row mt-5">
+                <div class="col-md-12 col-table-button-tts">
+                    <button type="button" class="btn btn-primary" id="add-tax-btn">Tambah Pengenaan Pajak</button>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table nowrap table-hover-tobasurimi" id="taxTable" width="100%" cellspacing="0">
+                        <table class="table nowrap table-hover-tobasurimi table-form-tts" id="taxTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>No.</th>
@@ -642,6 +652,9 @@ $(document).ready(function() {
                     const csrf = $(`[name="${csrfToken}"]`);
                     setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
+
+                    const nominalFaktur = $('#nominal_faktur').val().replace(/\D/g, '');
+                    data.set('nominal_faktur', nominalFaktur);
 
                     const selectedItems = selectedItemTable.rows().data().toArray();
                     data.append("penerimaan_barang", JSON.stringify(selectedItems));

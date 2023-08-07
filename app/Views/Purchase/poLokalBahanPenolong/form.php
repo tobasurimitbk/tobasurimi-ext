@@ -1016,6 +1016,10 @@
                             let tag_total = "";
 
                             row = 0;
+                            list_items = [];
+                            total_harga_barang = 0;
+                            total_qty = 0;
+                            total_harga = 0;
 
                             $(".body-detail-table").empty()
 
