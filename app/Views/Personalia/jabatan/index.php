@@ -5,7 +5,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Role</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Jabatan</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -14,8 +14,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Role</label>
+                                <input type="text" class="form-control jabatan_name" id="jabatan_name" name="jabatan_name" placeholder="Nama Jabatan" maxlength="30">
+                                <label for="floatingInput">Jabatan</label>
                             </div>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Role</h1>
+        <h1>Jabatan</h1>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -51,7 +51,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('name')" class="sort">Role</th>
+                                <th onclick="changeSort('jabatan_name')" class="sort">Jabatan</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -66,7 +66,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "name";
+    let sort = "jabatan_name";
     let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
@@ -84,7 +84,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("role/all"); ?>",
+            url: "<?= base_url("jabatan/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -106,7 +106,7 @@
             className: "text-center",
             sortable: false
         }, {
-            data: "name",
+            data: "jabatan_name",
             className: "text-center"
         }],
         columnDefs: [{
@@ -129,13 +129,13 @@
         // })
         var validator = $(".create-form").validate({
             rules: {
-                name: {
+                jabatan_name: {
                     required: true
                 }
             },
             messages: {
-                name: {
-                    required: "Role wajib diisi"
+                jabatan_name: {
+                    required: "Jabatan wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -187,13 +187,13 @@
             validator.reset();
 
             $.ajax({
-                url: "<?= base_url("role/id"); ?>" + "/" + id,
+                url: "<?= base_url("jabatan/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
                         $(".id").val(id);
-                        $(".name").val(res?.data?.name);
+                        $(".jabatan_name").val(res?.data?.jabatan_name);
 
                         $(".add-modal").modal("show")
                     } else {
@@ -210,15 +210,6 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
-
-        $('#name').keypress(function(event) {
-            // event.preventDefault()
-            const keycode = (event.keyCode ? event.keyCode : event.which);
-            if (keyCode === 13) {
-                console.log(keycode)
-                event.preventDefault()
-            }
-        });
 
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
@@ -241,7 +232,7 @@
                         // UPDATE
                         if (id) {
                             $.ajax({
-                                url: "<?= base_url("role/update"); ?>",
+                                url: "<?= base_url("jabatan/update"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -286,7 +277,7 @@
                         // CREATE
                         else {
                             $.ajax({
-                                url: "<?= base_url("role/save"); ?>",
+                                url: "<?= base_url("jabatan/save"); ?>",
                                 data: data,
                                 beforeSend: function(xhr) {
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -349,7 +340,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("role/delete"); ?>",
+                        url: "<?= base_url("jabatan/delete"); ?>",
                         data: {
                             id: id
                         },
