@@ -4,7 +4,7 @@ namespace App\Controllers\Production;
 
 use App\Controllers\BaseController;
 use App\Models\BarangModel;
-use App\Models\SatuanModel;
+use App\Models\SatuansModel;
 use App\Models\WorkOrdersModel;
 
 class WorkOrder extends BaseController
@@ -20,7 +20,7 @@ class WorkOrder extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
-        $this->satuanModel = new SatuanModel();
+        $this->satuanModel = new SatuansModel();
         $this->workOrdersModel = new WorkOrdersModel();
     }
 

@@ -164,11 +164,17 @@ class User extends BaseController
             $rules = [
                 "name" => [
                     "rules" => "required|is_unique[users.name]",
-                    'errors' => ['is_unique' => 'Nama sudah ada!']
+                    'errors' => [
+                        'required' => 'Nama tidak boleh kosong',
+                        'is_unique' => 'Nama sudah ada!'
+                    ]
                 ],
                 "username" => [
                     "rules" => "required|is_unique[users.username]",
-                    'errors' => ['is_unique' => 'Username sudah ada!']
+                    'errors' => [
+                        'required' => 'Username tidak boleh kosong',
+                        'is_unique' => 'Username sudah ada!'
+                    ]
                 ],
                 "password" => [
                     "rules" => "required"
@@ -245,10 +251,16 @@ class User extends BaseController
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama tidak boleh kosong'
+                    ]
                 ],
                 "username" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Username tidak boleh kosong'
+                    ]
                 ]
             ];
 

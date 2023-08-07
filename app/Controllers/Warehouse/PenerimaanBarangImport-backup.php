@@ -12,7 +12,7 @@ use App\Models\PenerimaanBarangDetailModel;
 use App\Models\RMImportPOModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
-use App\Models\SatuanModel;
+use App\Models\SatuansModel;
 use App\Models\TaxModel;
 use Dompdf\Dompdf;
 
@@ -44,7 +44,7 @@ class PenerimaanBarangImport extends BaseController
         $this->rmImportPOModel = new RMImportPOModel();
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
-        $this->satuanModel = new SatuanModel();
+        $this->satuanModel = new SatuansModel();
         $this->taxModel = new TaxModel();
         $this->dompdf = new Dompdf();
     }
