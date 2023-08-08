@@ -5848,6 +5848,23 @@ table.table.dataTable.table-form-tts tbody tr td .btn.btn-danger:active {
   transition: 0.3s ease-in;
 }
 
+/* PENJUALAN LOKAL INVOICE */
+
+form.create-form .form-floating.ff-so .select2 .selection .select2-selection {
+  height: 50px !important;
+}
+
+form.create-form
+  .form-floating.ff-so
+  .select2
+  .selection
+  .select2-selection
+  ul
+  li.select2-selection__choice {
+  border: 0px;
+  padding: 8px 0px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
