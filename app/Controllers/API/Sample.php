@@ -4,8 +4,7 @@ namespace App\Controllers\API;
 
 use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
-// use \Firebase\JWT\JWT;
-use App\Models\Admin\CategoryModel;
+use App\Models\AttendancesUnitModel;
 
 class Sample extends BaseController
 {
@@ -14,7 +13,7 @@ class Sample extends BaseController
 
     public function __construct()
     {
-        $this->categoryModel = new CategoryModel();
+        $this->AttendancesUnitModel = new AttendancesUnitModel();
     }
 
     public function list()
@@ -80,7 +79,7 @@ class Sample extends BaseController
             'message' => 'Category Created Succesfully'
         ];
 
-        return $this->respond($response, 201);   
+        return $this->respond($response, 201);
     }
 
     public function update($id)
@@ -113,6 +112,6 @@ class Sample extends BaseController
             'message' => 'Category Updated Succesfully'
         ];
 
-        return $this->respond($response, 201);   
+        return $this->respond($response, 201);
     }
 }

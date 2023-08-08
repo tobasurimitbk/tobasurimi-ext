@@ -45,6 +45,7 @@ class EmployeesModel extends Model
         'child',
         'employee_img',
         'status',
+        'attendance_sync',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -131,6 +132,24 @@ class EmployeesModel extends Model
             ->select("employees.*, users.name as users_name")
             ->join('users', 'users.employee_id = employees.id', 'left')
             ->where('users.name', NULL);
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
+    public function getEmployeesNotSyncAttendances($company_id)
+    {
+        $arrCondition = [
+            //            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id,
+            //            'users.deletedAt' => null
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.id,employees.attendance_sync,employees.name")
+            //->where('employees.attendance_sync', 0);
+            ->where('employees.id >', 0);
         $builder->where($arrCondition);
         $query = $builder->get();
 
