@@ -190,8 +190,8 @@ class UserModel extends Model
 
     public function get_by_username($username)
     {
-        $requete = "SELECT * FROM users ";
-        $requete .= "WHERE deletedAt is null and username='" . $username . "' and users.status='Aktif' limit 1";
+        $requete = "SELECT users.*, employees.name as employee_name FROM users LEFT JOIN employees ON users.employee_id = employees.id ";
+        $requete .= "WHERE users.deletedAt is null and users.username='" . $username . "' and users.status='Aktif' limit 1";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();
