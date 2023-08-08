@@ -376,8 +376,7 @@ class Employee extends BaseController
                 // update status user when employee status changed
                 $user = $this->UserModel->getByEmployeeId($id);
 
-                if($user)
-                {
+                if ($user) {
                     $this->UserModel->where(['id' => $user->id])->set(['status' => $status, 'name' => $name])->update();
                 }
 
@@ -497,11 +496,13 @@ class Employee extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $UserModel = new UserModel();
 
             if (!empty($id)) {
                 $values = [
                     "deletedAt" => date("Y-m-d H:i:s")
                 ];
+                $UserModel->where('employee_id', $id)->delete();
                 if ($this->EmployeesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
