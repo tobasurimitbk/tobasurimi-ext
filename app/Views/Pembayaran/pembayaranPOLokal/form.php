@@ -98,9 +98,15 @@
                 </div>
             </div>
             
+            <div class="col-subtitle-modal mt-3">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="form-label font-weight-bold modal-sub-title">Item List</label>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-12">
-                    <h4>Item List</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
