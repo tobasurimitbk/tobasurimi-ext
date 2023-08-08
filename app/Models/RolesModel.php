@@ -116,4 +116,20 @@ class RolesModel extends Model
         
         return $query->getResultArray();
     }
+
+    public function check_current($id, $name)
+    {
+        $selectQry = "roles.*";
+
+        if($id)
+        {
+            $data = $this->select($selectQry)
+            ->where('id !=', $id)
+            ->where('name', $name)
+            ->where('deletedAt', NULL)       
+            ->countAllResults();
+        }
+
+        return $data;
+    }
 }
