@@ -204,7 +204,7 @@ class Employee extends BaseController
                     "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
+                    "jabatan_id" => $this->request->getPost("jabatan_id"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
                     "pin"  => $this->request->getPost("pin")
@@ -376,8 +376,7 @@ class Employee extends BaseController
                 // update status user when employee status changed
                 $user = $this->UserModel->getByEmployeeId($id);
 
-                if($user)
-                {
+                if ($user) {
                     $this->UserModel->where(['id' => $user->id])->set(['status' => $status, 'name' => $name])->update();
                 }
 
@@ -400,7 +399,7 @@ class Employee extends BaseController
                     "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
+                    "jabatan_id" => $this->request->getPost("jabatan_id"),
                     "acc_no" => $this->request->getPost("acc_no"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
@@ -497,11 +496,13 @@ class Employee extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $UserModel = new UserModel();
 
             if (!empty($id)) {
                 $values = [
                     "deletedAt" => date("Y-m-d H:i:s")
                 ];
+                $UserModel->where('employee_id', $id)->delete();
                 if ($this->EmployeesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,

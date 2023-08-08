@@ -160,7 +160,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control jabatan" id="jabatan" name="jabatan" placeholder="Jabatan">
+                                <select class="form-select jabatan_id" name="jabatan_id" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+
+                                </select>
                                 <label for="floatingInput">Jabatan</label>
                             </div>
                         </div>
@@ -255,7 +258,7 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
@@ -319,7 +322,8 @@
         columns: [{
             data: "no",
             className: "text-center",
-            sortable: false
+            sortable: false,
+            width: "5%"
         }, {
             data: "nip",
             className: "text-center"
@@ -379,6 +383,12 @@
         })
 
         $('.marriage_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.jabatan_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
@@ -476,6 +486,27 @@
             .find('label')
             .css('z-index', '1');
 
+        //CSS SELECT2 FLOATING LABEL
+        $('.jabatan_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.jabatan_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.jabatan_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
@@ -522,7 +553,7 @@
                 child: {
                     required: true,
                 },
-                jabatan: {
+                jabatan_id: {
                     required: true,
                 },
                 join_date: {
@@ -712,6 +743,23 @@
                     })
 
                     $(".division_id").val('').change();
+                    $(".add-modal").modal("show")
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("jabatan/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".jabatan_id").empty()
+                    $(".jabatan_id").val("").change()
+                    $(".jabatan_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".jabatan_id").append(`<option value="${item.id}">${item.jabatan_name}</option>`)
+                    })
+
+                    $(".jabatan_id").val('').change();
                     $(".add-modal").modal("show")
                 }
             })
@@ -934,7 +982,7 @@
                         $(".nik").val(res?.data?.nik);
                         $(".phone_no").val(res?.data?.phone_no);
                         $(".status").val(res?.data?.status);
-                        $(".jabatan").val(res?.data?.jabatan);
+                        $(".jabatan_id").val(res?.data?.jabatan_id);
                         $(".zip_code").val(res?.data?.postal_code);
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
@@ -1007,6 +1055,23 @@
                                 })
 
                                 $(".division_id").val(res?.data?.division_id);
+                                $(".add-modal").modal("show")
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("jabatan/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".jabatan_id").empty()
+                                $(".jabatan_id").val("").change()
+                                $(".jabatanid").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".jabatan_id").append(`<option value="${item.id}">${item.jabatan_name}</option>`)
+                                })
+
+                                $(".jabatan_id").val(res?.data?.jabatan_id);
                                 $(".add-modal").modal("show")
                             }
                         })
