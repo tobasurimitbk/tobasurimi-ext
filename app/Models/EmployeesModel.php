@@ -13,7 +13,7 @@ class EmployeesModel extends Model
         'id',
         'company_id',
         'division_id',
-        'jabatan',
+        'jabatan_id',
         'join_date',
         'nik',
         'pin',
@@ -99,12 +99,12 @@ class EmployeesModel extends Model
         ];
 
         $builder = $this->db->table('employees')
-        ->select("employees.*, users.name as users_name")
-        ->join('users', 'users.employee_id = employees.id', 'left')
-        ->where('users.name', NULL);
+            ->select("employees.*, users.name as users_name")
+            ->join('users', 'users.employee_id = employees.id', 'left')
+            ->where('users.name', NULL);
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 }
