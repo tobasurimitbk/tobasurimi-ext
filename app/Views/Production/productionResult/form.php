@@ -35,7 +35,7 @@
                         <select class="form-select barang_id" name="work_order" id="work_order" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php foreach($workOrders ?? [] as $workOrder): ?>
-                            <option value="<?= $workOrder->id ?>" <?= $data->work_order_id == $workOrder->id ? 'selected' : '' ?>><?= $workOrder->wo_no ?></option>
+                            <option value="<?= $workOrder->id ?>" <?= !empty($data) && $data->work_order_id == $workOrder->id ? 'selected' : '' ?>><?= $workOrder->wo_no ?></option>
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput">Work Order</label>
@@ -46,7 +46,7 @@
                         <select class="form-select barang_id" name="warehouse" id="warehouse" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php foreach($warehouses ?? [] as $warehouse): ?>
-                            <option value="<?= $warehouse->id ?>" <?= $data->warehouse_id == $warehouse->id ? 'selected' : '' ?>><?= $warehouse->warehouse_name ?></option>
+                            <option value="<?= $warehouse->id ?>" <?= !empty($data) && $data->warehouse_id == $warehouse->id ? 'selected' : '' ?>><?= $warehouse->warehouse_name ?></option>
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput">Warehouse</label>
