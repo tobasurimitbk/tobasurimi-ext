@@ -39,7 +39,15 @@ class Employee extends BaseController
     {
         $dataEmployee = [];
         $dataEmployee = $this->EmployeesModel->getEmployees($this->this_company_id);
+        $secondDataEmployee = $this->EmployeesModel->getEmployeesUserDelete($this->this_company_id);
 
+        if($secondDataEmployee)
+        {
+            foreach($secondDataEmployee as $item)
+            {
+                array_push($dataEmployee, $item);
+            }
+        }
         $data = [
             "data" => $dataEmployee
         ];
