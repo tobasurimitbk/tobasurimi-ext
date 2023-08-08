@@ -367,6 +367,14 @@
     });
 
     $(document).ready(function() {
+        $('.create-form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
         $('.kategori').select2({
             placeholder: "Kategori: All",
             theme: "bootstrap-5",

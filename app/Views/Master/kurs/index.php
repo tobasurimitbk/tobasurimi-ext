@@ -197,6 +197,14 @@
         }
     });
     $(document).ready(function() {
+        $('.create-form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
         var validator = $(".create-form").validate({
             rules: {
                 metadata_id: {
