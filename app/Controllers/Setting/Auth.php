@@ -125,7 +125,7 @@ class Auth extends BaseController
                         $session = (object) [
                             "isLogin" => true,
                             "token" => $token,
-                            "name" => $res_user[0]["name"],
+                            "name" => $res_user[0]["employee_name"],
                             "username" => $res_user[0]["username"],
                             "this_role_id" => $this_role_id,
                             "this_role_name" => $this_role_name,
