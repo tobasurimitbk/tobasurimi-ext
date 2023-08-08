@@ -89,10 +89,38 @@ class AttendancesUnitModel extends Model
 
     public function getById($id)
     {
-        $supplierData = $this->asObject()
+        $temp = $this->asObject()
             ->select('attendances_unit.*')
             ->find($id);
 
-        return $supplierData;
+        return $temp;
+    }
+
+    public function getByCompany_id_and_master($company_id)
+    {
+        $arrCondition = [
+            'company_id' => $company_id
+        ];
+
+        $builder = $this->db->table('attendances_unit');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
+    public function getByCompany_id($company_id)
+    {
+        $arrCondition = [
+            'company_id' => $company_id,
+            'deletedAt' => NULL,
+
+        ];
+
+        $builder = $this->db->table('attendances_unit');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
     }
 }

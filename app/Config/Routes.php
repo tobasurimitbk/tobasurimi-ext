@@ -596,6 +596,12 @@ $routes->get('/company-access/all', 'Setting\CompanyAccess::allCompanyAccess', [
 //api
 $routes->get('/get-employee-by-company/(:segment)', 'HR\Attendance::get_employee_by_company/$1', ['filter' => 'Auth']);
 
+// attendance
+$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
+
+$routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filter' => 'Auth']);
+//$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
+
 //api
 /*
  * --------------------------------------------------------------------
