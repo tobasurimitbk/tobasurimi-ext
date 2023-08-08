@@ -99,6 +99,89 @@ class UserModel extends Model
         ];
     }
 
+    public function getUserDropdown()
+    {
+        $arrCondition = [
+            'deletedAt' => null
+        ];
+
+        $builder = $this->asObject()
+        ->select("users.*");
+        $builder->where($arrCondition);
+
+        $data = $builder->findAll();
+
+        return [
+            'data' => $data,
+        ];
+    }
+
+    public function check_current_name($id, $name)
+    {
+        $selectQry = "users.*";
+
+
+        $data = $this->select($selectQry)
+        ->where('id !=', $id)
+        ->where('name', $name)
+        ->where('deletedAt', NULL)       
+        ->countAllResults();
+
+        return $data;
+    }
+
+    public function check_current_username($id, $username)
+    {
+        $selectQry = "users.*";
+
+
+        $data = $this->select($selectQry)
+        ->where('id !=', $id)
+        ->where('username', $username)
+        ->where('deletedAt', NULL)       
+        ->countAllResults();
+
+        return $data;
+    }
+
+    public function getByEmployeeId($id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'employee_id' => $id
+        ];
+
+        $selectQry = "users.*
+        ";
+
+        $builder = $this->asObject()
+            ->select($selectQry);
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getRow();
+    }
+
+    public function getUser($id)
+    {
+        $arrCondition = [
+            'users.deletedAt' => null,
+            'users.id' => $id
+        ];
+
+        $selectQry = "users.*,
+        employees.nip AS nip
+        ";
+
+        $builder = $this->asObject()
+            ->select($selectQry)
+            ->join('employees', 'employees.id = users.employee_id');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getRow();
+    }
+
     public function update_status($data)
     {
         $requete = "UPDATE user_ SET status='" . $data['status'] . "', date_update='" . $data['date_update'] . "', user_update='" . $data['user_update'] . "' where user_id='" . $data['id'] . "'";
@@ -107,8 +190,8 @@ class UserModel extends Model
 
     public function get_by_username($username)
     {
-        $requete = "SELECT * FROM users ";
-        $requete .= "WHERE deletedAt is null and username='" . $username . "' and users.status='Aktif' limit 1";
+        $requete = "SELECT users.*, employees.name as employee_name FROM users LEFT JOIN employees ON users.employee_id = employees.id ";
+        $requete .= "WHERE users.deletedAt is null and users.username='" . $username . "' and users.status='Aktif' limit 1";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();

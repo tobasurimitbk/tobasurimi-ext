@@ -91,19 +91,31 @@ class Kurs extends BaseController
             $rules = [
                 "valas" => [
                     "rules" => "is_unique[metadata.value]",
-                    'errors' => ['is_unique' => 'Valas sudah ada!']
+                    'errors' => ['is_unique' => 'Valas sudah ada']
                 ],
                 "metadata_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Valas tidak boleh kosong'
+                    ]
                 ],
                 "nilai_kurs" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nilai Kurs tidak boleh kosong'
+                    ]
                 ],
                 "start_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Awal tidak boleh kosong'
+                    ]
                 ],
                 "end_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Akhir tidak boleh kosong'
+                    ]
                 ]
             ];
 
@@ -190,19 +202,31 @@ class Kurs extends BaseController
             $rules = [
                 "valas" => [
                     "rules" => "is_unique[metadata.value]",
-                    'errors' => ['is_unique' => 'Valas sudah ada!']
+                    'errors' => ['is_unique' => 'Valas sudah ada']
                 ],
                 "metadata_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Valas tidak boleh kosong'
+                    ]
                 ],
                 "nilai_kurs" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nilai Kurs tidak boleh kosong'
+                    ]
                 ],
                 "start_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Awal tidak boleh kosong'
+                    ]
                 ],
                 "end_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Akhir tidak boleh kosong'
+                    ]
                 ]
             ];
 

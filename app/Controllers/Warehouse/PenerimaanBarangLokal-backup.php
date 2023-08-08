@@ -12,7 +12,7 @@ use App\Models\PenerimaanBarangDetailModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
-use App\Models\SatuanModel;
+use App\Models\SatuansModel;
 use Dompdf\Dompdf;
 
 class PenerimaanBarangLokal extends BaseController
@@ -42,7 +42,7 @@ class PenerimaanBarangLokal extends BaseController
         $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
-        $this->satuanModel = new SatuanModel();
+        $this->satuanModel = new SatuansModel();
         $this->dompdf = new Dompdf();
     }
 

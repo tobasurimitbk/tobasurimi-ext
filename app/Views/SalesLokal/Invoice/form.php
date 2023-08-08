@@ -114,7 +114,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating ff-so mb-3" style="height: 50px;">
                             <select class="form-select id_so" name="id_so[]" id="id_so[]" disabled="true" multiple>
                                 <option value=""></option>
                                 <?php
@@ -182,7 +182,7 @@
 
         <div class="row">
             <div class="table-responsive">
-                <table class="table nowrap table-hover-tobasurimi dataTable table-detail-barang" width="100%" cellspacing="0">
+                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-detail-barang" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>

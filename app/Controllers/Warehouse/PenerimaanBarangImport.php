@@ -14,7 +14,7 @@ use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
-use App\Models\SatuanModel;
+use App\Models\SatuansModel;
 use App\Models\TaxModel;
 use Dompdf\Dompdf;
 
@@ -50,7 +50,7 @@ class PenerimaanBarangImport extends BaseController
         $this->rmImportPODetailModel = new RMImportPODetailModel();
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
-        $this->satuanModel = new SatuanModel();
+        $this->satuanModel = new SatuansModel();
         $this->taxModel = new TaxModel();
         $this->dompdf = new Dompdf();
     }
@@ -237,40 +237,76 @@ class PenerimaanBarangImport extends BaseController
         try{
             $rules = [
                 "no_penerimaan_barang" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. Penerimaan Barang tidak boleh kosong'
+                    ]
                 ],
                 "supplier_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Supplier tidak boleh kosong'
+                    ]
                 ],
                 "warehouse_id" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Warehouse tidak boleh kosong'
+                    ]
                 ],
                 "aju_document_type" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Jenis Dokumen tidak boleh kosong'
+                    ]
                 ],
                 "tipe_bahan" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tipe Bahan tidak boleh kosong'
+                    ]
                 ],
                 "aju_no" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. AJU tidak boleh kosong'
+                    ]
                 ],
                 "validation_date" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Pendaftaran tidak boleh kosong'
+                    ]
                 ],
                 "no_registration" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. Pendaftaran tidak boleh kosong'
+                    ]
                 ],
                 "invoice_no" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'No. Invoice tidak boleh kosong'
+                    ]
                 ],
                 "packaging" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Kemasan tidak boleh kosong'
+                    ]
                 ],
                 "total_weight" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Berat tidak boleh kosong'
+                    ]
                 ],
                 "biaya_masuk" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Biaya Masuk tidak boleh kosong'
+                    ]
                 ]
             ];
 

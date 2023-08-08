@@ -50,4 +50,22 @@ class AccessListsModel extends Model
         $query = $this->db->query($requete);
         return $query->getResultArray();
     }
+
+    public function get_access($payload)
+    {
+        $arrCondition = [
+            'access_lists.deletedAt' => null,
+            'access_lists.role_id' => $payload["role_id"],
+            'access_lists.company_id' => $payload["company_id"],
+            'access_lists.menu_url_id' => $payload["menu_url_id"]
+        ];
+
+        $builder = $this->db->table('access_lists')->
+        select('access_lists.*, menu_urls.name as menu_url_name')
+        ->join('menu_urls', 'access_lists.menu_url_id = menu_urls.id', 'left')
+        ->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getRow();
+    }
 }

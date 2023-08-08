@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class RolesModel extends Model
+class JabatanModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'roles';
+    protected $table            = 'jabatans';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -16,14 +16,11 @@ class RolesModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'name',
-        'createdAt',
-        'updatedAt',
-        'deletedAt'
+        'jabatan_name'
     ];
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -46,56 +43,40 @@ class RolesModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function get_by_in_id($id)
-    {
-        $requete = "SELECT * FROM roles WHERE deletedAt is null and id in (" . $id . ")";
-        //echo $requete;
-        $query = $this->db->query($requete);
-        return $query->getResultArray();
-    }
-
-    public function get_by_id($id)
-    {
-        $requete = "SELECT * FROM roles WHERE deletedAt is null and id='" . $id . "'";
-        //echo $requete;
-        $query = $this->db->query($requete);
-        return $query->getResultArray();
-    }
-
-    public function getRoleList($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getJabatanList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'name'          => 'roles.name',
+            'jabatan_name'          => 'jabatans.jabatan_name',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'roles.updatedAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'jabatans.updatedAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "roles.* ";
+        $selectQry = "jabatans.* ";
 
-        $rolesDataQry = $this->asObject()
+        $jabatansDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->orderBy($sort, $sortType);
 
-        $totalData = $rolesDataQry->countAllResults(false);
+        $totalData = $jabatansDataQry->countAllResults(false);
 
         if ($addCondition['search']) {
-            $rolesDataQry->groupStart();
+            $jabatansDataQry->groupStart();
         }
 
         if ($addCondition['search']) {
-            $rolesDataQry
-                ->like('name', $addCondition['search']);
+            $jabatansDataQry
+                ->like('jabatan_name', $addCondition['search']);
         }
 
         if ($addCondition['search']) {
-            $rolesDataQry->groupEnd();
+            $jabatansDataQry->groupEnd();
         }
 
-        $totalFilteredData = $rolesDataQry->countAllResults(false);
-        $data = $rolesDataQry->findAll($limit, $offset);
+        $totalFilteredData = $jabatansDataQry->countAllResults(false);
+        $data = $jabatansDataQry->findAll($limit, $offset);
 
         return [
             'data'              => $data,
@@ -104,16 +85,17 @@ class RolesModel extends Model
         ];
     }
 
-    public function getRoleDropdown()
+    public function getJabatanDropdown()
     {
-        $arrCondition = [
-            'deletedAt' => null
-        ];
+        $selectQry = "jabatans.* ";
 
-        $builder = $this->db->table('roles');
-        $builder->where($arrCondition);
-        $query = $builder->get();
-        
-        return $query->getResultArray();
+        $jabatansDataQry = $this->asObject()
+            ->select($selectQry);
+
+        $data = $jabatansDataQry->findAll();
+
+        return [
+            'data' => $data,
+        ];
     }
 }
