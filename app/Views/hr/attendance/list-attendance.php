@@ -85,7 +85,7 @@
             </div>
             <div class="row row-col-page-list-attendance">
                 <div class="table-responsive">
-                    <table class="table table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
+                    <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
                         <thead>
                             <tr>
                                 <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;User</td>
