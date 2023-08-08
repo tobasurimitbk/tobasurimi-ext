@@ -228,9 +228,7 @@ class Jabatan extends BaseController
 
         $dataJabatan = $JabatanModel->getJabatanDropdown();
 
-        $data = [
-            "data" => $dataJabatan
-        ];
+        $data = $dataJabatan;
 
         echo json_encode($data);
         return;

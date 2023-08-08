@@ -201,7 +201,7 @@ class Employee extends BaseController
                     "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
+                    "jabatan_id" => $this->request->getPost("jabatan_id"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
                     "pin"  => $this->request->getPost("pin")
@@ -387,7 +387,7 @@ class Employee extends BaseController
                     "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
+                    "jabatan_id" => $this->request->getPost("jabatan_id"),
                     "acc_no" => $this->request->getPost("acc_no"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
