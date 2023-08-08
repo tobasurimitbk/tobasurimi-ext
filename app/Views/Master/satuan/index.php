@@ -109,7 +109,8 @@
         columns: [{
             data: "no",
             className: "text-center",
-            sortable: false
+            sortable: false,
+            width: "5%"
         }, {
             data: "kode_satuan",
             className: "text-center"

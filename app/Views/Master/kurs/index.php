@@ -165,7 +165,8 @@
         columns: [{
             data: "no",
             className: "text-center",
-            orderable: false
+            orderable: false,
+            width: "5%"
         },
         {
             data: "valas",
