@@ -106,15 +106,14 @@ class RolesModel extends Model
 
     public function getRoleDropdown()
     {
-        $selectQry = "roles.* ";
-
-        $rolesDataQry = $this->asObject()
-            ->select($selectQry);
-
-        $data = $rolesDataQry->findAll();
-
-        return [
-            'data'              => $data,
+        $arrCondition = [
+            'deletedAt' => null
         ];
+
+        $builder = $this->db->table('roles');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResultArray();
     }
 }

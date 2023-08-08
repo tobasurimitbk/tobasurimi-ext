@@ -3,33 +3,37 @@
 namespace App\Controllers\Setting;
 
 use App\Controllers\BaseController;
+use App\Models\RolesModel;
+use App\Models\CompaniesModel;
+use App\Models\AccessListsModel;
+use App\Models\MenuUrlsModel;
 
 class Akses extends BaseController
 {
     protected $token;
+    protected $RolesModel;
+    protected $CompaniesModel;
+    protected $AccessListsModel;
+    protected $MenuUrlsModel;
     
     public function __construct()
     {
         $this->token = session()->get("login")->token;
+        $this->RolesModel = new RolesModel();
+        $this->CompaniesModel = new CompaniesModel();
+        $this->AccessListsModel = new AccessListsModel();
+        $this->MenuUrlsModel = new MenuUrlsModel();
     }
 
     public function akses()
     {
         //Get Role
-        $responseRole = curl_request("GET", "/roles/selectOption", $this->token);
-
         $dataRole = [];
-        if ($responseRole["code"] === 200) {
-            $dataRole = json_decode($responseRole["body"])->data;
-        }
+        $dataRole = $this->RolesModel->getRoleDropdown();
          
         //Get Company
-        $responseCompany = curl_request("GET", "/companies/all", $this->token);
-
         $dataCompany = [];
-        if ($responseCompany["code"] === 200) {
-            $dataCompany = json_decode($responseCompany["body"])->data;
-        }
+        $dataCompany = $this->CompaniesModel->getCompanies();
 
         $data = [
             "dataRole" => $dataRole,
@@ -41,112 +45,177 @@ class Akses extends BaseController
 
     public function getAkses()
     {
-        $payload = [
-            "idCompany" => $this->request->getGet("company_id"),
-            "idRole" => $this->request->getGet("role_id")
-        ];
+        //Get Access List
+        $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
+        $arr = [];
 
-        $response = curl_request("GET", "/accessLists", $this->token, $payload);
-        if ($response["code"] === 200) {
-            $data = [
-                "status"  => true,
-                "data"  => json_decode($response["body"])->data,
-            ];
-            echo json_encode($data);
-        } else {
-            $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
-            $data = [
-                "status" => false,
-                "message"  => $message
-            ];
-            echo json_encode($data);
+        if($res_access_list)
+        {
+            foreach($res_access_list as $parent)
+            {
+                $arr_child = [];
+                $res_access_child = $this->MenuUrlsModel->get_menu_url($parent["id"]);
+
+                if($res_access_child)
+                {
+                    foreach($res_access_child as $child)
+                    {
+                        $payload = [
+                            "company_id" => $this->request->getGet("company_id"),
+                            "role_id" => $this->request->getGet("role_id"),
+                            "menu_url_id" => $child["id"]
+                        ];
+
+                        $access = $this->AccessListsModel->get_access($payload);
+                        array_push($arr_child, [
+                            "menu_url_id"   => $child["id"],
+                            "name"      => $child["name"],
+                            "access"      => $access ? json_decode($access->action) : []
+                        ]);
+                    }
+                }
+
+                array_push($arr, [
+                    "menu_url_id"   => $parent["id"],
+                    "menuName"      => $parent["name"],
+                    "isParent"      => $parent["parent_id"],
+                    "child"         => $arr_child
+                ]);
+            }
         }
+
+        $data = [
+            "status"  => true,
+            "data"  => $arr,
+        ];
+        echo json_encode($data);
         return;
     }
 
     public function saveAkses()
     {
         try{
-            //Get Menu By Role Id
-            $dataAkses = array();
             $role_id = formatter($this->request->getPost("role_id"), "STR_TO_INT");
             $company_id = formatter($this->request->getPost("company_id"), "STR_TO_INT");
 
-            $payload = [
-                "idCompany" => $company_id,
-                "idRole" => $role_id
-            ];
+            $result = array();
 
-            $responseAkses = curl_request("GET", "/accessLists", $this->token, $payload);
+            //Get Access List
+            $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
 
-            if ($responseAkses["code"] === 200) {
-                $dataAkses = json_decode($responseAkses["body"])->data;
+            if($res_access_list)
+            {
+                foreach($res_access_list as $parent)
+                {
+                    $res_access_child = $this->MenuUrlsModel->get_menu_url($parent["id"]);
 
-                $result = array();
-                $child = array();
-                for ($i = 0; $i < count($dataAkses); $i++) {
-                    $child = $dataAkses[$i]->child;
-                    for ($j = 0; $j < count($child); $j++) {
-                        $access = array();
-                        if ($this->request->getPost("create_" . $child[$j]->menu_url_id) !== null) {
-                            array_push($access, 'c');
+                    if($res_access_child)
+                    {
+                        foreach($res_access_child as $child)
+                        {
+                            $access = array();
+                            if ($this->request->getPost("create_" . $child["id"]) !== null) {
+                                array_push($access, 'c');
+                            }
+                            if ($this->request->getPost("read_" . $child["id"]) !== null) {
+                                array_push($access, 'r');
+                            }
+                            if ($this->request->getPost("update_" . $child["id"]) !== null) {
+                                array_push($access, 'u');
+                            }
+                            if ($this->request->getPost("delete_" . $child["id"]) !== null) {
+                                array_push($access, 'd');
+                            }
+                            if ($this->request->getPost("print_" . $child["id"]) !== null) {
+                                array_push($access, 'p');
+                            }
+                            if ($this->request->getPost("approve_" . $child["id"]) !== null) {
+                                array_push($access, 'a');
+                            }
+                            array_push(
+                                $result,
+                                [
+                                    "parent_id" => $this->request->getPost("parent_" . $child["id"]),
+                                    "menu_url_id" => $child["id"],
+                                    "action" => $access
+                                ]
+                            );
                         }
-                        if ($this->request->getPost("read_" . $child[$j]->menu_url_id) !== null) {
-                            array_push($access, 'r');
-                        }
-                        if ($this->request->getPost("update_" . $child[$j]->menu_url_id) !== null) {
-                            array_push($access, 'u');
-                        }
-                        if ($this->request->getPost("delete_" . $child[$j]->menu_url_id) !== null) {
-                            array_push($access, 'd');
-                        }
-                        if ($this->request->getPost("print_" . $child[$j]->menu_url_id) !== null) {
-                            array_push($access, 'p');
-                        }
-                        if ($this->request->getPost("approve_" . $child[$j]->menu_url_id) !== null) {
-                            array_push($access, 'a');
-                        }
-                        array_push(
-                            $result,
-                            (object) [
-                                "parent_id" => $this->request->getPost("parent_" . $child[$j]->menu_url_id),
-                                "menu_url_id" => $child[$j]->menu_url_id,
-                                "action" => $access,
-                            ]
-                        );
                     }
                 }
 
-                $payload = json_encode([
-                    "data" => $result,
-                    "role_id" => $role_id,
-                    "company_id" => $company_id,
-                ]);
+                $payloadFinal = [];
 
-                $response = curl_request("POST", "/accessLists", $this->token, $payload);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => json_encode($payload),
+                //     "payload"   => json_encode($payload),
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
+                foreach($result as $item)
+                {
+                    $payloadLoop = [
+                        "company_id" => $this->request->getPost("company_id"),
+                        "role_id" => $this->request->getPost("role_id"),
+                        "menu_url_id" => $item["menu_url_id"],
+                        "action" => json_encode($item["action"])
                     ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+
+                    // search menu url exist
+                    $exist_access = $this->AccessListsModel->get_access($payloadLoop);
+
+                    // update
+                    if($exist_access)
+                    {
+                        array_push($payloadFinal, $payloadLoop);
+
+                        $updateAccess = $this->AccessListsModel->where(['id' => $exist_access->id])->set($payloadLoop)->update();
+
+                        if (!$updateAccess) {
+                            $data = [
+                                "status"            => false,
+                                "message"    => $exist_access->menu_url_name . " Gagal diubah",
+                                "payload"   => $payloadLoop,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                        }
+                    }
+                    // create
+                    else
+                    {
+                        if(sizeof($item["action"]) !== 0)
+                        {
+                            array_push($payloadFinal, $payloadLoop);
+
+                            $createAccess = $this->AccessListsModel->insert($payloadLoop);
+
+                            if (!$createAccess) {
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $exist_access->menu_url_name . " Gagal disimpan",
+                                    "payload"   => $payloadLoop,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+                    }
                 }
+
+                $data = [
+                    "status"            => true,
+                    "payload"   => $payloadFinal,
+                    "message"    => "Data berhasil disimpan",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
             }
             else
             {
-                $message = is_object(json_decode($responseAkses["body"])) ? json_decode($responseAkses["body"])->message : 'Menu berdasarkan role tidak ditemukan';
+                $message = 'Menu berdasarkan role tidak ditemukan';
 
                 $data = [
                     "status"            => false,
