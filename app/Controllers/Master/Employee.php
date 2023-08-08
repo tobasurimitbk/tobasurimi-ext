@@ -5,6 +5,7 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
+use App\Models\UserModel;
 
 class Employee extends BaseController
 {
@@ -12,6 +13,7 @@ class Employee extends BaseController
     protected $this_company_id;
     protected $ProvincesModel;
     protected $EmployeesModel;
+    protected $UserModel;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class Employee extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->ProvincesModel = new ProvincesModel();
         $this->EmployeesModel = new EmployeesModel();
+        $this->UserModel = new UserModel();
     }
 
     public function employee()
@@ -36,7 +39,15 @@ class Employee extends BaseController
     {
         $dataEmployee = [];
         $dataEmployee = $this->EmployeesModel->getEmployees($this->this_company_id);
+        $secondDataEmployee = $this->EmployeesModel->getEmployeesUserDelete($this->this_company_id);
 
+        if($secondDataEmployee)
+        {
+            foreach($secondDataEmployee as $item)
+            {
+                array_push($dataEmployee, $item);
+            }
+        }
         $data = [
             "data" => $dataEmployee
         ];
@@ -201,7 +212,7 @@ class Employee extends BaseController
                     "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
+                    "jabatan_id" => $this->request->getPost("jabatan_id"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
                     "pin"  => $this->request->getPost("pin")
@@ -367,6 +378,15 @@ class Employee extends BaseController
                 $payload = '';
 
                 $id = $this->request->getPost("id");
+                $status = $this->request->getPost("status") === "Aktif" ? 'Aktif' : 'Non Aktif';
+                $name = $this->request->getPost("name");
+
+                // update status user when employee status changed
+                $user = $this->UserModel->getByEmployeeId($id);
+
+                if ($user) {
+                    $this->UserModel->where(['id' => $user->id])->set(['status' => $status, 'name' => $name])->update();
+                }
 
                 $values = [
                     "company_id" => $this->this_company_id,
@@ -387,7 +407,7 @@ class Employee extends BaseController
                     "postal_code" => $this->request->getPost("zip_code"),
                     "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
                     "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan" => $this->request->getPost("jabatan"),
+                    "jabatan_id" => $this->request->getPost("jabatan_id"),
                     "acc_no" => $this->request->getPost("acc_no"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
@@ -484,11 +504,13 @@ class Employee extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $UserModel = new UserModel();
 
             if (!empty($id)) {
                 $values = [
                     "deletedAt" => date("Y-m-d H:i:s")
                 ];
+                $UserModel->where('employee_id', $id)->delete();
                 if ($this->EmployeesModel->update($id, $values)) {
                     $data = [
                         "status"            => true,

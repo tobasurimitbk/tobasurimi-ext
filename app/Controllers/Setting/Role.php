@@ -73,11 +73,26 @@ class Role extends BaseController
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required"
+                    "rules" => "required|is_unique[roles.name]",
+                    'errors' => [
+                        'required' => 'Role tidak boleh kosong',
+                        'is_unique' => 'Role sudah ada'
+                    ]
                 ]
             ];
 
             $RolesModel = new RolesModel();
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $insertData = [
@@ -106,14 +121,7 @@ class Role extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -130,35 +138,60 @@ class Role extends BaseController
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Role tidak boleh kosong'
+                    ]
                 ]
             ];
 
             $RolesModel = new RolesModel();
 
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
-
-                $payload = [
-                    "name" => $this->request->getPost("name")
-                ];
-
-                $RolesModel->update($id, $payload);
-
-                $data = [
-                    "status"    => true,
-                    "message"   => "Data Berhasil disimpan",
-                    "payload"   => json_encode($payload),
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
                 $data = [
                     "status"    => false,
-                    "message"   => "Data Gagal Diubah",
+                    "message"   => $errorList[array_keys($errorList)[0]],
                     'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
+            }
+
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
+                $name = $this->request->getPost("name");
+
+                $payload = [
+                    "name" => $name
+                ];
+
+                // CHECK CURRENT ROLE
+                $check = $RolesModel->check_current($id, $name);
+
+                if($check > 0)
+                {
+                    $message = 'Role sudah ada';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => "",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                }
+                else
+                {
+                    $RolesModel->update($id, $payload);
+
+                    $data = [
+                        "status"    => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => json_encode($payload),
+                        'token'     => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             }
         } catch (\Exception $e) {
             $data = [

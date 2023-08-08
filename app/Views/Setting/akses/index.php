@@ -22,7 +22,7 @@
                                 if (!empty($dataCompany)) {
                                     foreach ($dataCompany as $company) {
                                 ?>
-                                        <option value="<?= $company->id; ?>"><?= $company->company; ?></option>
+                                        <option value="<?= $company["id"]; ?>"><?= $company["company"]; ?></option>
                                 <?php
                                     }
                                 }
@@ -39,7 +39,7 @@
                             if (!empty($dataRole)) {
                                 foreach ($dataRole as $role) {
                             ?>
-                                <option value="<?= $role->id; ?>"><?= $role->name; ?></option>
+                                <option value="<?= $role["id"]; ?>"><?= $role["name"]; ?></option>
                             <?php
                                 }
                             }
@@ -148,13 +148,14 @@
                 },
                 dataType: "json",
                 success: function(res) {
+                    console.log(res)
                     if (res.status) {
                         var list = res.data;
                         $(".body-akses").empty();
                         list.forEach((item) => {
                             tag_html += "<tr>";
                             tag_html += "<td colspan='8'>";
-                            tag_html += "<label class='form-header'>" + item.menuName + "</label>";
+                            tag_html += "<label class='form-header font-weight-bold'>" + item.menuName + "</label>";
                             tag_html += "</td>";
                             tag_html += "</tr>";
                             item.child.forEach((child) => {

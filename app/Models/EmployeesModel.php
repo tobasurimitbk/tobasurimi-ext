@@ -9,11 +9,16 @@ class EmployeesModel extends Model
     protected $table = 'employees';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
+    protected $DBGroup          = 'default';
+    protected $insertID         = 0;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = true;
+    protected $protectFields    = true;
     protected $allowedFields = [
         'id',
         'company_id',
         'division_id',
-        'jabatan',
+        'jabatan_id',
         'join_date',
         'nik',
         'pin',
@@ -44,6 +49,30 @@ class EmployeesModel extends Model
         'updatedAt',
         'deletedAt'
     ];
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
+
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
 
     public function get_by_id($id)
     {
@@ -94,16 +123,33 @@ class EmployeesModel extends Model
     {
         $arrCondition = [
             'employees.deletedAt' => null,
-            'employees.company_id' => $company_id
+            'employees.company_id' => $company_id,
+            'users.name' => null
         ];
 
         $builder = $this->db->table('employees')
-        ->select("employees.*, users.name as users_name")
-        ->join('users', 'users.employee_id = employees.id', 'left')
-        ->where('users.name', NULL);
-        $builder->where($arrCondition);
+            ->select("employees.*, users.name as users_name")
+            ->join('users', 'users.employee_id = employees.id', 'left');
+        $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
-        
+
+        return $query->getResultArray();
+    }
+
+    public function getEmployeesUserDelete($company_id)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id,
+            'users.deletedAt !=' => null
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.*, users.name as users_name")
+            ->join('users', 'users.employee_id = employees.id', 'left');
+        $builder->groupStart()->where($arrCondition)->groupEnd();
+        $query = $builder->get();
+
         return $query->getResultArray();
     }
 }

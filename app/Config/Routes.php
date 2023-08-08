@@ -510,6 +510,14 @@ $routes->post('/big-days/save', 'Master\BigDays::saveBigDay', ['filter' => 'Auth
 $routes->post('/big-days/update', 'Master\BigDays::updateBigDay', ['filter' => 'Auth']);
 $routes->post('/big-days/delete', 'Master\BigDays::deleteBigDay', ['filter' => 'Auth']);
 
+// Absensi Unit
+$routes->get('/attendances-unit', 'Master\AttendancesUnit::ListData', ['filter' => 'Auth']);
+$routes->get('/attendances-unit/all', 'Master\AttendancesUnit::allData', ['filter' => 'Auth']);
+$routes->get('/attendances-unit/id/(:segment)', 'Master\AttendancesUnit::getById/$1', ['filter' => 'Auth']);
+$routes->post('/attendances-unit/save', 'Master\AttendancesUnit::saveData', ['filter' => 'Auth']);
+$routes->post('/attendances-unit/update', 'Master\AttendancesUnit::updateData', ['filter' => 'Auth']);
+$routes->post('/attendances-unit/delete', 'Master\AttendancesUnit::deleteData', ['filter' => 'Auth']);
+
 // Tunjangan
 $routes->get('/tunjangan', 'Master\Tunjangan::ListTunjangan', ['filter' => 'Auth']);
 $routes->get('/tunjangan/all', 'Master\Tunjangan::allTunjangan', ['filter' => 'Auth']);
