@@ -5859,10 +5859,22 @@ form.create-form
   .select2
   .selection
   .select2-selection
+  ul {
+  height: 40px !important;
+  display: block;
+  overflow: auto;
+}
+
+form.create-form
+  .form-floating.ff-so
+  .select2
+  .selection
+  .select2-selection
   ul
   li.select2-selection__choice {
   border: 0px;
-  padding: 8px 0px;
+  padding: 7px 0px 0px 0px;
+  margin: 0;
 }
 
 /* ===== RESPONSIVE ===== */
