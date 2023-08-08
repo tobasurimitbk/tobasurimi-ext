@@ -158,7 +158,6 @@
                         <tr>
                             <th>No.</th>
                             <th onclick="changeSort('username')" class="sort">Username</th>
-                            <th onclick="changeSort('name')" class="sort">Nama</th>
                             <th onclick="changeSort('employeeName')" class="sort">Employee</th>
                             <th onclick="changeSort('status')" class="sort">Status</th>
                         </tr>
@@ -218,10 +217,6 @@
         }, 
         {
             data: "username",
-            className: "text-center"
-        },
-        {
-            data: "name",
             className: "text-center"
         },
         {

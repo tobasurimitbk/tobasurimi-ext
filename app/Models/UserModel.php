@@ -159,7 +159,7 @@ class UserModel extends Model
         $builder->where($arrCondition);
         $query = $builder->get();
 
-        return $query->getResult();
+        return $query->getRow();
     }
 
     public function getUser($id)
@@ -179,7 +179,7 @@ class UserModel extends Model
         $builder->where($arrCondition);
         $query = $builder->get();
 
-        return $query->getResult();
+        return $query->getRow();
     }
 
     public function update_status($data)

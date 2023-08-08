@@ -139,7 +139,6 @@ class User extends BaseController
                 "no" => $no++,
                 "id" => $data->id,
                 "username" => $data->username,
-                "name" => $data->name,
                 "employeeName" => $data->employeeName,
                 "status" => $data->status,
             ]);
@@ -347,7 +346,7 @@ class User extends BaseController
             $response =  $this->UserModel->getUser($id);
 
             if ($response) {
-                $response = $response[0];
+                $response = $response;
                 $company_role = $response ? json_decode($response->company_role) : [];
                 $new_company_role = [];
 

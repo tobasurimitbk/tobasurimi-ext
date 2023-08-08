@@ -370,26 +370,15 @@ class Employee extends BaseController
                 $payload = '';
 
                 $id = $this->request->getPost("id");
-                $status = $this->request->getPost("status");
+                $status = $this->request->getPost("status") === "Aktif" ? 'Aktif' : 'Non Aktif';
+                $name = $this->request->getPost("name");
 
                 // update status user when employee status changed
-                if($status === "AKTIF")
-                {
-                    $user = $this->UserModel->getByEmployeeId($id);
+                $user = $this->UserModel->getByEmployeeId($id);
 
-                    if($user)
-                    {
-                        $this->UserModel->where(['id' => $user[0]->id])->set(['status' => 'Aktif'])->update();
-                    }
-                }
-                else
+                if($user)
                 {
-                    $user = $this->UserModel->getByEmployeeId($id);
-
-                    if($user)
-                    {
-                        $this->UserModel->where(['id' => $user[0]->id])->set(['status' => 'Non Aktif'])->update();
-                    }
+                    $this->UserModel->where(['id' => $user->id])->set(['status' => $status, 'name' => $name])->update();
                 }
 
                 $values = [
