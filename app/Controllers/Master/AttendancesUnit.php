@@ -93,7 +93,7 @@ class AttendancesUnit extends BaseController
 
             if ($this->validate($rules)) {
                 if ($this->request->getPost("master") == 1) {
-                    $this->AttendancesUnitModel->set('master', 0)->where('id > ', 0)->update();
+                    $this->AttendancesUnitModel->set('master', 0)->where('company_id', $this->this_company_id)->update();
                 }
 
                 $values = [
@@ -157,7 +157,7 @@ class AttendancesUnit extends BaseController
 
             if ($this->validate($rules)) {
                 if ($this->request->getPost("master") == 1) {
-                    $this->AttendancesUnitModel->set('master', 0)->where('id > ', 0)->update();
+                    $this->AttendancesUnitModel->set('master', 0)->where('company_id', $this->this_company_id)->update();
                 }
 
                 $id = $this->request->getPost("id");
