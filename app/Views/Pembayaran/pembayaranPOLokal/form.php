@@ -108,7 +108,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <table class="table table-borderd nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>Tanggal LPB</th>

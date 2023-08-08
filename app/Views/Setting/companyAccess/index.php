@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="table-responsive mt-2">
-                    <table class="table-inside nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>Company</th>
@@ -127,7 +127,7 @@
         </div>
         <div class="row">
             <div class="table-responsive">
-                <table class="table nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-borderd nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>
