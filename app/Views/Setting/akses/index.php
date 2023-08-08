@@ -155,7 +155,7 @@
                         list.forEach((item) => {
                             tag_html += "<tr>";
                             tag_html += "<td colspan='8'>";
-                            tag_html += "<label class='form-header'>" + item.menuName + "</label>";
+                            tag_html += "<label class='form-header font-weight-bold'>" + item.menuName + "</label>";
                             tag_html += "</td>";
                             tag_html += "</tr>";
                             item.child.forEach((child) => {
