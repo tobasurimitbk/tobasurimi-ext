@@ -880,7 +880,7 @@ class PenerimaanBarangImport extends BaseController
         return;
     } */
 
-    public function getReceivedItemsBySupplier($supplierId, )
+    public function getReceivedItemsBySupplier($supplierId)
     {
         $selectQry = "penerimaan_barang.id AS id,
                       no_penerimaan_barang AS lpb_no, 

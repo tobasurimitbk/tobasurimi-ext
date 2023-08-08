@@ -125,14 +125,30 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'users.deletedAt' => null
+            'users.name' => null
         ];
 
         $builder = $this->db->table('employees')
             ->select("employees.*, users.name as users_name")
-            ->join('users', 'users.employee_id = employees.id', 'left')
-            ->where('users.name', NULL);
-        $builder->where($arrCondition);
+            ->join('users', 'users.employee_id = employees.id', 'left');
+        $builder->groupStart()->where($arrCondition)->groupEnd();
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
+    public function getEmployeesUserDelete($company_id)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id,
+            'users.deletedAt !=' => null
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.*, users.name as users_name")
+            ->join('users', 'users.employee_id = employees.id', 'left');
+        $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
 
         return $query->getResultArray();
