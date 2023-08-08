@@ -145,8 +145,8 @@ class EmployeesModel extends Model
         ];
 
         $builder = $this->db->table('employees')
-            ->select("employees.*, users.name as users_name")
-            ->join('users', 'users.employee_id = employees.id', 'left');
+            ->select("employees.*, users.name as users_name, users.deletedAt as userDeletedAt, users.id as user_id")
+            ->join('users', 'users.employee_id = employees.id');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
 
