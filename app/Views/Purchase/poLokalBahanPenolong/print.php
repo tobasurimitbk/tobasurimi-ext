@@ -162,7 +162,7 @@
                     <!-- <td><b><?= $detail->no ?></b></td> -->
                     <td><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
                     <td><?= $detail->kode_barang ?></b></td>
-                    <td class="w-50"><?= $detail->nama_barang ?></b></td>
+                    <td class="w-50"><?= $detail->nama_barang . " " . $detail->spec ?></b></td>
                     <!-- <td><?= $detail->nama_satuan ?></b></td> -->
                     <!-- <td><?= $detail->spec ?></b></td> -->
                     <td class="txt-right"><?= $detail->price ?></b></td>
