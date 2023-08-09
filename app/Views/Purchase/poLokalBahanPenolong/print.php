@@ -106,7 +106,7 @@
                     <div class="txt-bold">LONG</div>
                 </td>
                 <td class="txt-right">
-                    <div>Kepada : <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
+                    <div>Kepada: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
                 </td>
             </tr>
             <tr>
