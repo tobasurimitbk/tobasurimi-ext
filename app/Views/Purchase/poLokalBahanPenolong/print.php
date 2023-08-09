@@ -8,6 +8,12 @@
     <style>
         body {
             font-size: 10px;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        @page {
+            size: 8.27in 5.50in landscape;
         }
 
         .header {
@@ -57,7 +63,7 @@
         }
 
         .sign-row>div {
-            width: 150px;
+            width: 100px;
             border-top: 1px solid;
             margin-top: 5rem
         }
