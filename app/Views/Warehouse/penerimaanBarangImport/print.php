@@ -104,7 +104,7 @@
             <tr>
                 <td>
                     <div>
-                        <div style=""><b>Kemasan / Berat : <?= $dataPenerimaanBarang->packaging; ?> / <?= $dataPenerimaanBarang->total_weight; ?></b></div>
+                        <div style=""><b>Berat : <?= $dataPenerimaanBarang->total_weight; ?></b></div>
                         <div style="white-space: wrap">No. LPB : <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></div>
                         <div style="white-space: wrap">No. Order : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?></div>
                         <div style="white-space: wrap"></div>
