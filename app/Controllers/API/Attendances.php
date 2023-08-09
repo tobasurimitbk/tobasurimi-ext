@@ -6,13 +6,14 @@ use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesUnitModel;
+use App\Models\CompaniesModel;
 
 class Attendances extends BaseController
 {
     use ResponseTrait;
     protected $AttendancesLogModel;
-    protected $this_company_id;
     protected $AttendancesUnitModel;
+    protected $CompaniesModel;
     protected $attendances_id;
     protected $ip;
     protected $unit_key;
@@ -21,36 +22,40 @@ class Attendances extends BaseController
     {
         $this->AttendancesLogModel = new AttendancesLogModel();
         $this->AttendancesUnitModel = new AttendancesUnitModel();
-        $this->this_company_id = session()->get("login")->this_company_id;
+        $this->CompaniesModel = new CompaniesModel();
     }
 
 
 
     public function sync_attendance()
     {
-        $res_unit = $this->AttendancesUnitModel->getByCompany_id($this->this_company_id);
+        $res_company = $this->CompaniesModel->search_list(array('deletedAt' => NULL));
+        for ($k = 0; $k < count($res_company); $k++) {
+            $res_unit = $this->AttendancesUnitModel->getByCompany_id($res_company[$k]["id"]);
 
-        for ($i = 0; $i < count($res_unit); $i++) {
-            $this->attendances_id = $res_unit[0]["id"];
-            $this->ip = $res_unit[0]["ip"];
-            $this->unit_key = $res_unit[0]["unit_key"];
+            for ($i = 0; $i < count($res_unit); $i++) {
+                $this->attendances_id = $res_unit[0]["id"];
+                $this->ip = $res_unit[0]["ip"];
+                $this->unit_key = $res_unit[0]["unit_key"];
 
-            $res = $this->get_data_finger();
+                $res = $this->get_data_finger();
 
-            for ($j = 0; $j < count($res); $j++) {
-                $res_log = $this->AttendancesLogModel->get_by_company_employee_unit_date($this->this_company_id, $res[$j]["id"], $res_unit[$i]["id"], $res[$j]["date"]);
+                for ($j = 0; $j < count($res); $j++) {
+                    $res_log = $this->AttendancesLogModel->get_by_company_employee_unit_date($res_company[$k]["id"], $res[$j]["id"], $res_unit[$i]["id"], $res[$j]["date"]);
 
-                if (count($res_log) == 0) {
-                    $values = array(
-                        "company_id"    => $this->this_company_id,
-                        "employees_id"  => $res[$j]["id"],
-                        "attendances_unit_id"   => $res_unit[$i]["id"],
-                        "date_create"   => $res[$j]["date"]
-                    );
-                    $this->AttendancesLogModel->insert($values);
+                    if (count($res_log) == 0) {
+                        $values = array(
+                            "company_id"    => $res_company[$k]["id"],
+                            "employees_id"  => $res[$j]["id"],
+                            "attendances_unit_id"   => $res_unit[$i]["id"],
+                            "date_create"   => $res[$j]["date"]
+                        );
+                        $this->AttendancesLogModel->insert($values);
+                    }
                 }
             }
         }
+
 
         echo "done";
         exit;
