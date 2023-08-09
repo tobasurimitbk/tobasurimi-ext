@@ -25,8 +25,7 @@
             background-color: #F3EED9;
         }
 
-        .item-table tr th,
-        .item-table tr td {
+        .item-table tr th {
             border: 1px solid grey;
         }
 
@@ -90,11 +89,6 @@
         .w-100 {
             width: 100%;
         }
-
-        .test {
-            display: inline-block;
-            width: 100%;
-        }
     </style>
 </head>
 
@@ -106,7 +100,7 @@
                     <div class="txt-bold">PO LOKAL BAHAN PENOLONG</div>
                 </td>
                 <td class="txt-right">
-                    <div>Kepada YTH: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
+                    <div>Kepada: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
                 </td>
             </tr>
             <tr>
@@ -138,51 +132,49 @@
             </tr>
             <tr>
                 <td>
-                    Departmen: <?= $dataPOLokal->warehouseName ?>
+                    Departemen: <?= $dataPOLokal->warehouseName ?>
                 </td>
                 <td colspan="2">
                     Lokasi: <?= $dataPOLokal->companyName ?>
                 </td>
             </tr>
         </table>
-
-        <div class="mt-1 txt-bold" style="margin-bottom: 15px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
+        <div class="mt-1 txt-bold" style="margin-bottom: 5px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
         <table class="item-table">
             <tr>
-                <th>#</th>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
-                <th>Satuan</th>
-                <th>Spesifikasi</th>
-                <th>Harga Barang</th>
-                <th>Qty</th>
-                <th>Biaya Tambahan</th>
-                <th>Total Harga</th>
-                <th>PPN</th>
-                <th>PPH</th>
+                <!-- <th>No</th> -->
+                <th class="txt-left">QTY</th>
+                <th class="txt-left">KODE BARANG</th>
+                <th class="txt-left">NAMA BARANG</th>
+                <!-- <th>Satuan</th> -->
+                <!-- <th>Spesifikasi</th> -->
+                <th class="txt-left">HARGA</th>
+                <th class="txt-left">DISC(%)</th>
+                <!-- <th>Biaya Tambahan</th> -->
+                <th class="txt-left">JUMLAH</th>
+                <!-- <th>PPN</th> -->
+                <!-- <th>PPH</th> -->
             </tr>
             <?php
             foreach ($dataPOLokal->am_purchase_order_details as $detail) {
             ?>
                 <tr>
-                    <td><b><?= $detail->no ?></b></td>
+                    <!-- <td><b><?= $detail->no ?></b></td> -->
+                    <td><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
                     <td><?= $detail->kode_barang ?></b></td>
-                    <td><?= $detail->nama_barang ?></b></td>
-                    <td><?= $detail->nama_satuan ?></b></td>
-                    <td><?= $detail->spec ?></b></td>
-                    <td><?= $detail->price ?></b></td>
-                    <td><?= $detail->qty ?></b></td>
-                    <td><?= $detail->additional_cost ?></b></td>
-                    <td><?= $detail->totalPrice ?></b></td>
-                    <td><?= $detail->nilaiPpn ?></b></td>
-                    <td><?= $detail->nilaiPph ?></b></td>
+                    <td class="w-50"><?= $detail->nama_barang . " " . $detail->spec ?></b></td>
+                    <!-- <td><?= $detail->nama_satuan ?></b></td> -->
+                    <!-- <td><?= $detail->spec ?></b></td> -->
+                    <td class="txt-right"><?= $detail->price ?></b></td>
+                    <td class="txt-right"><?= $detail->disc ?></b></td>
+                    <!-- <td><?= $detail->additional_cost ?></b></td> -->
+                    <td class="txt-right"><?= $detail->totalPrice ?></b></td>
+                    <!-- <td><?= $detail->nilaiPpn ?></b></td> -->
+                    <!-- <td><?= $detail->nilaiPph ?></b></td> -->
                 </tr>
             <?php } ?>
         </table>
-
         <div class="header mt-1">
-            <div>Keterangan: <div><?= $dataPOLokal->note ?></div>
-            </div>
             <div class="txt-right">
                 <div>
                     Jumlah Pembelian: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
@@ -201,43 +193,41 @@
                 </div>
             </div>
         </div>
-        <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
+        <div style="text-decoration: underline;">
+            Keterangan: <div><?= $dataPOLokal->note ?></div>
+        </div>
+        <table class="w-100 sign-table border-collapse">
             <tr style="border: 0px;">
-                <td style="height: 50px; border: 0px;"></td>
-                <td style="border: 0px;"></td>
-                <td style="border: 0px;"></td>
-                <td style="border: 0px;"></td>
-                <td style="border: 0px;"></td>
+                <td style="height: 50px; border: 0px;">Pemesan Order</td>
+                <td style="border: 0px;">Pembuat Order</td>
+                <td style="border: 0px;">Diketahui oleh</td>
+                <td style="border: 0px;">Diperiksa oleh</td>
+                <td style="border: 0px;">Disetujui oleh</td>
             </tr>
             <tr>
                 <th>
                     <div class="sign-row txt-left">
-                        <div>Pemesan Order</div>
-                        (Warehouse)
+                        <div>(Warehouse)</div>
                     </div>
                 </th>
                 <th>
                     <div class="sign-row txt-left">
-                        <div>Pembuat Order</div>
-                        (Pembelian)
+                        <div>(Pembelian)</div>
                     </div>
                 </th>
                 <th>
                     <div class="sign-row txt-left">
-                        <div>Diketahui oleh</div>
-                        (Kabag Pembelian)
+                        <div>(Kabag Pembelian)</div>
                     </div>
                 </th>
                 <th>
                     <div class="sign-row txt-left">
-                        <div>Diperiksa oleh</div>
-                        (Audit)
+                        <div>(Audit)</div>
                     </div>
                 </th>
                 <th>
                     <div class="sign-row txt-left">
-                        <div>Disetujui oleh</div>
-                        (Direktur)
+                        <div>(Direktur)</div>
                     </div>
                 </th>
             </tr>

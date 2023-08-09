@@ -433,7 +433,7 @@ class POLokalBahanBaku extends BaseController
     public function print($id = null)
     {
         if ($id) {
-            $filename = "PO Bahan Baku Lokal";
+            $filename = "PO LOKAL Bahan Baku";
 
             $data = [];
             $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);

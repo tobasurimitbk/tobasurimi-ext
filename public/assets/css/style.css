@@ -5877,6 +5877,91 @@ form.create-form
   margin: 0;
 }
 
+.create-form.form-add-spp.form-hp .tab-content .tab-pane {
+  line-height: 1.5;
+}
+
+.create-form.form-add-spp.form-hp
+  .tab-content
+  .tab-pane
+  .form-floating
+  .btn.btn-pilih {
+  background: #007ae0;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-left: 0px;
+  margin-right: 0px;
+  letter-spacing: 0.2;
+  padding: 10px 15px;
+  border: 1px #007ae0 solid;
+  border-radius: 4px;
+  min-width: 100px;
+  height: 50px;
+  box-shadow: none !important;
+}
+
+.create-form.form-add-spp.form-hp
+  .tab-content
+  .tab-pane
+  .form-floating
+  .btn.btn-pilih:hover,
+.create-form.form-add-spp.form-hp
+  .tab-content
+  .tab-pane
+  .form-floating
+  .btn.btn-pilih:focus,
+.create-form.form-add-spp.form-hp
+  .tab-content
+  .tab-pane
+  .form-floating
+  .btn.btn-pilih:active {
+  background: #007ae0 !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-left: 0px;
+  margin-right: 0px;
+  letter-spacing: 0.2;
+  padding: 10px 15px;
+  border: 1px #007ae0 solid !important;
+  border-radius: 4px;
+  min-width: 100px;
+  height: 50px;
+  box-shadow: none !important;
+  opacity: 0.72;
+  transition: 0.3s ease-in;
+}
+
+.create-form.form-add-spp.form-hp
+  .tab-content
+  .tab-pane
+  .table
+  tbody
+  tr
+  td
+  .btn.btn-danger {
+  box-shadow: none !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+form.create-form.form-add-spp.form-hp .nav.nav-tabs button.nav-link {
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: #2f4858;
+  height: 50px;
+}
+
+form.create-form.form-add-spp.form-hp .nav.nav-tabs button.nav-link.active {
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: #e7323a;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
