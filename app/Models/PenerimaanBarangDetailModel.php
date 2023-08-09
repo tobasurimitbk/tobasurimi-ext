@@ -28,6 +28,9 @@ class PenerimaanBarangDetailModel extends Model
         'unit',
         'nama_barang_dok',
         'jml_masuk',
+        'packaging',
+        'packaging_type',
+        'packaging_qty',
         'summarized_qty',
         'createdAt',
         'updatedAt',
@@ -82,10 +85,12 @@ class PenerimaanBarangDetailModel extends Model
                 rm_purchase_order_details.spec,
                 rm_purchase_order_details.qty_diterima,
                 rm_purchase_order_details.remaining_qty,
+                packaging.nama_barang as nama_packaging,
                 rm_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
+                ->join('barangs as packaging', 'packaging.id = penerimaan_barang_detail.packaging', 'LEFT')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
@@ -106,10 +111,12 @@ class PenerimaanBarangDetailModel extends Model
                 am_purchase_order_details.spec,
                 am_purchase_order_details.qty_diterima,
                 am_purchase_order_details.remaining_qty,
+                packaging.nama_barang as nama_packaging,
                 am_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
+                ->join('barangs as packaging', 'packaging.id = penerimaan_barang_detail.packaging', 'LEFT')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
@@ -134,10 +141,12 @@ class PenerimaanBarangDetailModel extends Model
                 rm_import_po_details.spec,
                 rm_import_po_details.qty_diterima,
                 rm_import_po_details.remaining_qty,
+                packaging.nama_barang as nama_packaging,
                 rm_import_pos.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
+                ->join('barangs as packaging', 'packaging.id = penerimaan_barang_detail.packaging', 'LEFT')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
@@ -158,10 +167,12 @@ class PenerimaanBarangDetailModel extends Model
                 am_purchase_order_details.spec,
                 am_purchase_order_details.qty_diterima,
                 am_purchase_order_details.remaining_qty,
+                packaging.nama_barang as nama_packaging,
                 am_purchase_orders.po_no'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
+                ->join('barangs as packaging', 'packaging.id = penerimaan_barang_detail.packaging', 'LEFT')
                 ->join('taxes as ppn', 'ppn.id = penerimaan_barang_detail.ppn', 'LEFT')
                 ->join('taxes as pph', 'pph.id = penerimaan_barang_detail.pph', 'LEFT')
                 ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'LEFT')
