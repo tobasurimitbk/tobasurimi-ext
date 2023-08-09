@@ -103,10 +103,10 @@
         <table class="w-100">
             <tr>
                 <td colspan="2">
-                    <div class="txt-bold">PO LOKAL BAHAN PENOLONG</div>
+                    <div class="txt-bold">LONG</div>
                 </td>
                 <td class="txt-right">
-                    <div>Kepada YTH: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
+                    <div>Kepada : <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
                 </td>
             </tr>
             <tr>
@@ -138,7 +138,7 @@
             </tr>
             <tr>
                 <td>
-                    Departmen: <?= $dataPOLokal->warehouseName ?>
+                    Departemen: <?= $dataPOLokal->warehouseName ?>
                 </td>
                 <td colspan="2">
                     Lokasi: <?= $dataPOLokal->companyName ?>
