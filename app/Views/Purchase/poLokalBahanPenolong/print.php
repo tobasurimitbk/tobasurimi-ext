@@ -8,12 +8,12 @@
     <style>
         body {
             font-size: 10px;
-            margin: 0px;
-            padding: 0px;
         }
 
         @page {
             size: 8.27in 5.50in landscape;
+            margin: 2px;
+            padding: 2px;
         }
 
         .header {
