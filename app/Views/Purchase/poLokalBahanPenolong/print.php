@@ -103,7 +103,7 @@
         <table class="w-100">
             <tr>
                 <td colspan="2">
-                    <div class="txt-bold">LONG</div>
+                    <div class="txt-bold">PO LOKAL BAHAN PENOLONG</div>
                 </td>
                 <td class="txt-right">
                     <div>Kepada: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
