@@ -78,7 +78,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="text" class="form-control target input-picker" id="barang_jadi_unit" placeholder="Target" value="<?= $barangJadi->nama_barang ?? '' ?>" disabled>
+                                    <input type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_barang ?? '' ?>" disabled>
                                         <label for="floatingInput">Nama Barang</label>
                                     </div>
                                 </div>
@@ -88,14 +88,14 @@
                                         <label for="floatingInput">Kode Barang</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_satuan ?? '' ?>" disabled>
                                         <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input type="text" value="<?= $barangJadi->qty ?? '' ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="barang_jadi_qty" id="barangJadiQty">
@@ -119,18 +119,18 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control target input-picker" id="setengah_jadi_barang_code" placeholder="Target" disabled>
+                                        <input type="text" class="form-control target input-picker" id="setengah_jadi_barang_code" disabled>
                                         <label for="floatingInput">Kode Barang</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input type="text" class="form-control target input-picker" id="setengah_jadi_barang_unit" disabled>
+                                        <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control target input-picker" id="setengah_jadi_barang_unit" placeholder="Target" disabled>
-                                        <label for="floatingInput">Satuan</label>
-                                    </div>
-                                </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" id="barangSetengahJadiQty">
@@ -139,7 +139,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <button type="button" class="btn btn-primary" id="addBarangSetengahJadi">Pilih</button>
+                                        <button type="button" class="btn btn-primary btn-pilih" id="addBarangSetengahJadi">Pilih</button>
                                     </div>
                                 </div>
                             </div>
@@ -176,18 +176,18 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control target input-picker" id="scrap_code" placeholder="Target" disabled>
+                                        <input type="text" class="form-control target input-picker" id="scrap_code" disabled>
                                         <label for="floatingInput">Kode Barang</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input type="text" class="form-control target input-picker" id="scrap_unit" disabled>
+                                        <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control target input-picker" id="scrap_unit" placeholder="Target" disabled>
-                                        <label for="floatingInput">Satuan</label>
-                                    </div>
-                                </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="" id="scrapQty">
@@ -196,7 +196,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <button type="button" class="btn btn-primary" id="addScrap">Pilih</button>
+                                        <button type="button" class="btn btn-primary btn-pilih" id="addScrap">Pilih</button>
                                     </div>
                                 </div>
                             </div>
@@ -233,18 +233,18 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control target input-picker" id="materialReturnCode" placeholder="Target" disabled>
+                                        <input type="text" class="form-control target input-picker" id="materialReturnCode" disabled>
                                         <label for="floatingInput">Kode Barang</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input type="text" class="form-control target input-picker" id="materialReturnUnit" disabled>
+                                        <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" class="form-control target input-picker" id="materialReturnUnit" placeholder="Target" disabled>
-                                        <label for="floatingInput">Satuan</label>
-                                    </div>
-                                </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="" id="materialReturnQty">
@@ -253,7 +253,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <button type="button" class="btn btn-primary" id="addMaterialReturn">Pilih</button>
+                                        <button type="button" class="btn btn-primary btn-pilih" id="addMaterialReturn">Pilih</button>
                                     </div>
                                 </div>
                             </div>
