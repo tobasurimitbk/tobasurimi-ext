@@ -11,7 +11,6 @@ class Employees extends BaseController
 {
     use ResponseTrait;
     protected $EmployeesModel;
-    protected $this_company_id;
     protected $AttendancesUnitModel;
     protected $attendances_id;
     protected $ip;
@@ -21,24 +20,22 @@ class Employees extends BaseController
     {
         $this->EmployeesModel = new EmployeesModel();
         $this->AttendancesUnitModel = new AttendancesUnitModel();
-        $this->this_company_id = session()->get("login")->this_company_id;
     }
 
 
 
     public function sync_employee_to_master()
     {
-        $res_attendances = $this->AttendancesUnitModel->getByCompany_id_and_master($this->this_company_id);
+        $res_unit = $this->AttendancesUnitModel->getByMaster(1);
 
-        $this->attendances_id = $res_attendances[0]["id"];
-        $this->ip = $res_attendances[0]["ip"];
-        $this->unit_key = $res_attendances[0]["unit_key"];
-
-        //$rfinger = $this->get_data_finger();
-
-        $res = $this->EmployeesModel->getEmployeesNotSyncAttendances($this->this_company_id);
-        for ($i = 0; $i < count($res); $i++) {
-            $this->add_employee($res[$i]["id"], $res[$i]["name"]);
+        for ($i = 0; $i < count($res_unit); $i++) {
+            $this->attendances_id = $res_unit[$i]["id"];
+            $this->ip = $res_unit[$i]["ip"];
+            $this->unit_key = $res_unit[$i]["unit_key"];
+            $res = $this->EmployeesModel->getEmployeesNotSyncAttendances($res_unit[$i]["company_id"]);
+            for ($j = 0; $j < count($res); $j++) {
+                $this->add_employee($res[$j]["id"], $res[$j]["name"]);
+            }
         }
     }
 

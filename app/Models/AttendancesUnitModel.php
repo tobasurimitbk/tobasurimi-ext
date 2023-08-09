@@ -123,4 +123,18 @@ class AttendancesUnitModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function getByMaster($master)
+    {
+        $arrCondition = [
+            'master' => $master,
+            'deletedAt' => NULL,
+        ];
+
+        $builder = $this->db->table('attendances_unit');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }
