@@ -38,7 +38,10 @@ class Employee extends BaseController
     public function dropdownEmployee()
     {
         $dataEmployee = [];
+        // employee no user
         $dataEmployee = $this->EmployeesModel->getEmployees($this->this_company_id);
+
+        // employee with user when user deleted
         $secondDataEmployee = $this->EmployeesModel->getEmployeesUserDelete($this->this_company_id);
 
         if($secondDataEmployee)
@@ -46,10 +49,23 @@ class Employee extends BaseController
             foreach($secondDataEmployee as $item)
             {
                 array_push($dataEmployee, $item);
+            }   
+        }
+
+        $finalDataEmployee = [];
+
+        foreach($dataEmployee as $item)
+        {
+            // check employee with user when user not deleted
+            $check = $this->UserModel->countUserByEmployeeId($item["id"]);
+
+            if($check < 1)
+            {
+                array_push($finalDataEmployee, $item);
             }
         }
         $data = [
-            "data" => $dataEmployee
+            "data" => $finalDataEmployee
         ];
 
         echo json_encode($data);

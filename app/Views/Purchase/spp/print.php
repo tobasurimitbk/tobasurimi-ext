@@ -162,15 +162,15 @@
         <table>
             <thead>
                 <tr>
-                    <td><b>No.</b></td>
-                    <td><b>Kode Barang</b></td>
-                    <td><b>Nama Barang</b></td>
-                    <td><b>Satuan</b></td>
-                    <td><b>Spesifikasi</b></td>
-                    <td><b>Harga Barang</b></td>
-                    <td><b>qty</b></td>
-                    <td><b>Total Harga</b></td>
-                    <td><b>keterangan</b></td>
+                    <td style="width: 10px;"><b>No.</b></td>
+                    <td style="width: 80px;"><b>Kode Barang</b></td>
+                    <td style="width: 110px;"><b>Nama Barang</b></td>
+                    <td style="width: 200px;"><b>Spesifikasi</b></td>
+                    <td style="width: 30px;"><b>qty</b></td>
+                    <td style="width: 80px;"><b>Satuan</b></td>
+                    <td style="width: 120px;"><b>Keterangan</b></td>
+                    <td style="width: 80px;"><b>Harga Barang</b></td>
+                    <td><b></b></td>
                 </tr>
             </thead>
             <tbody>
@@ -181,25 +181,23 @@
                         <td><b><?= $detail->no ?></b></td>
                         <td><b><?= $detail->kodeBarang ?></b></td>
                         <td><b><?= $detail->barangName ?></b></td>
-                        <td><b><?= $detail->satuanName ?></b></td>
                         <td><b><?= $detail->spec ?></b></td>
-                        <td><b><?= $detail->price ?></b></td>
                         <td><b><?= $detail->qty ?></b></td>
-                        <td><b><?= $detail->totalPrice ?></b></td>
+                        <td><b><?= $detail->satuanName ?></b></td>
                         <td><b><?= $detail->note ?></b></td>
+                        <td><b><?= $detail->price ?></b></td>
+                        <td><b></b></td>
                     </tr>
                 <?php } ?>
             </tbody>
-            <thead>
+            <!-- <thead>
                 <tr>
-                    <!-- <td colspan="5">TOTAL</td> -->
                     <td colspan="6">TOTAL</td>
-                    <!-- <td><?= $dataSPP->totalPrice ?></td> -->
                     <td><?= $dataSPP->totalQty ?></td>
                     <td><?= $dataSPP->totalAll ?></td>
                     <td></td>
                 </tr>
-            </thead>
+            </thead> -->
         </table>
 
         <div>

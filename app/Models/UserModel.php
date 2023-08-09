@@ -162,6 +162,18 @@ class UserModel extends Model
         return $query->getRow();
     }
 
+    public function countUserByEmployeeId($id)
+    {
+        $selectQry = "users.*";
+
+        $data = $this->select($selectQry)
+        ->where('employee_id', $id)
+        ->where('deletedAt', NULL)       
+        ->countAllResults();
+
+        return $data;
+    }
+
     public function getUser($id)
     {
         $arrCondition = [

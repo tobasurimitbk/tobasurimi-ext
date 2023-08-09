@@ -656,11 +656,11 @@ class TerimaFakturImport extends BaseController
                 ];
             }
             
-            $tandaTerimaFakturModel->db->transStart();
+            $tandaTerimaFakturModel->db->transException(true)->transStart();
             $tandaTerimaData = [
                 // 'supplier_id'       => $postData['supplier_id'],
                 // 'invoice_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['invoice_date']))),
-                'receive_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['receive_date']))),
+                'receive_date'      => date("Y-m-d", strtotime(str_replace("/", "-", $postData['receive_date']))),
                 'potongan'          => $postData['potongan'] ?? 0,
                 'tambahan'          => $postData['tambahan'] ?? 0,
                 // 'faktur_type'       => 'LOKAL',
