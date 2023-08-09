@@ -121,7 +121,7 @@
                     <td class="txt-bold txt-right txt-underline">Tanggal: <?= $dataPO->po_date ? date("d/m/Y", strtotime($dataPO->po_date)) : ""; ?></td>
                 </tr>
                 <tr>
-                    <td class="txt-underline txt-bold">PO BAHAN BAKU LOKAL</td>
+                    <td class="txt-underline txt-bold">PO LOKAL BAHAN BAKU</td>
                     <td colspan="2">NO. NOTA : <?= $dataPO->po_no ?></td>
                 </tr>
             </table>
