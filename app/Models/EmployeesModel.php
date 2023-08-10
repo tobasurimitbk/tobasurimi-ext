@@ -125,11 +125,11 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'users.name' => null
+            'users.id' => null
         ];
 
         $builder = $this->db->table('employees')
-            ->select("employees.*, users.name as users_name")
+            ->select("employees.*, users.id as users_id, users.name as users_name")
             ->join('users', 'users.employee_id = employees.id', 'left');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();

@@ -31,7 +31,6 @@ class PenerimaanBarangModel extends Model
         'no_registration',
         'letter_no',
         'invoice_no',
-        'packaging',
         'total_weight',
         'shipping_cost',
         'is_summarized',

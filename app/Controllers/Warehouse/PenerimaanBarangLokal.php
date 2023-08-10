@@ -270,12 +270,6 @@ class PenerimaanBarangLokal extends BaseController
                         'required' => 'No. Invoice tidak boleh kosong'
                     ]
                 ],
-                "packaging" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Kemasan tidak boleh kosong'
-                    ]
-                ],
                 "total_weight" => [
                     "rules" => "required",
                     'errors' => [
@@ -323,7 +317,6 @@ class PenerimaanBarangLokal extends BaseController
                     "no_registration" => $this->request->getPost("no_registration"),
                     "letter_no" => $this->request->getPost("letter_no"),
                     "invoice_no" => $this->request->getPost("invoice_no"),
-                    "packaging" => $this->request->getPost("packaging"),
                     "total_weight" => $this->request->getPost("total_weight"),
                     "shipping_cost" => formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT"),
                     "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),

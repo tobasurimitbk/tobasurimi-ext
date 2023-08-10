@@ -597,7 +597,7 @@ class POLokalBahanPenolong extends BaseController
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanPenolong/print', $data));
 
             // (optional) setup the paper size and orientation
-            $this->dompdf->setPaper('A4', 'landscape');
+            $this->dompdf->setPaper('A5', 'landscape');
 
             // render html as PDF
             $this->dompdf->render();

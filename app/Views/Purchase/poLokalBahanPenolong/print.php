@@ -7,7 +7,14 @@
     <title>PO Lokal Bahan Penolong</title>
     <style>
         body {
-            font-size: 10px;
+            font-size: 12px;
+            font-family: calibri;
+        }
+
+        @page {
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
         }
 
         .header {
@@ -52,14 +59,14 @@
         .sign-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 2.5rem;
+            margin-top: 0rem;
             width: 100%;
         }
 
         .sign-row>div {
-            width: 150px;
+            width: 100px;
             border-top: 1px solid;
-            margin-top: 5rem
+            margin-top: 2rem
         }
 
         .txt-bold {
@@ -88,6 +95,13 @@
 
         .w-100 {
             width: 100%;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 90px;
         }
     </style>
 </head>
@@ -139,7 +153,7 @@
                 </td>
             </tr>
         </table>
-        <div class="mt-1 txt-bold" style="margin-bottom: 5px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
+        <div class="mt-025 txt-bold" style="margin-bottom: 3px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
         <table class="item-table">
             <tr>
                 <!-- <th>No</th> -->
@@ -162,7 +176,7 @@
                     <!-- <td><b><?= $detail->no ?></b></td> -->
                     <td><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
                     <td><?= $detail->kode_barang ?></b></td>
-                    <td class="w-50"><?= $detail->nama_barang . " " . $detail->spec ?></b></td>
+                    <td><?= $detail->nama_barang . " " . $detail->spec ?></b></td>
                     <!-- <td><?= $detail->nama_satuan ?></b></td> -->
                     <!-- <td><?= $detail->spec ?></b></td> -->
                     <td class="txt-right"><?= $detail->price ?></b></td>
@@ -174,7 +188,7 @@
                 </tr>
             <?php } ?>
         </table>
-        <div class="header mt-1">
+        <div class="header mt-025">
             <div class="txt-right">
                 <div>
                     Jumlah Pembelian: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
@@ -194,11 +208,11 @@
             </div>
         </div>
         <div style="text-decoration: underline;">
-            Keterangan: <div><?= $dataPOLokal->note ?></div>
+            Keterangan: <?= $dataPOLokal->note ?>
         </div>
-        <table class="w-100 sign-table border-collapse">
+        <table class="w-100 sign-table border-collapse footer" style="padding-top: 0px; margin-top: 0px">
             <tr style="border: 0px;">
-                <td style="height: 50px; border: 0px;">Pemesan Order</td>
+                <td style="height: 30px; border: 0px;">Pemesan Order</td>
                 <td style="border: 0px;">Pembuat Order</td>
                 <td style="border: 0px;">Diketahui oleh</td>
                 <td style="border: 0px;">Diperiksa oleh</td>

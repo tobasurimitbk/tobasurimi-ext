@@ -199,12 +199,6 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->packaging : ""; ?>" type="text" class="form-control packaging" id="packaging" name="packaging" placeholder="Kemasan">
-                        <label for="floatingInput">Kemasan</label>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->total_weight : ""; ?>" type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
                         <label for="floatingInput">Berat</label>
                     </div>
@@ -215,14 +209,14 @@
                         <label for="floatingInput">Biaya Ongkos Kirim (Opsional)</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->biaya_masuk) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Biaya Masuk">
                         <label for="floatingInput">Biaya Masuk</label>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->ppn, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control ppn" name="ppn" id="ppn" placeholder="PPN % (Opsional)">
@@ -574,9 +568,6 @@ var validator_detail = $(".detail-form").validate({
                 invoice_no: {
                     required: true,
                 },
-                packaging: {
-                    required: true,
-                },
                 total_weight: {
                     required: true,
                 },
@@ -617,9 +608,6 @@ var validator_detail = $(".detail-form").validate({
                 },
                 invoice_no: {
                     required: "No. Invoice wajib diisi"
-                },
-                packaging: {
-                    required: "Packaging wajib diisi"
                 },
                 total_weight: {
                     required: "Weight wajib diisi"
