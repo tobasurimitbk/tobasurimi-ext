@@ -51,6 +51,7 @@ class RMImportPOModel extends Model
             'currency'          => 'metadata.value',
             'createdAt'         => 'rm_import_pos.createdAt',
             'updatedAt'         => 'rm_import_pos.updatedAt',
+            'statusPenerimaan'  => 'rm_import_pos.status_penerimaan'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

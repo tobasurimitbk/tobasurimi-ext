@@ -10,27 +10,26 @@
             Batal
         </a>
         <?php if(!empty($dataPenerimaanBarang)){ ?> 
-
-            <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?><?= $dataPenerimaanBarang->id; ?>')">
-                Print
-            </button>
-            <?php 
-            }
-            ?> 
-            <?php if(!empty($dataPenerimaanBarang)){ 
-                if($dataPenerimaanBarang->status_po === "OPEN"){ 
-            ?> 
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
-                Close PO
-            </button>
-            <?php }
-            } else { ?> 
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent-and-close">
-                Simpan & Close PO
-            </button>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan
-            </button>
+        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?><?= $dataPenerimaanBarang->id; ?>')">
+            Print
+        </button>
+        <?php 
+        }
+        ?> 
+        <?php if(!empty($dataPenerimaanBarang)){ 
+            if($dataPenerimaanBarang->status_post === "WAITING"){ 
+        ?> 
+        <button class="btn btn-success posting-spp float-right">
+            Posting
+        </button>
+        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+            Simpan 
+        </button>
+        <?php }
+        } else { ?> 
+        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+            Simpan 
+        </button>
         <?php } ?> 
     </div>
 </div>
@@ -49,10 +48,10 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_penerimaan_barang : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
+                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_penerimaan_barang : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                                 <label for="floatingInput">No. Penerimaan</label>
                             </div>
-                            <div style="<?= !empty($dataPenerimaanBarang) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                            <div style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                 <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
@@ -61,7 +60,7 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="hidden" name="tipe" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->tipe_bahan : ""; ?>" />
-                        <select <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
+                        <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
                             <option value="BAKU" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? "selected" : "") : ""; ?>>Bahan Baku</option>
                             <option value="PENOLONG" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? "selected" : "") : ""; ?>>Bahan Penolong</option>
                         </select>
@@ -70,7 +69,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                        <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php
                             if (!empty($dataSupplier)) {
@@ -88,18 +87,33 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <?php if(!empty($dataPenerimaanBarang)){ 
-                        ?>
-                            <select multiple disabled="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
-                                <option value=""></option>
-                                <?php
-                                    $dataLoop = json_decode($dataPenerimaanBarang->multiple_po_no);
-                                    foreach ($dataLoop as $no) {
-                                ?>
-                                        <option value="<?= $no; ?>" selected><?= $no; ?></option>
-                                <?php
-                                }
-                                ?>
-                            </select> 
+                            if($dataPenerimaanBarang->status_post === "FINISH"){
+                            ?>
+                                <select multiple disabled="true" class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                                    <option value=""></option>
+                                    <?php
+                                        $dataLoop = json_decode($dataPenerimaanBarang->multiple_po_no);
+                                        foreach ($dataLoop as $no) {
+                                    ?>
+                                            <option value="<?= $no; ?>" selected><?= $no; ?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>    
+                            <?php } else { ?>
+                                <select multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataNo)) {
+                                        foreach ($dataNo as $no) {
+                                    ?>
+                                            <option value="<?= $no["id"]; ?>" <?= (!empty($dataPenerimaanBarang) ? (in_array($no["id"], ($dataPenerimaanBarang->multiple_po_id ? json_decode($dataPenerimaanBarang->multiple_po_id) : [])) ? "selected" : "") : ""); ?>><?= $no["po_no"]; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>    
+                            <?php } ?>
                         <?php } else {
                         ?>
                             <select multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
@@ -123,7 +137,7 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                        <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php
                             if (!empty($dataWarehouse)) {
@@ -147,7 +161,7 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
+                        <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select aju_document_type" id="aju_document_type" name="aju_document_type" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php
                             if (!empty($dataAJU)) {
@@ -164,14 +178,14 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->aju_no : ""; ?>" type="text" class="form-control aju_no" name="aju_no" id="aju_no" placeholder="No. Invoice">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->aju_no : ""; ?>" type="text" class="form-control aju_no" name="aju_no" id="aju_no" placeholder="No. Invoice">
                         <label for="floatingInput">No. AJU</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : "") : ""; ?>" type="text" class="form-control input-picker validation_date" id="validation_date" name="validation_date" placeholder="Tanggal Pendaftaran">
+                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : "") : ""; ?>" type="text" class="form-control input-picker validation_date" id="validation_date" name="validation_date" placeholder="Tanggal Pendaftaran">
                             <label for="floatingInput">Tanggal Pendaftaran</label>
                         </div>
                     </div>
@@ -179,7 +193,7 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_registration : ""; ?>" type="text" class="form-control no_registration" id="no_registration" name="no_registration" placeholder="No. Pendaftaran">
+                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_registration : ""; ?>" type="text" class="form-control no_registration" id="no_registration" name="no_registration" placeholder="No. Pendaftaran">
                             <label for="floatingInput">No. Pendaftaran</label>
                         </div>
                     </div>
@@ -193,25 +207,25 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->invoice_no : ""; ?>" type="text" class="form-control invoice_no" id="invoice_no" name="invoice_no" placeholder="No. Invoice">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->invoice_no : ""; ?>" type="text" class="form-control invoice_no" id="invoice_no" name="invoice_no" placeholder="No. Invoice">
                         <label for="floatingInput">No. Invoice</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->total_weight : ""; ?>" type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->total_weight : ""; ?>" type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
                         <label for="floatingInput">Berat</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->shipping_cost) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim (Opsional)">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->shipping_cost) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim (Opsional)">
                         <label for="floatingInput">Biaya Ongkos Kirim (Opsional)</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->biaya_masuk) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Biaya Masuk">
+                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->biaya_masuk) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Biaya Masuk">
                         <label for="floatingInput">Biaya Masuk</label>
                     </div>
                 </div>
@@ -219,13 +233,13 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->ppn, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control ppn" name="ppn" id="ppn" placeholder="PPN % (Opsional)">
+                        <input value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->ppn, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control ppn" name="ppn" id="ppn" placeholder="PPN % (Opsional)">
                         <label for="floatingInput">PPN % (Opsional)</label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->pph, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? 'disabled=true' : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control pph" name="pph" id="pph" placeholder="PPH % (Opsional)">
+                        <input value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->pph, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control pph" name="pph" id="pph" placeholder="PPH % (Opsional)">
                         <label for="floatingInput">PPH % (Opsional)</label>
                     </div>
                 </div>
@@ -246,6 +260,8 @@
                             <th>No.</th>
                             <th>Kode Barang</th>
                             <th>Nama Barang</th>
+                            <th>No. PO</th>
+                            <th>Status Penerimaan</th>
                             <th>Satuan</th>
                             <th>Jml. Order</th>
                             <th>Jml. Diterima</th>
@@ -278,17 +294,38 @@
                         ?> 
     
                             <tr>
-                                    <td><?= $no; ?></td>
-                                    <td><?= $details["kode_barang"]; ?></td>
-                                    <td><?= $details["nama_barang"]; ?></td>
-                                    <td><?= $details["nama_satuan"]; ?></td>
-                                    <td><?= $details["qty"]; ?></td>
-                                    <td><?= $details["qty_diterima"] ? formatter($details["qty_diterima"], "CURR_TO_INT") : 0; ?></td>
-                                    <td><?= $details["remaining_qty"] ? formatter($details["remaining_qty"], "CURR_TO_INT") : 0; ?></td>
-                                    <td><?= $details["jml_masuk"]; ?></td>
-                                    <td><?= $details["harga"] ? number_format($details["harga"]) : 0; ?></td>
-                                    <td><?= $details["sub_total"] ? number_format($details["sub_total"]) : 0; ?></td>
-                                    <td><?= $details["keterangan"]; ?></td>
+                                <?php if($dataPenerimaanBarang->status_post === "WAITING" && $details["status_penerimaan"] === "0"){ 
+                                    $qty_diterima = $details["qty_diterima"] ? formatter($details["qty_diterima"], "CURR_TO_INT") : 0;
+                                    $remaining_qty = $details["remaining_qty"] ? formatter($details["remaining_qty"], "CURR_TO_INT") : 0;    
+                                ?> 
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?= $no; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["kode_barang"]; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["nama_barang"]; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["nama_satuan"]; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["po_no"]; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["qty"]; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?= $details["qty_diterima"] ? formatter($details["qty_diterima"], "CURR_TO_INT") : 0; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?= $details["remaining_qty"] ? formatter($details["remaining_qty"], "CURR_TO_INT") : 0; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["jml_masuk"]; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?></td>
+                                        <td class="edit-table-detail" data-qty_diterima="<?= $qty_diterima; ?>" data-remaining_qty="<?= $remaining_qty; ?>" data-jml_masuk="<?= $details["jml_masuk"]; ?>" data-barang_id="<?= $details["barang_id"]; ?>" data-unit="<?= $details["unit"]; ?>" data-keterangan="<?=  $details["keterangan"]; ?>"  data-sub_total="<?=  $details["sub_total"] ?  number_format($details["sub_total"]) : 0; ?>" data-harga="<?=  $details["harga"] ?  number_format($details["harga"]) : 0; ?>" data-nama_barang_dokumen="<?=  $details["nama_barang_dok"]; ?>" data-qty="<?=  $details["qty"]; ?>" data-satuan="<?=  $details["nama_satuan"]; ?>" data-nama_barang="<?=  $details["nama_barang"]; ?>" data-kode="<?=  $details["kode_barang"]; ?>" data-purchase_order_details_id="<?=  $details["purchase_order_details_id"]; ?>" data-id="<?=  $details["id"]; ?>" data-row="<?= $no; ?>"><?=  $details["keterangan"]; ?></td>
+                                    <?php } else { ?>
+                                        <td><?= $no; ?></td>
+                                        <td><?= $details["kode_barang"]; ?></td>
+                                        <td><?= $details["nama_barang"]; ?></td>
+                                        <td><?= $details["po_no"]; ?></td>
+                                        <td><?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?></td>
+                                        <td><?= $details["nama_satuan"]; ?></td>
+                                        <td><?= $details["qty"]; ?></td>
+                                        <td><?= $details["qty_diterima"] ? formatter($details["qty_diterima"], "CURR_TO_INT") : 0; ?></td>
+                                        <td><?= $details["remaining_qty"] ? formatter($details["remaining_qty"], "CURR_TO_INT") : 0; ?></td>
+                                        <td><?= $details["jml_masuk"]; ?></td>
+                                        <td><?= $details["harga"] ? number_format($details["harga"]) : 0; ?></td>
+                                        <td><?= $details["sub_total"] ? number_format($details["sub_total"]) : 0; ?></td>
+                                        <td><?= $details["keterangan"]; ?></td>
+                                    <?php } ?>
                             </tr>
                         <?php 
                             $no++;
@@ -299,7 +336,7 @@
                         <tr>
                             <td></td>
                             <td>GRAND TOTAL</td>
-                            <td colspan="2"></td>
+                            <td colspan="4"></td>
                             <td><b><?= $total_jml_order; ?></b></td>
                             <td><b><?= $total_qty_diterima; ?></b></td>
                             <td><b><?= $total_remaining_qty; ?></b></td>
@@ -474,6 +511,8 @@
         harga: Number('<?= $details["harga"] ? $details["harga"] : 0; ?>').toLocaleString(),
         sub_total: Number('<?= $details["sub_total"] ? $details["sub_total"] : 0; ?>').toLocaleString(),
         keterangan: '<?= $details["keterangan"]; ?>',
+        status_penerimaan: '<?= $details["status_penerimaan"] === "0" ? "OPEN" : "CLOSED"; ?>',
+        po_no: '<?= $details["po_no"]; ?>',
     })
     <?php 
         }
@@ -919,6 +958,12 @@ var validator_detail = $(".detail-form").validate({
                                             tag_html += nama_barang;
                                             tag_html += "</td>";
                                             tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="${jml_masuk}" data-barang_id="${barang_id}" data-unit="${unit}" data-keterangan="${keterangan}"  data-sub_total="${nilai_sub_total}" data-harga="${harga}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                            tag_html += item.po_no;
+                                            tag_html += "</td>";
+                                            tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="${jml_masuk}" data-barang_id="${barang_id}" data-unit="${unit}" data-keterangan="${keterangan}"  data-sub_total="${nilai_sub_total}" data-harga="${harga}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                            tag_html += item.status_penerimaan;
+                                            tag_html += "</td>";
+                                            tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="${jml_masuk}" data-barang_id="${barang_id}" data-unit="${unit}" data-keterangan="${keterangan}"  data-sub_total="${nilai_sub_total}" data-harga="${harga}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
                                             tag_html += satuan;
                                             tag_html += "</td>";
                                             tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="${jml_masuk}" data-barang_id="${barang_id}" data-unit="${unit}" data-keterangan="${keterangan}"  data-sub_total="${nilai_sub_total}" data-harga="${harga}" data-nama_barang_dokumen="${nama_barang_dokumen}" data-qty="${qty}" data-satuan="${satuan}" data-nama_barang="${nama_barang}" data-kode="${kode_barang}" data-purchase_order_details_id="${purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
@@ -960,7 +1005,9 @@ var validator_detail = $(".detail-form").validate({
                                                 jml_masuk: jml_masuk,
                                                 harga: harga,
                                                 sub_total: nilai_sub_total,
-                                                keterangan: keterangan
+                                                keterangan: keterangan,
+                                                po_no: item.po_no,
+                                                status_penerimaan: item.status_penerimaan
                                             });
 
                                         }
@@ -975,6 +1022,12 @@ var validator_detail = $(".detail-form").validate({
                                             tag_html += "</td>";
                                             tag_html += `<td class="edit-table-detail" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}"  data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
                                             tag_html += item.nama_barang;
+                                            tag_html += "</td>";
+                                            tag_html += `<td class="edit-table-detail" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}"  data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                            tag_html += item.po_no;
+                                            tag_html += "</td>";
+                                            tag_html += `<td class="edit-table-detail" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}"  data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
+                                            tag_html += item.status_penerimaan;
                                             tag_html += "</td>";
                                             tag_html += `<td class="edit-table-detail" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}"  data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
                                             tag_html += item.satuan;
@@ -1028,7 +1081,7 @@ var validator_detail = $(".detail-form").validate({
                                     tag_total += `<td>`;
                                     tag_total += `GRAND TOTAL`;
                                     tag_total += "</td>";
-                                    tag_total += `<td colspan='2'>`;
+                                    tag_total += `<td colspan='4'>`;
                                     tag_total += "</td>";
                                     tag_total += `<td>`;
                                     tag_total += total_jml_order;
@@ -1059,20 +1112,75 @@ var validator_detail = $(".detail-form").validate({
                             })
                         }
                     }
-                    }
                 }
+            }
         })
 
-        $(".btn-submit-parent-and-close").click(function() {
+        $(".posting-spp").click(function() {
             $(".detail-modal").modal("hide")
-            let validate = false;
-            if(list_items.length === 0)
-            {
-                validate = true;
-            }
+
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di Posting?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Posting',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("penerimaan-barang-import/update-status"); ?>",
+                        data: {
+                            id: $(".id").val(),
+                            tipe_bahan: $(".tipe_bahan").val(),
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("penerimaan-barang-import"); ?>" + "/id/" + $(".id").val()
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Diubah, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
+        })
+
+        $(".btn-submit-parent").click(function() {
+            $(".detail-modal").modal("hide")
 
             // CHECK IF NO BARANG
-            if(validate)
+            if(list_items.length === 0)
             {
                 Swal.fire({
                     icon: 'error',
@@ -1109,74 +1217,80 @@ var validator_detail = $(".detail-form").validate({
                             data.append("multiple_po_no", JSON.stringify(arr_no));
 
                             let id = $(".id").val();
+                            let validate_jml_masuk = false;
+
                             // UPDATE
                             if(id)
                             {
-                                data.append("status_post", "FINISH");
+                                if(list_delete.length !== 0)
+                                {
+                                    list_delete.map(obj => {
+                                        update_list_items.push(
+                                            {
+                                                id: obj.id ? Number(obj.id) : "",
+                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                unit: obj.unit ? Number(obj.unit) : 0,
+                                                nama_barang_dok: obj.nama_barang_dokumen,
+                                                qty: obj.qty ? Number(obj.qty) : 0,
+                                                remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
+                                                qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
+                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
+                                                keterangan: obj.keterangan,
+                                                ppn: 0,
+                                                pph: 0,
+                                                is_delete: true
+                                            }
+                                        )
+                                    })
+                                }
 
-                                $.ajax({
-                                    url: "<?= base_url("penerimaan-barang-import/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url("penerimaan-barang-import"); ?>" + "/id/" + id;
-                                            })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Diubah, coba Lagi',
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                });
-                            }
-                            // CREATE
-                            else
-                            {
-                                let validate_jml_masuk = false;
                                 list_items.map(obj => {
-                                    update_list_items.push(
-                                        {
-                                            purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
-                                            barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            unit: obj.unit ? Number(obj.unit) : 0,
-                                            nama_barang_dok: obj.nama_barang_dokumen,
-                                            qty: obj.qty ? Number(obj.qty) : 0,
-                                            remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
-                                            qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
-                                            jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
-                                            harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                            sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
-                                            keterangan: obj.keterangan,
-                                            ppn: 0,
-                                            pph: 0
-                                        }
-                                    )
+                                    if (obj.id) {
+                                        update_list_items.push(
+                                            {
+                                                id: obj.id ? Number(obj.id) : "",
+                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                unit: obj.unit ? Number(obj.unit) : 0,
+                                                nama_barang_dok: obj.nama_barang_dokumen,
+                                                qty: obj.qty ? Number(obj.qty) : 0,
+                                                remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
+                                                qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
+                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
+                                                keterangan: obj.keterangan,
+                                                ppn: 0,
+                                                pph: 0,
+                                                is_delete: false
+                                            }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        update_list_items.push(
+                                            {
+                                                id: obj.id ? Number(obj.id) : "",
+                                                purchase_order_details_id: obj.purchase_order_details_id ? Number(obj.purchase_order_details_id) : 0,
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                unit: obj.unit ? Number(obj.unit) : 0,
+                                                nama_barang_dok: obj.nama_barang_dokumen,
+                                                qty: obj.qty ? Number(obj.qty) : 0,
+                                                remaining_qty: (Number(obj.remaining_qty) - Number(obj.jml_masuk)),
+                                                qty_diterima: (Number(obj.qty_diterima) + Number(obj.jml_masuk)),
+                                                jml_masuk: obj.jml_masuk ? Number(obj.jml_masuk) : 0,
+                                                harga: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
+                                                sub_total: obj.sub_total ? Number(obj.sub_total.replaceAll(",", "")) : 0,
+                                                keterangan: obj.keterangan,
+                                                ppn: 0,
+                                                pph: 0,
+                                                is_delete: false
+                                            }
+                                        )
+                                    }
 
                                     let jml_masuk = obj.jml_masuk ? Number(obj.jml_masuk) : 0;
                                     if(jml_masuk === 0)
@@ -1186,8 +1300,6 @@ var validator_detail = $(".detail-form").validate({
                                 })
 
                                 data.append("items", JSON.stringify(update_list_items))
-
-                                data.append("status_post", "FINISH");
 
                                 // validasi jumlah masuk kosong
                                 if(validate_jml_masuk)
@@ -1202,7 +1314,7 @@ var validator_detail = $(".detail-form").validate({
                                 else
                                 {
                                     $.ajax({
-                                        url: "<?= base_url("penerimaan-barang-import/save"); ?>",
+                                        url: "<?= base_url("penerimaan-barang-import/update"); ?>",
                                         data: data,
                                         beforeSend: function(xhr) {
                                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1220,7 +1332,7 @@ var validator_detail = $(".detail-form").validate({
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("penerimaan-barang-import"); ?>" + "/id/" + response.id;
+                                                    window.location.href = "<?= base_url("penerimaan-barang-import"); ?>" + "/id/" + id;
                                                 })
                                             } else {
                                                 Swal.fire({
@@ -1243,67 +1355,9 @@ var validator_detail = $(".detail-form").validate({
                                     });
                                 }
                             }
-                        }
-                    })
-                }
-            }
-        })
-
-        $(".btn-submit-parent").click(function() {
-            $(".detail-modal").modal("hide")
-            let validate = false;
-            if(list_items.length === 0)
-            {
-                validate = true;
-            }
-
-            // CHECK IF NO BARANG
-            if(validate)
-            {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Barang Tidak Boleh Kosong",
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-            else
-            {
-                if ($(".create-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            setLoading()
-                            let data = new FormData(document.querySelector(".create-form"));
-
-                            let update_list_items = [];
-
-                            data.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
-                            var arr_no = $('.multiple_po_id').select2('data').map(function(elem){ 
-                                return elem.text 
-                            });
-                            console.log(arr_no)
-                            data.append("acceptance_type", ($('.multiple_po_id').val().length > 1) ? "MULTIPLE ORDER" : "SINGLE ORDER")
-                            data.append("multiple_po_no", JSON.stringify(arr_no));
-
-                            let id = $(".id").val();
-                            // UPDATE
-                            if(id)
-                            {
-
-                            }
                             // CREATE
                             else
                             {
-                                let validate_jml_masuk = false;
                                 list_items.map(obj => {
                                     update_list_items.push(
                                         {
@@ -1331,8 +1385,6 @@ var validator_detail = $(".detail-form").validate({
                                 })
 
                                 data.append("items", JSON.stringify(update_list_items))
-
-                                data.append("status_post", "WAITING");
 
                                 // validasi jumlah masuk kosong
                                 if(validate_jml_masuk)
@@ -1451,8 +1503,11 @@ var validator_detail = $(".detail-form").validate({
             total_jml_harga = 0;
             total_jml_sub_total = 0;
 
-            list_items.push((item) => {
-                list_delete.push(item);
+            list_items.map((item) => {
+                if(item.id)
+                {
+                    list_delete.push(item);
+                }
             })
 
             row = 0;
@@ -1519,7 +1574,7 @@ var validator_detail = $(".detail-form").validate({
                                 let remaining_qty = item.remaining_qty ? Number(item.remaining_qty) : 0;
 
                                 // penerimaan not done
-                                if(remaining_qty !== 0)
+                                if(remaining_qty !== 0 || item.status_penerimaan === "0")
                                 {
                                     list_items.push({
                                         id: '',
@@ -1537,7 +1592,9 @@ var validator_detail = $(".detail-form").validate({
                                         jml_masuk: 0,
                                         harga: harga_sementara,
                                         sub_total: sub_total_sementara,
-                                        keterangan: item.note
+                                        keterangan: item.note,
+                                        po_no: item.po_no,
+                                        status_penerimaan: "OPEN"
                                     })
 
                                     tag_html += `<tr>`;
@@ -1549,6 +1606,12 @@ var validator_detail = $(".detail-form").validate({
                                     tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
                                     tag_html += item.nama_barang;
+                                    tag_html += "</td>";
+                                    tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
+                                    tag_html += item.po_no;
+                                    tag_html += "</td>";
+                                    tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
+                                    tag_html += "OPEN";
                                     tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
                                     tag_html += item.nama_satuan;
@@ -1595,7 +1658,7 @@ var validator_detail = $(".detail-form").validate({
                                     tag_total += `<td>`;
                                     tag_total += `GRAND TOTAL`;
                                     tag_total += "</td>";
-                                    tag_total += `<td colspan='2'>`;
+                                    tag_total += `<td colspan='4'>`;
                                     tag_total += "</td>";
                                     tag_total += `<td>`;
                                     tag_total += total_jml_order;
@@ -1666,7 +1729,9 @@ var validator_detail = $(".detail-form").validate({
                                         jml_masuk: 0,
                                         harga: harga_sementara,
                                         sub_total: sub_total_sementara,
-                                        keterangan: item.note
+                                        keterangan: item.note,
+                                        po_no: item.po_no,
+                                        status_penerimaan: "OPEN"
                                     })
 
                                     tag_html += `<tr>`;
@@ -1678,6 +1743,12 @@ var validator_detail = $(".detail-form").validate({
                                     tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
                                     tag_html += item.nama_barang;
+                                    tag_html += "</td>";
+                                    tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
+                                    tag_html += item.po_no;
+                                    tag_html += "</td>";
+                                    tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
+                                    tag_html += "OPEN";
                                     tag_html += "</td>";
                                     tag_html += `<td class="edit-table-detail" data-qty_diterima="${qty_diterima}" data-remaining_qty="${remaining_qty}" data-jml_masuk="0" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.note}" data-sub_total="${sub_total_sementara}" data-harga="${harga_sementara}" data-nama_barang_dokumen="${item.nama_barang}" data-qty="${qty_sementara}" data-satuan="${item.nama_satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.id}" data-id="" data-row="${row + 1}">`;
                                     tag_html += item.nama_satuan;
@@ -1724,7 +1795,7 @@ var validator_detail = $(".detail-form").validate({
                                     tag_total += `<td>`;
                                     tag_total += `GRAND TOTAL`;
                                     tag_total += "</td>";
-                                    tag_total += `<td colspan='2'>`;
+                                    tag_total += `<td colspan='4'>`;
                                     tag_total += "</td>";
                                     tag_total += `<td>`;
                                     tag_total += total_jml_order;
@@ -1759,21 +1830,33 @@ var validator_detail = $(".detail-form").validate({
         })
         
         $(".supplier_id").change(function() {
-            let tag_total = "";
+            total_jml_order = 0;
+            total_jml_masuk = 0;
+            total_qty_diterima = 0;
+            total_remaining_qty = 0;
+            total_jml_harga = 0;
+            total_jml_sub_total = 0;
 
+            list_items.map(item => {
+                if(item.id)
+                {
+                    list_delete.push(item)
+                }
+            })
+
+            row = 0;
+            list_items = [];
             $(".body-detail-table").empty();
-            $(".foot-detail-table").empty();
 
+            let tag_total = "";
+            $(".foot-detail-table").empty()
             tag_total += `<tr>`;
             tag_total += `<td>`;
             tag_total += "</td>";
             tag_total += `<td>`;
             tag_total += `GRAND TOTAL`;
             tag_total += "</td>";
-            tag_total += `<td colspan='2'>`;
-            tag_total += "</td>";
-            tag_total += `<td>`;
-            tag_total += total_jml_order;
+            tag_total += `<td colspan='4'>`;
             tag_total += "</td>";
             tag_total += `<td>`;
             tag_total += 0;
@@ -1790,7 +1873,10 @@ var validator_detail = $(".detail-form").validate({
             tag_total += `<td>`;
             tag_total += 0;
             tag_total += "</td>";
-            tag_total += `<td colspan="1">`;
+            tag_total += `<td>`;
+            tag_total += 0;
+            tag_total += "</td>";
+            tag_total += `<td colspan="2">`;
             tag_total += "</td>";
             tag_total += "</tr>";
 
@@ -1809,13 +1895,13 @@ var validator_detail = $(".detail-form").validate({
                         dataType: "json",
                         success: function(res) {
                             console.log(res)
-                            $(".multiple_po_id").attr("disabled", true)
+                            // $(".multiple_po_id").attr("disabled", true)
                             $(".multiple_po_id").empty()
                             $(".multiple_po_id").append(`<option value=""></option>`)
                             res.data.forEach(function(item) {
                                 $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
                             })
-                            $(".multiple_po_id").attr("disabled", false)
+                            // $(".multiple_po_id").attr("disabled", false)
                             $(".multiple_po_id").val([]);
                         }
                     })
@@ -1831,13 +1917,13 @@ var validator_detail = $(".detail-form").validate({
                         dataType: "json",
                         success: function(res) {
                             console.log(res)
-                            $(".multiple_po_id").attr("disabled", true)
+                            // $(".multiple_po_id").attr("disabled", true)
                             $(".multiple_po_id").empty()
                             $(".multiple_po_id").append(`<option value=""></option>`)
                             res.data.forEach(function(item) {
                                 $(".multiple_po_id").append(`<option value="${item.id}">${item.po_no}</option>`)
                             })
-                            $(".multiple_po_id").attr("disabled", false)
+                            // $(".multiple_po_id").attr("disabled", false)
                             $(".multiple_po_id").val([]);
                         }
                     })
@@ -1845,7 +1931,7 @@ var validator_detail = $(".detail-form").validate({
             }
             else
             {
-                $(".multiple_po_id").attr("disabled", true)
+                // $(".multiple_po_id").attr("disabled", true)
                 $(".multiple_po_id").empty()
                 $(".multiple_po_id").append(`<option value=""></option>`)
                 $(".multiple_po_id").val([]);
@@ -1924,7 +2010,10 @@ var validator_detail = $(".detail-form").validate({
         total_jml_sub_total = 0;
 
         list_items.map(item => {
-            list_delete.push(item)
+            if(item.id)
+            {
+                list_delete.push(item)
+            }
         })
 
         row = 0;
@@ -1939,7 +2028,7 @@ var validator_detail = $(".detail-form").validate({
         tag_total += `<td>`;
         tag_total += `GRAND TOTAL`;
         tag_total += "</td>";
-        tag_total += `<td colspan='2'>`;
+        tag_total += `<td colspan='4'>`;
         tag_total += "</td>";
         tag_total += `<td>`;
         tag_total += 0;
@@ -1965,7 +2054,7 @@ var validator_detail = $(".detail-form").validate({
 
         $(".foot-detail-table").append(tag_total);
 
-        $(".supplier_id").attr("disabled", "true");
+        // $(".supplier_id").attr("disabled", "true");
 
         if($(".tipe_bahan").val() === "BAKU")
         {
@@ -1981,7 +2070,7 @@ var validator_detail = $(".detail-form").validate({
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
-                    $(".supplier_id").removeAttr("disabled");
+                    // $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }
@@ -2001,7 +2090,7 @@ var validator_detail = $(".detail-form").validate({
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`);
                     })
-                    $(".supplier_id").removeAttr("disabled");
+                    // $(".supplier_id").removeAttr("disabled");
 
                     $(".supplier_id").val("").change();
                 }

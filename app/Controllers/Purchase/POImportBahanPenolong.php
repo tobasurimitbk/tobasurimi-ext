@@ -141,7 +141,8 @@ class POImportBahanPenolong extends BaseController
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
                 "currency"      => $data->currency,
-                "is_posted"     => $data->is_posted
+                "is_posted"     => $data->is_posted,
+                "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);
         }
 
