@@ -7,8 +7,8 @@
     <title>PO Lokal Bahan Penolong</title>
     <style>
         body {
-            font-size: 12px;
-            font-family: calibri;
+            font-size: 13px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         @page {
@@ -40,6 +40,10 @@
             margin-top: 0.25rem;
         }
 
+        .mt-050 {
+            margin-top: 0.5rem;
+        }
+
         .mt-1 {
             margin-top: 1rem;
         }
@@ -64,7 +68,7 @@
         }
 
         .sign-row>div {
-            width: 100px;
+            width: 120px;
             border-top: 1px solid;
             margin-top: 2rem
         }
@@ -154,44 +158,44 @@
             </tr>
         </table>
         <div class="mt-025 txt-bold" style="margin-bottom: 3px;">Harap dikirimkan kepada kami barang-barang berikut dibawah ini:</div>
-        <table class="item-table">
+        <table class="item-table mt-050">
             <tr>
                 <!-- <th>No</th> -->
-                <th class="txt-left">QTY</th>
-                <th class="txt-left">KODE BARANG</th>
-                <th class="txt-left">NAMA BARANG</th>
                 <!-- <th>Satuan</th> -->
                 <!-- <th>Spesifikasi</th> -->
-                <th class="txt-left">HARGA</th>
-                <th class="txt-left">DISC(%)</th>
                 <!-- <th>Biaya Tambahan</th> -->
-                <th class="txt-left">JUMLAH</th>
                 <!-- <th>PPN</th> -->
                 <!-- <th>PPH</th> -->
+                <th class="txt-left" style="padding-left: 5px; width: 70px;">QTY</th>
+                <th class="txt-left" style="padding-left: 5px; width: 120px;">KODE BARANG</th>
+                <th class="txt-left" style="padding-left: 5px;">NAMA BARANG</th>
+                <th class="txt-left" style="padding-left: 5px; width: 80px;">HARGA</th>
+                <th class="txt-left" style="padding-left: 5px; width: 60px;">DISC(%)</th>
+                <th class="txt-left" style="padding-left: 5px; width: 80px;">JUMLAH</th>
             </tr>
             <?php
             foreach ($dataPOLokal->am_purchase_order_details as $detail) {
             ?>
                 <tr>
                     <!-- <td><b><?= $detail->no ?></b></td> -->
-                    <td><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
-                    <td><?= $detail->kode_barang ?></b></td>
-                    <td><?= $detail->nama_barang . " " . $detail->spec ?></b></td>
                     <!-- <td><?= $detail->nama_satuan ?></b></td> -->
                     <!-- <td><?= $detail->spec ?></b></td> -->
-                    <td class="txt-right"><?= $detail->price ?></b></td>
-                    <td class="txt-right"><?= $detail->disc ?></b></td>
                     <!-- <td><?= $detail->additional_cost ?></b></td> -->
-                    <td class="txt-right"><?= $detail->totalPrice ?></b></td>
                     <!-- <td><?= $detail->nilaiPpn ?></b></td> -->
                     <!-- <td><?= $detail->nilaiPph ?></b></td> -->
+                    <td style="padding-left: 5px;"><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
+                    <td style="padding-left: 5px;"><?= $detail->kode_barang ?></b></td>
+                    <td style="padding-left: 5px;"><?= $detail->nama_barang . " " . $detail->spec ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= $detail->price ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= $detail->disc ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= $detail->totalPrice ?></b></td>
                 </tr>
             <?php } ?>
         </table>
         <div class="header mt-025">
             <div class="txt-right">
                 <div>
-                    Jumlah Pembelian: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
+                    Sub Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
                 </div>
                 <div class="mt-025">
                     Diskon: <span class="txt-bold"><?= $dataPOLokal->totalDisc ?></span>
@@ -203,14 +207,14 @@
                     PPN (dikreditkan): <span class="txt-bold"><?= $dataPOLokal->totalPpn ?></span>
                 </div>
                 <div class="mt-025">
-                    Total Pembelian: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPo ?></span>
+                    Grand Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPo ?></span>
                 </div>
             </div>
         </div>
         <div style="text-decoration: underline;">
             Keterangan: <?= $dataPOLokal->note ?>
         </div>
-        <table class="w-100 sign-table border-collapse footer" style="padding-top: 0px; margin-top: 0px">
+        <table class="w-50 sign-table border-collapse footer" style="padding-top: 0px; margin-top: 0px">
             <tr style="border: 0px;">
                 <td style="height: 30px; border: 0px;">Pemesan Order</td>
                 <td style="border: 0px;">Pembuat Order</td>
