@@ -16,7 +16,7 @@
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
-                                    <label for="floatingInput">No. SPP</label>
+                                    <label for="floatingInput">Kode Supplier</label>
                                 </div>
                                 <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
@@ -760,6 +760,8 @@
         })
 
         $(".btn-show-form").click(function() {
+            $('.input-generate').hide();
+
             $(".id").val("");
             $(".title-name").text("Tambah");
 
@@ -842,6 +844,8 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+
+            $('.input-generate').show();
             $(".create-form")[0].reset()
             $(".delete-form").css('display', '');
             let id = data.id;

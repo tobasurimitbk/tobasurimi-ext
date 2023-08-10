@@ -20,9 +20,9 @@
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
-                                    <label for="floatingInput">No. SPP</label>
+                                    <label for="floatingInput">Kode Supplier</label>
                                 </div>
-                                <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div style="<?= !empty($dataSPP) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -766,6 +766,8 @@
         })
 
         $(".btn-show-form").click(function() {
+            $('.input-generate').show();
+
             $(".id").val("");
             $(".title-name").text("Tambah");
 
@@ -838,6 +840,8 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
+                        $('.input-generate').hide()
+
                         $(".id").val(id);
                         $(".kode").val(res?.data?.kode);
                         $(".name").val(res?.data?.name);
