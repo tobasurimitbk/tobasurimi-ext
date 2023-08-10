@@ -8,6 +8,7 @@
     <style>
         body {
             font-size: 12px;
+            font-family: calibri;
         }
 
         @page {
