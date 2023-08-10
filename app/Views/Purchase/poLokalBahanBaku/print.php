@@ -13,8 +13,8 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 27px;
-            padding: 27px;
+            margin: 29px;
+            padding: 29px;
         }
 
         .pagebreak {
@@ -218,9 +218,9 @@
             </table>
         </div>
 
-        <div class="pagebreak">
+        <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 1rem;">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
                     <?= $dataPO->companyName ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -274,9 +274,9 @@
             </div>
         </div>
 
-        <div class="pagebreak">
+        <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 1rem;">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
                     <?= $dataPO->companyName ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>

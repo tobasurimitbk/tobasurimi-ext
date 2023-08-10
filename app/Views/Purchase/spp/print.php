@@ -14,8 +14,8 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 27px;
-            padding: 27px;
+            margin: 29px;
+            padding: 29px;
         }
 
         .table-border {
