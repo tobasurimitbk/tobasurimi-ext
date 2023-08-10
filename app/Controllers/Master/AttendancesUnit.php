@@ -4,18 +4,24 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesUnitModel;
+use App\Models\EmployeesModel;
+use App\Models\EmployeesFingerModel;
 
 class AttendancesUnit extends BaseController
 {
     protected $token;
     protected $this_company_id;
     protected $AttendancesUnitModel;
+    protected $EmployeesModel;
+    protected $EmployeesFingerModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->AttendancesUnitModel = new AttendancesUnitModel();
+        $this->EmployeesModel = new EmployeesModel();
+        $this->EmployeesFingerModel = new EmployeesFingerModel();
     }
 
     public function ListData()
@@ -297,5 +303,138 @@ class AttendancesUnit extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function CopyToFinger()
+    {
+        $res_master = $this->AttendancesUnitModel->getByCompany_id_and_master($this->this_company_id, 1);
+        $res_child = $this->AttendancesUnitModel->getByCompany_id_and_master($this->this_company_id, 0);
+        $res_employees = $this->EmployeesModel->getEmployeesNotSyncAttendances($this->this_company_id);
+
+        //        $this->EmployeesModel = new EmployeesModel();
+        //      $this->EmployeesFingerModel = new EmployeesFingerModel();
+        for ($i = 0; $i < count($res_child); $i++) {
+            for ($j = 0; $j < count($res_employees); $j++) {
+                $this->delete_finger($res_employees[$j]["id"], $res_child[$i]["ip"], $res_child[$i]["unit_key"]);
+                $this->delete_finger_user($res_employees[$j]["id"], $res_child[$i]["ip"], $res_child[$i]["unit_key"]);
+
+                $this->insert_finger_user($res_employees[$j]["id"], $res_child[$i]["ip"], $res_child[$i]["unit_key"], $res_employees[$j]["name"]);
+
+                $res_finger = $this->EmployeesFingerModel->getByEmployeesId($res_employees[$j]["id"]);
+
+                for ($k = 0; $k < count($res_finger); $k++) {
+                    $this->insert_finger_data($res_employees[$j]["id"], $res_child[$i]["ip"], $k, $res_child[$i]["unit_key"], $res_finger[$k]["finger"]);
+                    //$this->insert_finger($res_employees[$j]["id"], $res_child[$i]["ip"], $res_child[$i]["unit_key"], $res_employees[$j]["name"]);
+                }
+            }
+        }
+
+        $data = [
+            "status"            => true,
+            "message"   => "Process Berhasil",
+            "payload"   => "",
+            'token' => csrf_hash()
+        ];
+        echo json_encode($data);
+    }
+
+    public function delete_finger($user_id, $ip, $unit_key)
+    {
+        $Connect = fsockopen($ip, "80", $errno, $errstr, 1);
+        if ($Connect) {
+            $soap_request = "<DeleteTemplate><ArgComKey xsi:type=\"xsd:integer\">" . $unit_key . "</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">" . $user_id . "</PIN></Arg></DeleteTemplate>";
+
+            $newLine = "\r\n";
+            fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
+            fputs($Connect, "Content-Type: text/xml" . $newLine);
+            fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
+            fputs($Connect, $soap_request . $newLine);
+            $buffer = "";
+            while ($Response = fgets($Connect, 1024)) {
+                $buffer = $buffer . $Response;
+            }
+        } else echo "Koneksi Gagal";
+        //	echo $buffer;
+        $buffer = $this->Parse_Data($buffer, "<DeleteTemplateResponse>", "</DeleteTemplateResponse>");
+        $buffer = $this->Parse_Data($buffer, "<Information>", "</Information>");
+        return;
+    }
+
+    public function delete_finger_user($user_id, $ip, $unit_key)
+    {
+        $Connect = fsockopen($ip, "80", $errno, $errstr, 1);
+        if ($Connect) {
+            $soap_request = "<DeleteUser><ArgComKey xsi:type=\"xsd:integer\">" . $unit_key . "</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">" . $user_id . "</PIN></Arg></DeleteUser>";
+            $newLine = "\r\n";
+            fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
+            fputs($Connect, "Content-Type: text/xml" . $newLine);
+            fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
+            fputs($Connect, $soap_request . $newLine);
+            $buffer = "";
+            while ($Response = fgets($Connect, 1024)) {
+                $buffer = $buffer . $Response;
+            }
+        } else echo "Koneksi Gagal";
+        //echo $buffer;
+        $buffer = $this->Parse_Data($buffer, "<DeleteUserResponse>", "</DeleteUserResponse>");
+        $buffer = $this->Parse_Data($buffer, "<Information>", "</Information>");
+        return;
+    }
+
+    public function insert_finger_user($user_id, $ip, $unit_key, $name)
+    {
+        $Connect = fsockopen($ip, "80", $errno, $errstr, 1);
+        if ($Connect) {
+            $soap_request = "<SetUserInfo><ArgComKey Xsi:type=\"xsd:integer\">" . $unit_key . "</ArgComKey><Arg><PIN>" . $user_id . "</PIN><Name>" . $name . "</Name></Arg></SetUserInfo>";
+            $newLine = "\r\n";
+            fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
+            fputs($Connect, "Content-Type: text/xml" . $newLine);
+            fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
+            fputs($Connect, $soap_request . $newLine);
+            $buffer = "";
+            while ($Response = fgets($Connect, 1024)) {
+                $buffer = $buffer . $Response;
+            }
+        } else echo "Koneksi Gagal";
+
+        $buffer = $this->Parse_Data($buffer, "<Information>", "</Information>");
+        //echo "<B>Result:</B><BR>";
+        //echo $buffer;
+        return;
+    }
+
+    public function insert_finger_data($user_id, $ip, $finger_id, $unit_key, $data_finger)
+    {
+        $Connect = fsockopen($ip, "80", $errno, $errstr, 1);
+        if ($Connect) {
+            $soap_request = "<SetUserTemplate><ArgComKey xsi:type=\"xsd:integer\">" . $unit_key . "</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">" . $user_id . "</PIN><FingerID xsi:type=\"xsd:integer\">" . $finger_id . "</FingerID><Size>" . strlen($data_finger) . "</Size><Valid>1</Valid><Template>" . $data_finger . "</Template></Arg></SetUserTemplate>";
+            $newLine = "\r\n";
+            fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
+            fputs($Connect, "Content-Type: text/xml" . $newLine);
+            fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
+            fputs($Connect, $soap_request . $newLine);
+            $buffer = "";
+            while ($Response = fgets($Connect, 1024)) {
+                $buffer = $buffer . $Response;
+            }
+        } else echo "Koneksi Gagal";
+
+        //	echo $buffer;
+        $buffer = $this->Parse_Data($buffer, "<SetUserTemplateResponse>", "</SetUserTemplateResponse>");
+        $buffer = $this->Parse_Data($buffer, "<Information>", "</Information>");
+    }
+
+    public function Parse_Data($data, $p1, $p2)
+    {
+        $data = " " . $data;
+        $hasil = "";
+        $awal = strpos($data, $p1);
+        if ($awal != "") {
+            $akhir = strpos(strstr($data, $p1), $p2);
+            if ($akhir != "") {
+                $hasil = substr($data, $awal + strlen($p1), $akhir - strlen($p1));
+            }
+        }
+        return $hasil;
     }
 }

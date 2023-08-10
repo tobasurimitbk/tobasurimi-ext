@@ -56,10 +56,38 @@
     </div>
 </div>
 
+<div class="modal copy-modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><label class="title-name"></label> Copy Data Finger</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id" name="id" id="id" />
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            Apakah anda yakin untuk mengcopy dari master ke unit yang lain?
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-copy btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-process-form">Process</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
         <h1>Unit Absensi</h1>
+        <button class="btn btn-copy-unit btn-add" float-right data-btn="create-modal" style="right:130px;">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Copy Data Finger
+        </button>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -203,6 +231,12 @@
             },
         });
 
+
+        $(".btn-copy-unit").click(function() {
+            $(".copy-modal").modal("show")
+        })
+
+
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".title-name").text("Tambah");
@@ -215,6 +249,10 @@
 
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
+        })
+
+        $(".btn-hide-copy").click(function() {
+            $(".copy-modal").modal("hide")
         })
 
         $(".dataTable_info").addClass("pt-0");
@@ -261,6 +299,52 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
+
+
+        $(".btn-process-form").click(function() {
+            const csrf = $(`[name="${csrfToken}"]`);
+            $.ajax({
+                url: "<?= base_url("attendances-unit/copy-to-finger"); ?>",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    console.log(response);
+                    if (response.status) {
+                        stopLoading()
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                $(".copy-modal").modal("hide")
+                            })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                },
+                onError: function(response) {
+                    csrf.val(response.token);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Gagal Disimpan, coba Lagi',
+                        confirmButtonColor: '#4e73df',
+                    })
+                    stopLoading()
+                }
+            });
+        });
 
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
