@@ -13,8 +13,8 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
+            margin: 27px;
+            padding: 27px;
         }
 
         .header {
