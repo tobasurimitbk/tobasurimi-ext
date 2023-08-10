@@ -86,7 +86,8 @@ class PenerimaanBarangDetailModel extends Model
                 rm_purchase_order_details.qty_diterima,
                 rm_purchase_order_details.remaining_qty,
                 packaging.nama_barang as nama_packaging,
-                rm_purchase_orders.po_no'
+                rm_purchase_orders.po_no, 
+                rm_purchase_orders.status_penerimaan'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
@@ -112,7 +113,8 @@ class PenerimaanBarangDetailModel extends Model
                 am_purchase_order_details.qty_diterima,
                 am_purchase_order_details.remaining_qty,
                 packaging.nama_barang as nama_packaging,
-                am_purchase_orders.po_no'
+                am_purchase_orders.po_no,
+                am_purchase_orders.status_penerimaan'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
@@ -142,7 +144,8 @@ class PenerimaanBarangDetailModel extends Model
                 rm_import_po_details.qty_diterima,
                 rm_import_po_details.remaining_qty,
                 packaging.nama_barang as nama_packaging,
-                rm_import_pos.po_no'
+                rm_import_pos.po_no,
+                rm_import_pos.status_penerimaan'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')
@@ -168,7 +171,8 @@ class PenerimaanBarangDetailModel extends Model
                 am_purchase_order_details.qty_diterima,
                 am_purchase_order_details.remaining_qty,
                 packaging.nama_barang as nama_packaging,
-                am_purchase_orders.po_no'
+                am_purchase_orders.po_no,
+                am_purchase_orders.status_penerimaan'
                 )
                 ->where($arrCondition)
                 ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id')

@@ -64,6 +64,8 @@ class AMPurchaseOrderDetailModel extends Model
         ];
 
         $selectQry = "am_purchase_order_details.*,
+            am_purchase_order_details.po_no,
+            am_purchase_order_details.status_penerimaan,
             FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price) + CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS totalPrice,
             FORMAT(CEILING(am_purchase_order_details.qty), 'N', 'en-us') AS qty,
             FORMAT(CEILING(am_purchase_order_details.price), 'N', 'en-us') AS price,
@@ -77,6 +79,7 @@ class AMPurchaseOrderDetailModel extends Model
 
         $builder = $this->db->table('am_purchase_order_details')
             ->select($selectQry)
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
