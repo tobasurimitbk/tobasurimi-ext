@@ -12,8 +12,8 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 15px;
-            padding: 15px;
+            margin: 20px;
+            padding: 20px;
         }
 
         .header {
@@ -94,6 +94,13 @@
 
         .w-100 {
             width: 100%;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100px;
         }
     </style>
 </head>
@@ -202,7 +209,7 @@
         <div style="text-decoration: underline;">
             Keterangan: <?= $dataPOLokal->note ?>
         </div>
-        <table class="w-100 sign-table border-collapse" style="padding-top: 0px; margin-top: 0px">
+        <table class="w-100 sign-table border-collapse footer" style="padding-top: 0px; margin-top: 0px">
             <tr style="border: 0px;">
                 <td style="height: 30px; border: 0px;">Pemesan Order</td>
                 <td style="border: 0px;">Pembuat Order</td>
