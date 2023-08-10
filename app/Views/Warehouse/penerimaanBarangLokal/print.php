@@ -112,70 +112,55 @@
 
         .footer {
             position: absolute;
-            bottom: 0;
+            /* bottom: 0; */
             height: 90px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 25px;
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
     <?php if (!empty($dataPenerimaanBarang)) { ?>
-        <table class="w-100">
+        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
+        <table class="w-100 mt-050">
             <tr>
                 <td>
-                    <div><span class="txt-bold">LAPORAN BARANG MASUK</span></div>
+                    <div><span class="txt-bold">No. LPB   : <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></span></div>
                 </td>
                 <td>
-                    <div>From:<span class="txt-bold"><?= $dataPenerimaanBarang->supplier_name; ?></span></div>
+                    <div><span class="txt-bold">Supplier   : <?= $dataPenerimaanBarang->supplier_name; ?></span></div>
                 </td>
                 <td class="txt-right">
-                    <div>Jumlah Kemasan:</div>
+                    <div>&nbsp;</div>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold"><?= $dataPenerimaanBarang->aju_type_name; ?> / <?= $dataPenerimaanBarang->aju_no; ?></</span></div>
+                    <div><span class="txt-bold">Tanggal    : <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></span></div>
                 </td>
                 <td>
-                    <div> <?= $dataPenerimaanBarang->supplier_address; ?></div>
+                    <div><span class="txt-bold">No. PO  &nbsp; : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?></span></div>
                 </td>
                 <td class="txt-right">
-                    <div>No. Order  <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div>Departemen:<?= $dataPenerimaanBarang->warehouse_name; ?></div>
-                </td>
-                <td>
-                    <div>&nbsp;</div>
-                </td>
-                <td class="txt-right">
-                    <div>File/ Style No:KREDIT</div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div>Tanggal:<?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></div>
-                </td>
-                <td>
-                    <div>&nbsp;</div>
-                </td>
-                <td class="txt-right">
-                    <div>&nbsp;</div>
+                    <div><span class="txt-bold">Gudang:    <?= $dataPenerimaanBarang->warehouse_name; ?></span></div>
                 </td>
             </tr>
         </table>
         <table class="item-table mt-050">
             <tr>
-                <th class="txt-left" style="padding-left: 5px; width: 70px;">No.</th>
-                <th class="txt-left" style="padding-left: 5px; width: 120px;">Nama Barang</th>
-                <th class="txt-left" style="padding-left: 5px;">Qty</th>
-                <th class="txt-left" style="padding-left: 5px; width: 80px;">Satuan</th>
-                <th class="txt-left" style="padding-left: 5px; width: 80px;">@ Rp</th>
+                <th class="txt-left" style="padding-left: 5px; width: 30px;">No.</th>
+                <th class="txt-left" style="padding-left: 5px; width: 100px;">Nama Barang</th>
+                <th class="txt-left" style="padding-left: 5px; width: 40px;">Qty</th>
+                <th class="txt-left" style="padding-left: 5px; width: 30px;">Satuan</th>
+                <th class="txt-left" style="padding-left: 5px; width: 60px;">@ Rp</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">Jumlah</th>
-                <th class="txt-left" style="padding-left: 5px; width: 80px;">Ket. PO</th>
-                <th class="txt-left" style="padding-left: 5px; width: 80px;">Keterangan</th>
+                <th class="txt-left" style="padding-left: 5px; width: 150px;">Ket. PO</th>
+                <th class="txt-left" style="padding-left: 5px; width: 60px;">Keterangan</th>
             </tr>
             
             <?php 
@@ -203,17 +188,17 @@
             </tr>
             <?php } ?>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>Total</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total); ?></td>
                 <td style="padding-left: 5px;" colspan="2"></td>
             </tr>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>Ongkos Kirim</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>ONGKOS KIRIM</b></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
                 <td style="padding-left: 5px;" colspan="2"></td>
             </tr>
         </table>
-        <div class="header mt-025">
+        <div class="header mt-050">
         <table class="w-50 sign-table footer" style="padding-top: 0px; margin-top: 0px">
             <tr>
                 <td>Diperiksa & Dibukukan</td>

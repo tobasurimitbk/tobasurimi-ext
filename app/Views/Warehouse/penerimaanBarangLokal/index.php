@@ -51,9 +51,7 @@
                             <th onclick="changeSort('validation_date')" class="sort">Tanggal Daftar</th>
                             <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                             <th>Jumlah Item</th>
-                            <th>Print</th>
-                            <th>Posting</th>
-                            <th>Hapus</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -142,68 +140,33 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row?.id;
-                return `
-                    <div class="mt-0">
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                        <i class="fa fa-print fa-sm mr-2" aria-hidden="true"></i>Print
-                    </button>
-                    </div>
-                `
-            }
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
                 let status = row?.status_post
                 let tipe_bahan = row?.tipe_bahan
-                if (status == "WAITING") {
-                    return `
-                        <div class="mt-0">
-                            <button onclick="posting(${id}, ${tipe_bahan})" class="btn btn-success posting-spp">
-                                Posting
-                            </button>
-                        </div>
-                    `
-                } else {
-                    return `
-                        <div class="mt-0">
-                            <label>
 
-                            </label>
-                        </div>
-                    `
-                }
-            }
-        },
-        {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                let status = row?.status_post
                 if (status == "WAITING") {
                     return `
                         <div class="mt-0">
-                            <button onclick="remove(${id})" class="btn btn-danger delete-parent">
-                                Hapus
-                            </button>
+                        <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                        </button>
+                        <button onclick="posting(${id}, ${tipe_bahan})" class="btn btn-success posting-spp">
+                            <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                        </button>
+                        <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
                         </div>
                     `
                 } else {
                     return `
                         <div class="mt-0">
-                            <label>
-                                
-                            </label>
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                        </button>
                         </div>
                     `
                 }
+
             }
         }],
         columnDefs: [{
