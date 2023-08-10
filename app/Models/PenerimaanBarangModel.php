@@ -41,7 +41,6 @@ class PenerimaanBarangModel extends Model
         'ppn',
         'pph',
         'tipe_bahan',
-        'status_po',
         'biaya_masuk',
         'status_post',
         'status_penerimaan'
