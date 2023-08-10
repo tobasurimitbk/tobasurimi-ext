@@ -1,14 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Penerimaan Barang Lokal</title>
     <style>
+        body {
+            font-size: 13px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        @page {
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
+        }
 
         .header {
             display: flex;
             justify-content: space-between;
+        }
+
+        .item-table {
+            border-collapse: collapse;
+            text-align: left;
+            width: 100%;
+        }
+
+        .item-table tr th {
+            border: 1px solid grey;
+        }
+
+        .item-table tr td {
+            border: 1px solid grey;
+        }
+
+        .mt-025 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-050 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
+        }
+
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        .border-collapse {
+            border-collapse: collapse;
+        }
+
+        .sign-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .sign-table td {
+            border: 1px solid;
+        }
+
+        /* .sign-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0rem;
+            width: 100%;
+        }
+
+        .sign-row>div {
+            width: 120px;
+            border-top: 1px solid;
+            margin-top: 2rem
+        } */
+
+        .txt-bold {
+            font-weight: 700;
+        }
+
+        .txt-center {
+            text-align: center;
+        }
+
+        .txt-left {
+            text-align: left;
+        }
+
+        .txt-right {
+            text-align: right;
+        }
+
+        .txt-top {
+            vertical-align: top;
+        }
+
+        .w-30 {
+            width: 30%;
         }
 
         .w-50 {
@@ -19,121 +110,74 @@
             width: 100%;
         }
 
-        html {
-            font-size: 10px;
-        }
-        
-        .table 
-        td {
-            border: 1px solid;
-            text-align: center;
-        }
-
-        .table tr td:last-child {
-            text-align: center;
-            border-right: none;
-        }
-        .table tr td:first-child {
-            text-align: center;
-            border-left: none;
-        }
-        .table {
-            border-left:1px solid;
-            border-right:1px solid;
-        }
-        .table td {
-            padding: 5px;
-        }
-
-        .sign-table 
-        td {
-            text-align: center;
-        }
-
-        .note {
-            width: 50%;
-            text-align: justify;
-        }
-
-        .border-collapse {
-            border-collapse: collapse;
-        }
-
-        .sign-table td:not(:last-child) {
-            border: 1px solid;
+        .footer {
+            position: absolute;
+            bottom: 0;
+            height: 90px;
         }
     </style>
 </head>
-<body>
-    <?php if(!empty($dataPenerimaanBarang) && !empty($dataPenerimaanBarangDetail)){ ?>
-    <div class="header">
-        <table class="mt-1 w-100">
-            <tr>
-                <td>
-                    <div>
-                        <div><b> Laporan Barang Masuk </b></div>
-                        <div style="white-space: wrap"><?= $dataPenerimaanBarang->aju_type_name; ?> / <?= $dataPenerimaanBarang->aju_no; ?></div>
-                        <div style="white-space: wrap">Tanggal: <?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></div>
-                        <div style="white-space: wrap"></div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <table class="mt-5 w-100">
-            <tr>
-                <td>
-                    <div>
-                        <div style=""> <b> Gudang : <?= $dataPenerimaanBarang->warehouse_name; ?></b></div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <table class="mt-5 w-100">
-            <tr>
-                <td>
-                    <div>
-                        <div style=""> <b> From : <?= $dataPenerimaanBarang->supplier_name; ?></b></div>
-                        <div style="white-space: wrap">Address : <?= $dataPenerimaanBarang->supplier_address; ?></div>
-                        <div style="white-space: wrap">Phone : <?= $dataPenerimaanBarang->supplier_phone; ?></div>
-                        <div style="white-space: wrap"></div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <table class="mt-5 w-100">
-            <tr>
-                <td>
-                    <div>
-                        <div style=""><b>Berat : <?= $dataPenerimaanBarang->total_weight; ?></b></div>
-                        <div style="white-space: wrap">No. LPB : <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></div>
-                        <div style="white-space: wrap">No. Order : <?= implode(", ",json_decode($dataPenerimaanBarang->multiple_po_no)); ?></div>
-                        <div style="white-space: wrap"></div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
 
-    <div class="inline" style="margin-top:1rem">
-        <br />
-        <table class="table"
-        style="
-            border-collapse: collapse;
-            width: 100%;
-        "
-        >
-        <thead>
+<body>
+    <?php if (!empty($dataPenerimaanBarang)) { ?>
+        <table class="w-100">
             <tr>
-            <td><b>No.</b></td>
-            <td><b>Nama Barang</b></td>
-            <td><b>No. PO</b></td>
-            <td><b>Satuan</b></td>
-            <td><b>Jumlah</b></td>
-            <td><b>Sub Total</b></td>
-            <td><b>Keterangan</b></td>
+                <td>
+                    <div><span class="txt-bold">LAPORAN BARANG MASUK</span></div>
+                </td>
+                <td>
+                    <div>From:<span class="txt-bold"><?= $dataPenerimaanBarang->supplier_name; ?></span></div>
+                </td>
+                <td class="txt-right">
+                    <div>Jumlah Kemasan:</div>
+                </td>
             </tr>
-        </thead>
-        <tbody>
+            <tr>
+                <td>
+                    <div><span class="txt-bold"><?= $dataPenerimaanBarang->aju_type_name; ?> / <?= $dataPenerimaanBarang->aju_no; ?></</span></div>
+                </td>
+                <td>
+                    <div> <?= $dataPenerimaanBarang->supplier_address; ?></div>
+                </td>
+                <td class="txt-right">
+                    <div>No. Order  <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div>Departemen:<?= $dataPenerimaanBarang->warehouse_name; ?></div>
+                </td>
+                <td>
+                    <div>&nbsp;</div>
+                </td>
+                <td class="txt-right">
+                    <div>File/ Style No:KREDIT</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div>Tanggal:<?= $dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : ""; ?></div>
+                </td>
+                <td>
+                    <div>&nbsp;</div>
+                </td>
+                <td class="txt-right">
+                    <div>&nbsp;</div>
+                </td>
+            </tr>
+        </table>
+        <table class="item-table mt-050">
+            <tr>
+                <th class="txt-left" style="padding-left: 5px; width: 70px;">No.</th>
+                <th class="txt-left" style="padding-left: 5px; width: 120px;">Nama Barang</th>
+                <th class="txt-left" style="padding-left: 5px;">Qty</th>
+                <th class="txt-left" style="padding-left: 5px; width: 80px;">Satuan</th>
+                <th class="txt-left" style="padding-left: 5px; width: 80px;">@ Rp</th>
+                <th class="txt-left" style="padding-left: 5px; width: 60px;">Jumlah</th>
+                <th class="txt-left" style="padding-left: 5px; width: 80px;">Ket. PO</th>
+                <th class="txt-left" style="padding-left: 5px; width: 80px;">Keterangan</th>
+            </tr>
+            
             <?php 
             $no = 1;
             $jml_masuk = 0;
@@ -148,42 +192,45 @@
                 $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>
             <tr>
-                <td><?= $no++; ?></td>
-                <td><?= $detail["nama_barang"]; ?></td>
-                <td><?= $detail["po_no"]; ?></td>
-                <td><?= $detail["nama_satuan"]; ?></td>
-                <td><?= $detail["jml_masuk"]; ?></td>
-                <td><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
-                <td><?= $detail["keterangan"]; ?></td>
+                <td class="txt-center" style="padding-left: 5px;"><?= $no++; ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_barang"]; ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= $detail["jml_masuk"]; ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= $detail["po_no"]; ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
-                <tr>
-                    <td style="text-align:center" colspan="4">Grand Total</td>
-                    <td><?= $jml_masuk; ?></td>
-                    <td><?= number_format($jml_sub_total); ?></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td style="text-align:center" colspan="4">Ongkos Kirim</td>
-                    <td></td>
-                    <td><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <table class="w-100 sign-table border-collapse">
             <tr>
-                <td style="height: 80px;"></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>Total</b></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total); ?></td>
+                <td style="padding-left: 5px;" colspan="2"></td>
+            </tr>
+            <tr>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>Ongkos Kirim</b></td>
+                <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
+                <td style="padding-left: 5px;" colspan="2"></td>
+            </tr>
+        </table>
+        <div class="header mt-025">
+        <table class="w-50 sign-table footer" style="padding-top: 0px; margin-top: 0px">
+            <tr>
+                <td>Diperiksa & Dibukukan</td>
+                <td class="txt-center">Tgl</td>
+                <td class="txt-center">Paraf</td>
+            </tr>
+            <tr>
+                <td style="height: 40px;">Pembelian</td>
                 <td></td>
                 <td></td>
             </tr>
             <tr>
-            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Pembelian:</div></td>
-            <td><div style="text-align: left !important; margin-left:1rem;width:100%;height:0rem;border-top:1px solid">Accounting:</div></td>
+                <td style="height: 40px;">Accounting</td>
+                <td></td>
+                <td></td>
             </tr>
         </table>
-    </div>
-<?php } ?>
+    <?php } ?>
 </body>
 </html>
