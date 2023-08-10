@@ -195,7 +195,8 @@ class PenerimaanBarangLokal extends BaseController
                 "warehouse_name"        => $data->warehouse_name,
                 "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
                 "supplier_name"         => $data->supplier_name,
-                "itemCount"             => $data->itemCount
+                "itemCount"             => $data->itemCount,
+                "status_post"           => $data->status_post,
             ]);
         }
 

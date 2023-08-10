@@ -215,7 +215,8 @@ class PenerimaanBarangImport extends BaseController
                 "tipe_bahan"            => $data->tipe_bahan,
                 "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
                 "supplier_name"         => $data->supplier_name,
-                "itemCount"             => $data->itemCount
+                "itemCount"             => $data->itemCount,
+                "status_post"           => $data->status_post,
             ]);
         }
 
@@ -548,7 +549,7 @@ class PenerimaanBarangImport extends BaseController
 
                         $detailPayload = [
                             'purchase_order_details_id' => $data->purchase_order_details_id,
-                            'penerimaan_barang_id' => $response,
+                            'penerimaan_barang_id' => $id,
                             'harga' => $data->harga,
                             'sub_total' => $data->sub_total,
                             'keterangan' => $data->keterangan,
