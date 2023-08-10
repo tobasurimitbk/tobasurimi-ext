@@ -9,7 +9,7 @@ class EmployeesFingerModel extends Model
     protected $DBGroup          = 'default';
     protected $table            = 'employees_finger';
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
         'employees_id',
@@ -41,5 +41,23 @@ class EmployeesFingerModel extends Model
         $total = count($query->getResultArray());
 
         return $total;
+    }
+
+    public function getByEmployeesId($employees_id)
+    {
+        $arrCondition = [
+            //            'employees.deletedAt' => null,
+            'employees_finger.employees_id' => $employees_id,
+            //            'users.deletedAt' => null
+        ];
+
+        $builder = $this->db->table('employees_finger')
+            ->select("employees_finger.*")
+            //->where('employees.attendance_sync', 0);
+            ->where('employees_id >', 0);
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
     }
 }

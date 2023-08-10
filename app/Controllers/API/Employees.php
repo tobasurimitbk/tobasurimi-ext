@@ -47,6 +47,14 @@ class Employees extends BaseController
                     //$this->EmployeesFingerModel->delete_by_EmployeesId($res[$j]["id"]);
                     //$this->EmployeesFingerModel->delete("employees_id", $res[$j]["id"]);
                     $this->EmployeesFingerModel->where("employees_id", $res[$j]["id"])->delete();
+
+                    for ($k = 0; $k < count($resfinger); $k++) {
+                        $values = [
+                            "employees_id"  => $res[$j]["id"],
+                            "finger"        => $resfinger[$k]["data"]
+                        ];
+                        $this->EmployeesFingerModel->insert($values);
+                    }
                 }
             }
         }

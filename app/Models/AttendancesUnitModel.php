@@ -96,10 +96,11 @@ class AttendancesUnitModel extends Model
         return $temp;
     }
 
-    public function getByCompany_id_and_master($company_id)
+    public function getByCompany_id_and_master($company_id, $master)
     {
         $arrCondition = [
-            'company_id' => $company_id
+            'company_id' => $company_id,
+            'master' => $master
         ];
 
         $builder = $this->db->table('attendances_unit');
