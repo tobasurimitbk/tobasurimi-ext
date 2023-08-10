@@ -13,8 +13,8 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 27px;
-            padding: 27px;
+            margin: 29px;
+            padding: 29px;
         }
 
         .header {
@@ -101,6 +101,10 @@
             width: 100%;
         }
 
+        .txt-underline {
+            text-decoration: underline;
+        }
+
         .footer {
             position: absolute;
             bottom: 0;
@@ -115,7 +119,7 @@
         <table class="w-100">
             <tr>
                 <td colspan="2">
-                    <div class="txt-bold">PO LOKAL BAHAN PENOLONG</div>
+                    <div class="txt-underline txt-bold">PO LOKAL BAHAN PENOLONG</div>
                 </td>
                 <td class="txt-right">
                     <div>Kepada: <span class="txt-bold"><?= $dataPOLokal->supplierName ?></span></div>
