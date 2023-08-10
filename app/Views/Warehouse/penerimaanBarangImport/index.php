@@ -31,8 +31,8 @@
             </div>
             <div class="col">
                 <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                    <option value="waiting">New</option>
-                    <option value="finish">Done</option>
+                    <option value="waiting">WAITING</option>
+                    <option value="finish">FINISH</option>
                 </select>
             </div>
             <div class="col">
@@ -51,7 +51,9 @@
                             <th onclick="changeSort('validation_date')" class="sort">Tanggal Daftar</th>
                             <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                             <th>Jumlah Item</th>
-                            <th></th>
+                            <th>Print</th>
+                            <th>Posting</th>
+                            <th>Hapus</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -148,6 +150,61 @@
                     </div>
                 `
             }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                let status = row?.status_post
+                let tipe_bahan = row?.tipe_bahan
+                if (status == "WAITING") {
+                    return `
+                        <div class="mt-0">
+                            <button onclick="posting(${id}, ${tipe_bahan})" class="btn btn-success posting-spp">
+                                Posting
+                            </button>
+                        </div>
+                    `
+                } else {
+                    return `
+                        <div class="mt-0">
+                            <label>
+
+                            </label>
+                        </div>
+                    `
+                }
+            }
+        },
+        {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                let status = row?.status_post
+                if (status == "WAITING") {
+                    return `
+                        <div class="mt-0">
+                            <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                                Hapus
+                            </button>
+                        </div>
+                    `
+                } else {
+                    return `
+                        <div class="mt-0">
+                            <label>
+                                
+                            </label>
+                        </div>
+                    `
+                }
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -200,6 +257,117 @@
             location.replace(`<?= base_url("penerimaan-barang-import/id"); ?>/${data.id}`);
         })
     })
+
+    const posting = function(id, tipe_bahan) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di posting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("penerimaan-barang-import/update-status"); ?>",
+                    data: {
+                        id: id,
+                        tipe_bahan: tipe_bahan
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
+    const remove = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di hapus?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("penerimaan-barang-import/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
 
     const print = function(url) 
     {

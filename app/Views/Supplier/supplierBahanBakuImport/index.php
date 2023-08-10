@@ -13,9 +13,14 @@
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control kode" id="kode" name="kode" placeholder="Kode">
-                                <label for="floatingInput">Kode</label>
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <label for="floatingInput">Kode Supplier</label>
+                                </div>
+                                <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -621,39 +626,39 @@
                     required: true
                 },
                 address: {
-                    required: true
+                    // required: true
                 },
                 no_npwp: {
-                    required: true,
+                    // required: true,
                     minlength: 15,
                     maxlength: 15,
                 },
                 phone: {
-                    required: true
+                    // required: true
                 },
                 contact_person: {
-                    required: true
+                    // required: true
                 },
                 email: {
-                    required: true
+                    // required: true
                 },
                 no_rekening: {
-                    required: true
+                    // required: true
                 },
                 supplier_buyer: {
-                    required: true
+                    // required: true
                 },
                 province_parent_id: {
-                    required: true
+                    // required: true
                 },
                 city_parent_id: {
-                    required: true
+                    // required: true
                 },
                 ap_id: {
-                    required: true
+                    // required: true
                 },
                 ar_id: {
-                    required: true
+                    // required: true
                 }
             },
             messages: {
@@ -755,6 +760,8 @@
         })
 
         $(".btn-show-form").click(function() {
+            $('.input-generate').show();
+
             $(".id").val("");
             $(".title-name").text("Tambah");
 
@@ -814,6 +821,8 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
+            
+            $('.input-generate').hide();
             $(".create-form")[0].reset()
             $(".delete-form").css('display', '');
             let id = data.id;
@@ -1546,6 +1555,18 @@
         else
         {
             sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
+
+    const changeStatus = function() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+
+        if (value) {
+            $(".kode").attr("readonly", true);
+            $(".kode").val("AUTO GENERATE");
+        } else {
+            $(".kode").attr("readonly", false);
+            $(".kode").val("");
         }
     }
 </script>
