@@ -139,7 +139,7 @@
             </tr>
             <tr>
                 <td>
-                    Tanggal: <?= $dataPOLokal->po_date ?>
+                    Tanggal: <?= date("d-m-Y", strtotime($dataPOLokal->po_date)) ?>
                 </td>
                 <td>
                     No. SPP: <?= $dataPOLokal->spp_no ?>
@@ -198,13 +198,13 @@
                     Sub Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPrice ?></span>
                 </div>
                 <div class="mt-025">
-                    Diskon: <span class="txt-bold"><?= $dataPOLokal->totalDisc ?></span>
+                    Diskon: <span class="txt-bold">Rp. <?= $dataPOLokal->totalDisc ?></span>
                 </div>
                 <div class="mt-025">
                     DPP: <span class="txt-bold">Rp. <?= $dataPOLokal->dpp ?></span>
                 </div>
                 <div class="mt-025">
-                    PPN (dikreditkan): <span class="txt-bold"><?= $dataPOLokal->totalPpn ?></span>
+                    PPN (dikreditkan): <span class="txt-bold">Rp. <?= $dataPOLokal->totalPpn ?></span>
                 </div>
                 <div class="mt-025">
                     Grand Total: <span class="txt-bold">Rp. <?= $dataPOLokal->totalPo ?></span>

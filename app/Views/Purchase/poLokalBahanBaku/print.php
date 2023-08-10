@@ -4,10 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Po Lokal Bahan Baku</title>
     <style>
+        body {
+            font-size: 13px;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
         @page {
-            size: landscape;
+            size: 8.27in 5.50in landscape;
+            margin: 25px;
+            padding: 25px;
         }
 
         .pagebreak {
@@ -36,16 +43,26 @@
         }
 
         .item-table tr td {
-            padding: 5px 15px;
+            padding-left: 3px;
+            padding-right: 3px;
         }
 
         .item-table tr th {
             border: 1px solid;
-            padding: 5px 15px;
+            padding-left: 3px;
+            padding-right: 3px;
         }
 
         .item-table tr td:not(.skip) {
             border: 1px solid;
+        }
+
+        .mt-05 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
         }
 
         .mt-2 {
@@ -100,14 +117,21 @@
         .sign-row {
             display: flex;
             justify-content: space-around;
-            margin-top: 2.5rem;
+            margin-top: 1rem;
             width: 100%;
         }
 
         .sign-row>div {
-            width: 250px;
+            width: 200px;
             border-top: 1px solid;
-            margin-top: 5rem
+            margin-top: 2rem
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 90px;
         }
     </style>
 </head>
@@ -168,9 +192,9 @@
                     <td class="txt-right"><?= $dataPO->totalPaid ?></td>
                 </tr>
             </table>
-            <table class="w-100 sign-table border-collapse signed-info">
+            <table class="w-100 sign-table border-collapse signed-info footer">
                 <tr>
-                    <td style="height: 50px;"></td>
+                    <td style="height: 30px;"></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -196,35 +220,35 @@
 
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 30%;padding: 1.2rem;">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 1rem;">
                     <?= $dataPO->companyName ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>
-                <div style="padding: 1.2rem">
+                <div style="padding: 0.5rem">
                     Kwitansi<br>
-                    No. PO : <?= $dataPO->po_no ?>
+                    No. PO : <?= $dataPO->po_no ?><br>
+                    Tanggal: <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?>
                 </div>
             </div>
-
-            <table class="w-100 mt-2">
+            <table class="w-100 mt-05">
                 <tr>
-                    <td style="width: 30%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
+                    <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">PT. TOBA SURIMI INDUSTRIES</td>
+                    <td style="vertical-align: top; width: 55%;"><?= $dataPO->companyName ?></td>
                 </tr>
                 <tr>
-                    <td>BANYAKNYA UANG (AMOUNT)</td>
+                    <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
                     <td style="vertical-align: top;"><?= $dataPO->amount ?></td>
                 </tr>
                 <tr>
-                    <td>UNTUK PEMBAYARAN (FOR PAYMENT)</td>
+                    <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
                     <td style="vertical-align: top;">: </td>
                     <td style="vertical-align: top;">PEMBELIAN <?= $dataPO->itemName ?> SEBANYAK <?= $dataPO->totalQty ?> KG DARI <?= $dataPO->supplierName ?></td>
                 </tr>
             </table>
 
-            <table class="mt-2" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
+            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
@@ -243,45 +267,45 @@
             </table>
 
             <div class="w-100">
-                <div class="txt-center" style="margin-left: auto;margin-right: 0;padding: 1rem;width: 25%;">
-                    <div>Medan, 31-12-2022</div>
+                <div class="footer txt-right">
                     <div>Yang Menerima</div>
-                    <div class="mt-4">(<?= $dataPO->supplierName ?>)</div>
+                    <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
                 </div>
             </div>
         </div>
 
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 30%;padding: 1.2rem;">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 1rem;">
                     <?= $dataPO->companyName ?><br>
                     <?= $dataPO->companyAddress ?>
                 </div>
-                <div style="padding: 1.2rem">
+                <div style="padding: 0.5rem">
                     Kwitansi Harian<br>
-                    No. PO : <?= $dataPO->po_no ?>
+                    No. PO : <?= $dataPO->po_no ?><br>
+                    Tanggal: <?= $dataPO->po_date ? date("d-m-Y", strtotime($dataPO->po_date)) : ""; ?>
                 </div>
             </div>
 
             <table class="w-100 mt-2">
                 <tr>
-                    <td style="width: 30%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
+                    <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;">PT. TOBA SURIMI INDUSTRIES</td>
+                    <td style="vertical-align: top; width: 55%;"><?= $dataPO->companyName ?></td>
                 </tr>
                 <tr>
-                    <td>BANYAKNYA UANG (AMOUNT)</td>
+                    <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
                     <td style="vertical-align: top;"><?= $dataPO->amountDaily ?></td>
                 </tr>
                 <tr>
-                    <td>UNTUK PEMBAYARAN (FOR PAYMENT)</td>
+                    <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
                     <td style="vertical-align: top;">: </td>
                     <td style="vertical-align: top;">PEMBELIAN <?= $dataPO->itemName ?> SEBANYAK <?= $dataPO->totalQty ?> KG DARI <?= $dataPO->supplierName ?></td>
                 </tr>
             </table>
 
-            <table class="mt-2" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
+            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
                 <tr>
                     <td>Bruto</td>
                     <td>Rp.</td>
@@ -300,23 +324,19 @@
             </table>
 
             <div class="w-100">
-                <div class="txt-center" style="margin-left: auto;margin-right: 0;padding: 1rem;width: 25%;">
-                    <div>Medan, 31-12-2022</div>
+                <div class="footer txt-right">
                     <div>Yang Menerima</div>
-                    <div class="mt-4">(<?= $dataPO->supplierName ?>)</div>
+                    <div class="mt-2">(<?= $dataPO->supplierName ?>)</div>
                 </div>
             </div>
         </div>
 
-        <div class="pagebreak">
+        <div>
             <table class="w-100">
                 <tr>
-                    <td colspan="2"></td>
-                    <td class="txt-bold txt-right txt-underline">Tanggal: <?= $dataPO->po_date ?></td>
-                </tr>
-                <tr>
                     <td class="txt-underline txt-bold">KWITANSI TAMBAHAN</td>
-                    <td colspan="2">NO. NOTA : <?= $dataPO->po_no ?></td>
+                    <td>NO. NOTA : <?= $dataPO->po_no ?></td>
+                    <td class="txt-bold txt-right txt-underline">Tanggal: <?= $dataPO->po_date ?></td>
                 </tr>
             </table>
 
@@ -361,9 +381,9 @@
                     <td><?= $dataPO->subsidi_langsung ?></td>
                 </tr>
             </table>
-            <table class="w-100 sign-table border-collapse signed-info">
+            <table class="w-100 sign-table border-collapse signed-info footer">
                 <tr>
-                    <td style="height: 50px;"></td>
+                    <td style="height: 30px;"></td>
                     <td></td>
                     <td></td>
                 </tr>

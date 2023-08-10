@@ -76,7 +76,7 @@
     <?php if (!empty($dataSPP)) { ?>
         <table class="mt-5">
             <tr>
-                <td>Tanggal Order: <?= $dataSPP->request_date ?></td>
+                <td>Tanggal Order: <?= date("d-m-Y", strtotime($dataSPP->request_date)) ?></td>
                 <td>Jenis Order: <?= $dataSPP->spp_type ?></td>
             </tr>
             <tr>
