@@ -88,10 +88,10 @@ class SupplierModel extends Model
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('cities', 'suppliers.city_id = cities.id')
-            ->join('provinces', 'suppliers.province_id = provinces.id')
-            ->join('sub_akuns AS ap', 'suppliers.ap_id = ap.id')
-            ->join('sub_akuns AS ar', 'suppliers.ar_id = ar.id')
+            ->join('cities', 'suppliers.city_id = cities.id', 'left')
+            ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
+            ->join('sub_akuns AS ap', 'suppliers.ap_id = ap.id', 'left')
+            ->join('sub_akuns AS ar', 'suppliers.ar_id = ar.id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
@@ -117,8 +117,8 @@ class SupplierModel extends Model
     {
         $supplierData = $this->asObject()
             ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name')
-            ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id')
-            ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id')
+            ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id', 'left')
+            ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id', 'left')
             ->find($id);
 
         return $supplierData;
@@ -138,5 +138,30 @@ class SupplierModel extends Model
         $query = $builder->get();
         
         return $query->getResultArray();
+    }
+
+    public function generateSupplierCode(): string
+    {   
+        $month = idate('m');
+        $year = date('y');
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "/SUP/$romanMonth/$year";
+        
+        $lastData = $this->asObject()
+            ->like('kode', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $invNumber = '001' . $numberTemplate;
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->kode);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+
+        return $invNumber;
     }
 }

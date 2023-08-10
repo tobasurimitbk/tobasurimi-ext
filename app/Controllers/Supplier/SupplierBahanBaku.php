@@ -110,40 +110,40 @@ class SupplierBahanBaku extends BaseController
                     "rules" => "required"
                 ],
                 "address" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "no_npwp" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "phone" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "contact_person" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "email" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|valid_email"
                 ],
                 "no_rekening" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "supplier_buyer" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
                 ],
                 "province_parent_id" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|is_natural"
                 ],
                 "city_parent_id" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|is_natural"
                 ],
                 "postal_code" => [
-                    "rules" => "required|numeric"
+                    "rules" => "permit_empty|numeric"
                 ],
                 "ap_id" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|is_natural"
                 ],
                 "ar_id" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|is_natural"
                 ]
             ];
 
@@ -159,28 +159,33 @@ class SupplierBahanBaku extends BaseController
             }
 
             $payload = json_encode([
-                "company_id" => $this->this_company_id,
-                "kode" => $this->request->getPost("kode"),
-                "name" => $this->request->getPost("name"),
-                "address" => $this->request->getPost("address"),
-                "no_npwp" => $this->request->getPost("no_npwp"),
-                "phone" => $this->request->getPost("phone"),
-                "contact_person" => $this->request->getPost("contact_person"),
-                "email" => $this->request->getPost("email"),
-                "no_rekening" => $this->request->getPost("no_rekening"),
-                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                "province_id" => $this->request->getPost("province_parent_id"),
-                "city_id" => $this->request->getPost("city_parent_id"),
-                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                "kategori" => "LOKAL",
-                "type" => "BAHAN BAKU"
+                "company_id"        => $this->this_company_id,
+                "kode"              => $this->request->getPost("kode"),
+                "name"              => $this->request->getPost("name"),
+                "address"           => $this->request->getPost("address"),
+                "no_npwp"           => $this->request->getPost("no_npwp"),
+                "phone"             => $this->request->getPost("phone"),
+                "contact_person"    => $this->request->getPost("contact_person"),
+                "email"             => $this->request->getPost("email"),
+                "no_rekening"       => $this->request->getPost("no_rekening"),
+                "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
+                "province_id"       => $this->request->getPost("province_parent_id"),
+                "city_id"           => $this->request->getPost("city_parent_id"),
+                "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                "kategori"          => "LOKAL",
+                "type"              => "BAHAN BAKU"
                 // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
             ]);
 
+            $supplierCode = $this->request->getPost("kode");
+            if ($supplierCode == 'AUTO GENERATE') {
+                $supplierCode = $supplierModel->generateSupplierCode();
+            }
+
             $insertData = [
                 "company_id"        => $this->this_company_id,
-                "kode"              => $this->request->getPost("kode"),
+                "kode"              => $supplierCode,
                 "name"              => $this->request->getPost("name"),
                 "address"           => $this->request->getPost("address"),
                 "no_npwp"           => $this->request->getPost("no_npwp"),
@@ -198,7 +203,6 @@ class SupplierBahanBaku extends BaseController
                 "type"              => "BAHAN BAKU"
             ];
             $insert = $supplierModel->insert($insertData);
-            $response = curl_request("POST", "/suppliers", $this->token, $payload);
 
             if (!$insert) {
                 $data = [
@@ -223,9 +227,9 @@ class SupplierBahanBaku extends BaseController
         catch(\Exception $e)
         {
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
             ];
             echo json_encode($data);
             return;

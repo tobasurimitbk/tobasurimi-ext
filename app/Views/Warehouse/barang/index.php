@@ -8,10 +8,25 @@
                 <h5 class="modal-title"><label class="title-name"></label> Barang</h5>
             </div>
             <div class="modal-body">
-            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+                <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                     <input type="hidden" class="id" name="id" id="id" />
                     <input type="hidden" class="parent" name="parent" id="parent" />
                     <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3" style="height: 50px;">
+                                <div for="floatingInput" class="label-modal-master-barang">Product Spec</div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="productSpec" id="inlineRadio1" value="single">
+                                    <label class="form-check-label" for="inlineRadio1">Single Spec</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="productSpec" id="inlineRadio2" value="multi" checked>
+                                    <label class="form-check-label" for="inlineRadio2">Multi Spec</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -166,9 +181,9 @@
                 </div> -->
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -789,6 +804,19 @@
             })
         })
 
+        $('[name="productSpec"]').change(function() {
+            const specVal = $(this).val();
+
+            if (specVal == 'single') {
+                $('#parent_id').val('').trigger('change');
+                $('#parent_id').prop('disabled', true);
+                haciu2();
+            } else {
+                $('#parent_id').prop('disabled', false);
+                haciu1();
+            }
+        });
+
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
         })
@@ -1097,43 +1125,45 @@
 
             if($(".parent_id").val())
             {
-                $(".is_parent").css("display", "");
-                $('.stok').rules('add', {
-                    required: true
-                });
-                $('.harga_barang').rules('add', {
-                    required: true
-                });
-                $('.type').rules('add', {
-                    required: true
-                });
-                $('.satuan_id').rules('add', {
-                    required: true
-                });
-                $('.kategori_id').rules('add', {
-                    required: true
-                });
-                $('.hs_id').rules('add', {
-                    required: true
-                });
-                $('.ap_id').rules('add', {
-                    required: true
-                });
-                $('.ar_id').rules('add', {
-                    required: true
-                });
+                haciu2()
+                // $(".is_parent").css("display", "");
+                // $('.stok').rules('add', {
+                //     required: true
+                // });
+                // $('.harga_barang').rules('add', {
+                //     required: true
+                // });
+                // $('.type').rules('add', {
+                //     required: true
+                // });
+                // $('.satuan_id').rules('add', {
+                //     required: true
+                // });
+                // $('.kategori_id').rules('add', {
+                //     required: true
+                // });
+                // $('.hs_id').rules('add', {
+                //     required: true
+                // });
+                // $('.ap_id').rules('add', {
+                //     required: true
+                // });
+                // $('.ar_id').rules('add', {
+                //     required: true
+                // });
             }
             else
             {
-                $(".is_parent").css("display", "none");
-                $('.stok').rules('remove', 'required');
-                $('.harga_barang').rules('remove', 'required');
-                $('.type').rules('remove', 'required');
-                $('.satuan_id').rules('remove', 'required');
-                $('.kategori_id').rules('remove', 'required');
-                $('.hs_id').rules('remove', 'required');
-                $('.ap_id').rules('remove', 'required');
-                $('.ar_id').rules('remove', 'required');
+                haciu1()
+                // $(".is_parent").css("display", "none");
+                // $('.stok').rules('remove', 'required');
+                // $('.harga_barang').rules('remove', 'required');
+                // $('.type').rules('remove', 'required');
+                // $('.satuan_id').rules('remove', 'required');
+                // $('.kategori_id').rules('remove', 'required');
+                // $('.hs_id').rules('remove', 'required');
+                // $('.ap_id').rules('remove', 'required');
+                // $('.ar_id').rules('remove', 'required');
             }
             }
         })
@@ -1512,6 +1542,46 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+
+    const haciu1 = () => {
+        $(".is_parent").css("display", "none");
+        $('.stok').rules('remove', 'required');
+        $('.harga_barang').rules('remove', 'required');
+        $('.type').rules('remove', 'required');
+        $('.satuan_id').rules('remove', 'required');
+        $('.kategori_id').rules('remove', 'required');
+        $('.hs_id').rules('remove', 'required');
+        $('.ap_id').rules('remove', 'required');
+        $('.ar_id').rules('remove', 'required');
+    };
+
+    const haciu2 = () => {
+        $(".is_parent").css("display", "");
+        $('.stok').rules('add', {
+            required: true
+        });
+        $('.harga_barang').rules('add', {
+            required: true
+        });
+        $('.type').rules('add', {
+            required: true
+        });
+        $('.satuan_id').rules('add', {
+            required: true
+        });
+        $('.kategori_id').rules('add', {
+            required: true
+        });
+        $('.hs_id').rules('add', {
+            required: true
+        });
+        $('.ap_id').rules('add', {
+            required: true
+        });
+        $('.ar_id').rules('add', {
+            required: true
+        });
+    };
 </script>
 
 <?= $this->endSection(); ?>
