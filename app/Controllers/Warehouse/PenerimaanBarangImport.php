@@ -499,6 +499,93 @@ class PenerimaanBarangImport extends BaseController
                             }
                         }
 
+                        // automate close po check item by check ech po number
+                        foreach($multiple_po_id as $item)
+                        {
+                            $check_close = true;
+                            
+                            if($tipe_bahan === "BAKU")
+                            {
+                                $responseDetail = $this->rmImportPODetailModel->getPurchaseOrderDetailByPurchaseOrderId($item);
+
+                                if($responseDetail)
+                                {
+                                    foreach($responseDetail as $itemDetail)
+                                    {
+                                        // check if each item must 0 remaining qty to close
+                                        if($itemDetail["remaining_qty"] !== 0.00)
+                                        {
+                                            $check_close = false;
+                                        }
+                                    }
+
+                                    if($check_close)
+                                    {
+                                        $conditionUpdate = [
+                                            'id' => $item
+                                        ];
+
+                                        $payloadupdate = [
+                                            'status_penerimaan' => 1
+                                        ];
+                        
+                                        $responseStatusPenerimaan = $this->rmImportPOModel->where($conditionUpdate)->set($payloadupdate)->update();
+
+                                        if(!$responseStatusPenerimaan) {
+                                            $message =  'Gagal Ubah Status Penerimaan';
+                                            $data = [
+                                                "status"            => false,
+                                                "message"    => $message,
+                                                "payload"   => $payload,
+                                                'token' => csrf_hash()
+                                            ];
+                                            echo json_encode($data);
+                                        }
+                                    }
+                                }
+                            }
+                            if($tipe_bahan === "PENOLONG")
+                            {
+                                $responseDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($item);
+
+                                if($responseDetail)
+                                {
+                                    foreach($responseDetail as $itemDetail)
+                                    {
+                                        // check if each item must 0 remaining qty to close
+                                        if($itemDetail["remaining_qty"] !== 0.00)
+                                        {
+                                            $check_close = false;
+                                        }  
+                                    }
+
+                                    if($check_close)
+                                    {
+                                        $conditionUpdate = [
+                                            'id' => $item
+                                        ];
+
+                                        $payloadupdate = [
+                                            'status_penerimaan' => 1
+                                        ];
+                        
+                                        $responseStatusPenerimaan = $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
+
+                                        if(!$responseStatusPenerimaan) {
+                                            $message =  'Gagal Ubah Status Penerimaan';
+                                            $data = [
+                                                "status"            => false,
+                                                "message"    => $message,
+                                                "payload"   => $payload,
+                                                'token' => csrf_hash()
+                                            ];
+                                            echo json_encode($data);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         // ADD STOK
                         // if($status_post === "FINISH")
                         // {

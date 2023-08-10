@@ -68,6 +68,7 @@ class AMPurchaseOrderModel extends Model
             'currency'          => 'metadata.value',
             'createdAt'         => 'am_purchase_orders.createdAt',
             'updatedAt'         => 'am_purchase_orders.updatedAt',
+            'statusPenerimaan'  => 'am_purchase_orders.status_penerimaan'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
