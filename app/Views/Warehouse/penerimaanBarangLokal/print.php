@@ -202,8 +202,8 @@
         <table class="w-50 sign-table footer" style="padding-top: 0px; margin-top: 0px">
             <tr>
                 <td>Diperiksa & Dibukukan</td>
-                <td class="txt-center">Tgl</td>
-                <td class="txt-center">Paraf</td>
+                <td class="txt-center" style="width:100px;">Tgl</td>
+                <td class="txt-center" style="width:100px;">Paraf</td>
             </tr>
             <tr>
                 <td style="height: 40px;">Pembelian</td>
