@@ -197,7 +197,7 @@
                     Sub Total: <span class="txt-bold">Rp. <?= number_format($totalPrice) ?></span>
                 </div>
                 <div class="mt-025">
-                    Diskon: <span class="txt-bold">Rp. <?= $totalDisc ?></span>
+                    Discount: <span class="txt-bold">Rp. <?= $totalDisc ?></span>
                 </div>
                 <div class="mt-025">
                     Grand Total: <span class="txt-bold">Rp. <?= number_format($totalPrice - $totalDisc) ?></span>
