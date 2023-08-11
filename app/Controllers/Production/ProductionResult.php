@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangModel;
 use App\Models\ProductionResultModel;
 use App\Models\ProductionResultDetailModel;
+use App\Models\StockDetailModel;
 use App\Models\WarehousesModel;
 use App\Models\WorkOrdersModel;
 
@@ -17,6 +18,7 @@ class ProductionResult extends BaseController
     private $barangModel;
     private $productionResultModel;
     private $productionResultDetailModel;
+    private $stockDetailModel;
     private $warehousesModel;
     private $workOrdersModel;
 
@@ -27,6 +29,7 @@ class ProductionResult extends BaseController
         $this->barangModel = new BarangModel();
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailModel = new ProductionResultDetailModel();
+        $this->stockDetailModel = new StockDetailModel();
         $this->warehousesModel = new WarehousesModel();
         $this->workOrdersModel = new WorkOrdersModel();
     }
@@ -310,9 +313,17 @@ class ProductionResult extends BaseController
 
             foreach ($arrProductionResDet as &$det) {
                 $det['production_result_id'] = $productionResultId;
+
+                // increase stock
+                $this->barangModel->where('id', $det['barang_id'])
+                    ->increment('stok', $det['qty']);
+
+                //insert to stock detail
+                $this->stockDetailModel->addStock($det['barang_id'], $postData['warehouse'], $det['qty']);
             }
 
             $this->productionResultDetailModel->insertBatch($arrProductionResDet);
+
             $this->productionResultModel->db->transComplete();
 
             $data = [
