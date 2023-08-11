@@ -15,6 +15,8 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuansModel;
+use App\Models\StockDetailModel;
+
 use Dompdf\Dompdf;
 
 class PenerimaanBarangLokal extends BaseController
@@ -32,6 +34,8 @@ class PenerimaanBarangLokal extends BaseController
     protected $supplierModel;
     protected $warehousesModel;
     protected $satuanModel;
+    private $stockDetailModel;
+
     protected $dompdf;
     
     public function __construct()
@@ -49,6 +53,8 @@ class PenerimaanBarangLokal extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuansModel();
+        $this->stockDetailModel = new StockDetailModel();
+
         $this->dompdf = new Dompdf();
     }
 
@@ -391,62 +397,46 @@ class PenerimaanBarangLokal extends BaseController
                 //         }
                 //     }
                 // }
-                
+
+                $detailPayload = [];
+
+                $this->penerimaanBarangModel->db->transException(true)->transStart();
                 $response =  $this->penerimaanBarangModel->insert($payload);
 
-                if ($response) {
-                    foreach($items as $data)
-                    {
-                        $detailPayload = [];
+                foreach($items as $data) {
 
-                        $detailPayload = [
-                            'purchase_order_details_id' => $data->purchase_order_details_id,
-                            'penerimaan_barang_id' => $response,
-                            'harga' => $data->harga,
-                            'sub_total' => $data->sub_total,
-                            'keterangan' => $data->keterangan,
-                            'barang_id' => $data->barang_id,
-                            'qty' => $data->qty,
-                            'pph' => $data->ppn,
-                            'ppn' => $data->pph,
-                            'unit' => $data->unit,
-                            'nama_barang_dok' => $data->nama_barang_dok,
-                            'jml_masuk' => $data->jml_masuk
-                        ];
-
-                        $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
-
-                        if(!$responseDetail) {
-                            $message =  'Data Gagal Disimpan';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                        }
-                    }
-
-                    $data = [
-                        "id" => $response,
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        "response" => $response,
-                        'token' => csrf_hash()
+                    $detailPayload[] = [
+                        'purchase_order_details_id' => $data->purchase_order_details_id,
+                        'penerimaan_barang_id' => $response,
+                        'harga' => $data->harga,
+                        'sub_total' => $data->sub_total,
+                        'keterangan' => $data->keterangan,
+                        'barang_id' => $data->barang_id,
+                        'qty' => $data->qty,
+                        'pph' => $data->ppn,
+                        'ppn' => $data->pph,
+                        'unit' => $data->unit,
+                        'nama_barang_dok' => $data->nama_barang_dok,
+                        'jml_masuk' => $data->jml_masuk
                     ];
-                    echo json_encode($data);
-                } else {
-                    $message =  'Data Gagal Disimpan';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+
+                    // insert to stock
+                    // $this->stockDetailModel->addStock($data->barang_id, $payload['warehouse_id'], $data->qty);
                 }
+
+                $this->penerimaanBarangDetailModel->insertBatch($detailPayload);
+
+                $this->penerimaanBarangModel->db->transComplete();
+
+                $data = [
+                    "id"        => $response,
+                    "status"    => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => $payload,
+                    "response"  => $response,
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
             } 
         }
         catch(\Exception $e)
