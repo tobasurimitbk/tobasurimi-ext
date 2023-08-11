@@ -705,86 +705,86 @@ class PenerimaanBarangLokal extends BaseController
                 $detail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
                 if($detail)
                 {
-                    // check po already closed or not
-                    if($detail["status_penerimaan"] === "0")
+                    foreach($detail as $item)
                     {
-                        foreach($detail as $item)
+                        // check po already closed or not
+                        if($item["status_penerimaan"] === "0")
                         {
-                            $jml_masuk = $item["jml_masuk"] ? formatter($item["jml_masuk"], "STR_TO_INT") : 0;
-                            $qty_diterima = $item["qty_diterima"] ? formatter($item["qty_diterima"], "STR_TO_INT") : 0;
-                            $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_INT") : 0;
-                            $barang_id = $item["barang_id"] ? formatter($item["barang_id"], "STR_TO_INT") : 0;
-                            $purchase_order_details_id = $item["purchase_order_details_id"] ? formatter($item["purchase_order_details_id"], "STR_TO_INT") : 0;
+                        $jml_masuk = $item["jml_masuk"] ? formatter($item["jml_masuk"], "STR_TO_INT") : 0;
+                        $qty_diterima = $item["qty_diterima"] ? formatter($item["qty_diterima"], "STR_TO_INT") : 0;
+                        $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_INT") : 0;
+                        $barang_id = $item["barang_id"] ? formatter($item["barang_id"], "STR_TO_INT") : 0;
+                        $purchase_order_details_id = $item["purchase_order_details_id"] ? formatter($item["purchase_order_details_id"], "STR_TO_INT") : 0;
 
-                            $conditionRemain = [
-                                'id' => $purchase_order_details_id
+                        $conditionRemain = [
+                            'id' => $purchase_order_details_id
+                        ];
+
+                        $payloadRemain = [
+                            'qty_diterima' => $qty_diterima + $jml_masuk,
+                            'remaining_qty' => $remaining_qty - $jml_masuk
+                        ];
+
+                        // UPDATE REMAINING QTY AND JML DITERIMA
+                        if($tipe_bahan === "BAKU")
+                        {
+                            $responseDet = $this->rmPurchaseOrderDetailModel->where($conditionRemain)->set($payloadRemain)->update();
+
+                            if(!$responseDet) {
+                                $message =  'Gagal Ubah Remaining';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => "",
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+                        if($tipe_bahan === "PENOLONG")
+                        {
+                            $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)->set($payloadRemain)->update();
+
+                            if(!$responseDet) {
+                                $message =  'Gagal Ubah Remaining';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => "",
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                            }
+                        }
+
+                        // ADD STOK
+                        $find = $this->barangModel->find($barang_id);
+
+                        if($find)
+                        {
+                            $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_INT") : 0;
+
+                            $conditionUpdateStok = [
+                                'id' => $barang_id
                             ];
 
-                            $payloadRemain = [
-                                'qty_diterima' => $qty_diterima + $jml_masuk,
-                                'remaining_qty' => $remaining_qty - $jml_masuk
+                            $payloadupdateStok = [
+                                'stok' => $stok + $jml_masuk
                             ];
+            
+                            $responseStok = $this->barangModel->where($conditionUpdateStok)->set($payloadupdateStok)->update();    
 
-                            // UPDATE REMAINING QTY AND JML DITERIMA
-                            if($tipe_bahan === "BAKU")
-                            {
-                                $responseDet = $this->rmPurchaseOrderDetailModel->where($conditionRemain)->set($payloadRemain)->update();
-
-                                if(!$responseDet) {
-                                    $message =  'Gagal Ubah Remaining';
-                                    $data = [
-                                        "status"            => false,
-                                        "message"    => $message,
-                                        "payload"   => "",
-                                        'token' => csrf_hash()
-                                    ];
-                                    echo json_encode($data);
-                                }
-                            }
-                            if($tipe_bahan === "PENOLONG")
-                            {
-                                $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)->set($payloadRemain)->update();
-
-                                if(!$responseDet) {
-                                    $message =  'Gagal Ubah Remaining';
-                                    $data = [
-                                        "status"            => false,
-                                        "message"    => $message,
-                                        "payload"   => "",
-                                        'token' => csrf_hash()
-                                    ];
-                                    echo json_encode($data);
-                                }
-                            }
-
-                            // ADD STOK
-                            $find = $this->barangModel->find($barang_id);
-
-                            if($find)
-                            {
-                                $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_INT") : 0;
-
-                                $conditionUpdateStok = [
-                                    'id' => $barang_id
+                            if(!$responseStok) {
+                                $message =  'Gagal Tambah Stok';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => "",
+                                    'token' => csrf_hash()
                                 ];
-
-                                $payloadupdateStok = [
-                                    'stok' => $stok + $jml_masuk
-                                ];
-                
-                                $responseStok = $this->barangModel->where($conditionUpdateStok)->set($payloadupdateStok)->update();    
-
-                                if(!$responseStok) {
-                                    $message =  'Gagal Tambah Stok';
-                                    $data = [
-                                        "status"            => false,
-                                        "message"    => $message,
-                                        "payload"   => "",
-                                        'token' => csrf_hash()
-                                    ];
-                                    echo json_encode($data);
-                                }
+                                echo json_encode($data);
                             }
+                        }
                         }
                     }
                 }

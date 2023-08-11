@@ -235,7 +235,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-barang-import/update-status"); ?>",
+                    url: "<?= base_url("penerimaan-barang-lokal/update-status"); ?>",
                     data: {
                         id: id,
                         tipe_bahan: tipe_bahan
