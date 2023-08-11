@@ -478,14 +478,14 @@ class POImportBahanBaku extends BaseController
 
                         $detailPayload = [
                             'rm_import_po_id' => $id,
-                            'barang_id' =>$barang_id,
-                            'spec' => $data->spec,
-                            'note' => $data->note,
-                            'unit' => $data->unit,
-                            'qty' => $data->qty,
-                            'remaining_qty' => $data->qty,
-                            'qty_diterima' => 0,
-                            'price' => $data->price,
+                            // 'barang_id' =>$barang_id,
+                            // 'spec' => $data->spec,
+                            // 'note' => $data->note,
+                            // 'unit' => $data->unit,
+                            // 'qty' => $data->qty,
+                            // 'remaining_qty' => $data->qty,
+                            // 'qty_diterima' => 0,
+                            // 'price' => $data->price,
                             'disc' => $data->disc,
                             'additional_cost' => $data->additional_cost
                         ];
