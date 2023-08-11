@@ -269,7 +269,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
+                                <input readonly="true" type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
                                 <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>

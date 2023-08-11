@@ -171,12 +171,12 @@
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">DISC(%)</th>
                 <th class="txt-left" style="padding-left: 5px; width: 80px;">TOTAL</th>
             </tr>
-            <?php 
+            <?php
             $no = 1;
             $totalPrice = 0;
             $totalDisc = 0;
 
-            foreach($dataPODetail as $detail){ 
+            foreach ($dataPODetail as $detail) {
                 $totalan = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "CURR_TO_INT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
                 $totalPrice += $totalan;
                 $totalDisc += $totalan * (float)$detail["disc"] / 100;
@@ -245,4 +245,5 @@
         </table>
     <?php } ?>
 </body>
+
 </html>

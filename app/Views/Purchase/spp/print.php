@@ -21,6 +21,7 @@
         .table-border {
             border: 1px solid black;
             padding-left: 3px;
+            padding-right: 3px;
         }
 
         table {
@@ -68,6 +69,10 @@
             width: 100%;
             height: 90px;
         }
+
+        tbody {
+            font-size: 12px;
+        }
     </style>
 </head>
 
@@ -87,13 +92,13 @@
         <table class="mt-5 table-border">
             <thead class="table-border">
                 <tr class="table-border">
-                    <td class="table-border" style="width: 2px;"><b>No.</b></td>
+                    <td class="table-border" style="width: 5px;"><b>No.</b></td>
                     <td class="table-border" style="width: 105px;"><b>Kode Barang</b></td>
                     <td class="table-border" style="width: 220px;"><b>Nama Barang</b></td>
-                    <td class="table-border" style="width: 80px;"><b>Qty</b></td>
-                    <td class="table-border" style="width: 8px;"><b>Keterangan</b></td>
-                    <td class="table-border" style="width: 35px;"><b>Harga</b></td>
-                    <td class="table-border" style="width: 10px;"><b></b></td>
+                    <td class="table-border" style="width: 90px;"><b>Qty</b></td>
+                    <td class="table-border" style="width: 10px;"><b>Keterangan</b></td>
+                    <td class="table-border" style="width: 70px;"><b>Harga</b></td>
+                    <td class="table-border"><b></b></td>
                 </tr>
             </thead>
             <tbody>
