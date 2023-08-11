@@ -149,7 +149,7 @@
                         <button class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')" style="box-shadow: none !important;">
                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                         </button>
-                        <button onclick="posting(${id}, ${tipe_bahan})" class="btn btn-success posting-spp">
+                        <button onclick="posting(${id}, '${tipe_bahan}')" class="btn btn-success posting-spp">
                             <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                         </button>
                         <button onclick="remove(${id})" class="btn btn-danger delete-parent">
