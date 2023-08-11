@@ -636,6 +636,52 @@ class POImportBahanPenolong extends BaseController
         return;
     }
 
+    public function closePOImportBahanPenolong()
+    {
+        try{
+            $id = $this->request->getPost("id");
+
+            $payload = [
+                "status_penerimaan" => 1
+            ];
+            
+            $condition = [
+                'id' => $id
+            ];
+
+            $response = $this->amPurchaseOrderModel->where($condition)->set($payload)->update();
+
+            if ($response) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "PO Berhasil di Close",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = 'PO Gagal di Close';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
     public function deletePOImportBahanPenolong()
     {
         try{
