@@ -133,6 +133,9 @@
             render: function(data, type, row) {
                 let id = row?.id;
                 let status = row?.is_posted
+                let status_penerimaan = row?.status_penerimaan
+
+                // jika belum posting
                 if (status !== "1") {
                     return `
                         <div class="mt-0">
@@ -148,13 +151,27 @@
                         </div>
                     `
                 } else {
-                    return `
-                        <div class="mt-0">
-                        <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-penolong/print/"); ?>${id}')" style="box-shadow: none !important;">
-                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                        </button>
-                        </div>
-                    `
+                    // jika belum close po
+                    if (status_penerimaan !== "CLOSED") {
+                        return `
+                            <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button onclick="closePO(${id})" class="btn btn-danger delete-parent">
+                                <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
+                            </button>
+                            </div>
+                        `
+                    } else {
+                        return `
+                            <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            </div>
+                        `
+                    }
                 }
             }
         }],
@@ -225,6 +242,61 @@
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("po-import-bahan-penolong/update-status"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
+    const closePO = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan Close PO?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Close',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("po-import-bahan-penolong/close-po"); ?>",
                     data: {
                         id: id
                     },
