@@ -137,7 +137,7 @@ class BarangModel extends Model
 
     public function getBarangByCompanyId($company_id)
     {
-        $arrCondition = [
+        /* $arrCondition = [
             'deletedAt' => null,
             'parent_id !=' => 0,
             'company_id' => $company_id
@@ -147,7 +147,23 @@ class BarangModel extends Model
         $builder->where($arrCondition);
         $query = $builder->get();
 
-        return $query->getResult();
+        return $query->getResult(); */
+        
+        $data = $this->asObject()
+            ->where('company_id', $company_id)
+            ->groupStart()
+                ->groupStart()
+                    ->where('barangs.parent_id !=', 0)
+                    ->where('barangs.spec_type', 'multi')
+                ->groupEnd()
+                ->orGroupStart()
+                    ->where('barangs.parent_id', 0)
+                    ->where('barangs.spec_type', 'single')
+                ->groupEnd()
+            ->groupEnd()
+            ->findAll();
+
+        return $data;
     }
 
     public function getBarangByKode($kode, $id = null)
@@ -219,13 +235,13 @@ class BarangModel extends Model
         $arrCondition = [
             'barangs.deletedAt' => null,
             'barangs.status' => 'Aktif',
-            'barangs.parent_id !=' => 0,
+            // 'barangs.parent_id !=' => 0,
             'metadata.deletedAt' => null,
             'barangs.type' => $type
         ];
         // FORMAT(CEILING(barangs.harga_barang), 'N', 'en-us') AS harga_barang,
 
-        $selectQry = "barangs.*,
+        /* $selectQry = "barangs.*,
         metadata.value AS value, 
         ";
 
@@ -236,6 +252,27 @@ class BarangModel extends Model
             ->orderBy('barangs.nama_barang', 'ASC');
         $query = $builder->get();
 
-        return $query->getResultArray();
+        return $query->getResultArray(); */
+
+        $selectQry = "barangs.*,
+        metadata.value AS value, 
+        ";
+        $data = $this->select($selectQry)
+            ->join('metadata', 'metadata.id = barangs.kategori_id')
+            ->where($arrCondition)
+            ->groupStart()
+                ->groupStart()
+                    ->where('barangs.parent_id !=', 0)
+                    ->where('barangs.spec_type', 'multi')
+                ->groupEnd()
+                ->orGroupStart()
+                    ->where('barangs.parent_id', 0)
+                    ->where('barangs.spec_type', 'single')
+                ->groupEnd()
+            ->groupEnd()
+            ->orderBy('barangs.nama_barang', 'ASC')
+            ->findAll();
+
+        return $data;
     }
 }
