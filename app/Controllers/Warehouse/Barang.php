@@ -285,6 +285,7 @@ class Barang extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 

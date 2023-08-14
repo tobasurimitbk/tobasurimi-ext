@@ -275,15 +275,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control Nominal" name="Nominal" id="Nominal" placeholder="Nominal">
-                                <label for="floatingInput">Nominal</label>
+                                <select class="form-select tunjangan_id" name="tunjangan_id" id="tunjangan_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Tunjangan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select nominal" name="nominal" id="nominal">
-                                    <option value=""></option>
-                                </select>
+                                <input onkeyup="formatNumber(this)" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
                                 <label for="floatingInput">Nominal</label>
                             </div>
                         </div>
@@ -804,6 +804,7 @@
             $(".title-detail-name").text("Tambah")
             $(".delete-detail").css('display', 'none');
             $(".id_detail").val('')
+            $(".nominal").val("");
 
             validator_detail.resetForm();
             validator_detail.reset();
@@ -814,12 +815,14 @@
                 dataType: "json",
                 success: function(res) {
                     $(".tunjangan_id").empty()
+                    $(".jabatan_id").val("").change()
                     $(".tunjangan_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
                         $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
                     })
 
                     $(".tunjangan_id").val('').change();
+                    $(".detail-modal").modal("show")
                 }
             })
         })
@@ -843,6 +846,11 @@
             document.getElementById("preview_photo").src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIIAAACCCAMAAAC93eDPAAAAMFBMVEXk5ueutLfn6eqyt7qrsbTh4+TDx8q2u77Z3N3Jzc/U19nO0dPq7Oy8wcSnrrHd4OEuWFw9AAADAUlEQVR4nO2a23LjIAxAjQAbsIH//9vFTjpNUhckRyI7u5ynTF84lSVuYpoGg8FgMBgMBoPB4H8DYNs2gE+NvkEOfo4xzj7YD2jAFKIy3+jZ9bUA67Ux6hFjlnXqJwH+Zfy7hQ5bJwF3KrCTou0SCP+bwBEIJ+8Ac/rdYJcI0g6wVGJw+xirrAPElkGJg6gDzG0D2W8BK8agOIgZTBlnoNQiFQZYkAZiKQmhXo5PWBGFSeMNzCwRBmwu3h0kwoDPhEPBC4TBUYJQ4F80cbPSN4l/vdpoMZBISEuoyIOF24BWDwfsNTFTDZLjVohkBfZJmjA13uDPR7KCYlcgG6jIrUAuiH9SgWzAr/D5iqAt1YcC+3JNn5q4t/JQO0meK2ReA9re9UAzGxSoCpHdYCPmo8TJkrhhSOwCZdtECwL7xDRR968m8BsQDrU7MgdbShgEtvAHFq0gkgk7+F10EjpY73MDzkHyxgtXmCYKXsIC5mxr2M9RZActfAkMoeFgBFbIVwenahJi5fjkYCt1IXK5csLm07lEUrlXUwTKNu7nDiZ164jcJCa/mIdYGKNi6NgXukvkNepbh0wtc8gfaRXCBpPN2drjV+/BYf+fc3YuFJxz2d7/1mf0MnbwcdFafTUqjzlxieVr2EncA8D5qFM6bxKmpEtWCFrAZp/L4JziIdO5BcheN4f/LlF2C4C9Q40b/8tiWRlXTID1tUONslAz02QF00oLwINEmjkiAUFfFLhFwr8bCciI3miVsni95bCdvxIgSsTrgYCM3LS3uNy+hXA1DX86XLt928i3SzWHK8fc1jsFqoOmJ8S7lfAT4r4S806BiKEdcQQMFO0aEDxrHnxBOGw2D22XHdBHrSwjoPCXkdiLjCvgbiPpF94UFtSBS9IA1SKgduipIKqCdMF5gXZGSgehTFDNLyEsUMLQaqdLzUoPCo29g8zi8OJQr0uQN2g9bMgi69Mz9SuxC89FLlBtnMmX5E5939AhGxvPISHqDtTf+kAXqh9iMBgMBn8LfwAfLCKVi1nppAAAAABJRU5ErkJggg==";
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
+
+            komponen_gaji = [];
+            row = 0
+
+            console.log(komponen_gaji, "hehehehe")
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -1011,7 +1019,7 @@
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Company Already Exist',
+                        title: 'Komponen Already Exist',
                         confirmButtonColor: '#4e73df',
                     })
                 }
@@ -1064,7 +1072,7 @@
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Company Already Exist',
+                        title: 'Komponen Already Exist',
                         confirmButtonColor: '#4e73df',
                     })
                 }
@@ -1087,6 +1095,14 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
+                        let new_komponen_gaji = [];
+                        komponen_gaji.forEach((item) => {
+                            new_komponen_gaji.push({
+                                "tunjangan_id": item.tunjangan_id,
+                                "nominal": item.nominal
+                            })
+                        })
+                        data.append("komponen_gaji", JSON.stringify(new_komponen_gaji))
                         console.log(data)
                         let id = $(".id").val();
                         // UPDATE
@@ -1257,6 +1273,12 @@
 
             validator.resetForm();
             validator.reset();
+
+            komponen_gaji = [];
+            row = 0
+
+
+            console.log(komponen_gaji, "hahahaha")
 
             $.ajax({
                 url: "<?= base_url("employee/id"); ?>" + "/" + id,
@@ -1460,12 +1482,14 @@
             dataType: "json",
             success: function(res) {
                 $(".tunjangan_id").empty()
+                $(".jabatan_id").val("").change()
                 $(".tunjangan_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
                     $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
                 })
 
                 $(".tunjangan_id").val(tunjangan_id).change();
+                $(".detail-modal").modal("show")
             }
         })
     })

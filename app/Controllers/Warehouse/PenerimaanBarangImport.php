@@ -390,6 +390,7 @@ class PenerimaanBarangImport extends BaseController
                                 'token' => csrf_hash()
                             ];
                             echo json_encode($data);
+                            return;
                         } 
                     }
 
@@ -583,6 +584,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -604,6 +606,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -621,6 +624,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
                     }
@@ -722,6 +726,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token'     => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         } elseif ($tipe_bahan === "PENOLONG") {
                             $responseDet = $this->amPurchaseOrderDetailModel->where($conditionRemain)
@@ -737,6 +742,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token'     => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -766,6 +772,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -816,6 +823,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
                     }
@@ -856,6 +864,7 @@ class PenerimaanBarangImport extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
                     }
