@@ -336,7 +336,7 @@
                     keterangan: "<?= $payload['keterangan'] ?>",
                     tax: <?= $payload['tax'] ?>,
                     discount_percentage: <?= $payload['discount_percentage'] ?>,
-                    dept: <?= $payload['dept'] ?>,
+                    dept: <?= $payload['dept'] ?? 0 ?>,
                     warehouse_id: <?= $payload['id_warehouse'] ?>,
                     warehouse_name: "<?= $payload['warehouse_name'] ?>"
                 });

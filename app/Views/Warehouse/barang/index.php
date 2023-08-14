@@ -808,7 +808,7 @@
             const specVal = $(this).val();
 
             if (specVal == 'single') {
-                $('#parent_id').val('').trigger('change');
+                $('#parent_id').val('').trigger('change.select2');
                 $('#parent_id').prop('disabled', true);
                 haciu2();
             } else {
