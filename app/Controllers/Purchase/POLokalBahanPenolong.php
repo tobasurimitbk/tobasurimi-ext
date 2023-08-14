@@ -365,10 +365,8 @@ class POLokalBahanPenolong extends BaseController
 
                 $insertData = [
                     "company_id"            => $this->this_company_id,
-                    "purchase_request_id"   => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                     "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "warehouse_id"          => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,

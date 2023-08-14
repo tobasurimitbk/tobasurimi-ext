@@ -275,7 +275,6 @@ class POLokalBahanBaku extends BaseController
 
                 $insertData = [
                     "company_id" => $this->this_company_id,
-                    "purchase_request_id"   => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "pph" => $this->request->getPost("pph"),
