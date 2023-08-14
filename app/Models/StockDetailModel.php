@@ -68,4 +68,40 @@ class StockDetailModel extends Model
         }
 
     }
+
+    public function reduceStock(int $barangId, int $warehouseId, float $qty)
+    {
+        $data = [
+            'barang_id'     => $barangId,
+            'warehouse_id'  => $warehouseId,
+            'qty >'         => 0
+        ];
+        $stockList = $this->asObject()
+            ->where($data)
+            ->orderBy('stock_date', 'ASC')
+            ->findAll();
+
+        foreach ($stockList as $stock) {
+
+            if ($qty > $stock->qty) {
+                $qty -= $stock->qty;
+
+                // update stock qty to zero
+                $this->where('id', $stock->id)->set('qty', 0)
+                    ->update();
+
+            } else {
+
+                // decrement stock qty
+                $this->builder()->where('id', $stock->id)
+                    ->decrement('qty', $qty);
+
+                $qty = 0;
+
+                break;
+            }
+
+        }
+
+    }
 }
