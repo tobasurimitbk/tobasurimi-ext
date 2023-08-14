@@ -43,7 +43,8 @@
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
-                            <th onclick="changeSort('currency')" class="sort">Valas</th>
+                            <th onclick="changeSort('currencyName')" class="sort">Valas</th>
+                            <th onclick="changeSort('itemCount')">Jumlah Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
                             <th>Posting</th>
                         </tr>
@@ -118,7 +119,11 @@
             className: "text-center"
         },
         {
-            data: "currency",
+            data: "currencyName",
+            className: "text-center"
+        },
+        {
+            data: "itemCount",
             className: "text-center"
         },
         {
@@ -133,22 +138,45 @@
             render: function(data, type, row) {
                 let id = row?.id;
                 let status = row?.is_posted
+                let status_penerimaan = row?.status_penerimaan
+
+                // jika belum posting
                 if (status !== "1") {
                     return `
                         <div class="mt-0">
-                            <button onclick="posting(${id})" class="btn btn-success posting-spp">
-                                Posting
-                            </button>
+                        <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-penolong/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                        </button>
+                        <button onclick="posting(${id})" class="btn btn-success posting-spp">
+                            <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                        </button>
+                        <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
                         </div>
                     `
                 } else {
-                    return `
-                        <div class="mt-0">
-                            <label>
-                                Posted
-                            </label>
-                        </div>
-                    `
+                    // jika belum close po
+                    if (status_penerimaan !== "CLOSED") {
+                        return `
+                            <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button onclick="closePO(${id})" class="btn btn-danger delete-parent">
+                                <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
+                            </button>
+                            </div>
+                        `
+                    } else {
+                        return `
+                            <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            </div>
+                        `
+                    }
                 }
             }
         }],
@@ -257,6 +285,121 @@
                 });
             }
         })
+    }
+
+    const closePO = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan Close PO?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Close',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("po-import-bahan-penolong/close-po"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
+    const remove = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di hapus?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Posting',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("po-import-bahan-penolong/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
+
+    const print = function(url) 
+    {
+        window.open(url, "_blank");
     }
 
     const changeSort = function(val) {

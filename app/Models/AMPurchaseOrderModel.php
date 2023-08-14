@@ -65,7 +65,7 @@ class AMPurchaseOrderModel extends Model
             'poNo'             => 'am_purchase_orders.po_no',
             'supplierName'      => 'suppliers.name',
             'total'             => 'am_purchase_orders.total',
-            'currency'          => 'metadata.value',
+            'currencyName'      => 'metadata.value',
             'createdAt'         => 'am_purchase_orders.createdAt',
             'updatedAt'         => 'am_purchase_orders.updatedAt',
             'statusPenerimaan'  => 'am_purchase_orders.status_penerimaan'
@@ -77,12 +77,15 @@ class AMPurchaseOrderModel extends Model
 
         $selectQry = "am_purchase_orders.*, 
                       suppliers.name AS supplierName, 
-                      metadata.value AS currency";
+                      metadata.value AS currencyName,
+                      COUNT(am_purchase_order_details.id) AS itemCount";
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
             ->join('metadata', 'metadata.id = am_purchase_orders.currency')
+            ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->groupBy(('am_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);

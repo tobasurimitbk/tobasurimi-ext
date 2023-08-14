@@ -140,7 +140,8 @@ class POImportBahanPenolong extends BaseController
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
-                "currency"      => $data->currency,
+                "currencyName"  => $data->currencyName,
+                "itemCount"     => $data->itemCount,
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);
@@ -481,14 +482,14 @@ class POImportBahanPenolong extends BaseController
 
                         $detailPayload = [
                             'am_purchase_order_id' => $id,
-                            'barang_id' =>$barang_id,
-                            'spec' => $data->spec,
-                            'note' => $data->note,
-                            'unit' => $data->unit,
-                            'qty' => $data->qty,
-                            'remaining_qty' => $data->qty,
-                            'qty_diterima' => 0,
-                            'price' => $data->price,
+                            // 'barang_id' =>$barang_id,
+                            // 'spec' => $data->spec,
+                            // 'note' => $data->note,
+                            // 'unit' => $data->unit,
+                            // 'qty' => $data->qty,
+                            // 'remaining_qty' => $data->qty,
+                            // 'qty_diterima' => 0,
+                            // 'price' => $data->price,
                             'disc' => $data->disc,
                             'additional_cost' => $data->additional_cost
                         ];
@@ -615,6 +616,52 @@ class POImportBahanPenolong extends BaseController
                 echo json_encode($data);
             } else {
                 $message = 'Data Gagal Diposting';
+                $data = [
+                    "status"            => false,
+                    "message"    => $message,
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        }
+        catch(\Exception $e)
+        {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function closePOImportBahanPenolong()
+    {
+        try{
+            $id = $this->request->getPost("id");
+
+            $payload = [
+                "status_penerimaan" => 1
+            ];
+            
+            $condition = [
+                'id' => $id
+            ];
+
+            $response = $this->amPurchaseOrderModel->where($condition)->set($payload)->update();
+
+            if ($response) {
+                $data = [
+                    "status"            => true,
+                    "message"   => "PO Berhasil di Close",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $message = 'PO Gagal di Close';
                 $data = [
                     "status"            => false,
                     "message"    => $message,

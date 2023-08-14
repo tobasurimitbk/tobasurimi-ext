@@ -95,7 +95,7 @@ class RMPurchaseOrderModel extends Model
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id')
-            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'right')
+            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
             ->groupBy(('rm_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 

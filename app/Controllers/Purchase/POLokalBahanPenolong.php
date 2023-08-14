@@ -189,11 +189,14 @@ class POLokalBahanPenolong extends BaseController
             array_push($dataPOLokal, [
                 "no"            => $no++,
                 "id"            => $data->id,
-                "po_date"       => $data->po_date,
+                "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
-                "currency"      => $data->currency,
+                "currencyName"      => $data->currencyName,
+                "is_posted"     => $data->is_posted,
+                "itemCount"     => $data->itemCount,
+                "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED"
             ]);
         }
 
@@ -362,10 +365,8 @@ class POLokalBahanPenolong extends BaseController
 
                 $insertData = [
                     "company_id"            => $this->this_company_id,
-                    "purchase_request_id"   => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
                     "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "warehouse_id"          => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
@@ -392,13 +393,13 @@ class POLokalBahanPenolong extends BaseController
                         $dataDetail = [
                             "id"                    => $value->id ?? null,
                             "am_purchase_order_id"  => $this->request->getPost("id"),
-                            "barang_id"             => $value->item_id,
-                            "spec"                  => $value->spec,
-                            "note"                  => $value->note,
-                            "unit"                  => $value->unit,
-                            "qty"                   => $value->qty,
-                            "remaining_qty"         => $value->remaining_qty,
-                            "price"                 => $value->price,
+                            // "barang_id"             => $value->item_id,
+                            // "spec"                  => $value->spec,
+                            // "note"                  => $value->note,
+                            // "unit"                  => $value->unit,
+                            // "qty"                   => $value->qty,
+                            // "remaining_qty"         => $value->remaining_qty,
+                            // "price"                 => $value->price,
                             "disc"                  => $value->disc,
                             "additional_cost"       => $value->additional_cost,
                             "ppn"                   => $value->ppn,
@@ -466,7 +467,47 @@ class POLokalBahanPenolong extends BaseController
             } else {
                 $data = [
                     "status"    => false,
-                    "message"   => "Data Gagal Disimpan",
+                    "message"   => "Data Gagal diposting",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+            $data = [
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function closePOLokalBahanPenolong()
+    {
+        try {
+            $id = $this->request->getPost("id");
+            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
+
+            $payload = [
+                "status_penerimaan" => true
+            ];
+
+            if (!empty($id)) {
+                $AMPurchaseOrderModel->update($id, $payload);
+
+                $data = [
+                    "status"    => true,
+                    "message"   => "PO Berhasil di Close",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"    => false,
+                    "message"   => "PO Gagal di Close",
                     "payload"   => json_encode($payload),
                     'token'     => csrf_hash()
                 ];

@@ -177,7 +177,7 @@
             $totalDisc = 0;
 
             foreach ($dataPODetail as $detail) {
-                $totalan = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "CURR_TO_INT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
+                $totalan = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_INT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
                 $totalPrice += $totalan;
                 $totalDisc += $totalan * (float)$detail["disc"] / 100;
             ?>
@@ -197,7 +197,7 @@
                     Sub Total: <span class="txt-bold">Rp. <?= number_format($totalPrice) ?></span>
                 </div>
                 <div class="mt-025">
-                    Diskon: <span class="txt-bold">Rp. <?= $totalDisc ?></span>
+                    Discount: <span class="txt-bold">Rp. <?= $totalDisc ?></span>
                 </div>
                 <div class="mt-025">
                     Grand Total: <span class="txt-bold">Rp. <?= number_format($totalPrice - $totalDisc) ?></span>

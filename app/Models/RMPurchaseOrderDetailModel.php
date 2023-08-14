@@ -82,10 +82,11 @@ class RMPurchaseOrderDetailModel extends Model
                         FORMAT(CEILING(rm_purchase_order_details.daily_price), 'N', 'en-us') AS daily_price,
                         FORMAT(CEILING(rm_purchase_order_details.general_price), 'N', 'en-us') AS general_price,
                         FORMAT(CEILING(rm_purchase_order_details.monthly_price), 'N', 'en-us') AS monthly_price,
-                        FORMAT(CEILING(rm_purchase_order_details.qty), 'N', 'en-us') AS qty,
                         barangs.kode_barang AS kodeBarang,
                         barangs.nama_barang AS barangName,
-                        warehouses.warehouse_name AS warehouseName
+                        warehouses.warehouse_name AS warehouseName,
+                        satuans.id as id_satuan, 
+                        satuans.nama_satuan
                         ";
 
         $condition = [
@@ -96,7 +97,8 @@ class RMPurchaseOrderDetailModel extends Model
             ->select($selectQry)
             ->where($condition)
             ->join('barangs', 'rm_purchase_order_details.barang_id = barangs.id', 'left')
-            ->join('warehouses', 'barangs.warehouse_id = warehouses.id', 'left')
+            ->join('warehouses', 'rm_purchase_order_details.bagian = warehouses.id', 'left')
+            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
             ->findAll();
 
         return $poBBLokalDetailData;

@@ -48,7 +48,7 @@ class RMImportPOModel extends Model
             'poNo'             => 'rm_import_pos.po_no',
             'supplierName'      => 'suppliers.name',
             'total'             => 'rm_import_pos.total',
-            'currency'          => 'metadata.value',
+            'currencyName'      => 'metadata.value',
             'createdAt'         => 'rm_import_pos.createdAt',
             'updatedAt'         => 'rm_import_pos.updatedAt',
             'statusPenerimaan'  => 'rm_import_pos.status_penerimaan'
@@ -60,12 +60,15 @@ class RMImportPOModel extends Model
 
         $selectQry = "rm_import_pos.*, 
                       suppliers.name AS supplierName, 
-                      metadata.value AS currency";
+                      metadata.value AS currencyName,
+                      COUNT(rm_import_po_details.id) AS itemCount";
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id')
             ->join('metadata', 'metadata.id = rm_import_pos.currency')
+            ->join('rm_import_po_details', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+            ->groupBy(('rm_import_pos.id'))
             ->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
