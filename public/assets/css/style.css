@@ -5962,6 +5962,11 @@ form.create-form.form-add-spp.form-hp .nav.nav-tabs button.nav-link.active {
   color: #e7323a;
 }
 
+table.dataTable .body-table tr td .btn.btn-danger {
+  box-shadow: none;
+  font-size: 13px;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
