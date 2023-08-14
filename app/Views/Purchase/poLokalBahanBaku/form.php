@@ -1205,7 +1205,7 @@
                 {
                     Swal.fire({
                         icon: 'error',
-                        title: "Harap Lengkapi Data Peti, Kualitas, Harga Harian, Harga Bulanan",
+                        title: "Harap Lengkapi Data Bagian, Peti, Kualitas, Harga Harian, Harga Bulanan",
                         confirmButtonColor: '#4e73df',
                     })
                 }
