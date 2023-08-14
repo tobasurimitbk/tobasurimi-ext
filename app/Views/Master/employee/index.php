@@ -807,7 +807,7 @@
             $(".nominal").val("");
 
             validator_detail.resetForm();
-            validator_detail.reset();
+            validator_detail.reset();            
 
             $.ajax({
                 url: `<?= base_url("tunjangan/dropdown"); ?>`,
@@ -835,6 +835,7 @@
                 maxlength: 6
             });
 
+
             $(".province_id").val('').change()
             $(".city_id").val('').change()
             $(".city_id").empty()
@@ -849,6 +850,8 @@
 
             komponen_gaji = [];
             row = 0
+
+            $(".body-detail-table").empty()
 
             console.log(komponen_gaji, "hehehehe")
 
@@ -1276,6 +1279,8 @@
 
             komponen_gaji = [];
             row = 0
+
+            $(".body-detail-table").empty()
 
 
             console.log(komponen_gaji, "hahahaha")
