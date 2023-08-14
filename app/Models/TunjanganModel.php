@@ -91,4 +91,18 @@ class TunjanganModel extends Model
 
         return $supplierData;
     }
+
+    public function getTunjanganDropdown()
+    {
+        $selectQry = "tunjangan.* ";
+
+        $tunjanganDataQry = $this->asObject()
+            ->select($selectQry);
+
+        $data = $tunjanganDataQry->findAll();
+
+        return [
+            'data' => $data,
+        ];
+    }
 }

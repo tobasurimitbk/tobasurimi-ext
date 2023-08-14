@@ -261,10 +261,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
+                                <!-- <select class="form-select satuan" name="satuan" id="satuan" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Satuan</label>
+                                <label for="floatingInput">Satuan</label> -->
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly="true" type="text" class="form-control satuan" id="satuan" name="satuan" placeholder="Satuan">
+                                    <label for="floatingInput">Satuan</label>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -509,11 +513,11 @@
             .css('z-index', '1');
 
         // SATUAN
-        $('.satuan').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        })
+        // $('.satuan').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".detail-modal .modal-content")
+        // })
 
         //CSS SELECT2 FLOATING LABEL
         $('.satuan')
@@ -846,7 +850,7 @@
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
                         res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.kode_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         })
 
                         $(".kode_barang").val("").change();
@@ -868,7 +872,7 @@
                         $(".kode_barang").append(`<option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>`);
 
                         res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.kode_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         })
 
                         $(".kode_barang").val("").change();
@@ -886,6 +890,7 @@
                     $(".satuan").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
+                        console.log(item)
                         $(".satuan").append(`<option value="${item.id}">${item.nama_satuan}</option>`);
                     })
 
@@ -1582,9 +1587,9 @@
 
                     res.data.forEach(function(item) {
                         if (kode_barang === item.kode_barang) {
-                            $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                            $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.kode_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         } else {
-                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.kode_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         }
                     })
                 }
@@ -1609,9 +1614,9 @@
 
                     res.data.forEach(function(item) {
                         if (kode_barang === item.kode_barang) {
-                            $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                            $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.kode_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         } else {
-                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.satuan_id}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
+                            $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan="${item.kode_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         }
                     })
                 }

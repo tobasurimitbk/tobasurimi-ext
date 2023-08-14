@@ -256,19 +256,11 @@ class Tunjangan extends BaseController
 
     public function dropdownTunjangan()
     {
-        $dataDivisi = $this->TunjanganModel->get_by_company_id($this->this_company_id);
+        $TunjanganModel = new TunjanganModel();
 
-        /*
-        $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
-        $dataDivisi = [];
-        if ($responseDivisi["code"] === 200) {
-            $dataDivisi = json_decode($responseDivisi["body"])->data;
-        }
-        */
+        $dataJabatan = $TunjanganModel->getTunjanganDropdown();
 
-        $data = [
-            "data" => $dataDivisi
-        ];
+        $data = $dataJabatan;
 
         echo json_encode($data);
         return;

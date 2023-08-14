@@ -437,6 +437,10 @@ $routes->get('/role/dropdown', 'Setting\Role::dropdownRole', ['filter' => 'Auth'
 // JABATAN
 $routes->get('/jabatan/dropdown', 'Personalia\Jabatan::dropdownJabatan', ['filter' => 'Auth']);
 
+// TUNJANGAN
+$routes->get('/tunjangan/dropdown', 'Master\Tunjangan::dropdownTunjangan', ['filter' => 'Auth']);
+
+
 // USER
 $routes->get('/user/dropdown', 'Setting\User::dropdownUser', ['filter' => 'Auth']);
 
