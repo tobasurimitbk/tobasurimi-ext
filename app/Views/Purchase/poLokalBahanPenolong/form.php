@@ -286,8 +286,8 @@
                                             <td><?= $no; ?></td>
                                             <td><?= $details->kode_barang; ?></td>
                                             <td><?= $details->nama_barang; ?></td>
-                                            <td><?= $details->nama_satuan; ?></td>
                                             <td><?= $details->spec; ?></td>
+                                            <td><?= $details->nama_satuan; ?></td>
                                             <td><?= $details->price; ?></td>
                                             <td><?= formatter($details->qty, "STR_TO_INT"); ?></td>
                                             <td><?= formatter($details->remaining_qty, "STR_TO_INT"); ?></td>

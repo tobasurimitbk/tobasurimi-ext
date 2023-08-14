@@ -177,9 +177,9 @@
             $totalDisc = 0;
 
             foreach ($dataPODetail as $detail) {
-                $totalan = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_INT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
-                $totalPrice += $totalan;
-                $totalDisc += $totalan * (float)$detail["disc"] / 100;
+                $totalPriceWithAdditional = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_INT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
+                $totalPrice += $totalPriceWithAdditional;
+                $totalDisc += $totalPriceWithAdditional * (float)$detail["disc"] / 100;
             ?>
                 <tr>
                     <td style="padding-left: 5px;"><?= $detail["qty"] . " " . $detail["nama_satuan"] ?></b></td>
@@ -187,20 +187,23 @@
                     <td style="padding-left: 5px;"><?= $detail["nama_barang"] . " " . $detail["spec"] ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= number_format(formatter($detail["price"], "STR_TO_INT")) ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail["disc"] ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= $detail["totalPrice"] ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= number_format($totalPriceWithAdditional); ?></b></td>
                 </tr>
             <?php } ?>
         </table>
         <div class="header mt-025">
             <div class="txt-right">
                 <div>
-                    Sub Total: <span class="txt-bold">Rp. <?= number_format($totalPrice) ?></span>
+                    Currency: <span class="txt-bold"><?= $dataPO->currencyName ?></span>
                 </div>
                 <div class="mt-025">
-                    Discount: <span class="txt-bold">Rp. <?= $totalDisc ?></span>
+                    Sub Total: <span class="txt-bold"><?= number_format($totalPrice) ?></span>
                 </div>
                 <div class="mt-025">
-                    Grand Total: <span class="txt-bold">Rp. <?= number_format($totalPrice - $totalDisc) ?></span>
+                    Discount: <span class="txt-bold"><?= $totalDisc ?></span>
+                </div>
+                <div class="mt-025">
+                    Grand Total: <span class="txt-bold"><?= number_format($totalPrice - $totalDisc) ?></span>
                 </div>
             </div>
         </div>
