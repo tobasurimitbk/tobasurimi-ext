@@ -5,8 +5,8 @@ namespace App\Controllers\Purchase;
 use App\Controllers\BaseController;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
-use App\Models\SupplierModel;
 use App\Models\SppModel;
+use App\Models\SupplierModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanBaku extends BaseController
@@ -15,6 +15,8 @@ class POLokalBahanBaku extends BaseController
     protected $this_company_id;
     protected $RMPurchaseOrderModel;
     protected $RMPurchaseOrderDetailModel;
+    protected $SppModel;
+    protected $SupplierModel;
     protected $dompdf;
 
     public function __construct()
@@ -23,6 +25,8 @@ class POLokalBahanBaku extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->RMPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $this->SppModel = new SppModel();
+        $this->SupplierModel = new SupplierModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -34,16 +38,14 @@ class POLokalBahanBaku extends BaseController
     public function createPOLokalBahanBaku()
     {
         //Get SPP Number
-        $SppModel = new SppModel();
-        $dataSPP = $SppModel->getNoSPP('Bahan Baku Lokal');
+        $dataSPP = $this->SppModel->getNoSPP('Bahan Baku Lokal');
 
         foreach (array_keys($dataSPP) as $key) {
             $dataSPP[$key] = (object)$dataSPP[$key];
         }
 
         //Get Supplier
-        $supplierModel = new SupplierModel();
-        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -60,8 +62,7 @@ class POLokalBahanBaku extends BaseController
     public function getByIdPOLokalBahanBaku($id = null)
     {
         //Get Supplier
-        $supplierModel = new SupplierModel();
-        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -71,49 +72,14 @@ class POLokalBahanBaku extends BaseController
             "dataSupplier" => $dataSupplier
         ];
 
-        $RMPurchaseOrderModel = new RMPurchaseOrderModel();
-        $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-
         if (!empty($id)) {
-            $dataBBLokal = $RMPurchaseOrderModel->getPoBBLokalById($id);
-            $dataBBLokalDetail = $RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
+            $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
+            $dataBBLokalDetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
             $data["dataPOLokal"] = $dataBBLokal;
             $data["dataPOLokal"]->rm_purchase_order_details = $dataBBLokalDetail;
         }
 
         return view('Purchase/poLokalBahanBaku/form', $data);
-        return;
-    }
-
-    public function getByIdPOLokalBahanBakuAjax()
-    {
-        $id = $this->request->getGet("id");
-
-        if (!empty($id)) {
-            $response = curl_request("GET", "/purchaseOrder/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                    "message" => $response
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
-            ];
-            echo json_encode($data);
-        }
-
         return;
     }
 
@@ -128,9 +94,6 @@ class POLokalBahanBaku extends BaseController
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
-
-        $BBLokalModel = new RMPurchaseOrderModel();
-
         $condition = [];
 
         $addCondition = [
@@ -142,7 +105,7 @@ class POLokalBahanBaku extends BaseController
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $poData = $BBLokalModel->getPoBBList($condition, $addCondition, $limit, $offset);
+        $poData = $this->RMPurchaseOrderModel->getPoBBList($condition, $addCondition, $limit, $offset);
 
         $dataPOLokal = [];
 
@@ -176,9 +139,6 @@ class POLokalBahanBaku extends BaseController
     public function savePOLokalBahanBaku()
     {
         try {
-            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
-            $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-
             $rules = [
                 "po_date" => [
                     "rules" => "required"
@@ -204,11 +164,11 @@ class POLokalBahanBaku extends BaseController
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
 
-                $insertData["po_no"] = $RMPurchaseOrderModel->generateNoPo();
+                $insertData["po_no"] = $this->RMPurchaseOrderModel->generateNoPo();
 
                 $payload = json_encode($insertData);
 
-                $insert = $RMPurchaseOrderModel->insert($insertData);
+                $insert = $this->RMPurchaseOrderModel->insert($insertData);
 
                 foreach ($insertData["items"] as $value) {
                     $value->barang_id = $value->item_id;
@@ -216,7 +176,7 @@ class POLokalBahanBaku extends BaseController
                     $value->remaining_qty = $value->qty;
                 }
 
-                $RMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
+                $this->RMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
 
                 if ($insert) {
                     $data = [
@@ -258,9 +218,6 @@ class POLokalBahanBaku extends BaseController
     public function updatePOLokalBahanBaku()
     {
         try {
-            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
-            $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-
             $rules = [
                 "po_date" => [
                     "rules" => "required"
@@ -289,14 +246,14 @@ class POLokalBahanBaku extends BaseController
 
 
                 if ($insertData) {
-                    $RMPurchaseOrderModel->update($id, $insertData);
+                    $this->RMPurchaseOrderModel->update($id, $insertData);
 
                     foreach ($insertData["items"] as $value) {
                         $value->barang_id = $value->item_id;
                         $value->rm_purchase_order_id = $id;
 
                         if (!empty($value->isDeleted)) {
-                            $RMPurchaseOrderDetailModel->where('id', $value->id)->delete();
+                            $this->RMPurchaseOrderDetailModel->where('id', $value->id)->delete();
                         }
 
                         $dataDetail = [
@@ -315,7 +272,7 @@ class POLokalBahanBaku extends BaseController
                             "monthly_price" => $value->monthly_price,
                         ];
 
-                        $RMPurchaseOrderDetailModel->upsert($dataDetail);
+                        $this->RMPurchaseOrderDetailModel->upsert($dataDetail);
                     }
 
                     $data = [
@@ -357,14 +314,13 @@ class POLokalBahanBaku extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
-            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
 
             $payload = [
                 "status_penerimaan" => true
             ];
 
             if (!empty($id)) {
-                $RMPurchaseOrderModel->update($id, $payload);
+                $this->RMPurchaseOrderModel->update($id, $payload);
 
                 $data = [
                     "status"    => true,
@@ -397,14 +353,13 @@ class POLokalBahanBaku extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
-            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
 
             $payload = [
                 "is_posted" => "1"
             ];
 
             if (!empty($id)) {
-                $RMPurchaseOrderModel->update($id, $payload);
+                $this->RMPurchaseOrderModel->update($id, $payload);
 
                 $data = [
                     "status"    => true,
@@ -436,8 +391,6 @@ class POLokalBahanBaku extends BaseController
     public function deletePOLokalBahanBaku()
     {
         try {
-            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
-            $RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
             $id = $this->request->getPost("id");
 
             if (empty($id)) {
@@ -450,8 +403,8 @@ class POLokalBahanBaku extends BaseController
                 return;
             }
 
-            $RMPurchaseOrderModel->delete($id);
-            $RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->delete();
+            $this->RMPurchaseOrderModel->delete($id);
+            $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->delete();
 
             $data = [
                 "status"    => true,

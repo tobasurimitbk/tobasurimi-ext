@@ -18,6 +18,10 @@ class POLokalBahanPenolong extends BaseController
     protected $this_company_id;
     protected $AMPurchaseOrderModel;
     protected $AMPurchaseOrderDetailModel;
+    protected $MetadataModel;
+    protected $SppModel;
+    protected $SupplierModel;
+    protected $WarehousesModel;
     protected $dompdf;
 
     public function __construct()
@@ -26,6 +30,10 @@ class POLokalBahanPenolong extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->AMPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $this->MetadataModel = new MetadataModel();
+        $this->SppModel = new SppModel();
+        $this->SupplierModel = new SupplierModel();
+        $this->WarehousesModel = new WarehousesModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -37,24 +45,21 @@ class POLokalBahanPenolong extends BaseController
     public function createPOLokalBahanPenolong()
     {
         //Get SPP Number
-        $SppModel = new SppModel();
-        $dataSPP = $SppModel->getNoSPP('Bahan Penolong Lokal');
+        $dataSPP = $this->SppModel->getNoSPP('Bahan Penolong Lokal');
 
         foreach (array_keys($dataSPP) as $key) {
             $dataSPP[$key] = (object)$dataSPP[$key];
         }
 
         //Get Supplier
-        $supplierModel = new SupplierModel();
-        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         //Get Valuta Asing By Metadata
-        $MetadataModel = new MetadataModel();
-        $dataValuta = $MetadataModel->get_by_name('Valuta Asing');
+        $dataValuta = $this->MetadataModel->get_by_name('Valuta Asing');
 
         foreach (array_keys($dataValuta) as $key) {
             $dataValuta[$key] = (object)$dataValuta[$key];
@@ -72,24 +77,21 @@ class POLokalBahanPenolong extends BaseController
     public function getByIdPOLokalBahanPenolong($id = null)
     {
         //Get SPP Number
-        $SppModel = new SppModel();
-        $dataSPP = $SppModel->getNoSPP('Bahan Penolong Lokal');
+        $dataSPP = $this->SppModel->getNoSPP('Bahan Penolong Lokal');
 
         foreach (array_keys($dataSPP) as $key) {
             $dataSPP[$key] = (object)$dataSPP[$key];
         }
 
         //Get Supplier
-        $supplierModel = new SupplierModel();
-        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         //Get Valuta Asing By Metadata
-        $MetadataModel = new MetadataModel();
-        $dataValuta = $MetadataModel->get_by_name('Valuta Asing');
+        $dataValuta = $this->MetadataModel->get_by_name('Valuta Asing');
 
         foreach (array_keys($dataValuta) as $key) {
             $dataValuta[$key] = (object)$dataValuta[$key];
@@ -101,13 +103,9 @@ class POLokalBahanPenolong extends BaseController
             "dataValuta" => $dataValuta
         ];
 
-        $AMPurchaseOrderModel = new AMPurchaseOrderModel();
-        $AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-
-
         if (!empty($id)) {
-            $dataBPLokal = $AMPurchaseOrderModel->getPOById($id);
-            $dataBPLokalDetail = $AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+            $dataBPLokal = $this->AMPurchaseOrderModel->getPOById($id);
+            $dataBPLokalDetail = $this->AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
             foreach (array_keys($dataBPLokalDetail) as $key) {
                 $dataBPLokalDetail[$key] = (object)$dataBPLokalDetail[$key];
             }
@@ -116,38 +114,6 @@ class POLokalBahanPenolong extends BaseController
         }
 
         return view('Purchase/poLokalBahanPenolong/form', $data);
-
-        return;
-    }
-
-    public function getByIdPOLokalBahanPenolongAjax()
-    {
-        $id = $this->request->getGet("id");
-
-        if (!empty($id)) {
-            $response = curl_request("GET", "/auxiliaryMaterialPO/lokal/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"  => true,
-                    "data"  => json_decode($response["body"])->data,
-                    "message" => $response
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditemukan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
-            ];
-            echo json_encode($data);
-        }
 
         return;
     }
@@ -164,8 +130,6 @@ class POLokalBahanPenolong extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $BPLokalModel = new AMPurchaseOrderModel();
-
         $condition = [
             'po_type' => "Lokal"
         ];
@@ -179,7 +143,7 @@ class POLokalBahanPenolong extends BaseController
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $poData = $BPLokalModel->getPoList($condition, $addCondition, $limit, $offset);
+        $poData = $this->AMPurchaseOrderModel->getPoList($condition, $addCondition, $limit, $offset);
 
         $dataPOLokal = [];
 
@@ -217,9 +181,6 @@ class POLokalBahanPenolong extends BaseController
     public function savePOLokalBahanPenolong()
     {
         try {
-            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
-            $AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-
             $rules = [
                 "purchase_request_id" => [
                     "rules" => "required"
@@ -275,13 +236,12 @@ class POLokalBahanPenolong extends BaseController
                 $insertData["total"] = $totalPrice;
 
                 if ($insertData["po_no"] === "") {
-                    $WarehousesModel = new WarehousesModel();
-                    $dataWarehouse = $WarehousesModel->find($insertData["warehouse_id"]);
+                    $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
                     $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                    $insertData["po_no"] = $AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataWarehouse["warehouse_name"], date('y'), $insertData["warehouse_id"], $last_day);
+                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataWarehouse["warehouse_name"], date('y'), $insertData["warehouse_id"], $last_day);
                 };
 
-                $insert = $AMPurchaseOrderModel->insert($insertData);
+                $insert = $this->AMPurchaseOrderModel->insert($insertData);
 
                 foreach ($insertData["items"] as $value) {
                     $value->barang_id = $value->item_id;
@@ -289,7 +249,7 @@ class POLokalBahanPenolong extends BaseController
                     $value->remaining_qty = $value->qty;
                 }
 
-                $AMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
+                $this->AMPurchaseOrderDetailModel->insertBatch($insertData["items"]);
 
                 $payload = json_encode($insertData);
 
@@ -333,9 +293,6 @@ class POLokalBahanPenolong extends BaseController
     public function updatePOLokalBahanPenolong()
     {
         try {
-            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
-            $AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-
             $rules = [
                 "po_no" => [
                     "rules" => "required"
@@ -380,14 +337,14 @@ class POLokalBahanPenolong extends BaseController
                 ];
 
                 if ($insertData) {
-                    $AMPurchaseOrderModel->update($id, $insertData);
+                    $this->AMPurchaseOrderModel->update($id, $insertData);
 
                     foreach ($insertData["items"] as $value) {
                         $value->barang_id = $value->item_id;
                         $value->am_purchase_order_id = $id;
 
                         if (!empty($value->isDeleted)) {
-                            $AMPurchaseOrderDetailModel->where('id', $value->id)->delete();
+                            $this->AMPurchaseOrderDetailModel->where('id', $value->id)->delete();
                         }
 
                         $dataDetail = [
@@ -406,7 +363,7 @@ class POLokalBahanPenolong extends BaseController
                             "pph"                   => $value->pph,
                         ];
 
-                        $AMPurchaseOrderDetailModel->upsert($dataDetail);
+                        $this->AMPurchaseOrderDetailModel->upsert($dataDetail);
                     }
 
                     $data = [
@@ -448,14 +405,13 @@ class POLokalBahanPenolong extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
-            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
 
             $payload = [
                 "is_posted" => true
             ];
 
             if (!empty($id)) {
-                $AMPurchaseOrderModel->update($id, $payload);
+                $this->AMPurchaseOrderModel->update($id, $payload);
 
                 $data = [
                     "status"    => true,
@@ -488,14 +444,13 @@ class POLokalBahanPenolong extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
-            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
 
             $payload = [
                 "status_penerimaan" => true
             ];
 
             if (!empty($id)) {
-                $AMPurchaseOrderModel->update($id, $payload);
+                $this->AMPurchaseOrderModel->update($id, $payload);
 
                 $data = [
                     "status"    => true,
@@ -528,8 +483,6 @@ class POLokalBahanPenolong extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
-            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
-            $AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
 
             if (empty($id)) {
                 $data = [
@@ -541,8 +494,8 @@ class POLokalBahanPenolong extends BaseController
                 return;
             }
 
-            $AMPurchaseOrderModel->delete($id);
-            $AMPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
+            $this->AMPurchaseOrderModel->delete($id);
+            $this->AMPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
 
             $data = [
                 "status"    => true,
@@ -595,13 +548,9 @@ class POLokalBahanPenolong extends BaseController
         if ($id) {
             $filename = "PO Lokal Bahan Penolong";
 
-            $AMPurchaseOrderModel = new AMPurchaseOrderModel();
-            $AMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-
-
             if (!empty($id)) {
-                $dataBPLokal = $AMPurchaseOrderModel->getPOById($id);
-                $dataBPLokalDetail = $AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+                $dataBPLokal = $this->AMPurchaseOrderModel->getPOById($id);
+                $dataBPLokalDetail = $this->AMPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
                 foreach (array_keys($dataBPLokalDetail) as $key) {
                     $dataBPLokalDetail[$key] = (object)$dataBPLokalDetail[$key];
                 }
