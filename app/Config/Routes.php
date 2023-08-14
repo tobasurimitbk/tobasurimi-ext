@@ -210,6 +210,7 @@ $routes->get('/po-lokal-bahan-baku/create', 'Purchase\POLokalBahanBaku::createPO
 $routes->post('/po-lokal-bahan-baku/save', 'Purchase\POLokalBahanBaku::savePOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/update', 'Purchase\POLokalBahanBaku::updatePOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/update-status', 'Purchase\POLokalBahanBaku::updateStatusPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-baku/close-po', 'Purchase\POLokalBahanBaku::closePOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/delete', 'Purchase\POLokalBahanBaku::deletePOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/print/(:segment)', 'Purchase\POLokalBahanBaku::print/$1', ['filter' => 'Auth']);
 
@@ -222,6 +223,7 @@ $routes->get('/po-lokal-bahan-penolong/create', 'Purchase\POLokalBahanPenolong::
 $routes->post('/po-lokal-bahan-penolong/save', 'Purchase\POLokalBahanPenolong::savePOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-penolong/update', 'Purchase\POLokalBahanPenolong::updatePOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-penolong/update-status', 'Purchase\POLokalBahanPenolong::updateStatusPOLokalBahanPenolong', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-penolong/close-po', 'Purchase\POLokalBahanPenolong::closePOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-penolong/delete', 'Purchase\POLokalBahanPenolong::deletePOLokalBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/print/(:segment)', 'Purchase\POLokalBahanPenolong::print/$1', ['filter' => 'Auth']);
 

@@ -396,7 +396,6 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let list_items = [];
-    let list_delete = [];
     var row = 0;
     var total_harga_barang = 0;
     var total_qty = 0;
@@ -1153,25 +1152,6 @@
                             var total = 0;
 
                             let update_list_items = [];
-
-                            if (list_delete.length !== 0) {
-                                list_delete.map(obj => {
-                                    update_list_items.push({
-                                        id: obj.id ? Number(obj.id) : 0,
-                                        item_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                        item_code: obj.kode_barang,
-                                        item_name: obj.nama_barang,
-                                        qty: obj.qty ? Number(obj.qty) : 0,
-                                        unit: obj.satuan ? Number(obj.satuan) : 0,
-                                        price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan,
-                                        disc: obj.disc ? Number(obj.disc) : 0,
-                                        additional_cost: obj.additional_cost ? Number(obj.additional_cost.replaceAll(",", "")) : 0,
-                                        spec: obj.spesifikasi,
-                                        isDeleted: true
-                                    })
-                                })
-                            }
 
                             list_items.map(obj => {
                                 total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);

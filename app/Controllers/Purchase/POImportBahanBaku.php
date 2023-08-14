@@ -139,7 +139,8 @@ class POImportBahanBaku extends BaseController
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
                 "total"         => number_format($data->total),
-                "currency"      => $data->currency,
+                "currencyName"  => $data->currencyName,
+                "itemCount"     => $data->itemCount,
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);

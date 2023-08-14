@@ -152,10 +152,12 @@ class POLokalBahanBaku extends BaseController
             array_push($dataPOLokal, [
                 "no"            => $no++,
                 "id"            => $data->id,
-                "po_date"       => date('Y-m-d', strtotime($data->po_date)),
+                "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
-                "itemCount"     => $data->itemCount
+                "itemCount"     => $data->itemCount,
+                "is_posted"     => $data->is_posted,
+                "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);
         }
 
@@ -300,16 +302,16 @@ class POLokalBahanBaku extends BaseController
 
                         $dataDetail = [
                             "id" => $value->id ?? null,
-                            "rm_purchase_order_id" => $this->request->getPost("id"),
-                            "barang_id" => $value->item_id,
-                            "spec" => $value->spec,
+                            // "rm_purchase_order_id" => $this->request->getPost("id"),
+                            // "barang_id" => $value->item_id,
+                            // "spec" => $value->spec,
                             "bagian" => $value->bagian,
                             "peti" => $value->peti,
                             "quality" => $value->quality,
-                            "note" => $value->note,
-                            "qty" => $value->qty,
-                            "remaining_qty" => $value->remaining_qty,
-                            "general_price" => $value->general_price,
+                            // "note" => $value->note,
+                            // "qty" => $value->qty,
+                            // "remaining_qty" => $value->remaining_qty,
+                            // "general_price" => $value->general_price,
                             "daily_price" => $value->daily_price,
                             "monthly_price" => $value->monthly_price,
                         ];
@@ -346,6 +348,46 @@ class POLokalBahanBaku extends BaseController
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function closePOLokalBahanBaku()
+    {
+        try {
+            $id = $this->request->getPost("id");
+            $RMPurchaseOrderModel = new RMPurchaseOrderModel();
+
+            $payload = [
+                "status_penerimaan" => true
+            ];
+
+            if (!empty($id)) {
+                $RMPurchaseOrderModel->update($id, $payload);
+
+                $data = [
+                    "status"    => true,
+                    "message"   => "PO Berhasil di Close",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"    => false,
+                    "message"   => "PO Gagal di Close",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+            $data = [
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
             ];
             echo json_encode($data);
         }

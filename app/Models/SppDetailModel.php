@@ -52,7 +52,6 @@ class SppDetailModel extends Model
     {
         $selectQry = "purchase_request_details.*,
                         FORMAT(CEILING(purchase_request_details.qty) * CEILING(purchase_request_details.price), 'N', 'en-us') AS totalPrice,
-                        FORMAT(CEILING(purchase_request_details.qty), 'N', 'en-us') AS qty,
                         FORMAT(CEILING(purchase_request_details.price), 'N', 'en-us') AS price,
                         barangs.kode_barang AS kodeBarang,
                         barangs.nama_barang AS barangName,
