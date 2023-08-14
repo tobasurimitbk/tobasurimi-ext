@@ -9,6 +9,7 @@ use App\Models\CustomerModel;
 use App\Models\BarangModel;
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
+use App\Models\StockDetailModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\AllNoModel;
 use Error;
@@ -24,6 +25,7 @@ class OrderForm extends BaseController
     protected $BarangModel;
     protected $WarehousesModel;
     protected $DetailStockBarang;
+    private $stockDetailModel;
     protected $SalesOrderDetailModel;
     protected $db;
     protected $AllNoModel;
@@ -38,6 +40,7 @@ class OrderForm extends BaseController
         $this->BarangModel = new BarangModel();
         $this->WarehousesModel = new WarehousesModel();
         $this->DetailStockBarang = new DetailStockBarang();
+        $this->stockDetailModel = new StockDetailModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->AllNoModel = new AllNoModel();
         $this->db = \Config\Database::connect();
@@ -274,7 +277,7 @@ class OrderForm extends BaseController
             $dataSalesOrder =  $this->SalesOrderModel->insert($values);
             $totalQty = 0;
             foreach ($items as $row) {
-                $item = $this->DetailStockBarang
+                /* $item = $this->DetailStockBarang
                     ->where('barang_id', $row->id_barang)
                     ->where('warehouse_id', $row->warehouse_id)
                     ->first();
@@ -282,24 +285,28 @@ class OrderForm extends BaseController
                 if ($item['stok'] < $row->qty) {
                     throw new ErrorException('barang tidak boleh kurang dari stock');
                     return;
-                }
+                } */
+
+                $this->BarangModel->builder()->decrement('stok', $row->qty);
+                $this->stockDetailModel->reduceStock($row->id_barang, $row->warehouse_id, $row->qty);
+
                 $totalQty = $totalQty + $row->qty;
                 $valueBarang = [
-                    "id_sales_order" => $dataSalesOrder,
-                    "id_barang" => $row->id_barang,
-                    "qty" => $row->qty,
-                    "amount" => $row->amount,
-                    "keterangan" => $row->keterangan,
-                    "tax" => $row->tax,
-                    "discount_percentage" => $row->discount_percentage,
-                    "dept" => $row->dept,
-                    "id_warehouse" => $row->warehouse_id,
+                    "id_sales_order"        => $dataSalesOrder,
+                    "id_barang"             => $row->id_barang,
+                    "qty"                   => $row->qty,
+                    "amount"                => $row->amount,
+                    "keterangan"            => $row->keterangan,
+                    "tax"                   => $row->tax,
+                    "discount_percentage"   => $row->discount_percentage,
+                    "dept"                  => $row->dept,
+                    "id_warehouse"          => $row->warehouse_id,
                 ];
                 $this->SalesOrderDetailModel->save($valueBarang);
-                $stok = [
+                /* $stok = [
                     "stok" => ($item['stok'] - $row->qty),
                 ];
-                $this->DetailStockBarang->update($item['id'], $stok);
+                $this->DetailStockBarang->update($item['id'], $stok); */
             }
 
             $this->SalesOrderModel->update($dataSalesOrder, ['qty_barang' => $totalQty]);
@@ -683,10 +690,18 @@ class OrderForm extends BaseController
     public function getAllWarehouse($id_barang)
     {
 
-        $dataWarehouse = $this->DetailStockBarang
+        /* $dataWarehouse = $this->DetailStockBarang
             ->join('warehouses', 'warehouses.id = detail_stok_barang.warehouse_id')
             ->where('barang_id', $id_barang)
             ->where('stok >', 0)
+            ->findAll(); */
+
+        $dataWarehouse = $this->stockDetailModel
+            // ->select()
+            ->join('warehouses', 'warehouses.id = stock_details.warehouse_id')
+            ->where('barang_id', $id_barang)
+            ->where('stock_details.qty >', 0)
+            ->groupBy(['stock_details.barang_id', 'stock_details.warehouse_id'])
             ->findAll();
 
         $data = [
