@@ -320,6 +320,7 @@ class POImportBahanPenolong extends BaseController
                                 'token' => csrf_hash()
                             ];
                             echo json_encode($data);
+                            return;
                         }
                     }
 
@@ -516,6 +517,7 @@ class POImportBahanPenolong extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -537,6 +539,7 @@ class POImportBahanPenolong extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -554,6 +557,7 @@ class POImportBahanPenolong extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
                     }

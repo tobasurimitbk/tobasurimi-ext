@@ -318,6 +318,7 @@ class POImportBahanBaku extends BaseController
                                 'token' => csrf_hash()
                             ];
                             echo json_encode($data);
+                            return;
                         }
                     }
 
@@ -513,6 +514,7 @@ class POImportBahanBaku extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -534,6 +536,7 @@ class POImportBahanBaku extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
 
@@ -551,6 +554,7 @@ class POImportBahanBaku extends BaseController
                                     'token' => csrf_hash()
                                 ];
                                 echo json_encode($data);
+                                return;
                             }
                         }
                     }
