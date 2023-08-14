@@ -275,15 +275,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control Nominal" name="Nominal" id="Nominal" placeholder="Nominal">
-                                <label for="floatingInput">Nominal</label>
+                                <select class="form-select tunjangan_id" name="tunjangan_id" id="tunjangan_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Tunjangan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select nominal" name="nominal" id="nominal">
-                                    <option value=""></option>
-                                </select>
+                                <input onkeyup="formatNumber(this)" type="text" class="form-control Nominal" name="Nominal" id="Nominal" placeholder="Nominal">
                                 <label for="floatingInput">Nominal</label>
                             </div>
                         </div>
@@ -814,12 +814,14 @@
                 dataType: "json",
                 success: function(res) {
                     $(".tunjangan_id").empty()
+                    $(".jabatan_id").val("").change()
                     $(".tunjangan_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
                         $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
                     })
 
                     $(".tunjangan_id").val('').change();
+                    $(".detail-modal").modal("show")
                 }
             })
         })
@@ -1087,6 +1089,14 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
+                        let new_komponen_gaji = [];
+                        komponen_gaji.forEach((item) => {
+                            new_komponen_gaji.push({
+                                "tunjangan_id": item.tunjangan_id,
+                                "nominal": item.nominal
+                            })
+                        })
+                        data.append("komponen_gaji", JSON.stringify(new_komponen_gaji))
                         console.log(data)
                         let id = $(".id").val();
                         // UPDATE
@@ -1460,12 +1470,14 @@
             dataType: "json",
             success: function(res) {
                 $(".tunjangan_id").empty()
+                $(".jabatan_id").val("").change()
                 $(".tunjangan_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
                     $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
                 })
 
                 $(".tunjangan_id").val(tunjangan_id).change();
+                $(".detail-modal").modal("show")
             }
         })
     })
