@@ -239,15 +239,16 @@ class BarangModel extends Model
             'metadata.deletedAt' => null,
             'barangs.type' => $type
         ];
-        // FORMAT(CEILING(barangs.harga_barang), 'N', 'en-us') AS harga_barang,
 
         /* $selectQry = "barangs.*,
         metadata.value AS value, 
+        satuans.kode_satuan AS kode_satuan, 
         ";
 
         $builder = $this->db->table('barangs')
             ->select($selectQry)
-            ->join('metadata', 'metadata.id = barangs.kategori_id');
+            ->join('metadata', 'metadata.id = barangs.kategori_id')
+            ->join('satuans', 'satuans.id = barangs.satuan_id');
         $builder->where($arrCondition)
             ->orderBy('barangs.nama_barang', 'ASC');
         $query = $builder->get();

@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal add-modal" tabindex="-1">
+<div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -231,11 +231,69 @@
                         </div>
                     </div>
                 </form>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive mt-2 mb-3">
+                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Komponen Gaji</th>
+                                <th>Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" tabindex="1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Komponen Gaji</h5>
+            </div>
+            <div class="modal-body">
+                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onkeyup="formatNumber(this)" type="text" class="form-control Nominal" name="Nominal" id="Nominal" placeholder="Nominal">
+                                <label for="floatingInput">Nominal</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select nominal" name="nominal" id="nominal">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Nominal</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -286,6 +344,9 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nip";
     let sortType = "asc";
+
+    let komponen_gaji = [];
+    var row = 0;
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -363,6 +424,45 @@
         }
     });
 
+    var validator_detail = $(".detail-form").validate({
+        rules: {
+            tunjangan_id: {
+                required: true
+            },
+            nominal: {
+                required: true
+            }
+        },
+        messages: {
+            tunjangan_id: {
+                required: "Tunjangan wajib diisi"
+            },
+            nominal: {
+                required: "Nominal wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
     $(document).ready(function() {
         $('.province_id').select2({
             placeholder: "",
@@ -392,6 +492,12 @@
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal .modal-content")
+        })
+
+        $('.tunjangan_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".detail-modal .modal-content")
         })
 
         $(".nik").mask("AAAAAAAAAAAAAAAA", {
@@ -503,6 +609,26 @@
             .css('margin-top', '22px').css('margin-left', '-7px');
 
         $('.jabatan_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        $(".tunjangan_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".tunjangan_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".tunjangan_id")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -674,6 +800,30 @@
 
         $(".phone_no").mask("0000000000000")
 
+        $(".btn-show-detail").click(function() {
+            $(".title-detail-name").text("Tambah")
+            $(".delete-detail").css('display', 'none');
+            $(".id_detail").val('')
+
+            validator_detail.resetForm();
+            validator_detail.reset();
+
+            $.ajax({
+                url: `<?= base_url("tunjangan/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $(".tunjangan_id").empty()
+                    $(".tunjangan_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
+                    })
+
+                    $(".tunjangan_id").val('').change();
+                }
+            })
+        })
+
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".form-pin").css("display", "");
@@ -765,6 +915,10 @@
             })
         })
 
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
+        })
+
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
         })
@@ -773,6 +927,148 @@
 
         $(".search").keyup(function() {
             table.ajax.reload();
+        })
+
+        $(".btn-submit-detail").click(function() {
+            let id = $(".id_detail").val();
+            let tunjangan_id = $(".tunjangan_id option:selected").val();
+            let tunjangan_name = $(".tunjangan_id option:selected").text();
+            let nominal = $(".nominal").val();
+
+            // update detail
+            if (id) {
+                let validate_exist = true;
+
+                komponen_gaji.map(item => {
+                    if (item.row != id) {
+                        if (item.tunjangan_id == tunjangan_id) {
+                            validate_exist = false;
+                        }
+                    }
+                })
+
+                if (validate_exist) {
+                    if ($(".detail-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                let new_komponen_gaji = []
+                                let tag_html = "";
+
+                                row = 0;
+
+                                $(".body-detail-table").empty()
+
+                                komponen_gaji.map(item => {
+                                    if (item.row == id) {
+                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${tunjangan_id}" data-nominal ="${nominal}">`;
+                                        tag_html += "<td>";
+                                        tag_html += tunjangan_name;
+                                        tag_html += "</td>";
+                                        tag_html += "<td>";
+                                        tag_html += nominal;
+                                        tag_html += "</td>";
+                                        tag_html += "</tr>";
+
+                                        new_komponen_gaji.push({
+                                            row: item.row,
+                                            tunjangan_id: tunjangan_id,
+                                            nominal: nominal,
+                                            tunjangan_name: tunjangan_name,
+                                        });
+                                    } else {
+                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-nominal ="${item.nominal}">`;
+                                        tag_html += "<td>";
+                                        tag_html += item.tunjangan_name;
+                                        tag_html += "</td>";
+                                        tag_html += "<td>";
+                                        tag_html += item.nominal;
+                                        tag_html += "</td>";
+                                        tag_html += "</tr>";
+
+                                        new_komponen_gaji.push(item);
+                                    }
+
+                                    row = row + 1;
+                                })
+
+                                komponen_gaji = new_komponen_gaji;
+
+                                $(".body-detail-table").append(tag_html)
+
+                                $(".detail-modal").modal("hide")
+                            }
+                        })
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Company Already Exist',
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+            // create detail
+            else {
+                let validate_exist = true;
+
+                komponen_gaji.map(item => {
+                    if (item.tunjangan_id == tunjangan_id) {
+                        validate_exist = false;
+                    }
+                })
+
+                if (validate_exist) {
+                    if ($(".detail-form").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: 'Simpan Data?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                komponen_gaji.push({
+                                    row: row + 1,
+                                    tunjangan_id: tunjangan_id,
+                                    nominal: nominal,
+                                    tunjangan_name: tunjangan_name,
+                                })
+
+                                let tag_html = "";
+                                tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${tunjangan_id}" data-nominal ="${nominal}">`;
+                                tag_html += "<td>";
+                                tag_html += tunjangan_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += nominal;
+                                tag_html += "</td>";
+                                tag_html += "</tr>";
+                                $(".body-detail-table").append(tag_html)
+                                $(".detail-modal").modal("hide")
+                                row = row + 1;
+                            }
+                        })
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Company Already Exist',
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
         })
 
         $(".btn-submit-form").click(function() {
@@ -1087,6 +1383,92 @@
         })
     })
 
+    $(document).on('show.bs.modal', '.detail-modal', function() {
+        document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
+    })
+
+    $(document).on('hide.bs.modal', '.detail-modal', function() {
+        document.getElementById("add_modal").style = "display: block;";
+        $(".add-modal").css("overflow-y", "auto");
+    })
+
+    $(document).on('click', '.delete-detail', function() {
+        let id = $(".id_detail").val()
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let new_komponen_gaji = []
+                let tag_html = "";
+
+                row = 0;
+
+                $(".body-detail-table").empty()
+
+                komponen_gaji.map(item => {
+                    if (item.row != id) {
+                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                        tag_html += "<td>";
+                        tag_html += item.tunjangan_name;
+                        tag_html += "</td>";
+                        tag_html += "<td>";
+                        tag_html += item.nominal;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_komponen_gaji.push({
+                            ...item,
+                            row: row + 1
+                        });
+
+                        row = row + 1;
+                    }
+                })
+
+                komponen_gaji = new_komponen_gaji;
+
+                $(".body-detail-table").append(tag_html)
+                $(".detail-modal").modal("hide")
+
+                $(".detail-modal").modal("hide")
+            }
+        })
+    })
+
+    $(document).on('click', '.edit-table-detail', function() {
+        $(".title-detail-name").text("Update")
+        $(".delete-detail").css('display', '');
+        let tunjangan_id = $(this).data('tunjanganid')
+        let nominal = $(this).data('nominal')
+        let id = $(this).data('id')
+
+        $(".id_detail").val(id)
+
+        validator_detail.resetForm();
+        validator_detail.reset();
+
+        $.ajax({
+            url: `<?= base_url("tunjangan/dropdown"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".tunjangan_id").empty()
+                $(".tunjangan_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
+                })
+
+                $(".tunjangan_id").val(tunjangan_id).change();
+            }
+        })
+    })
     //change picture
     const previewPhoto = function() {
         let file = document.getElementById("employeeImg").files[0];
