@@ -153,9 +153,10 @@ class SPP extends BaseController
                 "spp_no"        => $data->spp_no,
                 "warehouseName" => $data->warehouseName,
                 "total"         => number_format($data->total),
-                "request_date"  => date('Y-m-d', strtotime($data->request_date)),
+                "request_date"  => date('d/m/Y', strtotime($data->request_date)),
                 "is_posted"     => $data->is_posted,
-                "createdAt"     => date('Y-m-d', strtotime($data->createdAt)),
+                "itemCount"     => $data->itemCount,
+                "createdAt"     => date('d/m/Y', strtotime($data->createdAt)),
             ]);
         }
 
@@ -215,9 +216,9 @@ class SPP extends BaseController
                 $WarehousesModel = new WarehousesModel();
                 $dataWarehouse = $WarehousesModel->find($insertData["warehouse_id"]);
 
-                if ($insertData["spp_no"] === "") {
-                    $insertData["spp_no"] = $SppModel->generateNoSpp($dataWarehouse["warehouse_name"]);
-                }
+                // if ($insertData["spp_no"] === "") {
+                //     $insertData["spp_no"] = $SppModel->generateNoSpp($dataWarehouse["warehouse_name"]);
+                // }
 
 
                 $payload = json_encode($insertData);
@@ -316,9 +317,9 @@ class SPP extends BaseController
                 $WarehousesModel = new WarehousesModel();
                 $dataWarehouse = $WarehousesModel->find($insertData["warehouse_id"]);
 
-                if ($insertData["spp_no"] === "") {
-                    $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
-                }
+                // if ($insertData["spp_no"] === "") {
+                //     $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
+                // }
 
                 if ($insertData) {
                     $SppModel->update($id, $insertData);
@@ -454,6 +455,28 @@ class SPP extends BaseController
             ];
             echo json_encode($data);
         }
+        return;
+    }
+
+    public function generateSPP()
+    {
+        $warehouse_name = $this->request->getGet("warehouse_name");
+        $response = $this->SppModel->generateNoSpp($warehouse_name);
+        if ($response) {
+            $data = [
+                "status"  => true,
+                "data"  => $response,
+            ];
+            echo json_encode($data);
+        } else {
+            $message = 'Gagal Auto Generate';
+            $data = [
+                "status" => false,
+                "message"  => $message
+            ];
+            echo json_encode($data);
+        }
+
         return;
     }
 

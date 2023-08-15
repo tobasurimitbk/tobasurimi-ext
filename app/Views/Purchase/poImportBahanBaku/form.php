@@ -843,7 +843,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("po-import-bahan-baku"); ?>";
                                     })
                             } else {
                                 Swal.fire({
@@ -1097,7 +1097,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("po-import-bahan-baku"); ?>";
                                     })
                             } else {
                                 Swal.fire({
@@ -1214,7 +1214,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + id;
+                                                    window.location.href = "<?= base_url("po-import-bahan-baku"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -1257,7 +1257,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("po-import-bahan-baku"); ?>" + "/id/" + +response.id;
+                                                    window.location.href = "<?= base_url("po-import-bahan-baku"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({

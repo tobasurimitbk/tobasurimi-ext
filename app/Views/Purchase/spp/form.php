@@ -58,53 +58,7 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? ($dataSPP->request_date ? date("d/m/Y", strtotime($dataSPP->request_date)) : "") : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
-                                    <label for="floatingInput">Tanggal Order</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-request-date"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataSPP) ? $dataSPP->createdByName : session()->get("login")->name; ?>">
-                            <label for="floatingInput">Order Oleh</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
-                                <option value="Bahan Penolong Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Lokal" ? "selected" : "") : ""; ?>>Bahan Penolong Lokal</option>
-                                <option value="Bahan Penolong Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Import" ? "selected" : "") : ""; ?>>Bahan Penolong Import</option>
-                                <option value="Bahan Baku Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Baku Import" ? "selected" : "") : ""; ?>>Bahan Baku Import</option>
-                                <option value="Bahan Baku Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Baku Lokal" ? "selected" : "") : ""; ?>>Bahan Baku Lokal</option>
-                            </select>
-
-                            <label for="floatingInput">Tipe SPP</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
-                                    <label for="floatingInput">No. SPP</label>
-                                </div>
-                                <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            <select onchange="changeDepartment()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataWarehouse)) {
@@ -121,8 +75,54 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker request_date" value="<?= !empty($dataSPP) ? ($dataSPP->request_date ? date("d/m/Y", strtotime($dataSPP->request_date)) : "") : ""; ?>" id="request_date" name="request_date" placeholder="Tanggal Order">
+                                    <label for="floatingInput">Tanggal Order</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-request-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control spp_no" id="spp_no" name="spp_no" placeholder="No. SPP" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <label for="floatingInput">No. SPP</label>
+                                </div>
+                                <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
+                                <option value="Bahan Penolong Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Lokal" ? "selected" : "") : ""; ?>>Bahan Penolong Lokal</option>
+                                <option value="Bahan Penolong Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Penolong Import" ? "selected" : "") : ""; ?>>Bahan Penolong Import</option>
+                                <option value="Bahan Baku Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Baku Import" ? "selected" : "") : ""; ?>>Bahan Baku Import</option>
+                                <option value="Bahan Baku Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Bahan Baku Lokal" ? "selected" : "") : ""; ?>>Bahan Baku Lokal</option>
+                            </select>
+
+                            <label for="floatingInput">Tipe SPP</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input value="<?= !empty($dataSPP) ? $dataSPP->note : ""; ?>" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataSPP) ? $dataSPP->createdByName : session()->get("login")->name; ?>">
+                            <label for="floatingInput">Order Oleh</label>
                         </div>
                     </div>
                 </div>
@@ -622,7 +622,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("spp"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("spp"); ?>";
                                     })
                             } else {
                                 Swal.fire({
@@ -746,7 +746,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("spp"); ?>" + "/id/" + id;
+                                                    window.location.href = "<?= base_url("spp"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -790,7 +790,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("spp"); ?>" + "/id/" + response.id;
+                                                    window.location.href = "<?= base_url("spp"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -1691,12 +1691,43 @@
         window.open(url, "_blank");
     }
 
+    const changeDepartment = function() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
+
+        if (value) {
+            $(".spp_no").attr("readonly", true);
+
+            $.ajax({
+                url: `<?= base_url("spp/generate"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    warehouse_name: $(".warehouse_id option:selected").text()
+                },
+                success: function(res) {
+                    $(".spp_no").val(res?.data);
+                }
+            })
+        } 
+    }
+
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
 
         if (value) {
             $(".spp_no").attr("readonly", true);
-            $(".spp_no").val("AUTO GENERATE");
+
+            $.ajax({
+                url: `<?= base_url("spp/generate"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    warehouse_name: $(".warehouse_id option:selected").text()
+                },
+                success: function(res) {
+                    $(".spp_no").val(res?.data);
+                }
+            })
         } else {
             $(".spp_no").attr("readonly", false);
             $(".spp_no").val("");

@@ -1167,7 +1167,7 @@ var validator_detail = $(".detail-form").validate({
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("penerimaan-barang-import"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("penerimaan-barang-import"); ?>";
                                     })
                             } else {
                                 Swal.fire({
@@ -1348,7 +1348,7 @@ var validator_detail = $(".detail-form").validate({
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("penerimaan-barang-import"); ?>" + "/id/" + id;
+                                                    window.location.href = "<?= base_url("penerimaan-barang-import"); ?>";
                                                 })
                                             } else {
                                                 Swal.fire({
@@ -1433,7 +1433,7 @@ var validator_detail = $(".detail-form").validate({
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("penerimaan-barang-import"); ?>" + "/id/" + response.id;
+                                                    window.location.href = "<?= base_url("penerimaan-barang-import"); ?>";
                                                 })
                                             } else {
                                                 Swal.fire({
