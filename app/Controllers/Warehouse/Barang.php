@@ -221,113 +221,97 @@ class Barang extends BaseController
                 return;
             }
 
-            if ($this->validate($rules)) {
-                $id = $this->request->getPost("id");
+            $id = $this->request->getPost("id");
+            $productSpec = $this->request->getPost('productSpec');
+            $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
 
-                $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
-                if ($parent) {
-                    $payload = [
-                        "type" => $this->request->getPost("type"),
-                        "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                        "company_id" => $this->this_company_id,
-                        "nama_barang" => $this->request->getPost("nama_barang"),
-                        "harga_barang" => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                        "satuan_id" => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                        "kategori_id" => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                        "hs_id" => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                        "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                        "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                        "stok" => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                        "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                        "spek" => $this->request->getPost("spek")
-                    ];
-                } else {
-                    $payload = [
-                        "company_id" => $this->this_company_id,
-                        "nama_barang" => $this->request->getPost("nama_barang"),
-                        "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    ];
-                }
+            $barangData = $this->barangModel->asObject()
+                ->find($id);
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $payload,
-                //     "payload"   => $payload,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
-
-                $condition = [
-                    'id' => $id
-                ];
-
-                $response = $this->barangModel->where($condition)->set($payload)->update();
-
-                $supplier_id = json_decode($this->request->getPost("supplier_id"));
-
-                if ($response) {
-                    $responseDelete =  $this->barangSupplierModel->deleteByBarangId($id);
-
-                    if ($responseDelete) {
-                        foreach ($supplier_id as $item) {
-                            $payload_supplier = [
-                                "barang_id" => $id,
-                                "supplier_id" => $item
-                            ];
-                            $responseSupplier =  $this->barangSupplierModel->insert($payload_supplier);
-
-                            if (!$responseSupplier) {
-                                $message =  'Data Gagal Diubah';
-                                $data = [
-                                    "status"            => false,
-                                    "message"    => $message,
-                                    "payload"   => $payload_supplier,
-                                    'token' => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
-
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil diubah",
-                            "payload"   => $payload,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $data = [
-                            "status"            => false,
-                            "message"    => "Data Gagal Diubah",
-                            "payload"   => $payload,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $message = 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
+            if (empty($barangData)) {
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => 'Barang Tidak ditemukan',
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
+
+            if ($barangData->spec_type == 'single' && $productSpec == 'multi' && empty($parent)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Not Allowed',
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            if ($parent) {
+                $payload = [
+                    "spec_type"     => $productSpec,
+                    "parent_id"     => $parent,
+                    "type"          => $this->request->getPost("type"),
+                    "supplier_id"   => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "company_id"    => $this->this_company_id,
+                    "nama_barang"   => $this->request->getPost("nama_barang"),
+                    "harga_barang"  => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                    "satuan_id"     => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                    "kategori_id"   => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                    "hs_id"         => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
+                    "ap_id"         => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id"         => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "stok"          => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    "status"        => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                    "spek"          => $this->request->getPost("spek")
+                ];
+            } else {
+                $payload = [
+                    "spec_type"     => $productSpec,
+                    "parent_id"     => 0,
+                    "company_id"    => $this->this_company_id,
+                    "nama_barang"   => $this->request->getPost("nama_barang"),
+                    "status"        => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                ];
+            }
+
+            $condition = [
+                'id' => $id
+            ];
+
+            $this->barangModel->db->transException(true)->transStart();
+            
+            $this->barangModel->where($condition)->set($payload)
+                ->update();
+
+            $supplier_id = json_decode($this->request->getPost("supplier_id"));
+
+            $this->barangSupplierModel->deleteByBarangId($id);
+
+            foreach ($supplier_id as $item) {
+                $payload_supplier = [
+                    "barang_id" => $id,
+                    "supplier_id" => $item
+                ];
+                $this->barangSupplierModel->insert($payload_supplier);
+            }
+
+            $this->barangModel->db->transComplete();
+
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil diubah",
+                "payload"   => $payload,
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            
         } catch (\Exception $e) {
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
             ];
             echo json_encode($data);
         }
