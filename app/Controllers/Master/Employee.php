@@ -451,10 +451,23 @@ class Employee extends BaseController
                     }
                 }
 
-                dd($values);
-
                 if (isset($values)) {
                     if ($this->EmployeesModel->update($id, $values)) {
+                        foreach ($values["komponen_gaji"] as $value) {
+                            if (!empty($value->isDeleted)) {
+                                $this->GajiConjunctionModel->where('id', $value->id)->delete();
+                            }
+
+                            $dataDetail = [
+                                "id" => $value->id ?? null,
+                                "employee_id" => $this->request->getPost("id"),
+                                "tunjangan_id" => $value->tunjangan_id,
+                                "nominal" => $value->nominal,
+                            ];
+
+                            $this->GajiConjunctionModel->upsert($dataDetail);
+                        }
+
                         $data = [
                             "status"    => true,
                             "message"   => "Data Berhasil diubah",
@@ -512,6 +525,8 @@ class Employee extends BaseController
 
             $res = (object) $res[0];
 
+            $res->employee_img = $res->employee_img ? $res->employee_img : "";
+
             $res->komponen_gaji = $data;
 
             if ($res) {
@@ -550,6 +565,7 @@ class Employee extends BaseController
                 ];
                 $UserModel->where('employee_id', $id)->delete();
                 if ($this->EmployeesModel->update($id, $values)) {
+                    $this->GajiConjunctionModel->where('employee_id', $id)->delete();
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",

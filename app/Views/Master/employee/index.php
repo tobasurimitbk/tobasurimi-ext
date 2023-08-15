@@ -283,7 +283,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
+                                <input type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
                                 <label for="floatingInput">Nominal</label>
                             </div>
                         </div>
@@ -950,9 +950,9 @@
 
                 komponen_gaji.map(item => {
                     if (item.row != id) {
-                        if (item.tunjangan_id == tunjangan_id) {
-                            validate_exist = false;
-                        }
+                        // if (item.tunjangan_id == tunjangan_id) {
+                        //     validate_exist = false;
+                        // }
                     }
                 })
 
@@ -989,12 +989,13 @@
 
                                         new_komponen_gaji.push({
                                             row: item.row,
+                                            id: item.id,
                                             tunjangan_id: tunjangan_id,
                                             nominal: nominal,
                                             tunjangan_name: tunjangan_name,
                                         });
                                     } else {
-                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-nominal ="${item.nominal}">`;
+                                        tag_html += `<tr class="edit-table-detail" data-row ="${row+1}" data-id ="${item.id}" data-tunjanganid ="${item.tunjangan_id}" data-nominal ="${item.nominal}">`;
                                         tag_html += "<td>";
                                         tag_html += item.tunjangan_name;
                                         tag_html += "</td>";
@@ -1030,9 +1031,9 @@
                 let validate_exist = true;
 
                 komponen_gaji.map(item => {
-                    if (item.tunjangan_id == tunjangan_id) {
-                        validate_exist = false;
-                    }
+                    // if (item.tunjangan_id == tunjangan_id) {
+                    //     validate_exist = false;
+                    // }
                 })
 
                 if (validate_exist) {
@@ -1050,6 +1051,7 @@
                             if (result.isConfirmed) {
                                 komponen_gaji.push({
                                     row: row + 1,
+                                    id: id,
                                     tunjangan_id: tunjangan_id,
                                     nominal: nominal,
                                     tunjangan_name: tunjangan_name,
@@ -1100,7 +1102,8 @@
                         let id = $(".id").val();
                         komponen_gaji.forEach((item) => {
                             new_komponen_gaji.push({
-                                "employee_id": id === "" ? id : null,
+                                "id": item.id,
+                                "employee_id": item.employee_id,
                                 "tunjangan_id": item.tunjangan_id,
                                 "nominal": item.nominal
                             })
@@ -1310,9 +1313,7 @@
                         let tag_html = "";
 
                         res?.data?.komponen_gaji.map((item) => {
-                            console.log(item, "rerererer")
-
-                            tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                            tag_html += `<tr class="edit-table-detail" data-row ="${row + 1}" data-id ="${item.id}" data-employeeid = "${item.employee_id}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
                             tag_html += "<td>";
                             tag_html += item.tunjangan_name;
                             tag_html += "</td>";
@@ -1328,6 +1329,8 @@
 
                             row = row + 1;
                         })
+
+                        $(".body-detail-table").append(tag_html)
 
                         // AJAX GET CITY
                         $.ajax({
@@ -1459,7 +1462,7 @@
 
                 komponen_gaji.map(item => {
                     if (item.row != id) {
-                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                        tag_html += `<tr class="edit-table-detail" data-row ="${row + 1}" data-id ="${item.id}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
                         tag_html += "<td>";
                         tag_html += item.tunjangan_name;
                         tag_html += "</td>";
