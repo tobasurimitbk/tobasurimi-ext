@@ -68,13 +68,15 @@ class SppModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "purchase_requests.*,
-                        warehouses.warehouse_name AS warehouseName
-                        ";
+                    warehouses.warehouse_name AS warehouseName, 
+                    COUNT(purchase_request_details.id) AS itemCount";
 
         $purchaseRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
+            ->join('purchase_request_details', 'purchase_requests.id = purchase_request_details.purchase_request_id', 'left')
+            ->groupBy(('purchase_request_details.id'))
             ->orderBy($sort, $sortType);
 
         $totalData = $purchaseRequestsDataQry->countAllResults(false);

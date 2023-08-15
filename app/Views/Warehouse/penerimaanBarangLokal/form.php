@@ -1303,7 +1303,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
                                     })
                             } else {
                                 Swal.fire({
@@ -1484,7 +1484,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + id;
+                                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
                                                 })
                                             } else {
                                                 Swal.fire({
@@ -1569,7 +1569,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>" + "/id/" + response.id;
+                                                    window.location.href = "<?= base_url("penerimaan-barang-lokal"); ?>";
                                                 })
                                             } else {
                                                 Swal.fire({

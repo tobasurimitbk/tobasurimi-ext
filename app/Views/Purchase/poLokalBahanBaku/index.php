@@ -41,7 +41,7 @@
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplier')" class="sort">Supplier</th>
-                            <th onclick="changeSort('itemCount')">Jumlah Order</th>
+                            <th>Jumlah Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
                             <th>Actions</th>
                         </tr>
@@ -112,7 +112,9 @@
         },
         {
             data: "itemCount",
-            className: "text-center"
+            className: "text-center",
+            searchable: false,
+            sortable: false,
         },
         {
             data: "status_penerimaan",

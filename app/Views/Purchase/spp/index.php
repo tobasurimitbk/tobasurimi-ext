@@ -63,9 +63,10 @@
                                 <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
                                 <th onclick="changeSort('warehouse')" class="sort">Departemen</th>
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
+                                <th>Jumlah Order</th>
                                 <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
                                 <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
-                                <th>Posting</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -149,6 +150,12 @@
                 className: "text-center"
             },
             {
+                data: "itemCount",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+            },
+            {
                 data: "request_date",
                 className: "text-center"
             },
@@ -167,17 +174,20 @@
                     if (status !== "1") {
                         return `
                             <div class="mt-0">
+                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
                                 <button onclick="postingSpp(${id})" class="btn btn-success posting-spp">
-                                    Posting
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
                             </div>
                         `
                     } else {
                         return `
                             <div class="mt-0">
-                                <label>
-                                    Posted
-                                </label>
+                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
                             </div>
                         `
                     }
@@ -483,6 +493,11 @@
     //         });
     //     }
     // }
+
+    const print = function(url) 
+    {
+        window.open(url, "_blank");
+    }
 
     const pdf = function(url) {
         let search = $(".search").val();

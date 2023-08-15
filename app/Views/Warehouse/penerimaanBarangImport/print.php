@@ -159,7 +159,7 @@
                 <th class="txt-left" style="padding-left: 5px; width: 30px;">Satuan</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">@ Rp</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">Jumlah</th>
-                <th class="txt-left" style="padding-left: 5px; width: 150px;">Ket. PO</th>
+                <th class="txt-left" style="padding-left: 5px; width: 150px;">No. SPP</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">Keterangan</th>
             </tr>
             
@@ -183,7 +183,7 @@
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["sub_total"], "STR_TO_INT")); ?></td>
-                <td class="txt-left" style="padding-left: 5px;"><?= $detail["po_no"]; ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= $detail["spp_no"]; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["keterangan"]; ?></td>
             </tr>
             <?php } ?>
