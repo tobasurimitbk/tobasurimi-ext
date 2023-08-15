@@ -422,6 +422,7 @@
 
             list_items.push({
                 id: <?= $details["id"]; ?>,
+                purchase_request_detail_id: <?= $details["purchase_request_detail_id"]; ?>,
                 row: row,
                 barang_id: '<?= $details["barang_id"]; ?>',
                 kode_barang: '<?= $details["kode_barang"]; ?>',
@@ -701,6 +702,7 @@
 
                                 list_items.push({
                                     id: "",
+                                    purchase_request_detail_id: item.id ? Number(item.id) : 0,
                                     row: row + 1,
                                     barang_id: item.barang_id ? Number(item.barang_id) : 0,
                                     kode_barang: item.kodeBarang,
@@ -1161,6 +1163,7 @@
                                 if (obj.id) {
                                     update_list_items.push({
                                         id: obj.id ? Number(obj.id) : 0,
+                                        purchase_request_detail_id: obj.purchase_request_detail_id ? Number(obj.purchase_request_detail_id) : 0,
                                         item_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                         item_code: obj.kode_barang,
                                         item_name: obj.nama_barang,
@@ -1176,6 +1179,7 @@
                                 } else {
                                     update_list_items.push({
                                         id: "",
+                                        purchase_request_id: obj.purchase_request_detail_id ? Number(obj.purchase_request_detail_id) : 0,
                                         item_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                         item_code: obj.kode_barang,
                                         item_name: obj.nama_barang,
