@@ -14,7 +14,12 @@ class GajiConjunctionModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = [
+        "id",
+        "employee_id",
+        "tunjangan_id",
+        "nominal"
+    ];
 
     // Dates
     protected $useTimestamps = false;
@@ -39,4 +44,19 @@ class GajiConjunctionModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getKomponenByEmployeeId($id)
+    {
+        $arrCondition = [
+            'gaji_conjunction.employee_id' => $id
+        ];
+
+        $builder = $this->db->table('gaji_conjunction')
+            ->select('gaji_conjunction.*, tunjangan.name AS tunjangan_name')
+            ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }

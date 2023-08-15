@@ -5,7 +5,9 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
+use App\Models\GajiConjunctionModel;
 use App\Models\UserModel;
+use App\Models\TunjanganModel;
 
 class Employee extends BaseController
 {
@@ -13,7 +15,9 @@ class Employee extends BaseController
     protected $this_company_id;
     protected $ProvincesModel;
     protected $EmployeesModel;
+    protected $GajiConjunctionModel;
     protected $UserModel;
+    protected $TunjanganModel;
 
     public function __construct()
     {
@@ -21,7 +25,9 @@ class Employee extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->ProvincesModel = new ProvincesModel();
         $this->EmployeesModel = new EmployeesModel();
+        $this->GajiConjunctionModel = new GajiConjunctionModel();
         $this->UserModel = new UserModel();
+        $this->TunjanganModel = new TunjanganModel();
     }
 
     public function employee()
@@ -44,23 +50,19 @@ class Employee extends BaseController
         // employee with user when user deleted
         $secondDataEmployee = $this->EmployeesModel->getEmployeesUserDelete($this->this_company_id);
 
-        if($secondDataEmployee)
-        {
-            foreach($secondDataEmployee as $item)
-            {
+        if ($secondDataEmployee) {
+            foreach ($secondDataEmployee as $item) {
                 array_push($dataEmployee, $item);
-            }   
+            }
         }
 
         $finalDataEmployee = [];
 
-        foreach($dataEmployee as $item)
-        {
+        foreach ($dataEmployee as $item) {
             // check employee with user when user not deleted
-            $check = $this->UserModel->countUserByEmployeeId($item["id"]);
+            $check = $this->TunjanganModel->countUserByEmployeeId($item["id"]);
 
-            if($check < 1)
-            {
+            if ($check < 1) {
                 array_push($finalDataEmployee, $item);
             }
         }
@@ -231,7 +233,8 @@ class Employee extends BaseController
                     "jabatan_id" => $this->request->getPost("jabatan_id"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
-                    "pin"  => $this->request->getPost("pin")
+                    "pin"  => $this->request->getPost("pin"),
+                    "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
                 ];
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
@@ -241,8 +244,18 @@ class Employee extends BaseController
                     }
                 }
 
+                // var_dump($values);
+                // die;
+
                 if (isset($values)) {
-                    if ($this->EmployeesModel->insert($values)) {
+                    $insert = $this->EmployeesModel->insert($values);
+                    foreach ($values["komponen_gaji"] as $value) {
+                        $value->employee_id = $insert;
+                    }
+
+                    $this->GajiConjunctionModel->insertBatch($values["komponen_gaji"]);
+
+                    if ($insert) {
                         $data = [
                             "status"            => true,
                             "message"   => "Data Berhasil disimpan",
@@ -427,6 +440,7 @@ class Employee extends BaseController
                     "acc_no" => $this->request->getPost("acc_no"),
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
+                    "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
                 ];
                 $file = $this->request->getFile("employeeImg");
                 if (!empty($file->getName())) {
@@ -436,6 +450,8 @@ class Employee extends BaseController
                         $values["employee_img"] = $image;
                     }
                 }
+
+                dd($values);
 
                 if (isset($values)) {
                     if ($this->EmployeesModel->update($id, $values)) {
@@ -492,10 +508,16 @@ class Employee extends BaseController
             $res[0]["join_date"] = date("d/m/Y", strtotime($res[0]["join_date"]));
             $res[0]["dob"] = date("d/m/Y", strtotime($res[0]["dob"]));
             //            $response = curl_request("GET", "/employees/$id?idCompany=$this->this_company_id", $this->token);
-            if (count($res)) {
+            $data = $this->GajiConjunctionModel->getKomponenByEmployeeId($id);
+
+            $res = (object) $res[0];
+
+            $res->komponen_gaji = $data;
+
+            if ($res) {
                 $data = [
                     "status"  => true,
-                    "data"  => (object) $res[0],
+                    "data"  => $res,
                 ];
                 echo json_encode($data);
             } else {
