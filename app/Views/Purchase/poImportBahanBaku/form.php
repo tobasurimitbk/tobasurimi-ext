@@ -1179,7 +1179,7 @@
                                 } else {
                                     update_list_items.push({
                                         id: "",
-                                        purchase_request_id: obj.purchase_request_detail_id ? Number(obj.purchase_request_detail_id) : 0,
+                                        purchase_request_detail_id: obj.purchase_request_detail_id ? Number(obj.purchase_request_detail_id) : 0,
                                         item_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                         item_code: obj.kode_barang,
                                         item_name: obj.nama_barang,
