@@ -283,7 +283,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
+                                <input type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
                                 <label for="floatingInput">Nominal</label>
                             </div>
                         </div>
@@ -950,9 +950,9 @@
 
                 komponen_gaji.map(item => {
                     if (item.row != id) {
-                        if (item.tunjangan_id == tunjangan_id) {
-                            validate_exist = false;
-                        }
+                        // if (item.tunjangan_id == tunjangan_id) {
+                        //     validate_exist = false;
+                        // }
                     }
                 })
 
@@ -1031,9 +1031,9 @@
                 let validate_exist = true;
 
                 komponen_gaji.map(item => {
-                    if (item.tunjangan_id == tunjangan_id) {
-                        validate_exist = false;
-                    }
+                    // if (item.tunjangan_id == tunjangan_id) {
+                    //     validate_exist = false;
+                    // }
                 })
 
                 if (validate_exist) {

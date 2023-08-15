@@ -525,6 +525,8 @@ class Employee extends BaseController
 
             $res = (object) $res[0];
 
+            $res->employee_img = $res->employee_img ? $res->employee_img : "";
+
             $res->komponen_gaji = $data;
 
             if ($res) {
