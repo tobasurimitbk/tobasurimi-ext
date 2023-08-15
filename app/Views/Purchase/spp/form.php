@@ -17,15 +17,6 @@
                     Print
                 </button>
 
-                <?php if ($dataSPP->is_posted === "0") {
-                ?>
-                    <button class="btn btn-success posting-spp">
-                        Posting
-                    </button>
-                <?php
-                }
-                ?>
-
             <?php } ?>
 
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("spp"); ?>">

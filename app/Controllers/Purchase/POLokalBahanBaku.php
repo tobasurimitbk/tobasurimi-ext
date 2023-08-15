@@ -116,6 +116,7 @@ class POLokalBahanBaku extends BaseController
                 "no"            => $no++,
                 "id"            => $data->id,
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
+                "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
@@ -371,6 +372,24 @@ class POLokalBahanBaku extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $spp = $this->request->getPost("spp");
+
+            // spp close
+            $responsespp = $this->SppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
+
+            if(!$responsespp)
+            {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Gagal close SPP",
+                    "payload"   => "",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            // po posting
 
             $payload = [
                 "is_posted" => "1"

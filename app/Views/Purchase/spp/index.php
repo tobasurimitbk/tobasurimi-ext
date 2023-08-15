@@ -170,27 +170,14 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
-                    let status = row?.is_posted
-                    if (status !== "1") {
-                        return `
-                            <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                                <button onclick="postingSpp(${id})" class="btn btn-success posting-spp">
-                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                        `
-                    } else {
-                        return `
-                            <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                        `
-                    }
+                    
+                    return `
+                        <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    `
                 }
             },
             // {
@@ -289,60 +276,60 @@
         })
     })
 
-    const postingSpp = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Yakin akan di Posting?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Posting',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("spp/update-status"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                });
-            }
-        })
-    }
+    // const postingSpp = function(id) {
+    //     Swal.fire({
+    //         icon: 'question',
+    //         title: 'Yakin akan di Posting?',
+    //         confirmButtonColor: '#4e73df',
+    //         cancelButtonColor: '#d33',
+    //         showCancelButton: true,
+    //         reverseButtons: true,
+    //         confirmButtonText: 'Posting',
+    //         cancelButtonText: 'Batal',
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             const csrf = $(`[name="${csrfToken}"]`);
+    //             $.ajax({
+    //                 url: "<?= base_url("spp/update-status"); ?>",
+    //                 data: {
+    //                     id: id
+    //                 },
+    //                 beforeSend: function(xhr) {
+    //                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //                 },
+    //                 method: "POST",
+    //                 dataType: "json",
+    //                 success: function(response) {
+    //                     csrf.val(response.token);
+    //                     if (response.status) {
+    //                         Swal.fire({
+    //                                 icon: 'success',
+    //                                 title: response.message,
+    //                                 confirmButtonColor: '#4e73df',
+    //                             })
+    //                             .then(() => {
+    //                                 table.ajax.reload()
+    //                             })
+    //                     } else {
+    //                         Swal.fire({
+    //                             icon: 'error',
+    //                             title: response.message,
+    //                             confirmButtonColor: '#4e73df',
+    //                         })
+    //                     }
+    //                 },
+    //                 onError: function(response) {
+    //                     csrf.val(response.token);
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: 'Data Gagal Disimpan, coba Lagi',
+    //                         confirmButtonColor: '#4e73df',
+    //                     })
+    //                 }
+    //             });
+    //         }
+    //     })
+    // }
 
     // const approveHeadWarehouse = function(id) {
     //     const csrf = $(`[name="${csrfToken}"]`);
