@@ -44,7 +44,7 @@
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
                             <th onclick="changeSort('currencyName')" class="sort">Valas</th>
-                            <th onclick="changeSort('itemCount')">Jumlah Order</th>
+                            <th>Jumlah Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
                             <th>Posting</th>
                         </tr>
@@ -124,7 +124,9 @@
         },
         {
             data: "itemCount",
-            className: "text-center"
+            className: "text-center",
+            searchable: false,
+            sortable: false,
         },
         {
             data: "status_penerimaan",

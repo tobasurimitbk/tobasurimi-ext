@@ -191,6 +191,7 @@ $routes->get('/spp', 'Purchase\SPP::spp', ['filter' => 'Auth']);
 $routes->get('/spp/all', 'Purchase\SPP::allSPP', ['filter' => 'Auth']);
 $routes->get('/spp/id/(:segment)', 'Purchase\SPP::getByIdSPP/$1', ['filter' => 'Auth']);
 $routes->get('/spp/ajax', 'Purchase\SPP::getByIdSPPAjax', ['filter' => 'Auth']);
+$routes->get('/spp/generate', 'Purchase\SPP::generateSPP', ['filter' => 'Auth']);
 $routes->get('/spp/create', 'Purchase\SPP::createSPP', ['filter' => 'Auth']);
 $routes->post('/spp/save', 'Purchase\SPP::saveSPP', ['filter' => 'Auth']);
 $routes->post('/spp/update', 'Purchase\SPP::updateSPP', ['filter' => 'Auth']);
