@@ -257,9 +257,11 @@ class BarangModel extends Model
 
         $selectQry = "barangs.*,
         metadata.value AS value, 
+        satuans.nama_satuan AS nama_satuan, 
         ";
         $data = $this->select($selectQry)
             ->join('metadata', 'metadata.id = barangs.kategori_id')
+            ->join('satuans', 'satuans.id = barangs.satuan_id')
             ->where($arrCondition)
             ->groupStart()
                 ->groupStart()
