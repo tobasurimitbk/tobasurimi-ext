@@ -995,7 +995,7 @@
                                             tunjangan_name: tunjangan_name,
                                         });
                                     } else {
-                                        tag_html += `<tr class="edit-table-detail" data-row ="${row+1}" data-id ="${item.id}" data-tunjanganid ="${item.tunjangan_id}" data-nominal ="${item.nominal}">`;
+                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-nominal ="${item.nominal}">`;
                                         tag_html += "<td>";
                                         tag_html += item.tunjangan_name;
                                         tag_html += "</td>";
@@ -1313,7 +1313,7 @@
                         let tag_html = "";
 
                         res?.data?.komponen_gaji.map((item) => {
-                            tag_html += `<tr class="edit-table-detail" data-row ="${row + 1}" data-id ="${item.id}" data-employeeid = "${item.employee_id}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                            tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-employeeid = "${item.employee_id}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
                             tag_html += "<td>";
                             tag_html += item.tunjangan_name;
                             tag_html += "</td>";
@@ -1462,7 +1462,7 @@
 
                 komponen_gaji.map(item => {
                     if (item.row != id) {
-                        tag_html += `<tr class="edit-table-detail" data-row ="${row + 1}" data-id ="${item.id}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
                         tag_html += "<td>";
                         tag_html += item.tunjangan_name;
                         tag_html += "</td>";
