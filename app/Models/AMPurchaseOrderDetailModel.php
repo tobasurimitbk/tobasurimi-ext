@@ -17,6 +17,7 @@ class AMPurchaseOrderDetailModel extends Model
     protected $allowedFields    = [
         'id',
         'am_purchase_order_id',
+        'purchase_request_detail_id',
         'barang_id',
         'item_desc',
         'spec',

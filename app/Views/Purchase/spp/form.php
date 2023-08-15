@@ -847,6 +847,7 @@
                         })
 
                         $(".kode_barang").val("").change();
+                        $(".detail-modal").modal("show");
                     }
                 })
             } else if ($(".spp_type option:selected").val() === "Bahan Penolong Lokal" || $(".spp_type option:selected").val() === "Bahan Penolong Import") {

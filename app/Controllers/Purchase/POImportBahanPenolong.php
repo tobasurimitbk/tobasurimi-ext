@@ -298,6 +298,7 @@ class POImportBahanPenolong extends BaseController
 
                         $detailPayload = [
                             'am_purchase_order_id' => $response,
+                            'purchase_request_detail_id' => $data->purchase_request_detail_id,
                             'barang_id' =>$barang_id,
                             'spec' => $data->spec,
                             'note' => $data->note,

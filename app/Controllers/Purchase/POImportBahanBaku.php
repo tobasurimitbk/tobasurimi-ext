@@ -296,6 +296,7 @@ class POImportBahanBaku extends BaseController
 
                         $detailPayload = [
                             'rm_import_po_id' => $response,
+                            'purchase_request_detail_id' => $data->purchase_request_detail_id,
                             'barang_id' =>$barang_id,
                             'spec' => $data->spec,
                             'note' => $data->note,
