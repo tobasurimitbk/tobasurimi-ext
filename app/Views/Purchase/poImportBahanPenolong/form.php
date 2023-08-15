@@ -60,6 +60,7 @@
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPOImport) ? $dataPOImport->id : ""; ?>" />
+                <input type="hidden" class="spp" name="spp" id="spp" value="<?= !empty($dataPOImport) ? $dataPOImport->purchase_request_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-3">
@@ -1082,10 +1083,12 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
+                    let spp = $(".spp").val();
                     $.ajax({
                         url: "<?= base_url("po-import-bahan-penolong/update-status"); ?>",
                         data: {
-                            id: $(".id").val()
+                            id: $(".id").val(),
+                            spp: spp
                         },
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());

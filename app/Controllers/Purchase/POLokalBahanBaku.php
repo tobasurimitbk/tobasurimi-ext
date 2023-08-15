@@ -116,6 +116,7 @@ class POLokalBahanBaku extends BaseController
                 "no"            => $no++,
                 "id"            => $data->id,
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
+                "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
@@ -149,9 +150,11 @@ class POLokalBahanBaku extends BaseController
             ];
 
             if ($this->validate($rules)) {
+                $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
+
                 $insertData = [
                     "company_id" => $this->this_company_id,
-                    "purchase_request_id"   => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
+                    "purchase_request_id"   => $purchase_request_id,
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "pph" => $this->request->getPost("pph"),
@@ -163,6 +166,22 @@ class POLokalBahanBaku extends BaseController
                     "createdBy" => session()->get("login")->user_id,
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
+
+                // spp number cannot be used again
+                $responsespp = $this->SppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
+
+                if(!$responsespp)
+                {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "No. SPP gagal di close",
+                        "payload"   => "",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+                
 
                 $insertData["po_no"] = $this->RMPurchaseOrderModel->generateNoPo();
 
@@ -353,6 +372,24 @@ class POLokalBahanBaku extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $spp = $this->request->getPost("spp");
+
+            // spp close
+            $responsespp = $this->SppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
+
+            if(!$responsespp)
+            {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Gagal close SPP",
+                    "payload"   => "",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            // po posting
 
             $payload = [
                 "is_posted" => "1"

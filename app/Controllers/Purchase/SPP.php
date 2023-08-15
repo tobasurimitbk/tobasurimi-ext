@@ -196,7 +196,7 @@ class SPP extends BaseController
             if ($this->validate($rules)) {
                 $insertData = [
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
-                    "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
+                    "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),
@@ -296,7 +296,7 @@ class SPP extends BaseController
 
                 $insertData = [
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
-                    "spp_no" => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("spp_no"),
+                    "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
                     "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),

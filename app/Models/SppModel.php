@@ -133,10 +133,13 @@ class SppModel extends Model
 
     public function getNoSPP($type)
     {
+        // is posted 0 artinya spp masih open 
+        // request staatus waiting artinya di po belum ada yang menggunakan nomor spp tersebut
         $arrCondition = [
             'deletedAt' => null,
             'spp_type' => $type,
-            'is_posted' => 1
+            'is_posted' => 0,
+            'request_status' => 'waiting'
         ];
 
         $builder = $this->db->table('purchase_requests');

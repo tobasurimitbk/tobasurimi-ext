@@ -142,6 +142,7 @@
                     let id = row?.id;
                     let status = row?.is_posted
                     let status_penerimaan = row?.status_penerimaan
+                    let purchase_request_id = row?.purchase_request_id
 
                     // jika belum posting
                     if (status !== "1") {
@@ -150,7 +151,7 @@
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button onclick="posting(${id})" class="btn btn-success posting-spp">
+                            <button onclick="posting(${id}, ${purchase_request_id})" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
                             <button onclick="remove(${id})" class="btn btn-danger delete-parent">
@@ -235,7 +236,7 @@
         })
     })
 
-    const posting = function(id) {
+    const posting = function(id, purchase_request_id) {
         Swal.fire({
             icon: 'question',
             title: 'Yakin akan di Posting?',
@@ -251,7 +252,8 @@
                 $.ajax({
                     url: "<?= base_url("po-import-bahan-baku/update-status"); ?>",
                     data: {
-                        id: id
+                        id: id,
+                        spp: purchase_request_id
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
