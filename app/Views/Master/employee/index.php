@@ -807,7 +807,7 @@
             $(".nominal").val("");
 
             validator_detail.resetForm();
-            validator_detail.reset();            
+            validator_detail.reset();
 
             $.ajax({
                 url: `<?= base_url("tunjangan/dropdown"); ?>`,
@@ -852,8 +852,6 @@
             row = 0
 
             $(".body-detail-table").empty()
-
-            console.log(komponen_gaji, "hehehehe")
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -1099,15 +1097,15 @@
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
                         let new_komponen_gaji = [];
+                        let id = $(".id").val();
                         komponen_gaji.forEach((item) => {
                             new_komponen_gaji.push({
+                                "employee_id": id === "" ? id : null,
                                 "tunjangan_id": item.tunjangan_id,
                                 "nominal": item.nominal
                             })
                         })
                         data.append("komponen_gaji", JSON.stringify(new_komponen_gaji))
-                        console.log(data)
-                        let id = $(".id").val();
                         // UPDATE
                         if (id) {
                             $.ajax({
@@ -1282,9 +1280,6 @@
 
             $(".body-detail-table").empty()
 
-
-            console.log(komponen_gaji, "hahahaha")
-
             $.ajax({
                 url: "<?= base_url("employee/id"); ?>" + "/" + id,
                 method: "GET",
@@ -1309,7 +1304,30 @@
                         $(".zip_code").val(res?.data?.postal_code);
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
+                        $(".komponen_gaji").val(res?.data?.komponen_gaji).change();
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
+
+                        let tag_html = "";
+
+                        res?.data?.komponen_gaji.map((item) => {
+                            console.log(item, "rerererer")
+
+                            tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                            tag_html += "<td>";
+                            tag_html += item.tunjangan_name;
+                            tag_html += "</td>";
+                            tag_html += "<td>";
+                            tag_html += item.nominal;
+                            tag_html += "</td>";
+                            tag_html += "</tr>";
+
+                            komponen_gaji.push({
+                                ...item,
+                                row: row + 1
+                            });
+
+                            row = row + 1;
+                        })
 
                         // AJAX GET CITY
                         $.ajax({

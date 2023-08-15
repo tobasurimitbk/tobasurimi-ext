@@ -867,7 +867,7 @@
                         $(".id").val(id);
                         $('.parent').val(res?.data?.parent_id);
                         $('.kode_barang').rules('remove', 'required');
-                        if(res?.data?.parent_id !== "0")
+                        if(res?.data?.parent_id !== "0" || res?.data?.spec_type == 'single')
                         {
                             $(".is_parent").css("display", "");
                             $('.stok').rules('remove', 'required');
@@ -906,6 +906,7 @@
                             $('.ar_id').rules('remove', 'required');
                         }
 
+                        $(`[name="productSpec"][value="${res?.data?.spec_type}"]`).prop('checked', true);
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".spek").val(res?.data?.spek);
                         $(".nama_barang").val(res?.data?.nama_barang);
@@ -1110,8 +1111,8 @@
 
         $(".parent_id").change(function () {
             if(changeParent){
-            $(".kode_barang").val("");
-            $(".nama_barang").val("");
+            // $(".kode_barang").val("");
+            // $(".nama_barang").val("");
             $(".satuan_id").val("").change();
             $(".harga_barang").val("");
             $(".supplier_id").val([]).change();
