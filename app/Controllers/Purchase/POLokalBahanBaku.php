@@ -149,9 +149,11 @@ class POLokalBahanBaku extends BaseController
             ];
 
             if ($this->validate($rules)) {
+                $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
+
                 $insertData = [
                     "company_id" => $this->this_company_id,
-                    "purchase_request_id"   => formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT"),
+                    "purchase_request_id"   => $purchase_request_id,
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "pph" => $this->request->getPost("pph"),
@@ -163,6 +165,22 @@ class POLokalBahanBaku extends BaseController
                     "createdBy" => session()->get("login")->user_id,
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
+
+                // spp number cannot be used again
+                $responsespp = $this->SppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
+
+                if(!$responsespp)
+                {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "No. SPP gagal di close",
+                        "payload"   => "",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+                
 
                 $insertData["po_no"] = $this->RMPurchaseOrderModel->generateNoPo();
 

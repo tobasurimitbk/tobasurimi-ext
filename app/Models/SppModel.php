@@ -136,7 +136,8 @@ class SppModel extends Model
         $arrCondition = [
             'deletedAt' => null,
             'spp_type' => $type,
-            'is_posted' => 1
+            'is_posted' => 1,
+            'request_status' => 'waiting'
         ];
 
         $builder = $this->db->table('purchase_requests');
