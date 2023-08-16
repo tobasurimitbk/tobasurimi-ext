@@ -256,7 +256,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
@@ -817,7 +817,6 @@
                 dataType: "json",
                 success: function(res) {
                     $(".tunjangan_id").empty()
-                    $(".jabatan_id").val("").change()
                     $(".tunjangan_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
                         $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
@@ -1084,7 +1083,7 @@
             }
         })
 
-        $(".btn-submit-form").click(function() {
+        $(".btn-submit-parent").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
                     icon: 'question',
@@ -1339,7 +1338,7 @@
                         let tag_html = "";
 
                         res?.data?.komponen_gaji.map((item) => {
-                            tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-employeeid = "${item.employee_id}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                            tag_html += `<tr class="edit-table-detail" data-id="${row + 1}" data-employeeid="${item.employee_id}" data-tunjanganid="${item.tunjangan_id}" data-nominal="${item.nominal}">`;
                             tag_html += "<td>";
                             tag_html += item.tunjangan_name;
                             tag_html += "</td>";
@@ -1530,6 +1529,8 @@
 
         $(".id_detail").val(id)
 
+        $(".nominal").val(nominal)
+
         validator_detail.resetForm();
         validator_detail.reset();
 
@@ -1539,7 +1540,6 @@
             dataType: "json",
             success: function(res) {
                 $(".tunjangan_id").empty()
-                $(".jabatan_id").val("").change()
                 $(".tunjangan_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
                     $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
