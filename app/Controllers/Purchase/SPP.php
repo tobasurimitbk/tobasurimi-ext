@@ -7,6 +7,14 @@ use App\Models\SppModel;
 use App\Models\SppDetailModel;
 use App\Models\MetadataModel;
 use App\Models\WarehousesModel;
+
+use App\Models\RMImportPOModel;
+use App\Models\RMImportPODetailModel;
+use App\Models\AMPurchaseOrderModel;
+use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\RMPurchaseOrderModel;
+use App\Models\RMPurchaseOrderDetailModel;
+
 use Dompdf\Dompdf;
 
 class SPP extends BaseController
@@ -15,6 +23,17 @@ class SPP extends BaseController
     protected $role_id;
     protected $SppModel;
     protected $SppDetailModel;
+
+    protected $MetadataModel;
+    protected $WarehousesModel;
+
+    protected $RmImportPOModel;
+    protected $RmImportPODetailModel;
+    protected $AmPurchaseOrderModel;
+    protected $AmPurchaseOrderDetailModel;
+    protected $RmPurchaseOrderModel;
+    protected $RmPurchaseOrderDetailModel;
+
     protected $dompdf;
 
     public function __construct()
@@ -23,6 +42,17 @@ class SPP extends BaseController
         $this->role_id = session()->get("login")->this_role_id;
         $this->SppModel = new SppModel();
         $this->SppDetailModel = new SppDetailModel();
+
+        $this->MetadataModel = new MetadataModel();
+        $this->WarehousesModel = new WarehousesModel();
+
+        $this->RmImportPOModel = new RMImportPOModel();
+        $this->RmImportPODetailModel = new RMImportPODetailModel();
+        $this->AmPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->AmPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $this->RmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $this->RmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
         $this->dompdf = new Dompdf();
     }
 
@@ -34,12 +64,10 @@ class SPP extends BaseController
     public function createSPP()
     {
         //Get Order Type By Metadata
-        $MetadataModel = new MetadataModel();
-        $dataOrderType =  $MetadataModel->get_by_name("Tipe PO");
+        $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
         //Get Warehouse
-        $WarehousesModel = new WarehousesModel();
-        $dataWarehouse = $WarehousesModel->asObject()->findAll();
+        $dataWarehouse = $this->WarehousesModel->asObject()->findAll();
 
         $data = [
             "dataOrderType" => $dataOrderType,
@@ -52,24 +80,19 @@ class SPP extends BaseController
     public function getByIdSPP($id = null)
     {
         //Get Order Type By Metadata
-        $MetadataModel = new MetadataModel();
-        $dataOrderType =  $MetadataModel->get_by_name("Tipe PO");
+        $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
         //Get Warehouse
-        $WarehousesModel = new WarehousesModel();
-        $dataWarehouse = $WarehousesModel->asObject()->findAll();
+        $dataWarehouse = $this->WarehousesModel->asObject()->findAll();
 
         $data = [
             "dataOrderType" => $dataOrderType,
             "dataWarehouse" => $dataWarehouse
         ];
 
-        $SppModel = new SppModel();
-        $SppDetailModel = new SppDetailModel();
-
         if (!empty($id)) {
-            $dataSPP = $SppModel->getSppById($id);
-            $dataSppDetail = $SppDetailModel->getSppDetailById($id);
+            $dataSPP = $this->SppModel->getSppById($id);
+            $dataSppDetail = $this->SppDetailModel->getSppDetailById($id);
             $data["dataSPP"] = $dataSPP;
             $data["dataSPP"]->purchase_request_details = $dataSppDetail;
         }
@@ -123,9 +146,6 @@ class SPP extends BaseController
             "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-
-        $SppModel = new SppModel();
-
         $condition = [];
 
         $addCondition = [
@@ -139,7 +159,7 @@ class SPP extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $sppData = $SppModel->getSppList($condition, $addCondition, $limit, $offset);
+        $sppData = $this->SppModel->getSppList($condition, $addCondition, $limit, $offset);
 
         $dataSPP = [];
 
@@ -175,9 +195,6 @@ class SPP extends BaseController
     public function saveSPP()
     {
         try {
-            $SppModel = new SppModel();
-            $SppDetailModel = new SppDetailModel();
-
             $rules = [
                 "request_date" => [
                     "rules" => "required"
@@ -213,8 +230,7 @@ class SPP extends BaseController
 
                 $insertData["total"] = $totalPrice;
 
-                $WarehousesModel = new WarehousesModel();
-                $dataWarehouse = $WarehousesModel->find($insertData["warehouse_id"]);
+                $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
 
                 // if ($insertData["spp_no"] === "") {
                 //     $insertData["spp_no"] = $SppModel->generateNoSpp($dataWarehouse["warehouse_name"]);
@@ -223,14 +239,13 @@ class SPP extends BaseController
 
                 $payload = json_encode($insertData);
 
-                $insert = $SppModel->insert($insertData);
+                $insert = $this->SppModel->insert($insertData);
                 foreach ($insertData["items"] as $value) {
                     $value->barang_id = $value->item_id;
                     $value->purchase_request_id = $insert;
                 }
 
-
-                $SppDetailModel->insertBatch($insertData["items"]);
+                $this->SppDetailModel->insertBatch($insertData["items"]);
                 // $response = curl_request("POST", "/purchaseRequest", $this->token, $payload);
 
                 if ($insert) {
@@ -273,9 +288,6 @@ class SPP extends BaseController
     public function updateSPP()
     {
         try {
-            $SppModel = new SppModel();
-            $SppDetailModel = new SppDetailModel();
-
             $rules = [
                 "request_date" => [
                     "rules" => "required"
@@ -313,23 +325,22 @@ class SPP extends BaseController
 
                 $insertData["total"] = $totalPrice;
 
-
-                $WarehousesModel = new WarehousesModel();
-                $dataWarehouse = $WarehousesModel->find($insertData["warehouse_id"]);
+                $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
 
                 // if ($insertData["spp_no"] === "") {
                 //     $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
                 // }
 
                 if ($insertData) {
-                    $SppModel->update($id, $insertData);
+                    $this->SppModel->update($id, $insertData);
 
                     foreach ($insertData["items"] as $value) {
+                        // create and update spp
                         $value->barang_id = $value->item_id;
                         $value->purchase_request_id = $id;
 
                         if (!empty($value->isDeleted)) {
-                            $SppDetailModel->where('id', $value->id)->delete();
+                            $this->SppDetailModel->where('id', $value->id)->delete();
                         }
 
                         $dataDetail = [
@@ -343,7 +354,131 @@ class SPP extends BaseController
                             "note" => $value->note,
                         ];
 
-                        $SppDetailModel->upsert($dataDetail);
+                        $this->SppDetailModel->upsert($dataDetail);
+
+                        // update item po bb lokal
+                        if($this->request->getPost("spp_type") === "Bahan Baku Lokal")
+                        {
+                            $responsePO = $this->RmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
+
+                            if($responsePO)
+                            {
+                                $responseDetailPO = $this->RmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
+
+                                if($responseDetailPO)
+                                {
+                                    // delete po
+                                    if (!empty($value->isDeleted)) {
+                                        $this->RmPurchaseOrderDetailModel->where('id', $responseDetailPO->id)->delete();
+                                    }
+
+                                    // edit po
+                                    $dataDetail = [
+                                        "id" => $responseDetailPO->id,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "general_price" => $value->general_price,
+                                    ];
+            
+                                    $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
+                                }
+                            }
+                        }
+                        // update item po bp lokal
+                        if($this->request->getPost("spp_type") === "Bahan Penolong Lokal")
+                        {
+                            $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
+
+                            if($responsePO)
+                            {
+                                $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
+
+                                if($responseDetailPO)
+                                {
+                                    // delete po
+                                    if (!empty($value->isDeleted)) {
+                                        $this->AmPurchaseOrderDetailModel->where('id', $responseDetailPO->id)->delete();
+                                    }
+
+                                    // edit po
+                                    $dataDetail = [
+                                        "id" => $responseDetailPO->id,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "price" => $value->price,
+                                        "unit" => $value->unit,
+                                    ];
+            
+                                    $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
+                                }
+                            }
+                        }
+                        // update item po bb import
+                        if($this->request->getPost("spp_type") === "Bahan Baku Import")
+                        {
+                            $responsePO = $this->RmImportPOModel->getByPurchaseRequestId($this->request->getPost("id"));
+
+                            if($responsePO)
+                            {
+                                $responseDetailPO = $this->RmImportPODetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
+
+                                if($responseDetailPO)
+                                {
+                                    // delete po
+                                    if (!empty($value->isDeleted)) {
+                                        $this->RmImportPODetailModel->where('id', $responseDetailPO->id)->delete();
+                                    }
+
+                                    // edit po
+                                    $dataDetail = [
+                                        "id" => $responseDetailPO->id,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "price" => $value->price,
+                                        "unit" => $value->unit,
+                                    ];
+            
+                                    $this->RmImportPODetailModel->upsert($dataDetail);
+                                }
+                            }
+                        }
+                        // update item po bp import
+                        if($this->request->getPost("spp_type") === "Bahan Penolong Import")
+                        {
+                            $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
+
+                            if($responsePO)
+                            {
+                                $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
+
+                                if($responseDetailPO)
+                                {
+                                    // delete po
+                                    if (!empty($value->isDeleted)) {
+                                        $this->AmPurchaseOrderDetailModel->where('id', $responseDetailPO->id)->delete();
+                                    }
+
+                                    // edit po
+                                    $dataDetail = [
+                                        "id" => $responseDetailPO->id,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "price" => $value->price,
+                                        "unit" => $value->unit,
+                                    ];
+            
+                                    $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
+                                }
+                            }
+                        }
                     }
 
                     $data = [
@@ -385,14 +520,13 @@ class SPP extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
-            $SppModel = new SppModel();
 
             $payload = [
                 "is_posted" => "1"
             ];
 
             if (!empty($id)) {
-                $SppModel->update($id, $payload);
+                $this->SppModel->update($id, $payload);
 
                 $data = [
                     "status"    => true,
@@ -422,40 +556,40 @@ class SPP extends BaseController
 
     public function approveSPP()
     {
-        try {
-            $id = $this->request->getPost("id");
+        // try {
+        //     $id = $this->request->getPost("id");
 
-            $payload = json_encode([]);
+        //     $payload = json_encode([]);
 
-            $response = curl_request("PATCH", "/purchaseRequest/approve/$id", $this->token, $payload);
+        //     $response = curl_request("PATCH", "/purchaseRequest/approve/$id", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Approve Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        //     if ($response["code"] === 200) {
+        //         $data = [
+        //             "status"            => true,
+        //             "message"   => "Approve Berhasil diubah",
+        //             "payload"   => $payload,
+        //             'token' => csrf_hash()
+        //         ];
+        //         echo json_encode($data);
+        //     } else {
+        //         $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+        //         $data = [
+        //             "status"            => false,
+        //             "message"    => $message,
+        //             "payload"   => $payload,
+        //             'token' => csrf_hash()
+        //         ];
+        //         echo json_encode($data);
+        //     }
+        // } catch (\Exception $e) {
+        //     $data = [
+        //         "status"            => false,
+        //         "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+        //         'token' => csrf_hash()
+        //     ];
+        //     echo json_encode($data);
+        // }
+        // return;
     }
 
     public function generateSPP()
@@ -483,8 +617,6 @@ class SPP extends BaseController
     public function deleteSPP()
     {
         try {
-            $SppModel = new SppModel();
-            $SppDetailModel = new SppDetailModel();
             $id = $this->request->getPost("id");
 
             if (empty($id)) {
@@ -497,8 +629,8 @@ class SPP extends BaseController
                 return;
             }
 
-            $SppModel->delete($id);
-            $SppDetailModel->where('purchase_request_id', $id)->delete();
+            $this->SppModel->delete($id);
+            $this->SppDetailModel->where('purchase_request_id', $id)->delete();
 
             $data = [
                 "status"    => true,
@@ -531,8 +663,6 @@ class SPP extends BaseController
             "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $SppModel = new SppModel();
-
         $condition = [];
 
         $addCondition = [
@@ -544,7 +674,7 @@ class SPP extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $sppData = $SppModel->getSppList($condition, $addCondition, 100000000, 0);
+        $sppData = $this->SppModel->getSppList($condition, $addCondition, 100000000, 0);
 
         $dataSPP = [];
 
@@ -590,12 +720,9 @@ class SPP extends BaseController
         if ($id) {
             $filename = "SPP";
 
-            $SppModel = new SppModel();
-            $SppDetailModel = new SppDetailModel();
-
             if (!empty($id)) {
-                $dataSPP = $SppModel->getSppById($id);
-                $dataSppDetail = $SppDetailModel->getSppDetailById($id);
+                $dataSPP = $this->SppModel->getSppById($id);
+                $dataSppDetail = $this->SppDetailModel->getSppDetailById($id);
 
                 $no = 0;
                 $totalPrice = 0;
