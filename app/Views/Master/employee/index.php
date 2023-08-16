@@ -346,6 +346,8 @@
     let sortType = "asc";
 
     let komponen_gaji = [];
+    let list_delete = [];
+
     var row = 0;
 
     const table = $('.dataTable').DataTable({
@@ -1098,17 +1100,41 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
-                        let new_komponen_gaji = [];
                         let id = $(".id").val();
-                        komponen_gaji.forEach((item) => {
-                            new_komponen_gaji.push({
-                                "id": item.id,
-                                "employee_id": item.employee_id,
-                                "tunjangan_id": item.tunjangan_id,
-                                "nominal": item.nominal
+
+                        let update_komponen_gaji = [];
+
+                        if (list_delete.length !== 0) {
+                            list_delete.map(obj => {
+                                update_komponen_gaji.push({
+                                    id: obj.id ? Number(obj.id) : 0,
+                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
+                                    tunjangan_id: obj.tunjangan_id,
+                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
+                                    isDeleted: true
+                                })
                             })
+                        }
+
+                        komponen_gaji.map(obj => {
+                            if (obj.id) {
+                                update_komponen_gaji.push({
+                                    id: obj.id ? Number(obj.id) : 0,
+                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
+                                    tunjangan_id: obj.tunjangan_id,
+                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
+                                })
+                            } else {
+                                update_komponen_gaji.push({
+                                    id: obj.id ? Number(obj.id) : 0,
+                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
+                                    tunjangan_id: obj.tunjangan_id,
+                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
+                                })
+                            }
                         })
-                        data.append("komponen_gaji", JSON.stringify(new_komponen_gaji))
+
+                        data.append("komponen_gaji", JSON.stringify(update_komponen_gaji))
                         // UPDATE
                         if (id) {
                             $.ajax({
@@ -1477,6 +1503,11 @@
                         });
 
                         row = row + 1;
+                    } else {
+                        // sent parameter isDelete if have customer id and id
+                        if (item.id) {
+                            list_delete.push(item)
+                        }
                     }
                 })
 

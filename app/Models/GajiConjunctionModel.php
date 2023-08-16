@@ -48,6 +48,7 @@ class GajiConjunctionModel extends Model
     public function getKomponenByEmployeeId($id)
     {
         $arrCondition = [
+            'gaji_conjunction.deletedAt' => null,
             'gaji_conjunction.employee_id' => $id
         ];
 
