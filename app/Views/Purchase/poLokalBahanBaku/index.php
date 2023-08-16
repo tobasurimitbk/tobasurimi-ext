@@ -343,7 +343,7 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Posting',
+            confirmButtonText: 'Hapus',
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -381,7 +381,7 @@
                         csrf.val(response.token);
                         Swal.fire({
                             icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
+                            title: 'Data Gagal Dihapus, coba Lagi',
                             confirmButtonColor: '#4e73df',
                         })
                     }

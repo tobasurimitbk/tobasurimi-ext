@@ -940,11 +940,13 @@
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     let id = $(".id").val();
+                    let tipe = $(".spp_type option:selected").val();
                     setLoading()
                     $.ajax({
                         url: "<?= base_url("spp/delete"); ?>",
                         data: {
-                            id: id
+                            id: id,
+                            tipe: tipe
                         },
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());

@@ -172,6 +172,7 @@ class SPP extends BaseController
                 "spp_type"      => $data->spp_type,
                 "spp_no"        => $data->spp_no,
                 "warehouseName" => $data->warehouseName,
+                "spp_type"      => $data->spp_type,
                 "total"         => number_format($data->total),
                 "request_date"  => date('d/m/Y', strtotime($data->request_date)),
                 "is_posted"     => $data->is_posted,
@@ -717,6 +718,7 @@ class SPP extends BaseController
     {
         try {
             $id = $this->request->getPost("id");
+            $tipe = $this->request->getPost("tipe");
 
             if (empty($id)) {
                 $data = [
@@ -729,7 +731,99 @@ class SPP extends BaseController
             }
 
             $this->SppModel->delete($id);
-            $this->SppDetailModel->where('purchase_request_id', $id)->delete();
+            $deleteSPP = $this->SppDetailModel->where('purchase_request_id', $id)->delete();
+
+            if(!$deleteSPP)
+            {
+                $data = [
+                    "status"     => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token'      => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            if($tipe === "Bahan Baku Lokal")
+            {
+                $responsePO = $this->RmPurchaseOrderModel->getByPurchaseRequestId($id);
+
+                if($responsePO)
+                {
+                    $deletePO = $this->RmPurchaseOrderModel->where('id', $responsePO->id)->delete();
+
+                    if(!$deletePO)
+                    {
+                        $data = [
+                            "status"     => false,
+                            "message"    => "Data PO Gagal Dihapus",
+                            'token'      => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
+            }
+            if($tipe === "Bahan Penolong Lokal")
+            {
+                $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($id);
+
+                if($responsePO)
+                {
+                    $deletePO = $this->AmPurchaseOrderModel->where('id', $responsePO->id)->delete();
+
+                    if(!$deletePO)
+                    {
+                        $data = [
+                            "status"     => false,
+                            "message"    => "Data PO Gagal Dihapus",
+                            'token'      => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }    
+                }
+            }
+            if($tipe === "Bahan Baku Import")
+            {
+                $responsePO = $this->RmImportPOModel->getByPurchaseRequestId($id);
+
+                if($responsePO)
+                {
+                    $deletePO = $this->RmImportPOModel->where('id', $responsePO->id)->delete();
+
+                    if(!$deletePO)
+                    {
+                        $data = [
+                            "status"     => false,
+                            "message"    => "Data PO Gagal Dihapus",
+                            'token'      => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
+            }
+            if($tipe === "Bahan Penolong Import")
+            {
+                $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($id);
+
+                if($responsePO)
+                {
+                    $deletePO = $this->AmPurchaseOrderModel->where('id', $responsePO->id)->delete();
+
+                    if(!$deletePO)
+                    {
+                        $data = [
+                            "status"     => false,
+                            "message"    => "Data PO Gagal Dihapus",
+                            'token'      => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
+            }
 
             $data = [
                 "status"    => true,
