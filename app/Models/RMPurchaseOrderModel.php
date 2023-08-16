@@ -153,6 +153,20 @@ class RMPurchaseOrderModel extends Model
         return $poBBLokalData;
     }
 
+    public function getByPurchaseRequestId($id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'purchase_request_id' => $id,
+        ];
+
+        $builder = $this->db->table('rm_purchase_orders');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getRow();
+    }
+
     public function generateNoPo()
     {
         $romanNumb = [

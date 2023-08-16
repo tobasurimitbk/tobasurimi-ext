@@ -365,9 +365,6 @@
             qty: {
                 required: true
             },
-            satuan: {
-                required: true
-            },
             harga: {
                 required: true
             }
@@ -381,9 +378,6 @@
             },
             qty: {
                 required: "Qty wajib diisi"
-            },
-            satuan: {
-                required: "Satuan wajib diisi"
             },
             harga: {
                 required: "Harga wajib diisi"
@@ -1546,6 +1540,18 @@
 
         $(".spesifikasi").val(spesifikasi);
 
+        $(".barang_id").val(barang_id)
+        $(".nama_barang").val(nama_barang)
+
+        if (barang_id === "") {
+            $(".nama_barang").attr("readonly", false);
+        } else {
+            $(".nama_barang").attr("readonly", true);
+        }
+        $(".harga").val(harga)
+        $(".qty").val(qty)
+        $(".total").val((harga.replaceAll(",", "") * parseInt(qty)).toLocaleString())
+
         if ($(".spp_type option:selected").val() === "Bahan Baku Import" || $(".spp_type option:selected").val() === "Bahan Baku Lokal") {
             $.ajax({
                 url: `<?= base_url("barang/dropdown/type"); ?>`,
@@ -1566,11 +1572,15 @@
 
                     res.data.forEach(function(item) {
                         if (kode_barang === item.kode_barang) {
+                            $(".satuan_id").val(item.satuan_id);
+                            $(".satuan").val(item.nama_satuan);
                             $(".kode_barang").append(`<option selected data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         } else {
                             $(".kode_barang").append(`<option data-barang_id="${item.id}" data-nama="${item.nama_barang}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" data-stok="${item.stok}" data-harga="${Number(item.harga_barang).toLocaleString()}" value="${item.kode_barang}">${item.kode_barang} - ${item.nama_barang}</option>`);
                         }
                     })
+
+                    $(".detail-modal").modal("show");
                 }
             })
         } else if ($(".spp_type option:selected").val() === "Bahan Penolong Lokal" || $(".spp_type option:selected").val() === "Bahan Penolong Import") {
@@ -1601,17 +1611,6 @@
                         }
                     })
 
-                    $(".barang_id").val(barang_id)
-                    $(".nama_barang").val(nama_barang)
-
-                    if (barang_id === "") {
-                        $(".nama_barang").attr("readonly", false);
-                    } else {
-                        $(".nama_barang").attr("readonly", true);
-                    }
-                    $(".harga").val(harga)
-                    $(".qty").val(qty)
-                    $(".total").val((harga.replaceAll(",", "") * parseInt(qty)).toLocaleString())
                     $(".detail-modal").modal("show");
                 }
             })

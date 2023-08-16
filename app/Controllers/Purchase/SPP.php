@@ -354,7 +354,7 @@ class SPP extends BaseController
                             "note" => $value->note,
                         ];
 
-                        $this->SppDetailModel->upsert($dataDetail);
+                        $purchase_request_detail_id = $this->SppDetailModel->upsert($dataDetail);
 
                         // update item po bb lokal
                         if($this->request->getPost("spp_type") === "Bahan Baku Lokal")
@@ -363,8 +363,9 @@ class SPP extends BaseController
 
                             if($responsePO)
                             {
-                                $responseDetailPO = $this->RmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
-
+                                $responseDetailPO = $this->RmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
+                                
+                                // edit and delete po items
                                 if($responseDetailPO)
                                 {
                                     // delete po
@@ -379,7 +380,25 @@ class SPP extends BaseController
                                         "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
-                                        "general_price" => $value->general_price,
+                                        "remaining_qty" => $value->qty,
+                                        "general_price" => $value->price,
+                                    ];
+            
+                                    $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
+                                }
+                                // create po items
+                                else
+                                {
+                                    $dataDetail = [
+                                        "id" => null,
+                                        "rm_purchase_order_id" =>  $responsePO->id,
+                                        "purchase_request_detail_id" => $purchase_request_detail_id,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "remaining_qty" => $value->qty,
+                                        "general_price" => $value->price,
                                     ];
             
                                     $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
@@ -393,8 +412,9 @@ class SPP extends BaseController
 
                             if($responsePO)
                             {
-                                $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
+                                $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
+                                // edit and delete po items
                                 if($responseDetailPO)
                                 {
                                     // delete po
@@ -409,6 +429,25 @@ class SPP extends BaseController
                                         "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
+                                        "remaining_qty" => $value->qty,
+                                        "price" => $value->price,
+                                        "unit" => $value->unit,
+                                    ];
+            
+                                    $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
+                                }
+                                // create po items
+                                else
+                                {
+                                    $dataDetail = [
+                                        "id" => null,
+                                        "am_purchase_order_id" =>  $responsePO->id,
+                                        "purchase_request_detail_id" => $purchase_request_detail_id,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "remaining_qty" => $value->qty,
                                         "price" => $value->price,
                                         "unit" => $value->unit,
                                     ];
@@ -424,8 +463,9 @@ class SPP extends BaseController
 
                             if($responsePO)
                             {
-                                $responseDetailPO = $this->RmImportPODetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
+                                $responseDetailPO = $this->RmImportPODetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
+                                // edit and delete po items
                                 if($responseDetailPO)
                                 {
                                     // delete po
@@ -440,6 +480,25 @@ class SPP extends BaseController
                                         "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
+                                        "remaining_qty" => $value->qty,
+                                        "price" => $value->price,
+                                        "unit" => $value->unit,
+                                    ];
+            
+                                    $this->RmImportPODetailModel->upsert($dataDetail);
+                                }
+                                // create po items
+                                else
+                                {
+                                    $dataDetail = [
+                                        "id" => null,
+                                        "rm_import_po_id" =>  $responsePO->id,
+                                        "purchase_request_detail_id" => $purchase_request_detail_id,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "remaining_qty" => $value->qty,
                                         "price" => $value->price,
                                         "unit" => $value->unit,
                                     ];
@@ -455,8 +514,9 @@ class SPP extends BaseController
 
                             if($responsePO)
                             {
-                                $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id);
+                                $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
+                                // edit and delete po items
                                 if($responseDetailPO)
                                 {
                                     // delete po
@@ -471,6 +531,23 @@ class SPP extends BaseController
                                         "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
+                                        "remaining_qty" => $value->qty,
+                                        "price" => $value->price,
+                                        "unit" => $value->unit,
+                                    ];
+            
+                                    $this->AmPurchaseOrderDetailModel->upsert($dataDetail);
+                                }
+                                // create po items
+                                else
+                                {
+                                    $dataDetail = [
+                                        "id" => null,
+                                        "barang_id" => $value->item_id,
+                                        "spec" => $value->spec,
+                                        "note" => $value->note,
+                                        "qty" => $value->qty,
+                                        "remaining_qty" => $value->qty,
                                         "price" => $value->price,
                                         "unit" => $value->unit,
                                     ];
