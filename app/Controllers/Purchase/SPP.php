@@ -343,18 +343,38 @@ class SPP extends BaseController
                             $this->SppDetailModel->where('id', $value->id)->delete();
                         }
 
-                        $dataDetail = [
-                            "id" => $value->id ?? null,
-                            "purchase_request_id" => $this->request->getPost("id"),
-                            "barang_id" => $value->item_id,
-                            "spec" => $value->spec,
-                            "qty" => $value->qty,
-                            "unit" => $value->unit,
-                            "price" => $value->price,
-                            "note" => $value->note,
-                        ];
+                        $id_detail = $value->id ?? null;
+                        $purchase_request_detail_id = "";
 
-                        $purchase_request_detail_id = $this->SppDetailModel->upsert($dataDetail);
+                        if($id_detail)
+                        {
+                            $dataDetail = [
+                                "id" => $id_detail,
+                                "purchase_request_id" => $this->request->getPost("id"),
+                                "barang_id" => $value->item_id,
+                                "spec" => $value->spec,
+                                "qty" => $value->qty,
+                                "unit" => $value->unit,
+                                "price" => $value->price,
+                                "note" => $value->note,
+                            ];
+    
+                            $purchase_request_detail_id = $this->SppDetailModel->upsert($dataDetail);
+                        }
+                        else
+                        {
+                            $dataDetail = [
+                                "purchase_request_id" => $this->request->getPost("id"),
+                                "barang_id" => $value->item_id,
+                                "spec" => $value->spec,
+                                "qty" => $value->qty,
+                                "unit" => $value->unit,
+                                "price" => $value->price,
+                                "note" => $value->note,
+                            ];
+    
+                            $purchase_request_detail_id = $this->SppDetailModel->insert($dataDetail);
+                        }
 
                         // update item po bb lokal
                         if($this->request->getPost("spp_type") === "Bahan Baku Lokal")

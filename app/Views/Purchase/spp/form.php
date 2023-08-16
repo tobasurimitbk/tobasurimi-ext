@@ -902,7 +902,7 @@
                 $(".satuan_id").val(satuan_id);
                 $(".qty").val(stok);
                 $(".harga").val(harga ? harga.toLocaleString() : "");
-                $(".total").val(harga || stok ? (Number(harga.replaceAll(",", "")) * stok).toLocaleString() : "");
+                $(".total").val(harga && stok ? (Number(harga.includes(",") ? (harga.replaceAll(",", "")) : harga) * stok).toLocaleString() : "");
             } else {
                 $(".spesifikasi").val("")
                 $(".nama_barang").attr("readonly", false)
