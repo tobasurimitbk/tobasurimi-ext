@@ -563,6 +563,8 @@ class SPP extends BaseController
                                 {
                                     $dataDetail = [
                                         "id" => null,
+                                        "am_purchase_order_id" =>  $responsePO->id,
+                                        "purchase_request_detail_id" => $purchase_request_detail_id,
                                         "barang_id" => $value->item_id,
                                         "spec" => $value->spec,
                                         "note" => $value->note,
