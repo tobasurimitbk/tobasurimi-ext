@@ -442,7 +442,7 @@
 
             list_items.push({
                 id: <?= $details->id; ?>,
-                purchase_request_detail_id: <?= $details["purchase_request_detail_id"]; ?>,
+                purchase_request_detail_id: <?= $details->purchase_request_detail_id; ?>,
                 row: row,
                 barang_id: '<?= $details->barang_id; ?>',
                 kode_barang: '<?= $details->kodeBarang; ?>',
@@ -1126,63 +1126,83 @@
         })
 
         $(".posting-spp").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di Posting?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Posting',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let spp = $(".spp").val();
-                    $.ajax({
-                        url: "<?= base_url("po-lokal-bahan-baku/update-status"); ?>",
-                        data: {
-                            id: $(".id").val(),
-                            spp: spp
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
+            // validate input peti and other
+            let validate_peti_and_other = false;
+
+            list_items.map(obj => {
+                if(obj.peti === "")
+                {
+                    validate_peti_and_other = true;
+                }    
+            })
+
+            if(validate_peti_and_other)
+            {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Harap Lengkapi Data Bagian, Peti, Kualitas, Harga Harian, Harga Bulanan",
+                    confirmButtonColor: '#4e73df',
+                })
+            }
+            else
+            {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Yakin akan di Posting?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Posting',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        let spp = $(".spp").val();
+                        $.ajax({
+                            url: "<?= base_url("po-lokal-bahan-baku/update-status"); ?>",
+                            data: {
+                                id: $(".id").val(),
+                                spp: spp
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
-                                    })
-                            } else {
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
                                 Swal.fire({
                                     icon: 'error',
-                                    title: response.message,
+                                    title: 'Data Gagal Diubah, coba Lagi',
                                     confirmButtonColor: '#4e73df',
                                 })
                                 stopLoading()
                             }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Diubah, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-
+                        });
+                    }
+                })
+            }
         })
 
         $(".btn-submit-parent").click(function() {

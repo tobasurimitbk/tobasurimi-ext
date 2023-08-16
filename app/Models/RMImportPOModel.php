@@ -132,6 +132,20 @@ class RMImportPOModel extends Model
         return $sppData;
     }
 
+    public function getByPurchaseRequestId($id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'purchase_request_id' => $id,
+        ];
+
+        $builder = $this->db->table('rm_import_pos');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getRow();
+    }
+
     public function getNoPenerimaanBarang($supplier_id, $company_id)
     {
         $arrCondition = [

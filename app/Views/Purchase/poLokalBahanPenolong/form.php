@@ -478,7 +478,7 @@
 
             list_items.push({
                 id: <?= $details->id; ?>,
-                purchase_request_detail_id: <?= $details["purchase_request_detail_id"]; ?>,
+                purchase_request_detail_id: <?= $details->purchase_request_detail_id; ?>,
                 row: row,
                 barang_id: '<?= $details->barang_id; ?>',
                 kode_barang: '<?= $details->kode_barang; ?>',

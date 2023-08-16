@@ -60,4 +60,24 @@ class RMImportPODetailModel extends Model
         
         return $query->getResultArray();
     }
+
+    public function getPurchaseOrderDetailByPurchaseRequestDetailId($id)
+    {
+        $arrCondition = [
+            'rm_import_po_details.deletedAt' => null,
+            'rm_import_po_details.purchase_request_detail_id' => $id
+        ];
+
+        $builder = $this->db->table('rm_import_po_details')
+        ->select("rm_import_po_details.*, rm_import_pos.po_no,
+        FORMAT(CEILING(rm_import_po_details.qty) * CEILING(rm_import_po_details.price) + CEILING(rm_import_po_details.additional_cost), 'N', 'en-us') AS totalPrice,
+        rm_import_pos.status_penerimaan, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan")
+        ->join('rm_import_pos', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+        ->join('barangs', 'barangs.id = rm_import_po_details.barang_id', 'left')
+        ->join('satuans', 'satuans.id = rm_import_po_details.unit', 'left');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getRow();
+    }
 }
