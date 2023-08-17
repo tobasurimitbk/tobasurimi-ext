@@ -111,6 +111,7 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
+                                    <th></th>
                                     <th>Tanggal LPB</th>
                                     <th>No. LPB</th>
                                     <th>Item Name</th>
@@ -133,6 +134,8 @@
 </div>
 </section>
 
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
 <script>
 $(document).ready(function() {
     const id = $(".id").val();
@@ -208,6 +211,22 @@ $(document).ready(function() {
         display: "stripe",
         searching: false,
         columns: [{
+                /* data: "local_po_inv_sum_detail_id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    
+                    return `
+                        <div class="mt-0">
+                            <input class="form-check-input" type="checkbox" name="paidItem[]" value="${data}">
+                        </div>
+                    `
+                }, */
+                "defaultContent": ''
+        },
+        {
             data: "lpb_date",
             className: "text-center"
         },
@@ -232,9 +251,16 @@ $(document).ready(function() {
             className: "text-center"
         }],
         columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
+            'targets': 0,
+            "orderable": false,
+            className: 'select-checkbox',
+            'checkboxes': {
+               'selectRow': true
+            }
+         }],
+         'select': {
+            'style': 'multi'
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -296,7 +322,7 @@ $(document).ready(function() {
             dueDate = data.dueDate;
         });
         
-        $('#nominal_pembayaran').val(total);
+        // $('#nominal_pembayaran').val(total);
         $('#due_date').val(dueDate);
 
         // populate data table here
@@ -304,6 +330,14 @@ $(document).ready(function() {
         table.clear();
         table.rows.add(itemList.data).draw();
     });
+
+    table.on('select deselect', function (e, dt, type, indexes) {
+        const rowsSelected = table.rows({ selected: true }).data().toArray();
+        const totalAnj = rowsSelected.reduce((acc, val) => acc + +val.total, 0);
+
+        $('.nominal_pembayaran').val(totalAnj).trigger('keyup')
+        e.preventDefault();
+    })
 
     //CSS SELECT2 FLOATING LABEL
     $('.multiple_faktur_id')
@@ -339,14 +373,23 @@ $(document).ready(function() {
                 cancelButtonText: 'Batal',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const data = new FormData(document.querySelector(".create-form"));
+                    const rowsSelected = table.rows({ selected: true }).data().toArray();
+                    const ids = rowsSelected.map((obj) => {
+                        return obj.local_po_inv_sum_detail_id
+                    });
+                    data.append("local_po_inv_sum_detail_id", JSON.stringify(ids));
+
                     $.ajax({
                         url: "<?= base_url("pembayaran-po-lokal/create"); ?>",
-                        data: $(".create-form").serialize(),
+                        data: data,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
