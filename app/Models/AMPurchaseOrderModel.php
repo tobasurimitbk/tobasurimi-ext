@@ -150,6 +150,20 @@ class AMPurchaseOrderModel extends Model
         return $sppData;
     }
 
+    public function getByPurchaseRequestId($id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'purchase_request_id' => $id,
+        ];
+
+        $builder = $this->db->table('am_purchase_orders');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getRow();
+    }
+
     public function getNoPenerimaanBarang($po_type, $supplier_id, $company_id)
     {
         $arrCondition = [

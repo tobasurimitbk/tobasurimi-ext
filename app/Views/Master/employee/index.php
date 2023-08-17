@@ -256,7 +256,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                <button type="submit" class="btn btn-submit-form">Simpan</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
@@ -283,7 +283,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
+                                <input onkeyup="formatNumber(this)" oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
                                 <label for="floatingInput">Nominal</label>
                             </div>
                         </div>
@@ -346,6 +346,8 @@
     let sortType = "asc";
 
     let komponen_gaji = [];
+    let list_delete = [];
+
     var row = 0;
 
     const table = $('.dataTable').DataTable({
@@ -815,7 +817,6 @@
                 dataType: "json",
                 success: function(res) {
                     $(".tunjangan_id").empty()
-                    $(".jabatan_id").val("").change()
                     $(".tunjangan_id").append(`<option value=""></option>`)
                     res.data.forEach(function(item) {
                         $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
@@ -950,9 +951,9 @@
 
                 komponen_gaji.map(item => {
                     if (item.row != id) {
-                        // if (item.tunjangan_id == tunjangan_id) {
-                        //     validate_exist = false;
-                        // }
+                        if (item.tunjangan_id == tunjangan_id) {
+                            validate_exist = false;
+                        }
                     }
                 })
 
@@ -1031,9 +1032,9 @@
                 let validate_exist = true;
 
                 komponen_gaji.map(item => {
-                    // if (item.tunjangan_id == tunjangan_id) {
-                    //     validate_exist = false;
-                    // }
+                    if (item.tunjangan_id == tunjangan_id) {
+                        validate_exist = false;
+                    }
                 })
 
                 if (validate_exist) {
@@ -1082,7 +1083,7 @@
             }
         })
 
-        $(".btn-submit-form").click(function() {
+        $(".btn-submit-parent").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
                     icon: 'question',
@@ -1098,17 +1099,41 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
-                        let new_komponen_gaji = [];
                         let id = $(".id").val();
-                        komponen_gaji.forEach((item) => {
-                            new_komponen_gaji.push({
-                                "id": item.id,
-                                "employee_id": item.employee_id,
-                                "tunjangan_id": item.tunjangan_id,
-                                "nominal": item.nominal
+
+                        let update_komponen_gaji = [];
+
+                        if (list_delete.length !== 0) {
+                            list_delete.map(obj => {
+                                update_komponen_gaji.push({
+                                    id: obj.id ? Number(obj.id) : 0,
+                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
+                                    tunjangan_id: obj.tunjangan_id,
+                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
+                                    isDeleted: true
+                                })
                             })
+                        }
+
+                        komponen_gaji.map(obj => {
+                            if (obj.id) {
+                                update_komponen_gaji.push({
+                                    id: obj.id ? Number(obj.id) : 0,
+                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
+                                    tunjangan_id: obj.tunjangan_id,
+                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
+                                })
+                            } else {
+                                update_komponen_gaji.push({
+                                    id: obj.id ? Number(obj.id) : 0,
+                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
+                                    tunjangan_id: obj.tunjangan_id,
+                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
+                                })
+                            }
                         })
-                        data.append("komponen_gaji", JSON.stringify(new_komponen_gaji))
+
+                        data.append("komponen_gaji", JSON.stringify(update_komponen_gaji))
                         // UPDATE
                         if (id) {
                             $.ajax({
@@ -1313,12 +1338,12 @@
                         let tag_html = "";
 
                         res?.data?.komponen_gaji.map((item) => {
-                            tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-employeeid = "${item.employee_id}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
+                            tag_html += `<tr class="edit-table-detail" data-id="${row + 1}" data-employeeid="${item.employee_id}" data-tunjanganid="${item.tunjangan_id}" data-nominal="${item.nominal}">`;
                             tag_html += "<td>";
                             tag_html += item.tunjangan_name;
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += item.nominal;
+                            tag_html += Number(item.nominal).toLocaleString();
                             tag_html += "</td>";
                             tag_html += "</tr>";
 
@@ -1477,6 +1502,11 @@
                         });
 
                         row = row + 1;
+                    } else {
+                        // sent parameter isDelete if have customer id and id
+                        if (item.id) {
+                            list_delete.push(item)
+                        }
                     }
                 })
 
@@ -1499,6 +1529,8 @@
 
         $(".id_detail").val(id)
 
+        $(".nominal").val(Number(nominal).toLocaleString())
+
         validator_detail.resetForm();
         validator_detail.reset();
 
@@ -1508,7 +1540,6 @@
             dataType: "json",
             success: function(res) {
                 $(".tunjangan_id").empty()
-                $(".jabatan_id").val("").change()
                 $(".tunjangan_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
                     $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)

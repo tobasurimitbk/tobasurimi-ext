@@ -30,9 +30,6 @@
         </button>
         <?php }
         } else { ?> 
-        <button class="btn btn-hapus delete-parent float-right">
-            Hapus
-        </button>
         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
             Simpan 
         </button>

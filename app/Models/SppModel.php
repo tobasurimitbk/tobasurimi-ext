@@ -76,7 +76,7 @@ class SppModel extends Model
             ->where($condition)
             ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
             ->join('purchase_request_details', 'purchase_requests.id = purchase_request_details.purchase_request_id', 'left')
-            ->groupBy(('purchase_request_details.id'))
+            ->groupBy(('purchase_requests.id'))
             ->orderBy($sort, $sortType);
 
         $totalData = $purchaseRequestsDataQry->countAllResults(false);
