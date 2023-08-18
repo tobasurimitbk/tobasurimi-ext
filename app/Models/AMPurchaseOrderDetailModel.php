@@ -91,6 +91,42 @@ class AMPurchaseOrderDetailModel extends Model
         return $query->getResultArray();
     }
 
+    public function getPurchaseOrderDetailById($id)
+    {
+        $arrCondition = [
+            'am_purchase_order_details.deletedAt' => null,
+            'am_purchase_order_details.id' => $id
+        ];
+
+        $selectQry = "am_purchase_order_details.*,
+            am_purchase_orders.po_no,
+            purchase_requests.spp_no,
+            am_purchase_orders.status_penerimaan,
+            FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price), 'N', 'en-us') AS totalPriceWithoutAdditional,
+            FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price) + CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS totalPrice,
+            FORMAT(CEILING(am_purchase_order_details.price), 'N', 'en-us') AS price,
+            FORMAT(CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS additional_cost,
+            barangs.nama_barang, 
+            barangs.kode_barang,
+            taxppn.tax_value as ppnValue, 
+            taxpph.tax_value as pphValue, 
+            satuans.id as id_satuan, 
+            satuans.nama_satuan";
+
+        $builder = $this->db->table('am_purchase_order_details')
+            ->select($selectQry)
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
+            ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
+            ->join('taxes AS taxpph', 'taxpph.id = am_purchase_order_details.pph', 'left');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getRow();
+    }
+
     public function getPurchaseOrderDetailByPurchaseRequestDetailId($id)
     {
         $arrCondition = [

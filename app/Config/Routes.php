@@ -462,6 +462,8 @@ $routes->get('/barang/dropdown/parent', 'Warehouse\Barang::dropdownParentBarang'
 $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKategori', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type', 'Warehouse\Barang::dropdownBarangType', ['filter' => 'Auth']);
 
+$routes->get('/packaging/dropdown/condition', 'Warehouse\Barang::dropdownPackagingCondition', ['filter' => 'Auth']);
+
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
@@ -488,6 +490,7 @@ $routes->post('/penerimaan-barang-lokal/save', 'Warehouse\PenerimaanBarangLokal:
 $routes->post('/penerimaan-barang-lokal/update', 'Warehouse\PenerimaanBarangLokal::updatePenerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal/update-status', 'Warehouse\PenerimaanBarangLokal::updateStatusPenerimaanBarangLokal', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal/delete', 'Warehouse\PenerimaanBarangLokal::deletePenerimaanBarangLokal', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal/export-table', 'Warehouse\PenerimaanBarangLokal::exportTable', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangLokal::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG IMPORT

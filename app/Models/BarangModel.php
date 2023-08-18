@@ -20,6 +20,7 @@ class BarangModel extends Model
         'company_id',
         'type',
         'warehouse_id',
+        'barang_condition',
         'kode_barang',
         'nama_barang',
         'spek',
@@ -238,6 +239,56 @@ class BarangModel extends Model
             // 'barangs.parent_id !=' => 0,
             'metadata.deletedAt' => null,
             'barangs.type' => $type
+        ];
+
+        /* $selectQry = "barangs.*,
+        metadata.value AS value, 
+        satuans.kode_satuan AS kode_satuan, 
+        ";
+
+        $builder = $this->db->table('barangs')
+            ->select($selectQry)
+            ->join('metadata', 'metadata.id = barangs.kategori_id')
+            ->join('satuans', 'satuans.id = barangs.satuan_id');
+        $builder->where($arrCondition)
+            ->orderBy('barangs.nama_barang', 'ASC');
+        $query = $builder->get();
+
+        return $query->getResultArray(); */
+
+        $selectQry = "barangs.*,
+        metadata.value AS value, 
+        satuans.nama_satuan AS nama_satuan, 
+        ";
+        $data = $this->select($selectQry)
+            ->join('metadata', 'metadata.id = barangs.kategori_id')
+            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->where($arrCondition)
+            ->groupStart()
+                ->groupStart()
+                    ->where('barangs.parent_id !=', 0)
+                    ->where('barangs.spec_type', 'multi')
+                ->groupEnd()
+                ->orGroupStart()
+                    ->where('barangs.parent_id', 0)
+                    ->where('barangs.spec_type', 'single')
+                ->groupEnd()
+            ->groupEnd()
+            ->orderBy('barangs.nama_barang', 'ASC')
+            ->findAll();
+
+        return $data;
+    }
+
+    public function getPackagingByCondition($condition)
+    {
+        $arrCondition = [
+            'barangs.deletedAt' => null,
+            'barangs.status' => 'Aktif',
+            // 'barangs.parent_id !=' => 0,
+            'metadata.deletedAt' => null,
+            'barangs.barang_condition' => $condition,
+            'barangs.kategori_id' => 61
         ];
 
         /* $selectQry = "barangs.*,
