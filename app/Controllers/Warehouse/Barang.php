@@ -117,6 +117,12 @@ class Barang extends BaseController
                     'errors' => [
                         'required' => 'Nama Barang tidak boleh kosong'
                     ]
+                ],
+                "kondisi_barang" => [
+                    "rules" => "required|in_list[New,Scrap]",
+                    'errors' => [
+                        'required' => 'Kondisi Barang tidak boleh kosong'
+                    ]
                 ]
             ];
 
@@ -135,22 +141,23 @@ class Barang extends BaseController
             $productSpec = $this->request->getPost('productSpec');
             if ($parent_id || $productSpec == 'single') {
                 $payload = [
-                    "spec_type"     => $productSpec,
-                    "company_id"    => $this->this_company_id,
-                    "parent_id"     => formatter($this->request->getPost("parent_id") ?? 0, "STR_TO_INT"),
-                    "kode_barang"   => $this->request->getPost("kode_barang"),
-                    "nama_barang"   => $this->request->getPost("nama_barang"),
-                    "type"          => $this->request->getPost("type"),
-                    "supplier_id"   => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "harga_barang"  => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                    "satuan_id"     => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "kategori_id"   => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                    "hs_id"         => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                    "ap_id"         => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id"         => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "stok"          => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                    "status"        => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    "spek"          => $this->request->getPost("spek")
+                    "spec_type"         => $productSpec,
+                    "company_id"        => $this->this_company_id,
+                    "parent_id"         => formatter($this->request->getPost("parent_id") ?? 0, "STR_TO_INT"),
+                    "kode_barang"       => $this->request->getPost("kode_barang"),
+                    "nama_barang"       => $this->request->getPost("nama_barang"),
+                    "type"              => $this->request->getPost("type"),
+                    "supplier_id"       => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                    "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                    "kategori_id"       => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                    "barang_condition"  => $this->request->getPost("kondisi_barang"),
+                    "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
+                    "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    "status"            => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                    "spek"              => $this->request->getPost("spek")
                 ];
             } else {
                 $payload = [
@@ -207,6 +214,12 @@ class Barang extends BaseController
                     'errors' => [
                         'required' => 'Nama Barang tidak boleh kosong'
                     ]
+                ],
+                "kondisi_barang" => [
+                    "rules" => "required|in_list[New,Scrap]",
+                    'errors' => [
+                        'required' => 'Kondisi Barang tidak boleh kosong'
+                    ]
                 ]
             ];
 
@@ -250,21 +263,22 @@ class Barang extends BaseController
 
             if ($parent) {
                 $payload = [
-                    "spec_type"     => $productSpec,
-                    "parent_id"     => $parent,
-                    "type"          => $this->request->getPost("type"),
-                    "supplier_id"   => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "company_id"    => $this->this_company_id,
-                    "nama_barang"   => $this->request->getPost("nama_barang"),
-                    "harga_barang"  => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                    "satuan_id"     => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "kategori_id"   => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                    "hs_id"         => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                    "ap_id"         => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id"         => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "stok"          => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                    "status"        => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
-                    "spek"          => $this->request->getPost("spek")
+                    "spec_type"         => $productSpec,
+                    "parent_id"         => $parent,
+                    "type"              => $this->request->getPost("type"),
+                    "supplier_id"       => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "company_id"        => $this->this_company_id,
+                    "nama_barang"       => $this->request->getPost("nama_barang"),
+                    "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
+                    "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
+                    "kategori_id"       => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
+                    "barang_condition"  => $this->request->getPost("kondisi_barang"),
+                    "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
+                    "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    "status"            => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
+                    "spek"              => $this->request->getPost("spek")
                 ];
             } else {
                 $payload = [
