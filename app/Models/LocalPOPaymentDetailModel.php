@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class LocalPOInvSumDetailModel extends Model
+class LocalPOPaymentDetailModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'local_po_inv_sum_details';
+    protected $table            = 'local_po_payment_details';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -15,10 +15,9 @@ class LocalPOInvSumDetailModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'local_po_inv_summary_id',
-        'penerimaan_barang_id',
-        'inv_amt',
-        'is_paid'
+        'local_po_payment_id',
+        'local_po_inv_sum_detail_id',
+        'total'
     ];
 
     // Dates

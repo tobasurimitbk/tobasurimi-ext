@@ -213,9 +213,12 @@ class RekapFaktur extends BaseController
         $localPOInvSumModel = new LocalPOInvSummaryModel();
 
         $fakturList = $localPOInvSumModel->asObject()
-            ->select("id, summary_no, total, DATE_FORMAT(due_date, '%d/%m/%Y') AS due_date")
+            ->select("local_po_inv_summaries.id AS id, summary_no, total, DATE_FORMAT(due_date, '%d/%m/%Y') AS due_date")
+            ->join('local_po_inv_sum_details', 'local_po_inv_sum_details.local_po_inv_summary_id = local_po_inv_summaries.id')
             ->where('company_id', $this->this_company_id)
             ->where('supplier_id', $supplierId)
+            ->where('local_po_inv_sum_details.is_paid', 0)
+            ->groupBy('local_po_inv_summaries.id')
             ->findAll();
 
         $data = [
@@ -276,11 +279,20 @@ class RekapFaktur extends BaseController
         
         $localPOInvSumModel = new LocalPOInvSummaryModel();
 
-        $selectQry = "penerimaan_barang.no_penerimaan_barang AS no_lpb,
+        /* $selectQry = "local_po_inv_sum_details.id AS local_po_inv_sum_detail_id,
+                      penerimaan_barang.no_penerimaan_barang AS no_lpb,
                       DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       penerimaan_barang_detail.qty AS qty,
                       (penerimaan_barang_detail.qty * penerimaan_barang_detail.harga) AS total,
+                      satuans.kode_satuan AS unit"; */
+
+        $selectQry = "local_po_inv_sum_details.id AS local_po_inv_sum_detail_id,
+                      penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
+                      penerimaan_barang_detail.nama_barang_dok AS item_name,
+                      penerimaan_barang_detail.qty AS qty,
+                      local_po_inv_sum_details.inv_amt AS total,
                       satuans.kode_satuan AS unit";
         $fakturList = $localPOInvSumModel->asObject()
             ->select($selectQry)
@@ -290,6 +302,7 @@ class RekapFaktur extends BaseController
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
             // ->where('company_id', $this->this_company_id)
             ->where('local_po_inv_summaries.id', $summaryId)
+            ->where('local_po_inv_sum_details.is_paid', 0)
             ->findAll();
 
         $data = [

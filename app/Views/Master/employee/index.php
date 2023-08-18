@@ -283,7 +283,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
+                                <input onkeyup="formatNumber(this)" oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
                                 <label for="floatingInput">Nominal</label>
                             </div>
                         </div>
@@ -951,9 +951,9 @@
 
                 komponen_gaji.map(item => {
                     if (item.row != id) {
-                        // if (item.tunjangan_id == tunjangan_id) {
-                        //     validate_exist = false;
-                        // }
+                        if (item.tunjangan_id == tunjangan_id) {
+                            validate_exist = false;
+                        }
                     }
                 })
 
@@ -1032,9 +1032,9 @@
                 let validate_exist = true;
 
                 komponen_gaji.map(item => {
-                    // if (item.tunjangan_id == tunjangan_id) {
-                    //     validate_exist = false;
-                    // }
+                    if (item.tunjangan_id == tunjangan_id) {
+                        validate_exist = false;
+                    }
                 })
 
                 if (validate_exist) {
@@ -1343,7 +1343,7 @@
                             tag_html += item.tunjangan_name;
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += item.nominal;
+                            tag_html += Number(item.nominal).toLocaleString();
                             tag_html += "</td>";
                             tag_html += "</tr>";
 
@@ -1529,7 +1529,7 @@
 
         $(".id_detail").val(id)
 
-        $(".nominal").val(nominal)
+        $(".nominal").val(Number(nominal).toLocaleString())
 
         validator_detail.resetForm();
         validator_detail.reset();

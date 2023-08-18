@@ -6,7 +6,9 @@ use App\Controllers\BaseController;
 
 use App\Models\SupplierModel;
 use App\Models\LocalPOPaymentModel;
+use App\Models\LocalPOPaymentDetailModel;
 use App\Models\LocalPOInvSummaryModel;
+use App\Models\LocalPOInvSumDetailModel;
 
 class PembayaranPOLokal extends BaseController
 {
@@ -43,6 +45,7 @@ class PembayaranPOLokal extends BaseController
     public function getByIdPembayaranPOLokal($id)
     {   
         $localPOPaymentModel = new LocalPOPaymentModel();
+        $localPOPaymentDetModel = new LocalPOPaymentDetailModel();
         $supplierModel = new SupplierModel();
         $localPOInvSummaryModel = new LocalPOInvSummaryModel();
 
@@ -53,6 +56,10 @@ class PembayaranPOLokal extends BaseController
         $paymentData = $localPOPaymentModel->asObject()
             ->select($selectQry)
             ->find($id);
+
+        $paymentDetData = $localPOPaymentDetModel->where('local_po_payment_id', $id)
+            ->findAll();
+        $paidSumDetId = array_column($paymentDetData, 'local_po_inv_sum_detail_id');
 
         $supplierList = $supplierModel->asObject()
             ->where('company_id', $this->this_company_id)
@@ -66,11 +73,17 @@ class PembayaranPOLokal extends BaseController
             ->where('is_posted', 1)
             ->findAll();
 
-        $selectQry = "penerimaan_barang.no_penerimaan_barang AS no_lpb,
+        /* $selectQry = "penerimaan_barang.no_penerimaan_barang AS no_lpb,
                       DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       penerimaan_barang_detail.qty AS qty,
                       (penerimaan_barang_detail.qty * penerimaan_barang_detail.harga) AS total,
+                      satuans.kode_satuan AS unit"; */
+        $selectQry = "penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
+                      penerimaan_barang_detail.nama_barang_dok AS item_name,
+                      penerimaan_barang_detail.qty AS qty,
+                      local_po_inv_sum_details.inv_amt AS total,
                       satuans.kode_satuan AS unit";
         $itemList = $localPOInvSummaryModel->asObject()
             ->select($selectQry)
@@ -80,6 +93,7 @@ class PembayaranPOLokal extends BaseController
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
             // ->where('company_id', $this->this_company_id)
             ->where('local_po_inv_summaries.id', $paymentData->local_po_inv_summary_id)
+            ->whereIn('local_po_inv_sum_details.id', $paidSumDetId)
             ->findAll();
 
         $data = [
@@ -152,7 +166,12 @@ class PembayaranPOLokal extends BaseController
     {
         try {
             $localPOPaymentModel = new LocalPOPaymentModel();
+            $localPOPaymentDetModel = new LocalPOPaymentDetailModel();
             $localPOInvSumModel = new LocalPOInvSummaryModel();
+            $localPOInvSumDetModel = new LocalPOInvSumDetailModel();
+
+            $postData = $this->request->getPost();
+            $postData["local_po_inv_sum_detail_id"] = json_decode($postData["local_po_inv_sum_detail_id"]);
             
             $rules = [
                 "supplier_id" => [
@@ -170,12 +189,12 @@ class PembayaranPOLokal extends BaseController
                 "payment_method" => [
                     "rules" => "required"
                 ],
-                "payment_status" => [
-                    "rules" => "required|in_list[Unpaid,Paid]"
+                "local_po_inv_sum_detail_id.*" => [
+                    "rules" => "required|is_natural_no_zero"
                 ]
             ];
 
-            if (!$this->validate($rules)) {
+            if (!$this->validateData($postData, $rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
                     "status"    => false,
@@ -187,6 +206,10 @@ class PembayaranPOLokal extends BaseController
             }
 
             $summaryId = $this->request->getPost("summary_id");
+            $paymentTotal = 0;
+            $paymentDetData = [];
+
+            // check summary data
             $summaryData = $localPOInvSumModel->asObject()
                 ->find($summaryId);
 
@@ -200,17 +223,53 @@ class PembayaranPOLokal extends BaseController
                 return;
             }
 
+            // check selected items
+            foreach ($postData["local_po_inv_sum_detail_id"] as $sumDetId) {
+
+                $sumDetData = $localPOInvSumDetModel->asObject()
+                    ->find($sumDetId);
+                if (empty($sumDetData)) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => 'Item tidak ditemukan!',
+                        'token'     => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+
+                $paymentTotal += $sumDetData->inv_amt;
+                $paymentDetData[] = [
+                    'local_po_inv_sum_detail_id'    => $sumDetId,
+                    'total'                         => $sumDetData->inv_amt,
+                ];
+            }
+
+            $sumDetIds = array_column($paymentDetData, 'local_po_inv_sum_detail_id');
+            $localPOPaymentModel->db->transException(true)->transStart();
             $data = [
                 "supplier_id"               => (int)$this->request->getPost("supplier_id"),
                 "local_po_inv_summary_id"   => $summaryId,
                 "payment_no"                => $this->generatePaymentNo(),
-                "amount"                    => $summaryData->total,
+                "amount"                    => $paymentTotal,
                 "payment_date"              => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
                 "due_date"                  => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
                 "payment_method"            => $this->request->getPost("payment_method")
             ];
 
             $insertedId = $localPOPaymentModel->insert($data);
+
+            foreach ($paymentDetData as &$detData) {
+                $detData['local_po_payment_id'] = $insertedId;
+            }
+
+            $localPOPaymentDetModel->insertBatch($paymentDetData);
+
+            $localPOInvSumDetModel->whereIn('id', $sumDetIds)
+                ->set('is_paid', 1)
+                ->update();
+
+            $localPOPaymentModel->db->transComplete();
 
             $data = [
                 "id"        => $insertedId,
