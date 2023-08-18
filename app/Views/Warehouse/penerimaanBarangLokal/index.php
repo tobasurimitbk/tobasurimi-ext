@@ -5,6 +5,14 @@
 <section class="section">
 <div class="section-header">
     <h1>Penerimaan Barang Lokal</h1>
+
+    <!-- <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+        Export
+    </button>
+    <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+        <li><button class="dropdown-item" onclick="excel('<?= base_url("penerimaan-barang-lokal/export-table"); ?>')">Excel</button></li>
+    </ul> -->
+
     <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-lokal/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
@@ -335,6 +343,15 @@
     const print = function(url) 
     {
         window.open(url, "_blank");
+    }
+
+    const excel = function(url) {
+        let search = $(".search").val();
+        let status = $(".status").val();
+        let dateStart = $(".dateStart").val();
+        let dateEnd = $(".dateEnd").val();
+
+        window.open(url + `?search=${search}&status=${status}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 
     const changeSort = function(val) {

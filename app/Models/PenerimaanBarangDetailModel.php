@@ -61,6 +61,64 @@ class PenerimaanBarangDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function getPenerimaanBarangDetailList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $selectQry = "penerimaan_barang_detail.*, warehouses.warehouse_name, metadata.value as aju_type, 
+        suppliers.name as supplier_name, penerimaan_barang.validation_date,
+        barangs.kode_barang, 
+        barangs.nama_barang, 
+        penerimaan_barang.tipe_bahan,
+        satuans.nama_satuan,
+        satuans.kode_satuan,
+        penerimaan_barang.no_penerimaan_barang, penerimaan_barang.multiple_po_no";
+        $penerimaanBarangDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('barangs', 'barangs.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('satuans', 'penerimaan_barang_detail.unit = satuans.id', 'left')
+            ->where($condition);
+
+        $totalData = $penerimaanBarangDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+            $penerimaanBarangDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan', $addCondition['search']);
+        }
+
+        if ($addCondition['status']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.status_post', $addCondition['status']);
+        }
+
+        if ($addCondition['startdate']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.validation_date >=', $addCondition['startdate']);
+        }
+
+        if ($addCondition['lastdate']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.validation_date <=', $addCondition['lastdate']);
+        }
+
+        if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+            $penerimaanBarangDataQry->groupEnd();
+        }
+        
+        $totalFilteredData = $penerimaanBarangDataQry->countAllResults(false);
+        $data = $penerimaanBarangDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => '',
+            'sortType'  => ''
+        ];
+    }
+
     public function getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, $status_penerimaan)
     {
         $arrCondition = [
