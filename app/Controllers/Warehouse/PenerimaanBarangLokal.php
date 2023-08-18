@@ -16,9 +16,9 @@ use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+// use PhpOffice\PhpSpreadsheet\Spreadsheet;
+// use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+// use PhpOffice\PhpSpreadsheet\IOFactory;
 
 use Dompdf\Dompdf;
 
@@ -959,158 +959,158 @@ class PenerimaanBarangLokal extends BaseController
 
     public function exportTable()
     {
-        $dateStart = $this->request->getGet("dateStart") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "-";
-        $dateEnd = $this->request->getGet("dateEnd") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "-";
+        // $dateStart = $this->request->getGet("dateStart") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "-";
+        // $dateEnd = $this->request->getGet("dateEnd") ? date("d-m-Y", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "-";
 
-        $spreadsheet = new Spreadsheet();
-        // tulis header/nama kolom 
-        $spreadsheet->setActiveSheetIndex(0)
-                    ->setCellValue('A1', 'Laporan Penerimaan Barang Lokal');
+        // $spreadsheet = new Spreadsheet();
+        // // tulis header/nama kolom 
+        // $spreadsheet->setActiveSheetIndex(0)
+        //             ->setCellValue('A1', 'Laporan Penerimaan Barang Lokal');
 
-        $spreadsheet->setActiveSheetIndex(0)
-                    ->setCellValue('A3', 'Tanggal')
-                    ->setCellValue('B3', ':')
-                    ->setCellValue('C3', $dateStart . " S/D " . $dateEnd);
+        // $spreadsheet->setActiveSheetIndex(0)
+        //             ->setCellValue('A3', 'Tanggal')
+        //             ->setCellValue('B3', ':')
+        //             ->setCellValue('C3', $dateStart . " S/D " . $dateEnd);
 
-        $spreadsheet->setActiveSheetIndex(0)
-                    ->setCellValue('A4', 'No.')
-                    ->setCellValue('B4', 'Dok. Penerimaan')
-                    ->setCellValue('F4', 'Divisi')
-                    ->setCellValue('G4', 'Gudang')
-                    ->setCellValue('H4', 'Invoice')
-                    ->setCellValue('J4', 'Supplier')
-                    ->setCellValue('K4', 'kode Barang')
-                    ->setCellValue('L4', 'Nama Barang')
-                    ->setCellValue('M4', 'Satuan')
-                    ->setCellValue('N4', 'Jumlah')
-                    ->setCellValue('O4', 'Nilai')
-                    ->setCellValue('P4', 'Keterangan')
-                    ->setCellValue('Q4', 'Keterangan 2');
+        // $spreadsheet->setActiveSheetIndex(0)
+        //             ->setCellValue('A4', 'No.')
+        //             ->setCellValue('B4', 'Dok. Penerimaan')
+        //             ->setCellValue('F4', 'Divisi')
+        //             ->setCellValue('G4', 'Gudang')
+        //             ->setCellValue('H4', 'Invoice')
+        //             ->setCellValue('J4', 'Supplier')
+        //             ->setCellValue('K4', 'kode Barang')
+        //             ->setCellValue('L4', 'Nama Barang')
+        //             ->setCellValue('M4', 'Satuan')
+        //             ->setCellValue('N4', 'Jumlah')
+        //             ->setCellValue('O4', 'Nilai')
+        //             ->setCellValue('P4', 'Keterangan')
+        //             ->setCellValue('Q4', 'Keterangan 2');
 
-        $spreadsheet->setActiveSheetIndex(0)
-                    ->setCellValue('B5', 'Nomor PR')
-                    ->setCellValue('C5', 'Nomor PO')
-                    ->setCellValue('D5', 'Nomor')
-                    ->setCellValue('E5', 'Tanggal')
-                    ->setCellValue('H5', 'Nomor')
-                    ->setCellValue('I5', 'Tanggal');
+        // $spreadsheet->setActiveSheetIndex(0)
+        //             ->setCellValue('B5', 'Nomor PR')
+        //             ->setCellValue('C5', 'Nomor PO')
+        //             ->setCellValue('D5', 'Nomor')
+        //             ->setCellValue('E5', 'Tanggal')
+        //             ->setCellValue('H5', 'Nomor')
+        //             ->setCellValue('I5', 'Tanggal');
 
-        $addCondition = [
-            "search"            => $this->request->getGet("search"),
-            "status"            => $this->request->getGet("status"),
-            "statuspenerimaan"  => "LOKAL",
-            "sort"              => $this->request->getGet("sort"),
-            "sortType"          => $this->request->getGet("sortType"),
-            "startdate"         => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastdate"          => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
-        ];
+        // $addCondition = [
+        //     "search"            => $this->request->getGet("search"),
+        //     "status"            => $this->request->getGet("status"),
+        //     "statuspenerimaan"  => "LOKAL",
+        //     "sort"              => $this->request->getGet("sort"),
+        //     "sortType"          => $this->request->getGet("sortType"),
+        //     "startdate"         => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+        //     "lastdate"          => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        // ];
 
-        $condition = [
-            "status_penerimaan" => "LOKAL"
-        ];
+        // $condition = [
+        //     "status_penerimaan" => "LOKAL"
+        // ];
 
-        $penerimaanBarangData = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailList($condition, $addCondition, 100000000, 0);
+        // $penerimaanBarangData = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailList($condition, $addCondition, 100000000, 0);
 
-        $no = 1;
-        $column = 6;
+        // $no = 1;
+        // $column = 6;
 
-        // var_dump($penerimaanBarangData);
-        // die;
+        // // var_dump($penerimaanBarangData);
+        // // die;
 
-        // tulis data mobil ke cell
-        foreach($penerimaanBarangData['data'] as $data) {
-            $tipe_bahan = $data->tipe_bahan;
-            $dataLokalDetail = "";
-            if($tipe_bahan === "BAKU")
-            {
-                $dataLokalDetail = $this->rmPurchaseOrderDetailModel->getPurchaseOrderDetailById($data->purchase_order_details_id);
-            }
+        // // tulis data mobil ke cell
+        // foreach($penerimaanBarangData['data'] as $data) {
+        //     $tipe_bahan = $data->tipe_bahan;
+        //     $dataLokalDetail = "";
+        //     if($tipe_bahan === "BAKU")
+        //     {
+        //         $dataLokalDetail = $this->rmPurchaseOrderDetailModel->getPurchaseOrderDetailById($data->purchase_order_details_id);
+        //     }
 
-            if($tipe_bahan === "PENOLONG")
-            {
-                $dataLokalDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailById($data->purchase_order_details_id);
-            }
+        //     if($tipe_bahan === "PENOLONG")
+        //     {
+        //         $dataLokalDetail = $this->amPurchaseOrderDetailModel->getPurchaseOrderDetailById($data->purchase_order_details_id);
+        //     }
 
-            $spreadsheet->setActiveSheetIndex(0)
-                        ->setCellValue('A' . $column, $no++)
-                        ->setCellValue('B' . $column, $dataLokalDetail ? $dataLokalDetail->spp_no : "")
-                        ->setCellValue('C' . $column, $dataLokalDetail ? $dataLokalDetail->po_no : "")
-                        ->setCellValue('D' . $column, $data->no_penerimaan_barang)
-                        ->setCellValue('E' . $column, $data->validation_date)
-                        ->setCellValue('F' . $column, '')
-                        ->setCellValue('G' . $column, $data->warehouse_name)
-                        ->setCellValue('H' . $column, '0')
-                        ->setCellValue('I' . $column, date("Y-m-d", strtotime($data->createdAt)))
-                        ->setCellValue('J' . $column, $data->supplier_name)
-                        ->setCellValue('K' . $column, $data->kode_barang)
-                        ->setCellValue('L' . $column, $data->nama_barang)
-                        ->setCellValue('M' . $column, $data->kode_satuan)
-                        ->setCellValue('N' . $column, $data->jml_masuk)
-                        ->setCellValue('O' . $column, '')
-                        ->setCellValue('P' . $column, '')
-                        ->setCellValue('Q' . $column, '');
+        //     $spreadsheet->setActiveSheetIndex(0)
+        //                 ->setCellValue('A' . $column, $no++)
+        //                 ->setCellValue('B' . $column, $dataLokalDetail ? $dataLokalDetail->spp_no : "")
+        //                 ->setCellValue('C' . $column, $dataLokalDetail ? $dataLokalDetail->po_no : "")
+        //                 ->setCellValue('D' . $column, $data->no_penerimaan_barang)
+        //                 ->setCellValue('E' . $column, $data->validation_date)
+        //                 ->setCellValue('F' . $column, '')
+        //                 ->setCellValue('G' . $column, $data->warehouse_name)
+        //                 ->setCellValue('H' . $column, '0')
+        //                 ->setCellValue('I' . $column, date("Y-m-d", strtotime($data->createdAt)))
+        //                 ->setCellValue('J' . $column, $data->supplier_name)
+        //                 ->setCellValue('K' . $column, $data->kode_barang)
+        //                 ->setCellValue('L' . $column, $data->nama_barang)
+        //                 ->setCellValue('M' . $column, $data->kode_satuan)
+        //                 ->setCellValue('N' . $column, $data->jml_masuk)
+        //                 ->setCellValue('O' . $column, '')
+        //                 ->setCellValue('P' . $column, '')
+        //                 ->setCellValue('Q' . $column, '');
 
-            $spreadsheet->getActiveSheet()->getStyle('A' . $column)->getAlignment()->setHorizontal('center');
-            $spreadsheet->getActiveSheet()->getStyle('E' . $column)->getAlignment()->setHorizontal('center');
-            $spreadsheet->getActiveSheet()->getStyle('G' . $column)->getAlignment()->setHorizontal('left');
+        //     $spreadsheet->getActiveSheet()->getStyle('A' . $column)->getAlignment()->setHorizontal('center');
+        //     $spreadsheet->getActiveSheet()->getStyle('E' . $column)->getAlignment()->setHorizontal('center');
+        //     $spreadsheet->getActiveSheet()->getStyle('G' . $column)->getAlignment()->setHorizontal('left');
 
-            $column++;
-        }
+        //     $column++;
+        // }
 
-        $spreadsheet->setActiveSheetIndex(0)
-                    ->setCellValue('N' . $column, 'Total')
-                    ->setCellValue('O' . $column, '');
+        // $spreadsheet->setActiveSheetIndex(0)
+        //             ->setCellValue('N' . $column, 'Total')
+        //             ->setCellValue('O' . $column, '');
 
-        $spreadsheet->getActiveSheet()->getStyle('N' . $column . ':' . 'O' . $column)->getFont()->setBold(true);
+        // $spreadsheet->getActiveSheet()->getStyle('N' . $column . ':' . 'O' . $column)->getFont()->setBold(true);
 
-        $spreadsheet->getActiveSheet()->getStyle('A4:Q4')->getFont()->setBold(true);
-        $spreadsheet->getActiveSheet()->getStyle('A5:Q5')->getFont()->setBold(true);
+        // $spreadsheet->getActiveSheet()->getStyle('A4:Q4')->getFont()->setBold(true);
+        // $spreadsheet->getActiveSheet()->getStyle('A5:Q5')->getFont()->setBold(true);
 
-        $spreadsheet->getActiveSheet()->MergeCells('A4:A5');
-        $spreadsheet->getActiveSheet()->MergeCells('B4:E4');
-        $spreadsheet->getActiveSheet()->MergeCells('F4:F5');
-        $spreadsheet->getActiveSheet()->MergeCells('G4:G5');
-        $spreadsheet->getActiveSheet()->MergeCells('H4:I4');
-        $spreadsheet->getActiveSheet()->MergeCells('J4:J5');
-        $spreadsheet->getActiveSheet()->MergeCells('K4:K5');
-        $spreadsheet->getActiveSheet()->MergeCells('L4:L5');
-        $spreadsheet->getActiveSheet()->MergeCells('M4:M5');
-        $spreadsheet->getActiveSheet()->MergeCells('N4:N5');
-        $spreadsheet->getActiveSheet()->MergeCells('O4:O5');
-        $spreadsheet->getActiveSheet()->MergeCells('P4:P5');
-        $spreadsheet->getActiveSheet()->MergeCells('Q4:Q5');
+        // $spreadsheet->getActiveSheet()->MergeCells('A4:A5');
+        // $spreadsheet->getActiveSheet()->MergeCells('B4:E4');
+        // $spreadsheet->getActiveSheet()->MergeCells('F4:F5');
+        // $spreadsheet->getActiveSheet()->MergeCells('G4:G5');
+        // $spreadsheet->getActiveSheet()->MergeCells('H4:I4');
+        // $spreadsheet->getActiveSheet()->MergeCells('J4:J5');
+        // $spreadsheet->getActiveSheet()->MergeCells('K4:K5');
+        // $spreadsheet->getActiveSheet()->MergeCells('L4:L5');
+        // $spreadsheet->getActiveSheet()->MergeCells('M4:M5');
+        // $spreadsheet->getActiveSheet()->MergeCells('N4:N5');
+        // $spreadsheet->getActiveSheet()->MergeCells('O4:O5');
+        // $spreadsheet->getActiveSheet()->MergeCells('P4:P5');
+        // $spreadsheet->getActiveSheet()->MergeCells('Q4:Q5');
 
-        $spreadsheet->getActiveSheet()->getStyle('A4:A5')->getAlignment()->setVertical('center')->setHorizontal('right');
-        $spreadsheet->getActiveSheet()->getStyle('B4:E4')->getAlignment()->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('F4:F5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('G4:G5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('H4:I4')->getAlignment()->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('J4:J5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('K4:K5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('L4:L5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('M4:M5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('N4:N5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('O4:O5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('P4:P5')->getAlignment()->setVertical('center')->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('Q4:Q5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('A4:A5')->getAlignment()->setVertical('center')->setHorizontal('right');
+        // $spreadsheet->getActiveSheet()->getStyle('B4:E4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('F4:F5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('G4:G5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('H4:I4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('J4:J5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('K4:K5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('L4:L5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('M4:M5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('N4:N5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('O4:O5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('P4:P5')->getAlignment()->setVertical('center')->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('Q4:Q5')->getAlignment()->setVertical('center')->setHorizontal('center');
 
-        $spreadsheet->getActiveSheet()->getStyle('B5:E5')->getAlignment()->setHorizontal('center');
-        $spreadsheet->getActiveSheet()->getStyle('H5:I5')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('B5:E5')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->getStyle('H5:I5')->getAlignment()->setHorizontal('center');
 
-        foreach (range('B', 'Q') as $letra) {  
-            $spreadsheet->getActiveSheet()->getColumnDimension($letra)->setAutoSize(true);
-        }
+        // foreach (range('B', 'Q') as $letra) {  
+        //     $spreadsheet->getActiveSheet()->getColumnDimension($letra)->setAutoSize(true);
+        // }
         
-        // tulis dalam format .xlsx
-        $writer = new Xlsx($spreadsheet);
-        $fileName = 'Penerimaan Barang Lokal';
+        // // tulis dalam format .xlsx
+        // $writer = new Xlsx($spreadsheet);
+        // $fileName = 'Penerimaan Barang Lokal';
 
-        // Redirect hasil generate xlsx ke web client
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename='.$fileName.'.xlsx');
-        header('Cache-Control: max-age=0');
+        // // Redirect hasil generate xlsx ke web client
+        // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        // header('Content-Disposition: attachment;filename='.$fileName.'.xlsx');
+        // header('Cache-Control: max-age=0');
 
-        $writer->save('php://output');
+        // $writer->save('php://output');
     }
 
     public function print($id = null) 
