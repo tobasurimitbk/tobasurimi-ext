@@ -127,24 +127,24 @@
             </div>
             <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
                 <tr style="border: 0px;">
-                    <td style="height: 30px; border: 0px;"></td>
-                    <td style="border: 0px;"></td>
-                    <td style="border: 0px;"></td>
+                    <td style="height: 30px; border: 0px;">Diterima Oleh</td>
+                    <td style="border: 0px;">Disetujui Oleh</td>
+                    <td style="border: 0px;">Diorder Oleh</td>
                 </tr>
                 <tr>
                     <th>
                         <div class="sign-row txt-left">
-                            <div>Diterima Oleh:</div>
+                            <div></div>
                         </div>
                     </th>
                     <th>
                         <div class="sign-row txt-left">
-                            <div>Disetujui Oleh:</div>
+                            <div></div>
                         </div>
                     </th>
                     <th>
                         <div class="sign-row txt-left">
-                            <div>Diorder Oleh: <?= $dataSPP->createdByName ?></div>
+                            <div><?= $dataSPP->createdByName ?></div>
                         </div>
                     </th>
                 </tr>
