@@ -171,7 +171,7 @@ class RMImportPOModel extends Model
         $builder->select('po_no');
         $builder->orderBy('po_no', 'desc')
         ->where('warehouse_id', $warehouse_id)
-        ->where('createdAt >=', $thn . "-" . $bln . "-" . $tgl . " 00:00:00")
+        ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
         ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
         $query = $builder->get();
