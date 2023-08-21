@@ -3,11 +3,13 @@
 namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
+use App\Models\AttendancesLogModel;
 
 class Attendance extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $AttendancesLogModel;
 
     public function __construct()
     {
@@ -50,23 +52,34 @@ class Attendance extends BaseController
 
     public function ListAttendance()
     {
+        $AttendancesLogModel = new AttendancesLogModel();
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
-        //https: //tobasurimi-api.lyrid.id/attendance/report?year=2023&month=06&idCompany=1
-        $response = curl_request("GET", "/attendance/report?year=$year&month=$month&idCompany=" . $this->this_company_id, $this->token);
+        $AttendanceData = $AttendancesLogModel->get_all($year, $month);
 
-        $data_response = [];
-        if ($response["code"] === 200) {
-            //$data_response  = json_decode($response["body"])->data;
-            $data_response  = json_decode($response["body"], true);
+        foreach ($AttendanceData as $value) {
+            $value->list_attendance = [
+                [
+                    "periode" => $value->date_create,
+                    "checkin" => $value->date_create,
+                    "checkout" => $value->date_create,
+                ],
+            ];
+            $value->hadir = 0;
+            $value->alpha = 0;
+            $value->sakit = 0;
+            $value->ijin = 0;
+            $value->cuti = 0;
+            $value->libur = 0;
         }
-        //print_r($data_response);
+
+        // dd($AttendanceData);
 
         $data = [
             'year' => $year,
             'month' => $month,
-            'res_user'  => $data_response["data"]
+            'res_user'  => $AttendanceData
 
         ];
         return view('hr/attendance/list-attendance', $data);
@@ -74,7 +87,7 @@ class Attendance extends BaseController
 
     public function SaveAttendance()
     {
-        try{
+        try {
             $img = $this->request->getVar("pic");
             //$img = str_replace('data:image/jpeg;base64,', '', $img);
             $img = str_replace(' ', '+', $img);
@@ -108,9 +121,7 @@ class Attendance extends BaseController
                 ];
             }
             echo json_encode($data);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -122,13 +133,13 @@ class Attendance extends BaseController
         /*
         $file = uniqid() . '.png';
         $success = file_put_contents($file, $data);
-*/
+        */
         return;
     }
 
     public function CheckPinEmployee()
     {
-        try{
+        try {
             $employee_id = $this->request->getVar("employee_id");
             $pin = $this->request->getVar("pin");
 
@@ -157,9 +168,7 @@ class Attendance extends BaseController
                 ];
             }
             echo json_encode($data);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

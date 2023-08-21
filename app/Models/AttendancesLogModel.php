@@ -12,7 +12,7 @@ class AttendancesLogModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
         'company_id',
@@ -57,5 +57,21 @@ class AttendancesLogModel extends Model
         $query = $builder->get();
 
         return $query->getResultArray();
+    }
+
+    public function get_all($year, $month)
+    {
+        $selectQry = "attendances_log.* ,
+            employees.name AS employeeName
+            ";
+
+        $attendancesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->like('date_create', $year . "-" . $month)
+            ->join("employees", 'attendances_log.employees_id = employees.id')
+            ->findAll();
+
+
+        return $attendancesDataQry;
     }
 }
