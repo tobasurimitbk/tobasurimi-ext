@@ -337,70 +337,6 @@ class PenerimaanBarangLokal extends BaseController
 
                 $items = json_decode($this->request->getPost("items"));
 
-                // $data = [
-                //     "status"            => false,
-                //     "message"    => $multiple_po_id,
-                //     "payload"   => $multiple_po_id,
-                //     'token' => csrf_hash()
-                // ];
-                // echo json_encode($data);
-
-                // if($status_post === "FINISH")
-                // {
-                //     if($tipe_bahan === "BAKU")
-                //     {
-                //         foreach($multiple_po_id as $po_id)
-                //         {
-                //             $conditionUpdate = [
-                //                 'id' => $po_id
-                //             ];
-
-                //             $payloadupdate = [
-                //                 'status_penerimaan' => 1
-                //             ];
-            
-                //             $responseStatusPenerimaan = $this->rmPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
-
-                //             if(!$responseStatusPenerimaan) {
-                //                 $message =  'Gagal Ubah Status Penerimaan';
-                //                 $data = [
-                //                     "status"            => false,
-                //                     "message"    => $message,
-                //                     "payload"   => $payload,
-                //                     'token' => csrf_hash()
-                //                 ];
-                //                 echo json_encode($data);
-                //             }
-                //         }
-                //     }
-                //     if($tipe_bahan === "PENOLONG")
-                //     {
-                //         foreach($multiple_po_id as $po_id)
-                //         {
-                //             $conditionUpdate = [
-                //                 'id' => $po_id
-                //             ];
-
-                //             $payloadupdate = [
-                //                 'status_penerimaan' => 1
-                //             ];
-            
-                //             $responseStatusPenerimaan = $this->amPurchaseOrderModel->where($conditionUpdate)->set($payloadupdate)->update();
-
-                //             if(!$responseStatusPenerimaan) {
-                //                 $message =  'Gagal Ubah Status Penerimaan';
-                //                 $data = [
-                //                     "status"            => false,
-                //                     "message"    => $message,
-                //                     "payload"   => $payload,
-                //                     'token' => csrf_hash()
-                //                 ];
-                //                 echo json_encode($data);
-                //             }
-                //         }
-                //     }
-                // }
-
                 $detailPayload = [];
 
                 $this->penerimaanBarangModel->db->transException(true)->transStart();
@@ -878,7 +814,7 @@ class PenerimaanBarangLokal extends BaseController
                         
                         foreach ($responseDetail as $itemDetail) {
                             // check if each item must 0 remaining qty to close
-                            if ($itemDetail["remaining_qty"] !== 0.00) {
+                            if ($itemDetail["remaining_qty"] !== "0.00") {
                                 $check_close = false;
                             }  
                         }

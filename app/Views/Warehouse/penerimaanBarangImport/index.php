@@ -66,7 +66,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "no_penerimaan_barang";
+    let sort = "validation_date";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
@@ -74,7 +74,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[2, 'desc']],
+        order: [[4, 'desc']],
         fixedHeader: true,
         lengthMenu: [
             [25],

@@ -351,6 +351,8 @@ class PenerimaanBarangImport extends BaseController
                     "ppnbm" => 0,
                     "ppn" => $this->request->getPost("ppn"),
                     "pph" => $this->request->getPost("pph"),
+                    "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "CURR_TO_INT"),
+                    "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "CURR_TO_INT"),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "IMPORT",
                 ];
@@ -376,7 +378,10 @@ class PenerimaanBarangImport extends BaseController
                             'ppn' => $data->pph,
                             'unit' => $data->unit,
                             'nama_barang_dok' => $data->nama_barang_dok,
-                            'jml_masuk' => $data->jml_masuk
+                            'jml_masuk' => $data->jml_masuk,
+
+                            'packaging' => $data->packaging,
+                            'packaging_qty' => $data->packaging_qty
                         ];
 
                         $responseDetail = $this->penerimaanBarangDetailModel->insert($detailPayload);
@@ -538,6 +543,8 @@ class PenerimaanBarangImport extends BaseController
                     "ppnbm" => 0,
                     "ppn" => $this->request->getPost("ppn"),
                     "pph" => $this->request->getPost("pph"),
+                    "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "CURR_TO_INT"),
+                    "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "CURR_TO_INT"),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "IMPORT",
                 ];
@@ -567,7 +574,10 @@ class PenerimaanBarangImport extends BaseController
                             'ppn' => $data->pph,
                             'unit' => $data->unit,
                             'nama_barang_dok' => $data->nama_barang_dok,
-                            'jml_masuk' => $data->jml_masuk
+                            'jml_masuk' => $data->jml_masuk,
+
+                            'packaging' => $data->packaging,
+                            'packaging_qty' => $data->packaging_qty
                         ];
 
                         // kalau hapus
@@ -684,7 +694,7 @@ class PenerimaanBarangImport extends BaseController
             $multiple_po_id = json_decode($dataPenerimaanBarang->multiple_po_id);
             $tipe_bahan = $dataPenerimaanBarang->tipe_bahan;
             
-            $detail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "LOKAL");
+            $detail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($id, $tipe_bahan, "IMPORT");
 
             $this->penerimaanBarangModel->db->transException(true)->transStart();
 
@@ -700,6 +710,10 @@ class PenerimaanBarangImport extends BaseController
                         $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_INT") : 0;
                         $barang_id = $item["barang_id"] ? formatter($item["barang_id"], "STR_TO_INT") : 0;
                         $purchase_order_details_id = $item["purchase_order_details_id"] ? formatter($item["purchase_order_details_id"], "STR_TO_INT") : 0;
+
+                        // kemasan
+                        $packaging = $item["packaging"] ? formatter($item["packaging"], "STR_TO_INT") : 0;
+                        $packaging_qty = $item["packaging_qty"] ? formatter($item["packaging_qty"], "STR_TO_INT") : 0;
 
                         $conditionRemain = [
                             'id' => $purchase_order_details_id
@@ -746,8 +760,11 @@ class PenerimaanBarangImport extends BaseController
                             }
                         }
 
-                        // ADD STOK
+                        // ADD STOK BARANG
                         $find = $this->barangModel->find($barang_id);
+
+                        // ADD STOK KEMASAN
+                        $find_packaging = $this->barangModel->find($packaging);
 
                         if($find)
                         {
@@ -776,8 +793,35 @@ class PenerimaanBarangImport extends BaseController
                             }
                         }
 
-                        // add stock detail
-                        $this->stockDetailModel->addStock($barang_id, $dataPenerimaanBarang->warehouse_id, $jml_masuk);
+                        if ($find_packaging) {
+                            $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_INT") : 0;
+
+                            $payloadupdateStok = [
+                                'stok' => $stok + $packaging_qty
+                            ];
+            
+                            $responseStok = $this->barangModel->where('id', $packaging)
+                                ->set($payloadupdateStok)
+                                ->update();    
+
+                            if (!$responseStok) {
+                                $message =  'Gagal Tambah Stok';
+                                $data = [
+                                    "status"    => false,
+                                    "message"   => $message,
+                                    "payload"   => "",
+                                    'token'     => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+
+                        // add stock detail barang
+                        $this->stockDetailModel->addStock($barang_id, $dataPenerimaanBarang->warehouse_id, $jml_masuk, 'New');
+
+                        // add stock detail barang kemasan
+                        $this->stockDetailModel->addStock($packaging, $dataPenerimaanBarang->warehouse_id, $packaging_qty, 'Scrap');
                     }
                 }
             }
@@ -796,7 +840,7 @@ class PenerimaanBarangImport extends BaseController
                         foreach($responseDetail as $itemDetail)
                         {
                             // check if each item must 0 remaining qty to close
-                            if($itemDetail["remaining_qty"] !== 0.00)
+                            if($itemDetail["remaining_qty"] !== "0.00")
                             {
                                 $check_close = false;
                             }
