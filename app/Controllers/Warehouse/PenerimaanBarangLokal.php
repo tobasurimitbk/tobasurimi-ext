@@ -312,17 +312,6 @@ class PenerimaanBarangLokal extends BaseController
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
 
-                $data = [
-                    "id"        => "",
-                    "status"    => false,
-                    "message"   => $no,
-                    "payload"   => "",
-                    "response"  => "",
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-
                 $payload = [
                     "company_id" => $this->this_company_id,
                     "no_penerimaan_barang" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("no_penerimaan_barang"),
