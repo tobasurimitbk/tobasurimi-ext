@@ -50,7 +50,8 @@ class SalesOrderModel extends Model
         'ppn',
         'estimated_freight',
         'tax_status',
-        'include_pa'
+        'include_pa',
+        'paid_amt'
     ];
 
     // Dates

@@ -237,8 +237,6 @@ class OrderForm extends BaseController
             return redirect()->to('/order-form-lokal/create')->back()->withInput();
         }
 
-
-
         try {
             $this->db->transBegin();
 
@@ -354,6 +352,30 @@ class OrderForm extends BaseController
         //echo json_encode($data);
 
         return view('SalesLokal/OrderForm/form', $data);
+    }
+
+    public function getByCustomerId($customerId)
+    {
+        $select = "no_sales_order AS invoice_no,
+                   total_harga AS amt,
+                   order_date AS date,
+                   (total_harga - paid_amt) AS owing,
+                   discount_rupiah AS total_disc";
+        $condition = [
+            'id_customer'       => $customerId,
+            'tipe_sales_order'  => 'LOKAL'
+        ];
+
+        $dataSalesOrder = $this->SalesOrderModel->asObject()
+            ->select($select)
+            ->where($condition)
+            ->findAll();
+
+        $data = [
+            "data" => $dataSalesOrder
+
+        ];
+        echo json_encode($data);
     }
 
     public function update()
