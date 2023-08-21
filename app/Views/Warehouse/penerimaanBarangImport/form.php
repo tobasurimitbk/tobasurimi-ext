@@ -1128,6 +1128,13 @@ var validator_detail = $(".detail-form").validate({
                                                 packaging_qty: packaging_qty,
                                             });
 
+                                            total_jml_kemasan = total_jml_kemasan + packaging_qty;
+                                            total_jml_order = total_jml_order + qty;
+                                            total_jml_masuk = total_jml_masuk + jml_masuk;
+                                            total_qty_diterima = total_qty_diterima + qty_diterima;
+                                            total_remaining_qty = total_remaining_qty + remaining_qty;
+                                            total_jml_harga = total_jml_harga + (harga ? Number(harga.replaceAll(",", "")) : 0);
+                                            total_jml_sub_total = total_jml_sub_total + (nilai_sub_total ? Number(nilai_sub_total.replaceAll(",", "")) : 0);
                                         }
                                         else
                                         {
@@ -1180,17 +1187,16 @@ var validator_detail = $(".detail-form").validate({
                                             tag_html += "</tr>";
 
                                             new_list_items.push(item);
+
+                                            total_jml_kemasan = total_jml_kemasan + item.packaging_qty;
+                                            total_jml_order = total_jml_order + item.qty;
+                                            total_jml_masuk = total_jml_masuk + item.jml_masuk;
+                                            total_qty_diterima = total_qty_diterima + item.qty_diterima;
+                                            total_remaining_qty = total_remaining_qty + item.remaining_qty;
+                                            total_jml_harga = total_jml_harga + (item.harga ? Number(item.harga.replaceAll(",", "")) : 0);
+                                            total_jml_sub_total = total_jml_sub_total + (item.sub_total ? Number(item.sub_total.replaceAll(",", "")) : 0);
                                         }
                                         row = row + 1;
-
-                                        total_jml_kemasan = total_jml_kemasan + packaging_qty;
-                                        total_jml_order = total_jml_order + qty;
-                                        total_jml_masuk = total_jml_masuk + jml_masuk;
-                                        total_qty_diterima = total_qty_diterima + qty_diterima;
-                                        total_remaining_qty = total_remaining_qty + remaining_qty;
-                                        total_jml_harga = total_jml_harga + (harga ? Number(harga.replaceAll(",", "")) : 0);
-                                        total_jml_sub_total = total_jml_sub_total + (nilai_sub_total ? Number(nilai_sub_total.replaceAll(",", "")) : 0);
-                                    
                                     })
 
                                     list_items = [];
@@ -1750,8 +1756,9 @@ var validator_detail = $(".detail-form").validate({
                                         keterangan: item.note,
                                         po_no: item.po_no,
                                         status_penerimaan: "OPEN",
+                                        nama_packaging: "",
                                         packaging: "",
-                                        packaging_qty: ""
+                                        packaging_qty: 0
                                     })
 
                                     tag_html += `<tr>`;
@@ -1900,8 +1907,9 @@ var validator_detail = $(".detail-form").validate({
                                         keterangan: item.note,
                                         po_no: item.po_no,
                                         status_penerimaan: "OPEN",
+                                        nama_packaging: "",
                                         packaging: "",
-                                        packaging_qty: ""
+                                        packaging_qty: 0
                                     })
 
                                     tag_html += `<tr>`;
