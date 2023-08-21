@@ -340,8 +340,8 @@ class OrderForm extends BaseController
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
         $customers = $this->CustomerModel->where('company_id', $this->this_company_id)->findAll();
 
-        $dataSalesOrder->order_date = date("d/m/Y", strtotime($dataSalesOrder->order_date));
-        $dataSalesOrder->shipping_date = date("d/m/Y", strtotime($dataSalesOrder->shipping_date));
+        $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
+        $dataSalesOrder->shipping_date = $dataSalesOrder->shipping_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->shipping_date)) : "";
         $data = [
             "data" => $dataSalesOrder,
             "dataCustomers" => $customers,
