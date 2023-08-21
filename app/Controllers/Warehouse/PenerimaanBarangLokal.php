@@ -420,7 +420,10 @@ class PenerimaanBarangLokal extends BaseController
                         'ppn' => $data->pph,
                         'unit' => $data->unit,
                         'nama_barang_dok' => $data->nama_barang_dok,
-                        'jml_masuk' => $data->jml_masuk
+                        'jml_masuk' => $data->jml_masuk,
+
+                        'packaging' => $data->packaging,
+                        'packaging_qty' => $data->packaging_qty
                     ];
 
                     // insert to stock
@@ -590,7 +593,10 @@ class PenerimaanBarangLokal extends BaseController
                             'ppn' => $data->pph,
                             'unit' => $data->unit,
                             'nama_barang_dok' => $data->nama_barang_dok,
-                            'jml_masuk' => $data->jml_masuk
+                            'jml_masuk' => $data->jml_masuk,
+
+                            'packaging' => $data->packaging,
+                            'packaging_qty' => $data->packaging_qty
                         ];
 
                         // kalau hapus
@@ -720,6 +726,10 @@ class PenerimaanBarangLokal extends BaseController
                     $barang_id = $item["barang_id"] ? formatter($item["barang_id"], "STR_TO_INT") : 0;
                     $purchase_order_details_id = $item["purchase_order_details_id"] ? formatter($item["purchase_order_details_id"], "STR_TO_INT") : 0;
 
+                    // kemasan
+                    $packaging = $item["packaging"] ? formatter($item["packaging"], "STR_TO_INT") : 0;
+                    $packaging_qty = $item["packaging_qty"] ? formatter($item["packaging_qty"], "STR_TO_INT") : 0;
+
                     $conditionRemain = [
                         'id' => $purchase_order_details_id
                     ];
@@ -764,8 +774,11 @@ class PenerimaanBarangLokal extends BaseController
                         }
                     }
 
-                    // ADD STOK
+                    // ADD STOK BARANG
                     $find = $this->barangModel->find($barang_id);
+
+                    // ADD STOK KEMASAN
+                    $find_packaging = $this->barangModel->find($packaging);
 
                     if ($find) {
                         $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_INT") : 0;
@@ -791,8 +804,35 @@ class PenerimaanBarangLokal extends BaseController
                         }
                     }
 
-                    // add stock detail
-                    $this->stockDetailModel->addStock($barang_id, $dataPenerimaanBarang->warehouse_id, $jml_masuk);
+                    if ($find_packaging) {
+                        $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_INT") : 0;
+
+                        $payloadupdateStok = [
+                            'stok' => $stok + $packaging_qty
+                        ];
+        
+                        $responseStok = $this->barangModel->where('id', $packaging)
+                            ->set($payloadupdateStok)
+                            ->update();    
+
+                        if (!$responseStok) {
+                            $message =  'Gagal Tambah Stok';
+                            $data = [
+                                "status"    => false,
+                                "message"   => $message,
+                                "payload"   => "",
+                                'token'     => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                            return;
+                        }
+                    }
+
+                    // add stock detail barang
+                    $this->stockDetailModel->addStock($barang_id, $dataPenerimaanBarang->warehouse_id, $jml_masuk, 'New');
+
+                    // add stock detail barang kemasan
+                    $this->stockDetailModel->addStock($packaging, $dataPenerimaanBarang->warehouse_id, $packaging_qty, 'Scrap');
                 }
             }
 

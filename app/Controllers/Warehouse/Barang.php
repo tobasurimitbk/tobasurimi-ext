@@ -504,17 +504,4 @@ class Barang extends BaseController
         echo json_encode($data);
         return;
     }
-
-    public function dropdownPackagingCondition()
-    {
-        $condition = $this->request->getGet("condition");
-        $dataPackaging = $this->barangModel->getPackagingByCondition($condition);
-
-        $data = [
-            "data" => $dataPackaging
-        ];
-
-        echo json_encode($data);
-        return;
-    }
 }

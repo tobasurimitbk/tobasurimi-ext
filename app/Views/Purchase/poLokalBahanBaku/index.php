@@ -10,6 +10,7 @@
     </a>
 </div>
 <div class="card">
+    <?= csrf_field() ?>
     <div class="card-body">
         <div class="row justify-content-end row-col-spp">
             <div class="col mb-3">
@@ -57,15 +58,16 @@
 </section>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
     let sort = "poDate";
-    let sortType = "asc";
+    let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [[1, 'desc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
