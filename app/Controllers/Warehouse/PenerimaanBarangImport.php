@@ -351,8 +351,8 @@ class PenerimaanBarangImport extends BaseController
                     "ppnbm" => 0,
                     "ppn" => $this->request->getPost("ppn"),
                     "pph" => $this->request->getPost("pph"),
-                    "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "CURR_TO_INT"),
-                    "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "CURR_TO_INT"),
+                    "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "STR_TO_FLOAT"),
+                    "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "STR_TO_FLOAT"),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "IMPORT",
                 ];
@@ -543,8 +543,8 @@ class PenerimaanBarangImport extends BaseController
                     "ppnbm" => 0,
                     "ppn" => $this->request->getPost("ppn"),
                     "pph" => $this->request->getPost("pph"),
-                    "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "CURR_TO_INT"),
-                    "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "CURR_TO_INT"),
+                    "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "STR_TO_FLOAT"),
+                    "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "STR_TO_FLOAT"),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "IMPORT",
                 ];
@@ -705,15 +705,15 @@ class PenerimaanBarangImport extends BaseController
                     // check po already closed or not
                     if($item["status_penerimaan"] === "0")
                     {
-                        $jml_masuk = $item["jml_masuk"] ? formatter($item["jml_masuk"], "STR_TO_INT") : 0;
-                        $qty_diterima = $item["qty_diterima"] ? formatter($item["qty_diterima"], "STR_TO_INT") : 0;
-                        $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_INT") : 0;
+                        $jml_masuk = $item["jml_masuk"] ? formatter($item["jml_masuk"], "STR_TO_FLOAT") : 0;
+                        $qty_diterima = $item["qty_diterima"] ? formatter($item["qty_diterima"], "STR_TO_FLOAT") : 0;
+                        $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_FLOAT") : 0;
                         $barang_id = $item["barang_id"] ? formatter($item["barang_id"], "STR_TO_INT") : 0;
                         $purchase_order_details_id = $item["purchase_order_details_id"] ? formatter($item["purchase_order_details_id"], "STR_TO_INT") : 0;
 
                         // kemasan
                         $packaging = $item["packaging"] ? formatter($item["packaging"], "STR_TO_INT") : 0;
-                        $packaging_qty = $item["packaging_qty"] ? formatter($item["packaging_qty"], "STR_TO_INT") : 0;
+                        $packaging_qty = $item["packaging_qty"] ? formatter($item["packaging_qty"], "STR_TO_FLOAT") : 0;
 
                         $conditionRemain = [
                             'id' => $purchase_order_details_id
@@ -768,7 +768,7 @@ class PenerimaanBarangImport extends BaseController
 
                         if($find)
                         {
-                            $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_INT") : 0;
+                            $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_FLOAT") : 0;
 
                             $conditionUpdateStok = [
                                 'id' => $barang_id
@@ -794,7 +794,7 @@ class PenerimaanBarangImport extends BaseController
                         }
 
                         if ($find_packaging) {
-                            $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_INT") : 0;
+                            $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_FLOAT") : 0;
 
                             $payloadupdateStok = [
                                 'stok' => $stok + $packaging_qty

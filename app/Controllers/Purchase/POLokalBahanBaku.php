@@ -489,7 +489,7 @@ class POLokalBahanBaku extends BaseController
                     $dataPO->itemName = $value->barangName;
                     $totalPrice += formatter($value->general_price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT");
                     $totalDailyPrice += formatter($value->daily_price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT");
-                    $totalQty += formatter($value->qty, "CURR_TO_INT");
+                    $totalQty += formatter($value->qty, "STR_TO_FLOAT");
                 }
 
                 $dataPO->totalPrice = number_format($totalPrice);
@@ -501,7 +501,7 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->totalDailyPaid = number_format($totalDailyPrice + $totalDailyPrice * $pphTax);
                 $dataPO->amount = terbilang($totalPrice);
                 $dataPO->amountDaily = terbilang($totalDailyPrice);
-                $dataPO->selisih = formatter($dataPO->cong_batasan, "CURR_TO_INT") - formatter($dataPO->cong_sebenarnya, "CURR_TO_INT");
+                $dataPO->selisih = formatter($dataPO->cong_batasan, "STR_TO_INT") - formatter($dataPO->cong_sebenarnya, "STR_TO_INT");
                 $dataPO->totalTambahan = $dataPO->selisih * $totalQty;
                 $dataPO->pphTambahan = $dataPO->totalTambahan * $pphTax;
 

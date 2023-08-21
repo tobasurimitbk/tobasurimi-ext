@@ -171,8 +171,8 @@
             $jml_sub_total = 0;
 
             foreach($dataPenerimaanBarangDetail as $detail){ 
-                $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_INT");
-                $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_INT");
+                $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_FLOAT");
+                $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_FLOAT");
                 $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
                 $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>

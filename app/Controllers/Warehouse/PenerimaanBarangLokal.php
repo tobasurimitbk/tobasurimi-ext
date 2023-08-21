@@ -656,15 +656,15 @@ class PenerimaanBarangLokal extends BaseController
             foreach ($detail as $item) {
                 // check po already closed or not
                 if ($item["status_penerimaan"] === "0") {
-                    $jml_masuk = $item["jml_masuk"] ? formatter($item["jml_masuk"], "STR_TO_INT") : 0;
-                    $qty_diterima = $item["qty_diterima"] ? formatter($item["qty_diterima"], "STR_TO_INT") : 0;
-                    $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_INT") : 0;
+                    $jml_masuk = $item["jml_masuk"] ? formatter($item["jml_masuk"], "STR_TO_FLOAT") : 0;
+                    $qty_diterima = $item["qty_diterima"] ? formatter($item["qty_diterima"], "STR_TO_FLOAT") : 0;
+                    $remaining_qty = $item["remaining_qty"] ? formatter($item["remaining_qty"], "STR_TO_FLOAT") : 0;
                     $barang_id = $item["barang_id"] ? formatter($item["barang_id"], "STR_TO_INT") : 0;
                     $purchase_order_details_id = $item["purchase_order_details_id"] ? formatter($item["purchase_order_details_id"], "STR_TO_INT") : 0;
 
                     // kemasan
                     $packaging = $item["packaging"] ? formatter($item["packaging"], "STR_TO_INT") : 0;
-                    $packaging_qty = $item["packaging_qty"] ? formatter($item["packaging_qty"], "STR_TO_INT") : 0;
+                    $packaging_qty = $item["packaging_qty"] ? formatter($item["packaging_qty"], "STR_TO_FLOAT") : 0;
 
                     $conditionRemain = [
                         'id' => $purchase_order_details_id
@@ -717,7 +717,7 @@ class PenerimaanBarangLokal extends BaseController
                     $find_packaging = $this->barangModel->find($packaging);
 
                     if ($find) {
-                        $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_INT") : 0;
+                        $stok = $find["stok"] ? formatter($find["stok"], "STR_TO_FLOAT") : 0;
 
                         $payloadupdateStok = [
                             'stok' => $stok + $jml_masuk
@@ -741,7 +741,7 @@ class PenerimaanBarangLokal extends BaseController
                     }
 
                     if ($find_packaging) {
-                        $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_INT") : 0;
+                        $stok = $find_packaging["stok"] ? formatter($find_packaging["stok"], "STR_TO_FLOAT") : 0;
 
                         $payloadupdateStok = [
                             'stok' => $stok + $packaging_qty
