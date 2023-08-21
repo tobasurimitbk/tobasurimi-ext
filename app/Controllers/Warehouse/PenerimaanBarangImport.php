@@ -881,7 +881,7 @@ class PenerimaanBarangImport extends BaseController
                         foreach($responseDetail as $itemDetail)
                         {
                             // check if each item must 0 remaining qty to close
-                            if($itemDetail["remaining_qty"] !== 0.00)
+                            if($itemDetail["remaining_qty"] !== "0.00")
                             {
                                 $check_close = false;
                             }  
