@@ -1166,6 +1166,7 @@
 
                                             $(".body-detail-table").empty()
 
+                                            console.log(list_items)
                                             list_items.map(item => {
                                                 if(item.row == row_detail)
                                                 {
@@ -1280,7 +1281,7 @@
                                                     tag_html += item.nama_packaging;
                                                     tag_html += "</td>";
                                                     tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
-                                                    tag_html += item.packaging_qty;
+                                                    tag_html += item.packaging_qty ? item.packaging_qty : 0;
                                                     tag_html += "</td>";
                                                     tag_html += `<td class="edit-table-detail"  data-packaging="${item.packaging}" data-packaging_qty="${item.packaging_qty}" data-qty_diterima="${item.qty_diterima}" data-remaining_qty="${item.remaining_qty}" data-jml_masuk="${item.jml_masuk}" data-barang_id="${item.barang_id}" data-unit="${item.unit}" data-keterangan="${item.keterangan}" data-ppn="${item.ppn}" data-pph="${item.pph}" data-sub_total="${item.sub_total}" data-harga="${item.harga}" data-nama_barang_dokumen="${item.nama_barang_dokumen}" data-qty="${item.qty}" data-satuan="${satuan}" data-nama_barang="${item.nama_barang}" data-kode="${item.kode_barang}" data-purchase_order_details_id="${item.purchase_order_details_id}" data-id="${item.id}" data-row="${row + 1}">`;
                                                     tag_html += item.satuan;
@@ -1999,8 +2000,9 @@
                                         keterangan: item.note,
                                         status_penerimaan: "OPEN",
                                         po_no: item.po_no,
+                                        nama_packaging: "",
                                         packaging: "",
-                                        packaging_qty: ""
+                                        packaging_qty: 0
                                     })
 
                                     tag_html += `<tr>`;
