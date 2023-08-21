@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control kode_barang" name="kode_barang" id="kode_barang" placeholder="Kode Barang">
+                                <input type="text" class="form-control kode_barang" name="kode_barang" id="kode_barang" placeholder="Kode Barang" disabled>
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
