@@ -20,7 +20,6 @@ class BarangModel extends Model
         'company_id',
         'type',
         'warehouse_id',
-        'barang_condition',
         'kode_barang',
         'nama_barang',
         'spek',
