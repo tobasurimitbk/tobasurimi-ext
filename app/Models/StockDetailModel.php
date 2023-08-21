@@ -17,6 +17,7 @@ class StockDetailModel extends Model
     protected $allowedFields    = [
         'barang_id',
         'warehouse_id',
+        'stock_type',
         'qty',
         'stock_date'
     ];
@@ -45,11 +46,12 @@ class StockDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function addStock(int $barangId, int $warehouseId, float $qty)
+    public function addStock(int $barangId, int $warehouseId, float $qty, string $type = 'New')
     {
         $data = [
             'barang_id'     => $barangId,
             'warehouse_id'  => $warehouseId,
+            'stock_type'    => $type,
             'stock_date'    => date('Y-m-d')
         ];
         $checkStock = $this->asObject()
@@ -69,11 +71,12 @@ class StockDetailModel extends Model
 
     }
 
-    public function reduceStock(int $barangId, int $warehouseId, float $qty)
+    public function reduceStock(int $barangId, int $warehouseId, float $qty, string $type = 'New')
     {
         $data = [
             'barang_id'     => $barangId,
             'warehouse_id'  => $warehouseId,
+            'stock_type'    => $type,
             'qty >'         => 0
         ];
         $stockList = $this->asObject()

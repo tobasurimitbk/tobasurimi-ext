@@ -177,7 +177,7 @@
             $totalDisc = 0;
 
             foreach ($dataPODetail as $detail) {
-                $totalWithAdditional = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_INT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
+                $totalWithAdditional = formatter($detail["price"], "CURR_TO_INT") * formatter($detail["qty"], "STR_TO_FLOAT") +  formatter($detail["additional_cost"], "CURR_TO_INT");
                 $totalPrice += $totalWithAdditional;
                 $totalDisc += $totalWithAdditional * (float)$detail["disc"] / 100;
             ?>

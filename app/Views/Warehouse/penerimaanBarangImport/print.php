@@ -136,7 +136,7 @@
                     <div><span class="txt-bold">Supplier   : <?= $dataPenerimaanBarang->supplier_name; ?></span></div>
                 </td>
                 <td class="txt-right">
-                    <div>&nbsp;</div>
+                    <div><span class="txt-bold">Jenis Dokumen:    <?= $dataPenerimaanBarang->aju_type_name; ?></span></div>
                 </td>
             </tr>
             <tr>
@@ -155,6 +155,7 @@
             <tr>
                 <th class="txt-left" style="padding-left: 5px; width: 30px;">No.</th>
                 <th class="txt-left" style="padding-left: 5px; width: 100px;">Nama Barang</th>
+                <th class="txt-left" style="padding-left: 5px; width: 40px;">Kemasan</th>
                 <th class="txt-left" style="padding-left: 5px; width: 40px;">Qty</th>
                 <th class="txt-left" style="padding-left: 5px; width: 30px;">Satuan</th>
                 <th class="txt-left" style="padding-left: 5px; width: 60px;">@ Rp</th>
@@ -171,14 +172,15 @@
             $jml_sub_total = 0;
 
             foreach($dataPenerimaanBarangDetail as $detail){ 
-                $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_INT");
-                $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_INT");
+                $jml_masuk = $jml_masuk + formatter($detail["jml_masuk"], "STR_TO_FLOAT");
+                $jml_order = $jml_order + formatter($detail["qty"], "STR_TO_FLOAT");
                 $jml_harga = $jml_harga + formatter($detail["harga"], "STR_TO_INT");
                 $jml_sub_total = $jml_sub_total + formatter($detail["sub_total"], "STR_TO_INT");
             ?>
             <tr>
                 <td class="txt-center" style="padding-left: 5px;"><?= $no++; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_barang"]; ?></td>
+                <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_packaging"] . "/" . $detail["packaging_qty"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= $detail["jml_masuk"]; ?></td>
                 <td class="txt-left" style="padding-left: 5px;"><?= $detail["nama_satuan"]; ?></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($detail["harga"], "STR_TO_INT")); ?></td>
@@ -188,12 +190,12 @@
             </tr>
             <?php } ?>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="6"><b>TOTAL</b></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format($jml_sub_total); ?></td>
                 <td style="padding-left: 5px;" colspan="2"></td>
             </tr>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>ONGKOS KIRIM</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="6"><b>ONGKOS KIRIM</b></td>
                 <td class="txt-right" style="padding-left: 5px;"><?= number_format(formatter($dataPenerimaanBarang->shipping_cost, "STR_TO_INT")); ?></td>
                 <td style="padding-left: 5px;" colspan="2"></td>
             </tr>

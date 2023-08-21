@@ -174,7 +174,7 @@
                         <td><?= $detail->spec ?></td>
                         <td class="txt-right"><?= $detail->qty ?></td>
                         <td class="txt-right"><?= $detail->general_price ?></td>
-                        <td class="txt-right"><?= number_format(formatter($detail->general_price, "CURR_TO_INT") * formatter($detail->qty, "CURR_TO_INT")) ?></td>
+                        <td class="txt-right"><?= number_format(formatter($detail->general_price, "CURR_TO_INT") * formatter($detail->qty, "STR_TO_FLOAT")) ?></td>
                     </tr>
                 <?php } ?>
                 <tr class="table-border">

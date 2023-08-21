@@ -74,15 +74,15 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "tipe_bahan";
-    let sortType = "asc";
+    let sort = "validation_date";
+    let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [[4, 'desc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -168,7 +168,7 @@
                 } else {
                     return `
                         <div class="mt-0">
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-import/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                         </button>
                         </div>
@@ -299,7 +299,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-barang-import/delete"); ?>",
+                    url: "<?= base_url("penerimaan-barang-lokal/delete"); ?>",
                     data: {
                         id: id
                     },

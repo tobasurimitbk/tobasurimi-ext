@@ -926,7 +926,7 @@ class SPP extends BaseController
                     $no++;
                     $value->no = $no;
                     $totalPrice += formatter($value->price, "CURR_TO_INT");
-                    $totalQty += formatter($value->qty, "CURR_TO_INT");
+                    $totalQty += formatter($value->qty, "STR_TO_FLOAT");
                     $totalAll += formatter($value->totalPrice, "CURR_TO_INT");
                 }
                 $dataSPP->totalPrice = number_format($totalPrice);

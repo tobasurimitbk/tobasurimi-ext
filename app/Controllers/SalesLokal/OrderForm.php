@@ -237,8 +237,6 @@ class OrderForm extends BaseController
             return redirect()->to('/order-form-lokal/create')->back()->withInput();
         }
 
-
-
         try {
             $this->db->transBegin();
 
@@ -342,8 +340,8 @@ class OrderForm extends BaseController
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
         $customers = $this->CustomerModel->where('company_id', $this->this_company_id)->findAll();
 
-        $dataSalesOrder->order_date = date("d/m/Y", strtotime($dataSalesOrder->order_date));
-        $dataSalesOrder->shipping_date = date("d/m/Y", strtotime($dataSalesOrder->shipping_date));
+        $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
+        $dataSalesOrder->shipping_date = $dataSalesOrder->shipping_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->shipping_date)) : "";
         $data = [
             "data" => $dataSalesOrder,
             "dataCustomers" => $customers,
@@ -354,6 +352,30 @@ class OrderForm extends BaseController
         //echo json_encode($data);
 
         return view('SalesLokal/OrderForm/form', $data);
+    }
+
+    public function getByCustomerId($customerId)
+    {
+        $select = "no_sales_order AS invoice_no,
+                   total_harga AS amt,
+                   order_date AS date,
+                   (total_harga - paid_amt) AS owing,
+                   discount_rupiah AS total_disc";
+        $condition = [
+            'id_customer'       => $customerId,
+            'tipe_sales_order'  => 'LOKAL'
+        ];
+
+        $dataSalesOrder = $this->SalesOrderModel->asObject()
+            ->select($select)
+            ->where($condition)
+            ->findAll();
+
+        $data = [
+            "data" => $dataSalesOrder
+
+        ];
+        echo json_encode($data);
     }
 
     public function update()

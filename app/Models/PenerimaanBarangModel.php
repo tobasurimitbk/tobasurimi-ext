@@ -40,6 +40,8 @@ class PenerimaanBarangModel extends Model
         'ppnbm',
         'ppn',
         'pph',
+        'nilai_ppn',
+        'nilai_pph',
         'tipe_bahan',
         'biaya_masuk',
         'status_post',
@@ -157,7 +159,7 @@ class PenerimaanBarangModel extends Model
 
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
-        $builder->orderBy('no_penerimaan_barang', 'DESC');
+        $builder->orderBy('no_penerimaan_barang', 'desc');
         $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
         ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('no_penerimaan_barang', $lastStr);
@@ -167,8 +169,16 @@ class PenerimaanBarangModel extends Model
 
         $lastPenerimaan = '1';
         if ($query->getResultArray()) {
-            $lastPenerimaan = explode('/', $query->getResultArray()[0]['no_penerimaan_barang']);
-            $lastPenerimaan = intval($lastPenerimaan[1]) + 1;
+            // $lastPenerimaan = explode('/', $query->getResultArray()[0]['no_penerimaan_barang']);
+            // $lastPenerimaan = intval($lastPenerimaan[1]) + 1;
+            foreach($query->getResultArray() as $string) {
+                $explode = explode('/', $string['no_penerimaan_barang']);
+                $number = intval($explode[1]);
+                if($number > $lastPenerimaan) {
+                    $lastPenerimaan = $number;
+                }
+            }
+            $lastPenerimaan = $lastPenerimaan + 1;
         };
 
         $generatedNo = $kode . '/' . $lastPenerimaan . '/' . $lastStr;

@@ -46,7 +46,7 @@
                             <th onclick="changeSort('currencyName')" class="sort">Valas</th>
                             <th>Jumlah Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
-                            <th>Posting</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -62,14 +62,14 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "poDate";
-    let sortType = "asc";
+    let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [[1, 'desc']],
         fixedHeader: true,
         lengthMenu: [
             [25],

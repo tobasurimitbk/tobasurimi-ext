@@ -52,7 +52,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -84,7 +84,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -599,7 +599,7 @@ class POLokalBahanPenolong extends BaseController
                 foreach ($dataBPLokalDetail as $value) {
                     $no++;
                     $value->no = $no;
-                    $totalan = formatter($value->price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT") +  formatter($value->additional_cost, "CURR_TO_INT");
+                    $totalan = formatter($value->price, "CURR_TO_INT") * formatter($value->qty, "STR_TO_FLOAT") +  formatter($value->additional_cost, "CURR_TO_INT");
                     $value->nilaiPpn = number_format($totalan * (float)$value->ppnValue / 100);
                     $value->nilaiPph = number_format($totalan * (float)$value->pphValue / 100);
                     $totalPrice += $totalan;
