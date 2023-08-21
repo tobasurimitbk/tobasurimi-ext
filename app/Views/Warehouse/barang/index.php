@@ -90,7 +90,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
                                         <option value=""></option>
@@ -98,16 +98,7 @@
                                     <label for="floatingInput">Kategori</label>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select" name="kondisi_barang" id="kondisi_barang">
-                                        <option value="New">Baru</option>
-                                        <option value="Scrap">Scrap</option>
-                                    </select>
-                                    <label for="floatingInput">Kondisi</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select hs_id" name="hs_id" id="hs_id">
                                         <option value=""></option>
@@ -915,8 +906,6 @@
                             $('.ar_id').rules('remove', 'required');
                         }
 
-                        $('#kondisi_barang').val(res?.data?.barang_condition);
-                        // $('#kondisi_barang').val('Scrap');
                         $(`[name="productSpec"][value="${res?.data?.spec_type}"]`).prop('checked', true);
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".spek").val(res?.data?.spek);

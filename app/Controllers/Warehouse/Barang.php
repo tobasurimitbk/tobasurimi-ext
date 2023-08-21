@@ -117,12 +117,6 @@ class Barang extends BaseController
                     'errors' => [
                         'required' => 'Nama Barang tidak boleh kosong'
                     ]
-                ],
-                "kondisi_barang" => [
-                    "rules" => "required|in_list[New,Scrap]",
-                    'errors' => [
-                        'required' => 'Kondisi Barang tidak boleh kosong'
-                    ]
                 ]
             ];
 
@@ -151,7 +145,6 @@ class Barang extends BaseController
                     "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
                     "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
                     "kategori_id"       => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                    "barang_condition"  => $this->request->getPost("kondisi_barang"),
                     "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
@@ -214,12 +207,6 @@ class Barang extends BaseController
                     'errors' => [
                         'required' => 'Nama Barang tidak boleh kosong'
                     ]
-                ],
-                "kondisi_barang" => [
-                    "rules" => "required|in_list[New,Scrap]",
-                    'errors' => [
-                        'required' => 'Kondisi Barang tidak boleh kosong'
-                    ]
                 ]
             ];
 
@@ -272,7 +259,6 @@ class Barang extends BaseController
                     "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
                     "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
                     "kategori_id"       => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
-                    "barang_condition"  => $this->request->getPost("kondisi_barang"),
                     "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
