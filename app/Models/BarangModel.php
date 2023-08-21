@@ -212,23 +212,49 @@ class BarangModel extends Model
     {
         $arrCondition = [
             'barangs.deletedAt' => null,
-            'barangs.parent_id !=' => 0,
+            'barangs.status' => 'Aktif',
+            // 'barangs.parent_id !=' => 0,
             'metadata.deletedAt' => null,
             'metadata.value' => $kategori
         ];
 
-        $selectQry = "barangs.*,
+        /* $selectQry = "barangs.*,
         metadata.value AS value, 
+        satuans.kode_satuan AS kode_satuan, 
         ";
 
         $builder = $this->db->table('barangs')
             ->select($selectQry)
-            ->join('metadata', 'metadata.id = barangs.kategori_id');
+            ->join('metadata', 'metadata.id = barangs.kategori_id')
+            ->join('satuans', 'satuans.id = barangs.satuan_id');
         $builder->where($arrCondition)
             ->orderBy('barangs.nama_barang', 'ASC');
         $query = $builder->get();
 
-        return $query->getResultArray();
+        return $query->getResultArray(); */
+
+        $selectQry = "barangs.*,
+        metadata.value AS value, 
+        satuans.nama_satuan AS nama_satuan, 
+        ";
+        $data = $this->select($selectQry)
+            ->join('metadata', 'metadata.id = barangs.kategori_id')
+            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->where($arrCondition)
+            ->groupStart()
+                ->groupStart()
+                    ->where('barangs.parent_id !=', 0)
+                    ->where('barangs.spec_type', 'multi')
+                ->groupEnd()
+                ->orGroupStart()
+                    ->where('barangs.parent_id', 0)
+                    ->where('barangs.spec_type', 'single')
+                ->groupEnd()
+            ->groupEnd()
+            ->orderBy('barangs.nama_barang', 'ASC')
+            ->findAll();
+
+        return $data;
     }
 
     public function getBarangByType($type)

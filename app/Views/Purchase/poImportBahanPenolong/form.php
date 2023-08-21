@@ -176,8 +176,8 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran / Bulan">
-                            <label for="floatingInput">Termin Pembayaran</label>
+                            <input <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
+                            <label for="floatingInput">Termin Pembayaran (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -556,9 +556,6 @@
                 supplier_id: {
                     required: true
                 },
-                payment_term: {
-                    required: true,
-                },
                 currency: {
                     required: true,
                 },
@@ -575,9 +572,6 @@
                 },
                 supplier_id: {
                     required: "Supplier wajib diisi"
-                },
-                payment_term: {
-                    required: "Termin Pembayaran wajib diisi"
                 },
                 currency: {
                     required: "Valas wajib diisi"

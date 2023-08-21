@@ -46,7 +46,7 @@
                             <th onclick="changeSort('currencyName')" class="sort">Valas</th>
                             <th>Jumlah Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
-                            <th>Posting</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">

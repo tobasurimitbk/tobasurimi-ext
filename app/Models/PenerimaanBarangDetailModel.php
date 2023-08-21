@@ -146,7 +146,6 @@ class PenerimaanBarangDetailModel extends Model
                 rm_purchase_order_details.qty_diterima,
                 rm_purchase_order_details.remaining_qty,
                 packaging.nama_barang as nama_packaging,
-                packaging.barang_condition as packaging_condition,
                 rm_purchase_orders.po_no, 
                 rm_purchase_orders.status_penerimaan,
                 purchase_requests.spp_no'
@@ -238,7 +237,6 @@ class PenerimaanBarangDetailModel extends Model
                 am_purchase_order_details.qty_diterima,
                 am_purchase_order_details.remaining_qty,
                 packaging.nama_barang as nama_packaging,
-                packaging.barang_condition as packaging_condition,
                 am_purchase_orders.po_no,
                 am_purchase_orders.status_penerimaan,
                 purchase_requests.spp_no'
