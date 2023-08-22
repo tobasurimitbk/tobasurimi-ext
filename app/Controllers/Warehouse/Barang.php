@@ -105,13 +105,6 @@ class Barang extends BaseController
     {
         try {
             $rules = [
-                "kode_barang" => [
-                    "rules" => "required|is_unique[barangs.kode_barang]",
-                    'errors' => [
-                        'required' => 'Kode Barang tidak boleh kosong',
-                        'is_unique' => 'kode Barang sudah ada'
-                    ]
-                ],
                 "nama_barang" => [
                     "rules" => "required",
                     'errors' => [
@@ -132,13 +125,14 @@ class Barang extends BaseController
             }
 
             $parent_id = formatter($this->request->getPost("parent_id"), "STR_TO_INT");
+            $kodeBarang = $this->generateNewCode();
             $productSpec = $this->request->getPost('productSpec');
             if ($parent_id || $productSpec == 'single') {
                 $payload = [
                     "spec_type"         => $productSpec,
                     "company_id"        => $this->this_company_id,
                     "parent_id"         => formatter($this->request->getPost("parent_id") ?? 0, "STR_TO_INT"),
-                    "kode_barang"       => $this->request->getPost("kode_barang"),
+                    "kode_barang"       => $kodeBarang,
                     "nama_barang"       => $this->request->getPost("nama_barang"),
                     "type"              => $this->request->getPost("type"),
                     "supplier_id"       => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
@@ -157,7 +151,7 @@ class Barang extends BaseController
                     "spec_type"     => $productSpec,
                     "company_id"    => $this->this_company_id,
                     "parent_id"     => 0,
-                    "kode_barang"   => $this->request->getPost("kode_barang"),
+                    "kode_barang"   => $kodeBarang,
                     "nama_barang"   => $this->request->getPost("nama_barang"),
                     "status"        => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                 ];
@@ -176,7 +170,10 @@ class Barang extends BaseController
                 ];
             }
 
-            $this->barangSupplierModel->insertBatch($payload_supplier);
+            if (count($payload_supplier)) {
+                $this->barangSupplierModel->insertBatch($payload_supplier);
+            }
+            
             $this->barangModel->db->transComplete();
 
             $data = [
@@ -503,5 +500,25 @@ class Barang extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    private function generateNewCode()
+    {
+        // PR-0001
+        $lastBarang = $this->barangModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        if (empty($lastBarang)) {
+            return "PR-0001";
+        }
+
+        $lastCode = $lastBarang->kode_barang;
+        $lastCodeExp = explode('-', $lastCode);
+        $lastIncrement = (int)$lastCodeExp[1];
+        $newIncrement = str_pad(($lastIncrement + 1), 4, '0', STR_PAD_LEFT);
+
+        return "PR-$newIncrement";
     }
 }
