@@ -153,7 +153,7 @@ class PenerimaanBarangModel extends Model
         return $sppData;
     }
 
-    public function get_no($tgl, $bln, $thn, $last_day)
+    public function get_no($bln, $thn, $last_day)
     {
         $lastStr =  $thn . '/' . $bln;
 

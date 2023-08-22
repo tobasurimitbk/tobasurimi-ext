@@ -32,7 +32,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK" maxlength="30">
+                                <input type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK">
                                 <label for="floatingInput">NIK</label>
                             </div>
                         </div>

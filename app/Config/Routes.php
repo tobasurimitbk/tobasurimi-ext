@@ -421,6 +421,7 @@ $routes->get('/city/(:segment)', 'Master\City::getCityByProvince/$1', ['filter' 
 // EMPLOYEE
 $routes->get('/employee/dropdown', 'Master\Employee::dropdownEmployee', ['filter' => 'Auth']);
 $routes->get('/employee-pic/dropdown', 'Master\Employee::dropdownEmployeePIC', ['filter' => 'Auth']);
+$routes->get('/employee-division/dropdown', 'Master\Employee::dropdownEmployeeByDivision', ['filter' => 'Auth']);
 
 // SHIFT
 $routes->get('/shift/dropdown', 'Master\Shift::dropdownShift', ['filter' => 'Auth']);

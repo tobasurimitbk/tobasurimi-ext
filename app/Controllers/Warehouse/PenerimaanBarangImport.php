@@ -325,7 +325,7 @@ class PenerimaanBarangImport extends BaseController
 
             if ($this->validate($rules)) {
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
                 $status_post = $this->request->getPost("status_post");
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
@@ -518,7 +518,7 @@ class PenerimaanBarangImport extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
                 $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                $no = $this->penerimaanBarangModel->get_no(date('d'), date('m'), date('Y'), $last_day);
+                $no = $this->penerimaanBarangModel->get_no(date('m'), date('Y'), $last_day);
                 $tipe_bahan = $this->request->getPost("tipe_bahan");
                 $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
 
