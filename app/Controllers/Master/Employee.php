@@ -74,6 +74,19 @@ class Employee extends BaseController
         return;
     }
 
+    public function dropdownEmployeeByDivision()
+    {
+        $division = $this->request->getGet("division");
+        $dataEmployee = $this->EmployeesModel->getEmployeesByDivision($this->this_company_id, $division);
+
+        $data = [
+            "data" => $dataEmployee
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function dropdownEmployeePIC()
     {
         $dataEmployee = [];

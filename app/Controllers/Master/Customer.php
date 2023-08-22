@@ -91,10 +91,6 @@ class Customer extends BaseController
                 "phone" => $res[$i]["phone"],
                 "contact_person" => $res[$i]["contact_person"],
                 "email" => $res[$i]["email"],
-                "no_rekening" => $res[$i]["no_rekening"],
-                "supplier_buyer" => $res[$i]["supplier_buyer"],
-                "ap_name" => $res[$i]["ap_name"],
-                "ar_name" => $res[$i]["ar_name"]
             );
         }
 
@@ -113,84 +109,38 @@ class Customer extends BaseController
     {
         try {
             $rules = [
-                "kode" => [
-                    "rules" => "required"
-                ],
                 "name" => [
                     "rules" => "required"
                 ],
                 "address" => [
                     "rules" => "required"
-                ],
-                "no_npwp" => [
-                    "rules" => "required"
-                ],
-                "phone" => [
-                    "rules" => "required"
-                ],
-                "contact_person" => [
-                    "rules" => "required"
-                ],
-                "email" => [
-                    "rules" => "required"
-                ],
-                "no_rekening" => [
-                    "rules" => "required"
-                ],
-                "supplier_buyer" => [
-                    "rules" => "required"
-                ],
-                // "province_parent_id" => [
-                //     "rules" => "required"
-                // ],
-                // "city_parent_id" => [
-                //     "rules" => "required"
-                // ],
-                "ap_id" => [
-                    "rules" => "required"
-                ],
-                "ar_id" => [
-                    "rules" => "required"
                 ]
             ];
 
             if ($this->validate($rules)) {
-
+                $last_year = date("Y-m-t", strtotime(date('Y') . "-12-31"));
+                $kode = $this->CustomerModel->get_kode(date('m'), date('y'), $last_year);
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
+                    "kode" => $kode,
+                    "nik" => $this->request->getPost("nik"),
                     "name" => $this->request->getPost("name"),
                     "address" => $this->request->getPost("address"),
                     "no_npwp" => $this->request->getPost("no_npwp"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
-                    "bank_id" => $this->request->getPost("bank_id"),
                     "postal_code" => $this->request->getPost("parent_postal_code"),
-                    "nama_rekening" => $this->request->getPost("nama_rekening"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                     "province_id" => $this->request->getPost("province_parent_id"),
                     "city_id" => $this->request->getPost("city_parent_id"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "list_address" => json_decode($this->request->getPost("list_address"))
+                    "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
+                    "sales_id" => $this->request->getPost("sales_id"),
+                    "nik" => $this->request->getPost("nik"),
+                    "pajak" => !empty($this->request->getPost("pajak")) ? "1" : "0"
                 ];
+
                 $id = $this->CustomerModel->insert($values);
                 if ($id > 0) {
-                    $dlist_address = json_decode($this->request->getPost("list_address"), true);
-                    for ($i = 0; $i < count($dlist_address); $i++) {
-                        $values = [
-                            "customer_id"   => $id,
-                            "address"       => $dlist_address[$i]["address"],
-                            "province_id"   => isset($dlist_address[$i]["province_id"]) ? $dlist_address[$i]["province_id"] : "",
-                            "city_id"       => isset($dlist_address[$i]["city_id"]) ? $dlist_address[$i]["city_id"] : "",
-                            "postal_code"   => isset($dlist_address[$i]["postal_code"]) ? $dlist_address[$i]["postal_code"] : "",
-                            "main_address"  => isset($dlist_address[$i]["main_address"]) ? $dlist_address[$i]["main_address"] : "0",
-                        ];
-                        $this->ListAddressesModel->insert($values);
-                    }
-
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil disimpan",
@@ -231,43 +181,10 @@ class Customer extends BaseController
     {
         try {
             $rules = [
-                "kode" => [
-                    "rules" => "required"
-                ],
                 "name" => [
                     "rules" => "required"
                 ],
                 "address" => [
-                    "rules" => "required"
-                ],
-                "no_npwp" => [
-                    "rules" => "required"
-                ],
-                "phone" => [
-                    "rules" => "required"
-                ],
-                "contact_person" => [
-                    "rules" => "required"
-                ],
-                "email" => [
-                    "rules" => "required"
-                ],
-                "no_rekening" => [
-                    "rules" => "required"
-                ],
-                "supplier_buyer" => [
-                    "rules" => "required"
-                ],
-                // "province_parent_id" => [
-                //     "rules" => "required"
-                // ],
-                // "city_parent_id" => [
-                //     "rules" => "required"
-                // ],
-                "ap_id" => [
-                    "rules" => "required"
-                ],
-                "ar_id" => [
                     "rules" => "required"
                 ]
             ];
@@ -279,53 +196,22 @@ class Customer extends BaseController
 
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
                     "name" => $this->request->getPost("name"),
+                    "nik" => $this->request->getPost("nik"),
                     "address" => $this->request->getPost("address"),
                     "no_npwp" => $this->request->getPost("no_npwp"),
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
                     "postal_code" => $this->request->getPost("parent_postal_code"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
-                    "bank_id" => $this->request->getPost("bank_id"),
-                    "nama_rekening" => $this->request->getPost("nama_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                     "province_id" => $this->request->getPost("province_parent_id"),
                     "city_id" => $this->request->getPost("city_parent_id"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "list_address" => json_decode($this->request->getPost("list_address"))
+                    "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
+                    "sales_id" => $this->request->getPost("sales_id"),
+                    "nik" => $this->request->getPost("nik"),
+                    "pajak" => !empty($this->request->getPost("pajak")) ? "1" : "0"
                 ];
                 if ($this->CustomerModel->update($id, $values)) {
-                    $dlist_address = json_decode($this->request->getPost("list_address"), true);
-                    for ($i = 0; $i < count($dlist_address); $i++) {
-
-                        $values = [
-                            "customer_id"   => $id,
-                            "address"       => $dlist_address[$i]["address"],
-                            "province_id"   => isset($dlist_address[$i]["province_id"]) ? $dlist_address[$i]["province_id"] : "",
-                            "city_id"       => isset($dlist_address[$i]["city_id"]) ? $dlist_address[$i]["city_id"] : "",
-                            "postal_code"   => isset($dlist_address[$i]["postal_code"]) ? $dlist_address[$i]["postal_code"] : "",
-                            "main_address"  => isset($dlist_address[$i]["main_address"]) ? $dlist_address[$i]["main_address"] : "0",
-                        ];
-
-                        if (isset($dlist_address[$i]["isDelete"])) {
-                            if ($dlist_address[$i]["isDelete"] == 1) {
-                                $values = [
-                                    "deletedAt" => date("Y-m-d H:i:s")
-                                ];
-
-                                $this->ListAddressesModel->update($dlist_address[$i]["id"], $values);
-                            }
-                        } else {
-                            if (isset($dlist_address[$i]["id"])) {
-                                $this->ListAddressesModel->update($dlist_address[$i]["id"], $values);
-                            } else {
-                                $this->ListAddressesModel->insert($values);
-                            }
-                        }
-                    }
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
@@ -361,26 +247,13 @@ class Customer extends BaseController
         if (!empty($id)) {
             $res = $this->CustomerModel->get_by_id($id, '1');
 
-            //$response = curl_request("GET", "/customers/$id?idCompany=$this->this_company_id", $this->token);
-            //if ($response["code"] === 200) {
             if (count($res) > 0) {
-                $res_list = $this->ListAddressesModel->get_by_customer_id($id, '1');
-                for ($i = 0; $i < count($res_list); $i++) {
-                    $res_list[$i]->province_id = ($res_list[$i]->province_id == null) ? "" : $res_list[$i]->province_id;
-                    $res_list[$i]->province_name = ($res_list[$i]->province_name == null) ? "" : $res_list[$i]->province_name;
-                    $res_list[$i]->city_id = ($res_list[$i]->city_id == null) ? "" : $res_list[$i]->city_id;
-                    $res_list[$i]->city_name = ($res_list[$i]->city_name == null) ? "" : $res_list[$i]->city_name;
-                    $res_list[$i]->postal_code = ($res_list[$i]->postal_code == null) ? "" : $res_list[$i]->postal_code;
-                }
-                $res[0]["list_address"] = $res_list;
                 $data = [
                     "status"  => true,
                     "data"    => $res[0]
-                    //"data"  => json_decode($response["body"])->data,
                 ];
                 echo json_encode($data);
             } else {
-                //$message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Ditampilkan';
                 $message = 'Data Gagal Ditampilkan';
                 $data = [
                     "status" => false,

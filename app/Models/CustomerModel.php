@@ -6,9 +6,14 @@ use CodeIgniter\Model;
 
 class CustomerModel extends Model
 {
-    protected $table = 'customers';
-    protected $primaryKey = 'id';
+    protected $DBGroup          = 'default';
+    protected $table            = 'customers';
+    protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
+    protected $insertID         = 0;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = true;
+    protected $protectFields    = true;
     protected $allowedFields = [
         'id',
         'company_id',
@@ -21,23 +26,43 @@ class CustomerModel extends Model
         'phone',
         'contact_person',
         'email',
-        'no_rekening',
-        'bank_id',
-        'nama_rekening',
-        'supplier_buyer',
         'postal_code',
-        'ap_id',
-        'ar_id',
+        'tipe_pelanggan',
+        'nik',
+        'sales_id',
+        'pajak',
         'createdAt',
         'updatedAt',
         'deletedAt'
     ];
 
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
+
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
+
     public function get_by_id($id)
     {
-        $requete = "SELECT customers.*,ap.nama_sub as ap_name, ar.nama_sub as ar_name FROM customers ";
-        $requete .= "LEFT JOIN sub_akuns ap ON (ap.id=customers.ap_id) ";
-        $requete .= "LEFT JOIN sub_akuns ar ON (ar.id=customers.ar_id) ";
+        $requete = "SELECT customers.* FROM customers ";
         $requete .= "WHERE customers.deletedAt is null and customers.id='" . $id . "'";
 
         $query = $this->db->query($requete);
@@ -46,11 +71,9 @@ class CustomerModel extends Model
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
-        $requete = "SELECT customers.*,provinces.province_name,cities.city_name,s1.nama_sub as ap_name,s2.nama_sub as ar_name FROM customers ";
+        $requete = "SELECT customers.*,provinces.province_name,cities.city_name FROM customers ";
         $requete .= "LEFT JOIN provinces ON (customers.province_id=provinces.id) ";
         $requete .= "LEFT JOIN cities ON (customers.city_id=cities.id) ";
-        $requete .= "LEFT JOIN sub_akuns s1 ON (customers.ap_id=s1.id) ";
-        $requete .= "LEFT JOIN sub_akuns s2 ON (customers.ar_id=s2.id) ";
         $requete .= "WHERE customers.deletedAt is null ";
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND UPPER(customers.name) like '%" . strtoupper($values["name"]) . "%' ");
@@ -91,5 +114,38 @@ class CustomerModel extends Model
         $query = $builder->get();
 
         return $query->getResultArray();
+    }
+
+    public function get_kode($bln, $thn, $last_year)
+    {
+        $lastStr =  $thn;
+
+        $builder = $this->db->table('customers');
+        $builder->select('kode');
+        $builder->orderBy('kode', 'desc');
+        $builder->where('createdAt >=', $thn . "-01-01" . " 00:00:00")
+        ->where('createdAt <=', $last_year . " 23:59:59");
+        $builder->like('kode', $lastStr);
+        $query = $builder->get();
+
+        $kode = 'CS';
+
+        $lastKode = '1';
+        if ($query->getResultArray()) {
+            // $lastPenerimaan = explode('/', $query->getResultArray()[0]['no_penerimaan_barang']);
+            // $lastPenerimaan = intval($lastPenerimaan[1]) + 1;
+            foreach($query->getResultArray() as $string) {
+                $explode = explode('/', $string['kode']);
+                $number = intval($explode[1]);
+                if($number > $lastKode) {
+                    $lastKode = $number;
+                }
+            }
+            $lastKode = $lastKode + 1;
+        };
+
+        $generatedNo = $kode . '/' . $bln . '/' . $thn . '/' . $lastKode;
+
+        return $generatedNo;
     }
 }
