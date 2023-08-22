@@ -116,9 +116,9 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function get_kode($bln, $thn, $last_year)
+    public function get_kode($bln, $thn, $thn2, $last_year)
     {
-        $lastStr =  $thn;
+        $lastStr =  $thn2;
 
         $builder = $this->db->table('customers');
         $builder->select('kode');
@@ -130,21 +130,19 @@ class CustomerModel extends Model
 
         $kode = 'CS';
 
-        $lastKode = '1';
+        $lastKode = '0001';
         if ($query->getResultArray()) {
-            // $lastPenerimaan = explode('/', $query->getResultArray()[0]['no_penerimaan_barang']);
-            // $lastPenerimaan = intval($lastPenerimaan[1]) + 1;
             foreach($query->getResultArray() as $string) {
                 $explode = explode('/', $string['kode']);
-                $number = intval($explode[1]);
+                $number = intval($explode[3]);
                 if($number > $lastKode) {
                     $lastKode = $number;
                 }
             }
-            $lastKode = $lastKode + 1;
+            $lastKode = sprintf("%04d", $lastKode + 1);
         };
 
-        $generatedNo = $kode . '/' . $bln . '/' . $thn . '/' . $lastKode;
+        $generatedNo = $kode . '/' . $bln . '/' . $thn2 . '/' . $lastKode;
 
         return $generatedNo;
     }

@@ -119,7 +119,7 @@ class Customer extends BaseController
 
             if ($this->validate($rules)) {
                 $last_year = date("Y-m-t", strtotime(date('Y') . "-12-31"));
-                $kode = $this->CustomerModel->get_kode(date('m'), date('y'), $last_year);
+                $kode = $this->CustomerModel->get_kode(date('m'), date('Y'), date('y'), $last_year);
                 $values = [
                     "company_id" => $this->this_company_id,
                     "kode" => $kode,

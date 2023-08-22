@@ -169,8 +169,6 @@ class PenerimaanBarangModel extends Model
 
         $lastPenerimaan = '1';
         if ($query->getResultArray()) {
-            // $lastPenerimaan = explode('/', $query->getResultArray()[0]['no_penerimaan_barang']);
-            // $lastPenerimaan = intval($lastPenerimaan[1]) + 1;
             foreach($query->getResultArray() as $string) {
                 $explode = explode('/', $string['no_penerimaan_barang']);
                 $number = intval($explode[1]);
