@@ -61,4 +61,10 @@ class MetadataModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getByName(string $name): array
+    {
+        return $this->asObject()
+            ->where('name', $name)->findAll();
+    }
 }

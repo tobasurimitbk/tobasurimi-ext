@@ -6,7 +6,10 @@ use App\Controllers\BaseController;
 
 use App\Models\BarangModel;
 use App\Models\BarangSupplierModel;
+use App\Models\HSCodeModel;
 use App\Models\MetadataModel;
+use App\Models\SatuansModel;
+use App\Models\Sub_AkunsModel;
 
 class Barang extends BaseController
 {
@@ -14,7 +17,10 @@ class Barang extends BaseController
     protected $this_company_id;
     protected $barangModel;
     protected $barangSupplierModel;
+    protected $HSCodeModel;
     protected $metadataModel;
+    protected $SatuansModel;
+    protected $Sub_AkunsModel;
 
     public function __construct()
     {
@@ -22,7 +28,10 @@ class Barang extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
         $this->barangSupplierModel = new BarangSupplierModel();
+        $this->HSCodeModel = new HSCodeModel();
         $this->metadataModel = new MetadataModel();
+        $this->SatuansModel = new SatuansModel();
+        $this->Sub_AkunsModel = new Sub_AkunsModel();
     }
 
     public function barang()
@@ -30,8 +39,28 @@ class Barang extends BaseController
         // Get Kategori
         $dataKategori = $this->metadataModel->get_by_name('Kategori Barang');
 
+        // get parent barang
+        $dataBarangParent = $this->barangModel->getParentBarang($this->this_company_id);
+
+        // get kategori barang
+        $kategoriBarangData = $this->metadataModel->getByName('kategori barang');
+
+        // get ap ar account
+        $dataAPAR = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
+
+        // get satuan data
+        $satuanData = $this->SatuansModel->asObject()->findAll();
+
+        // get data HS
+        $dataKodeHS = $this->HSCodeModel->asObject()->findAll();
+
         $data = [
-            "dataKategori" => $dataKategori
+            "dataKategori"      => $dataKategori,
+            "dataBarangParent"  => $dataBarangParent,
+            "kategoriBarangData"=> $kategoriBarangData,
+            "aparData"          => $dataAPAR,
+            "satuanData"        => $satuanData,
+            "dataKodeHS"        => $dataKodeHS
         ];
 
         return view('Warehouse/barang/index', $data);
