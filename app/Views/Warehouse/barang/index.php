@@ -32,6 +32,9 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select parent_id" name="parent_id" id="parent_id">
                                     <option value=""></option>
+                                    <?php foreach ($dataBarangParent as $parent): ?>
+                                    <option value="<?= $parent->id ?>"><?= "$parent->kode_barang - $parent->nama_barang" ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Parent Barang</label>
                             </div>
@@ -50,6 +53,20 @@
                         </div>
                     </div>
                     <div class="is_parent" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" class="form-control spek" name="spek" id="spek" placeholder="Spesifikasi">
+                                    <label for="floatingInput">Spesifikasi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
+                                    <label for="floatingInput">Stok</label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -76,8 +93,35 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
+                                        <option value=""></option>
+                                        <?php foreach ($kategoriBarangData as $kategori): ?>
+                                        <option value="<?= $kategori->id ?>"><?= $kategori->value ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Kategori</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select hs_id" name="hs_id" id="hs_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataKodeHS as $dataAccount): ?>
+                                        <option value="<?= $dataAccount->id ?>"><?= $dataAccount->code ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Kode HS</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                         <option value=""></option>
+                                        <?php foreach ($satuanData as $satuan): ?>
+                                        <option value="<?= $satuan->id ?>"><?= $satuan->nama_satuan ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput">Satuan Barang</label>
                                 </div>
@@ -92,26 +136,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
-                                        <option value=""></option>
-                                    </select>
-                                    <label for="floatingInput">Kategori</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select hs_id" name="hs_id" id="hs_id">
-                                        <option value=""></option>
-                                    </select>
-                                    <label for="floatingInput">Kode HS</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select ap_id" name="ap_id" id="ap_id">
                                         <option value=""></option>
+                                        <?php foreach ($aparData as $accountData): ?>
+                                        <option value="<?= $accountData->id ?>"><?= "[$accountData->no_sub]$accountData->nama_sub" ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput">Akun Pembelian</label>
                                 </div>
@@ -120,22 +149,11 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select ar_id" name="ar_id" id="ar_id">
                                         <option value=""></option>
+                                        <?php foreach ($aparData as $accountData): ?>
+                                        <option value="<?= $accountData->id ?>"><?= "[$accountData->no_sub]$accountData->nama_sub" ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput">Akun Penjualan</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="text" class="form-control spek" name="spek" id="spek" placeholder="Spesifikasi">
-                                    <label for="floatingInput">Spesifikasi</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
-                                    <label for="floatingInput">Stok</label>
                                 </div>
                             </div>
                         </div>
@@ -700,6 +718,9 @@
             $('.hs_id').rules('remove', 'required');
             $('.ap_id').rules('remove', 'required');
             $('.ar_id').rules('remove', 'required');
+            $("#parent_id").val('').trigger('change');
+            $("#kode_barang").val('');
+            $("#nama_barang").val('');
             $(".type").val();
             $('.spek').val();
             $(".supplier_id").val([]).change();
@@ -714,7 +735,7 @@
             $(".stok").attr("readonly", false);
             $(".kode_barang").attr("readonly", false);
 
-            $.ajax({
+            /* $.ajax({
                 url: `<?= base_url("barang/dropdown/parent"); ?>`,
                 method: "GET",
                 dataType: "json",
@@ -727,9 +748,9 @@
 
                     $(".parent_id").val("").change();
                 }
-            })
+            }) */
 
-            $.ajax({
+            /* $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
                 method: "GET",
                 data: {
@@ -745,9 +766,9 @@
 
                     $(".kategori_id").val("").change();
                 }
-            })
+            }) */
 
-            $.ajax({
+            /* $.ajax({
                 url: `<?= base_url("ap-ar/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
@@ -766,9 +787,9 @@
                     $(".ap_id").val("").change();
                     $(".ar_id").val("").change();
                 }
-            })
+            }) */
 
-            $.ajax({
+            /* $.ajax({
                 url: `<?= base_url("satuan/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
@@ -783,9 +804,9 @@
 
                     $(".satuan_id").val("").change();
                 }
-            })
+            }) */
 
-            $.ajax({
+            /* $.ajax({
                 url: `<?= base_url("hs-code/dropdown"); ?>`,
                 method: "GET",
                 dataType: "json",
@@ -801,7 +822,9 @@
                     $(".hs_id").val("").change();
                     $(".add-modal").modal("show")
                 }
-            })
+            }) */
+
+            $(".add-modal").modal("show")
         })
 
         $('[name="productSpec"]').change(function() {
