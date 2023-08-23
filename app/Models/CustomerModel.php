@@ -32,7 +32,7 @@ class CustomerModel extends Model
         'currency',
         'saldo',
         'nik',
-        'sales',
+        'sales_id',
         'createdAt',
         'updatedAt',
         'deletedAt'
