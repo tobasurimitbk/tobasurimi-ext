@@ -9,18 +9,18 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="nama" name="nama" placeholder="Nama">
+                                <input autocomplete="off" type="text" class="form-control name" id="nama" name="nama" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control ip" id="ip" name="ip" placeholder="IP">
+                                <input autocomplete="off" type="text" class="form-control ip" id="ip" name="ip" placeholder="IP">
                                 <label for="floatingInput">IP</label>
                             </div>
                         </div>
@@ -28,7 +28,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control unit_key" id="unit_key" name="unit_key" placeholder="Unit Key">
+                                <input autocomplete="off" type="text" class="form-control unit_key" id="unit_key" name="unit_key" placeholder="Unit Key">
                                 <label for="floatingInput">Unit Key</label>
                             </div>
 
@@ -38,7 +38,7 @@
                             <div class="ffloat mb-3" style="height: 50px;">
                                 <label for="floatingInput">Master</label>
                                 <div>
-                                    <input class="master" name="master" id="master" value="1" type="checkbox">
+                                    <input autocomplete="off" class="master" name="master" id="master" value="1" type="checkbox">
                                 </div>
                             </div>
 
@@ -64,7 +64,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-12">
@@ -96,7 +96,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

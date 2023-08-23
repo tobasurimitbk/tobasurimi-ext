@@ -39,7 +39,7 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->id : ""; ?>" />
+            <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->id : ""; ?>" />
             <?= csrf_field() ?>
             <div class="row mb-1">
                 <div class="col-md-4">
@@ -51,18 +51,18 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_penerimaan_barang : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
+                                <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_penerimaan_barang : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                                 <label for="floatingInput">No. Penerimaan</label>
                             </div>
                             <div style="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <input autocomplete="off" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="hidden" name="tipe" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->tipe_bahan : ""; ?>" />
+                        <input autocomplete="off" type="hidden" name="tipe" value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->tipe_bahan : ""; ?>" />
                         <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
                             <option value="BAKU" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "BAKU" ? "selected" : "") : ""; ?>>Bahan Baku</option>
                             <option value="PENOLONG" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->tipe_bahan === "PENOLONG" ? "selected" : "") : ""; ?>>Bahan Penolong</option>
@@ -181,14 +181,14 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->aju_no : ""; ?>" type="text" class="form-control aju_no" name="aju_no" id="aju_no" placeholder="No. Invoice">
+                        <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->aju_no : ""; ?>" type="text" class="form-control aju_no" name="aju_no" id="aju_no" placeholder="No. Invoice">
                         <label for="floatingInput">No. AJU</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : "") : ""; ?>" type="text" class="form-control input-picker validation_date" id="validation_date" name="validation_date" placeholder="Tanggal Pendaftaran">
+                            <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->validation_date ? date("d/m/Y", strtotime($dataPenerimaanBarang->validation_date)) : "") : ""; ?>" type="text" class="form-control input-picker validation_date" id="validation_date" name="validation_date" placeholder="Tanggal Pendaftaran">
                             <label for="floatingInput">Tanggal Pendaftaran</label>
                         </div>
                     </div>
@@ -198,7 +198,7 @@
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_registration : ""; ?>" type="text" class="form-control no_registration" id="no_registration" name="no_registration" placeholder="No. Pendaftaran">
+                            <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->no_registration : ""; ?>" type="text" class="form-control no_registration" id="no_registration" name="no_registration" placeholder="No. Pendaftaran">
                             <label for="floatingInput">No. Pendaftaran</label>
                         </div>
                     </div>
@@ -212,19 +212,19 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->invoice_no : ""; ?>" type="text" class="form-control invoice_no" id="invoice_no" name="invoice_no" placeholder="No. Invoice">
+                        <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->invoice_no : ""; ?>" type="text" class="form-control invoice_no" id="invoice_no" name="invoice_no" placeholder="No. Invoice">
                         <label for="floatingInput">No. Invoice</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->total_weight : ""; ?>" type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
+                        <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang->total_weight : ""; ?>" type="number" class="form-control total_weight" id="total_weight" name="total_weight" placeholder="Berat">
                         <label for="floatingInput">Berat</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->shipping_cost) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim (Opsional)">
+                        <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->shipping_cost) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim (Opsional)">
                         <label for="floatingInput">Biaya Ongkos Kirim (Opsional)</label>
                     </div>
                 </div>
@@ -232,7 +232,7 @@
             <div class="row">
                 <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->biaya_masuk) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Bea Masuk">
+                            <input autocomplete="off" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->biaya_masuk) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control biaya_masuk" name="biaya_masuk" id="biaya_masuk" placeholder="Bea Masuk">
                             <label for="floatingInput">Bea Masuk</label>
                         </div>
                     </div>
@@ -246,19 +246,19 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->ppn, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control ppn" name="ppn" id="ppn" placeholder="PPN % (Opsional)">
+                        <input autocomplete="off" value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->ppn, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control ppn" name="ppn" id="ppn" placeholder="PPN % (Opsional)">
                         <label for="floatingInput">PPN % (Opsional)</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->pph, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control pph" name="pph" id="pph" placeholder="PPH % (Opsional)">
+                        <input autocomplete="off" value="<?= !empty($dataPenerimaanBarang) ? formatter($dataPenerimaanBarang->pph, "STR_TO_INT") : ""; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control pph" name="pph" id="pph" placeholder="PPH % (Opsional)">
                         <label for="floatingInput">PPH % (Opsional)</label>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly="true" value="<?= !empty($dataPenerimaanBarang) ? number_format(formatter($dataPenerimaanBarang->nilai_ppn, "STR_TO_INT")) : ""; ?>" type="text" class="form-control nilai_ppn" name="nilai_ppn" id="nilai_ppn" placeholder="PPN">
+                        <input autocomplete="off" readonly="true" value="<?= !empty($dataPenerimaanBarang) ? number_format(formatter($dataPenerimaanBarang->nilai_ppn, "STR_TO_INT")) : ""; ?>" type="text" class="form-control nilai_ppn" name="nilai_ppn" id="nilai_ppn" placeholder="PPN">
                         <label for="floatingInput">PPN</label>
                     </div>
                 </div>
@@ -266,7 +266,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly="true" value="<?= !empty($dataPenerimaanBarang) ? number_format(formatter($dataPenerimaanBarang->nilai_pph, "STR_TO_INT")) : ""; ?>" type="text" class="form-control nilai_pph" name="nilai_pph" id="nilai_pph" placeholder="PPH">
+                        <input autocomplete="off" readonly="true" value="<?= !empty($dataPenerimaanBarang) ? number_format(formatter($dataPenerimaanBarang->nilai_pph, "STR_TO_INT")) : ""; ?>" type="text" class="form-control nilai_pph" name="nilai_pph" id="nilai_pph" placeholder="PPH">
                         <label for="floatingInput">PPH</label>
                     </div>
                 </div>
@@ -398,8 +398,8 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <input type="hidden" class="purchase_order_details_id" name="purchase_order_details_id" id="purchase_order_details_id" />
+                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="off" type="hidden" class="purchase_order_details_id" name="purchase_order_details_id" id="purchase_order_details_id" />
                     <div class="row">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Barang</h5>
@@ -408,16 +408,16 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="hidden" class="kode" name="kode" id="kode" />
-                                <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
-                                <input type="hidden" class="unit" name="unit" id="unit" />
-                                <input type="text" readonly="true" class="form-control kode_barang" id="kode_barang" name="kode_barang" placeholder="Kode Barang">
+                                <input autocomplete="off" type="hidden" class="kode" name="kode" id="kode" />
+                                <input autocomplete="off" type="hidden" class="barang_id" name="barang_id" id="barang_id" />
+                                <input autocomplete="off" type="hidden" class="unit" name="unit" id="unit" />
+                                <input autocomplete="off" type="text" readonly="true" class="form-control kode_barang" id="kode_barang" name="kode_barang" placeholder="Kode Barang">
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
+                                <input autocomplete="off" type="text" readonly="true" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
@@ -425,13 +425,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control satuan_order" id="satuan_order" name="satuan_order" placeholder="Satuan Order">
+                                <input autocomplete="off" type="text" readonly="true" class="form-control satuan_order" id="satuan_order" name="satuan_order" placeholder="Satuan Order">
                                 <label for="floatingInput">Satuan Order</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control qty" id="qty" name="qty" placeholder="Jumlah Order">
+                                <input autocomplete="off" type="text" readonly="true" class="form-control qty" id="qty" name="qty" placeholder="Jumlah Order">
                                 <label for="floatingInput">Jumlah Order</label>
                             </div>
                         </div>
@@ -439,13 +439,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control qty_diterima" id="qty_diterima" name="qty_diterima" placeholder="Qty Diterima">
+                                <input autocomplete="off" type="text" readonly="true" class="form-control qty_diterima" id="qty_diterima" name="qty_diterima" placeholder="Qty Diterima">
                                 <label for="floatingInput">Qty Diterima</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control remaining_qty" id="remaining_qty" name="remaining_qty" placeholder="Sisa">
+                                <input autocomplete="off" type="text" readonly="true" class="form-control remaining_qty" id="remaining_qty" name="remaining_qty" placeholder="Sisa">
                                 <label for="floatingInput">Sisa</label>
                             </div>
                         </div>
@@ -453,7 +453,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" class="form-control jml_masuk" id="jml_masuk" name="jml_masuk" placeholder="Jumlah Diterima">
+                                <input autocomplete="off" type="number" class="form-control jml_masuk" id="jml_masuk" name="jml_masuk" placeholder="Jumlah Diterima">
                                 <label for="floatingInput">Jumlah Masuk</label>
                             </div>
                         </div>
@@ -472,13 +472,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nama_barang_dokumen" id="nama_barang_dokumen" name="nama_barang_dokumen" placeholder="Nama Barang di dokumen">
+                                <input autocomplete="off" type="text" class="form-control nama_barang_dokumen" id="nama_barang_dokumen" name="nama_barang_dokumen" placeholder="Nama Barang di dokumen">
                                 <label for="floatingInput">Nama Barang di dokumen</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control harga_barang_jasa" name="harga_barang_jasa" id="harga_barang_jasa" placeholder="Harga Satuan">
+                                <input autocomplete="off" onkeyup="formatNumber(this)" type="text" class="form-control harga_barang_jasa" name="harga_barang_jasa" id="harga_barang_jasa" placeholder="Harga Satuan">
                                 <label for="floatingInput">Harga Satuan</label>
                             </div>
                         </div>
@@ -486,7 +486,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control nilai_sub_total" name="nilai_sub_total" id="nilai_sub_total" placeholder="Total Harga">
+                                <input autocomplete="off" onkeyup="formatNumber(this)" type="text" class="form-control nilai_sub_total" name="nilai_sub_total" id="nilai_sub_total" placeholder="Total Harga">
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
@@ -507,7 +507,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" class="form-control packaging_qty" id="packaging_qty" name="packaging_qty" placeholder="Jumlah Kemasan">
+                                <input autocomplete="off" type="number" class="form-control packaging_qty" id="packaging_qty" name="packaging_qty" placeholder="Jumlah Kemasan">
                                 <label for="floatingInput">Jumlah Kemasan</label>
                             </div>
                         </div>

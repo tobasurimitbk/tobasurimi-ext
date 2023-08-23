@@ -334,7 +334,7 @@
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <input type="hidden" name="status_type" id="status_type" value="">
+    <input autocomplete="off" type="hidden" name="status_type" id="status_type" value="">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -342,11 +342,11 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row">
                         <div class="col-12">
                             <div class="form-floating">
-                                <input type="password" class="form-control pin" id="pin" name="pin" placeholder="PIN">
+                                <input autocomplete="off" type="password" class="form-control pin" id="pin" name="pin" placeholder="PIN">
                                 <label for="floatingInput">PIN</label>
                             </div>
                         </div>

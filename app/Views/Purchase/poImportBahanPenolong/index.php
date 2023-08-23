@@ -15,7 +15,7 @@
         <div class="row justify-content-end row-col-spp">
             <div class="col mb-3">
                 <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                    <input autocomplete="off" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                     </div>
@@ -23,14 +23,14 @@
             </div>
             <div class="col mb-3">
                 <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                    <input autocomplete="off" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                     </div>
                 </div>
             </div>
             <div class="col mb-3">
-                <input class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
+                <input autocomplete="off" class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
             </div>
         </div>
         <div class="row">

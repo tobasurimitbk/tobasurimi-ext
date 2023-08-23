@@ -45,77 +45,148 @@ class Customer extends BaseController
 
     public function allCustomer()
     {
-
-        $draw = $this->request->getVar('draw');
-        $row = $this->request->getVar('start');
-        $rowperpage = $this->request->getVar('length');
-        $temp = $this->request->getVar('order');
-        $columnIndex = $temp[0]['column']; // Column index
-
-        $temp = $this->request->getVar('columns');
-        $columnName = $temp[$columnIndex]['data']; // Column index
-
-        $temp = $this->request->getVar('order');
-        $columnSortOrder = $temp[0]['dir']; // Column index
-
-        $search = $this->request->getVar('search');
-        //$searchValue = $temp['value']; // Column index
-
-        $values = [
-            "company_id"    => $this->this_company_id,
-            "search"        => $search
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType")
         ];
 
-        $totalRecords = $this->CustomerModel->total_list(array());
-        $totalRecordwithFilter = $this->CustomerModel->total_list($values);
+        $condition = [];
 
-        $res = $this->CustomerModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType")
+        ];
 
-        $number = $row * $rowperpage;
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $customerData = $this->CustomerModel->getList($condition, $addCondition, $limit, $offset);
 
-        $data = [];
+        $dataCustomer = [];
 
-        for ($i = 0; $i < count($res); $i++) {
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $data[] = array(
-                "number" => ($row + $i + 1),
-                "no" => ($row + $i + 1),
-                "id" => $res[$i]["id"],
-                "kode" => $res[$i]["kode"],
-                "name" => $res[$i]["name"],
-                "address" => $res[$i]["address"],
-                "province_name" => $res[$i]["province_name"],
-                "city_name" => $res[$i]["city_name"],
-                "postal_code" => $res[$i]["postal_code"],
-                "no_npwp" => $res[$i]["no_npwp"],
-                "phone" => $res[$i]["phone"],
-                "contact_person" => $res[$i]["contact_person"],
-                "email" => $res[$i]["email"],
-            );
+        foreach ($customerData['data'] as $data) {
+            array_push($dataCustomer, [
+                "no"            => $no++,
+                "id"            => $data->id,
+                "kode"          => $data->kode,
+                "name"          => $data->name,
+                "phone"         => $data->phone,
+                "contact_person"=> $data->contact_person,
+                "saldo"         => number_format($data->saldo),
+                "currencyName"  => $data->currencyName,
+            ]);
         }
 
-        ## Response
-        $response = array(
-            "draw" => intval($draw),
-            "iTotalRecords" => $totalRecords,
-            "iTotalDisplayRecords" => $totalRecordwithFilter,
-            "aaData" => $data
-        );
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $customerData['totalData'],
+            "recordsFiltered"   => $customerData['totalFilteredData'],
+            "data"              => $dataCustomer,
+            // "response" => $response,
+            "payload"           => $payload
+        ];
 
-        return $this->response->setJSON($response);
+        echo json_encode($data);
+        return;
     }
+
+    // public function allCustomer()
+    // {
+
+    //     $draw = $this->request->getVar('draw');
+    //     $row = $this->request->getVar('start');
+    //     $rowperpage = $this->request->getVar('length');
+    //     $temp = $this->request->getVar('order');
+    //     $columnIndex = $temp[0]['column']; // Column index
+
+    //     $temp = $this->request->getVar('columns');
+    //     $columnName = $temp[$columnIndex]['data']; // Column index
+
+    //     $temp = $this->request->getVar('order');
+    //     $columnSortOrder = $temp[0]['dir']; // Column index
+
+    //     $search = $this->request->getVar('search');
+    //     //$searchValue = $temp['value']; // Column index
+
+    //     $values = [
+    //         "company_id"    => $this->this_company_id,
+    //         "search"        => $search
+    //     ];
+
+    //     $totalRecords = $this->CustomerModel->total_list(array());
+    //     $totalRecordwithFilter = $this->CustomerModel->total_list($values);
+
+    //     $res = $this->CustomerModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+
+    //     $number = $row * $rowperpage;
+
+    //     $data = [];
+
+    //     for ($i = 0; $i < count($res); $i++) {
+
+    //         $data[] = array(
+    //             "number" => ($row + $i + 1),
+    //             "no" => ($row + $i + 1),
+    //             "id" => $res[$i]["id"],
+    //             "kode" => $res[$i]["kode"],
+    //             "name" => $res[$i]["name"],
+    //             "phone" => $res[$i]["phone"],
+    //             "contact_person" => $res[$i]["contact_person"],
+    //             "saldo" => $res[$i]["saldo"],
+    //             "currencyName" => $res[$i]["currencyName"],
+    //         );
+    //     }
+
+    //     ## Response
+    //     $response = array(
+    //         "draw" => intval($draw),
+    //         "iTotalRecords" => $totalRecords,
+    //         "iTotalDisplayRecords" => $totalRecordwithFilter,
+    //         "aaData" => $data
+    //     );
+
+    //     return $this->response->setJSON($response);
+    // }
 
     public function saveCustomer()
     {
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama tidak boleh kosong'
+                    ]
                 ],
                 "address" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Alamat tidak boleh kosong'
+                    ]
+                ], 
+                "email" => [
+                    "rules" => "valid_email",
+                    'errors' => [
+                        'valid_email' => 'Email harus valid'
+                    ]
                 ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $last_year = date("Y-m-t", strtotime(date('Y') . "-12-31"));
@@ -134,9 +205,10 @@ class Customer extends BaseController
                     "province_id" => $this->request->getPost("province_parent_id"),
                     "city_id" => $this->request->getPost("city_parent_id"),
                     "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
-                    "sales_id" => $this->request->getPost("sales_id"),
                     "nik" => $this->request->getPost("nik"),
-                    "pajak" => !empty($this->request->getPost("pajak")) ? "1" : "0"
+                    "termin" => $this->request->getPost("termin"),
+                    "currency" => $this->request->getPost("currency"),
+                    "sales_id" => $this->request->getPost("sales_id")
                 ];
 
                 $id = $this->CustomerModel->insert($values);
@@ -158,14 +230,7 @@ class Customer extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -182,12 +247,35 @@ class Customer extends BaseController
         try {
             $rules = [
                 "name" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Nama tidak boleh kosong'
+                    ]
                 ],
                 "address" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Alamat tidak boleh kosong'
+                    ]
+                ],
+                "email" => [
+                    "rules" => "valid_email",
+                    'errors' => [
+                        'valid_email' => 'Email harus valid'
+                    ]
                 ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $payload = '';
@@ -207,9 +295,10 @@ class Customer extends BaseController
                     "province_id" => $this->request->getPost("province_parent_id"),
                     "city_id" => $this->request->getPost("city_parent_id"),
                     "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
-                    "sales_id" => $this->request->getPost("sales_id"),
                     "nik" => $this->request->getPost("nik"),
-                    "pajak" => !empty($this->request->getPost("pajak")) ? "1" : "0"
+                    "termin" => $this->request->getPost("termin"),
+                    "currency" => $this->request->getPost("currency"),
+                    "sales_id" => $this->request->getPost("sales_id")
                 ];
                 if ($this->CustomerModel->update($id, $values)) {
                     $data = [

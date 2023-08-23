@@ -9,35 +9,25 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control kode" id="kode" name="kode" placeholder="Kode">
-                                <label for="floatingInput">Kode</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <input autocomplete="off" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
+                                <input autocomplete="off" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
                                 <label for="floatingInput">NIK (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select sales_id" name="sales_id" id="sales_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Sales (Opsional)</label>
+                                <input autocomplete="off" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
+                                <label for="floatingInput"> NPWP (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -79,7 +69,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" minlength="5" maxlength="5" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Kode Pos (Opsional)">
+                                        <input autocomplete="off" type="text" minlength="5" maxlength="5" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Kode Pos (Opsional)">
                                         <label for="floatingInput">Kode Pos (Opsional)</label>
                                     </div>
                                 </div>
@@ -87,51 +77,58 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
-                                <label for="floatingInput"> NPWP (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
+                                <input autocomplete="off" type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
                                 <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
+                                <input autocomplete="off" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
                                 <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email (Opsional)">
+                                <input autocomplete="off" type="email" class="form-control email" id="email" name="email" placeholder="Email (Opsional)">
                                 <label for="floatingInput">Email (Opsional)</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="mb-3" style="height: 50px;">
-                                <label for="floatingInput">Kena Pajak</label>
-                                <div>
-                                    <label class="switch">
-                                        <input class="pajak" name="pajak" id="pajak" type="checkbox" checked>
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select currency" id="currency" name="currency">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Mata Uang (Opsional)</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select termin" id="termin" name="termin">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Termin (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_pelanggan" name="tipe_pelanggan" id="tipe_pelanggan">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Tipe Pelanggan (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select sales_id" name="sales_id" id="sales_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Sales (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -157,8 +154,8 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                <div class="col-md-4">
+                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Cari Nama Pelanggan" value="" />
                 </div>
             </div>
             <div class="row">
@@ -168,15 +165,11 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
-                                <th onclick="changeSort('name')" class="sort">Nama</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
-                                <th onclick="changeSort('city_name')" class="sort">Kota</th>
-                                <th onclick="changeSort('postal_code')" class="sort">Kode Pos</th>
-                                <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
-                                <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
-                                <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
-                                <th onclick="changeSort('email')" class="sort">Email</th>
+                                <th onclick="changeSort('name')" class="sort">Nama Pelanggan</th>
+                                <th onclick="changeSort('phone')" class="sort">Telepon</th>
+                                <th onclick="changeSort('contact_person')" class="sort">Kontak</th>
+                                <th onclick="changeSort('saldo')" class="sort">Saldo</th>
+                                <th onclick="changeSort('currencyName')" class="sort">Mata Uang</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -238,28 +231,16 @@
             data: "name",
             className: "text-center"
         }, {
-            data: "address",
-            className: "text-center"
-        }, {
-            data: "province_name",
-            className: "text-center"
-        }, {
-            data: "city_name",
-            className: "text-center"
-        }, {
-            data: "postal_code",
-            className: "text-center"
-        }, {
-            data: "no_npwp",
-            className: "text-center"
-        }, {
             data: "phone",
             className: "text-center"
         }, {
             data: "contact_person",
             className: "text-center"
         }, {
-            data: "email",
+            data: "saldo",
+            className: "text-center"
+        }, {
+            data: "currencyName",
             className: "text-center"
         }],
         columnDefs: [{
@@ -302,14 +283,14 @@
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.sales_id')
+        $(".sales_id")
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.sales_id')
+        $(".sales_id")
             .parent('div')
             .children('span')
             .children('span')
@@ -317,7 +298,63 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.sales_id')
+        $(".sales_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+         // TERMIN
+        $('.termin').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".termin")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".termin")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".termin")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
+        // MATA UANG
+        $('.currency').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".currency")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".currency")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".currency")
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -421,6 +458,9 @@
                 parent_postal_code: {
                     minlength: 5,
                     maxlength: 5
+                },
+                email: {
+                    email: true
                 }
             },
             messages: {
@@ -437,6 +477,9 @@
                 parent_postal_code: {
                     minlength: "Kode Pos Minimal 5 Digit",
                     maxlength: "Kode Pos Maksimal 5 Digit"
+                },
+                email: {
+                    email: "Email Harus Valid"
                 }
             },
             errorElement: 'span',
@@ -484,9 +527,6 @@
 
             $(".create-form")[0].reset()
 
-            $(".pajak").prop("checked", true);
-            $(".kode").val("AUTO GENERATE");
-
             $(".province_parent_id").val('').change()
             $(".city_parent_id").val('').change()
             $(".city_parent_id").empty()
@@ -509,6 +549,42 @@
                     })
 
                     $(".sales_id").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'termin'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".termin").empty()
+                    $(".termin").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".termin").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".termin").val("").change();
+                }
+            })
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'valuta_asing'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".currency").empty()
+                    $(".currency").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".currency").val("").change();
                 }
             })
 
@@ -541,9 +617,7 @@
             $(".create-form")[0].reset()
             $(".delete-form").css('display', '');
             let id = data.id;
-            $(".title-name").text("Update");
-
-            $(".kode").attr("readonly", true);
+            $(".title-name").text("Update")
 
             $.ajax({
                 url: "<?= base_url("customer/id"); ?>" + "/" + id,
@@ -552,22 +626,77 @@
                 success: function(res) {
                     if (res.data) {
                         $(".id").val(id);
-                        $(".kode").val(res?.data?.kode);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
                         $(".no_npwp").val(res?.data?.no_npwp);
                         $(".phone").val(res?.data?.phone);
 
                         $(".contact_person").val(res?.data?.contact_person);
+                        $(".sales").val(res?.data?.sales);
                         $(".email").val(res?.data?.email);
                         $(".parent_postal_code").val(res?.data?.postal_code);
                         $(".province_parent_id").val(res?.data?.province_id).change();
 
                         $(".nik").val(res?.data?.nik);
-                        $(".pajak").prop("checked", res?.data?.pajak === "1" ? true : false);
+
+                        $(".sales").val(res?.data?.sales);
 
                         validator.resetForm();
                         validator.reset();
+
+                        $.ajax({
+                            url: `<?= base_url("employee-division/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                division: 'SALES'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".sales_id").empty()
+                                $(".sales_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".sales_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+                                })
+
+                                $(".sales_id").val(res?.data?.sales_id).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'termin'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".termin").empty()
+                                $(".termin").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".termin").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".termin").val(res?.data?.termin).change();
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'valuta_asing'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".currency").empty()
+                                $(".currency").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".currency").val(res?.data?.currency).change();
+                            }
+                        })
 
                         // AJAX GET CITY
                         $.ajax({

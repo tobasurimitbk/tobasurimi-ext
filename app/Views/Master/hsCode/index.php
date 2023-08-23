@@ -9,18 +9,18 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control komoditi" id="komoditi" name="komoditi" placeholder="Komoditi">
+                                <input autocomplete="off" type="text" class="form-control komoditi" id="komoditi" name="komoditi" placeholder="Komoditi">
                                 <label for="floatingInput">Komoditi</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control code" id="code" name="code" placeholder="Kode">
+                                <input autocomplete="off" type="text" class="form-control code" id="code" name="code" placeholder="Kode">
                                 <label for="floatingInput">Kode</label>
                             </div>
                         </div>
@@ -28,13 +28,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control uraian_barang" id="uraian_barang" name="uraian_barang" placeholder="Uraian Barang">
+                                <input autocomplete="off" type="text" class="form-control uraian_barang" id="uraian_barang" name="uraian_barang" placeholder="Uraian Barang">
                                 <label for="floatingInput">Uraian Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control satuan_barang" id="satuan_barang" name="satuan_barang" placeholder="Satuan Barang">
+                                <input autocomplete="off" type="text" class="form-control satuan_barang" id="satuan_barang" name="satuan_barang" placeholder="Satuan Barang">
                                 <label for="floatingInput">Satuan Barang</label>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control uraian_satuan" id="uraian_satuan" name="uraian_satuan" placeholder="Uraian Satuan">
+                                <input autocomplete="off" type="text" class="form-control uraian_satuan" id="uraian_satuan" name="uraian_satuan" placeholder="Uraian Satuan">
                                 <label for="floatingInput">Uraian Satuan</label>
                             </div>
                         </div>
@@ -70,7 +70,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

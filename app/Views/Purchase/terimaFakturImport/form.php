@@ -40,13 +40,13 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->id : ""; ?>" type="hidden" class="id" name="id" id="id" />
-            <input value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->sender : ""; ?>" type="hidden" class="sender" name="sender" id="sender" />
+            <input autocomplete="off" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->id : ""; ?>" type="hidden" class="id" name="id" id="id" />
+            <input autocomplete="off" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->sender : ""; ?>" type="hidden" class="sender" name="sender" id="sender" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->invoice_date ?? ""; ?>" class="form-control input-picker datepicker" id="invoice_date" name="invoice_date" placeholder="Tanggal Faktur">
+                        <input autocomplete="off" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->invoice_date ?? ""; ?>" class="form-control input-picker datepicker" id="invoice_date" name="invoice_date" placeholder="Tanggal Faktur">
                         <label for="floatingInput">Tanggal Faktur</label>
                     </div>
                 </div>
@@ -54,11 +54,11 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input value="<?=  $dataTerimaFaktur->faktur_no ?? ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur" disabled readonly>
+                                <input autocomplete="off" value="<?=  $dataTerimaFaktur->faktur_no ?? ""; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur" disabled readonly>
                                 <label for="floatingInput">No. Terima Faktur</label>
                             </div>
                             <!-- <div style="<?= !empty($dataTerimaFaktur) ? "display:none;" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <input autocomplete="off" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div> -->
                         </div>
                     </div>
@@ -96,7 +96,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= $dataTerimaFaktur->nominal_faktur ?? ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" onkeyup="formatNumber(this)" placeholder="Nominal Faktur">
+                        <input autocomplete="off" <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= $dataTerimaFaktur->nominal_faktur ?? ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" onkeyup="formatNumber(this)" placeholder="Nominal Faktur">
                         <label for="floatingInput">Nominal Faktur</label>
                     </div>
                 </div>
@@ -161,19 +161,19 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker datepicker" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
+                        <input autocomplete="off" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker datepicker" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
                         <label for="floatingInput">Tanggal Penerimaan</label>
                     </div>
                 </div>
                 <!-- <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= $dataTerimaFaktur->item_total ?? 0; ?>" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" disabled readonly>
+                        <input autocomplete="off" value="<?= $dataTerimaFaktur->item_total ?? 0; ?>" type="text" class="form-control nominal_faktur" name="nominal_faktur" id="nominal_faktur" disabled readonly>
                         <label for="floatingInput">Total Nominal Faktur</label>
                     </div>
                 </div> -->
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                        <input autocomplete="off" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Potongan</label>
                     </div>
                 </div>
@@ -181,13 +181,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                        <input autocomplete="off" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Tambahan</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= $dataTerimaFaktur->nominal_faktur ?? 0; ?>" />
+                        <input autocomplete="off" readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= $dataTerimaFaktur->nominal_faktur ?? 0; ?>" />
                         <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly="true" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
+                        <input autocomplete="off" readonly="true" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
@@ -215,13 +215,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input class="form-control input-picker datepicker" id="tax_inv_date" name="tax_inv_date" placeholder="Tanggal Faktur Pajak">
+                        <input autocomplete="off" class="form-control input-picker datepicker" id="tax_inv_date" name="tax_inv_date" placeholder="Tanggal Faktur Pajak">
                         <label for="floatingInput">Tanggal Faktur Pajak</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control" id="tax_inv_no" name="tax_inv_no" placeholder="No. Faktur Pajak">
+                        <input autocomplete="off" type="text" class="form-control" id="tax_inv_no" name="tax_inv_no" placeholder="No. Faktur Pajak">
                         <label for="floatingInput">No. Faktur Pajak</label>
                     </div>
                 </div>
@@ -242,7 +242,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
+                        <input autocomplete="off" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
                         <label for="floatingInput">Jumlah</label>
                     </div>
                 </div>
@@ -386,13 +386,13 @@
         },
         {
             render: function(data, type, row) {
-                return `<div class="form-check"><input class="form-check-input" type="checkbox" ></div>`
+                return `<div class="form-check"><input autocomplete="off" class="form-check-input" type="checkbox" ></div>`
             },
             targets: 0
         },
         {
             render: function(data, type, row) {
-                return `<input class="form-control" type="text" value="${data}">`
+                return `<input autocomplete="off" class="form-control" type="text" value="${data}">`
             },
             targets: 8
         }],

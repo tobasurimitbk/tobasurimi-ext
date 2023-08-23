@@ -28,9 +28,11 @@ class CustomerModel extends Model
         'email',
         'postal_code',
         'tipe_pelanggan',
+        'termin',
+        'currency',
+        'saldo',
         'nik',
         'sales_id',
-        'pajak',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -69,26 +71,77 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
-        $requete = "SELECT customers.*,provinces.province_name,cities.city_name FROM customers ";
-        $requete .= "LEFT JOIN provinces ON (customers.province_id=provinces.id) ";
-        $requete .= "LEFT JOIN cities ON (customers.city_id=cities.id) ";
-        $requete .= "WHERE customers.deletedAt is null ";
-        if (isset($values["name"]))
-            $requete .= ($values["name"] == "") ? "" : ("AND UPPER(customers.name) like '%" . strtoupper($values["name"]) . "%' ");
-        if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(customers.kode) like '%" . strtoupper($values["search"]) . "%' OR UPPER(customers.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(customers.address) like '%" . strtoupper($values["search"]) . "%') ");
+        $availableSort = [
+            'kode'              => 'customers.kode',
+            'name'              => 'customers.name',
+            'phone'             => 'customers.phone',
+            'saldo'             => 'customers.saldo',
+            'currencyName'      => 'metadata.value',
+            'createdAt'         => 'customers.createdAt',
+            'updatedAt'         => 'customers.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        if ($sortby != '')
-            $requete .= "ORDER BY $sortby ";
-        if ($limit >= 0)
-            $requete .= "LIMIT $limit OFFSET $offset";
-        //echo $requete;
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'customers.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $query = $this->db->query($requete);
-        return $query->getResultArray();
+        $selectQry = "customers.*, 
+                      metadata.value AS currencyName";
+        $customerDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('metadata', 'customers.currency = metadata.id', 'left')
+            // ->groupBy(('customers.id'))
+            ->orderBy($sort, $sortType);
+
+        $totalData = $customerDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $customerDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $customerDataQry->like('customers.name', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $customerDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $customerDataQry->countAllResults(false);
+        $data = $customerDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
     }
+
+    // public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
+    // {
+    //     $requete = "SELECT customers.*,provinces.province_name,cities.city_name FROM customers ";
+    //     $requete .= "LEFT JOIN provinces ON (customers.province_id=provinces.id) ";
+    //     $requete .= "LEFT JOIN cities ON (customers.city_id=cities.id) ";
+    //     $requete .= "WHERE customers.deletedAt is null ";
+    //     if (isset($values["name"]))
+    //         $requete .= ($values["name"] == "") ? "" : ("AND UPPER(customers.name) like '%" . strtoupper($values["name"]) . "%' ");
+    //     if (isset($values["search"]))
+    //         $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(customers.kode) like '%" . strtoupper($values["search"]) . "%' OR UPPER(customers.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(customers.address) like '%" . strtoupper($values["search"]) . "%') ");
+
+    //     if ($sortby != '')
+    //         $requete .= "ORDER BY $sortby ";
+    //     if ($limit >= 0)
+    //         $requete .= "LIMIT $limit OFFSET $offset";
+    //     //echo $requete;
+
+    //     $query = $this->db->query($requete);
+    //     return $query->getResultArray();
+    // }
 
     public function total_list($values)
     {

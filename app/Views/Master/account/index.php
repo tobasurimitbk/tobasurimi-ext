@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form-kategori" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id_kategori" name="id_kategori" id="id_kategori" />
+                    <input autocomplete="off" type="hidden" class="id_kategori" name="id_kategori" id="id_kategori" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col">
@@ -24,7 +24,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control kode_akun_kategori" id="kode_akun_kategori" name="kode_akun_kategori" placeholder="Kode Akun">
+                                <input autocomplete="off" type="text" class="form-control kode_akun_kategori" id="kode_akun_kategori" name="kode_akun_kategori" placeholder="Kode Akun">
                                 <label for="floatingInput">Kode Akun</label>
                             </div>
                         </div>
@@ -32,7 +32,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nama_akun_kategori" id="nama_akun_kategori" name="nama_akun_kategori" placeholder="Nama Akun">
+                                <input autocomplete="off" type="text" class="form-control nama_akun_kategori" id="nama_akun_kategori" name="nama_akun_kategori" placeholder="Nama Akun">
                                 <label for="floatingInput">Nama Akun</label>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form-header" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id_header" name="id_header" id="id_header" />
+                    <input autocomplete="off" type="hidden" class="id_header" name="id_header" id="id_header" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col">
@@ -71,7 +71,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control kode_akun_header" id="kode_akun_header" name="kode_akun_header" placeholder="Kode Akun">
+                                <input autocomplete="off" type="text" class="form-control kode_akun_header" id="kode_akun_header" name="kode_akun_header" placeholder="Kode Akun">
                                 <label for="floatingInput">Kode Akun</label>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nama_akun_header" id="nama_akun_header" name="nama_akun_header" placeholder="Nama Akun">
+                                <input autocomplete="off" type="text" class="form-control nama_akun_header" id="nama_akun_header" name="nama_akun_header" placeholder="Nama Akun">
                                 <label for="floatingInput">Nama Akun</label>
                             </div>
                         </div>
@@ -103,8 +103,8 @@
             </div>
             <div class="modal-body">
                 <form class="create-form-sub" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id_sub" name="id_sub" id="id_sub" />
-                    <input type="hidden" class="category_id_sub" name="category_id_sub" id="category_id_sub" />
+                    <input autocomplete="off" type="hidden" class="id_sub" name="id_sub" id="id_sub" />
+                    <input autocomplete="off" type="hidden" class="category_id_sub" name="category_id_sub" id="category_id_sub" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col">
@@ -119,7 +119,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control kode_akun_sub" id="kode_akun_sub" name="kode_akun_sub" placeholder="Kode Akun">
+                                <input autocomplete="off" type="text" class="form-control kode_akun_sub" id="kode_akun_sub" name="kode_akun_sub" placeholder="Kode Akun">
                                 <label for="floatingInput">Kode Sub Akun</label>
                             </div>
                         </div>
@@ -127,7 +127,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nama_akun_sub" id="nama_akun_sub" name="nama_akun_sub" placeholder="Nama Akun">
+                                <input autocomplete="off" type="text" class="form-control nama_akun_sub" id="nama_akun_sub" name="nama_akun_sub" placeholder="Nama Akun">
                                 <label for="floatingInput">Nama Sub Akun</label>
                             </div>
                         </div>
@@ -148,7 +148,7 @@
                                 <label for="floatingInput">Status</label>
                                 <div>
                                     <label class="switch">
-                                        <input class="status_sub" name="status_sub" id="status_sub" type="checkbox" checked>
+                                        <input autocomplete="off" class="status_sub" name="status_sub" id="status_sub" type="checkbox" checked>
                                         <span class="slider round"></span>
                                     </label>
                                 </div>
@@ -189,7 +189,7 @@
                 <div class="tab-pane fade show active" id="kategori" role="tabpanel" aria-labelledby="kategori-tab">
                     <div class="collapse-kategori-list show" id="collapseKategoriList">
                         <div class="d-flex float-right mb-3">
-                            <input class="form-control search search-kategori form-out-search mr-3" placeholder="Search" />
+                            <input autocomplete="off" class="form-control search search-kategori form-out-search mr-3" placeholder="Search" />
                             <button class="btn btn-show-form btn-add float-right btn-show-form-kategori" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
@@ -214,7 +214,7 @@
                 <div class="tab-pane fade" id="header" role="tabpanel" aria-labelledby="header-tab">
                     <div class="collapse-header-list show" id="collapseHeaderList">
                         <div class="d-flex float-right mb-3">
-                            <input class="form-control search cari-header form-out-search mr-3" placeholder="Search" />
+                            <input autocomplete="off" class="form-control search cari-header form-out-search mr-3" placeholder="Search" />
                             <button class="btn btn-show-form btn-add float-right btn-show-form-header" data-btn="create-modal">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
@@ -239,7 +239,7 @@
                 <div class="tab-pane fade" id="sub" role="tabpanel" aria-labelledby="sub-tab">
                     <div class="collapse-header-list show" id="collapseSubList">
                         <div class="d-flex float-right mb-3 col-nav-tabs-contents-input-btn">
-                            <input class="form-control search search-sub form-out-search mr-3" placeholder="Search" />
+                            <input autocomplete="off" class="form-control search search-sub form-out-search mr-3" placeholder="Search" />
                             <select class="form-select status status-sub mr-3 form-select-no-title" name="status" id="status" aria-label="Floating label select example">
                                 <option value="Aktif">Aktif</option>
                                 <option value="Void">Void</option>
@@ -482,7 +482,7 @@
                     return `
                 <div class="mt-0">
                 <label class="switch">
-                <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
+                <input autocomplete="off" class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
                 <span class="slider round"></span>
                 </label>
                 </div>
