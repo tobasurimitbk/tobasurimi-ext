@@ -29,7 +29,7 @@ class CustomerModel extends Model
         'postal_code',
         'tipe_pelanggan',
         'termin',
-        'valas',
+        'currency',
         'saldo',
         'nik',
         'sales',

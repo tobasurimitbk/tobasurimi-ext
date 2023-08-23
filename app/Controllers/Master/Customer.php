@@ -65,12 +65,12 @@ class Customer extends BaseController
         $offset = $this->request->getGet("start");
         $customerData = $this->CustomerModel->getList($condition, $addCondition, $limit, $offset);
 
-        $dataPOImport = [];
+        $dataCustomer = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($customerData['data'] as $data) {
-            array_push($dataPOImport, [
+            array_push($dataCustomer, [
                 "no"            => $no++,
                 "id"            => $data->id,
                 "kode"          => $data->kode,
@@ -86,7 +86,7 @@ class Customer extends BaseController
             "draw"              => intval($this->request->getGet("draw")),
             "recordsTotal"      => $customerData['totalData'],
             "recordsFiltered"   => $customerData['totalFilteredData'],
-            "data"              => $dataPOImport,
+            "data"              => $dataCustomer,
             // "response" => $response,
             "payload"           => $payload
         ];
