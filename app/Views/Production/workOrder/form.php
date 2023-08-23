@@ -17,18 +17,18 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->id : ""; ?>" class="id" name="id" id="id" />
+            <input autocomplete="off" type="hidden" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->id : ""; ?>" class="id" name="id" id="id" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : ""; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi">
+                                <input autocomplete="off" type="text" value="<?= !empty($dataWorkOrders) ? $dataWorkOrders->wo_no : ""; ?>" class="form-control wo_no" id="wo_no" name="wo_no" placeholder="Kode Produksi">
                                 <label for="floatingInput">Kode Produksi</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <input autocomplete="off" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->production_amt, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control production_amt" name="production_amt" id="production_amt" placeholder="Hasil">
+                        <input autocomplete="off" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->production_amt, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control production_amt" name="production_amt" id="production_amt" placeholder="Hasil">
                         <label for="floatingInput">Hasil</label>
                     </div>
                 </div>
@@ -77,7 +77,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control target" name="target" id="target" placeholder="Target">
+                        <input autocomplete="off" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control target" name="target" id="target" placeholder="Target">
                         <label for="floatingInput">Target</label>
                     </div>
                 </div>

@@ -19,7 +19,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <input class="form-control search form-out-search" placeholder="Cari No. SC / No. PO / Buyer" value="" />
+                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Cari No. SC / No. PO / Buyer" value="" />
                 </div>
             </div>
             <div class="row">

@@ -9,19 +9,19 @@
             </div>
             <div class="modal-body">
                 <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
-                    <input type="hidden" class="parent" name="parent" id="parent" />
+                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="off" type="hidden" class="parent" name="parent" id="parent" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="mb-3" style="height: 50px;">
                                 <div for="floatingInput" class="label-modal-master-barang">Product Spec</div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="productSpec" id="inlineRadio1" value="single">
+                                    <input autocomplete="off" class="form-check-input" type="radio" name="productSpec" id="inlineRadio1" value="single">
                                     <label class="form-check-label" for="inlineRadio1">Single Spec</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="productSpec" id="inlineRadio2" value="multi" checked>
+                                    <input autocomplete="off" class="form-check-input" type="radio" name="productSpec" id="inlineRadio2" value="multi" checked>
                                     <label class="form-check-label" for="inlineRadio2">Multi Spec</label>
                                 </div>
                             </div>
@@ -41,13 +41,13 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control kode_barang" name="kode_barang" id="kode_barang" placeholder="Kode Barang" disabled>
+                                <input autocomplete="off" type="text" class="form-control kode_barang" name="kode_barang" id="kode_barang" placeholder="Kode Barang" disabled>
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nama_barang" name="nama_barang" id="nama_barang" placeholder="Nama Barang">
+                                <input autocomplete="off" type="text" class="form-control nama_barang" name="nama_barang" id="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
@@ -56,13 +56,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="text" class="form-control spek" name="spek" id="spek" placeholder="Spesifikasi">
+                                    <input autocomplete="off" type="text" class="form-control spek" name="spek" id="spek" placeholder="Spesifikasi">
                                     <label for="floatingInput">Spesifikasi</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
+                                    <input autocomplete="off" type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
                                     <label for="floatingInput">Stok</label>
                                 </div>
                             </div>
@@ -128,7 +128,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input type="text" onkeyup="formatNumber(this)" class="form-control harga_barang" name="harga_barang" id="harga_barang" placeholder="Harga Barang">
+                                    <input autocomplete="off" type="text" onkeyup="formatNumber(this)" class="form-control harga_barang" name="harga_barang" id="harga_barang" placeholder="Harga Barang">
                                     <label for="floatingInput">Harga Barang</label>
                                 </div>
                             </div>
@@ -164,7 +164,7 @@
                                 <label for="floatingInput" class="label-modal-master-barang">Status</label>
                                 <div>
                                     <label class="switch">
-                                    <input class="status" name="status" id="status" type="checkbox" checked>
+                                    <input autocomplete="off" class="status" name="status" id="status" type="checkbox" checked>
                                     <span class="slider round"></span>
                                     </label>
                                 </div>
@@ -219,7 +219,7 @@
     <div class="card-body">
         <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
             <div class="col mb-3">
-                <input class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
+                <input autocomplete="off" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
             </div>
             <div class="col mb-3">
                 <select class="form-select kategori form-out-search" name="kategori" id="kategori" aria-label="Floating label select example">
@@ -378,7 +378,7 @@
                 return `
                 <div class="mt-2">
                 <label class="switch">
-                <input class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
+                <input autocomplete="off" class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
                 <span class="slider round"></span>
                 </label>
                 </div>
@@ -877,7 +877,7 @@
                         //     })
                         //     tag_html += `<tr class="table_${row_detail}">`;
                         //     tag_html += `<td>`;
-                        //     tag_html += `<input type="text" onkeypress="return lettersOnly(event)" value="${item}" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
+                        //     tag_html += `<input autocomplete="off" type="text" onkeypress="return lettersOnly(event)" value="${item}" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
                         //     tag_html += `</td>`;
                         //     tag_html += `<td>`;
                         //     tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;
@@ -1448,7 +1448,7 @@
         let tag_html = "";
         tag_html += `<tr class="table_${row_detail}">`;
         tag_html += `<td>`;
-        tag_html += `<input type="text" onkeypress="return lettersOnly(event)" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
+        tag_html += `<input autocomplete="off" type="text" onkeypress="return lettersOnly(event)" class="form-control spek_${row_detail}" id="spek_${row_detail}" name="spek_${row_detail}">`;
         tag_html += `</td>`;
         tag_html += `<td>`;
         tag_html += `<button onclick='deleteChildRow(${row_detail})'>X</button>`;

@@ -25,7 +25,7 @@
 
                 <div class="col">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input class="form-control komponen" placeholder="Search" value="" disabled />
+                        <input autocomplete="off" class="form-control komponen" placeholder="Search" value="" disabled />
                         <label for="floatingInput">Komponen</label>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

@@ -9,8 +9,8 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
-                    <input type="hidden" class="valas" name="valas" id="valas" />
+                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="off" type="hidden" class="valas" name="valas" id="valas" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" onkeyup="formatNumber(this)" class="form-control nilai_kurs" id="nilai_kurs" name="nilai_kurs" placeholder="Nilai Kurs">
+                                <input autocomplete="off" type="text" onkeyup="formatNumber(this)" class="form-control nilai_kurs" id="nilai_kurs" name="nilai_kurs" placeholder="Nilai Kurs">
                                 <label for="floatingInput">Nilai Kurs</label>
                             </div>
                         </div>
@@ -33,7 +33,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Mulai">
+                                        <input autocomplete="off" class="form-control input-picker start_date" id="start_date" name="start_date" placeholder="Tanggal Mulai">
                                         <label for="floatingInput">Tanggal Mulai</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -48,7 +48,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Akhir">
+                                        <input autocomplete="off" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Akhir">
                                         <label for="floatingInput">Tanggal Akhir</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -84,7 +84,7 @@
         <div class="row justify-content-end row-col-spp">
             <div class="col mb-3">
                 <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                    <input autocomplete="off" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                     </div>
@@ -92,14 +92,14 @@
             </div>
             <div class="col mb-3">
                 <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                    <input autocomplete="off" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                     </div>
                 </div>
             </div>
             <div class="col mb-3">
-                <input class="form-control search form-out-search" placeholder="Ketik Valas" value="" />
+                <input autocomplete="off" class="form-control search form-out-search" placeholder="Ketik Valas" value="" />
             </div>
         </div>
         <div class="row">

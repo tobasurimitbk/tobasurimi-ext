@@ -207,7 +207,8 @@ class Customer extends BaseController
                     "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
                     "nik" => $this->request->getPost("nik"),
                     "termin" => $this->request->getPost("termin"),
-                    "currency" => $this->request->getPost("currency")
+                    "currency" => $this->request->getPost("currency"),
+                    "sales_id" => $this->request->getPost("sales_id")
                 ];
 
                 $id = $this->CustomerModel->insert($values);
@@ -296,7 +297,8 @@ class Customer extends BaseController
                     "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
                     "nik" => $this->request->getPost("nik"),
                     "termin" => $this->request->getPost("termin"),
-                    "currency" => $this->request->getPost("currency")
+                    "currency" => $this->request->getPost("currency"),
+                    "sales_id" => $this->request->getPost("sales_id")
                 ];
                 if ($this->CustomerModel->update($id, $values)) {
                     $data = [

@@ -21,12 +21,12 @@
 
 
             <form class="create-form form-add-shift" role="form" method="POST" enctype="multipart/form-data">
-                <input type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control nama_shift" id="nama_shift" name="nama_shift" <?= !empty($data) ? ($data->nama_shift === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->nama_shift : ""; ?>" placeholder="Shift Name">
+                            <input autocomplete="off" type="text" class="form-control nama_shift" id="nama_shift" name="nama_shift" <?= !empty($data) ? ($data->nama_shift === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->nama_shift : ""; ?>" placeholder="Shift Name">
                             <label for="floatingInput">Shift Name</label>
                         </div>
                     </div>
@@ -35,28 +35,28 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="time" class="form-control SOT" id="SOT" name="SOT" <?= !empty($data) ? ($data->SOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->SOT : ""; ?>" placeholder="Start of time">
+                            <input autocomplete="off" type="time" class="form-control SOT" id="SOT" name="SOT" <?= !empty($data) ? ($data->SOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->SOT : ""; ?>" placeholder="Start of time">
                             <label for="floatingInput">Jam Masuk</label>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="time" class="form-control EOT" id="EOT" name="EOT" <?= !empty($data) ? ($data->EOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->EOT : ""; ?>" placeholder="End of time">
+                            <input autocomplete="off" type="time" class="form-control EOT" id="EOT" name="EOT" <?= !empty($data) ? ($data->EOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->EOT : ""; ?>" placeholder="End of time">
                             <label for="floatingInput">Jam Pulang</label>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="time" class="form-control BSOT" id="BSOT" name="BSOT" <?= !empty($data) ? ($data->BSOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->BSOT : ""; ?>" placeholder="Break start of time">
+                            <input autocomplete="off" type="time" class="form-control BSOT" id="BSOT" name="BSOT" <?= !empty($data) ? ($data->BSOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->BSOT : ""; ?>" placeholder="Break start of time">
                             <label for="floatingInput">Jam Istirahat</label>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="time" class="form-control BEOT" id="BEOT" name="BEOT" <?= !empty($data) ? ($data->BEOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->BEOT : ""; ?>" placeholder="Break end of time">
+                            <input autocomplete="off" type="time" class="form-control BEOT" id="BEOT" name="BEOT" <?= !empty($data) ? ($data->BEOT === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->BEOT : ""; ?>" placeholder="Break end of time">
                             <label for="floatingInput">Jam Selesai Istirahat</label>
                         </div>
                     </div>

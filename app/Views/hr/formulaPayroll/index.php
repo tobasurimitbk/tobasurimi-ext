@@ -15,7 +15,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

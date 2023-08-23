@@ -17,14 +17,14 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" class="id" name="id" id="id" />
+            <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" value="<?= $paymentData->payment_no ?? '' ?>" placeholder="No. Pembayaran" disabled>
+                                <input autocomplete="off" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" value="<?= $paymentData->payment_no ?? '' ?>" placeholder="No. Pembayaran" disabled>
                                 <label for="floatingInput">No. Pembayaran</label>
                             </div>
                         </div>
@@ -93,7 +93,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control no_bukti_pembayaran" id="currency" value="<?= $paymentData->currency ?? '' ?>" placeholder="Currency" disabled>
+                                <input autocomplete="off" type="text" class="form-control no_bukti_pembayaran" id="currency" value="<?= $paymentData->currency ?? '' ?>" placeholder="Currency" disabled>
                                 <label for="floatingInput">Currency</label>
                             </div>
                         </div>
@@ -101,7 +101,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control" id="po_amt" name="po_amt" value="<?= $poData->total ?? '' ?>" disabled>
+                        <input autocomplete="off" type="text" class="form-control" id="po_amt" name="po_amt" value="<?= $poData->total ?? '' ?>" disabled>
                         <label for="floatingInput">PO Amount</label>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control no_bukti_pembayaran" id="payment_amt" name="payment_amt" value="<?= $paymentData->payment_amt ?? '' ?>" onkeyup="formatNumber(this)">
+                                <input autocomplete="off" type="text" class="form-control no_bukti_pembayaran" id="payment_amt" name="payment_amt" value="<?= $paymentData->payment_amt ?? '' ?>" onkeyup="formatNumber(this)">
                                 <label for="floatingInput">Payment Amount</label>
                             </div>
                         </div>
@@ -119,7 +119,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input type="text" class="form-control" id="current_exchange_rate" name="current_exchange_rate" value="<?= $paymentData->current_exchange_rate ?? '' ?>" onkeyup="formatNumber(this)">
+                        <input autocomplete="off" type="text" class="form-control" id="current_exchange_rate" name="current_exchange_rate" value="<?= $paymentData->current_exchange_rate ?? '' ?>" onkeyup="formatNumber(this)">
                         <label for="floatingInput">Kurs saat ini</label>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="payment_date" name="payment_date" value="<?= $paymentData->payment_date ?? '' ?>" placeholder="Payment Date">
+                                <input autocomplete="off" type="text" class="form-control" id="payment_date" name="payment_date" value="<?= $paymentData->payment_date ?? '' ?>" placeholder="Payment Date">
                                 <label for="floatingInput">Payment Date</label>
                             </div>
                         </div>
@@ -139,7 +139,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" name="termin" id="termin" value="<?= $paymentData->termin ?? '' ?>" placeholder="Termin">
+                                <input autocomplete="off" type="text" class="form-control" name="termin" id="termin" value="<?= $paymentData->termin ?? '' ?>" placeholder="Termin">
                                 <label for="floatingInput">Termin</label>
                             </div>
                         </div>
@@ -162,7 +162,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="voucher_no" name="voucher_no" value="<?= $paymentData->voucher_no ?? '' ?>" placeholder="No. Voucher">
+                                <input autocomplete="off" type="text" class="form-control" id="voucher_no" name="voucher_no" value="<?= $paymentData->voucher_no ?? '' ?>" placeholder="No. Voucher">
                                 <label for="floatingInput">No. Voucher</label>
                             </div>
                         </div>
@@ -178,7 +178,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
+                        <input autocomplete="off" value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
                         <label for="floatingInput">Pembayaran Oleh</label>
                     </div>
                 </div>

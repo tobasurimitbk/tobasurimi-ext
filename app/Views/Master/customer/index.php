@@ -9,24 +9,24 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <input autocomplete="off" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
+                                <input autocomplete="off" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
                                 <label for="floatingInput">NIK (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
+                                <input autocomplete="off" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
                                 <label for="floatingInput"> NPWP (Opsional)</label>
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input type="text" minlength="5" maxlength="5" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Kode Pos (Opsional)">
+                                        <input autocomplete="off" type="text" minlength="5" maxlength="5" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Kode Pos (Opsional)">
                                         <label for="floatingInput">Kode Pos (Opsional)</label>
                                     </div>
                                 </div>
@@ -79,19 +79,19 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
+                                <input autocomplete="off" type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
                                 <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
+                                <input autocomplete="off" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
                                 <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="email" class="form-control email" id="email" name="email" placeholder="Email (Opsional)">
+                                <input autocomplete="off" type="email" class="form-control email" id="email" name="email" placeholder="Email (Opsional)">
                                 <label for="floatingInput">Email (Opsional)</label>
                             </div>
                         </div>
@@ -125,8 +125,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control sales" id="sales" name="sales" placeholder="Sales">
-                                <label for="floatingInput">Sales</label>
+                                <select class="form-select sales_id" name="sales_id" id="sales_id">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Sales (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -152,8 +154,8 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
-                    <input class="form-control search form-out-search" placeholder="Search" value="" />
+                <div class="col-md-4">
+                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Cari Nama Pelanggan" value="" />
                 </div>
             </div>
             <div class="row">
@@ -272,6 +274,34 @@
                 }
             }
         })
+
+        // SALES
+        $('.sales_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $(".sales_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $(".sales_id")
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $(".sales_id")
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
          // TERMIN
         $('.termin').select2({
@@ -505,6 +535,24 @@
             $(".delete-form").css('display', 'none');
 
             $.ajax({
+                url: `<?= base_url("employee-division/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    division: 'SALES'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".sales_id").empty()
+                    $(".sales_id").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".sales_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+                    })
+
+                    $(".sales_id").val("").change();
+                }
+            })
+
+            $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
                 method: "GET",
                 data: {
@@ -595,6 +643,24 @@
 
                         validator.resetForm();
                         validator.reset();
+
+                        $.ajax({
+                            url: `<?= base_url("employee-division/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                division: 'SALES'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".sales_id").empty()
+                                $(".sales_id").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".sales_id").append(`<option value="${item.id}">${item.nip} - ${item.name}</option>`)
+                                })
+
+                                $(".sales_id").val(res?.data?.sales_id).change();
+                            }
+                        })
 
                         $.ajax({
                             url: `<?= base_url("metadata/dropdown"); ?>`,

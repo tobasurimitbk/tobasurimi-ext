@@ -19,7 +19,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-pinjaman-karyawan" role="form" method="POST" enctype="multipart/form-data">
-                <input type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-6">
@@ -42,14 +42,14 @@
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="date" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? ($data->start_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->start_date : ""; ?>" placeholder="Tanggal mulai">
+                            <input autocomplete="off" type="date" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? ($data->start_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->start_date : ""; ?>" placeholder="Tanggal mulai">
                             <label for="floatingInput">Tanggal mulai</label>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="date" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? ($data->end_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->end_date : ""; ?>" placeholder="Tanggal akhir">
+                            <input autocomplete="off" type="date" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? ($data->end_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->end_date : ""; ?>" placeholder="Tanggal akhir">
                             <label for="floatingInput">Tanggal akhir</label>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                             <label for="floatingInput">Posting</label>
                             <div class="switch-form-form-perijinan">
                                 <label class="switch">
-                                    <input class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
+                                    <input autocomplete="off" class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>

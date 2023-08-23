@@ -57,7 +57,7 @@
 
 
                 <div class="col-md-3">
-                    <input class="form-control search form-out-search fos-jk mb-3" placeholder="Search" value="" />
+                    <input autocomplete="off" class="form-control search form-out-search fos-jk mb-3" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

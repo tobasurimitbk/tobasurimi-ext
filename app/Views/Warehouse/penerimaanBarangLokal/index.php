@@ -23,7 +23,7 @@
             <div class="col">
             <?= csrf_field() ?>
                 <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
+                    <input autocomplete="off" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                     </div>
@@ -31,7 +31,7 @@
             </div>
             <div class="col">
                 <div class="input-group input-group-password">
-                    <input class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
+                    <input autocomplete="off" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                     <div class="input-group-prepend group-prepend-password align-items-center">
                         <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                     </div>
@@ -44,7 +44,7 @@
                 </select>
             </div>
             <div class="col">
-                <input class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
+                <input autocomplete="off" class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
             </div>
         </div>
         <div class="row">

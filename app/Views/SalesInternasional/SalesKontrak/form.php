@@ -43,18 +43,18 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSO) ? $dataSO->sales_contract_id : ""; ?>" />
+                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSO) ? $dataSO->sales_contract_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
                                     <label for="floatingInput">No. SC</label>
                                 </div>
                                 <div style="<?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input autocomplete="off" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -78,7 +78,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->customer_po_no : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
+                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->customer_po_no : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
                             <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
@@ -86,13 +86,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->loading_port : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
+                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->loading_port : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
                             <label for="floatingInput">Loading Port</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->dicharge_port : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
+                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->dicharge_port : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
                             <label for="floatingInput">Dicharge Port</label>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSO) ? ($dataSO->due_date ? date("d/m/Y", strtotime($dataSO->due_date)) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
+                                    <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSO) ? ($dataSO->due_date ? date("d/m/Y", strtotime($dataSO->due_date)) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
                                     <label for="floatingInput">Due Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -113,13 +113,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
+                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
                             <label for="floatingInput">Payment Term (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->tolerance : ""; ?>"  type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
+                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->tolerance : ""; ?>"  type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
                             <label for="floatingInput">Tolerance</label>
                         </div>
                     </div>
@@ -127,7 +127,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSO) ? ($dataSO->shipment_date ? date("d/m/Y", strtotime($dataSO->shipment_date)) : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
+                                    <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSO) ? ($dataSO->shipment_date ? date("d/m/Y", strtotime($dataSO->shipment_date)) : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
                                     <label for="floatingInput">Shipment Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -154,7 +154,7 @@
                 <div class="row mt-3">
                     <div class="col-md-4">
                         <div class="form-floating">
-                            <input readonly value="<?= !empty($dataSO) ? ($dataSO->total_amount ? number_format($dataSO->total_amount) : 0) : ""; ?>" type="text" value="0" class="form-control total_amount" id="total_amount" name="total_amount" placeholder="Grand Total" />
+                            <input autocomplete="off" readonly value="<?= !empty($dataSO) ? ($dataSO->total_amount ? number_format($dataSO->total_amount) : 0) : ""; ?>" type="text" value="0" class="form-control total_amount" id="total_amount" name="total_amount" placeholder="Grand Total" />
                             <label for="floatingInput">Grand Total</label>
                         </div>
                     </div>
@@ -264,8 +264,8 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <input type="hidden" class="barang_id" name="barang_id" id="barang_id" />
+                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="off" type="hidden" class="barang_id" name="barang_id" id="barang_id" />
                     <div class="row">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Barang</h5>
@@ -274,7 +274,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="hidden" class="kode" name="kode" id="kode" />
+                                <input autocomplete="off" type="hidden" class="kode" name="kode" id="kode" />
                                 <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
                                     <option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>
                                 </select>
@@ -283,7 +283,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
+                                <input autocomplete="off" type="text" class="form-control nama_barang" id="nama_barang" name="nama_barang" placeholder="Nama Barang">
                                 <label for="floatingInput">Nama Barang</label>
                             </div>
                         </div>
@@ -304,7 +304,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <input autocomplete="off" type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                                 <label for="floatingInput">Qty</label>
                             </div>
                         </div>
@@ -312,13 +312,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
+                                <input autocomplete="off" onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
                                 <label for="floatingInput">Harga</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                                <input autocomplete="off" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
                                 <label for="floatingInput">Total</label>
                             </div>
                         </div>
@@ -326,7 +326,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
+                                <input autocomplete="off" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
                                 <label for="floatingInput">Remark</label>
                             </div>
                         </div>

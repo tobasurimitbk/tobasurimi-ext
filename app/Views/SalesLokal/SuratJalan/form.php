@@ -19,7 +19,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp form-add-pinjaman-karyawan" role="form" method="POST" enctype="multipart/form-data">
-                <input type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-6">
@@ -63,17 +63,17 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input " class=" form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> placeholder="Tanggal Pengiriman" value="<?= !empty($data) ? $data->shipping_date : ""; ?>">
+                            <input autocomplete="off" " class=" form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> placeholder="Tanggal Pengiriman" value="<?= !empty($data) ? $data->shipping_date : ""; ?>">
                             <label for="floatingInput">Tanggal Pengiriman</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" disabled="true" value=" <?= !empty($data) ? $data->no_surat_jalan : ""; ?>" placeholder="No surat jalan">
+                            <input autocomplete="off" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" disabled="true" value=" <?= !empty($data) ? $data->no_surat_jalan : ""; ?>" placeholder="No surat jalan">
                             <label for="floatingInput">No Surat Jalan</label>
                         </div>
                     </div>
-                    <input type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
+                    <input autocomplete="off" type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
                 </div>
         </div>
         </form>
