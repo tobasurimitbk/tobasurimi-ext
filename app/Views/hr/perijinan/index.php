@@ -51,7 +51,7 @@
 
                                 <th onclick="changeSort('status')" class="sort">Status</th>
 
-                                <th onclick="changeSort('is_posted')" class="sort">Posted</th>
+                                <!-- <th onclick="changeSort('is_posted')" class="sort">Posted</th> -->
 
                                 <th class="sort">Action</th>
                             </tr>
@@ -71,7 +71,7 @@
     let sort = "periode";
     let sortType = "asc";
     let trigger = true;
-    let year = 2023;
+    let year = new Date().getFullYear();
 
     var row = 0;
 
@@ -133,8 +133,8 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                // data.dateStart = $(".dateStart").val();
-                // data.dateEnd = $(".dateEnd").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
                 data.sortType = sortType;
                 data.year = year;
@@ -150,39 +150,42 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "employeeNip",
-            className: "text-center"
-        }, {
-            data: "employeeName",
-            className: "text-center"
-        }, {
-            data: "divisionName",
-            className: "text-center"
-        }, {
-            data: "periode",
-            className: "text-center"
-        }, {
-            data: "status",
-            className: "text-center"
-        }, {
-            data: "is_posted",
-            className: "text-center"
-        }, {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "employeeNip",
+                className: "text-center"
+            }, {
+                data: "employeeName",
+                className: "text-center"
+            }, {
+                data: "divisionName",
+                className: "text-center"
+            }, {
+                data: "periode",
+                className: "text-center"
+            }, {
+                data: "status",
+                className: "text-center"
+            },
+            // {
+            //     data: "is_posted",
+            //     className: "text-center"
+            // },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
                 `
+                }
             }
-        }],
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"

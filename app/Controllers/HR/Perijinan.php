@@ -101,6 +101,8 @@ class Perijinan extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart"),
+            "dateEnd"       => $this->request->getGet("dateEnd"),
         ];
 
         $dataEmployee = [];
@@ -114,25 +116,20 @@ class Perijinan extends BaseController
         foreach ($FormData['data'] as $data) {
             array_push($dataEmployee, [
                 "no" => $no++,
-                "id" =>  bin2hex($this->encrypter->encrypt($data->employee_id)),
+                "id" =>  $data->id,
                 "employeeName" => $data->employeeName,
-                // "employeeNip" => $data->employeeNip,
-                // "divisionName" => $data->divisionName,
+                "employeeNip" => $data->employeeNip,
+                "divisionName" => $data->divisionName,
                 "periode" => $data->periode,
                 "status" => $data->status,
             ]);
         }
 
-
-        var_dump($dataEmployee);
-        die;
-
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $FormData['totalData'],
-            "recordsFiltered" => $FormData['totalFilterData'],
+            "recordsFiltered" => $FormData['totalFilteredData'],
             "data" => $dataEmployee,
-            // "response" => $response,
             "payload" => $payload
         ];
 

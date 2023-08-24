@@ -57,35 +57,43 @@ class FormPerijinanModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "form_perijinan.* ,
-            employees.name AS employeeName
+            employees.name AS employeeName,
+            employees.nip AS employeeNip,
+            divisis.divisi AS divisionName
             ";
 
         $formPerijinanQry = $this->asObject()
             ->select($selectQry)
             ->join('employees', 'form_perijinan.employee_id = employees.id')
+            ->join('divisis', 'employees.division_id = divisis.id')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
         $totalData = $formPerijinanQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $formPerijinanQry->groupStart();
         }
 
-        // if ($addCondition['search']) {
-        //     $formPerijinanQry
-        //         ->like('employees.name', $addCondition['search']);
-        // }
-
         if ($addCondition['search']) {
+            $formPerijinanQry
+                ->like('employees.name', $addCondition['search']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $formPerijinanQry->where('form_perijinan.periode >=',  $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $formPerijinanQry->where('form_perijinan.periode <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $formPerijinanQry->groupEnd();
         }
 
         $totalFilteredData = $formPerijinanQry->countAllResults(false);
         $data = $formPerijinanQry->findAll($limit, $offset);
-
-        // var_dump($data);
-        // die;
 
         return [
             'data'              => $data,
