@@ -9,24 +9,24 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
+                                <input autocomplete="one-time-code" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK (Opsional)">
                                 <label for="floatingInput">NIK (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
                                 <label for="floatingInput"> NPWP (Opsional)</label>
                             </div>
                         </div>
@@ -34,7 +34,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <textarea class="form-control address" id="address" name="address"></textarea>
+                                <textarea autocomplete="one-time-code" class="form-control address" id="address" name="address"></textarea>
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" minlength="5" maxlength="5" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Kode Pos (Opsional)">
+                                        <input autocomplete="one-time-code" type="text" minlength="5" maxlength="5" class="form-control parent_postal_code" id="parent_postal_code" name="parent_postal_code" placeholder="Kode Pos (Opsional)">
                                         <label for="floatingInput">Kode Pos (Opsional)</label>
                                     </div>
                                 </div>
@@ -79,19 +79,19 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
+                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
                                 <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
+                                <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
                                 <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="email" class="form-control email" id="email" name="email" placeholder="Email (Opsional)">
+                                <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email (Opsional)">
                                 <label for="floatingInput">Email (Opsional)</label>
                             </div>
                         </div>
@@ -155,7 +155,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-4">
-                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Cari Nama Pelanggan" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Nama Pelanggan" value="" />
                 </div>
             </div>
             <div class="row">

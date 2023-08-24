@@ -34,13 +34,13 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSO) ? $dataSO->sales_order_export_id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSO) ? $dataSO->sales_order_export_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" readonly="true" value="<?= !empty($dataSO) ? $dataSO->sales_order_export_no : ""; ?>" type="text" class="form-control sales_order_export_no" id="sales_order_export_no" name="sales_order_export_no" placeholder="No. SO Export">
+                                <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataSO) ? $dataSO->sales_order_export_no : ""; ?>" type="text" class="form-control sales_order_export_no" id="sales_order_export_no" name="sales_order_export_no" placeholder="No. SO Export">
                                 <label for="floatingInput">No. SO Export</label>
                             </div>
                         </div>
@@ -64,7 +64,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" readonly="true" value="<?= !empty($dataSO) ? $dataSO->customer_po_no : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
+                            <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataSO) ? $dataSO->customer_po_no : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
                             <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
@@ -72,13 +72,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" readonly="true" value="<?= !empty($dataSO) ? $dataSO->loading_port : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
+                            <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataSO) ? $dataSO->loading_port : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
                             <label for="floatingInput">Loading Port</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" readonly="true" value="<?= !empty($dataSO) ? $dataSO->dicharge_port : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
+                            <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataSO) ? $dataSO->dicharge_port : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
                             <label for="floatingInput">Dicharge Port</label>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" disabled="true" value="<?= !empty($dataSO) ? ($dataSO->due_date ? date("d/m/Y", strtotime($dataSO->due_date)) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
+                                    <input autocomplete="one-time-code" disabled="true" value="<?= !empty($dataSO) ? ($dataSO->due_date ? date("d/m/Y", strtotime($dataSO->due_date)) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
                                     <label for="floatingInput">Due Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -99,13 +99,13 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" readonly="true" value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
+                            <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataSO) ? $dataSO->payment_term : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
                             <label for="floatingInput">Payment Term (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" readonly="true" value="<?= !empty($dataSO) ? $dataSO->tolerance : ""; ?>"  type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
+                            <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataSO) ? $dataSO->tolerance : ""; ?>"  type="text" class="form-control tolerance" id="tolerance" name="tolerance" placeholder="Tolerance">
                             <label for="floatingInput">Tolerance</label>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" readonly="true" value="<?= !empty($dataSO) ? ($dataSO->shipment_date ? date("d/m/Y", strtotime($dataSO->shipment_date)) : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
+                                    <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataSO) ? ($dataSO->shipment_date ? date("d/m/Y", strtotime($dataSO->shipment_date)) : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
                                     <label for="floatingInput">Shipment Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -126,13 +126,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea readonly="true" class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSO) ? $dataSO->documents_required : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" readonly="true" class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSO) ? $dataSO->documents_required : ""; ?></textarea>
                             <label for="floatingInput">Document Required</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea readonly="true" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSO) ? $dataSO->special_instructions : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" readonly="true" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSO) ? $dataSO->special_instructions : ""; ?></textarea>
                             <label for="floatingInput">Special Instructions</label>
                         </div>
                     </div>
@@ -140,19 +140,19 @@
                 <div class="row mt-4">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->director_name : ""; ?>" type="text" class="form-control director_name" id="director_name" name="director_name" placeholder="Nama Direktur">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->director_name : ""; ?>" type="text" class="form-control director_name" id="director_name" name="director_name" placeholder="Nama Direktur">
                             <label for="floatingInput">Nama Direktur</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->marketing_name : ""; ?>" type="text" class="form-control marketing_name" id="marketing_name" name="marketing_name" placeholder="Nama Marketing">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->marketing_name : ""; ?>" type="text" class="form-control marketing_name" id="marketing_name" name="marketing_name" placeholder="Nama Marketing">
                             <label for="floatingInput">Nama Marketing</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->exim_name : ""; ?>" type="text" class="form-control exim_name" id="exim_name" name="exim_name" placeholder="Nama Exim">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->exim_name : ""; ?>" type="text" class="form-control exim_name" id="exim_name" name="exim_name" placeholder="Nama Exim">
                             <label for="floatingInput">Nama Exim</label>
                         </div>
                     </div>
@@ -160,19 +160,19 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->procurement_name : ""; ?>" type="text" class="form-control procurement_name" id="procurement_name" name="procurement_name" placeholder="Nama Procure">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->procurement_name : ""; ?>" type="text" class="form-control procurement_name" id="procurement_name" name="procurement_name" placeholder="Nama Procure">
                             <label for="floatingInput">Nama Procure</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->production_name : ""; ?>" type="text" class="form-control production_name" id="production_name" name="production_name" placeholder="Nama Production">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->production_name : ""; ?>" type="text" class="form-control production_name" id="production_name" name="production_name" placeholder="Nama Production">
                             <label for="floatingInput">Nama Production</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->qc_name : ""; ?>" type="text" class="form-control qc_name" id="qc_name" name="qc_name" placeholder="Nama QC">
+                            <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->qc_name : ""; ?>" type="text" class="form-control qc_name" id="qc_name" name="qc_name" placeholder="Nama QC">
                             <label for="floatingInput">Nama QC</label>
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                 <div class="row mt-3">
                     <div class="col-md-4">
                         <div class="form-floating">
-                            <input autocomplete="off" readonly value="<?= !empty($dataSO) ? ($dataSO->total_amount ? number_format($dataSO->total_amount) : 0) : ""; ?>" type="text" value="0" class="form-control total_amount" id="total_amount" name="total_amount" placeholder="Grand Total" />
+                            <input autocomplete="one-time-code" readonly value="<?= !empty($dataSO) ? ($dataSO->total_amount ? number_format($dataSO->total_amount) : 0) : ""; ?>" type="text" value="0" class="form-control total_amount" id="total_amount" name="total_amount" placeholder="Grand Total" />
                             <label for="floatingInput">Grand Total</label>
                         </div>
                     </div>

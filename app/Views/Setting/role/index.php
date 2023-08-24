@@ -9,12 +9,12 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
                                 <label for="floatingInput">Role</label>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

@@ -21,19 +21,19 @@
 
 
             <form class="create-form form-add-formula-payroll" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control nama_formula" id="nama_formula" name="nama_formula" placeholder="Nama Formula">
+                            <input autocomplete="one-time-code" type="text" class="form-control nama_formula" id="nama_formula" name="nama_formula" placeholder="Nama Formula">
                             <label for="floatingInput">Nama Formula</label>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control formula" id="formula" name="formula" placeholder="Formula">
+                            <input autocomplete="one-time-code" type="text" class="form-control formula" id="formula" name="formula" placeholder="Formula">
                             <label for="floatingInput">Formula</label>
                         </div>
                     </div>

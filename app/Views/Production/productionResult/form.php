@@ -17,14 +17,14 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp form-hp" role="form" method="POST" enctype="multipart/form-data">
-            <input autocomplete="off" type="hidden" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
+            <input autocomplete="one-time-code" type="hidden" value="<?= $data->id ?? ""; ?>" class="id" name="id" id="id" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" value="<?= $data->pr_no ?? ""; ?>" class="form-control" id="pr_no" name="pr_no" placeholder="Kode Produksi" disabled>
+                                <input autocomplete="one-time-code" type="text" value="<?= $data->pr_no ?? ""; ?>" class="form-control" id="pr_no" name="pr_no" placeholder="Kode Produksi" disabled>
                                 <label for="floatingInput">Kode Produksi</label>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" type="text" value="<?= $data->receive_date ?? '' ?>"  class="form-control target input-picker" name="receive_date" id="receive_date" placeholder="Target">
+                        <input autocomplete="one-time-code" type="text" value="<?= $data->receive_date ?? '' ?>"  class="form-control target input-picker" name="receive_date" id="receive_date" placeholder="Target">
                         <label for="floatingInput">Receive Date</label>
                     </div>
                 </div>
@@ -78,19 +78,19 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_barang ?? '' ?>" disabled>
+                                    <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_barang ?? '' ?>" disabled>
                                         <label for="floatingInput">Nama Barang</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="barang_jadi_code" value="<?= $barangJadi->kode_barang ?? '' ?>" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="barang_jadi_code" value="<?= $barangJadi->kode_barang ?? '' ?>" disabled>
                                         <label for="floatingInput">Kode Barang</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_satuan ?? '' ?>" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="barang_jadi_unit" value="<?= $barangJadi->nama_satuan ?? '' ?>" disabled>
                                         <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
@@ -98,7 +98,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" value="<?= $barangJadi->qty ?? '' ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="barang_jadi_qty" id="barangJadiQty">
+                                        <input autocomplete="one-time-code" type="text" value="<?= $barangJadi->qty ?? '' ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="barang_jadi_qty" id="barangJadiQty">
                                         <label for="floatingInput">Qty</label>
                                     </div>
                                 </div>
@@ -119,13 +119,13 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="setengah_jadi_barang_code" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="setengah_jadi_barang_code" disabled>
                                         <label for="floatingInput">Kode Barang</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="setengah_jadi_barang_unit" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="setengah_jadi_barang_unit" disabled>
                                         <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" id="barangSetengahJadiQty">
+                                        <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" id="barangSetengahJadiQty">
                                         <label for="floatingInput">Qty</label>
                                     </div>
                                 </div>
@@ -176,13 +176,13 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="scrap_code" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="scrap_code" disabled>
                                         <label for="floatingInput">Kode Barang</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="scrap_unit" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="scrap_unit" disabled>
                                         <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
@@ -190,7 +190,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="" id="scrapQty">
+                                        <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="" id="scrapQty">
                                         <label for="floatingInput">Qty</label>
                                     </div>
                                 </div>
@@ -233,13 +233,13 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="materialReturnCode" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="materialReturnCode" disabled>
                                         <label for="floatingInput">Kode Barang</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control target input-picker" id="materialReturnUnit" disabled>
+                                        <input autocomplete="one-time-code" type="text" class="form-control target input-picker" id="materialReturnUnit" disabled>
                                         <label for="floatingInput">Satuan</label>
                                     </div>
                                 </div>
@@ -247,7 +247,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="" id="materialReturnQty">
+                                        <input autocomplete="one-time-code" type="text" value="<?= !empty($dataWorkOrders) ? formatter($dataWorkOrders->target, "STR_TO_INT") : ""; ?>"  oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" name="" id="materialReturnQty">
                                         <label for="floatingInput">Qty</label>
                                     </div>
                                 </div>

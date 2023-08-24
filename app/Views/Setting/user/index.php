@@ -9,14 +9,14 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
-                    <input autocomplete="off" type="hidden" class="create_name" name="create_name" id="create_name" />
-                    <!-- <input autocomplete="off" type="hidden" class="company_role" name="company_role" id="company_role" /> -->
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="create_name" name="create_name" id="create_name" />
+                    <!-- <input autocomplete="one-time-code" type="hidden" class="company_role" name="company_role" id="company_role" /> -->
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
                                 <label for="floatingInput">Username</label>
                             </div>
                         </div>
@@ -25,7 +25,7 @@
                         <div class="col">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
+                                    <input autocomplete="one-time-code" type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
                                     <label for="floatingInput">Password</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -48,7 +48,7 @@
                         </div>
                         <div class="col col-edit">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" readonly type="text" class="form-control name" id="name" name="name" placeholder="Employee">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control name" id="name" name="name" placeholder="Employee">
                                 <label for="floatingInput">Employee</label>
                             </div>
                         </div>
@@ -106,7 +106,7 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -148,7 +148,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-4">
-                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Ketik Username / Name" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Username / Name" value="" />
                 </div>
             </div>
             <div class="row">

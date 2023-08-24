@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-3 mb-3 view-cols-image">
@@ -19,12 +19,12 @@
                     <div class="row">
                         <div class="col-md-6 col-input-files-img" style="height: 50px;">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" onchange="previewPhoto();" type="file" class="form-control input-image logo" id="logo" name="logo" accept="image/png, image/jpg, image/jpeg">
+                                <input autocomplete="one-time-code" onchange="previewPhoto();" type="file" class="form-control input-image logo" id="logo" name="logo" accept="image/png, image/jpg, image/jpeg">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control company" id="company" name="company" placeholder="Company">
+                                <input autocomplete="one-time-code" type="text" class="form-control company" id="company" name="company" placeholder="Company">
                                 <label for="floatingInput">Company</label>
                             </div>
                         </div>
@@ -32,13 +32,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control holding_company" id="holding_company" name="holding_company" placeholder="Holding Company">
+                                <input autocomplete="one-time-code" type="text" class="form-control holding_company" id="holding_company" name="holding_company" placeholder="Holding Company">
                                 <label for="floatingInput">Holding Company</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)">
+                                <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)">
                                 <label for="floatingInput">Email (Optional)</label>
                             </div>
                         </div>
@@ -46,13 +46,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <textarea class="form-control address text-area-all" id="address" name="address" placeholder="Address"></textarea>
+                                <textarea autocomplete="one-time-code" class="form-control address text-area-all" id="address" name="address" placeholder="Address"></textarea>
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
                                 <label for="floatingInput">Nomor Telepon</label>
                             </div>
                         </div>
@@ -85,7 +85,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <input autocomplete="one-time-code" type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
@@ -113,7 +113,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

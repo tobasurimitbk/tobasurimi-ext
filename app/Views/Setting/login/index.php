@@ -23,7 +23,7 @@
                                             <span class="input-group-text input-group-text-login-register" id="basic-addon1"><i class="icon-login-register fas fa-user"></i></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input autocomplete="off" type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
+                                            <input autocomplete="one-time-code" type="text" class="form-control username" id="username" name="username" placeholder="Username" maxlength="30">
                                             <label for="floatingInput">Username</label>
                                         </div>
                                     </div>
@@ -32,7 +32,7 @@
                                             <span class="input-group-text input-group-text-login-register" id="basic-addon1"><i class="icon-login-register fas fa-lock"></i></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input autocomplete="off" type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
+                                            <input autocomplete="one-time-code" type="password" class="form-control password" id="password" name="password" placeholder="Password" maxlength="30">
                                             <label for="floatingInput">Password</label>
                                         </div>
                                         <div class="input-group-prepend group-prepend-password-login-register align-items-center">

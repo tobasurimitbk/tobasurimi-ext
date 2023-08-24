@@ -20,8 +20,8 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-order-form-lokal" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
-                <input autocomplete="off" type="hidden" class="tipe_sales_order" name="tipe_sales_order" id="tipe_sales_order" value="LOKAL" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="tipe_sales_order" name="tipe_sales_order" id="tipe_sales_order" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -46,14 +46,14 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $seller_name ?>">
-                            <input autocomplete="off" type="hidden" class="form-control sales_name" id="id_user" name="id_user" value="<?= $id_user ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $seller_name ?>">
+                            <input autocomplete="one-time-code" type="hidden" class="form-control sales_name" id="id_user" name="id_user" value="<?= $id_user ?>">
                             <label for="floatingInput">Nama Sales</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control sales_name" id="destination" name="destination" value="<?= empty($data->destination) ? '' : $data->destination ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="destination" name="destination" value="<?= empty($data->destination) ? '' : $data->destination ?>">
                             <label for="floatingInput">Tujuan Pengiriman</label>
                         </div>
                     </div>
@@ -66,14 +66,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" class="form-control input-picker order_date" id="order_date" name="order_date" <?= !empty($data) ? ($data->order_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->order_date : ""; ?>" placeholder="Tanggal Pemesanan">
+                                    <input autocomplete="one-time-code" class="form-control input-picker order_date" id="order_date" name="order_date" <?= !empty($data) ? ($data->order_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->order_date : ""; ?>" placeholder="Tanggal Pemesanan">
                                     <label for="floatingInput">Tanggal Pemesanan</label>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" class="form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
+                                    <input autocomplete="one-time-code" class="form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
                                     <label for="floatingInput">Tanggal Pengiriman</label>
                                 </div>
                             </div>
@@ -82,13 +82,13 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->estimated_freight : ""; ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->estimated_freight : ""; ?>">
                             <label for="floatingInput">Estimated Freight</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?= !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->payment_terms : ""; ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?= !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->payment_terms : ""; ?>">
                             <label for="floatingInput">Terms</label>
                         </div>
                     </div>
@@ -97,13 +97,13 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->ppn : ""; ?>">
+                            <input autocomplete="one-time-code" type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->ppn : ""; ?>">
                             <label for="floatingInput">PPN</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 50px;">
-                            <textarea <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control parent_keterangan text-area-all" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control parent_keterangan text-area-all" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -114,7 +114,7 @@
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="off" class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status == 'true' ? 'checked' : '') : ''; ?>>
+                                            <input autocomplete="one-time-code" class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status == 'true' ? 'checked' : '') : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -126,7 +126,7 @@
                                     <label for="floatingInput">Include pa</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="off" class="include_pa" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : ''; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->include_pa == 'true' ? 'checked' : '') : ''; ?>>
+                                            <input autocomplete="one-time-code" class="include_pa" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : ''; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->include_pa == 'true' ? 'checked' : '') : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -222,8 +222,8 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <!-- <input autocomplete="off" type="hidden" class="id_barang" name="id_barang" id="id_barang" /> -->
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <!-- <input autocomplete="one-time-code" type="hidden" class="id_barang" name="id_barang" id="id_barang" /> -->
 
                     <div class="row">
                         <div class="col-md-12">
@@ -238,13 +238,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <input autocomplete="one-time-code" type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                                 <label for="floatingInput">Qty</label>
                             </div>
                         </div>
@@ -252,13 +252,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control amount" name="amount" id="amount" placeholder="Total Harga">
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
                                 <label for="floatingInput">Keterangan</label>
                             </div>
                         </div>
@@ -266,13 +266,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control tax" name="tax" id="tax" placeholder="Total Pajak">
+                                <input autocomplete="one-time-code" type="text" class="form-control tax" name="tax" id="tax" placeholder="Total Pajak">
                                 <label for="floatingInput">Total Pajak</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
+                                <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
                                 <label for="floatingInput">disc%</label>
                             </div>
                         </div>
@@ -280,7 +280,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control dept" name="dept" id="dept" placeholder="dept">
+                                <input autocomplete="one-time-code" type="text" class="form-control dept" name="dept" id="dept" placeholder="dept">
                                 <label for="floatingInput">dept</label>
                             </div>
                         </div>

@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-3 mb-3 view-cols-image">
@@ -19,12 +19,12 @@
                     <div class="row">
                         <div class="col-md-6 col-input-files-img" style="height: 50px;">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" onchange="previewPhoto();" type="file" class="form-control input-image employeeImg" id="employeeImg" name="employeeImg" accept="image/png, image/jpg, image/jpeg">
+                                <input autocomplete="one-time-code" onchange="previewPhoto();" type="file" class="form-control input-image employeeImg" id="employeeImg" name="employeeImg" accept="image/png, image/jpg, image/jpeg">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
                                 <label for="floatingInput">Nama Lengkap</label>
                             </div>
                         </div>
@@ -32,13 +32,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK">
+                                <input autocomplete="one-time-code" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK">
                                 <label for="floatingInput">NIK</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
                                 <label for="floatingInput">NIP</label>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
@@ -54,7 +54,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
+                                        <input autocomplete="one-time-code" class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
                                         <label for="floatingInput">Tanggal Lahir</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -94,7 +94,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
+                                <input autocomplete="one-time-code" type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
@@ -102,13 +102,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone (Optional)" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone (Optional)" maxlength="30">
                                 <label for="floatingInput">Nomor Telepon (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)" maxlength="30">
+                                <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email (Optional)" maxlength="30">
                                 <label for="floatingInput">Email (Optional)</label>
                             </div>
                         </div>
@@ -144,7 +144,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Jumlah Anak">
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Jumlah Anak">
                                 <label for="floatingInput">Jumlah Anak</label>
                             </div>
                         </div>
@@ -173,7 +173,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
+                                        <input autocomplete="one-time-code" class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
                                         <label for="floatingInput">Tanggal Bergabung</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -200,13 +200,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
                                 <label for="floatingInput">No. Rekening</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control owner_name" id="owner_name" name="owner_name" placeholder="Nama Pemilik Rekening" maxlength="100">
+                                <input autocomplete="one-time-code" type="text" class="form-control owner_name" id="owner_name" name="owner_name" placeholder="Nama Pemilik Rekening" maxlength="100">
                                 <label for="floatingInput">Nama Pemilik Rekening</label>
                             </div>
                         </div>
@@ -214,7 +214,7 @@
                     <div class="row">
                         <div class="col-md-6 form-pin">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN (Optional)">
+                                <input autocomplete="one-time-code" type="text" class="form-control pin" id="pin" name="pin" oninput="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="PIN (Optional)">
                                 <label for="floatingInput">PIN (Optional)</label>
                             </div>
                         </div>
@@ -271,7 +271,7 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -283,7 +283,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" onkeyup="formatNumber(this)" oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
+                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
                                 <label for="floatingInput">Nominal</label>
                             </div>
                         </div>
@@ -311,7 +311,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

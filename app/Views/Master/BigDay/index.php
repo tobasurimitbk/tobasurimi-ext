@@ -9,12 +9,12 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control name" id="nama" name="nama" placeholder="Nama">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="nama" name="nama" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
                         </div>
@@ -23,7 +23,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" class="form-control input-picker date_create" id="date_create" name="date_create" placeholder="Tanggal">
+                                        <input autocomplete="one-time-code" class="form-control input-picker date_create" id="date_create" name="date_create" placeholder="Tanggal">
                                         <label for="floatingInput">Tanggal Mulai</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -58,7 +58,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
             <div class="row">

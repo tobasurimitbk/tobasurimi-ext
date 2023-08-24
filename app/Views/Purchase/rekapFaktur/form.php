@@ -24,7 +24,7 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= $rekapData->id ?? '' ?>"/>
+            <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= $rekapData->id ?? '' ?>"/>
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
@@ -53,13 +53,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" class="form-control input-picker due_date" id="due_date" name="due_date" value="<?= $rekapData->due_date ?? '' ?>" placeholder="Tanggal Jatuh Tempo">
+                        <input autocomplete="one-time-code" class="form-control input-picker due_date" id="due_date" name="due_date" value="<?= $rekapData->due_date ?? '' ?>" placeholder="Tanggal Jatuh Tempo">
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
+                        <input autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
                         <label for="floatingInput">Pembayaran Oleh</label>
                     </div>
                 </div>

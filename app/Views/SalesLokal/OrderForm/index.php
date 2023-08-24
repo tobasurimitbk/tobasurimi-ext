@@ -13,7 +13,7 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-4 mb-3">
-                    <input autocomplete="off" class="form-control search form-out-search" placeholder="Cari No. SO" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. SO" value="" />
                 </div>
             </div>
             <div class="row">

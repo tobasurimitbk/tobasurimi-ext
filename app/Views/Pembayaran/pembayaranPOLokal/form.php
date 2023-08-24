@@ -17,25 +17,25 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= $dataPembayaranPOLokal->id ?? '' ?>" />
+            <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= $dataPembayaranPOLokal->id ?? '' ?>" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" value="<?= $dataPembayaranPOLokal->payment_no ?? '' ?>" <?= (!empty($dataPembayaranPOLokal)) ? 'disabled' : '' ?>>
+                                <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" value="<?= $dataPembayaranPOLokal->payment_no ?? '' ?>" <?= (!empty($dataPembayaranPOLokal)) ? 'disabled' : '' ?>>
                                 <label for="floatingInput">No. Pembayaran</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input autocomplete="off" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()" <?= (!empty($dataPembayaranPOLokal)) ? 'disabled' : '' ?>>
+                                <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()" <?= (!empty($dataPembayaranPOLokal)) ? 'disabled' : '' ?>>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->payment_date ?? '' ?>">
+                        <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->payment_date ?? '' ?>">
                         <label for="floatingInput">Tanggal Pembayaran</label>
                     </div>
                 </div>
@@ -68,13 +68,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" onkeyup="formatNumber(this)" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" value="<?= $dataPembayaranPOLokal->amount ?? 0 ?>" readonly disabled>
+                        <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" value="<?= $dataPembayaranPOLokal->amount ?? 0 ?>" readonly disabled>
                         <label for="floatingInput">Nominal Pembayaran</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->due_date ?? '' ?>" readonly>
+                        <input autocomplete="one-time-code" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->due_date ?? '' ?>" readonly>
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
+                        <input autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
                         <label for="floatingInput">Pembayaran Oleh</label>
                     </div>
                 </div>
@@ -220,7 +220,7 @@ $(document).ready(function() {
                     
                     return `
                         <div class="mt-0">
-                            <input autocomplete="off" class="form-check-input" type="checkbox" name="paidItem[]" value="${data}">
+                            <input autocomplete="one-time-code" class="form-check-input" type="checkbox" name="paidItem[]" value="${data}">
                         </div>
                     `
                 }, */

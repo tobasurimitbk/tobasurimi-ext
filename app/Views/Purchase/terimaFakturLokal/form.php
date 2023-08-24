@@ -26,12 +26,12 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input autocomplete="off" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->id : ""; ?>" type="hidden" class="id" name="id" id="id" />
+            <input autocomplete="one-time-code" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->id : ""; ?>" type="hidden" class="id" name="id" id="id" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker receive_date" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
+                        <input autocomplete="one-time-code" value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker receive_date" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
                         <label for="floatingInput">Tanggal Penerimaan</label>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" value="<?= $dataTerimaFaktur->inv_no ?? "AUTO GENERATE"; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur" disabled>
+                                <input autocomplete="one-time-code" value="<?= $dataTerimaFaktur->inv_no ?? "AUTO GENERATE"; ?>" type="text" class="form-control no" id="no" name="no" placeholder="No. Terima Faktur" disabled>
                                 <label for="floatingInput">No. Terima Faktur</label>
                             </div>
                         </div>
@@ -60,7 +60,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" value="<?= $dataTerimaFaktur->inv_total ?? ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control" name="inv_total" id="inv_total" placeholder="Total Nominal Faktur">
+                        <input autocomplete="one-time-code" value="<?= $dataTerimaFaktur->inv_total ?? ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control" name="inv_total" id="inv_total" placeholder="Total Nominal Faktur">
                         <label for="floatingInput">Total Nominal Faktur</label>
                     </div>
                 </div>
@@ -68,13 +68,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->due_date : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
+                        <input autocomplete="one-time-code" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->due_date : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Tanggal Jatuh Tempo">
                         <label for="floatingInput">Tanggal Jatuh Tempo</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="off" readonly="true" value="<?= $dataTerimaFaktur->createdBy ?? session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
+                        <input autocomplete="one-time-code" readonly="true" value="<?= $dataTerimaFaktur->createdBy ?? session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <textarea class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
+                        <textarea autocomplete="one-time-code" class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>

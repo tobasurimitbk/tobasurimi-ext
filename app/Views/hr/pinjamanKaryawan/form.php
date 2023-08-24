@@ -19,7 +19,7 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-pinjaman-karyawan" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-6">
@@ -42,7 +42,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="number" class="form-control total_pinjaman" id="total_pinjaman" name="total_pinjaman" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->amount : ""; ?>" placeholder="Total Pinjaman">
+                            <input autocomplete="one-time-code" type="number" class="form-control total_pinjaman" id="total_pinjaman" name="total_pinjaman" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->amount : ""; ?>" placeholder="Total Pinjaman">
                             <label for="floatingInput">Total Pinjaman</label>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="number" class="form-control termin_pembayaran" id="termin_pembayaran" name="termin_pembayaran" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> placeholder="Termin Pembayaran" value="<?= !empty($data) ? $data->term : ""; ?>">
+                            <input autocomplete="one-time-code" type="number" class="form-control termin_pembayaran" id="termin_pembayaran" name="termin_pembayaran" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> placeholder="Termin Pembayaran" value="<?= !empty($data) ? $data->term : ""; ?>">
                             <label for="floatingInput">Termin Pembayaran</label>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
                             <label for="floatingInput">Posting</label>
                             <div class="switch-form-pinjaman-karyawan">
                                 <label class="switch">
-                                    <input autocomplete="off" class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
+                                    <input autocomplete="one-time-code" class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>

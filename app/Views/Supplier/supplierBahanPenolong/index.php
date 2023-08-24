@@ -9,23 +9,23 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
                                     <label for="floatingInput">Kode Supplier</label>
                                 </div>
                                 <div style="<?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="off" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
                         </div>
@@ -33,7 +33,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
                                 <label for="floatingInput">Alamat</label>
                             </div>
                         </div>
@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="off" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="postal_code" placeholder="Postal Code">
+                                        <input autocomplete="one-time-code" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="postal_code" placeholder="Postal Code">
                                         <label for="floatingInput">Kode Pos</label>
                                     </div>
                                 </div>
@@ -78,13 +78,13 @@
                     <div class="row">
                      <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
                                 <label for="floatingInput">Nomor NPWP</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
+                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
                                 <label for="floatingInput">No. Telepon</label>
                             </div>
                         </div>
@@ -92,13 +92,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
+                                <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
                                 <label for="floatingInput">Contact Person</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="email" class="form-control email" id="email" name="email" placeholder="Email">
+                                <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
                                 <label for="floatingInput">Email</label>
                             </div>
                         </div>
@@ -106,7 +106,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
                                 <label for="floatingInput">No. Rekening</label>
                             </div>
                         </div>
@@ -187,11 +187,11 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
+                                <input autocomplete="one-time-code" type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
                                 <label for="floatingInput">Address</label>
                             </div>
                         </div>
@@ -224,7 +224,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
+                                <input autocomplete="one-time-code" readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
                                 <label for="floatingInput">Kode Pos</label>
                             </div>
                         </div>
@@ -252,7 +252,7 @@
     <div class="card-body">
         <div class="row justify-content-end mb-3">
             <div class="col-md-2">
-                <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
+                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
             </div>
         </div>
         <div class="row">
@@ -889,11 +889,11 @@
                             tag_html += "<td class='actions'>";
                             if(item.main_address == 1)
                             {
-                                tag_html += `<input autocomplete="off" type="radio" checked id="main" name="main" value="${index + 1}">`;
+                                tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${index + 1}">`;
                             }   
                             else
                             {
-                                tag_html += `<input autocomplete="off" type="radio" id="main" name="main" value="${index + 1}">`;
+                                tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${index + 1}">`;
                             } 
                             tag_html += "</td>";
                             tag_html += "</tr>";
@@ -1084,11 +1084,11 @@
         //                             tag_html += "<td class='actions'>";
         //                             if(item.row == main_address)
         //                             {
-        //                                 tag_html += `<input autocomplete="off" type="radio" checked id="main" name="main" value="${row + 1}">`;
+        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
         //                             }
         //                             else
         //                             {
-        //                                 tag_html += `<input autocomplete="off" type="radio" id="main" name="main" value="${row + 1}">`;
+        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
         //                             }
         //                             tag_html += "</td>";
         //                             tag_html += "</tr>";
@@ -1129,11 +1129,11 @@
         //                             tag_html += "<td class='actions'>";
         //                             if(item.row == main_address)
         //                             {
-        //                                 tag_html += `<input autocomplete="off" type="radio" checked id="main" name="main" value="${row + 1}">`;
+        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
         //                             }
         //                             else
         //                             {
-        //                                 tag_html += `<input autocomplete="off" type="radio" id="main" name="main" value="${row + 1}">`;
+        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
         //                             }
         //                             tag_html += "</td>";
         //                             tag_html += "</tr>";
@@ -1202,11 +1202,11 @@
         //                     tag_html += "<td class='actions'>";
         //                     if(row === 0)
         //                     {
-        //                         tag_html += `<input autocomplete="off" type="radio" checked id="main" name="main" value="${row + 1}">`;
+        //                         tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
         //                     }   
         //                     else
         //                     {
-        //                         tag_html += `<input autocomplete="off" type="radio" id="main" name="main" value="${row + 1}">`;
+        //                         tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
         //                     } 
         //                     tag_html += "</td>";
         //                     tag_html += "</tr>";
@@ -1433,11 +1433,11 @@
     //                         tag_html += "<td class='actions'>";
     //                         if(main_address == item.row)
     //                         {
-    //                             tag_html += `<input autocomplete="off" type="radio" checked id="main" name="main" value="${row + 1}">`;
+    //                             tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
     //                         }   
     //                         else
     //                         {
-    //                             tag_html += `<input autocomplete="off" type="radio" id="main" name="main" value="${row + 1}">`;
+    //                             tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
     //                         } 
     //                         tag_html += "</td>";
     //                         tag_html += "</tr>";

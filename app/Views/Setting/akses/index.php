@@ -162,45 +162,45 @@
                                 tag_html += "<tr>";
                                 tag_html += "<td>";
                                 tag_html += child.name;
-                                tag_html += "<input <input autocomplete='off' type='hidden' value='" + item.menu_url_id + "' name='parent_" + child.menu_url_id + "'  id='parent_" + child.menu_url_id + "'  />";
+                                tag_html += "<input <input autocomplete='one-time-code' type='hidden' value='" + item.menu_url_id + "' name='parent_" + child.menu_url_id + "'  id='parent_" + child.menu_url_id + "'  />";
                                 tag_html += "</td>";
                                 if (child.access.includes('c')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' checked name='create_" + child.menu_url_id + "'  id='create_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='create_" + child.menu_url_id + "'  id='create_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (!child.access.includes('c')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' name='create_" + child.menu_url_id + "'  id='create_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='create_" + child.menu_url_id + "'  id='create_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (child.access.includes('r')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' checked name='read_" + child.menu_url_id + "'  id='read_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='read_" + child.menu_url_id + "'  id='read_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (!child.access.includes('r')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' name='read_" + child.menu_url_id + "'  id='read_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='read_" + child.menu_url_id + "'  id='read_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (child.access.includes('u')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' checked name='update_" + child.menu_url_id + "'  id='update_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='update_" + child.menu_url_id + "'  id='update_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (!child.access.includes('u')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' name='update_" + child.menu_url_id + "'  id='update_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='update_" + child.menu_url_id + "'  id='update_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (child.access.includes('d')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' checked name='delete_" + child.menu_url_id + "'  id='delete_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='delete_" + child.menu_url_id + "'  id='delete_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (!child.access.includes('d')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' name='delete_" + child.menu_url_id + "'  id='delete_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='delete_" + child.menu_url_id + "'  id='delete_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (child.access.includes('p')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' checked name='print_" + child.menu_url_id + "'  id='print_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='print_" + child.menu_url_id + "'  id='print_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (!child.access.includes('p')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' name='print_" + child.menu_url_id + "'  id='print_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='print_" + child.menu_url_id + "'  id='print_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (child.access.includes('a')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' checked name='approve_" + child.menu_url_id + "'  id='approve_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' checked name='approve_" + child.menu_url_id + "'  id='approve_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
                                 if (!child.access.includes('a')) {
-                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' name='approve_" + child.menu_url_id + "'  id='approve_" + child.menu_url_id + "'  /><span></span></label></td>";
+                                    tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' name='approve_" + child.menu_url_id + "'  id='approve_" + child.menu_url_id + "'  /><span></span></label></td>";
                                 }
-                                tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='off' type='checkbox' class='checkbox-round' id='" + child.menu_url_id + "' onchange='checkAll(" + child.menu_url_id + ")' /><span></span></label></td>";
+                                tag_html += "<td style='text-align:center;'><label class='checkbox'><input <input autocomplete='one-time-code' type='checkbox' class='checkbox-round' id='" + child.menu_url_id + "' onchange='checkAll(" + child.menu_url_id + ")' /><span></span></label></td>";
                                 tag_html += "</tr>";
                             })
                         })

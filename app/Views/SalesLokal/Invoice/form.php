@@ -18,20 +18,20 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-pinjaman-karyawan" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="off" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
-                <input autocomplete="off" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" disabled="true" value="<?= !empty($data) ? $data->no_faktur : ""; ?>" placeholder="Auto Generate">
+                            <input autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" disabled="true" value="<?= !empty($data) ? $data->no_faktur : ""; ?>" placeholder="Auto Generate">
                             <label for="floatingInput">No Faktur</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" disabled="true" value="<?= !empty($data) ? $data->tanggal_faktur : ""; ?>" placeholder="Tanggal Faktur"></input>
+                            <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" disabled="true" value="<?= !empty($data) ? $data->tanggal_faktur : ""; ?>" placeholder="Tanggal Faktur"></input>
                             <label for="floatingInput">Tanggal Faktur</label>
                         </div>
                     </div>
@@ -58,8 +58,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="off" type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
-                                    <input autocomplete="off" type="text" class="form-control user" id="user" name="user" disabled="true" placeholder="penjual" value="<?= $seller_name  ?>">
+                                    <input autocomplete="one-time-code" type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
+                                    <input autocomplete="one-time-code" type="text" class="form-control user" id="user" name="user" disabled="true" placeholder="penjual" value="<?= $seller_name  ?>">
                                     <label for="floatingInput">Penjual</label>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@
                                             <label for="floatingInput">Pajak</label>
                                             <div class="switch-form-pinjaman-karyawan">
                                                 <label class="switch">
-                                                    <input autocomplete="off" class="tax_status" <?= !empty($data) ? ($data->status_tax === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->status_tax == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->status_tax == 'true' ? 'true' : 'false') : 'false'; ?>">
+                                                    <input autocomplete="one-time-code" class="tax_status" <?= !empty($data) ? ($data->status_tax === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->status_tax == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->status_tax == 'true' ? 'true' : 'false') : 'false'; ?>">
                                                     <span class="slider round"></span>
                                                 </label>
                                             </div>
@@ -81,7 +81,7 @@
                                             <label for="floatingInput">Include pa</label>
                                             <div class="switch-form-pinjaman-karyawan">
                                                 <label class="switch">
-                                                    <input autocomplete="off" class="include_pa" <?= !empty($data) ? ($data->termasuk_pa === true ? 'disabled=true' : '') : 'disabled=true'; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'true' : 'false') : 'false'; ?>">
+                                                    <input autocomplete="one-time-code" class="include_pa" <?= !empty($data) ? ($data->termasuk_pa === true ? 'disabled=true' : '') : 'disabled=true'; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'true' : 'false') : 'false'; ?>">
                                                     <span class="slider round"></span>
                                                 </label>
                                             </div>
@@ -153,7 +153,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating ff-ket mb-3" style="height: 50px;">
-                            <textarea <?= !empty($data->keterangan) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="Keterangan" name="Keterangan" placeholder="Keterangan"><?= !empty($data->keterangan) ? $data->keterangan : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" <?= !empty($data->keterangan) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="Keterangan" name="Keterangan" placeholder="Keterangan"><?= !empty($data->keterangan) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -162,16 +162,16 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="hidden" class="form-control dpp" id="dpp" name="dpp" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->dpp)  : ""; ?>">
-                            <input autocomplete="off" type="hidden" class="form-control ppn" id="ppn" name="ppn" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->ppn) : ""; ?>">
-                            <input autocomplete="off" type="number" class="form-control total_invoice" id="total_invoice" name="total_invoice" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->total_invoice) : ""; ?>">
+                            <input autocomplete="one-time-code" type="hidden" class="form-control dpp" id="dpp" name="dpp" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->dpp)  : ""; ?>">
+                            <input autocomplete="one-time-code" type="hidden" class="form-control ppn" id="ppn" name="ppn" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->ppn) : ""; ?>">
+                            <input autocomplete="one-time-code" type="number" class="form-control total_invoice" id="total_invoice" name="total_invoice" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->total_invoice) : ""; ?>">
                             <label for="floatingInput">Total Invoice</label>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="off" type="text" class="form-control terms" id="terms" name="terms" <?= !empty($data) ? ($data->terms === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->terms : ""; ?>" placeholder="terms">
+                            <input autocomplete="one-time-code" type="text" class="form-control terms" id="terms" name="terms" <?= !empty($data) ? ($data->terms === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->terms : ""; ?>" placeholder="terms">
                             <label for="floatingInput">Terms</label>
                         </div>
                     </div>

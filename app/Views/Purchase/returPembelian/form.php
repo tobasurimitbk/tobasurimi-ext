@@ -17,18 +17,18 @@
 <div class="card">
     <div class="card-body">
         <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
+            <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
             <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="off" type="text" class="form-control no" id="no" name="no" placeholder="No. Retur">
+                                <input autocomplete="one-time-code" type="text" class="form-control no" id="no" name="no" placeholder="No. Retur">
                                 <label for="floatingInput">No. Retur</label>
                             </div>
                             <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                <input autocomplete="off" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                             </div>
                         </div>
                     </div>

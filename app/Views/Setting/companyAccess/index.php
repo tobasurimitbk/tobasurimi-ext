@@ -9,11 +9,11 @@
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id" name="id" id="id" />
-                    <input autocomplete="off" type="hidden" class="username" name="username" id="username" />
-                    <input autocomplete="off" type="hidden" class="employee_id" name="employee_id" id="employee_id" />
-                    <input autocomplete="off" type="hidden" class="status" name="status" id="status" />
-                    <input autocomplete="off" type="hidden" class="password" name="password" id="password" />
+                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                    <input autocomplete="one-time-code" type="hidden" class="username" name="username" id="username" />
+                    <input autocomplete="one-time-code" type="hidden" class="employee_id" name="employee_id" id="employee_id" />
+                    <input autocomplete="one-time-code" type="hidden" class="status" name="status" id="status" />
+                    <input autocomplete="one-time-code" type="hidden" class="password" name="password" id="password" />
                     <?= csrf_field() ?>
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -24,7 +24,7 @@
                                 <label for="floatingInput">User</label>
                             </div>
                             <div class="form-floating mb-3 edit-user" style="height: 50px;">
-                                <input autocomplete="off" type="text" readonly="true" class="form-control name" name="name" id="name">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control name" name="name" id="name">
                                 <label for="floatingInput">User</label>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="off" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -122,7 +122,7 @@
     <div class="card-body">
         <div class="row justify-content-end mb-3">
             <div class="col-md-2">
-                <input autocomplete="off" class="form-control search form-out-search" placeholder="Search" value="" />
+                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
             </div>
         </div>
         <div class="row">
