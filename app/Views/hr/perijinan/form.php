@@ -82,7 +82,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3" style="height: 50px;">
                             <label for="floatingInput">Posting</label>
@@ -94,7 +94,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
         </div>
         </form>
     </div>

@@ -4,12 +4,16 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use Config\Services;
+use App\Models\FormPerijinanModel;
+use App\Models\EmployeesModel;
 
 class Perijinan extends BaseController
 {
     protected $token;
     protected $this_company_id;
     protected $encrypter;
+    protected $FormPerijinanModel;
+    protected $EmployeesModel;
 
     public function __construct()
     {
@@ -23,19 +27,19 @@ class Perijinan extends BaseController
         return view('hr/perijinan/index');
     }
 
-
     public function createView()
     {
+        $EmployeesModel = new EmployeesModel();
+
         $data = [
             "status" => ["IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR"]
         ];
 
         //Get Employee
-        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
+        $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
-        $dataEmployee = [];
-        if ($responseEmployee["code"] === 200) {
-            $dataEmployee = json_decode($responseEmployee["body"])->data;
+        foreach (array_keys($dataEmployee) as $key) {
+            $dataEmployee[$key] = (object)$dataEmployee[$key];
         }
 
         $data["dataEmployee"] = $dataEmployee;
@@ -89,35 +93,43 @@ class Perijinan extends BaseController
             "idCompany" => $this->this_company_id,
         ];
 
-        $response = curl_request("GET", "/attendance/allAbsence", $this->token, $payload);
+        $FormPerijinanModel = new FormPerijinanModel();
+
+        $condition = [];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getGet("dateStart"),
+            "dateEnd"       => $this->request->getGet("dateEnd"),
+        ];
+
         $dataEmployee = [];
-        $totalRecords = 0;
 
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $FormData = $FormPerijinanModel->getPerijinanList($condition, $addCondition, $limit, $offset);
 
-            foreach ($body as $data) {
-                array_push($dataEmployee, [
-                    "no" => $no++,
-                    "id" =>  bin2hex($this->encrypter->encrypt($data->employee_id)),
-                    "employeeName" => $data->employeeName,
-                    "employeeNip" => $data->employeeNip,
-                    "divisionName" => $data->divisionName,
-                    "periode" => $data->periode,
-                    "status" => $data->status,
-                ]);
-            }
+        foreach ($FormData['data'] as $data) {
+            array_push($dataEmployee, [
+                "no" => $no++,
+                "id" =>  $data->id,
+                "employeeName" => $data->employeeName,
+                "employeeNip" => $data->employeeNip,
+                "divisionName" => $data->divisionName,
+                "periode" => $data->periode,
+                "status" => $data->status,
+            ]);
         }
 
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
+            "recordsTotal"    => $FormData['totalData'],
+            "recordsFiltered" => $FormData['totalFilteredData'],
             "data" => $dataEmployee,
-            "response" => $response,
             "payload" => $payload
         ];
 
@@ -127,7 +139,7 @@ class Perijinan extends BaseController
 
     public function save()
     {
-        try{
+        try {
             $rules = [
                 "employee_id" => [
                     "rules" => "required"
@@ -146,37 +158,49 @@ class Perijinan extends BaseController
                 ],
             ];
 
+            $FormPerijinan = new FormPerijinanModel();
 
             if ($this->validate($rules)) {
-                $payload = json_encode([
+                $insertData = [
                     "company_id" => $this->this_company_id,
                     "employee_id" => $this->request->getPost("employee_id"),
                     "start_date" => $this->request->getPost("start_date"),
                     "end_date" => $this->request->getPost("end_date"),
                     "status" => $this->request->getPost("status"),
                     "reason" => $this->request->getPost("reason"),
-                    "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
-                ]);
+                    // "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
+                ];
 
-                $response = curl_request("POST", "/attendance/setAttendance", $this->token, $payload);
+                $payload = json_encode($insertData);
 
-                if ($response["code"] === 200) {
+                $tglAkhir = strtotime($insertData['end_date']);
+                $tglAwal = strtotime($insertData['start_date']);
+
+                $jarak = $tglAkhir - $tglAwal;
+
+                $selisih = $jarak / 60 / 60 / 24;
+
+                for ($i = 0; $i < $selisih; $i++) {
+                    $insertData['periode'] = date("Y-m-d", $tglAwal + ($i * 3600 * 24));
+
+                    $insert = $FormPerijinan->insert($insertData);
+                }
+
+                if ($insert) {
                     $data = [
+                        "id" => $insert,
                         "status"            => true,
-                        "message"   => $response["message"],
+                        "message"   => "Data Berhasil disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
                     $data = [
                         "status"            => false,
-                        "message"    => $message,
+                        "message"    => "Data Gagal Disimpan",
                         "payload"   => $payload,
                         'token' => csrf_hash(),
-                        'code' => $response["code"]
                     ];
                     echo json_encode($data);
                 }
@@ -188,9 +212,7 @@ class Perijinan extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -203,7 +225,7 @@ class Perijinan extends BaseController
 
     public function update()
     {
-        try{
+        try {
             $rules = [
                 "employee_id" => [
                     "rules" => "required"
@@ -267,9 +289,7 @@ class Perijinan extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -282,7 +302,7 @@ class Perijinan extends BaseController
 
     public function delete()
     {
-        try{
+        try {
             $id = $this->request->getPost("id");
 
             if (!empty($id)) {
@@ -312,9 +332,7 @@ class Perijinan extends BaseController
                 ];
                 echo json_encode($data);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
