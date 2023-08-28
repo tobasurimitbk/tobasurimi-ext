@@ -153,7 +153,8 @@
                                 <?php
                                     } else {
                                         $temp = mktime(0, 0, 0, $month, $j, $year);
-                                        if (date("N", $temp) == 7) {
+                                        echo ($temp);
+                                        if (date("N", $temp) == 7 || date("N", $temp) == 6) {
                                             echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                             echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                         } else {

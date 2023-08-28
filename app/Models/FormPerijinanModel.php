@@ -119,4 +119,33 @@ class FormPerijinanModel extends Model
 
         return $formPerijinanQry;
     }
+
+    public function getPerijinanAmt($id, $year, $month)
+    {
+        $date = $year . "-" . $month;
+        $selectQry = "form_perijinan.* ,
+            employees.name AS employeeName,
+            employees.nip AS employeeNip,
+            divisis.divisi AS divisionName
+            ";
+
+        $formPerijinanQry = $this->asObject()
+            ->select($selectQry)
+            ->join('employees', 'form_perijinan.employee_id = employees.id')
+            ->join('divisis', 'employees.division_id = divisis.id')
+            ->where('emplyee_id', $id)
+            ->where('periode', $id)
+            ->orderBy('periode', 'DESC');
+
+        $totalData = $formPerijinanQry->countAllResults(false);
+
+        $totalFilteredData = $formPerijinanQry->countAllResults(false);
+        $data = $formPerijinanQry->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

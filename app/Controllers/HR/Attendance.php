@@ -4,12 +4,16 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\EmployeesModel;
+use App\Models\FormPerijinanModel;
 
 class Attendance extends BaseController
 {
     protected $token;
     protected $this_company_id;
     protected $AttendancesLogModel;
+    protected $EmployeesModel;
+    protected $FormPerijinanModel;
 
     public function __construct()
     {
@@ -53,36 +57,70 @@ class Attendance extends BaseController
     public function ListAttendance()
     {
         $AttendancesLogModel = new AttendancesLogModel();
+        $EmployeesModel = new EmployeesModel();
+        $FormPerijinanModel = new FormPerijinanModel();
+
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
         $AttendanceData = $AttendancesLogModel->get_all($year, $month);
+        $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
-        foreach ($AttendanceData as $value) {
-            $value->list_attendance = [
-                [
-                    "periode" => $value->date_create,
-                    "checkin" => $value->date_create,
-                    "checkout" => $value->date_create,
-                ],
+        $data = array();
+
+        foreach ($dataEmployee as $value) {
+            $dataPerijinan = $FormPerijinanModel->getPerijinanById($value["id"], $year, $month);
+
+            $constructor = [
+                "employeeName" => $value['name'],
+                "listAttendance" => array(),
+                "hadir" => 0,
+                "alpha" => 0,
+                "sakit" => 0,
+                "ijin" => 0,
+                "cuti" => 0,
+                "libur" => 0,
             ];
-            $value->hadir = 0;
-            $value->alpha = 0;
-            $value->sakit = 0;
-            $value->ijin = 0;
-            $value->cuti = 0;
-            $value->libur = 0;
+
+            $att = (object)[
+                "periode" => 0,
+                "checkin" => 0,
+                "checkout" => 0,
+            ];
+
+            $constructor['listAttendance'][] = $att;
+
+            $data[] = $constructor;
         }
+
+        dd($data);
+
+        $data = [
+            'year' => $year,
+            'month' => $month,
+            'res_user'  => $data
+
+        ];
+        // return view('hr/attendance/list-attendance', $data);
+    }
+
+    public function LogAttendance()
+    {
+        $AttendancesLogModel = new AttendancesLogModel();
+
+        $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
+        $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
+
+        $AttendanceData = $AttendancesLogModel->get_all($year, $month);
 
         // dd($AttendanceData);
 
         $data = [
             'year' => $year,
             'month' => $month,
-            'res_user'  => $AttendanceData
-
+            'log'  => $AttendanceData
         ];
-        return view('hr/attendance/list-attendance', $data);
+        return view('hr/attendance/log-attendance', $data);
     }
 
     public function SaveAttendance()
