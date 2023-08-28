@@ -63,7 +63,6 @@ class Attendance extends BaseController
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
-        $AttendanceData = $AttendancesLogModel->get_all($year, $month);
         $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
         $data = array();
@@ -125,17 +124,18 @@ class Attendance extends BaseController
             };
 
             $groupList = array();
+            $groupSubList = array();
 
             foreach ($list_att as $element) {
                 $groupList[$element["periode"]][] = $element;
-            }
+            };
 
-            $constructor['listAttendance'] = $groupList;
+            $constructor['list_attendance'] = $groupList;
 
             $data[] = $constructor;
         }
 
-        dd($data);
+        // dd($data);
 
         $data = [
             'year' => $year,
@@ -143,7 +143,7 @@ class Attendance extends BaseController
             'res_user'  => $data
 
         ];
-        // return view('hr/attendance/list-attendance', $data);
+        return view('hr/attendance/list-attendance', $data);
     }
 
     public function LogAttendance()

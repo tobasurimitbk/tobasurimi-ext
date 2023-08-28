@@ -121,21 +121,22 @@
                         ?>
                             <tr>
                                 <td style="vertical-align:middle;z-index:9999" nowrap>
-                                    &nbsp;<?php echo $res_user[$i]->employeeName; ?></td>
+                                    &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
                                 <?php
                                 for ($j = 1; $j <= $last_date; $j++) {
                                     $no = (strlen($j) == 1) ? ("0" . $j) : $j;
                                     $jam_masuk = "";
                                     $jam_keluar = "";
                                     $check = 0;
-                                    for ($k = 0; $k < count($res_user[$i]->list_attendance); $k++) {
-
-                                        if ($res_user[$i]->list_attendance[$k]["periode"] == ($year . "-" . $month . "-" . $no)) {
-                                            $jam_masuk = $res_user[$i]["list_attendance"][$k]["checkin"];
-                                            $jam_keluar = $res_user[$i]["list_attendance"][$k]["checkout"];
-                                            if ($res_user[$i]["list_attendance"][$k]["checkin"] != '')
-                                                $check = 1;
-                                            break;
+                                    foreach ($res_user[$i]["list_attendance"] as $val) {
+                                        for ($k = 0; $k < count($val); $k++) {
+                                            if ($val[$k] == ($year . "-" . $month . "-" . $no)) {
+                                                $jam_masuk = $res_user[$i]["list_attendance"][$k]["check"];
+                                                $jam_keluar = $res_user[$i]["list_attendance"][$k]["check"];
+                                                if ($val["check"] != '')
+                                                    $check = 1;
+                                                break;
+                                            }
                                         }
                                     }
                                     if ($check == 1) {
@@ -154,7 +155,7 @@
                                     } else {
                                         $temp = mktime(0, 0, 0, $month, $j, $year);
                                         echo ($temp);
-                                        if (date("N", $temp) == 7 || date("N", $temp) == 6) {
+                                        if (date("N", $temp) == 7) {
                                             echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                             echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                         } else {
@@ -166,12 +167,12 @@
                                 }
                                 ?>
 
-                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]->hadir; ?></td>
-                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]->alpha; ?></td>
-                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]->sakit; ?></td>
-                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]->ijin; ?></td>
-                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]->cuti; ?></td>
-                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]->libur; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["hadir"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["alpha"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["sakit"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["ijin"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["cuti"]; ?></td>
+                                <td height="25" style="vertical-align:middle;z-index:9999"><?php echo $res_user[$i]["libur"]; ?></td>
 
                             </tr>
 
