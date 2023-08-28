@@ -53,7 +53,7 @@
 
                                 <!-- <th onclick="changeSort('is_posted')" class="sort">Posted</th> -->
 
-                                <th class="sort">Action</th>
+                                <!-- <th class="sort">Action</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -174,17 +174,18 @@
             //     data: "is_posted",
             //     className: "text-center"
             // },
-            {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let id = row?.id;
-                    return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
-                `
-                }
-            }
+
+            // {
+            //     data: "id",
+            //     className: "text-center actions",
+            //     searchable: false,
+            //     sortable: false,
+            //     render: function(data, type, row) {
+            //         let id = row?.id;
+            //         return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
+            //     `
+            //     }
+            // }
         ],
         columnDefs: [{
             defaultContent: "-",

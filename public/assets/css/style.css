@@ -4626,7 +4626,7 @@ footer.main-footer .footer-right a {
 }
 
 .modal {
-  padding: 25px;
+  padding: 25px !important;
 }
 
 .modal .modal-dialog .modal-content .modal-body .col-subtitle-modal {

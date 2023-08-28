@@ -24,7 +24,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select employee_id" name="employee_id" id="employee_id" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select employee_id" name="employee_id" id="employee_id">
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataEmployee)) {
@@ -42,14 +42,14 @@
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="date" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? ($data->start_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->start_date : ""; ?>" placeholder="Tanggal mulai">
+                            <input autocomplete="one-time-code" type="date" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? 'disabled=true' :  ''; ?> value='<?= $data->periode ?>' placeholder="Tanggal mulai">
                             <label for="floatingInput">Tanggal mulai</label>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="date" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? ($data->end_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->end_date : ""; ?>" placeholder="Tanggal akhir">
+                            <input autocomplete="one-time-code" type="date" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? 'disabled=true' : ''; ?> value='<?= $data->periode ?>' placeholder="Tanggal akhir">
                             <label for="floatingInput">Tanggal akhir</label>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                             <label for="floatingInput">Posting</label>
                             <div class="switch-form-form-perijinan">
                                 <label class="switch">
-                                    <input autocomplete="one-time-code" class="is_posted" <?= !empty($data) ? ($data->is_posted === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data->is_posted === true ? 'checked' : '') : ''; ?>>
+                                    <input autocomplete="one-time-code" class="is_posted" <?= !empty($data) ? ($data === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data === true ? 'checked' : '') : ''; ?>>
                                     <span class="slider round"></span>
                                 </label>
                             </div>
@@ -109,7 +109,7 @@
         // EMPLOYEE
         $('.employee_id').select2({
             placeholder: "",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -298,7 +298,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                                            window.location.href = "<?= base_url("form-perijinan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({

@@ -47,34 +47,32 @@ class Perijinan extends BaseController
         return view('hr/perijinan/form', $data);
     }
 
-    public function getById()
+    public function getById($id)
     {
+        $EmployeesModel = new EmployeesModel();
+
         $data = [
-            "status" => ["IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR"]
+            "status" => ["HADIR", "IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR"]
         ];
 
-        //Get Employee
-        $responseEmployee = curl_request("GET", "/employees/selectOption", $this->token);
+        $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
-        $dataEmployee = [];
-        if ($responseEmployee["code"] === 200) {
-            $dataEmployee = json_decode($responseEmployee["body"])->data;
+        foreach (array_keys($dataEmployee) as $key) {
+            $dataEmployee[$key] = (object)$dataEmployee[$key];
         }
 
         $data["dataEmployee"] = $dataEmployee;
 
         if (!empty($id)) {
-            $id = $this->encrypter->decrypt(hex2bin($id));
+            $FormPerijinanModel = new FormPerijinanModel();
 
-            $resShift = curl_request("GET", "/perijinan/$id", $this->token);
-            $dataDetail = [];
+            $dataPerijinan = $FormPerijinanModel->getPerijinanById($id);
 
-            if ($resShift["code"] === 200) {
-                $dataDetail = json_decode($resShift["body"])->data;
-            }
-
-            $data["data"] = $dataDetail;
+            $data["data"] = $dataPerijinan;
         };
+
+        // var_dump($data);
+        // die;
 
         return view('hr/perijinan/form', $data);
     }
@@ -227,15 +225,6 @@ class Perijinan extends BaseController
     {
         try {
             $rules = [
-                "employee_id" => [
-                    "rules" => "required"
-                ],
-                "start_date" => [
-                    "rules" => "required"
-                ],
-                "end_date" => [
-                    "rules" => "required"
-                ],
                 "status" => [
                     "rules" => "required"
                 ],
@@ -244,48 +233,29 @@ class Perijinan extends BaseController
                 ],
             ];
 
-
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $payload = json_encode([
-                    "company_id" => $this->this_company_id,
-                    "employee_id" => $this->request->getPost("employee_id"),
-                    "start_date" => $this->request->getPost("start_date"),
-                    "end_date" => $this->request->getPost("end_date"),
+                $payload = [
                     "status" => $this->request->getPost("status"),
-                    "reason" => $this->request->getPost("reason"),
-                    "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
-                ]);
+                    "reason" => $this->request->getPost("reason")
+                ];
 
-                $response = curl_request("PATCH", "/perijinan/$id", $this->token, $payload);
+                $FormPerijinanModel = new FormPerijinanModel();
+                $FormPerijinanModel->update($id, $payload);
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        // "id" => json_decode($response["body"])->createdId,
-                        "status"            => true,
-                        "message"   => "Data Berhasil diubah",
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                        'code' => $response["code"]
-                    ];
-                    echo json_encode($data);
-                }
+                $data = [
+                    "status"    => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
             } else {
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
+                    "status"    => false,
+                    "message"   => "Data Gagal Diubah",
+                    'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
             }

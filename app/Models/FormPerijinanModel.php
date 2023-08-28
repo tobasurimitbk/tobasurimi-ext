@@ -101,4 +101,22 @@ class FormPerijinanModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getPerijinanById($id)
+    {
+
+        $selectQry = "form_perijinan.* ,
+            employees.name AS employeeName,
+            employees.nip AS employeeNip,
+            divisis.divisi AS divisionName
+            ";
+
+        $formPerijinanQry = $this->asObject()
+            ->select($selectQry)
+            ->join('employees', 'form_perijinan.employee_id = employees.id')
+            ->join('divisis', 'employees.division_id = divisis.id')
+            ->find($id);
+
+        return $formPerijinanQry;
+    }
 }
