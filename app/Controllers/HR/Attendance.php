@@ -102,9 +102,10 @@ class Attendance extends BaseController
                 }
             }
 
+            $list_att = array();
+
             $constructor = [
                 "employeeName" => $value['name'],
-                "listAttendance" => array(),
                 "hadir" => $hadir,
                 "alpha" => $alpha,
                 "sakit" => $sakit,
@@ -115,14 +116,21 @@ class Attendance extends BaseController
 
             foreach ($dataLog as $val2) {
                 $dat = strtotime($val2->date_create);
-                $att = (object)[
+                $att = [
                     "periode" => date('d-m-Y', $dat),
                     "check" => date('H:i:s', $dat),
                     // "checkout" => $val2->date_create,
                 ];
-                $constructor['listAttendance'][] = $att;
+                $list_att[] = $att;
             };
 
+            $groupList = array();
+
+            foreach ($list_att as $element) {
+                $groupList[$element["periode"]][] = $element;
+            }
+
+            $constructor['listAttendance'] = $groupList;
 
             $data[] = $constructor;
         }
