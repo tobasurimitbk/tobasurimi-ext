@@ -87,13 +87,13 @@ if (!function_exists('formatter')) {
             return $return;
             break;
          case "STR_TO_INT":
-            return !empty($value) ? intval($value) : "";
+            return !empty($value) ? intval($value) : 0;
             break;
          case "STR_TO_BOOL":
             return !empty($value) ? ($value === "true" ? true : false)  : "";
             break;
          case "STR_TO_FLOAT":
-            return !empty($value) ? floatval($value) : "";
+            return !empty($value) ? floatval($value) : 0;
             break;
          case "CURR_TO_INT":
             return intval(str_replace(",", "", $value));
