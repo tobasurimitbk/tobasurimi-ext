@@ -74,4 +74,20 @@ class AttendancesLogModel extends Model
 
         return $attendancesDataQry;
     }
+
+    public function getLogAmt($id, $year, $month)
+    {
+        $selectQry = "attendances_log.* ,
+            employees.name AS employeeName
+            ";
+
+        $attendancesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->like('date_create', $year . "-" . $month)
+            ->join("employees", 'attendances_log.employees_id = employees.id')
+            ->where('employees_id', $id)
+            ->findAll();
+
+        return $attendancesDataQry;
+    }
 }

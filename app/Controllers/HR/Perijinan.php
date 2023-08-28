@@ -71,9 +71,6 @@ class Perijinan extends BaseController
             $data["data"] = $dataPerijinan;
         };
 
-        // var_dump($data);
-        // die;
-
         return view('hr/perijinan/form', $data);
     }
 

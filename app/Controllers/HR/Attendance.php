@@ -67,28 +67,62 @@ class Attendance extends BaseController
         $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
         $data = array();
+        $hadir = 0;
+        $alpha = 0;
+        $sakit = 0;
+        $ijin = 0;
+        $cuti = 0;
+        $libur = 0;
 
         foreach ($dataEmployee as $value) {
-            $dataPerijinan = $FormPerijinanModel->getPerijinanById($value["id"], $year, $month);
+            $dataPerijinan = $FormPerijinanModel->getPerijinanAmt($value["id"], $year, $month);
+            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
+
+            foreach ($dataPerijinan as $val1) {
+                switch ($val1->status) {
+                    case "HADIR":
+                        $hadir++;
+                        break;
+                    case "ALPHA":
+                        $alpha++;
+                        break;
+                    case "SAKIT":
+                        $sakit++;
+                        break;
+                    case "IJIN":
+                        $ijin++;
+                        break;
+                    case "CUTI":
+                        $cuti++;
+                        break;
+                    case "LIBUR":
+                        $libur++;
+                        break;
+                    default:
+                }
+            }
 
             $constructor = [
                 "employeeName" => $value['name'],
                 "listAttendance" => array(),
-                "hadir" => 0,
-                "alpha" => 0,
-                "sakit" => 0,
-                "ijin" => 0,
-                "cuti" => 0,
-                "libur" => 0,
+                "hadir" => $hadir,
+                "alpha" => $alpha,
+                "sakit" => $sakit,
+                "ijin" => $ijin,
+                "cuti" => $cuti,
+                "libur" => $libur,
             ];
 
-            $att = (object)[
-                "periode" => 0,
-                "checkin" => 0,
-                "checkout" => 0,
-            ];
+            foreach ($dataLog as $val2) {
+                $dat = strtotime($val2->date_create);
+                $att = (object)[
+                    "periode" => date('d-m-Y', $dat),
+                    "check" => date('H:i:s', $dat),
+                    // "checkout" => $val2->date_create,
+                ];
+                $constructor['listAttendance'][] = $att;
+            };
 
-            $constructor['listAttendance'][] = $att;
 
             $data[] = $constructor;
         }
@@ -112,8 +146,6 @@ class Attendance extends BaseController
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
         $AttendanceData = $AttendancesLogModel->get_all($year, $month);
-
-        // dd($AttendanceData);
 
         $data = [
             'year' => $year,
