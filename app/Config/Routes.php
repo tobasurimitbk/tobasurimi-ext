@@ -563,6 +563,7 @@ $routes->post('/pinjaman-karyawan/delete', 'HR\PinjamanKaryawan::delete', ['filt
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);
 $routes->get('/form-perijinan/id/(:segment)', 'HR\Perijinan::getById/$1', ['filter' => 'Auth']);
+$routes->post('/form-perijinan/update', 'HR\Perijinan::update', ['filter' => 'Auth']);
 $routes->get('/form-perijinan/create', 'HR\Perijinan::createView', ['filter' => 'Auth']);
 $routes->get('/form-perijinan/all', 'HR\Perijinan::allPerijinan', ['filter' => 'Auth']);
 $routes->post('/form-perijinan/save', 'HR\Perijinan::save', ['filter' => 'Auth']);
