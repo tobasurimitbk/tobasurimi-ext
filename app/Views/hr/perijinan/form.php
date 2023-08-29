@@ -42,14 +42,14 @@
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="date" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? 'disabled=true' :  ''; ?> value='<?= $data->periode ?>' placeholder="Tanggal mulai">
+                            <input autocomplete="one-time-code" type="date" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? 'disabled=true' :  ''; ?> value='<?= !empty($data) ? $data->periode :  ''; ?>' placeholder="Tanggal mulai">
                             <label for="floatingInput">Tanggal mulai</label>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="date" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? 'disabled=true' : ''; ?> value='<?= $data->periode ?>' placeholder="Tanggal akhir">
+                            <input autocomplete="one-time-code" type="date" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? 'disabled=true' : ''; ?> value='<?= !empty($data) ? $data->periode :  ''; ?>' placeholder="Tanggal akhir">
                             <label for="floatingInput">Tanggal akhir</label>
                         </div>
                     </div>

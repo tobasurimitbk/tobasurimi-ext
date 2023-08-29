@@ -25,8 +25,6 @@ class Attendances extends BaseController
         $this->CompaniesModel = new CompaniesModel();
     }
 
-
-
     public function sync_attendance()
     {
         $res_company = $this->CompaniesModel->search_list(array('deletedAt' => NULL));
@@ -74,6 +72,7 @@ class Attendances extends BaseController
         }
         return $hasil;
     }
+
     public function get_data_finger()
     {
         $Connect = fsockopen($this->ip, "80", $errno, $errstr, 1);
