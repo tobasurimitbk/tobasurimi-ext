@@ -117,14 +117,13 @@ class Attendance extends BaseController
                 $dat = strtotime($val2->date_create);
                 $att = [
                     "periode" => date('d-m-Y', $dat),
-                    "check" => date('H:i:s', $dat),
-                    // "checkout" => $val2->date_create,
+                    "checkin" => date('H:i:s', $dat),
+                    "checkout" => date('H:i:s', $dat),
                 ];
                 $list_att[] = $att;
             };
 
             $groupList = array();
-            $groupSubList = array();
 
             foreach ($list_att as $element) {
                 $groupList[$element["periode"]][] = $element;
@@ -135,30 +134,64 @@ class Attendance extends BaseController
             $data[] = $constructor;
         }
 
-        // dd($data);
-
         $data = [
             'year' => $year,
             'month' => $month,
             'res_user'  => $data
 
         ];
+
         return view('hr/attendance/list-attendance', $data);
     }
 
     public function LogAttendance()
     {
         $AttendancesLogModel = new AttendancesLogModel();
+        $EmployeesModel = new EmployeesModel();
 
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
-        $AttendanceData = $AttendancesLogModel->get_all($year, $month);
+        $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
+
+        $data = array();
+
+
+        foreach ($dataEmployee as $value) {
+            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
+
+            $list_att = array();
+
+            $constructor = [
+                "employeeName" => $value['name'],
+            ];
+
+            foreach ($dataLog as $val2) {
+                $dat = strtotime($val2->date_create);
+                $att = [
+                    "periode" => date('Y-m-d', $dat),
+                    "checkin" => date('H:i:s', $dat),
+                    "checkout" => date('H:i:s', $dat),
+                ];
+                $list_att[] = $att;
+            };
+
+            $groupList = array();
+
+            foreach ($list_att as $element) {
+                $groupList[$element["periode"]][] = $element;
+            };
+
+            $constructor['list_attendance'] = $groupList;
+
+            $data[] = $constructor;
+        }
 
         $data = [
             'year' => $year,
             'month' => $month,
-            'log'  => $AttendanceData
+            'res_user'  => $data
+
         ];
         return view('hr/attendance/log-attendance', $data);
     }

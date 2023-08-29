@@ -130,10 +130,13 @@
                                     $check = 0;
                                     foreach ($res_user[$i]["list_attendance"] as $val) {
                                         for ($k = 0; $k < count($val); $k++) {
-                                            if ($val[$k] == ($year . "-" . $month . "-" . $no)) {
-                                                $jam_masuk = $res_user[$i]["list_attendance"][$k]["check"];
-                                                $jam_keluar = $res_user[$i]["list_attendance"][$k]["check"];
-                                                if ($val["check"] != '')
+
+                                            if ($val[$k]['periode'] == ($year . "-" . $month . "-" . $no)) {
+                                                $jam_masuk = $val[$k]["checkin"];
+                                                $jam_keluar = $val[$k]["checkout"];
+                                                var_dump($val[$k]['checkin']);
+                                                die;
+                                                if ($val[$k]["checkin"] != '')
                                                     $check = 1;
                                                 break;
                                             }
@@ -154,7 +157,6 @@
                                 <?php
                                     } else {
                                         $temp = mktime(0, 0, 0, $month, $j, $year);
-                                        echo ($temp);
                                         if (date("N", $temp) == 7) {
                                             echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                             echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
