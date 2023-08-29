@@ -47,11 +47,11 @@
                     <!--begin: Datatable -->
                     <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
                     <table class="tops-table">
-                        <tr>
+                        <!-- <tr>
                             <td nowrap><img src='<?= base_url() ?>/assets/img/blue.png' width='25' height='25'>&nbsp;Hadir&nbsp;&nbsp;</td>
                             <td></td>
                             <td nowrap><img src='<?= base_url() ?>/assets/img/red.png' width='25' height='25'>&nbsp;Tidak Hadir</td>
-                        </tr>
+                        </tr> -->
                     </table>
                     <style>
                         th {
@@ -96,11 +96,11 @@
                                     $no = (strlen($i) == 1) ? ("0" . $i) : $i;
 
                                     if (date("N", $temp) == 7) {
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Masuk " . $i . "</font></td>";
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Last Checked " . $i . "</font></td>";
+                                        // echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
                                     } else {
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Masuk " . $i . "</td>";
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Last Checked " . $i . "</td>";
+                                        // echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</td>";
                                     }
                                 ?>
 
@@ -141,19 +141,19 @@
 
 
                                             </td>
-                                            <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
+                                            <!-- <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
                                                 <font color="black"><?php echo $jam_keluar; ?></font>
-                                            </td>
+                                            </td> -->
 
                                     <?php
                                         } else {
                                             $temp = mktime(0, 0, 0, $month, $j, $year);
                                             if (date("N", $temp) == 7) {
                                                 echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
-                                                echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
+                                                // echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                             } else {
                                                 echo "<td width=25 align=center style='background-color:#ff0000'></td>";
-                                                echo "<td width=25 align=center style='background-color:#ff0000'></td>";
+                                                // echo "<td width=25 align=center style='background-color:#ff0000'></td>";
                                                 // echo "<td bgcolor=\"red\" width=40>&nbsp;</td>";
                                             }
                                         }
@@ -173,8 +173,6 @@
 <script>
     function printReport() {
         document.location.href = 'log-attendance?month=' + document.getElementById('month').value + '&year=' + document.getElementById('year').value;
-
-
     }
 </script>
 
