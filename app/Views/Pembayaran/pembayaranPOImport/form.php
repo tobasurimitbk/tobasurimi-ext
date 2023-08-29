@@ -43,7 +43,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                         <select class="form-select " name="po_type" id="po_type">
                             <option disabled selected value=""></option>
                             <option value="BAKU" <?= (!empty($paymentData) && $paymentData->po_type == 'BAKU') ? 'selected' : '' ?>>Baku</option>
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                         <select class="form-select " name="supplier_id" id="supplier">
                             <option disabled selected value=""></option>
                             <?php foreach ($supplierList ?? [] as $supplier): ?>
@@ -66,7 +66,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                         <select class="form-select " name="import_po" id="import_po" disabled>
                             <option disabled selected value=""></option>
                             <?php foreach ($poList ?? [] as $po): ?>
@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                         <select class="form-select " name="import_lpb" id="import_lpb" disabled>
                             <option disabled selected value=""></option>
                             <?php foreach ($lpbList ?? [] as $lpb): ?>
