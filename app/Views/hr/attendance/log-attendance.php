@@ -12,7 +12,7 @@
                 <div class="col-6 mb-4">
                     <form id="search_form" name="search_form" class="kt-form kt-form--fit kt-margin-b-20" method="POST">
 
-                        <?php echo "Attendance " . date("F Y", strtotime($year . "-" . $month . "-01")); ?>
+                        <!-- <?php echo "Attendance " . date("F Y", strtotime($year . "-" . $month . "-01")); ?> -->
                         <select name="month" id="month">
                             <?php
                             for ($i = 1; $i <= 12; $i++) {
@@ -37,7 +37,7 @@
                         <button type="button" class="btn btn-primary btn-brand--icon" id="kt_search" onclick="printReport();">
                             <span>
                                 <i class="la la-print"></i>
-                                <span>Process</span>
+                                <span>Cari</span>
                             </span>
                         </button>
 
@@ -96,11 +96,11 @@
                                     $no = (strlen($i) == 1) ? ("0" . $i) : $i;
 
                                     if (date("N", $temp) == 7) {
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Last Checked " . $i . "</font></td>";
-                                        // echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Masuk " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
                                     } else {
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Last Checked " . $i . "</td>";
-                                        // echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Masuk " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</td>";
                                     }
                                 ?>
 
@@ -123,14 +123,12 @@
                                         $jam_keluar = "";
                                         $check = 0;
                                         foreach ($res_user[$i]["list_attendance"] as $val) {
-                                            for ($k = 0; $k < count($val); $k++) {
-                                                if ($val[$k]['periode'] == ($year . "-" . $month . "-" . $no)) {
-                                                    $jam_masuk = $val[$k]["checkin"];
-                                                    $jam_keluar = $val[$k]["checkout"];
-                                                    if ($val[$k]["checkin"] != '')
-                                                        $check = 1;
-                                                    break;
-                                                }
+                                            if ($val->periode == ($year . "-" . $month . "-" . $no)) {
+                                                $jam_masuk = $val->checkin;
+                                                $jam_keluar = $val->checkout;
+                                                if ($val->checkin != '')
+                                                    $check = 1;
+                                                break;
                                             }
                                         }
                                         if ($check == 1) {
@@ -139,21 +137,20 @@
 
                                                 <font color="black"><?php echo $jam_masuk; ?></font>
 
-
                                             </td>
-                                            <!-- <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
+                                            <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
                                                 <font color="black"><?php echo $jam_keluar; ?></font>
-                                            </td> -->
+                                            </td>
 
                                     <?php
                                         } else {
                                             $temp = mktime(0, 0, 0, $month, $j, $year);
                                             if (date("N", $temp) == 7) {
                                                 echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
-                                                // echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
+                                                echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                             } else {
                                                 echo "<td width=25 align=center style='background-color:#ff0000'></td>";
-                                                // echo "<td width=25 align=center style='background-color:#ff0000'></td>";
+                                                echo "<td width=25 align=center style='background-color:#ff0000'></td>";
                                                 // echo "<td bgcolor=\"red\" width=40>&nbsp;</td>";
                                             }
                                         }

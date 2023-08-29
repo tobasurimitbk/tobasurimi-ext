@@ -160,32 +160,15 @@ class Attendance extends BaseController
         foreach ($dataEmployee as $value) {
             $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
 
-            $list_att = array();
-
             $constructor = [
                 "employeeName" => $value['name'],
+                "list_attendance" => $dataLog
             ];
-
-            foreach ($dataLog as $val2) {
-                $dat = strtotime($val2->date_create);
-                $att = [
-                    "periode" => date('Y-m-d', $dat),
-                    "checkin" => date('H:i:s', $dat),
-                    "checkout" => date('H:i:s', $dat),
-                ];
-                $list_att[] = $att;
-            };
-
-            $groupList = array();
-
-            foreach ($list_att as $element) {
-                $groupList[$element["periode"]][] = $element;
-            };
-
-            $constructor['list_attendance'] = $groupList;
 
             $data[] = $constructor;
         }
+
+        // dd($data);
 
         $data = [
             'year' => $year,

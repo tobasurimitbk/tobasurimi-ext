@@ -77,7 +77,10 @@ class AttendancesLogModel extends Model
 
     public function getLogAmt($id, $year, $month)
     {
-        $selectQry = "attendances_log.* ,
+        $selectQry = "attendances_log.employees_id ,
+            DATE_FORMAT(date_create, '%Y-%m-%d') as periode, 
+            DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin, 
+            DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout, 
             employees.name AS employeeName
             ";
 
@@ -86,6 +89,7 @@ class AttendancesLogModel extends Model
             ->like('date_create', $year . "-" . $month)
             ->join("employees", 'attendances_log.employees_id = employees.id')
             ->where('employees_id', $id)
+            ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
             ->findAll();
 
         return $attendancesDataQry;
