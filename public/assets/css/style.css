@@ -4955,6 +4955,13 @@ input:checked + .slider:before {
   transition: 0.3s ease-in;
 }
 
+.form-pembayaran-po
+  .select2-container
+  .select2-selection--single
+  .select2-selection__rendered {
+  padding-left: 0;
+}
+
 .section .section-header .btn.btn-discard {
   background: #ffffff !important;
   font-family: "Poppins", sans-serif !important;

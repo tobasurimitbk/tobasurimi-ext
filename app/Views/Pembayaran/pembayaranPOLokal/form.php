@@ -42,7 +42,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                         <select class="form-select " name="supplier_id" id="supplier">
                             <option disabled selected value=""></option>
                             <?php foreach ($suppliers as $supplier): ?>
@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                         <select class="form-select" name="summary_id" id="supplier-faktur">
                             <option value=""></option>
                             <?php foreach ($summaryList ?? [] as $summary): ?>
