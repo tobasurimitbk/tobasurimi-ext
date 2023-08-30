@@ -81,7 +81,7 @@ class FormPerijinanModel extends Model
         }
 
         if ($addCondition['dateStart']) {
-            $formPerijinanQry->where('form_perijinan.periode >=',  $addCondition['dateStart']);
+            $formPerijinanQry->where('form_perijinan.periode >=', $addCondition['dateStart']);
         }
 
         if ($addCondition['dateEnd']) {

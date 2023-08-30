@@ -106,6 +106,13 @@ class Perijinan extends BaseController
         $offset = $this->request->getGet("start");
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        if ($addCondition['dateStart'] !== "" && $addCondition["dateEnd"] !== "") {
+            $addCondition['dateStart'] = str_replace('/', '-', $addCondition['dateStart']);
+            $addCondition['dateEnd'] = str_replace('/', '-', $addCondition['dateEnd']);
+            $addCondition['dateStart'] = date_format(date_create($addCondition['dateStart']), 'Y-m-d');
+            $addCondition['dateEnd'] = date_format(date_create($addCondition['dateEnd']), 'Y-m-d');
+        }
+
         $FormData = $FormPerijinanModel->getPerijinanList($condition, $addCondition, $limit, $offset);
 
         foreach ($FormData['data'] as $data) {
@@ -115,7 +122,7 @@ class Perijinan extends BaseController
                 "employeeName" => $data->employeeName,
                 "employeeNip" => $data->employeeNip,
                 "divisionName" => $data->divisionName,
-                "periode" => $data->periode,
+                "periode" => date_format(date_create($data->periode), "d-m-Y"),
                 "status" => $data->status,
             ]);
         }

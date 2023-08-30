@@ -133,13 +133,13 @@
                                         }
                                         if ($check == 1) {
                                     ?>
-                                            <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
+                                            <td width=25 align=center style="background-color:#007ae0" style='vertical-align: middle;'>
 
-                                                <font color="black"><?php echo $jam_masuk; ?></font>
+                                                <font color="white"><?php echo $jam_masuk; ?></font>
 
                                             </td>
-                                            <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
-                                                <font color="black"><?php echo $jam_keluar; ?></font>
+                                            <td width=25 align=center style="background-color:#007ae0" style='vertical-align: middle;'>
+                                                <font color="white"><?php echo $jam_keluar; ?></font>
                                             </td>
 
                                     <?php
@@ -149,8 +149,8 @@
                                                 echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                                 echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                             } else {
-                                                echo "<td width=25 align=center style='background-color:#ff0000'></td>";
-                                                echo "<td width=25 align=center style='background-color:#ff0000'></td>";
+                                                echo "<td width=25 align=center style='background-color:#e7323a'></td>";
+                                                echo "<td width=25 align=center style='background-color:#e7323a'></td>";
                                                 // echo "<td bgcolor=\"red\" width=40>&nbsp;</td>";
                                             }
                                         }
