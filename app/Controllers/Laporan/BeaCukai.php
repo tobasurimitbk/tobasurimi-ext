@@ -197,12 +197,16 @@ class BeaCukai extends BaseController
             if ($this->validate($rules)) {
                 // $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
                 $po_type = $this->request->getPost("po_type");
+                $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+                $no = $this->BeaCukaiModel->get_no(date('d'), date('m'), date('Y'), date('y'), $last_day);
+
                 if($po_type === "LOKAL BAKU")
                 {
                     $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
 
                     $payload = [
                         "company_id" => $this->this_company_id,
+                        "no_bea_cukai" => $no,
                         "user_id" => $this->user_id,
                         "multiple_po_id" => json_encode($multiple_po_id),
                         "multiple_po_no" => $this->request->getPost("multiple_po_no"),
@@ -224,6 +228,7 @@ class BeaCukai extends BaseController
                 {
                     $payload = [
                         "company_id" => $this->this_company_id,
+                        "no_bea_cukai" => $no,
                         "user_id" => $this->user_id,"supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                         // "multiple_po_id" => json_encode($multiple_po_id),
                         // "multiple_po_no" => $this->request->getPost("multiple_po_no"),
@@ -249,6 +254,7 @@ class BeaCukai extends BaseController
 
                     $payload = [
                         "company_id" => $this->this_company_id,
+                        "no_bea_cukai" => $no,
                         "user_id" => $this->user_id,
                         "multiple_po_id" => json_encode($multiple_po_id),
                         "multiple_po_no" => $this->request->getPost("multiple_po_no"),
@@ -270,6 +276,7 @@ class BeaCukai extends BaseController
                 {
                     $payload = [
                         "company_id" => $this->this_company_id,
+                        "no_bea_cukai" => $no,
                         "user_id" => $this->user_id,
                         "po_id" => formatter($this->request->getPost("po_id"), "STR_TO_INT"),
                         "po_no" => $this->request->getPost("po_no"),
@@ -291,7 +298,7 @@ class BeaCukai extends BaseController
 
                 // $data = [
                 //     "status"            => false,
-                //     "message"    => json_encode($items),
+                //     "message"    => json_encode($payload),
                 //     "payload"   => $payload,
                 //     'token' => csrf_hash()
                 // ];

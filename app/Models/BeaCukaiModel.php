@@ -126,4 +126,29 @@ class BeaCukaiModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function get_no($tgl, $bln, $thn, $thn2, $last_day)
+    {
+        $lastStr =  $tgl . $bln . $thn;
+
+        $builder = $this->db->table('bea_cukai');
+        $builder->select('no_bea_cukai');
+        $builder->orderBy('no_bea_cukai', 'desc')
+            ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
+            ->where('createdAt <=', $last_day . " 23:59:59");
+        $builder->like('no_bea_cukai', $lastStr);
+        $query = $builder->get();
+
+        $last = '01';
+        if ($query->getResultArray()) {
+            $lastFirst = explode('/', $query->getResultArray()[0]['no_bea_cukai']);
+            $last = explode('-', $lastFirst[0]);
+            $last = intval($last[1]) + 1;
+            $last = sprintf("%02d", $last);
+        };
+
+        $generatedNo =  $lastStr . '-' . $last . '/TOBA/' . $thn2;
+
+        return $generatedNo;
+    }
 }

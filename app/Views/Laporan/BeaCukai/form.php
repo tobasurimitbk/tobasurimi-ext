@@ -37,8 +37,8 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($dataBeaCukai) ? $dataBeaCukai->no_bea_cukai : ""; ?>" readonly="true" autocomplete="one-time-code" type="text" class="form-control bc_no" id="bc_no" name="bc_no" placeholder="No. Bea Cukai">
-                            <label for="floatingInput">No. Bea Cukai</label>
+                            <input value="<?= !empty($dataBeaCukai) ? $dataBeaCukai->no_bea_cukai : "AUTO GENERATE"; ?>" readonly="true" autocomplete="one-time-code" type="text" class="form-control bc_no" id="bc_no" name="bc_no" placeholder="No. Dokumen">
+                            <label for="floatingInput">No. Dokumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">

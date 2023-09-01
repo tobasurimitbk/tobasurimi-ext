@@ -29,7 +29,7 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>
-                            <th onclick="changeSort('no_bea_cukai')" class="sort">No. Bea Cukai</th>
+                            <th onclick="changeSort('no_bea_cukai')" class="sort">No. Dokumen</th>
                             <th onclick="changeSort('status_po')" class="sort">Jenis PO</th>
                             <th onclick="changeSort('tipe_bahan')" class="sort">Tipe PO</th>
                             <th>No. PO</th>
