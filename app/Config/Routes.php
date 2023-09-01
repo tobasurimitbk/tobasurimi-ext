@@ -512,10 +512,15 @@ $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Wareho
 // HUMAN RESOURCE
 // Attendance
 $routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
-$routes->get('/list-attendance', 'HR\Attendance::ListAttendance', ['filter' => 'Auth']);
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
 $routes->post('/check-pin-employee', 'HR\Attendance::CheckPinEmployee', ['filter' => 'Auth']);
+// Generate Attendance
+$routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
+$routes->post('/generate-attendance', 'HR\Attendance::generateAttendanceAction', ['filter' => 'Auth']);
+$routes->post('/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter' => 'Auth']);
+$routes->post('/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
+$routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttendance', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
