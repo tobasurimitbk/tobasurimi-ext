@@ -1,10 +1,37 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    th {
+        background-color: white;
+    }
 
+    th:first-child,
+    td:first-child {
+        position: sticky;
+        left: -12px;
+
+    }
+
+    td:first-child {
+        border: 1px solid #f2f2f2;
+        box-sizing: border-box;
+    }
+
+    td:first-child::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        left: 0;
+        top: 0;
+        z-index: -1;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>List Attendance</h1>
+        <h1>Log Attendance</h1>
     </div>
     <div class="card">
         <div class="card-body">
@@ -46,41 +73,6 @@
                 <div class="col-6 mb-4">
                     <!--begin: Datatable -->
                     <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
-                    <table class="tops-table">
-                        <!-- <tr>
-                            <td nowrap><img src='<?= base_url() ?>/assets/img/blue.png' width='25' height='25'>&nbsp;Hadir&nbsp;&nbsp;</td>
-                            <td></td>
-                            <td nowrap><img src='<?= base_url() ?>/assets/img/red.png' width='25' height='25'>&nbsp;Tidak Hadir</td>
-                        </tr> -->
-                    </table>
-                    <style>
-                        th {
-                            background-color: white;
-                        }
-
-                        th:first-child,
-                        td:first-child {
-                            position: sticky;
-                            left: -12px;
-
-                        }
-
-                        td:first-child {
-                            border: 1px solid #f2f2f2;
-                            box-sizing: border-box;
-                        }
-
-                        td:first-child::after {
-                            content: '';
-                            position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            background: #fff;
-                            left: 0;
-                            top: 0;
-                            z-index: -1;
-                        }
-                    </style>
                 </div>
             </div>
             <div class="row row-col-page-list-attendance">
@@ -91,75 +83,125 @@
                                 <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;User</td>
                                 <?php
                                 $last_date = date("t", strtotime($year . "-" . $month . "-01"));
-                                for ($i = 1; $i <= $last_date; $i++) {
+                                for ($i = 1; $i <= $last_date; $i++) :
                                     $temp = mktime(0, 0, 0, $month, $i, $year);
                                     $no = (strlen($i) == 1) ? ("0" . $i) : $i;
 
-                                    if (date("N", $temp) == 7) {
+                                    if (date("N", $temp) == 7) :
                                         echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Masuk " . $i . "</font></td>";
                                         echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
-                                    } else {
+                                    else :
                                         echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Masuk " . $i . "</td>";
                                         echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</td>";
-                                    }
+                                    endif;
+                                endfor;
                                 ?>
-
-                                <?php
-                                }
-                                ?>
+                                <td>Hadir</td>
+                                <td>Ijin</td>
+                                <td>Alpha</td>
+                                <td>Cuti</td>
+                                <td>Sakit</td>
+                                <td>Libur</td>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            for ($i = 0; $i < count($res_user); $i++) {
-                            ?>
+                            <?php for ($i = 0; $i < count($res_user); $i++) : ?>
+                                <?php
+                                $hadir = 0;
+                                $alpha = 0;
+                                ?>
                                 <tr>
                                     <td style="vertical-align:middle;z-index:9999" nowrap>
                                         &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
                                     <?php
-                                    for ($j = 1; $j <= $last_date; $j++) {
+                                    for ($j = 1; $j <= $last_date; $j++) :
                                         $no = (strlen($j) == 1) ? ("0" . $j) : $j;
-                                        $jam_masuk = "";
-                                        $jam_keluar = "";
-                                        $check = 0;
-                                        foreach ($res_user[$i]["list_attendance"] as $val) {
-                                            if ($val->periode == ($year . "-" . $month . "-" . $no)) {
+                                        $jam_masuk = ""; // checkOut
+                                        $jam_keluar = ""; // checkIN
+                                        $check = 0; // cek apakah ada di log absen tidak
+
+                                        $dateFormat = ($year . "-" . $month . "-" . $no);
+                                        $formPerizinanModel = new \App\Models\FormPerijinanModel();
+
+                                        $perizinanCheck = $formPerizinanModel
+                                            ->where('employee_id', $res_user[$i]['employeeID'])
+                                            ->where('periode', ($year . "-" . $month . "-" . $no))
+                                            ->first();
+
+                                        foreach ($res_user[$i]["list_attendance"] as $val) :
+                                            if ($val->periode == ($year . "-" . $month . "-" . $no)) :
                                                 $jam_masuk = $val->checkin;
                                                 $jam_keluar = $val->checkout;
                                                 if ($val->checkin != '')
                                                     $check = 1;
                                                 break;
-                                            }
-                                        }
-                                        if ($check == 1) {
+                                            endif;
+                                        endforeach;
                                     ?>
-                                            <td width=25 align=center style="background-color:#007ae0" style='vertical-align: middle;'>
+                                        <?php if ($perizinanCheck != null) : ?>
+                                            <!-- Ada perizinan -->
+                                            <?php if ($perizinanCheck['status']  != "ALPHA") : ?>
+                                                <!-- Ada perizinan bukan alpha -->
+                                                <td width=25 align=center style='background-color:#d6bc27; color:white;'>
+                                                    <b><?= $perizinanCheck['status'] ?></b>
+                                                </td>
+                                                <td width=25 align=center style='background-color:#d6bc27; color:white;'>
+                                                    <b><?= $perizinanCheck['status']  ?></b>
+                                                </td>
+                                            <?php else : ?>
+                                                <!-- Ada perizinan dengan status alpha -->
+                                                <?php $alpha++; ?>
+                                                <td width=25 align=center style='background-color:#e7323a'></td>
+                                                <td width=25 align=center style='background-color:#e7323a'></td>
+                                            <?php endif; ?>
+                                        <?php else : ?>
+                                            <?php if ($check == 1) : ?>
+                                                <?php $hadir++; ?>
+                                                <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
+                                                    <font color="white"><b><?= $jam_masuk; ?></b></font>
+                                                </td>
+                                                <td width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
+                                                    <font color="white"><b><?= $jam_keluar; ?></b></font>
+                                                </td>
+                                            <?php else : ?>
 
-                                                <font color="white"><?php echo $jam_masuk; ?></font>
+                                                <?php
+                                                $temp = mktime(0, 0, 0, $month, $j, $year);
+                                                if (date("N", $temp) == 7) {
+                                                    // Hari Minggu
+                                                    echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
+                                                    echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
+                                                } else {
+                                                    // tidak absen = alpha
+                                                    $alpha++;
+                                                    echo "<td width=25 align=center style='background-color:#e7323a'></td>";
+                                                    echo "<td width=25 align=center style='background-color:#e7323a'></td>";
+                                                }
 
-                                            </td>
-                                            <td width=25 align=center style="background-color:#007ae0" style='vertical-align: middle;'>
-                                                <font color="white"><?php echo $jam_keluar; ?></font>
-                                            </td>
-
-                                    <?php
-                                        } else {
-                                            $temp = mktime(0, 0, 0, $month, $j, $year);
-                                            if (date("N", $temp) == 7) {
-                                                echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
-                                                echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
-                                            } else {
-                                                echo "<td width=25 align=center style='background-color:#e7323a'></td>";
-                                                echo "<td width=25 align=center style='background-color:#e7323a'></td>";
-                                                // echo "<td bgcolor=\"red\" width=40>&nbsp;</td>";
-                                            }
-                                        }
-                                    }
-                                    ?>
+                                                ?>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+                                    <td>
+                                        <b><?= $hadir ?></b>
+                                    </td>
+                                    <td align=center>
+                                        <b><?= $res_user[$i]['statusAttendances']['IJIN']; ?></b>
+                                    </td>
+                                    <td align=center>
+                                        <b><?= $alpha ?></b>
+                                    </td>
+                                    <td align=center>
+                                        <b><?= $res_user[$i]['statusAttendances']['CUTI']; ?></b>
+                                    </td>
+                                    <td align=center>
+                                        <b><?= $res_user[$i]['statusAttendances']['SAKIT']; ?></b>
+                                    </td>
+                                    <td align=center>
+                                        <b><?= $res_user[$i]['statusAttendances']['LIBUR']; ?></b>
+                                    </td>
                                 </tr>
-                            <?php
-                            }
-                            ?>
+                            <?php endfor; ?>
                         </tbody>
                     </table>
                 </div>

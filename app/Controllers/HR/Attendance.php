@@ -147,34 +147,44 @@ class Attendance extends BaseController
 
     public function LogAttendance()
     {
+        // declare model
         $AttendancesLogModel = new AttendancesLogModel();
         $EmployeesModel = new EmployeesModel();
+        $FormPerijinanModel = new FormPerijinanModel();
 
+        // get data $_GET
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
+        // get data from model
         $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
-        $data = array();
+        // declare variable for store data
+        $dataResult = array();
 
-
+        // set data attendance
         foreach ($dataEmployee as $value) {
+            // get log attendance by employee and $year-$month
             $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
-
-            $constructor = [
+            // store data
+            $dataResult[] = [
+                "employeeID" => $value['id'],
                 "employeeName" => $value['name'],
-                "list_attendance" => $dataLog
+                "list_attendance" => $dataLog,
+                'statusAttendances' => [
+                    'IJIN' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN", $year, $month),
+                    'CUTI' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI", $year, $month),
+                    'SAKIT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT", $year, $month),
+                    'LIBUR' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "LIBUR", $year, $month)
+                ]
             ];
-
-            $data[] = $constructor;
         }
 
-        // dd($data);
-
+        // final data
         $data = [
             'year' => $year,
             'month' => $month,
-            'res_user'  => $data
+            'res_user'  => $dataResult
 
         ];
         return view('hr/attendance/log-attendance', $data);

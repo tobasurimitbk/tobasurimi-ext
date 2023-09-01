@@ -143,4 +143,15 @@ class FormPerijinanModel extends Model
 
         return $data;
     }
+
+    public function getTotalPerijinanByStatus($employeeID, $status, $year, $month)
+    {
+        $formPerijinanQry = $this->asObject()
+            ->where('LEFT(periode, 7)', $year . "-" . $month)
+            ->where('status', $status)
+            ->where('employee_id', $employeeID)
+            ->countAllResults();
+
+        return $formPerijinanQry;
+    }
 }

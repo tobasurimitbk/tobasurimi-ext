@@ -146,6 +146,7 @@
                                     $attandanceModel = new \App\Models\AttendancesModel();
                                     $status = $attandanceModel->getStatusAttendances($year, $month, $e['id']);
                                     ?>
+                                    <?php $libur = 0; ?>
                                     <tr>
                                         <td style="vertical-align:middle;z-index:9999" nowrap>
                                             &nbsp; <?= $e['name']; ?>
@@ -160,6 +161,7 @@
                                             ?>
                                             <?php $temp = mktime(0, 0, 0, $month, $j, $year); ?>
                                             <?php if (date("N", $temp) == 7) : ?>
+                                                <?php $libur++; ?>
                                                 <!-- Hari Libur (Minggu) -->
                                                 <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                                 <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 al ign=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
@@ -191,7 +193,7 @@
                                         <?php endfor; ?>
                                         <td align="center"><b><?= $status['HADIR'] ?></b></td>
                                         <td align="center"><b><?= $status['IJIN'] ?></b></td>
-                                        <td align="center"><b><?= $status['ALPHA'] ?></b></td>
+                                        <td align="center"><b><?= $status['ALPHA'] - $libur ?></b></td>
                                         <td align="center"><b><?= $status['CUTI'] ?></b></td>
                                         <td align="center"><b><?= $status['SAKIT'] ?></b></td>
                                         <td align="center"><b><?= $status['LIBUR'] ?></b></td>
