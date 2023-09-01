@@ -172,6 +172,7 @@ class Barang extends BaseController
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    "tax"               => $this->request->getPost('tax') ?? 0,
                     "status"            => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                     "spek"              => $this->request->getPost("spek")
                 ];
@@ -289,6 +290,7 @@ class Barang extends BaseController
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    "tax"               => $this->request->getPost('tax') ?? 0,
                     "status"            => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                     "spek"              => $this->request->getPost("spek")
                 ];

@@ -26,12 +26,30 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $data->no_sales_order ?? '' ?>">
+                            <label for="floatingInput">No. SO</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" class="form-control input-picker order_date" id="order_date" name="order_date" <?= !empty($data) ? ($data->order_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->order_date : ""; ?>" placeholder="Tanggal Pemesanan">
+                            <label for="floatingInput">Tanggal Pemesanan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $seller_name ?>">
+                            <input autocomplete="one-time-code" type="hidden" class="form-control sales_name" id="id_user" name="id_user" value="<?= $id_user ?>">
+                            <label for="floatingInput">Nama Sales</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php
-
-                                use function PHPUnit\Framework\isEmpty;
-
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
@@ -44,46 +62,25 @@
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-8">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $seller_name ?>">
-                            <input autocomplete="one-time-code" type="hidden" class="form-control sales_name" id="id_user" name="id_user" value="<?= $id_user ?>">
-                            <label for="floatingInput">Nama Sales</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="destination" name="destination" disabled value="<?= empty($data->destination) ? '' : $data->destination ?>">
+                            <label for="floatingInput">Tagihan Ke</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="destination" name="destination" value="<?= empty($data->destination) ? '' : $data->destination ?>">
-                            <label for="floatingInput">Tujuan Pengiriman</label>
-                        </div>
-                    </div>
-
-
                 </div>
 
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker order_date" id="order_date" name="order_date" <?= !empty($data) ? ($data->order_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->order_date : ""; ?>" placeholder="Tanggal Pemesanan">
-                                    <label for="floatingInput">Tanggal Pemesanan</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
-                                    <label for="floatingInput">Tanggal Pengiriman</label>
-                                </div>
-                            </div>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" class="form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
+                            <label for="floatingInput">Tanggal Pengiriman</label>
                         </div>
                     </div>
-
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" <?= !empty($data) ? ($data->estimated_freight === true ? 'disabled=true' : '') : ''; ?> placeholder="estimated_freight" value="<?= !empty($data) ? $data->estimated_freight : ""; ?>">
-                            <label for="floatingInput">Estimated Freight</label>
+                            <input autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" onkeyup="formatNumber(this)" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="End of time">
+                            <label for="floatingInput">Biaya Kirim</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -94,47 +91,34 @@
                     </div>
                 </div>
                 <div class="row">
-
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="number" class="form-control ppn" id="ppn" name="ppn" <?= !empty($data) ? ($data->ppn === true ? 'disabled=true' : '') : ''; ?> placeholder="ppn" value="<?= !empty($data) ? $data->ppn : ""; ?>">
-                            <label for="floatingInput">PPN</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating ff-ket mb-3" style="height: 50px;">
-                            <textarea autocomplete="one-time-code" <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control parent_keterangan text-area-all" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
+                        <div class="form-floating ff-ket mb-3" style="height: 80px;">
+                            <textarea autocomplete="one-time-code" <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3" style="height: 50px;">
-                                    <label for="floatingInput">Pajak</label>
-                                    <div class="switch-form-pinjaman-karyawan">
-                                        <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status == 'true' ? 'checked' : '') : ''; ?>>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="mb-3" style="height: 50px;">
-                                    <label for="floatingInput">Include pa</label>
-                                    <div class="switch-form-pinjaman-karyawan">
-                                        <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_pa" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : ''; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->include_pa == 'true' ? 'checked' : '') : ''; ?>>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
+                    <div class="col-md-1">
+                        <div class="mb-3" style="height: 50px;">
+                            <label for="floatingInput">Pajak</label>
+                            <div class="switch-form-pinjaman-karyawan">
+                                <label class="switch">
+                                    <input autocomplete="one-time-code" class="tax_status" <?= !empty($data) ? ($data->tax_status === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->tax_status == 'true' ? 'checked' : '') : ''; ?>>
+                                    <span class="slider round"></span>
+                                </label>
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-md-2">
+                        <div class="mb-3" style="height: 50px;">
+                            <label for="floatingInput">Include Pajak</label>
+                            <div class="switch-form-pinjaman-karyawan">
+                                <label class="switch">
+                                    <input autocomplete="one-time-code" class="include_tax" <?= !empty($data) ? ($data->include_pa === true ? 'disabled=true' : '') : ''; ?> name="include_tax" id="include_tax" type="checkbox" <?= !empty($data) ? ($data->include_pa == 'true' ? 'checked' : '') : ''; ?>>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </form>
@@ -160,52 +144,45 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
+                                <th>Kode Barang</th>
                                 <th>Nama Barang</th>
-                                <th>Harga Barang</th>
                                 <th>Qty</th>
-                                <th>Total Harga</th>
-                                <th>Keterangan</th>
-                                <th>Hapus</th>
+                                <th>Satuan</th>
+                                <th>Harga Satuan</th>
+                                <th>Discount (%)</th>
+                                <th>Amount</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                            <?php
-                            $no = 1;
-                            $total_harga_barang = 0;
-                            $total_qty = 0;
-                            $total_harga = 0;
-
-                            if (!empty($data)) {
-                                foreach ($data->detail as $d) {
-                                    $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $d['harga_barang']), "STR_TO_INT");
-                                    $total_qty = $total_qty + $d['qty'];
-                                    $total_harga = $total_harga + formatter(str_replace(",", "", $d['amount']), "STR_TO_INT");
-                            ?>
-                                    <tr>
-                                        <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $no; ?></td>
-                                        <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['nama_barang']; ?></td>
-                                        <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['harga_barang']; ?></td>
-                                        <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['qty']; ?></td>
-                                        <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['amount']; ?></td>
-                                        <td class="edit-table-detail" data-warehouse_name="<?= $d['warehouse_name'] ?>" data-dept="<?= $d['dept'] ?>" data-id_warehouse="<?= $d['id_warehouse'] ?>" data-tax="<?= $d['tax'] ?>" data-discount_percentage="<?= $d['discount_percentage'] ?>" data-id_barang="<?= $d['id_barang'] ?>" data-nama_barang="<?= $d['nama_barang'] ?>" data-harga="<?= $d['harga_barang'] ?>" data-qty="<?= $d['qty'] ?>" data-amount="<?= $d['amount'] ?>" data-keterangan="<?= $d['keterangan'] ?>" data-id="<?= $d['id'] ?>" data-row="<?= $no ?>"><?= $d['keterangan']; ?></td>
-                                        <td><button onclick=' deleteRow(<?= $no ?>); '>X</button></td>
-                                    </tr>
-
-                            <?php
-                                    $no++;
-                                }
-                            } ?>
                         </tbody>
-                        <tfoot class="foot-detail-table" id="foot-detail-table">
-                            <tr>
-                                <td colspan="1"></td>
-                                <td><b>TOTAL</b></td>
-                                <td><b><?= number_format($total_harga_barang); ?></b></td>
-                                <td><b><?= $total_qty; ?></b></td>
-                                <td><b><?= number_format($total_harga); ?></b></td>
-                                <td colspan="3"></td>
-                            </tr>
-                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-borderless" width="100%" cellspacing="0">
+                        <tr>
+                            <td class="font-weight-bold">Sub Total</td>
+                            <td class="font-weight-bold text-right">Rp. <span id="itemSubTotal">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>Discount</td>
+                            <td class="text-right">Rp. <span id="discTotal">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>PPn (11%)</td>
+                            <td class="text-right">Rp. <span id="taxTotal">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>Biaya Kirim</td>
+                            <td class="text-right">Rp. <span id="freightCost"><?= number_format($data->estimated_freight ?? 0); ?></span></td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold" style="border-top: 1px solid #929292">Total Order <span>(Termasuk Pajak)</span></td>
+                            <td style="border-top: 1px solid #929292" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -266,22 +243,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control tax" name="tax" id="tax" placeholder="Total Pajak">
-                                <label for="floatingInput">Total Pajak</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
                                 <label for="floatingInput">disc%</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control dept" name="dept" id="dept" placeholder="dept">
-                                <label for="floatingInput">dept</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -345,6 +308,79 @@
             ?>
         <?php
         } ?>
+
+        const table = $('.dataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            info: false,
+            paging: false,
+            fixedHeader: true,
+            display: "stripe",
+            searching: false,
+            ordering: false,
+            columns: [{
+                data: "no",
+                className: "text-center",
+            },
+            {
+                data: "kode_barang",
+                className: "text-center"
+            }, 
+            {
+                data: "nama_barang",
+                className: "text-center"
+            },
+            {
+                data: "qty",
+                className: "text-center"
+            },
+            {
+                data: "satuan",
+                className: "text-center"
+            },
+            {
+                data: "harga_barang",
+                className: "text-center"
+            },
+            {
+                data: "disc",
+                className: "text-center"
+            },
+            {
+                data: "amount",
+                className: "text-center"
+            },
+            {
+                data: "status",
+                className: "text-center actions",
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `
+                    <div class="mt-2">
+                        <button>X</button>
+                    </div>
+                    `
+                }
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        $('.dataTable tbody').on('click', 'button', function () { // delete datatable row
+            table.row($(this).parents('tr')).remove().draw();
+
+            reCountTotal();
+        });
 
         $(".order_date").datepicker({
             todayHighlight: true,
@@ -416,8 +452,6 @@
             .find('label')
             .css('z-index', '1');
 
-
-
         // BARANG
         $('.id_barang').select2({
             placeholder: "Pilih Barang",
@@ -453,19 +487,13 @@
                 id_customer: {
                     required: true
                 },
-                id_user: {
-                    required: true
-                },
-                destination: {
-                    required: true
-                },
                 order_date: {
                     required: true
                 },
                 shipping_date: {
                     required: true
                 },
-                terms: {
+                payment_terms: {
                     required: true
                 },
             },
@@ -473,19 +501,13 @@
                 id_customer: {
                     required: "Nama Customer wajib diisi"
                 },
-                id_user: {
-                    required: "Nama Sales wajib diisi"
-                },
-                destination: {
-                    required: "Tujuan pengiriman wajib diisi"
-                },
                 order_date: {
                     required: "tanggal pemesanan wajib diisi"
                 },
                 shipping_date: {
                     required: "tanggal pengiriman wajib diisi"
                 },
-                terms: {
+                payment_terms: {
                     required: "terms wajib diisi"
                 },
             },
@@ -571,6 +593,7 @@
                 $(element).removeClass('select-class');
             },
         });
+
         $(".id_barang").change(function() {
             if ($(".id_barang").val()) {
                 let nama = $(".id_barang option:selected").data("nama") ? $(".id_barang option:selected").data("nama") : "";
@@ -597,17 +620,17 @@
                 })
 
                 $(".nama_barang").val(nama);
-                $(".harga").val(harga ? harga.toLocaleString() : "");
+                $(".harga").val(harga ? +harga.toLocaleString('en-EN') : "");
                 // $(".id_warehouse").val(warehouseId);
                 // $(".warehouse").val(warehouseName);
             } else {
                 $(".nama_barang").attr("readonly", false)
-                $(".harga").val("");
+                $(".harga").val("0");
                 $(".qty").val("");
-                $(".amount").val("");
+                $(".amount").val("0");
                 $(".keterangan").val("").change();
                 $(".tax").val("");
-                $(".discount_percentage").val("");
+                $(".discount_percentage").val("0");
                 $(".dept").val("");
                 $(".warehouse").val("");
                 $(".id_warehouse").val("");
@@ -664,7 +687,7 @@
                         if (item.id == id_barang) {
                             valData = item.id
                         }
-                        $(".id_barang").append(`<option data-satuan="${item?.nama_satuan}" data-warehouse_id="${idWarehouse}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}" ${item.id==id_barang?'selected':''}>${item.nama_barang}</option>`);
+                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${idWarehouse}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}" ${item.id==id_barang?'selected':''}>${item.nama_barang}</option>`);
                     })
 
                     $(".id_barang").val(valData).change();
@@ -699,6 +722,9 @@
                         setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
                         var total = 0;
+                        let taxAmt = 0;
+                        const tableData = table.rows().data().toArray();
+                        console.log(tableData)
 
                         let update_list_items = [];
 
@@ -722,9 +748,19 @@
                             })
                         }
 
-                        list_items.map(obj => {
-                            total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
-                            if (obj.id) {
+                        const taxStatus = $('#tax_status').is(':checked');
+                        const includeTaxStatus = $('#include_tax').is(':checked');
+                        tableData.map(obj => {
+                            console.log(obj)
+                            // total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
+                            total += obj.amount || 0;
+                            
+                            if (taxStatus && !includeTaxStatus) {
+                                taxAmt += obj.taxAmt ?? 0;
+                                total += obj.taxAmt ?? 0;
+                            }
+
+                            /* if (obj.id) {
                                 update_list_items.push({
                                     id: obj.id ? Number(obj.id) : 0,
                                     id_barang: obj.id_barang ? Number(obj.id_barang) : 0,
@@ -756,13 +792,14 @@
                                     warhouse_name: obj.warhouse_name,
                                     isDeleted: false
                                 })
-                            }
+                            } */
                         })
 
                         data.append("total", total)
-                        data.append("include_pa", $('.include_pa').val() === 'on' ? 'true' : 'false')
-                        data.append("tax_status", $('.tax_status').val() === 'on' ? 'true' : 'false')
-                        data.append("items", JSON.stringify(update_list_items))
+                        data.append('taxAmt', taxAmt)
+                        data.append("tax_status", taxStatus)
+                        data.append("include_tax", includeTaxStatus)
+                        data.append("items", JSON.stringify(tableData))
                         // data.append("items", update_list_items)
 
                         // var object = {};
@@ -818,12 +855,13 @@
                         }
                         // CREATE
                         else {
-                            if (!update_list_items.length) {
+                            if (!tableData.length) {
                                 Swal.fire({
                                     icon: 'error',
                                     title: "Barang Tidak Boleh Kosong",
                                     confirmButtonColor: '#4e73df',
-                                })
+                                });
+                                return;
                             }
 
                             $.ajax({
@@ -899,7 +937,7 @@
                     $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
 
                     res.dataBarang.forEach(function(item) {
-                        $(".id_barang").append(`<option data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-tax="${+item.tax}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
                     })
 
                     $(".id_barang").val("").change();
@@ -920,18 +958,22 @@
             let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
             let id_barang = $(".id_barang option:selected").val()
             let nama_barang = $(".id_barang option:selected").text()
+            const selectedData = $(".id_barang option:selected").data();
             let harga = $(".harga").val()
             let qty = $(".qty").val()
-            let amount = $(".amount").val()
+            let amount = $(".amount").val().replace(/\,/g, '');
             let keterangan = $(".keterangan").val()
-            let tax = $(".tax").val()
-            let discountPercentage = $(".discount_percentage").val()
+            // const tax = $(".tax").val()
+            const tax = selectedData.tax;
+            let discountPercentage = $(".discount_percentage").val() || 0;
             let dept = $(".dept").val()
             let warehouseId = $(".warehouse").val()
             let warhouseName = $(".warehouse").text()
 
-            let validate_same = false;
+            const discAmt = amount * (discountPercentage / 100);
+            const discountedAmt = amount - discAmt;
 
+            let validate_same = false;
 
             if (validate_same) {
                 Swal.fire({
@@ -966,7 +1008,7 @@
                                 total_qty = 0;
                                 total_harga = 0;
 
-                                list_items.map(item => {
+                                /* list_items.map(item => {
                                     if (item.row == row_detail) {
                                         tag_html += `<tr>`;
                                         tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
@@ -1045,13 +1087,13 @@
                                         total_qty = total_qty + Number(item.qty);
                                         total_harga = total_harga + Number(item.amount.replaceAll(",", ""));
                                     }
-                                })
+                                }) */
 
 
                                 list_items = [];
                                 list_items = new_list_items;
 
-                                $(".body-detail-table").append(tag_html)
+                                // $(".body-detail-table").append(tag_html)
                                 $(".foot-detail-table").empty()
 
                                 tag_total += `<tr>`;
@@ -1100,13 +1142,36 @@
                                     harga: harga,
                                     qty: qty,
                                     amount: amount,
+                                    discountedAmt: discountedAmt,
                                     keterangan: keterangan,
                                     tax: tax,
+                                    taxAmt: amount * (tax / 100),
                                     discount_percentage: discountPercentage,
                                     dept: dept,
                                     warehouse_id: warehouseId,
                                     warhouse_name: warhouseName
                                 });
+
+                                table.row.add({
+                                    id_barang: id_barang,
+                                    kode_barang: selectedData.code,
+                                    nama_barang: nama_barang,
+                                    qty: qty,
+                                    satuan: selectedData.satuan,
+                                    harga_barang: harga,
+                                    barangTotal: amount,
+                                    disc: discountPercentage,
+                                    tax: tax,
+                                    taxAmt: amount * (tax / 100),
+                                    keterangan: keterangan,
+                                    discAmt: discAmt,
+                                    amount: discountedAmt,
+                                    dept: dept,
+                                    warehouse_id: warehouseId,
+                                    warehouse_name: warhouseName
+                                }).draw(false);
+
+                                reCountTotal();
 
                                 total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
                                 total_qty = total_qty + Number(qty);
@@ -1115,7 +1180,7 @@
                                 let tag_html = "";
                                 let tag_total = "";
 
-                                tag_html += `<tr>`;
+                                /* tag_html += `<tr>`;
                                 tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">`;
                                 tag_html += row + 1;
                                 tag_html += "</td>";
@@ -1138,7 +1203,7 @@
                                 tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
                                 tag_html += "</td>";
                                 tag_html += "</tr>";
-                                $(".body-detail-table").append(tag_html)
+                                $(".body-detail-table").append(tag_html) */
 
                                 $(".foot-detail-table").empty()
 
@@ -1172,112 +1237,68 @@
             }
         });
 
-    })
+        $('#estimated_freight').keyup(function () {
+            const estimatedFreight = $(this).val();
+            $('#freightCost').html(estimatedFreight);
+            reCountTotal();
+        });
 
+        const reCountTotal = () => {
+            const taxStatus = $('#tax_status').is(':checked');
+            const includeTax = $('#include_tax').is(':checked');
+            const itemList = table.rows().data();
 
+            let itemSubTotal = 0;
+            let discTotal = 0;
+            let taxTotal = 0;
+            const estimatedFreightVal = $('#estimated_freight').val() || '0';
+            const estimatedFreight = +estimatedFreightVal.replace(/\,/g, '');
 
+            itemList.map((obj) => {
+                itemSubTotal += +obj.barangTotal;
+                discTotal += +obj.discAmt;
 
-    const deleteRow = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let new_list_items = []
-                let tag_html = "";
-                let tag_total = "";
+                if (taxStatus && !includeTax) {
+                    taxTotal += +obj.taxAmt;
+                }
+            });
 
-                $(".body-detail-table").empty()
+            $('#itemSubTotal').html(itemSubTotal.toLocaleString());
+            $('#discTotal').html(discTotal.toLocaleString());
+            $('#taxTotal').html(taxTotal.toLocaleString());
 
-                row = 0;
-                total_harga_barang = 0;
-                total_qty = 0;
-                total_harga = 0;
+            // if (includeTax) taxTotal = 0;
 
-                list_items.map(item => {
-                    if (item.row != id) {
+            const grandTotal = itemSubTotal + estimatedFreight + taxTotal - discTotal; 
+            $('#grandTotal').html(grandTotal.toLocaleString());
+        };
 
-                        tag_html += `<tr>`;
-                        tag_html += `<td class="edit-table-detail" data-warehouse_name="${item.warehouse_name}" data-dept="${item.dept}"  data-id_warehouse="${item.warehouse_id}" data-tax="${item.tax}" data-discount_percentage="${item.discount_percentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}>`;
-                        tag_html += row + 1;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail" data-warehouse_name="${item.warehouse_name}" data-dept="${item.dept}"  data-id_warehouse="${item.warehouse_id}" data-tax="${item.tax}" data-discount_percentage="${item.discount_percentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}>`;
-                        tag_html += item.nama_barang;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail" data-warehouse_name="${item.warehouse_name}" data-dept="${item.dept}"  data-id_warehouse="${item.warehouse_id}" data-tax="${item.tax}" data-discount_percentage="${item.discount_percentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}>`;
-                        tag_html += item.harga;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail" data-warehouse_name="${item.warehouse_name}" data-dept="${item.dept}"  data-id_warehouse="${item.warehouse_id}" data-tax="${item.tax}" data-discount_percentage="${item.discount_percentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}>`;
-                        tag_html += item.qty;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail" data-warehouse_name="${item.warehouse_name}" data-dept="${item.dept}"  data-id_warehouse="${item.warehouse_id}" data-tax="${item.tax}" data-discount_percentage="${item.discount_percentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}>`;
-                        tag_html += item.amount;
-                        tag_html += "</td>";
-                        tag_html += `<td class="edit-table-detail" data-warehouse_name="${item.warehouse_name}" data-dept="${item.dept}"  data-id_warehouse="${item.warehouse_id}" data-tax="${item.tax}" data-discount_percentage="${item.discount_percentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}>`;
-                        tag_html += item.keterangan;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
+        $('#tax_status').change(function() {
 
-                        new_list_items.push({
-                            ...item,
-                            row: row + 1
-                        });
-                        row = row + 1;
-
-                        total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                        total_qty = total_qty + Number(item.qty);
-                        total_harga = total_harga + Number(item.amount.replaceAll(",", ""));
-                    } else {
-                        if (item.id) {
-                            list_delete.push(item)
-                        }
-                    }
-                })
-
-                list_items = [];
-                list_items = new_list_items;
-
-                $(".body-detail-table").append(tag_html)
-                $(".foot-detail-table").empty()
-
-                tag_total += `<tr>`;
-                tag_total += "<td colspan='1'>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += "<b>TOTAL</b>";
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_qty}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td>";
-                tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                tag_total += "</td>";
-                tag_total += "<td colspan='3'>";
-                tag_total += "</td>";
-                tag_total += "</tr>";
-
-                $(".foot-detail-table").append(tag_total);
-                $(".detail-modal").modal("hide")
+            if (!this.checked) {
+                $('#include_tax').prop('checked', false);
             }
-        })
-    }
 
+            reCountTotal();
+        });
+        $('#include_tax').change(function() {
 
+            const taxStatus = $('#tax_status').is(':checked');
 
+            if (this.checked && !taxStatus) {
+                $(this).prop('checked', false);
+            }
 
+            reCountTotal()
+        });
 
+        <?php if (!empty($data)): ?>
+        const dataHaciu = <?= json_encode($data->detail) ?>;
+        table.rows.add(dataHaciu).draw(false);
+        reCountTotal();
+        <?php endif; ?>
+
+    })
 
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
