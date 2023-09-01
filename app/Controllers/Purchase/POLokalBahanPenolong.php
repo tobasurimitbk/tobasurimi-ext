@@ -10,6 +10,7 @@ use App\Models\SupplierModel;
 use App\Models\SppModel;
 use App\Models\MetadataModel;
 use App\Models\WarehousesModel;
+use App\Models\BeaCukaiModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanPenolong extends BaseController
@@ -22,6 +23,7 @@ class POLokalBahanPenolong extends BaseController
     protected $SppModel;
     protected $SupplierModel;
     protected $WarehousesModel;
+    protected $BeaCukaiModel;
     protected $dompdf;
 
     public function __construct()
@@ -34,6 +36,7 @@ class POLokalBahanPenolong extends BaseController
         $this->SppModel = new SppModel();
         $this->SupplierModel = new SupplierModel();
         $this->WarehousesModel = new WarehousesModel();
+        $this->BeaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -556,6 +559,18 @@ class POLokalBahanPenolong extends BaseController
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
 
         $dataPOLokal = $this->AMPurchaseOrderModel->getNoPenerimaanBarang("LOKAL", $id, $this->this_company_id);
+
+        $data = [
+            "data" => $dataPOLokal
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownBeaCukaiPOLokalBahanPenolong()
+    {
+        $dataPOLokal = $this->AMPurchaseOrderModel->getNoPOBeaCukai("LOKAL", $this->this_company_id);
 
         $data = [
             "data" => $dataPOLokal

@@ -156,7 +156,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-1">
+            <!-- <div class="row mb-1">
                 <div class="col-md-4">
                     <label class="form-label font-weight-bold">Data Dokumen</label>
                 </div>
@@ -270,7 +270,7 @@
                         <label for="floatingInput">PPH</label>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </form>
         <div class="col-subtitle-modal">
             <div class="row mt-3">
@@ -687,12 +687,6 @@ var validator_detail = $(".detail-form").validate({
                 },
                 biaya_masuk: {
                     required: true,
-                },
-                status_post: {
-                    required: true,
-                },
-                status_penerimaan: {
-                    required: true,
                 }
             },
             messages: {
@@ -728,13 +722,7 @@ var validator_detail = $(".detail-form").validate({
                 },
                 biaya_masuk: {
                     required: "Bea Masuk wajib diisi"
-                },
-                status_post: {
-                    required: "Status Post wajib diisi"
-                },
-                status_penerimaan: {
-                    required: "Status Penerimaan wajib diisi"
-                },
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',

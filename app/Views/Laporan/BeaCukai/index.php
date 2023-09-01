@@ -4,8 +4,8 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>PO Import Bahan Baku</h1>
-    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-import-bahan-baku/create"); ?>">
+    <h1>Bea Cukai</h1>
+    <a class="btn btn-show-form btn-add float-right" href="<?= base_url("bea-cukai/create"); ?>">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </a>
 </div>
@@ -13,24 +13,14 @@
     <div class="card-body">
         <?= csrf_field() ?>
         <div class="row justify-content-end row-col-spp">
-            <div class="col mb-3">
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
-                    </div>
-                </div>
+            <div class="col-md-3">
+                <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                    <option value="waiting">WAITING</option>
+                    <option value="finish">FINISH</option>
+                </select>
             </div>
-            <div class="col mb-3">
-                <div class="input-group input-group-password">
-                    <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                    <div class="input-group-prepend group-prepend-password align-items-center">
-                        <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col mb-3">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
+            <div class="col-md-3">
+                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Bea Cukai" value="" />
             </div>
         </div>
         <div class="row">
@@ -39,13 +29,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No.</th>
-                            <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
-                            <th onclick="changeSort('poNo')" class="sort">No. PO</th>
-                            <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
-                            <th onclick="changeSort('total')" class="sort">Total Harga</th>
-                            <th onclick="changeSort('currencyName')" class="sort">Valas</th>
-                            <th>Jumlah Order</th>
-                            <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
+                            <th onclick="changeSort('no_bea_cukai')" class="sort">No. Bea Cukai</th>
+                            <th onclick="changeSort('status_po')" class="sort">Jenis PO</th>
+                            <th onclick="changeSort('tipe_bahan')" class="sort">Tipe PO</th>
+                            <th>No. PO</th>
+                            <th onclick="changeSort('createdAt')" class="sort">Tanggal</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -61,7 +50,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "poDate";
+    let sort = "no_bea_cukai";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
@@ -77,12 +66,10 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("po-import-bahan-baku/all"); ?>",
+            url: "<?= base_url("bea-cukai/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -104,34 +91,32 @@
             width: "5%"
         },
         {
-            data: "po_date",
+            data: "no_bea_cukai",
+            className: "text-center"
+        },
+        {
+            data: "status_po",
+            className: "text-center"
+        },
+        {
+            data: "tipe_bahan",
             className: "text-center"
         },
         {
             data: "po_no",
-            className: "text-center"
-        },
-        {
-            data: "supplierName",
-            className: "text-center"
-        },
-        {
-            data: "total",
-            className: "text-center"
-        },
-        {
-            data: "currencyName",
-            className: "text-center"
-        },
-        {
-            data: "itemCount",
             className: "text-center",
             searchable: false,
-            sortable: false,
+            sortable: false
         },
         {
-            data: "status_penerimaan",
+            data: "createdAt",
             className: "text-center"
+        },
+        {
+            data: "status_post",
+            className: "text-center",
+            searchable: false,
+            sortable: false
         },
         {
                 data: "id",
@@ -140,47 +125,22 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row?.id;
-                    let status = row?.is_posted
-                    let status_penerimaan = row?.status_penerimaan
-                    let purchase_request_id = row?.purchase_request_id
+                    let status = row?.status_post
 
-                    // jika belum posting
-                    if (status !== "1") {
+                    if (status == "WAITING") {
                         return `
                             <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button onclick="posting(${id}, ${purchase_request_id})" class="btn btn-success posting-spp">
+                            <button onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button onclick="remove(${id})" class="btn btn-danger delete-parent">
+                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                             </div>
                         `
                     } else {
-                        // jika belum close po
-                        if (status_penerimaan !== "CLOSED") {
-                            return `
-                                <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                                <button onclick="closePO(${id})" class="btn btn-danger delete-parent">
-                                    <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
-                                </button>
-                                </div>
-                            `
-                        } else {
-                            return `
-                                <div class="mt-0">
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("po-import-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                                </div>
-                            `
-                        }
+                        return `
+                        `
                     }
                 }
             }],
@@ -198,115 +158,37 @@
         }
     });
     $(document).ready(function() {
-        $(".dateStart").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $(".dateEnd").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $('.icon-dateStart').click(function() {
-            $(".dateStart").focus();
-        });
-
-        $('.icon-dateEnd').click(function() {
-            $(".dateEnd").focus();
-        });
-
         $(".dataTable_info").addClass("pt-0");
 
         $(".search").keyup(function () {
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd").change(function () {
+        $(".status").change(function () {
             table.ajax.reload();
         })
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("po-import-bahan-baku/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("bea-cukai/id"); ?>/${data.id}`);
         })
     })
 
-    const posting = function(id, purchase_request_id) {
+    const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Yakin akan di Posting?',
+            title: 'Yakin akan di posting?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Hapus',
+            confirmButtonText: 'Posting',
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("po-import-bahan-baku/update-status"); ?>",
-                    data: {
-                        id: id,
-                        spp: purchase_request_id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Dihapus, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                });
-            }
-        })
-    }
-
-    const closePO = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Yakin akan Close PO?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Close',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("po-import-bahan-baku/close-po"); ?>",
+                    url: "<?= base_url("bea-cukai/update-status"); ?>",
                     data: {
                         id: id
                     },
@@ -361,7 +243,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("po-import-bahan-baku/delete"); ?>",
+                    url: "<?= base_url("bea-cukai/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -400,11 +282,6 @@
                 });
             }
         })
-    }
-
-    const print = function(url) 
-    {
-        window.open(url, "_blank");
     }
 
     const changeSort = function(val) {

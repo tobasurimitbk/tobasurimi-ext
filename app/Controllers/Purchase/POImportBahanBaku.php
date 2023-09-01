@@ -9,6 +9,7 @@ use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
+use App\Models\BeaCukaiModel;
 use Dompdf\Dompdf;
 
 class POImportBahanBaku extends BaseController
@@ -22,6 +23,7 @@ class POImportBahanBaku extends BaseController
     protected $rmImportPODetailModel;
     protected $sppModel;
     protected $supplierModel;
+    protected $beaCukaiModel;
     protected $dompdf;
 
     public function __construct()
@@ -35,6 +37,7 @@ class POImportBahanBaku extends BaseController
         $this->rmImportPODetailModel = new RMImportPODetailModel();
         $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
+        $this->beaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -816,6 +819,47 @@ class POImportBahanBaku extends BaseController
         $data = [
             "data" => $dataPOImport
         ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownBeaCukaiPOImportBahanBaku()
+    {
+        $dataPOImport = $this->rmImportPOModel->getNoPOBeaCukai($this->this_company_id);
+
+        $data = [
+            "data" => $dataPOImport
+        ];
+        // $dataBea = $this->beaCukaiModel->getNoPOBeaCukai("IMPORT", "BAKU", $this->this_company_id);
+        // $newData = [];
+        // $multi = [];
+
+        // foreach($dataPOImport as $item)
+        // {
+        //     // check exist
+        //     $validate = true;
+        //     foreach($dataBea as $bea)
+        //     {
+        //         $multi =  $bea["multiple_po_id"] ? json_decode($bea["multiple_po_id"]) : [];
+
+        //         foreach($multi as $check)
+        //         {
+        //             if(formatter($check, "STR_TO_INT") === formatter($item["id"], "STR_TO_INT"))
+        //             {
+        //                 $validate = false;
+        //             }
+        //         }
+        //     }
+        //     if($validate){
+        //         array_push($newData, $item);
+        //     }
+        // }
+        // $data = [
+        //     "data" => $newData,
+        //     "multi" => $multi,
+        //     "po" => $dataPOImport
+        // ];
 
         echo json_encode($data);
         return;

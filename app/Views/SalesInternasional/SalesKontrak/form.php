@@ -1069,7 +1069,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + id;
+                                                    window.location.href = "<?= base_url("sales-kontrak"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -1112,7 +1112,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + +response.id;
+                                                    window.location.href = "<?= base_url("sales-kontrak"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({

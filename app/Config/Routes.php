@@ -401,6 +401,13 @@ $routes->get('/supplier-bahan-penolong/dropdown', 'Supplier\SupplierBahanPenolon
 $routes->get('/supplier-bahan-baku-import/dropdown', 'Supplier\SupplierBahanBakuImport::dropdownSupplier', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-penolong-import/dropdown', 'Supplier\SupplierBahanPenolongImport::dropdownSupplier', ['filter' => 'Auth']);
 
+// PO UTK BEA CUKAI
+$routes->get('/po-bea-cukai-lokal-baku/dropdown', 'Purchase\POLokalBahanBaku::dropdownBeaCukaiPOLokalBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-bea-cukai-import-baku/dropdown', 'Purchase\POImportBahanBaku::dropdownBeaCukaiPOImportBahanBaku', ['filter' => 'Auth']);
+$routes->get('/po-bea-cukai-lokal-penolong/dropdown', 'Purchase\POLokalBahanPenolong::dropdownBeaCukaiPOLokalBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/po-bea-cukai-import-penolong/dropdown', 'Purchase\POImportBahanPenolong::dropdownBeaCukaiPOImportBahanPenolong', ['filter' => 'Auth']);
+
+
 // PO
 $routes->get('/po-lokal-bahan-baku/dropdown', 'Purchase\POLokalBahanBaku::dropdownPOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/dropdown', 'Purchase\POLokalBahanPenolong::dropdownPOLokalBahanPenolong', ['filter' => 'Auth']);
@@ -509,13 +516,29 @@ $routes->post('/penerimaan-barang-import/update-status', 'Warehouse\PenerimaanBa
 $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImport::deletePenerimaanBarangImport', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 
+// LAPORAN
+// BEA CUKAI
+$routes->get('/bea-cukai', 'Laporan\BeaCukai::index', ['filter' => 'Auth']);
+$routes->get('/bea-cukai/all', 'Laporan\BeaCukai::all', ['filter' => 'Auth']);
+$routes->get('/bea-cukai/create', 'Laporan\BeaCukai::createView', ['filter' => 'Auth']);
+$routes->get('/bea-cukai/id/(:segment)', 'Laporan\BeaCukai::getById/$1', ['filter' => 'Auth']);
+$routes->post('/bea-cukai/save', 'Laporan\BeaCukai::save', ['filter' => 'Auth']);
+$routes->post('/bea-cukai/update', 'Laporan\BeaCukai::update', ['filter' => 'Auth']);
+$routes->post('/bea-cukai/update-status', 'Laporan\BeaCukai::updateStatus', ['filter' => 'Auth']);
+$routes->post('/bea-cukai/delete', 'Laporan\BeaCukai::delete', ['filter' => 'Auth']);
+
 // HUMAN RESOURCE
 // Attendance
 $routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
-$routes->get('/list-attendance', 'HR\Attendance::ListAttendance', ['filter' => 'Auth']);
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
 $routes->post('/check-pin-employee', 'HR\Attendance::CheckPinEmployee', ['filter' => 'Auth']);
+// Generate Attendance
+$routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
+$routes->post('/generate-attendance', 'HR\Attendance::generateAttendanceAction', ['filter' => 'Auth']);
+$routes->post('/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter' => 'Auth']);
+$routes->post('/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
+$routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttendance', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);

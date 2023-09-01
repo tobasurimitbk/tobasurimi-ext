@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\AttendancesModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
 
@@ -146,34 +147,44 @@ class Attendance extends BaseController
 
     public function LogAttendance()
     {
+        // declare model
         $AttendancesLogModel = new AttendancesLogModel();
         $EmployeesModel = new EmployeesModel();
+        $FormPerijinanModel = new FormPerijinanModel();
 
+        // get data $_GET
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
+        // get data from model
         $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
-        $data = array();
+        // declare variable for store data
+        $dataResult = array();
 
-
+        // set data attendance
         foreach ($dataEmployee as $value) {
+            // get log attendance by employee and $year-$month
             $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
-
-            $constructor = [
+            // store data
+            $dataResult[] = [
+                "employeeID" => $value['id'],
                 "employeeName" => $value['name'],
-                "list_attendance" => $dataLog
+                "list_attendance" => $dataLog,
+                'statusAttendances' => [
+                    'IJIN' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN", $year, $month),
+                    'CUTI' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI", $year, $month),
+                    'SAKIT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT", $year, $month),
+                    'LIBUR' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "LIBUR", $year, $month)
+                ]
             ];
-
-            $data[] = $constructor;
         }
 
-        // dd($data);
-
+        // final data
         $data = [
             'year' => $year,
             'month' => $month,
-            'res_user'  => $data
+            'res_user'  => $dataResult
 
         ];
         return view('hr/attendance/log-attendance', $data);
@@ -289,5 +300,206 @@ class Attendance extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+
+    public function generateAttendanceView()
+    {
+        $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
+        $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
+
+        // declare model
+        $AttendanceModel = new AttendancesModel();
+        $EmployeesModel = new EmployeesModel();
+
+        // get attendance Total (ngecek apakah sudah digenerate belum)
+        $totalAttendances = $AttendanceModel->where('LEFT(periode, 7)', $year . "-" . $month)
+            ->where('company_id', $this->this_company_id)
+            ->countAllResults();
+        // check is posting
+        $isPosting = $AttendanceModel->where('LEFT(periode, 7)', $year . "-" . $month)
+            ->where('company_id', $this->this_company_id)
+            ->where('isPosting', 1)
+            ->countAllResults();
+
+        // Data Send To View
+        $data = [
+            'year' => $year,
+            'month' => $month,
+            'totalAttendances' => $totalAttendances,
+            'employeesData' => $EmployeesModel->getEmployees($this->this_company_id),
+            'isPosting' =>  $isPosting
+        ];
+
+        return \view('hr/attendance/attendance-generate', $data);
+    }
+
+    public function generateAttendanceAction()
+    {
+        // declare variable
+        $month = $this->request->getVar('month');
+        $year = $this->request->getVar('year');
+        // declare model
+        $AttendancesLogModel = new AttendancesLogModel();
+        $EmployeesModel = new EmployeesModel();
+        $AttendanceModel = new AttendancesModel();
+        $FormPerijinanModel = new FormPerijinanModel();
+
+        $employeeData = $EmployeesModel->getEmployees($this->this_company_id);
+        // check employee
+        if (count($employeeData) == 0) {
+            return $this->response->setJSON([
+                'message' => "Employee tidak ditemukan di company ini",
+                'code' => 422
+            ]);
+        }
+
+        // remove all if exist and insert again
+        $AttendanceModel->where([
+            'MONTH(periode)' => $month,
+            'YEAR(periode)' => $year,
+            'company_id' => $this->this_company_id
+        ])->delete();
+
+        // generate yyyy-mm-dd per tahun-bulan
+        // Menghitung jumlah hari dalam bulan yang diberikan
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        // Membuat array untuk menyimpan semua tanggal
+        $allDates = array();
+        // Menghasilkan semua tanggal dalam bulan dan tahun yang diberikan
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+            $allDates[] = $date;
+        }
+
+        // loop employee
+        foreach ($employeeData as $e) {
+            // loop date
+            foreach ($allDates as $dates) {
+                // chek apakah data izin
+                $formPerizinan = $FormPerijinanModel->where('periode', $dates)
+                    ->where('employee_id', $e['id'])
+                    ->first();
+
+                if ($formPerizinan != null) {
+                    // ada perizinan 
+                    $AttendanceModel->insert([
+                        'company_id' => $this->this_company_id,
+                        'employee_id' => $e['id'],
+                        'periode' => $dates,
+                        'status' => $formPerizinan['status'],
+                        'reason' => $formPerizinan['reason']
+                    ]);
+                } elseif ($formPerizinan == null) {
+                    // tidak ada data perizinan jadi
+                    // get attendance by date and employee
+                    $logAttandance = $AttendancesLogModel->where('employees_id', $e['id'])
+                        ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
+                        ->orderBy('id', "DESC") // ambil terbaru
+                        ->limit(2) // get 2 date in log attandance 
+                        ->get()
+                        ->getResult();
+
+                    if (\count($logAttandance) == 0) {
+                        // rekap absen tidak ditemukan
+                        // set jadi ALPHA
+                        $AttendanceModel->insert([
+                            'company_id' => $this->this_company_id,
+                            'employee_id' => $e['id'],
+                            'periode' => $dates,
+                            'status' => 'ALPHA',
+                        ]);
+                    } else {
+                        // data absen ada di log
+                        if (\count($logAttandance) == 2) {
+                            // ada attandance (in dan out)
+                            // create in
+                            $AttendanceModel->insert([
+                                'company_id' => $this->this_company_id,
+                                'employee_id' => $e['id'],
+                                'periode' => $dates,
+                                'checkin' => \date('H:i:s', \strtotime($logAttandance[1]->date_create)), // in
+                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // out
+                                'status' => 'HADIR'
+                            ]);
+                        } else {
+                            // ada attandance only(in)
+                            $AttendanceModel->insert([
+                                'company_id' => $this->this_company_id,
+                                'employee_id' => $e['id'],
+                                'periode' => $dates,
+                                'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // in
+                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // out
+                                'status' => 'HADIR',
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this->response->setJSON([
+            'message' => "Attendance berhasil digenerate",
+            'code' => 200
+        ]);
+    }
+
+    public function getDetailAttendance()
+    {
+        $employeeID = $this->request->getVar('employeeID');
+        $tanggal = $this->request->getVar('tanggal');
+
+        $AttendanceModel = new AttendancesModel();
+        $EmployeesModel = new EmployeesModel();
+
+        $resultData = [
+            'attendance' => $AttendanceModel->where('periode', $tanggal)
+                ->where('employee_id', $employeeID)
+                ->first(),
+            'employee' => $EmployeesModel->where('id', $employeeID)->first()
+        ];
+
+        return $this->response->setJSON([
+            'data' => $resultData
+        ]);
+    }
+
+    public function updateAttendance()
+    {
+        $attendenceID = $this->request->getVar('attendenceID');
+        $checkIN = $this->request->getVar('checkIn');
+        $checkOut = $this->request->getVar('checkOut');
+        $statusKehadiran = $this->request->getVar('statusKehadiran');
+        $reason = $this->request->getVar('reason');
+
+        $AttendanceModel = new AttendancesModel();
+
+        $AttendanceModel->update($attendenceID, [
+            'checkin' => $checkIN, // in
+            'checkout' => $checkOut, // out
+            'status' => $statusKehadiran,
+            'reason' => $reason
+        ]);
+
+        return $this->response->setJSON([
+            'message' => "Attendence diperbaruhi"
+        ]);
+    }
+
+    public function updatePostAttendance()
+    {
+        $year = $this->request->getVar('year');
+        $month = $this->request->getVar('month');
+        $status = $this->request->getVar('statusPosting');
+
+        $query = "UPDATE attendances SET isPosting = ? WHERE DATE_FORMAT(periode, '%Y-%m') = ?";
+        $params = [$status, "$year-$month"];
+
+        $db = \Config\Database::connect();
+        $db->query($query, $params);
+
+        return $this->response->setJSON([
+            'message' => "Status posting presensi diperbaruhi"
+        ]);
     }
 }

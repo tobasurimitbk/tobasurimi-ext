@@ -163,6 +163,22 @@ class RMImportPOModel extends Model
         return $query->getResultArray();
     }
 
+    public function getNoPOBeaCukai($company_id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'is_posted' => 1,
+            'status_penerimaan' => 0,
+            'company_id' => $company_id
+        ];
+
+        $builder = $this->db->table('rm_import_pos');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResultArray();
+    }
+
     public function get_no($tgl, $bln, $thn, $warehouse, $thn2, $warehouse_id, $last_day)
     {
         $lastStr =  $tgl . $bln . $thn;
