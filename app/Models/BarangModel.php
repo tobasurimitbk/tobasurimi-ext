@@ -30,6 +30,7 @@ class BarangModel extends Model
         'ap_id',
         'ar_id',
         'stok',
+        'tax',
         'status',
         'createdAt',
         'updatedAt',

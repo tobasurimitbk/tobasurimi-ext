@@ -157,6 +157,14 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" onkeyup="formatNumber(this)" class="form-control" name="tax" id="tax" placeholder="Pajak Barang">
+                                    <label for="floatingInput">Tax (%)</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -934,7 +942,8 @@
                         $(".spek").val(res?.data?.spek);
                         $(".nama_barang").val(res?.data?.nama_barang);
                         $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
-                        console.log()
+                        $('#tax').val(res.data.tax);
+                        
                         validator.resetForm();
                         validator.reset();
 
@@ -976,7 +985,9 @@
                             }
                         })
 
-                        $.ajax({
+                        $(".ap_id").val(res?.data?.ap_id).change();
+                        $(".ar_id").val(res?.data?.ar_id).change();
+                        /* $.ajax({
                             url: `<?= base_url("ap-ar/dropdown"); ?>`,
                             method: "GET",
                             dataType: "json",
@@ -995,7 +1006,7 @@
                                 $(".ap_id").val(res?.data?.ap_id).change();
                                 $(".ar_id").val(res?.data?.ar_id).change();
                             }
-                        })
+                        }) */
 
                         $(".supplier_id").empty()
                         $(".type").val(res?.data?.type)
@@ -1078,7 +1089,11 @@
                             })
                         }
 
-                        $.ajax({
+                        $(".satuan_id").val(res?.data?.satuan_id).change();
+                        $(".hs_id").val(res?.data?.hs_id).change();
+                        changeParent = true;
+                        $(".add-modal").modal("show")
+                        /* $.ajax({
                             url: `<?= base_url("satuan/dropdown"); ?>`,
                             method: "GET",
                             dataType: "json",
@@ -1112,7 +1127,7 @@
                                 changeParent = true;
                                 $(".add-modal").modal("show")
                             }
-                        })
+                        }) */
                     } else {
                         Swal.fire({
                             icon: 'error',

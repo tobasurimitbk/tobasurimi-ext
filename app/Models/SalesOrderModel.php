@@ -21,6 +21,7 @@ class SalesOrderModel extends Model
 
     public function __construct()
     {
+        parent::__construct();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
     }
 
@@ -143,7 +144,14 @@ class SalesOrderModel extends Model
             ->select($selectQry)
             ->find($id);
 
-        $selectQueryDetail = "sales_order_detail.*,warehouses.warehouse_name,barangs.nama_barang,barangs.harga_barang,barangs.satuan_id,satuans.kode_satuan";
+        $selectQueryDetail = "sales_order_detail.*,
+                              sales_order_detail.discount_percentage AS disc, 
+                              warehouses.warehouse_name, 
+                              barangs.kode_barang AS kode_barang,
+                              barangs.nama_barang AS nama_barang,
+                              barangs.harga_barang AS harga_barang,
+                              barangs.satuan_id,
+                              satuans.kode_satuan AS satuan";
         $detail = $this->SalesOrderDetailModel
             ->where('id_sales_order', $id)
             ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
