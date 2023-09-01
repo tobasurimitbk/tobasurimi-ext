@@ -75,9 +75,15 @@
                     <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
                 </div>
             </div>
-            <div class="row row-col-page-list-attendance">
+            <hr>
+            <div class="row row-col-page-list-attendance mt-4">
+                <div class="row mb-3" style="text-align: right;">
+                    <div class="col-sm-4" style="margin-top: -10px; float: right;">
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Nama Employee" value="" />
+                    </div>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
+                    <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="attendanceTable">
                         <thead>
                             <tr>
                                 <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;User</td>
@@ -213,6 +219,18 @@
     function printReport() {
         document.location.href = 'log-attendance?month=' + document.getElementById('month').value + '&year=' + document.getElementById('year').value;
     }
+    // search
+    $('.search').keyup(function() {
+        var searchText = $(this).val().toLowerCase();
+        $('#attendanceTable tbody tr').each(function() {
+            var employeeName = $(this).find('td:eq(0)').text().toLowerCase();
+            if (employeeName.includes(searchText)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
 </script>
 
 
