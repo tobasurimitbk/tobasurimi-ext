@@ -253,5 +253,4 @@ class PenerimaanBarangModel extends Model
 
         return $receiveDataQry;
     }
-
 }

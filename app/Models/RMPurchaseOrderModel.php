@@ -74,6 +74,22 @@ class RMPurchaseOrderModel extends Model
         return $query->getResultArray();
     }
 
+    public function getNoPOBeaCukai($company_id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'is_posted' => 1,
+            'status_penerimaan' => 0,
+            'company_id' => $company_id
+        ];
+
+        $builder = $this->db->table('rm_purchase_orders');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+        
+        return $query->getResultArray();
+    }
+
     public function getPoBBList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [

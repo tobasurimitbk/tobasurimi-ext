@@ -7,6 +7,7 @@ use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
+use App\Models\BeaCukaiModel;
 use Dompdf\Dompdf;
 
 class POLokalBahanBaku extends BaseController
@@ -17,6 +18,7 @@ class POLokalBahanBaku extends BaseController
     protected $RMPurchaseOrderDetailModel;
     protected $SppModel;
     protected $SupplierModel;
+    protected $BeaCukaiModel;
     protected $dompdf;
 
     public function __construct()
@@ -27,6 +29,7 @@ class POLokalBahanBaku extends BaseController
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->SppModel = new SppModel();
         $this->SupplierModel = new SupplierModel();
+        $this->BeaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -540,6 +543,47 @@ class POLokalBahanBaku extends BaseController
         $data = [
             "data" => $dataPOLokal
         ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownBeaCukaiPOLokalBahanBaku()
+    {
+        $dataPOLokal = $this->RMPurchaseOrderModel->getNoPOBeaCukai($this->this_company_id);
+
+        $data = [
+            "data" => $dataPOLokal
+        ];
+        // $dataBea = $this->BeaCukaiModel->getNoPOBeaCukai("LOKAL", "BAKU", $this->this_company_id);
+        // $newData = [];
+        // $multi = [];
+
+        // foreach($dataPOLokal as $item)
+        // {
+        //     // check exist
+        //     $validate = true;
+        //     foreach($dataBea as $bea)
+        //     {
+        //         $multi =  $bea["multiple_po_id"] ? json_decode($bea["multiple_po_id"]) : [];
+
+        //         foreach($multi as $check)
+        //         {
+        //             if(formatter($check, "STR_TO_INT") === formatter($item["id"], "STR_TO_INT"))
+        //             {
+        //                 $validate = false;
+        //             }
+        //         }
+        //     }
+        //     if($validate){
+        //         array_push($newData, $item);
+        //     }
+        // }
+        // $data = [
+        //     "data" => $newData,
+        //     "multi" => $multi,
+        //     "po" => $dataPOLokal
+        // ];
 
         echo json_encode($data);
         return;

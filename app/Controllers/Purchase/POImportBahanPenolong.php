@@ -9,6 +9,7 @@ use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierModel;
+use App\Models\BeaCukaiModel;
 use Dompdf\Dompdf;
 
 class POImportBahanPenolong extends BaseController
@@ -22,6 +23,7 @@ class POImportBahanPenolong extends BaseController
     protected $amPurchaseOrderDetailModel;
     protected $sppModel;
     protected $supplierModel;
+    protected $beaCukaiModel;
     protected $dompdf;
 
     public function __construct()
@@ -35,6 +37,7 @@ class POImportBahanPenolong extends BaseController
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->sppModel = new SppModel();
         $this->supplierModel = new SupplierModel();
+        $this->beaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -815,6 +818,18 @@ class POImportBahanPenolong extends BaseController
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
 
         $dataPOImport = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Import", $id, $this->this_company_id);
+
+        $data = [
+            "data" => $dataPOImport
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function dropdownBeaCukaiPOImportBahanPenolong()
+    {
+        $dataPOImport = $this->amPurchaseOrderModel->getNoPOBeaCukai("Import", $this->this_company_id);
 
         $data = [
             "data" => $dataPOImport

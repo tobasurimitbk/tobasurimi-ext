@@ -135,9 +135,9 @@
                 <td>
                     <div><span class="txt-bold">Supplier   : <?= $dataPenerimaanBarang->supplier_name; ?></span></div>
                 </td>
-                <td class="txt-right">
-                    <div><span class="txt-bold">Jenis Dokumen:    <?= $dataPenerimaanBarang->aju_type_name; ?></span></div>
-                </td>
+                <!-- <td class="txt-right">
+                    <div><span class="txt-bold">Jenis Dokumen:    <?php // $dataPenerimaanBarang->aju_type_name; ?></span></div>
+                </td> -->
             </tr>
             <tr>
                 <td>

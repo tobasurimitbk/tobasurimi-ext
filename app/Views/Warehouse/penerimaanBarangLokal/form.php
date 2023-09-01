@@ -156,7 +156,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-1">
+            <!-- <div class="row mb-1">
                 <div class="col-md-4">
                     <label class="form-label font-weight-bold">Data Dokumen</label>
                 </div>
@@ -203,8 +203,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row mb-1">
+            </div> -->
+            <!-- <div class="row mb-1">
                 <div class="col-md-4">
                     <label class="form-label font-weight-bold">No. Surat Jalan</label>
                 </div>
@@ -228,8 +228,8 @@
                         <label for="floatingInput">Berat</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
+            </div> -->
+            <!-- <div class="row">
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang->status_post === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? number_format($dataPenerimaanBarang->shipping_cost) : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control shipping_cost" name="shipping_cost" id="shipping_cost" placeholder="Biaya Ongkos Kirim">
@@ -248,7 +248,7 @@
                         <label for="floatingInput">PPNBM</label>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </form>
         <div class="col-subtitle-modal">
             <div class="row mt-3">
@@ -470,7 +470,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <!--<div class="row">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Tax</h5>
                         </div>
@@ -492,7 +492,7 @@
                                 <label for="floatingInput">PPH</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Kemasan</h5>
@@ -704,12 +704,6 @@
                 },
                 ppnbm: {
                     required: true,
-                },
-                status_post: {
-                    required: true,
-                },
-                status_penerimaan: {
-                    required: true,
                 }
             },
             messages: {
@@ -754,13 +748,7 @@
                 },
                 ppnbm: {
                     required: "PPNBM wajib diisi"
-                },
-                status_post: {
-                    required: "Status Post wajib diisi"
-                },
-                status_penerimaan: {
-                    required: "Status Penerimaan wajib diisi"
-                },
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -1070,11 +1058,15 @@
             let satuan = $(".satuan_order").val()
             let qty = $(".qty").val() ? Number($(".qty").val()) : 0
             let keterangan = $(".keterangan").val()
-            let ppn = $(".ppn option:selected").val()
-            let pph = $(".pph option:selected").val()
+            let ppn = 0
+            let pph = 0
+            // let ppn = $(".ppn option:selected").val()
+            // let pph = $(".pph option:selected").val()
             let unit = $(".unit").val() ? Number($(".unit").val()) : 0
-            let nilai_ppn = $(".ppn option:selected").text()
-            let nilai_pph = $(".pph option:selected").text()
+            let nilai_ppn = 0
+            let nilai_pph = 0
+            // let nilai_ppn = $(".ppn option:selected").text()
+            // let nilai_pph = $(".pph option:selected").text()
             let nilai_sub_total = $(".nilai_sub_total").val() ? $(".nilai_sub_total").val() : 0
             let purchase_order_details_id = $(".purchase_order_details_id").val()
             let harga = $(".harga_barang_jasa").val()
@@ -1238,10 +1230,14 @@
                                                         harga: harga,
                                                         sub_total: nilai_sub_total,
                                                         keterangan: keterangan,
-                                                        ppn: ppn,
-                                                        nilai_ppn: nilai_ppn,
-                                                        pph: pph,
-                                                        nilai_pph: nilai_pph,
+                                                        // ppn: ppn,
+                                                        // nilai_ppn: nilai_ppn,
+                                                        // pph: pph,
+                                                        // nilai_pph: nilai_pph,
+                                                        ppn: 0,
+                                                        nilai_ppn: 0,
+                                                        pph: 0,
+                                                        nilai_pph: 0,
                                                         status_penerimaan: item.status_penerimaan,
                                                         po_no: item.po_no,
                                                         nama_packaging: nama_packaging,
@@ -2314,45 +2310,46 @@
                 })
 
                 $(".packaging").val(packaging).change();
-            }
-        })
-
-        $.ajax({
-            url: `<?= base_url("tax/dropdown"); ?>`,
-            method: "GET",
-            data: {
-                type: 'ppn'
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".ppn").empty()
-                $(".ppn").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
-                })
-
-                $(".ppn").val(ppn).change();
-            }
-        })
-
-        $.ajax({
-            url: `<?= base_url("tax/dropdown"); ?>`,
-            method: "GET",
-            data: {
-                type: 'pph'
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".pph").empty()
-                $(".pph").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
-                })
-
-                $(".pph").val(pph).change();
                 $(".detail-modal").modal("show")
             }
         })
+
+        // $.ajax({
+        //     url: `<?= base_url("tax/dropdown"); ?>`,
+        //     method: "GET",
+        //     data: {
+        //         type: 'ppn'
+        //     },
+        //     dataType: "json",
+        //     success: function(res) {
+        //         $(".ppn").empty()
+        //         $(".ppn").append(`<option value=""></option>`)
+        //         res.data.forEach(function(item) {
+        //             $(".ppn").append(`<option value="${item.id}">${item.tax_value}</option>`)
+        //         })
+
+        //         $(".ppn").val(ppn).change();
+        //     }
+        // })
+
+        // $.ajax({
+        //     url: `<?= base_url("tax/dropdown"); ?>`,
+        //     method: "GET",
+        //     data: {
+        //         type: 'pph'
+        //     },
+        //     dataType: "json",
+        //     success: function(res) {
+        //         $(".pph").empty()
+        //         $(".pph").append(`<option value=""></option>`)
+        //         res.data.forEach(function(item) {
+        //             $(".pph").append(`<option value="${item.id}">${item.tax_value}</option>`)
+        //         })
+
+        //         $(".pph").val(pph).change();
+                
+        //     }
+        // })
     })
 
     const changeTipeBahan = function()
