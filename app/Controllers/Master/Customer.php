@@ -3,10 +3,12 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+
 use App\Models\ProvincesModel;
 use App\Models\CustomerModel;
 use App\Models\BanksModel;
 use App\Models\ListAddressesModel;
+use App\models\SalesOrderModel;
 
 class Customer extends BaseController
 {
@@ -16,6 +18,7 @@ class Customer extends BaseController
     protected $CustomerModel;
     protected $BanksModel;
     protected $ListAddressesModel;
+    protected $SalesOrderModel;
 
     public function __construct()
     {
@@ -25,6 +28,7 @@ class Customer extends BaseController
         $this->CustomerModel = new CustomerModel();
         $this->BanksModel = new BanksModel();
         $this->ListAddressesModel = new ListAddressesModel();
+        $this->SalesOrderModel = new SalesOrderModel();
     }
 
     public function customer()
@@ -407,4 +411,24 @@ class Customer extends BaseController
         }
         return;
     }
+
+    public function getLocalSOList($id)
+    {
+        $soList = $this->SalesOrderModel
+            ->select('id, no_sales_order')
+            ->where('id_customer', $id)
+            ->where('tipe_sales_order', 'LOKAL')
+            ->findAll();
+
+        $customerData = $this->CustomerModel->asObject()
+            ->select('address')
+            ->find($id);
+
+        $data = [
+            'SOList' => $soList,
+            'address'=> $customerData->address
+        ];
+        echo json_encode($data);
+    }
+
 }

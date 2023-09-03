@@ -56,6 +56,7 @@ $routes->get('/customer/id/(:segment)', 'Master\Customer::getByIdCustomer/$1', [
 $routes->post('/customer/save', 'Master\Customer::saveCustomer', ['filter' => 'Auth']);
 $routes->post('/customer/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
+$routes->get('/customer/getLocalSOList/(:num)', 'Master\Customer::getLocalSOList/$1', ['filter' => 'Auth']);
 
 // WAREHOUSE
 $routes->get('/warehouse', 'Master\Warehouse::warehouse', ['filter' => 'Auth']);
@@ -318,6 +319,8 @@ $routes->get('/order-form-lokal/all', 'SalesLokal\OrderForm::all', ['filter' => 
 $routes->post('/order-form-lokal/save', 'SalesLokal\OrderForm::save', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/update', 'SalesLokal\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/delete', 'SalesLokal\OrderForm::delete', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/getItemList', 'SalesLokal\OrderForm::getItemListByIds', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/getItemList/(:num)', 'SalesLokal\OrderForm::getItemListById/$1', ['filter' => 'Auth']);
 
 $routes->get('/order-form-lokal/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
 
@@ -344,10 +347,10 @@ $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' 
 
 // Retur
 $routes->get('/retur', 'SalesLokal\Retur::index', ['filter' => 'Auth']);
-$routes->get('/retur/id/(:segment)', 'SalesLokal\Retur::getById/$1', ['filter' => 'Auth']);
+$routes->get('/retur/(:num)', 'SalesLokal\Retur::getById/$1', ['filter' => 'Auth']);
 $routes->get('/retur/create', 'SalesLokal\Retur::createView', ['filter' => 'Auth']);
 $routes->get('/retur/all', 'SalesLokal\Retur::all', ['filter' => 'Auth']);
-$routes->post('/retur/save', 'SalesLokal\Retur::create', ['filter' => 'Auth']);
+$routes->post('/retur/save', 'SalesLokal\Retur::save', ['filter' => 'Auth']);
 $routes->post('/retur/update', 'SalesLokal\Retur::update', ['filter' => 'Auth']);
 $routes->post('/retur/delete', 'SalesLokal\Retur::delete', ['filter' => 'Auth']);
 

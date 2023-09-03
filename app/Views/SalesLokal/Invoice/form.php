@@ -236,19 +236,19 @@
                         <tr>
                             <td colspan="5"></td>
                             <td><b>DPP</b></td>
-                            <td><b><?= number_format($data->dpp)  ?></b></td>
+                            <td><b><?= number_format($data->dpp ?? 0)  ?></b></td>
                             <td colspan="5"></td>
                         </tr>
                         <tr>
                             <td colspan="5"></td>
                             <td><b>PPN</b></td>
-                            <td><b><?= number_format($data->ppn) ?></b></td>
+                            <td><b><?= number_format($data->ppn ?? 0) ?></b></td>
                             <td colspan="5"></td>
                         </tr>
                         <tr>
                             <td colspan="5"></td>
                             <td><b>Total Invoice</b></td>
-                            <td><b><?= number_format($data->total_invoice) ?></b></td>
+                            <td><b><?= number_format($data->total_invoice ?? 0) ?></b></td>
                             <td colspan="5"></td>
                         </tr>
                     </tfoot>

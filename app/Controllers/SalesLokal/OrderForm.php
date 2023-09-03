@@ -743,4 +743,38 @@ class OrderForm extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function getItemListbyId($id)
+    {
+        $SOData = $this->SalesOrderModel->asObject()
+            ->select('tax_status, include_pa')
+            ->find($id);
+        $itemList = $this->SalesOrderDetailModel->getItemListByIds($id);
+
+        $taxStatus = filter_var($SOData->tax_status, FILTER_VALIDATE_BOOLEAN);
+        $includeTax = filter_var($SOData->include_pa, FILTER_VALIDATE_BOOLEAN);
+
+        $data = [
+            'SOData'    => [
+                'taxStatus' => $taxStatus,
+                'includeTax' => $includeTax
+            ],
+            'itemList'  => $itemList
+        ];
+        echo json_encode($data);
+    }
+
+    public function getItemListbyIds()
+    {
+        $ids = $this->request->getGet('ids');
+
+        if (empty($ids)) {
+            echo json_encode('[]');
+            return;
+        }
+        
+        $datas = $this->SalesOrderDetailModel->getItemListByIds($ids);
+
+        echo json_encode($datas);
+    }
 }

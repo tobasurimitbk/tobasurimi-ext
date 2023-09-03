@@ -3,29 +3,38 @@
 namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
+
 use Config\Services;
+
 use App\Models\SalesOrderModel;
+use App\Models\SalesOrderDetailModel;
 use App\Models\CustomerModel;
 use App\Models\AllNoModel;
 use App\Models\SuratJalanModel;
 
 class SuratJalan extends BaseController
 {
-    protected $token;
-    protected $this_company_id;
-    protected $CustomerModel;
-    protected $SalesOrderModel;
-    protected $encrypter;
-    protected $SuratJalanModel;
-    protected $AllNoModel;
+    private $token;
+    private $this_company_id;
+    private $userId;
+
+    private $CustomerModel;
+    private $SalesOrderModel;
+    private $SalesOrderDetailModel;
+    private $encrypter;
+    private $SuratJalanModel;
+    private $AllNoModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->userId = session()->get("login")->user_id;
+
         $this->encrypter = Services::encrypter();
         $this->CustomerModel = new CustomerModel();
         $this->SalesOrderModel = new SalesOrderModel();
+        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->AllNoModel = new AllNoModel();
         $this->SuratJalanModel = new SuratJalanModel();
     }
@@ -109,42 +118,47 @@ class SuratJalan extends BaseController
 
     public function save()
     {
-        $payload = $this->request->getVar();
-        $data = [
-            "payload" => $payload,
-            'token'   => csrf_hash()
-        ];
-        //echo json_encode($payload);
-
-
-        $validate = $this->validate([
+        $rules = [
             "id_customer" => [
                 "rules" => "required",
-                'errors' =>
-                [
+                'errors' => [
                     'required' => 'Customer tidak boleh kosong',
                 ]
             ],
-            "id_so" => 'is_array',
+            "id_so.*" => [
+                "rules" => "required|numeric",
+                "errors" => [
+                    "required" => 'Sales Order tidak boleh kosong!'
+                ]
+            ],
             "shipping_date" => [
-                "rules" => "required",
-                'errors' =>
-                [
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
                     'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
             ],
-            /*
-            "no_surat_jalan" => [
-                "rules" => "required",
+            "no_po" => [
+                "rules" => "permit_empty",
                 'errors' => [
-                    'required' => 'no surat jalan tidak boleh kosong',
+                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
-            ],*/
-        ]);
-        if (!$validate) {
-            // echo json_encode($payload);
-            //return;
-            return redirect()->to('/surat-jalan/create')->back()->withInput();
+            ],
+            "note" => [
+                "rules" => "permit_empty",
+                'errors' => [
+                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
+        ];
+        if (!$this->validate($rules)) {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
         }
 
         $dataSo = $this->request->getPost('id_so');
@@ -152,11 +166,21 @@ class SuratJalan extends BaseController
         $idArray = array();
         $noArray = array();
 
-        foreach ($dataSo as $payload) {
-            $delimiter = ",";
-            $parts = explode($delimiter, $payload);
-            array_push($idArray, $parts[0]);
-            array_push($noArray, $parts[1]);
+        foreach ($dataSo as $soId) {
+            $soData = $this->SalesOrderModel->asObject()->find($soId);
+
+            if (empty($soData)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Sales Order tidak ditemukan!",
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $idArray[] = $soId;
+            $noArray[] = $soData->no_sales_order;
         }
 
 
@@ -169,37 +193,36 @@ class SuratJalan extends BaseController
 
         $shippingDate = $this->request->getPost('shipping_date');
 
-        $values = [
-            "id_user" => $this->request->getPost('id_user'),
-            "id_customer" => $this->request->getPost('id_customer'),
-            "id_customer" => $this->request->getPost('id_customer'),
-            "shipping_date" =>  $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-            "no_surat_jalan" => $noSuratJalan,
-            "no_po" => $this->request->getPost('no_po'),
-            'multiple_id_so' => json_encode($idArray),
-            'multiple_no_so' => json_encode($noArray),
-        ];
         try {
 
-            // Create a new validation instance
+            $values = [
+                "id_user"       => $this->userId,
+                "id_customer"   => $this->request->getPost('id_customer'),
+                "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
+                "no_surat_jalan"=> $noSuratJalan,
+                "no_po"         => $this->request->getPost('no_po'),
+                "note"          => $this->request->getPost('note'),
+                'multiple_id_so'=> json_encode($idArray),
+                'multiple_no_so'=> json_encode($noArray),
+            ];
             $dataSuratJalan =  $this->SuratJalanModel->insert($values);
 
             $data = [
-                "id" => $dataSuratJalan,
-                "status"            => true,
+                "id"        => $dataSuratJalan,
+                "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 "payload"   => $values,
-                'token' => csrf_hash(),
+                'token'     => csrf_hash(),
             ];
             echo json_encode($data);
             return;
         } catch (\Exception $e) {
             //echo "Transaction failed: " . $e->getMessage();
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 "payload"   => $values,
-                'token' => csrf_hash(),
+                'token'     => csrf_hash(),
             ];
             echo json_encode($data);
             return;
@@ -209,7 +232,9 @@ class SuratJalan extends BaseController
     public function getById($id = null)
     {
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
-        $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
+        $customers = $this->CustomerModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->findAll();
 
         $dataSuratJalan->shipping_date = date("m/d/Y", strtotime($dataSuratJalan->shipping_date));
         $dataSo = $this->SalesOrderModel
@@ -217,6 +242,9 @@ class SuratJalan extends BaseController
             ->where(['id_customer' => $dataSuratJalan->id_customer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
             ->select(['id', 'no_sales_order'])
             ->findAll();
+
+        $dataSuratJalan->itemList = $this->SalesOrderDetailModel->getItemListByIds($dataSuratJalan->multiple_id_so);
+
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,

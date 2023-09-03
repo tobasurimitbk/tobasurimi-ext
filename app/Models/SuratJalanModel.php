@@ -14,7 +14,17 @@ class SuratJalanModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_user', 'id_po', 'id_customer', 'multiple_id_so', 'multiple_no_so', 'no_po', 'shipping_date', 'no_surat_jalan'];
+    protected $allowedFields    = [
+        'id_user', 
+        'id_po', 
+        'id_customer', 
+        'multiple_id_so', 
+        'multiple_no_so', 
+        'no_po', 
+        'shipping_date', 
+        'no_surat_jalan', 
+        'note'
+    ];
 
     // Dates
     protected $useTimestamps = true;
