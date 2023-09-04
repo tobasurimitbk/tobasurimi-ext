@@ -48,7 +48,7 @@
                             <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
                             <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
                             <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
-                            <th onclick="changeSort('validation_date')" class="sort">Tanggal Daftar</th>
+                            <th onclick="changeSort('createdAt')" class="sort">Tanggal</th>
                             <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                             <th>Jumlah Item</th>
                             <th>Actions</th>
@@ -66,7 +66,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "validation_date";
+    let sort = "createdAt";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
@@ -120,7 +120,7 @@
             className: "text-center"
         },
         {
-            data: "validation_date",
+            data: "createdAt",
             className: "text-center"
         },
         {

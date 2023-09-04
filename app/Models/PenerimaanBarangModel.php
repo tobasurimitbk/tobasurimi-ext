@@ -91,9 +91,9 @@ class PenerimaanBarangModel extends Model
         $selectQry = "penerimaan_barang.*, warehouses.warehouse_name, metadata.value as aju_type, suppliers.name as supplier_name, COUNT(penerimaan_barang_detail.id) AS itemCount";
         $penerimaanBarangDataQry = $this->asObject()
             ->select($selectQry)
-            ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type')
-            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id')
-            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id')
+            ->join('metadata', 'metadata.id = penerimaan_barang.aju_document_type', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'right')
             ->groupBy(('penerimaan_barang.id'))
             ->where($condition)
