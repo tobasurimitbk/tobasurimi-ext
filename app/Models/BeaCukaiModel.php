@@ -143,12 +143,12 @@ class BeaCukaiModel extends Model
         return $query->getResultArray();
     }
 
-    public function checkPostingBeaCukaiByPOId($id, $company_id)
+    public function checkPostingBeaCukaiByPONo($no, $company_id)
     {
         $arrCondition = [
             'deletedAt' => null,
             'company_id' => $company_id,
-            'po_id' => $id,
+            'po_no' => $no,
             'status_post' => 'FINISH'
         ];
 

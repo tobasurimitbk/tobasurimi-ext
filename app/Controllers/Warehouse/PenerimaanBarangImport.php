@@ -224,7 +224,7 @@ class PenerimaanBarangImport extends BaseController
             {
                 if($data->tipe_bahan === "PENOLONG")
                 {
-                    $check = $this->beaCukaiModel->checkPostingBeaCukaiByPOId($item, $this->this_company_id);
+                    $check = $this->beaCukaiModel->checkPostingBeaCukaiByPONo($item, $this->this_company_id);
 
                     if($check)
                     {
