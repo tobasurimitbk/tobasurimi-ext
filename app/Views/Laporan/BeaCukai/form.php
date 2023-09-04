@@ -1473,7 +1473,9 @@
                                 tag_total += `<td>`;
                                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                                 tag_total += "</td>";
-                                tag_total += `<td colspan="2">`;
+                                tag_total += `<td>`;
+                                tag_total += "</td>";
+                                tag_total += `<td>`;
                                 tag_total += "</td>";
                                 tag_total += "</tr>";
                                 
@@ -1597,7 +1599,9 @@
                                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                                 tag_total += "</td>";
                                 tag_total += `<td>`;
-                                tag_total += `</td colspan="2">`;
+                                tag_total += `</td>`;
+                                tag_total += `<td>`;
+                                tag_total += "</td>";
                                 tag_total += "</tr>";
                                 
                                 $(".foot-detail-table").empty();
@@ -1776,7 +1780,9 @@
                                     tag_total += `<td>`;
                                     tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                                     tag_total += "</td>";
-                                    tag_total += `<td colspan="2">`;
+                                    tag_total += `<td>`;
+                                    tag_total += "</td>";
+                                    tag_total += `<td>`;
                                     tag_total += "</td>";
                                     tag_total += "</tr>";
                                     
@@ -1899,7 +1905,9 @@
                                     tag_total += `<td>`;
                                     tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                                     tag_total += "</td>";
-                                    tag_total += `<td colspan="2">`;
+                                    tag_total += `<td>`;
+                                    tag_total += "</td>";
+                                    tag_total += `<td>`;
                                     tag_total += "</td>";
                                     tag_total += "</tr>";
                                     

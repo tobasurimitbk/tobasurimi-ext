@@ -222,6 +222,38 @@ class BeaCukai extends BaseController
                         "status_post" => "WAITING",
                         "status_po" => "LOKAL"
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($item["multiple_po_no"])
+                            {
+                                $no = json_decode($item["multiple_po_no"]);
+                                $list = json_decode($this->request->getPost("multiple_po_no"));
+                                foreach($no as $secondItem)
+                                {
+                                    foreach($list as $thirdItem)
+                                    {
+                                        if($thirdItem === $secondItem)
+                                        {
+                                            $data = [
+                                                "status"            => false,
+                                                "message"    => $thirdItem . " Sudah terdaftar di bea cukai",
+                                                "payload"   => $payload,
+                                                'token' => csrf_hash()
+                                            ];
+                                            echo json_encode($data);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if($po_type === "LOKAL PENOLONG")
@@ -246,6 +278,27 @@ class BeaCukai extends BaseController
                         "status_post" => "WAITING",
                         "status_po" => "LOKAL"
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($item["po_no"] === $this->request->getPost("po_no"))
+                            {
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $item["po_no"] . " Sudah terdaftar di bea cukai",
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+                    }
                 }
 
                 if($po_type === "IMPORT BAKU")
@@ -270,6 +323,38 @@ class BeaCukai extends BaseController
                         "status_post" => "WAITING",
                         "status_po" => "IMPORT"
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($item["multiple_po_no"])
+                            {
+                                $no = json_decode($item["multiple_po_no"]);
+                                $list = json_decode($this->request->getPost("multiple_po_no"));
+                                foreach($no as $secondItem)
+                                {
+                                    foreach($list as $thirdItem)
+                                    {
+                                        if($thirdItem === $secondItem)
+                                        {
+                                            $data = [
+                                                "status"            => false,
+                                                "message"    => $thirdItem . " Sudah terdaftar di bea cukai",
+                                                "payload"   => $payload,
+                                                'token' => csrf_hash()
+                                            ];
+                                            echo json_encode($data);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if($po_type === "IMPORT PENOLONG")
@@ -292,6 +377,27 @@ class BeaCukai extends BaseController
                         "status_post" => "WAITING",
                         "status_po" => "IMPORT"
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($item["po_no"] === $this->request->getPost("po_no"))
+                            {
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $item["po_no"] . " Sudah terdaftar di bea cukai",
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+                    }
                 }
 
                 $items = json_decode($this->request->getPost("items"));
@@ -420,6 +526,9 @@ class BeaCukai extends BaseController
                 $id = $this->request->getPost("id"); 
                 // $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
                 $po_type = $this->request->getPost("po_type");
+
+                $dataBeaCukai = $this->BeaCukaiModel->asObject()->find($id);
+
                 if($po_type === "LOKAL BAKU")
                 {
                     $multiple_po_id = formatter(json_decode($this->request->getPost("multiple_po_id")), "ARR_TO_INT");
@@ -439,6 +548,46 @@ class BeaCukai extends BaseController
                         "ppn" => $this->request->getPost("ppn"),
                         "pph" => $this->request->getPost("pph"),
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($item["multiple_po_no"])
+                            {
+                                $default = json_decode($dataBeaCukai->multiple_po_no);
+                                $no = json_decode($item["multiple_po_no"]);
+                                $list = json_decode($this->request->getPost("multiple_po_no"));
+
+                                foreach($no as $secondItem)
+                                {
+                                    foreach($list as $thirdItem)
+                                    {
+                                        if($thirdItem === $secondItem)
+                                        {
+                                            foreach($default as $fourItem)
+                                            {
+                                                if($thirdItem !== $fourItem)
+                                                {
+                                                    $data = [
+                                                        "status"            => false,
+                                                        "message"    => $thirdItem . " Sudah terdaftar di bea cukai",
+                                                        "payload"   => $payload,
+                                                        'token' => csrf_hash()
+                                                    ];
+                                                    echo json_encode($data);
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if($po_type === "LOKAL PENOLONG")
@@ -460,6 +609,30 @@ class BeaCukai extends BaseController
                         "ppn" => $this->request->getPost("ppn"),
                         "pph" => $this->request->getPost("pph"),
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($dataBeaCukai->po_no !== $item["po_no"])
+                            {
+                                if($item["po_no"] === $this->request->getPost("po_no"))
+                                {
+                                    $data = [
+                                        "status"            => false,
+                                        "message"    => $item["po_no"] . " Sudah terdaftar di bea cukai",
+                                        "payload"   => $payload,
+                                        'token' => csrf_hash()
+                                    ];
+                                    echo json_encode($data);
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if($po_type === "IMPORT BAKU")
@@ -481,6 +654,46 @@ class BeaCukai extends BaseController
                         "ppn" => $this->request->getPost("ppn"),
                         "pph" => $this->request->getPost("pph"),
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($item["multiple_po_no"])
+                            {
+                                $default = json_decode($dataBeaCukai->multiple_po_no);
+                                $no = json_decode($item["multiple_po_no"]);
+                                $list = json_decode($this->request->getPost("multiple_po_no"));
+
+                                foreach($no as $secondItem)
+                                {
+                                    foreach($list as $thirdItem)
+                                    {
+                                        if($thirdItem === $secondItem)
+                                        {
+                                            foreach($default as $fourItem)
+                                            {
+                                                if($thirdItem !== $fourItem)
+                                                {
+                                                    $data = [
+                                                        "status"            => false,
+                                                        "message"    => $thirdItem . " Sudah terdaftar di bea cukai",
+                                                        "payload"   => $payload,
+                                                        'token' => csrf_hash()
+                                                    ];
+                                                    echo json_encode($data);
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if($po_type === "IMPORT PENOLONG")
@@ -500,6 +713,30 @@ class BeaCukai extends BaseController
                         "ppn" => $this->request->getPost("ppn"),
                         "pph" => $this->request->getPost("pph"),
                     ];
+
+                    // validate already exist
+                    $check = $this->BeaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $item)
+                        {
+                            if($dataBeaCukai->po_no !== $item["po_no"])
+                            {
+                                if($item["po_no"] === $this->request->getPost("po_no"))
+                                {
+                                    $data = [
+                                        "status"            => false,
+                                        "message"    => $item["po_no"] . " Sudah terdaftar di bea cukai",
+                                        "payload"   => $payload,
+                                        'token' => csrf_hash()
+                                    ];
+                                    echo json_encode($data);
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 $items = json_decode($this->request->getPost("items"));
