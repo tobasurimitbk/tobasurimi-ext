@@ -17,6 +17,7 @@ use App\Models\StockDetailModel;
 use App\Models\WarehousesModel;
 use App\Models\SatuansModel;
 use App\Models\TaxModel;
+use App\Models\BeaCukaiModel;
 
 use Dompdf\Dompdf;
 
@@ -37,6 +38,7 @@ class PenerimaanBarangImport extends BaseController
     protected $warehousesModel;
     protected $satuanModel;
     protected $taxModel;
+    protected $beaCukaiModel;
 
     protected $dompdf;
     
@@ -58,6 +60,7 @@ class PenerimaanBarangImport extends BaseController
         $this->warehousesModel = new WarehousesModel();
         $this->satuanModel = new SatuansModel();
         $this->taxModel = new TaxModel();
+        $this->beaCukaiModel = new BeaCukaiModel();
 
         $this->dompdf = new Dompdf();
     }
@@ -187,6 +190,7 @@ class PenerimaanBarangImport extends BaseController
             "sorttype" => $this->request->getGet("sortType"),
             "statuspenerimaan" => "IMPORT",
             "status" => $this->request->getGet("status"),
+            "status_bc" => $this->request->getGet("status_bc"),
             "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -214,6 +218,69 @@ class PenerimaanBarangImport extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($penerimaanBarangData['data'] as $data) {
+            $multiple_po_no = json_decode($data->multiple_po_no);
+            $status_bc = "WAITING";
+            foreach($multiple_po_no as $item)
+            {
+                if($data->tipe_bahan === "PENOLONG")
+                {
+                    $check = $this->beaCukaiModel->checkPostingBeaCukaiByPOId($item, $this->this_company_id);
+
+                    if($check)
+                    {
+                        foreach($check as $secondItem)
+                        {
+                            if($secondItem["tipe_bahan"] === "PENOLONG")
+                            {
+                                if($secondItem["po_no"] === $item)
+                                {
+                                    $status_bc = "FINISH";
+                                }
+                            }
+                        }
+                    }
+                }
+                if($data->tipe_bahan === "BAKU")
+                {
+                    $check = $this->beaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+
+                    if($check)
+                    {
+                        $condition = false;
+                        $conditionSecond = [];
+                        foreach($check as $secondItem)
+                        {
+                            if($secondItem["tipe_bahan"] === "BAKU")
+                            {
+                                $no_multi = json_decode($secondItem["multiple_po_no"]);
+                                
+                                if(in_array($item, $no_multi))
+                                {
+                                    array_push($conditionSecond, true);
+                                }
+                                else
+                                {
+                                    array_push($conditionSecond, false);
+                                }
+                            }
+                        }
+
+                        if(sizeof($conditionSecond) !== 0)
+                        {
+                            if(!in_array(false, $conditionSecond))
+                            {
+                                $condition = true;
+                            }
+                        }
+
+                        if($condition)
+                        {
+                            $status_bc = "FINISH";
+                        }
+                    }
+                }
+            }
+
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
@@ -224,8 +291,39 @@ class PenerimaanBarangImport extends BaseController
                 // "validation_date"       => $data->validation_date ? date("d/m/Y", strtotime($data->validation_date)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
+                "multiple_po_no"        => json_decode($data->multiple_po_no),
                 "status_post"           => $data->status_post,
+                "status_bc"             => $status_bc
             ]);
+        }
+
+        // filter status bc
+        if($this->request->getGet("status_bc") === "waiting")
+        {
+            $newDataPenerimaanBarang = [];
+            foreach($dataPenerimaanBarang as $item)
+            {
+                if($item["status_bc"] === "WAITING")
+                {
+                    array_push($newDataPenerimaanBarang, $item);
+                }
+            }  
+            $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
+            $dataPenerimaanBarang = $newDataPenerimaanBarang;
+        }
+
+        if($this->request->getGet("status_bc") === "finish")
+        {
+            $newDataPenerimaanBarang = [];
+            foreach($dataPenerimaanBarang as $item)
+            {
+                if($item["status_bc"] === "FINISH")
+                {
+                    array_push($newDataPenerimaanBarang, $item);
+                }
+            }  
+            $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
+            $dataPenerimaanBarang = $newDataPenerimaanBarang;
         }
 
         $data = [

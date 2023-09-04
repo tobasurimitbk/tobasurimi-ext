@@ -39,8 +39,14 @@
             </div>
             <div class="col">
                 <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                    <option value="waiting">WAITING</option>
-                    <option value="finish">FINISH</option>
+                    <option value="waiting">STATUS LPB:WAITING</option>
+                    <option value="finish">STATUS LPB:FINISH</option>
+                </select>
+            </div>
+            <div class="col">
+                <select class="form-select status_bc" name="status_bc" id="status_bc" aria-label="Floating label select example">
+                    <option value="waiting">STATUS BC:WAITING</option>
+                    <option value="finish">STATUS BC:FINISH</option>
                 </select>
             </div>
             <div class="col">
@@ -55,9 +61,11 @@
                             <th>No.</th>
                             <th onclick="changeSort('tipe_bahan')" class="sort">Jenis PO</th>
                             <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
+                            <th>No. PO</th>
                             <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                             <th onclick="changeSort('createdAt')" class="sort">Tanggal</th>
                             <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
+                            <th>Status BC</th>
                             <th>Jumlah Item</th>
                             <th>Actions</th>
                         </tr>
@@ -97,6 +105,7 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
+                data.status_bc = $(".status_bc").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -124,6 +133,12 @@
             className: "text-center"
         },
         {
+            data: "multiple_po_no",
+            className: "text-center",
+            searchable: false,
+            sortable: false
+        },
+        {
             data: "warehouse_name",
             className: "text-center"
         },
@@ -134,6 +149,12 @@
         {
             data: "supplier_name",
             className: "text-center"
+        },
+        {
+            data: "status_bc",
+            className: "text-center",
+            searchable: false,
+            sortable: false
         },
         {
             data: "itemCount",
@@ -219,7 +240,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .status").change(function () {
+        $(".dateStart, .dateEnd, .status, .status_bc").change(function () {
             table.ajax.reload();
         })
 

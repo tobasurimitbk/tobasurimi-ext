@@ -143,6 +143,23 @@ class BeaCukaiModel extends Model
         return $query->getResultArray();
     }
 
+    public function checkPostingBeaCukaiByPOId($id, $company_id)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'company_id' => $company_id,
+            'po_id' => $id,
+            'status_post' => 'FINISH'
+        ];
+
+        $builder = $this->db->table('bea_cukai')
+        ->select('bea_cukai.*');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
     public function get_no($tgl, $bln, $thn, $thn2, $last_day)
     {
         $lastStr =  $tgl . $bln . $thn;

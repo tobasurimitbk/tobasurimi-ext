@@ -106,7 +106,7 @@ class PenerimaanBarangModel extends Model
         }
 
         if ($addCondition['search']) {
-            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan', $addCondition['search']);
+            $penerimaanBarangDataQry->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search']);
         }
 
         if ($addCondition['status']) {
