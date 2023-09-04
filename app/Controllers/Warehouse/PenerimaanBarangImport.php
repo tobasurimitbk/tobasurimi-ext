@@ -220,6 +220,9 @@ class PenerimaanBarangImport extends BaseController
         foreach ($penerimaanBarangData['data'] as $data) {
             $multiple_po_no = json_decode($data->multiple_po_no);
             $status_bc = "WAITING";
+            $condition = false;
+            $conditionSecond = [];
+
             foreach($multiple_po_no as $item)
             {
                 if($data->tipe_bahan === "PENOLONG")
@@ -234,10 +237,18 @@ class PenerimaanBarangImport extends BaseController
                             {
                                 if($secondItem["po_no"] === $item)
                                 {
-                                    $status_bc = "FINISH";
+                                    array_push($conditionSecond, true);
+                                }
+                                else
+                                {
+                                    array_push($conditionSecond, false);
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+                        array_push($conditionSecond, false);
                     }
                 }
                 if($data->tipe_bahan === "BAKU")
@@ -246,8 +257,6 @@ class PenerimaanBarangImport extends BaseController
 
                     if($check)
                     {
-                        $condition = false;
-                        $conditionSecond = [];
                         foreach($check as $secondItem)
                         {
                             if($secondItem["tipe_bahan"] === "BAKU")
@@ -264,21 +273,25 @@ class PenerimaanBarangImport extends BaseController
                                 }
                             }
                         }
-
-                        if(sizeof($conditionSecond) !== 0)
-                        {
-                            if(!in_array(false, $conditionSecond))
-                            {
-                                $condition = true;
-                            }
-                        }
-
-                        if($condition)
-                        {
-                            $status_bc = "FINISH";
-                        }
+                    }
+                    else
+                    {
+                        array_push($conditionSecond, false);
                     }
                 }
+            }
+
+            if(sizeof($conditionSecond) !== 0)
+            {
+                if(!in_array(false, $conditionSecond))
+                {
+                    $condition = true;
+                }
+            }
+
+            if($condition)
+            {
+                $status_bc = "FINISH";
             }
 
             array_push($dataPenerimaanBarang, [
