@@ -52,7 +52,7 @@ class SalesOrderDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getItemListByIds(array|int $ids): array
+    public function getItemListByIds($ids): array
     {
         if (!is_array($ids)) $ids = [$ids];
 
