@@ -374,54 +374,12 @@ class PenerimaanBarangImport extends BaseController
                         'required' => 'Warehouse tidak boleh kosong'
                     ]
                 ],
-                // "aju_document_type" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Jenis Dokumen tidak boleh kosong'
-                //     ]
-                // ],
                 "tipe_bahan" => [
                     "rules" => "required",
                     'errors' => [
                         'required' => 'Tipe Bahan tidak boleh kosong'
                     ]
-                ],
-                // "aju_no" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'No. AJU tidak boleh kosong'
-                //     ]
-                // ],
-                // "validation_date" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Tanggal Pendaftaran tidak boleh kosong'
-                //     ]
-                // ],
-                // "no_registration" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'No. Pendaftaran tidak boleh kosong'
-                //     ]
-                // ],
-                // "invoice_no" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'No. Invoice tidak boleh kosong'
-                //     ]
-                // ],
-                // "total_weight" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Berat tidak boleh kosong'
-                //     ]
-                // ],
-                // "biaya_masuk" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Biaya Masuk tidak boleh kosong'
-                //     ]
-                // ]
+                ]
             ];
 
             if (!$this->validate($rules)) {
@@ -451,20 +409,6 @@ class PenerimaanBarangImport extends BaseController
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
                     "tipe_bahan" => $tipe_bahan,
-                    // "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
-                    // "aju_no" => $this->request->getPost("aju_no"),
-                    // "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
-                    // "no_registration" => $this->request->getPost("no_registration"),
-                    // "letter_no" => "",
-                    // "invoice_no" => $this->request->getPost("invoice_no"),
-                    // "total_weight" => $this->request->getPost("total_weight"),
-                    // "shipping_cost" => $this->request->getPost("shipping_cost") ? formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT") : 0,
-                    // "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
-                    // "ppnbm" => 0,
-                    // "ppn" => $this->request->getPost("ppn"),
-                    // "pph" => $this->request->getPost("pph"),
-                    // "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "STR_TO_FLOAT"),
-                    // "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "STR_TO_FLOAT"),
                     "status_post" => "WAITING",
                     "status_penerimaan" => "IMPORT",
                 ];
@@ -491,7 +435,6 @@ class PenerimaanBarangImport extends BaseController
                             'unit' => $data->unit,
                             'nama_barang_dok' => $data->nama_barang_dok,
                             'jml_masuk' => $data->jml_masuk,
-
                             'packaging' => $data->packaging,
                             'packaging_qty' => $data->packaging_qty
                         ];
@@ -566,54 +509,12 @@ class PenerimaanBarangImport extends BaseController
                         'required' => 'Warehouse tidak boleh kosong'
                     ]
                 ],
-                // "aju_document_type" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Jenis Dokumen tidak boleh kosong'
-                //     ]
-                // ],
                 "tipe_bahan" => [
                     "rules" => "required",
                     'errors' => [
                         'required' => 'Tipe Bahan tidak boleh kosong'
                     ]
-                ],
-                // "aju_no" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'No. AJU tidak boleh kosong'
-                //     ]
-                // ],
-                // "validation_date" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Tanggal Pendaftaran tidak boleh kosong'
-                //     ]
-                // ],
-                // "no_registration" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'No. Pendaftaran tidak boleh kosong'
-                //     ]
-                // ],
-                // "invoice_no" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'No. Invoice tidak boleh kosong'
-                //     ]
-                // ],
-                // "total_weight" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Berat tidak boleh kosong'
-                //     ]
-                // ],
-                // "biaya_masuk" => [
-                //     "rules" => "required",
-                //     'errors' => [
-                //         'required' => 'Biaya Masuk tidak boleh kosong'
-                //     ]
-                // ]
+                ]
             ];
 
             if (!$this->validate($rules)) {
@@ -642,23 +543,7 @@ class PenerimaanBarangImport extends BaseController
                     "acceptance_type" => $this->request->getPost("acceptance_type"),
                     "multiple_po_id" => json_encode($multiple_po_id),
                     "multiple_po_no" => $this->request->getPost("multiple_po_no"),
-                    "tipe_bahan" => $tipe_bahan,
-                    // "aju_document_type" => formatter($this->request->getPost("aju_document_type"), "STR_TO_INT"),
-                    // "aju_no" => $this->request->getPost("aju_no"),
-                    // "validation_date" => $this->request->getPost("validation_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("validation_date")))) : "",
-                    // "no_registration" => $this->request->getPost("no_registration"),
-                    // "letter_no" => "",
-                    // "invoice_no" => $this->request->getPost("invoice_no"),
-                    // "total_weight" => $this->request->getPost("total_weight"),
-                    // "shipping_cost" => $this->request->getPost("shipping_cost") ? formatter($this->request->getPost("shipping_cost"), "CURR_TO_INT") : 0,
-                    // "biaya_masuk" => formatter($this->request->getPost("biaya_masuk"), "CURR_TO_INT"),
-                    // "ppnbm" => 0,
-                    // "ppn" => $this->request->getPost("ppn"),
-                    // "pph" => $this->request->getPost("pph"),
-                    // "nilai_ppn" => formatter($this->request->getPost("nilai_ppn"), "STR_TO_FLOAT"),
-                    // "nilai_pph" => formatter($this->request->getPost("nilai_pph"), "STR_TO_FLOAT"),
-                    "status_post" => "WAITING",
-                    "status_penerimaan" => "IMPORT",
+                    "tipe_bahan" => $tipe_bahan
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
@@ -687,7 +572,6 @@ class PenerimaanBarangImport extends BaseController
                             'unit' => $data->unit,
                             'nama_barang_dok' => $data->nama_barang_dok,
                             'jml_masuk' => $data->jml_masuk,
-
                             'packaging' => $data->packaging,
                             'packaging_qty' => $data->packaging_qty
                         ];
