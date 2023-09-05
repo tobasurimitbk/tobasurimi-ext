@@ -267,10 +267,6 @@ class PenerimaanBarangImport extends BaseController
                                 {
                                     array_push($conditionSecond, true);
                                 }
-                                else
-                                {
-                                    array_push($conditionSecond, false);
-                                }
                             }
                         }
                     }
