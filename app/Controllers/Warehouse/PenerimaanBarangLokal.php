@@ -213,19 +213,22 @@ class PenerimaanBarangLokal extends BaseController
 
                     if($check)
                     {
+                        $arr = [];
                         foreach($check as $secondItem)
                         {
                             if($secondItem["tipe_bahan"] === "PENOLONG")
                             {
-                                if($secondItem["po_no"] === $item)
-                                {
-                                    array_push($conditionSecond, true);
-                                }
-                                else
-                                {
-                                    array_push($conditionSecond, false);
-                                }
+                                array_push($arr, $secondItem["po_no"]);
                             }
+                        }
+
+                        if(str_contains(implode($arr), $item))
+                        {
+                            array_push($conditionSecond, true);
+                        }
+                        else
+                        {
+                            array_push($conditionSecond, false);
                         }
                     }
                     else
@@ -239,17 +242,22 @@ class PenerimaanBarangLokal extends BaseController
 
                     if($check)
                     {
+                        $arr = [];
                         foreach($check as $secondItem)
                         {
                             if($secondItem["tipe_bahan"] === "BAKU")
                             {
-                                $no_multi = json_decode($secondItem["multiple_po_no"]);
-                                
-                                if(in_array($item, $no_multi))
-                                {
-                                    array_push($conditionSecond, true);
-                                }
+                                array_push($arr, implode(json_decode($secondItem["multiple_po_no"])));
                             }
+                        }
+
+                        if(str_contains(implode($arr), $item))
+                        {
+                            array_push($conditionSecond, true);
+                        }
+                        else
+                        {
+                            array_push($conditionSecond, false);
                         }
                     }
                     else
