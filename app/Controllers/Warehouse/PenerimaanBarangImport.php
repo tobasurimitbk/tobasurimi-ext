@@ -240,7 +240,7 @@ class PenerimaanBarangImport extends BaseController
                             }
                         }
 
-                        if(str_contains(implode($arr), $item))
+                        if(strpos(implode($arr), $item))
                         {
                             array_push($conditionSecond, true);
                         }
@@ -269,7 +269,7 @@ class PenerimaanBarangImport extends BaseController
                             }
                         }
 
-                        if(str_contains(implode($arr), $item))
+                        if(strpos(implode($arr), $item))
                         {
                             array_push($conditionSecond, true);
                         }
