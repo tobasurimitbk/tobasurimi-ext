@@ -7,6 +7,7 @@ use App\Models\CustomerModel;
 use App\Models\MetadataModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SalesOrderModel;
+use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
 use App\Models\AllNoModel;
 use Config\Services;
@@ -17,23 +18,28 @@ class Invoice extends BaseController
     protected $token;
     protected $this_company_id;
     protected $CustomerModel;
+    private $userId;
     protected $encrypter;
     protected $MetadataModel;
     protected $SalesOrderInvoiceModel;
     protected $AllNoModel;
     protected $SalesOrderModel;
+    protected $SalesOrderDetailModel;
     protected $SuratJalanModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->userId = session()->get("login")->user_id;
+
         $this->encrypter = Services::encrypter();
         $this->CustomerModel = new CustomerModel();
         $this->MetadataModel = new MetadataModel();
         $this->SalesOrderInvoiceModel = new SalesOrderInvoiceModel();
         $this->AllNoModel   = new AllNoModel();
         $this->SalesOrderModel = new SalesOrderModel();
+        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->SuratJalanModel = new SuratJalanModel();
     }
 
@@ -64,11 +70,11 @@ class Invoice extends BaseController
         $offset = $currentPage - 1;
 
         $payload = [
-            "pageSize" => $pageSize,
-            "currentPage" => $currentPage,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
+            "pageSize"      => $pageSize,
+            "currentPage"   => $currentPage,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
         ];
 
         $condition = ['sales_order_invoice.deletedAt' => null, 'sales_order_invoice.tipe_invoice' => 'LOKAL'];
@@ -88,13 +94,16 @@ class Invoice extends BaseController
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             array_push($dataAllSalesOrderInvoice, [
-                "no"            => $no++,
-                "id"            => $data->id,
-                "no_faktur"      => $data->no_faktur,
-                "total_invoice"      => number_format(floatval($data->total_invoice)),
-                "kode_pelanggan"        => $data->kode_pelanggan,
+                "no"                => $no++,
+                "id"                => $data->id,
+                "no_faktur"         => $data->no_faktur,
+                "tanggal_faktur"    => $data->tanggal_faktur,
+                "document_type"     => $data->document_type,
+                "document_no"       => $data->document_no,
+                "total_invoice"     => number_format(floatval($data->total_invoice)),
+                "kode_pelanggan"    => $data->kode_pelanggan,
                 "keterangan"        => $data->keterangan,
-                "nama_pelanggan" => $data->nama_pelanggan,
+                "nama_pelanggan"    => $data->nama_pelanggan,
             ]);
         }
 
@@ -116,86 +125,68 @@ class Invoice extends BaseController
         $payload =  $this->request->getVar();
         //echo json_encode($payload);
         //return;
-        $validate = $this->validate([
-            "id_user" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'User tidak boleh kosong',
-                ]
-            ],
-            "id_customer" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'Customer tidak boleh kosong',
-                ]
-            ],
-            "id_surat_jalan" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'surat jalan tidak boleh kosong',
-                ]
-            ],
-
-            "tipe_invoice" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'tanggal pemesanan ID tidak boleh kosong',
-                ]
-            ],
+        $rules = [
             "tanggal_faktur" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'tanggal pengiriman tidak boleh kosong',
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
+                    'required' => 'Tanggal Faktur tidak boleh kosong',
                 ]
             ],
-            "no_surat_jalan" => [
+            "doc_type" => [
+                "rules" => "required|in_list[pesanan,pengiriman]",
+                'errors' => [
+                    'required' => 'Jenis dokumen tidak boleh kosong',
+                ]
+            ],
+            "doc_id" => [
                 "rules" => "required",
                 'errors' => [
-                    'required' => 'no surat jalan tidak boleh kosong',
+                    'required' => 'Nomor Dokumen tidak boleh kosong',
                 ]
             ],
             "terms" => [
                 "rules" => "required",
                 'errors' => [
-                    'required' => 'terms tidak boleh kosong',
+                    'required' => 'Term tidak boleh kosong',
                 ]
             ],
-            "total_invoice" => [
+            "ship_via" => [
                 "rules" => "required",
                 'errors' => [
-                    'required' => 'total harga tidak boleh kosong',
+                    'required' => 'Ship via tidak boleh kosong',
                 ]
             ],
-            "ppn" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'ppn tidak boleh kosong',
-                ],
-            ],
-            "dpp" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'dpp tidak boleh kosong',
-                ],
-            ],
+            "keterangan" => [
+                "rules" => "permit_empty",
+                'errors' => [
+                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ]
+        ];
 
-
-        ]);
-        if (!$validate) {
-            //$error = validation_errors();
-            //echo json_encode($error);
-            //throw new ErrorException(json_encode($error));
-            //return;
-            return redirect()->to('/invoice-penjualan-lokal/create')->back()->withInput();
+        if (!$this->validate($rules)) {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
         }
+
         try {
+
+            $postData = $this->request->getPost();
+            $documentData = null;
+
+            if ($postData['doc_type'] === 'pesanan') {
+                $documentData = $this->SalesOrderModel->asObject()
+                    ->find($postData['doc_id']);
+            } else {
+                $documentData = $this->SuratJalanModel->asObject()
+                    ->find($postData['doc_id']);
+            }
 
             $code = "LKL/INV";
             $currentYear = date('Y');
@@ -204,34 +195,34 @@ class Invoice extends BaseController
             $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
             $noFaktur = $code . $number . "/" . $currentYear . "/" . $currentMonth;
 
-
             $values = [
-                "id_user" => $this->request->getPost('id_user'),
-                "id_customer" => $this->request->getPost('id_customer'),
-                "id_surat_jalan" => $this->request->getPost('id_surat_jalan'),
-                "no_surat_jalan" => $this->request->getPost('no_surat_jalan'),
-                "no_faktur" => $noFaktur,
-                "tanggal_faktur" => $this->request->getPost('tanggal_faktur'),
-                "terms" => $this->request->getPost('terms'),
-                "ship_via_id" => $this->request->getPost('ship_via'),
-                "keterangan" => $this->request->getPost('keterangan'),
-                "dpp" => $this->request->getPost('dpp'),
-                "ppn" => $this->request->getPost('ppn'),
-                "total_invoice" => $this->request->getPost('total_invoice'),
-                "termasuk_pa" => $this->request->getPost('include_pa') ? 'true' : 'false',
-                "status_tax" => $this->request->getPost('tax_status') ? 'true' : 'false',
-                "tipe_invoice" => $this->request->getPost('tipe_invoice'),
-                "status_pelunasan" => 'UNPAID',
-
+                "id_user"           => $this->userId,
+                "document_type"     => $postData['doc_type'],
+                "document_id"       => $postData['doc_id'],
+                "id_customer"       => $documentData->id_customer,
+                // "id_surat_jalan"    => $postData['id_surat_jalan'],
+                // "no_surat_jalan"    => $postData['no_surat_jalan'],
+                "no_faktur"         => $noFaktur,
+                "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-',$postData['tanggal_faktur']))),
+                "terms"             => $postData['terms'],
+                "ship_via_id"       => $postData['ship_via'],
+                "keterangan"        => $postData['keterangan'],
+                // "dpp"               => $postData['dpp'],
+                // "ppn"               => $postData['ppn'],
+                // "total_invoice"     => $postData['total_invoice'],
+                // "termasuk_pa"       => $this->request->getPost('include_pa') ? 'true' : 'false',
+                // "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
+                "tipe_invoice"      => 'LOKAL',
+                "status_pelunasan"  => 'UNPAID',
             ];
 
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->insert($values);
             $data = [
-                "id" => $dataSalesOrderInvoice,
-                "status"            => true,
+                "id"        => $dataSalesOrderInvoice,
+                "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 "payload"   => $values,
-                'token' => csrf_hash(),
+                'token'     => csrf_hash(),
             ];
             echo json_encode($data);
             return;
@@ -247,7 +238,7 @@ class Invoice extends BaseController
         };
     }
 
-    public function dataSuratJalanDetail($id_surat_jalan)
+    private function dataSuratJalanDetail($id_surat_jalan)
     {
         $data = $this->SuratJalanModel
             ->asObject()
@@ -274,7 +265,7 @@ class Invoice extends BaseController
         ];
         return $allData;
     }
-    public function dropDownSuratJalan($id_customer)
+    private function dropDownSuratJalan($id_customer)
     {
         $data = $this->SuratJalanModel
             ->asObject()
@@ -291,26 +282,27 @@ class Invoice extends BaseController
     {
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
-        $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->select(['id', 'name'])->findAll();
-        $dataSalesInvoiceOrder->tanggal_faktur = date("d-m-Y", strtotime($dataSalesInvoiceOrder->tanggal_faktur));
-        $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
-        $detailSoBarang = $this->dataSuratJalanDetail($dataSalesInvoiceOrder->id_surat_jalan);
-        $dataSalesInvoiceOrder->detail = $detailSoBarang['detail_barang'];
-        $dataSo = $detailSoBarang['detail_so'];
-        $dataSuratJalan = $this->dropDownSuratJalan($dataSalesInvoiceOrder->id_customer);
 
+        $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type);
+        
+        $tipeShipping = $this->MetadataModel->asObject()
+            ->select(['id', 'value'])
+            ->where('name', 'tipe_shipping_via')
+            ->findAll();
+        
+        $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
+        // dd($documentData);
         $data = [
-            "data" => $dataSalesInvoiceOrder,
-            "dataCustomers" => $customers,
-            "id_user" => $dataSalesInvoiceOrder->id_user,
-            "seller_name" => $dataSalesInvoiceOrder->seller_name,
-            "via" => $tipeShipping,
-            'dataSuratJalan' => $dataSuratJalan,
-            'dataSo' => $dataSo
+            "data"          => $dataSalesInvoiceOrder,
+            "documentList"  => $documentList,
+            "documentData"  => $documentData,
+            "id_user"       => $dataSalesInvoiceOrder->id_user,
+            "seller_name"   => $dataSalesInvoiceOrder->seller_name,
+            "via"           => $tipeShipping,
+            // 'dataSuratJalan'=> $dataSuratJalan,
+            // 'dataSo'        => $dataSo
 
-        ];
-        //echo json_encode($data);
-
+        ];//dd($data);
         return view('SalesLokal/Invoice/form', $data);
     }
 
@@ -478,5 +470,100 @@ class Invoice extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function getDocNumber($documentType)
+    {
+        $documentList = $this->getDocNumberList($documentType);
+
+        echo json_encode(['data' => $documentList]);
+    }
+
+    public function getDocData($docType, $docId)
+    {
+        $data = $this->getDocDataaaa($docType, $docId);
+        echo json_encode($data);
+    }
+
+    public function getItemList($id)
+    {
+        $invData = $this->SalesOrderInvoiceModel->asObject()
+            ->find($id);
+
+        $documentData = $this->getDocDataaaa($invData->document_type, $invData->document_id);
+        echo json_encode($documentData);
+    }
+
+    private function getDocNumberList(string $documentType): array
+    {
+        $documentList = [];
+
+        if ($documentType === 'pesanan') {
+            $documentList = $this->SalesOrderModel->asObject()
+                ->select('id, no_sales_order AS doc_no')
+                ->findAll();
+        } else { // pengiriman
+            $documentList = $this->SuratJalanModel->asObject()
+                ->select('id, no_surat_jalan AS doc_no')
+                ->findAll();
+        }
+
+        return $documentList;
+    }
+
+    private function getDocDataaaa(string $docType, int $docId): object
+    {
+        $soId = 0;
+        $customerName = '';
+        $customerAddress = '';
+        $salesName = '';
+        $taxStatus = false;
+        $includeTax = false;
+        $itemList = [];
+
+        if ($docType == 'pesanan') {
+            $soId = $docId;
+            $soData = $this->SalesOrderModel->asObject()
+                ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress')
+                ->join('customers', 'customers.id = sales_order.id_customer')
+                ->find($docId);
+            
+            $customerName = $soData->customerName;
+            $customerAddress = $soData->customerAddress;
+            $taxStatus = filter_var($soData->tax_status, FILTER_VALIDATE_BOOLEAN);
+            $includeTax = filter_var($soData->include_pa, FILTER_VALIDATE_BOOLEAN);
+        } else {
+            $suratJalanData = $this->SuratJalanModel->asObject()
+                ->find($docId);
+
+            $soId = json_decode($suratJalanData->multiple_id_so);
+        }
+
+        $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
+
+        $dpp = 0;
+        $taxAmt = 0;
+
+        foreach ($itemList as $item) {
+            $hargaBarang = str_replace(',', '', $item->harga_barang);
+            $qty = str_replace(',', '', $item->qty);
+
+            $itemTotal = $hargaBarang * $qty;
+
+            $dpp += $itemTotal;
+            $taxAmt += $itemTotal * ($item->tax / 100);
+        }
+
+        $data = (object)[
+            'customerName'      => $customerName,
+            'customerAddress'   => $customerAddress,
+            'taxStatus'         => $taxStatus,
+            'includeTax'        => $includeTax,
+            'itemList'          => $itemList,
+            'dpp'               => number_format($dpp),
+            'tax'               => number_format($taxAmt),
+            'total'             => number_format($dpp + $taxAmt)
+        ];
+        return $data;
     }
 }

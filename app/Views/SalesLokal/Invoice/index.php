@@ -18,11 +18,11 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th onclick="changeSort('no')" class="sort">No.</th>
-                                <th onclick="changeSort('kode_pelanggan')" class="sort">Kode Pelanggan</th>
-                                <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Pelanggan</th>
-                                <th onclick="changeSort('no_faktur')" class="sort">No Faktur</th>
-                                <th onclick="changeSort('total_invoice')" class="sort">Total Invoice</th>
-                                <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
+                                <th onclick="changeSort('kode_pelanggan')" class="sort">Nomor Invoice</th>
+                                <th onclick="changeSort('nama_pelanggan')" class="sort">Tanggal Invoice</th>
+                                <th onclick="changeSort('no_faktur')" class="sort">Nama Customer</th>
+                                <th onclick="changeSort('total_invoice')" class="sort">Jenis Dokumen</th>
+                                <th onclick="changeSort('keterangan')" class="sort">No Dokumen</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -90,36 +90,44 @@
         //responsive: true,
         display: "stripe",
         searching: false,
-        columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        }, {
-            data: "kode_pelanggan",
-            className: "text-center"
-        }, {
-            data: "nama_pelanggan",
-            className: "text-center"
-        }, {
-            data: "no_faktur",
-            className: "text-center"
-        }, {
-            data: "total_invoice",
-            className: "text-center"
-        }, {
-            data: "keterangan",
-            className: "text-center"
-        }, {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
-                `
+        columns: [
+            {
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, 
+            {
+                data: "no_faktur",
+                className: "text-center"
+            }, 
+            {
+                data: "tanggal_faktur",
+                className: "text-center"
+            }, 
+            {
+                data: "nama_pelanggan",
+                className: "text-center"
+            }, 
+            {
+                data: "document_type",
+                className: "text-center"
+            }, 
+            {
+                data: "document_no",
+                className: "text-center"
+            }, 
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                    `
+                }
             }
-        }],
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"

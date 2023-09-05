@@ -118,10 +118,10 @@ class Retur extends BaseController
                     'required' => 'Customer tidak boleh kosong',
                 ]
             ],
-            "id_so" => [
+            "id_inv" => [
                 "rules" => "required|numeric",
                 "errors" => [
-                    "required" => 'Sales Order tidak boleh kosong!'
+                    "required" => 'Invoice tidak boleh kosong!'
                 ]
             ],
             "return_date" => [
@@ -188,12 +188,12 @@ class Retur extends BaseController
         try {
 
             $values = [
-                "return_no"     => $noReturn,
-                "return_date"   => date("Y-m-d", strtotime(str_replace("/", "-", $returnDate))),
-                "customer_id"   => $postData['id_customer'],
-                "sales_order_id"=> $postData['id_so'],
-                "note"          => $postData['note'],
-                "returned_item" => json_encode($returnedItem)
+                "return_no"             => $noReturn,
+                "return_date"           => date("Y-m-d", strtotime(str_replace("/", "-", $returnDate))),
+                "customer_id"           => $postData['id_customer'],
+                "sales_order_inv_id"    => $postData['id_so'],
+                "note"                  => $postData['note'],
+                "returned_item"         => json_encode($returnedItem)
             ];
             $id =  $this->soReturnModel->insert($values);
 

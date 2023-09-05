@@ -17,7 +17,7 @@ class SalesOrderReturnModel extends Model
     protected $allowedFields    = [
         'return_no',
         'customer_id',
-        'sales_order_id',
+        'sales_order_inv_id',
         'return_date',
         'note',
         'returned_item'

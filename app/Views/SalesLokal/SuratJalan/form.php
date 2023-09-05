@@ -91,34 +91,34 @@
                 </div>
 
                 <!-- list barang -->
-            <div class="col-subtitle-modal">
-                <div class="row mt-3">
-                    <div class="col-md-12">
-                        <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No.</th>
-                                <th>Kode Barang</th>
-                                <th>Nama Barang</th>
-                                <th>Qty</th>
-                                <th>Satuan</th>
-                                <th>Harga Satuan</th>
-                                <th>Discount (%)</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                        </tbody>
-                    </table>
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Kode Barang</th>
+                                    <th>Nama Barang</th>
+                                    <th>Qty</th>
+                                    <th>Satuan</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Discount (%)</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
             </div>
         </form>
     </div>

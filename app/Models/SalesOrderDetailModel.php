@@ -62,6 +62,7 @@ class SalesOrderDetailModel extends Model
                       sales_order_detail.qty AS qty,
                       satuans.kode_satuan AS satuan,
                       sales_order_detail.discount_percentage AS disc,
+                      sales_order_detail.tax AS tax,
                       sales_order_detail.amount AS amount";
 
         $datas = $this->asObject()

@@ -22,6 +22,8 @@ class SalesOrderInvoiceModel extends Model
     protected $allowedFields = [
         'id_user',
         'id_po',
+        'document_type',
+        'document_id',
         'id_customer',
         'id_surat_jalan',
         'no_surat_jalan',
@@ -80,15 +82,21 @@ class SalesOrderInvoiceModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'sales_order_invoice.updatedAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_order_invoice.*,customers.name as nama_pelanggan,customers.kode as kode_pelanggan";
+        $selectQry = "sales_order_invoice.*,
+                      DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+                      customers.name AS nama_pelanggan,
+                      customers.kode AS kode_pelanggan,
+                      IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no";
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
+            ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
-        $totalData = $salesOrderInvoiceLokal->where('tipe_invoice', 'LOKAL');
+        $totalData = $salesOrderInvoiceLokal->countAllResults(false);
 
         if ($addCondition['search']) {
             $salesOrderInvoiceLokal->groupStart();
@@ -115,7 +123,10 @@ class SalesOrderInvoiceModel extends Model
     }
     public function getSalesOrderInvoiceLokalById($id)
     {
-        $selectQry = "sales_order_invoice.*,users.name as seller_name,customers.name as customer_name ";
+        $selectQry = "sales_order_invoice.*,
+                      DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+                      users.name AS seller_name,
+                      customers.name AS customer_name ";
 
         $dataSalesOrderInvoice = $this->asObject()
             ->join('users', 'users.id = sales_order_invoice.id_user')

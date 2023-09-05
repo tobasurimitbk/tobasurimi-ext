@@ -56,7 +56,7 @@ $routes->get('/customer/id/(:segment)', 'Master\Customer::getByIdCustomer/$1', [
 $routes->post('/customer/save', 'Master\Customer::saveCustomer', ['filter' => 'Auth']);
 $routes->post('/customer/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
-$routes->get('/customer/getLocalSOList/(:num)', 'Master\Customer::getLocalSOList/$1', ['filter' => 'Auth']);
+$routes->get('/customer/getLocalInvoiceList/(:num)', 'Master\Customer::getLocalInvoiceList/$1', ['filter' => 'Auth']);
 
 // WAREHOUSE
 $routes->get('/warehouse', 'Master\Warehouse::warehouse', ['filter' => 'Auth']);
@@ -332,6 +332,9 @@ $routes->get('/invoice-penjualan-lokal/all', 'SalesLokal\Invoice::all', ['filter
 $routes->post('/invoice-penjualan-lokal/save', 'SalesLokal\Invoice::save', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/update', 'SalesLokal\Invoice::update', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/getDocNumber/(:alpha)', 'SalesLokal\Invoice::getDocNumber/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/getDocumentData/(:alpha)/(:num)', 'SalesLokal\Invoice::getDocData/$1/$2', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/getItemList/(:num)', 'SalesLokal\Invoice::getItemList/$1', ['filter' => 'Auth']);
 
 // Surat Jalan
 $routes->get('/surat-jalan', 'SalesLokal\SuratJalan::index', ['filter' => 'Auth']);

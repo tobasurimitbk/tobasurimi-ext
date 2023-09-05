@@ -9,6 +9,7 @@ use App\Models\CustomerModel;
 use App\Models\BanksModel;
 use App\Models\ListAddressesModel;
 use App\models\SalesOrderModel;
+use App\models\SalesOrderInvoiceModel;
 
 class Customer extends BaseController
 {
@@ -19,6 +20,7 @@ class Customer extends BaseController
     protected $BanksModel;
     protected $ListAddressesModel;
     protected $SalesOrderModel;
+    private $soInvModel;
 
     public function __construct()
     {
@@ -29,6 +31,7 @@ class Customer extends BaseController
         $this->BanksModel = new BanksModel();
         $this->ListAddressesModel = new ListAddressesModel();
         $this->SalesOrderModel = new SalesOrderModel();
+        $this->soInvModel = new SalesOrderInvoiceModel();
     }
 
     public function customer()
@@ -412,12 +415,17 @@ class Customer extends BaseController
         return;
     }
 
-    public function getLocalSOList($id)
+    public function getLocalInvoiceList($id)
     {
-        $soList = $this->SalesOrderModel
-            ->select('id, no_sales_order')
+        // $soList = $this->SalesOrderModel
+        //     ->select('id, no_sales_order')
+        //     ->where('id_customer', $id)
+        //     ->where('tipe_sales_order', 'LOKAL')
+        //     ->findAll();
+
+        $invList = $this->soInvModel->select("id, no_faktur")
             ->where('id_customer', $id)
-            ->where('tipe_sales_order', 'LOKAL')
+            ->where('tipe_invoice', 'LOKAL')
             ->findAll();
 
         $customerData = $this->CustomerModel->asObject()
@@ -425,7 +433,7 @@ class Customer extends BaseController
             ->find($id);
 
         $data = [
-            'SOList' => $soList,
+            'invList' => $invList,
             'address'=> $customerData->address
         ];
         echo json_encode($data);

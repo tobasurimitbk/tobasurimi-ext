@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" disabled="true" value="<?= !empty($data) ? $data->tanggal_faktur : ""; ?>" placeholder="Tanggal Faktur"></input>
+                            <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" value="<?= $data->tanggal_faktur ?? ""; ?>" placeholder="Tanggal Faktur"></input>
                             <label for="floatingInput">Tanggal Faktur</label>
                         </div>
                     </div>
@@ -39,222 +39,153 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select" name="doc_type" id="doc_type">
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataCustomers)) {
-                                    foreach ($dataCustomers as $customer) {
-                                ?>
-                                        <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->id_customer === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                <option value="pesanan" <?= ($data->document_type ?? '') == 'pesanan' ? 'selected' : '' ?>>Pesanan</option>
+                                <option value="pengiriman" <?= ($data->document_type ?? '') == 'pengiriman' ? 'selected' : '' ?>>Pengiriman</option>
                             </select>
+                            <label for="floatingInput">Jenis Dokumen</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select" name="doc_id" id="doc_id">
+                                <option value=""></option>
+                                <?php foreach ($documentList as $document): ?>
+                                <option value="<?= $document->id ?>" <?= $data->document_id == $document->id ? 'selected' : '' ?>><?= $document->doc_no ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Nomor Dokumen</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="text" class="form-control" id="customerName" value="<?= $documentData->customerName ?? '' ?>" disabled>
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="hidden" class="form-control id_user" id="id_user" name="id_user" value="<?= $id_user ?>">
-                                    <input autocomplete="one-time-code" type="text" class="form-control user" id="user" name="user" disabled="true" placeholder="penjual" value="<?= $seller_name  ?>">
-                                    <label for="floatingInput">Penjual</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3" style="height: 50px;">
-                                            <label for="floatingInput">Pajak</label>
-                                            <div class="switch-form-pinjaman-karyawan">
-                                                <label class="switch">
-                                                    <input autocomplete="one-time-code" class="tax_status" <?= !empty($data) ? ($data->status_tax === true ? 'disabled=true' : '') : ''; ?> name="tax_status" id="tax_status" type="checkbox" <?= !empty($data) ? ($data->status_tax == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->status_tax == 'true' ? 'true' : 'false') : 'false'; ?>">
-                                                    <span class="slider round"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3" style="height: 50px;">
-                                            <label for="floatingInput">Include pa</label>
-                                            <div class="switch-form-pinjaman-karyawan">
-                                                <label class="switch">
-                                                    <input autocomplete="one-time-code" class="include_pa" <?= !empty($data) ? ($data->termasuk_pa === true ? 'disabled=true' : '') : 'disabled=true'; ?> name="include_pa" id="include_pa" type="checkbox" <?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'checked' : '') : ''; ?> value="<?= !empty($data) ? ($data->termasuk_pa == 'true' ? 'true' : 'false') : 'false'; ?>">
-                                                    <span class="slider round"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_surat_jalan" name="id_surat_jalan" id="id_surat_jalan" <?= !empty($data) ? ($data->id_surat_jalan === true ? 'disabled=true' : '') : ''; ?>>
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataSuratJalan)) {
-                                    foreach ($dataSuratJalan as $surat) {
-                                ?>
-                                        <option value="<?= $surat->id; ?>" <?= !empty($data) ? ($data->id_surat_jalan === $surat->id ? "selected" : "") : ""; ?>><?= $surat->no_surat_jalan; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Surat Jalan</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating ff-so mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so[]" id="id_so[]" disabled="true" multiple>
-                                <option value=""></option>
-                                <?php
-                                if (!empty($dataSo)) {
-                                    foreach ($dataSo as $so) {
-                                ?>
-                                        <option value="<?= $so['id']; ?>" selected><?= $so['no_so']; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">SO</label>
+                            <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>" disabled>
+                            <label for="floatingInput">Tagihan Ke</label>
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via_id === true ? 'disabled=true' : '') : ''; ?>>
-                                <option value=""></option>
-                                <?php
-                                if (!empty($via)) {
-                                    foreach ($via as $payload) {
-                                ?>
-                                        <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via_id) ? ($payload->id === $data->ship_via_id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <label for="floatingInput">Pengiriman via</label>
+                            <input type="text" class="form-control" id="salesName" value="<?= $documentData->salesName ?? '' ?>" disabled>
+                            <label for="floatingInput">Nama Sales</label>
                         </div>
                     </div>
-
-                    <div class="col-md-6">
-                        <div class="form-floating ff-ket mb-3" style="height: 50px;">
-                            <textarea autocomplete="one-time-code" <?= !empty($data->keterangan) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="Keterangan" name="Keterangan" placeholder="Keterangan"><?= !empty($data->keterangan) ? $data->keterangan : ""; ?></textarea>
-                            <label for="floatingInput">Keterangan</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="hidden" class="form-control dpp" id="dpp" name="dpp" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->dpp)  : ""; ?>">
-                            <input autocomplete="one-time-code" type="hidden" class="form-control ppn" id="ppn" name="ppn" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->ppn) : ""; ?>">
-                            <input autocomplete="one-time-code" type="number" class="form-control total_invoice" id="total_invoice" name="total_invoice" disabled="true" placeholder="Total Invoice" value="<?= !empty($data) ? floatval($data->total_invoice) : ""; ?>">
-                            <label for="floatingInput">Total Invoice</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control terms" id="terms" name="terms" <?= !empty($data) ? ($data->terms === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->terms : ""; ?>" placeholder="terms">
+                            <input type="text" class="form-control" id="terms" name="terms" value="<?= $data->terms ?? '' ?>">
                             <label for="floatingInput">Terms</label>
                         </div>
                     </div>
-
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select ship_via" name="ship_via" id="ship_via" <?= !empty($data) ? ($data->ship_via_id === true ? 'disabled=true' : '') : ''; ?>>
+                                <option value=""></option>
+                                <?php foreach ($via as $payload): ?>
+                                <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via_id) ? ($payload->id === $data->ship_via_id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Ship Via (Opsional)</label>
+                        </div>
+                    </div>
                 </div>
-        </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating ff-ket mb-3" style="height: 70px;">
+                            <textarea autocomplete="one-time-code" style="height: 100%;" <?= !empty($data->keterangan) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control Keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= $data->keterangan ?? ""; ?></textarea>
+                            <label for="floatingInput">Keterangan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="mb-3" style="height: 50px;">
+                                    <label for="floatingInput">Pajak</label>
+                                    <div class="switch-form-pinjaman-karyawan">
+                                        <label class="switch">
+                                            <input autocomplete="one-time-code" class="tax_status" disabled name="tax_status" id="tax_status" type="checkbox" <?= ($documentData->taxStatus ?? false) ? 'checked' : ''; ?>>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-3" style="height: 50px;">
+                                    <label for="floatingInput">Include Pajak</label>
+                                    <div class="switch-form-pinjaman-karyawan">
+                                        <label class="switch">
+                                            <input autocomplete="one-time-code" class="include_tax" disabled name="include_tax" id="include_tax" type="checkbox" <?= ($documentData->includeTax ?? false) ? 'checked' : ''; ?>>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- list barang -->
+                <div class="col-subtitle-modal">
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Kode Barang</th>
+                                    <th>Nama Barang</th>
+                                    <th>Qty</th>
+                                    <th>Satuan</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Discount (%)</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-borderless" width="100%" cellspacing="0">
+                            <tr>
+                                <td class="font-weight-bold">DPP</td>
+                                <td class="font-weight-bold text-right">Rp. <span id="itemSubTotal">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>PPn (11%)</td>
+                                <td class="text-right">Rp. <span id="taxTotal">0</span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-bold" style="border-top: 1px solid #929292">Total Invoice <span>(Termasuk Pajak)</span></td>
+                                <td style="border-top: 1px solid #929292" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </form>
 
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-detail-barang" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th>Nama Barang</th>
-                            <th>Qty</th>
-                            <th>satuan</th>
-                            <th>Harga Barang</th>
-                            <th>Disc %</th>
-                            <th>Total Harga</th>
-                            <th>dept</th>
-                            <th>Gudang</th>
-                            <th>Keterangan</th>
-                            <th>No So</th>
-                            <th>No Surat Jalan</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-                        <?php
-                        $no = 1;
-                        $total_harga_barang = 0;
-                        $total_qty = 0;
-                        $total_harga = 0;
-
-                        if (!empty($data)) {
-                            foreach ($data->detail as $d) {
-                                $total_harga_barang = $total_harga_barang + formatter(str_replace(",", "", $d['harga_barang']), "STR_TO_INT");
-                                $total_qty = $total_qty + $d['qty'];
-                                $total_harga = $total_harga + formatter(str_replace(",", "", $d['amount']), "STR_TO_INT");
-                        ?>
-                                <tr>
-                                    <td><?= $no ?></td>
-                                    <td><?= $d['nama_barang'] ?></td>
-                                    <td><?= $d['qty'] ?></td>
-                                    <td><?= $d['kode_satuan'] ?></td>
-                                    <td><?= number_format($d['harga_barang']) ?></td>
-                                    <td><?= $d['discount_percentage'] ?></td>
-                                    <td><?= number_format($d['amount']) ?></td>
-                                    <td><?= $d['dept'] ?></td>
-                                    <td><?= $d['warehouse_name'] ?></td>
-                                    <td><?= $d['keterangan'] ?></td>
-                                    <td><?= $d['no_so'] ?></td>
-                                    <td><?= $d['no_surat_jalan'] ?></td>
-                                </tr>
-
-                        <?php
-                                $no++;
-                            }
-                        } ?>
-                    </tbody>
-                    <tfoot class="foot-detail-table" id="foot-detail-table">
-                        <tr>
-                            <td colspan="5"></td>
-                            <td><b>DPP</b></td>
-                            <td><b><?= number_format($data->dpp ?? 0)  ?></b></td>
-                            <td colspan="5"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"></td>
-                            <td><b>PPN</b></td>
-                            <td><b><?= number_format($data->ppn ?? 0) ?></b></td>
-                            <td colspan="5"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"></td>
-                            <td><b>Total Invoice</b></td>
-                            <td><b><?= number_format($data->total_invoice ?? 0) ?></b></td>
-                            <td colspan="5"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
     </div>
     </div>
 </section>
@@ -267,18 +198,95 @@
 
     // Format the date to your desired representation
     // var formattedDate = currentDate.toLocaleString().slice(0, 9); // You can use other formatting methods if needed
-    var formattedDateFront = moment(currentDate).format("DD/MM/YYYY")
+    // var formattedDateFront = moment(currentDate).format("DD/MM/YYYY")
     var tanggalFaktur = moment(currentDate).format("YYYY-MM-DD")
     // Display the date on the webpage
     $(document).ready(function() {
 
-        $(".tanggal_faktur").val(formattedDateFront);
+        const table = $('.dataTable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+            processing: true,
+            info: false,
+            paging: false,
+            fixedHeader: true,
+            display: "stripe",
+            searching: false,
+            ordering: false,
+            columns: [{
+                data: "no",
+                className: "text-center",
+            },
+            {
+                data: "kode_barang",
+                className: "text-center"
+            }, 
+            {
+                data: "nama_barang",
+                className: "text-center"
+            },
+            {
+                data: "qty",
+                className: "text-center"
+            },
+            {
+                data: "satuan",
+                className: "text-center"
+            },
+            {
+                data: "harga_barang",
+                className: "text-center"
+            },
+            {
+                data: "disc",
+                className: "text-center"
+            },
+            {
+                data: "amount",
+                className: "text-center"
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        // $(".tanggal_faktur").val(formattedDateFront);
 
         // via
-        $('.ship_via').select2({
+        $('.ship_via, #doc_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
-        })
+        });
+
+        $('#doc_type').select2({
+            minimumResultsForSearch: -1,
+            placeholder: "",
+            theme: "bootstrap-5"
+        }).change(function() {
+
+            // clear datatable here
+
+            getDocumentList(this.value);
+        });
+
+        $("#doc_id").change(function() {
+            getDocumentData(this.value);
+        });
+
+        $("#tanggal_faktur").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        });
 
         //CSS SELECT2 FLOATING LABEL
         $('.ship_via')
@@ -296,7 +304,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ship_via')
+        $('.ship_via, #doc_type, #doc_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -381,7 +389,59 @@
             .find('label')
             .css('z-index', '1');
 
+        function getDocumentList(docType) {
+            table.clear();
+            
+            $.ajax({
+                url: `<?= base_url('/invoice-penjualan-lokal/getDocNumber/'); ?>${docType}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $("#doc_id").empty();
+                    $("#doc_id").append(`<option value=""></option>`);
 
+                    res.data.forEach(function(item) {
+                        console.log('hah')
+                        $("#doc_id").append(`<option  value="${item.id}">${item.doc_no}</option>`);
+                    })
+                }
+            });
+        }
+
+        function getDocumentData(docId) {
+            const docType = $('#doc_type').val();
+
+            table.clear();
+
+            $.ajax({
+                url: `<?= base_url('/invoice-penjualan-lokal/getDocumentData/'); ?>${docType}/${docId}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    $('#customerName').val(res.customerName);
+                    $('#customerAddress').val(res.customerAddress);
+                    $('#salesName').val();
+                    $('#tax_status').prop('checked', res.taxStatus);
+                    $('#include_tax').prop('checked', res.includeTax)
+
+                    // add datatable data here
+                    table.rows.add(res.itemList).draw(false);
+
+                    // add total here
+                    $('#itemSubTotal').html(res.dpp);
+                    $('#taxTotal').html(res.tax);
+                    $('#grandTotal').html(res.total);
+                }
+            });
+        }
+
+        <?php if (!empty($documentData)): ?>
+        const itemList = <?= json_encode($documentData->itemList) ?>;
+        table.rows.add(itemList).draw(false);
+        $('#itemSubTotal').html('<?= $documentData->dpp ?>');
+        $('#taxTotal').html('<?= $documentData->tax ?>');
+        $('#grandTotal').html('<?= $documentData->total ?>');
+        <?php endif; ?>
     })
 
     var validator = $(".create-form").validate({
@@ -447,7 +507,7 @@
         },
     });
 
-    $(".id_customer").change(function() {
+    /* $(".id_customer").change(function() {
         const id = $(".id_customer").val()
         if (id) {
             $.ajax({
@@ -472,8 +532,9 @@
                 }
             })
         }
-    })
-    $(".id_surat_jalan").change(function() {
+    }) */
+
+    /* $(".id_surat_jalan").change(function() {
         const id = $(".id_surat_jalan").val()
         if (id) {
             $.ajax({
@@ -557,211 +618,7 @@
                 }
             })
         }
-    })
-
-    $('.tax_status').change(function() {
-        let dataDpp = parseFloat($("#dpp").val())
-        let dataPPn = parseFloat($("#ppn").val())
-        let dataHargaInvoice = parseFloat($("#total_invoice").val())
-        let includePa = $('.include_pa').val() === 'true'
-
-        if ($('.tax_status').val() === 'false') {
-            $('.tax_status').val('true')
-            $('.include_pa').prop("disabled", false)
-
-            if (dataHargaInvoice && includePa) {
-                dataPPn = dataHargaInvoice * 11 / 100
-                dataDpp = dataHargaInvoice - dataPPn
-                dataHargaInvoice = dataHargaInvoice
-                $(".foot-detail-table").empty()
-                let tag_total =
-                    `
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>DPP</b></td>
-                                <td><b>${dataDpp.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>PPN</b></td>
-                                <td><b>${dataPPn.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>Total Invoice</b></td>
-                                <td><b>${dataHargaInvoice.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            `
-                $(".foot-detail-table").append(tag_total);
-            } else if (dataHargaInvoice && !includePa) {
-                dataPPn = dataHargaInvoice * 11 / 100
-                dataDpp = dataHargaInvoice
-                dataHargaInvoice = dataHargaInvoice + dataPPn
-                $(".foot-detail-table").empty()
-                let tag_total =
-                    `
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>DPP</b></td>
-                                <td><b>${dataDpp.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>PPN</b></td>
-                                <td><b>${dataPPn.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>Total Invoice</b></td>
-                                <td><b>${dataHargaInvoice.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            `
-                $(".foot-detail-table").append(tag_total);
-            }
-
-
-        } else {
-            $('.tax_status').val('false')
-            $(".foot-detail-table").empty()
-            $('.include_pa').prop("disabled", true)
-
-
-            if (dataHargaInvoice && includePa) {
-                dataPPn = 0
-                dataDpp = dataHargaInvoice
-                $(".foot-detail-table").empty()
-                let tag_total =
-                    `
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>DPP</b></td>
-                                <td><b>${dataDpp.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>PPN</b></td>
-                                <td><b>${dataPPn.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>Total Invoice</b></td>
-                                <td><b>${dataHargaInvoice.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            `
-                $(".foot-detail-table").append(tag_total);
-            } else if (dataHargaInvoice && !includePa) {
-                dataPPn = 0
-                dataHargaInvoice = dataDpp
-                $(".foot-detail-table").empty()
-                let tag_total =
-                    `
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>DPP</b></td>
-                                <td><b>${dataDpp.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>PPN</b></td>
-                                <td><b>${dataPPn.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>Total Invoice</b></td>
-                                <td><b>${dataHargaInvoice.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            `
-                $(".foot-detail-table").append(tag_total);
-            }
-        }
-
-        $("#dpp").val(dataDpp)
-        $("#ppn").val(dataPPn)
-        $("#total_invoice").val(dataHargaInvoice)
-    })
-
-    $('.include_pa').change(function() {
-        let dataDpp = parseFloat($("#dpp").val())
-        let dataPPn = parseFloat($("#ppn").val())
-        let dataHargaInvoice = parseFloat($("#total_invoice").val())
-        let statusTax = $('.tax_status').val() === 'true'
-
-
-        if ($('.include_pa').val() === 'false') {
-            $('.include_pa').val('true')
-            if (statusTax && dataHargaInvoice) {
-                dataHargaInvoice = dataDpp
-                dataDpp = dataHargaInvoice - dataPPn
-                $(".foot-detail-table").empty()
-                let tag_total =
-                    `
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>DPP</b></td>
-                                <td><b>${dataDpp.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>PPN</b></td>
-                                <td><b>${dataPPn.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>Total Invoice</b></td>
-                                <td><b>${dataHargaInvoice.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            `
-                $(".foot-detail-table").append(tag_total);
-            }
-        } else {
-            $('.include_pa').val('false')
-            if (statusTax && dataHargaInvoice) {
-                dataDpp = dataHargaInvoice
-                dataHargaInvoice = dataHargaInvoice + dataPPn
-                $(".foot-detail-table").empty()
-                let tag_total =
-                    `
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>DPP</b></td>
-                                <td><b>${dataDpp.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>PPN</b></td>
-                                <td><b>${dataPPn.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="5"></td>
-                                <td><b>Total Invoice</b></td>
-                                <td><b>${dataHargaInvoice.toLocaleString()}</b></td>
-                                <td colspan="5"></td>
-                            </tr>
-                            `
-                $(".foot-detail-table").append(tag_total);
-            }
-        }
-        $("#dpp").val(dataDpp)
-        $("#ppn").val(dataPPn)
-        $("#total_invoice").val(dataHargaInvoice)
-    })
+    }) */
 
     $(".btn-submit").click(function() {
         if ($(".create-form").valid()) {
@@ -791,7 +648,7 @@
                     data.append("dpp", dpp)
                     data.append("no_surat_jalan", noSuratJalan)
                     if (!id) {
-                        data.append("tanggal_faktur", tanggalFaktur)
+                        // data.append("tanggal_faktur", tanggalFaktur)
                     }
 
                     // UPDATE

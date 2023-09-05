@@ -59,7 +59,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_so" name="id_so" id="id_so" <?= !empty($data) ? ($data->sales_order_id === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_inv" name="id_inv" id="id_inv" <?= !empty($data) ? ($data->sales_order_id === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php if (!empty($salesOrderData)): ?>
                                 <option value="<?= $salesOrderData->id ?>" selected><?= $salesOrderData->no_sales_order ?></option>
@@ -231,21 +231,21 @@
             .find('label')
             .css('z-index', '1');
 
-        // SO
-        $('.id_so').select2({
+        // INV
+        $('.id_inv').select2({
             placeholder: "",
             theme: "bootstrap-5"
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_so')
+        $('.id_inv')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_so')
+        $('.id_inv')
             .parent('div')
             .children('span')
             .children('span')
@@ -253,12 +253,12 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_so')
+        $('.id_inv')
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
-        $('.id_so')
+        $('.id_inv')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -274,39 +274,39 @@
             if ($(".id_customer").val()) {
                 const customerId = $(".id_customer").val();
                 $.ajax({
-                    url: `<?= base_url('/customer/getLocalSOList/'); ?>${customerId}`,
+                    url: `<?= base_url('/customer/getLocalInvoiceList/'); ?>${customerId}`,
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".id_so").empty();
-                        $(".id_So").prepend(`<option value=""></option>`);
+                        $(".id_inv").empty();
+                        $(".id_inv").prepend(`<option value=""></option>`);
 
                         $('#customerAddress').val(res.address);
                         
-                        res.SOList.forEach(function(item) {
-                            $(".id_so").append(`<option  value="${item.id}">${item.no_sales_order}</option>`);
+                        res.invList.forEach(function(item) {
+                            $(".id_inv").append(`<option  value="${item.id}">${item.no_faktur}</option>`);
                         });
 
-                        $(".id_so").val('').trigger('select2.change');
+                        $(".id_inv").val('').trigger('select2.change');
                     }
                 })
 
             } else {
                 $(".id_customer").attr("readonly", false)
-                $(".id_so").val("");
+                $(".id_inv").val("");
             }
         });
 
-        $(".id_so").change(function () {
+        $(".id_inv").change(function () {
             const id = $(this).val();
 
             $.ajax({
-                url: `<?= base_url('/order-form-lokal/getItemList/'); ?>${id}`,
+                url: `<?= base_url('/invoice-penjualan-lokal/getItemList/'); ?>${id}`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
-                    $('#tax_status').prop('checked', res.SOData.taxStatus);
-                    $('#include_tax').prop('checked', res.SOData.includeTax);
+                    // $('#tax_status').prop('checked', res.SOData.taxStatus);
+                    // $('#include_tax').prop('checked', res.SOData.includeTax);
 
                     table.clear();
                     table.rows.add(res.itemList).draw(false);
@@ -450,7 +450,7 @@
             id_po: {
                 required: true
             },
-            'id_so[]': {
+            id_inv: {
                 required: true
             },
             no_po: {
@@ -470,7 +470,7 @@
             id_po: {
                 required: "PO wajib diisi"
             },
-            'id_so[]': {
+            id_inv: {
                 required: "SO wajib diisi"
             },
             no_po: {
