@@ -289,6 +289,7 @@ class PenerimaanBarangLokal extends BaseController
         }
 
         // filter status bc
+        $no = 1;
         if($this->request->getGet("status_bc") === "waiting")
         {
             $newDataPenerimaanBarang = [];
@@ -296,7 +297,19 @@ class PenerimaanBarangLokal extends BaseController
             {
                 if($item["status_bc"] === "WAITING")
                 {
-                    array_push($newDataPenerimaanBarang, $item);
+                    array_push($newDataPenerimaanBarang, [
+                        "no"                    => $no++,
+                        "id"                    => $item["id"],
+                        "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
+                        "warehouse_name"        => $item["warehouse_name"],
+                        "tipe_bahan"            => $item["tipe_bahan"],
+                        "createdAt"             => $item["createdAt"],
+                        "supplier_name"         => $item["supplier_name"],
+                        "itemCount"             => $item["itemCount"],
+                        "multiple_po_no"        => $item["multiple_po_no"],
+                        "status_post"           => $item["status_post"],
+                        "status_bc"             => $item["status_bc"]
+                    ]);
                 }
             }  
             $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
@@ -310,7 +323,19 @@ class PenerimaanBarangLokal extends BaseController
             {
                 if($item["status_bc"] === "FINISH")
                 {
-                    array_push($newDataPenerimaanBarang, $item);
+                    array_push($newDataPenerimaanBarang, [
+                        "no"                    => $no++,
+                        "id"                    => $item["id"],
+                        "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
+                        "warehouse_name"        => $item["warehouse_name"],
+                        "tipe_bahan"            => $item["tipe_bahan"],
+                        "createdAt"             => $item["createdAt"],
+                        "supplier_name"         => $item["supplier_name"],
+                        "itemCount"             => $item["itemCount"],
+                        "multiple_po_no"        => $item["multiple_po_no"],
+                        "status_post"           => $item["status_post"],
+                        "status_bc"             => $item["status_bc"]
+                    ]);
                 }
             }  
             $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
