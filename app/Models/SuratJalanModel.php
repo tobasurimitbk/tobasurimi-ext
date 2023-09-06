@@ -20,6 +20,7 @@ class SuratJalanModel extends Model
         'id_customer', 
         'multiple_id_so', 
         'multiple_no_so', 
+        'sales_order_invoice_id',
         'no_po', 
         'shipping_date', 
         'no_surat_jalan', 

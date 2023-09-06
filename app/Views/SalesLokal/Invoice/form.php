@@ -51,7 +51,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select" name="doc_id" id="doc_id">
                                 <option value=""></option>
-                                <?php foreach ($documentList as $document): ?>
+                                <?php foreach ($documentList ?? [] as $document): ?>
                                 <option value="<?= $document->id ?>" <?= $data->document_id == $document->id ? 'selected' : '' ?>><?= $document->doc_no ?></option>
                                 <?php endforeach; ?>
                             </select>

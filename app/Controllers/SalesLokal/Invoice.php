@@ -188,12 +188,16 @@ class Invoice extends BaseController
                     ->find($postData['doc_id']);
             }
 
+            // start transaction
+            $this->SalesOrderInvoiceModel->db->transException(true)->transStart();
+
             $code = "LKL/INV";
             $currentYear = date('Y');
             $currentMonth = date('m');
             $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
             $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
             $noFaktur = $code . $number . "/" . $currentYear . "/" . $currentMonth;
+
 
             $values = [
                 "id_user"           => $this->userId,
@@ -217,6 +221,20 @@ class Invoice extends BaseController
             ];
 
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->insert($values);
+
+            $updateData = [$documentData->id, ['sales_order_invoice_id' => $dataSalesOrderInvoice]];
+            if ($postData['doc_type'] === 'pesanan') {
+                $this->SalesOrderModel->update(...$updateData);
+            } else {
+                /* $soIds = json_decode($documentData->multiple_id_so);
+                $this->SalesOrderModel->whereIn('id', $soIds)
+                    ->set(['sales_order_invoice_id' => $dataSalesOrderInvoice])
+                    ->update(); */
+                $this->SuratJalanModel->update(...$updateData);
+            }
+
+            $this->SalesOrderInvoiceModel->db->transComplete();
+
             $data = [
                 "id"        => $dataSalesOrderInvoice,
                 "status"    => true,
@@ -500,10 +518,13 @@ class Invoice extends BaseController
 
         if ($documentType === 'pesanan') {
             $documentList = $this->SalesOrderModel->asObject()
+                ->where('surat_jalan_so_id', null)
+                ->where('sales_order_invoice_id', null)
                 ->select('id, no_sales_order AS doc_no')
                 ->findAll();
         } else { // pengiriman
             $documentList = $this->SuratJalanModel->asObject()
+                ->where('sales_order_invoice_id', null)
                 ->select('id, no_surat_jalan AS doc_no')
                 ->findAll();
         }

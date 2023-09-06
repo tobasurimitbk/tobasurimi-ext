@@ -18,19 +18,14 @@ class SalesOrderModel extends Model
     protected $useSoftDeletes = true;
     protected $protectedField = true;
 
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
-    }
-
     protected $allowedFields = [
         'id_user',
         'id_po',
         'id_customer',
         'no_sales_order',
         'no_po',
+        'surat_jalan_so_id',
+        'sales_order_invoice_id',
         'destination',
         'due_date',
         'keterangan_dokumen',
@@ -78,6 +73,12 @@ class SalesOrderModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->SalesOrderDetailModel = new SalesOrderDetailModel();
+    }
 
     public function getAllSalesOrderLokal($condition, $addCondition, $limit = 10, $offset = 0)
     {

@@ -195,6 +195,9 @@ class SuratJalan extends BaseController
 
         try {
 
+            // start transaction
+            $this->SuratJalanModel->db->transException(true)->transStart();
+
             $values = [
                 "id_user"       => $this->userId,
                 "id_customer"   => $this->request->getPost('id_customer'),
@@ -206,6 +209,13 @@ class SuratJalan extends BaseController
                 'multiple_no_so'=> json_encode($noArray),
             ];
             $dataSuratJalan =  $this->SuratJalanModel->insert($values);
+
+            $this->SalesOrderModel->whereIn('id', $idArray)
+                ->set(['surat_jalan_so_id' => $dataSuratJalan])
+                ->update();
+
+            // finish transaction
+            $this->SuratJalanModel->db->transComplete();
 
             $data = [
                 "id"        => $dataSuratJalan,
@@ -394,12 +404,16 @@ class SuratJalan extends BaseController
 
     public function dropDownSalesOrder($idCustomer)
     {
-        $data = $this->SalesOrderModel
-            ->asObject()
-            ->where(['id_customer' => $idCustomer, 'tipe_sales_order' => 'LOKAL', 'deletedAt' => null])
+        $condition = [
+            'id_customer'               => $idCustomer, 
+            'tipe_sales_order'          => 'LOKAL',
+            'surat_jalan_so_id'         => null,
+            'sales_order_invoice_id'    => null
+        ];
+        $data = $this->SalesOrderModel->asObject()
+            ->where($condition)
             ->select(['id', 'no_sales_order'])
             ->findAll();
-
 
         echo json_encode($data);
         return;
