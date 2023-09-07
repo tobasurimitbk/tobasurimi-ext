@@ -49,22 +49,16 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataCustomers)) {
-                                    foreach ($dataCustomers as $customer) {
-                                ?>
-                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                <?php foreach ($dataCustomers ?? [] as $customer): ?>
+                                <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
                     <div class="col-md-8">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="destination" name="destination" disabled value="<?= empty($data->destination) ? '' : $data->destination ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" disabled value="<?= empty($data->destination) ? '' : $data->destination ?>">
                             <label for="floatingInput">Tagihan Ke</label>
                         </div>
                     </div>
@@ -400,7 +394,11 @@
         $('.id_customer').select2({
             placeholder: "",
             theme: "bootstrap-5"
-        })
+        }).change(function() {
+            const customerAddress = $(this).find(':selected').data('address');
+            $('#tagihan_ke').val(decodeURIComponent(customerAddress));
+        });
+
         //CSS SELECT2 FLOATING LABEL
         $('.id_customer')
             .parent('div')

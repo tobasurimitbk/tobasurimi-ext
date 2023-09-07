@@ -177,7 +177,7 @@ class Customer extends BaseController
                     ]
                 ], 
                 "email" => [
-                    "rules" => "valid_email",
+                    "rules" => "permit_empty|valid_email",
                     'errors' => [
                         'valid_email' => 'Email harus valid'
                     ]
