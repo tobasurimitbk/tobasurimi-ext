@@ -26,7 +26,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $data->no_sales_order ?? '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" disabled=true value="<?= $data->no_sales_order ?? '' ?>">
                             <label for="floatingInput">No. SO</label>
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $seller_name ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control sales_name" id="sales_name" name="sales_name" disabled=true value="<?= $data->salesName ?? '' ?>">
                             <input autocomplete="one-time-code" type="hidden" class="form-control sales_name" id="id_user" name="id_user" value="<?= $id_user ?>">
                             <label for="floatingInput">Nama Sales</label>
                         </div>
@@ -50,7 +50,7 @@
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer): ?>
-                                <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Customer</label>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-8">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" disabled value="<?= empty($data->destination) ? '' : $data->destination ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" disabled value="<?= $data->address ?? '' ?>">
                             <label for="floatingInput">Tagihan Ke</label>
                         </div>
                     </div>
@@ -396,7 +396,10 @@
             theme: "bootstrap-5"
         }).change(function() {
             const customerAddress = $(this).find(':selected').data('address');
+            const salesName = $(this).find(':selected').data('salesname');
+console.log(salesName)
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
+            $('#sales_name').val(decodeURIComponent(salesName));
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -492,7 +495,7 @@
                     required: true
                 },
                 payment_terms: {
-                    required: true
+                    // required: true
                 },
             },
             messages: {

@@ -58,7 +58,12 @@ class OrderForm extends BaseController
     public function createView()
     {
         //Get Customers
-        $customers = $this->CustomerModel->where('company_id', $this->this_company_id)->findAll();
+        $customers = $this->CustomerModel
+            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->join('employees', 'employees.id = customers.sales_id')
+            ->where('customers.company_id', $this->this_company_id)
+            ->findAll();
+
         $data = [
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
@@ -354,7 +359,11 @@ class OrderForm extends BaseController
             $detail['taxAmt'] = $detail['barangTotal'] * $detail['tax'] / 100;
         }
 
-        $customers = $this->CustomerModel->where('company_id', $this->this_company_id)->findAll();
+        $customers = $this->CustomerModel
+            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->join('employees', 'employees.id = customers.sales_id')
+            ->where('customers.company_id', $this->this_company_id)
+            ->findAll();
 // dd($dataSalesOrder->detail);
         $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
         $dataSalesOrder->shipping_date = $dataSalesOrder->shipping_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->shipping_date)) : "";
@@ -362,7 +371,7 @@ class OrderForm extends BaseController
             "data" => $dataSalesOrder,
             "dataCustomers" => $customers,
             "id_user" => $dataSalesOrder->id_user,
-            "seller_name" => $dataSalesOrder->seller_name,
+            // "seller_name" => $dataSalesOrder->seller_name,
 
         ];
         //echo json_encode($data);

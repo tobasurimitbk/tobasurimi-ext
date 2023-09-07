@@ -418,6 +418,7 @@
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
+                    $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
                     $('#customerAddress').val(res.customerAddress);
                     $('#salesName').val();

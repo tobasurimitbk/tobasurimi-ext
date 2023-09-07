@@ -429,12 +429,14 @@ class Customer extends BaseController
             ->findAll();
 
         $customerData = $this->CustomerModel->asObject()
-            ->select('address')
+            ->select('customers.address, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->join('employees', 'employees.id = customers.sales_id ')
             ->find($id);
 
         $data = [
-            'invList' => $invList,
-            'address' => $customerData->address
+            'invList'   => $invList,
+            'address'   => $customerData->address,
+            'salesName' => $customerData->salesName
         ];
         echo json_encode($data);
     }

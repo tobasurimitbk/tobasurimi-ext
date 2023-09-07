@@ -22,6 +22,7 @@ class SalesOrderModel extends Model
         'id_user',
         'id_po',
         'id_customer',
+        'sales_id',
         'no_sales_order',
         'no_po',
         'surat_jalan_so_id',
@@ -137,11 +138,16 @@ class SalesOrderModel extends Model
 
     public function getSalesOrderLokalById($id)
     {
-        $selectQry = "sales_order.*,users.name as seller_name,customers.name as customer_name ,customers.address,customers.phone";
+        $selectQry = "sales_order.*,
+                      users.name as seller_name,
+                      CONCAT(employees.nip , ' - ', employees.name) AS salesName,
+                      customers.name as customer_name ,
+                      customers.address,customers.phone";
 
         $dataSalesOrder = $this->asObject()
             ->join('users', 'users.id = sales_order.id_user')
             ->join('customers', 'customers.id = sales_order.id_customer ')
+            ->join('employees', 'employees.id = sales_order.sales_id ')
             ->select($selectQry)
             ->find($id);
 

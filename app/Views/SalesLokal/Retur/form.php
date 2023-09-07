@@ -288,6 +288,7 @@
                         });
 
                         $(".id_inv").val('').trigger('select2.change');
+                        $('#nama_sales').val(res.salesName)
                     }
                 })
 

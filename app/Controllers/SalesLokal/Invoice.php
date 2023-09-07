@@ -539,6 +539,7 @@ class Invoice extends BaseController
     private function getDocDataaaa(string $docType, int $docId): object
     {
         $soId = 0;
+        $salesName = '';
         $customerName = '';
         $customerAddress = '';
         $salesName = '';
@@ -549,10 +550,12 @@ class Invoice extends BaseController
         if ($docType == 'pesanan') {
             $soId = $docId;
             $soData = $this->SalesOrderModel->asObject()
-                ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress')
+                ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName')
                 ->join('customers', 'customers.id = sales_order.id_customer')
+                ->join('employees', 'employees.id = sales_order.sales_id')
                 ->find($docId);
             
+            $salesName = $soData->salesName;
             $customerName = $soData->customerName;
             $customerAddress = $soData->customerAddress;
             $taxStatus = filter_var($soData->tax_status, FILTER_VALIDATE_BOOLEAN);
@@ -584,6 +587,7 @@ class Invoice extends BaseController
         }
 
         $data = (object)[
+            'salesName'         => $salesName,
             'customerName'      => $customerName,
             'customerAddress'   => $customerAddress,
             'taxStatus'         => $taxStatus,
