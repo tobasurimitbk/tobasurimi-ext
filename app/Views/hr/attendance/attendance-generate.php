@@ -166,27 +166,27 @@
                                                 <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                                 <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 al ign=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                             <?php else : ?>
-                                                <?php if ($attandance?->status == "ALPHA") : ?>
+                                                <?php if ($attandance->status == "ALPHA") : ?>
                                                     <!-- Employe Tidak Hadir -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ff0000; color:white;'>
                                                     </td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ff0000; color:white;'>
                                                     </td>
-                                                <?php elseif ($attandance?->status == "HADIR") : ?>
+                                                <?php elseif ($attandance->status == "HADIR") : ?>
                                                     <!-- Employe Hadir -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
                                                         <font color="white"><b><?= $attandance->checkin; ?></b></font>
                                                     </td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
-                                                        <font color="white"><b><?= $attandance?->checkout; ?></b></font>
+                                                        <font color="white"><b><?= $attandance->checkout; ?></b></font>
                                                     </td>
                                                 <?php else : ?>
                                                     <!-- Employe Ada Izin -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#d6bc27; color:white;'>
-                                                        <b><?= $attandance?->status ?></b>
+                                                        <b><?= $attandance->status ?></b>
                                                     </td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#d6bc27; color:white;'>
-                                                        <b><?= $attandance?->status ?></b>
+                                                        <b><?= $attandance->status ?></b>
                                                     </td>
                                                 <?php endif; ?>
                                             <?php endif; ?>
