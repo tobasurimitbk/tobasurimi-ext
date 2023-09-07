@@ -242,6 +242,11 @@ class SuratJalan extends BaseController
     public function getById($id = null)
     {
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
+
+        if (empty($dataSuratJalan)) {
+            return view('errors/html/error_404', ['message' => 'Not Found']);
+        }
+
         $customers = $this->CustomerModel->asObject()
             ->where('company_id', $this->this_company_id)
             ->findAll();

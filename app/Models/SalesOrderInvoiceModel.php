@@ -134,8 +134,6 @@ class SalesOrderInvoiceModel extends Model
             ->select($selectQry)
             ->find($id);
 
-
-
         return $dataSalesOrderInvoice;
     }
 }

@@ -65,13 +65,13 @@ class SalesOrderReturnModel extends Model
         $selectQry = "sales_order_returns.id AS id,
                       sales_order_returns.return_no AS returnNo,
                       sales_order_returns.return_date AS returnDate,
-                      sales_order.no_sales_order AS salesOrderNo,
+                      sales_order_invoice.no_faktur AS invNo,
                       customers.name AS customerName";
 
         $soReturn = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = sales_order_returns.customer_id')
-            ->join('sales_order', 'sales_order.id = sales_order_returns.sales_order_id')
+            ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_returns.sales_order_inv_id')
             ->where($condition)
             ->orderBy($sort, $sortType);
 

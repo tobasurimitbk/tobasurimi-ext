@@ -59,10 +59,10 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_inv" name="id_inv" id="id_inv" <?= !empty($data) ? ($data->sales_order_id === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_inv" name="id_inv" id="id_inv" <?= !empty($data) ? ($data->sales_order_inv_id === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
-                                <?php if (!empty($salesOrderData)): ?>
-                                <option value="<?= $salesOrderData->id ?>" selected><?= $salesOrderData->no_sales_order ?></option>
+                                <?php if (!empty($invData)): ?>
+                                <option value="<?= $invData->id ?>" selected><?= $invData->no_faktur ?></option>
                                 <?php endif; ?>
                             </select>
                             <label for="floatingInput">SO</label>
@@ -75,7 +75,7 @@
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" disabled name="tax_status" id="tax_status" type="checkbox" <?= ($salesOrderData->tax_status ?? false) ? 'checked' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="tax_status" disabled name="tax_status" id="tax_status" type="checkbox" <?= ($invData->tax_status ?? false) ? 'checked' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -86,7 +86,7 @@
                                     <label for="floatingInput">Include Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" disabled name="include_tax" id="include_tax" type="checkbox" <?= ($salesOrderData->include_pa ?? false) ? 'checked' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="include_tax" disabled name="include_tax" id="include_tax" type="checkbox" <?= ($invData->include_pa ?? false) ? 'checked' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>

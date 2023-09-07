@@ -114,6 +114,8 @@ class SuratJalanModel extends Model
             ->select($selectQry)
             ->find($id);
 
+        if (empty($dataSuratJalan)) return null; 
+
         $dataMultpleid = json_decode($dataSuratJalan->multiple_id_so);
         $dataMultpleNo = json_decode($dataSuratJalan->multiple_no_so);
 

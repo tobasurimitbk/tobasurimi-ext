@@ -151,6 +151,12 @@ class OrderForm extends BaseController
                     'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
             ],
+            "estimated_freight" => [
+                "rules" => "permit_empty|is_natural",
+                'errors' => [
+                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
             "tax_status" => [
                 "rules" => "permit_empty|in_list[true,false]",
                 'errors' => [

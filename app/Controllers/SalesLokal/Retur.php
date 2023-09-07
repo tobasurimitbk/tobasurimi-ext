@@ -9,6 +9,7 @@ use App\Models\AllNoMOdel;
 use App\Models\CustomerModel;
 use App\Models\SalesOrderModel;
 use App\Models\SalesOrderReturnModel;
+use App\Models\SalesOrderInvoiceModel;
 
 class Retur extends BaseController
 {
@@ -20,6 +21,7 @@ class Retur extends BaseController
     private $customerModel;
     private $soModel;
     private $soReturnModel;
+    private $soInvModel;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class Retur extends BaseController
         $this->customerModel = new CustomerModel();
         $this->soModel = new SalesOrderModel();
         $this->soReturnModel = new SalesOrderReturnModel();
+        $this->soInvModel = new SalesOrderInvoiceModel();
     }
 
     public function index()
@@ -87,7 +90,7 @@ class Retur extends BaseController
                 "id"            => $data->id,
                 "returnNo"      => $data->returnNo,
                 "customerName"  => $data->customerName,
-                "salesOrderNo"  => $data->salesOrderNo,
+                "invNo"         => $data->invNo,
                 "returnDate"    => date("d/m/Y", strtotime($data->returnDate))
             ]);
         }
@@ -233,15 +236,15 @@ class Retur extends BaseController
             ->join('customers', 'customers.id = sales_order_returns.customer_id')
             ->find($id);
 
-        $salesOrderData = $this->soModel->asObject()
-            ->find($returnData->sales_order_id);
+        $invData = $this->soInvModel->asObject()
+            ->find($returnData->sales_order_inv_id);
 
         $returnData->itemList = json_decode($returnData->returned_item);
         
         $data = [
             'data'          => $returnData,
             'dataCustomers' => $customerList,
-            'salesOrderData'=> $salesOrderData
+            'invData'       => $invData
         ];
         return view('SalesLokal/Retur/form', $data);
     }

@@ -19,7 +19,7 @@
                                 <th>No.</th>
                                 <th>Nomor Return</th>
                                 <th>Nama Customer</th>
-                                <th>No. Sales Order</th>
+                                <th>No. Invoice</th>
                                 <th>Tanggal Return</th>
                             </tr>
                         </thead>
@@ -98,7 +98,7 @@
             data: "customerName",
             className: "text-center"
         }, {
-            data: "salesOrderNo",
+            data: "invNo",
             className: "text-center"
         }, {
             data: "returnDate",

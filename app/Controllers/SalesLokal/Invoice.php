@@ -301,6 +301,10 @@ class Invoice extends BaseController
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
 
+        if (empty($dataSalesInvoiceOrder)) {
+            return view('errors/html/error_404', ['message' => 'Not Found']);
+        }
+
         $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type);
         
         $tipeShipping = $this->MetadataModel->asObject()
@@ -555,9 +559,13 @@ class Invoice extends BaseController
             $includeTax = filter_var($soData->include_pa, FILTER_VALIDATE_BOOLEAN);
         } else {
             $suratJalanData = $this->SuratJalanModel->asObject()
+                ->select('surat_jalan_so.*, customers.name AS customerName, customers.address AS customerAddress')
+                ->join('customers', 'customers.id = surat_jalan_so.id_customer')
                 ->find($docId);
 
             $soId = json_decode($suratJalanData->multiple_id_so);
+            $customerName = $suratJalanData->customerName;
+            $customerAddress = $suratJalanData->customerAddress;
         }
 
         $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
