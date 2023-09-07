@@ -42,6 +42,17 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select country_code" name="country_code" id="country_code">
+                            <option value=""></option>
+                            <?php foreach ($country as $c) : ?>
+                                <option value="<?= $c->code; ?>">
+                                    <?= $c->country_name; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Pilih Negara</label>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="row">
@@ -460,7 +471,7 @@
             placeholder: "",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content")
-        })
+        });
 
         //CSS SELECT2 FLOATING LABEL
         $(".province_id")
@@ -853,6 +864,7 @@
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
+                        $(".country_code").val(res?.data?.country_code).change();
 
                         row = res?.data?.list_address.length;
 
@@ -1568,6 +1580,59 @@
             $(".kode").val("");
         }
     }
+
+    // COUNTRY
+    $('.country_code').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    });
+
+    $(".country_code")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $(".country_code")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $(".country_code")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    // DISABLED PROVINSI DAN KABUPATEN JIKA YANG DIPILIH BUKAN INDONESIA
+    $('.country_code').on('change', function() {
+        var codeCountry = $(this).val();
+        if (codeCountry != "ID") {
+            // DISABLED PROVINSI
+            $('.province_parent_id').val("").change();
+            $('.province_parent_id').attr('disabled', true);
+            // DISABLED KABUPATEN
+            $('.city_parent_id').val("").change();
+            $('.city_parent_id').attr('disabled', true);
+        } else {
+            // ENABLED
+            $('.province_parent_id').attr('disabled', false);
+            $('.city_parent_id').attr('disabled', false);
+        }
+    });
+
+    // RESTART SELECT2 KETIKA KLIK TAMBAH BUTTON
+    $('.btn-add').click(function() {
+        $('.country_code').val("").change();
+        $('.ap_id').val(null).trigger("change");
+        $('.ar_id').val(null).trigger("change");
+        $('.province_parent_id').attr('disabled', false);
+        $('.city_parent_id').attr('disabled', false);
+    });
 </script>
 
 

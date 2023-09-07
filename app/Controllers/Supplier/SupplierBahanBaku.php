@@ -3,7 +3,7 @@
 namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
-
+use App\Models\CountryModel;
 use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
 
@@ -21,11 +21,14 @@ class SupplierBahanBaku extends BaseController
     public function supplierBahanBaku()
     {
         $provinceModel = new ProvinceModel();
-        //Get Provinces
+        $countryModel = new CountryModel();
+
         $provinceData = $provinceModel->asObject()->findAll();
+        $countryData = $countryModel->asObject()->findAll();
 
         $data = [
             "dataProvinces" => $provinceData,
+            "country" => $countryData
         ];
 
         return view('Supplier/supplierBahanBaku/index', $data);
@@ -72,13 +75,13 @@ class SupplierBahanBaku extends BaseController
                 "address"       => $data->address,
                 "province_name" => $data->province_name,
                 "city_name"     => $data->city_name,
-                "postal_code"   => $data->postal_code, 
+                "postal_code"   => $data->postal_code,
                 "no_npwp"       => $data->no_npwp,
                 "phone"         => $data->phone,
-                "contact_person"=> $data->contact_person,
+                "contact_person" => $data->contact_person,
                 "email"         => $data->email,
                 "no_rekening"   => $data->no_rekening,
-                "supplier_buyer"=> $data->supplier_buyer,
+                "supplier_buyer" => $data->supplier_buyer,
                 "ap_name"       => $data->ap_name,
                 "ar_name"       => $data->ar_name
             ]);
@@ -99,7 +102,7 @@ class SupplierBahanBaku extends BaseController
 
     public function saveSupplierBahanBaku()
     {
-        try{
+        try {
             $supplierModel = new SupplierModel();
 
             $rules = [
@@ -130,11 +133,8 @@ class SupplierBahanBaku extends BaseController
                 "supplier_buyer" => [
                     "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
                 ],
-                "province_parent_id" => [
-                    "rules" => "permit_empty|is_natural"
-                ],
-                "city_parent_id" => [
-                    "rules" => "permit_empty|is_natural"
+                "country_code" => [
+                    "rules" => "required"
                 ],
                 "postal_code" => [
                     "rules" => "permit_empty|numeric"
@@ -200,7 +200,8 @@ class SupplierBahanBaku extends BaseController
                 "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "kategori"          => "LOKAL",
-                "type"              => "BAHAN BAKU"
+                "type"              => "BAHAN BAKU",
+                "country_code"      => $this->request->getPost("country_code")
             ];
             $insert = $supplierModel->insert($insertData);
 
@@ -214,7 +215,7 @@ class SupplierBahanBaku extends BaseController
                 echo json_encode($data);
                 return;
             }
-                
+
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
@@ -223,9 +224,7 @@ class SupplierBahanBaku extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -238,7 +237,7 @@ class SupplierBahanBaku extends BaseController
 
     public function updateSupplierBahanBaku()
     {
-        try{
+        try {
             $supplierModel = new SupplierModel();
 
             $rules = [
@@ -269,10 +268,7 @@ class SupplierBahanBaku extends BaseController
                 "supplier_buyer" => [
                     "rules" => "required"
                 ],
-                "province_parent_id" => [
-                    "rules" => "required"
-                ],
-                "city_parent_id" => [
+                "country_code" => [
                     "rules" => "required"
                 ],
                 "postal_code" => [
@@ -317,7 +313,8 @@ class SupplierBahanBaku extends BaseController
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "kategori"          => "LOKAL",
-                    "type"              => "BAHAN BAKU"
+                    "type"              => "BAHAN BAKU",
+                    "country_code"      => $this->request->getPost("country_code")
                     // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
                 ];
             }
@@ -334,9 +331,7 @@ class SupplierBahanBaku extends BaseController
                 echo json_encode($data);
                 return;
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -360,7 +355,7 @@ class SupplierBahanBaku extends BaseController
             echo json_encode($data);
             return;
         }
-        
+
         // $response = curl_request("GET", "/suppliers/$id?idCompany=$this->this_company_id", $this->token);
 
         $supplierData->list_address = []; // cek nanti
@@ -369,13 +364,13 @@ class SupplierBahanBaku extends BaseController
             "data"      => $supplierData,
         ];
         echo json_encode($data);
-        
+
         return;
     }
 
     public function deleteSupplierBahanBaku()
     {
-        try{
+        try {
             $supplierModel = new SupplierModel();
             $id = $this->request->getPost("id");
 
@@ -397,9 +392,7 @@ class SupplierBahanBaku extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

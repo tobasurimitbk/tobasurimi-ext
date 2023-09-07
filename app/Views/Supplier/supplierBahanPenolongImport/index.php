@@ -38,6 +38,17 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select class="form-select country_code" name="country_code" id="country_code">
+                            <option value=""></option>
+                            <?php foreach ($country as $c) : ?>
+                                <option value="<?= $c->code; ?>">
+                                    <?= $c->country_name; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Pilih Negara</label>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="row">
@@ -76,7 +87,7 @@
                         </div>
                     </div>
                     <div class="row">
-                     <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
                                 <label for="floatingInput">Nomor NPWP</label>
@@ -152,7 +163,7 @@
                         </div>
                     </div>
                 </div> -->
-                    <!-- <div class="table-responsive mt-2">
+                <!-- <div class="table-responsive mt-2">
                         <table class="table-inside table-bordered nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
@@ -171,9 +182,9 @@
                     </div> -->
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                    <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
+                <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -242,49 +253,49 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1>Supplier Bahan Penolong Import</h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end mb-3">
-            <div class="col-md-2">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+    <div class="section-header">
+        <h1>Supplier Bahan Penolong Import</h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end mb-3">
+                <div class="col-md-2">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th onclick="changeSort('kode')" class="sort">Kode</th>
-                            <th onclick="changeSort('name')" class="sort">Nama</th>
-                            <th onclick="changeSort('address')" class="sort">Alamat</th>
-                            <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
-                            <th onclick="changeSort('city_name')" class="sort">Kota</th>
-                            <th onclick="changeSort('postal_code')" class="sort">Kode Pos</th>
-                            <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
-                            <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
-                            <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
-                            <th onclick="changeSort('email')" class="sort">Email</th>
-                            <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
-                            <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
-                            <th onclick="changeSort('ap_name')" class="sort">AP</th>
-                            <th onclick="changeSort('ar_name')" class="sort">AR</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('kode')" class="sort">Kode</th>
+                                <th onclick="changeSort('name')" class="sort">Nama</th>
+                                <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
+                                <th onclick="changeSort('city_name')" class="sort">Kota</th>
+                                <th onclick="changeSort('postal_code')" class="sort">Kode Pos</th>
+                                <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
+                                <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
+                                <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
+                                <th onclick="changeSort('email')" class="sort">Email</th>
+                                <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
+                                <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
+                                <th onclick="changeSort('ap_name')" class="sort">AP</th>
+                                <th onclick="changeSort('ar_name')" class="sort">AR</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -302,7 +313,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -389,49 +402,49 @@
     });
 
     var validator_detail = $(".detail-form").validate({
-            rules: {
-                detail_address: {
-                    required: true
-                },
-                province_id: {
-                    required: true
-                },
-                city_id: {
-                    required: true
-                }
+        rules: {
+            detail_address: {
+                required: true
             },
-            messages: {
-                detail_address: {
-                    required: "Address wajib diisi"
-                },
-                province_id: {
-                    required: "Province wajib diisi"
-                },
-                city_id: {
-                    required: "City wajib diisi"
-                },
+            province_id: {
+                required: true
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
+            city_id: {
+                required: true
+            }
+        },
+        messages: {
+            detail_address: {
+                required: "Address wajib diisi"
             },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
+            province_id: {
+                required: "Province wajib diisi"
+            },
+            city_id: {
+                required: "City wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
     $(document).ready(function() {
         const select2Prop = {
@@ -440,7 +453,7 @@
                 delay: 300,
                 url: `<?= base_url("sub-account/dropdown"); ?>`,
                 dataType: 'json',
-                data: function (params) {
+                data: function(params) {
                     return {
                         search: params.term,
                         page: params.page || 1
@@ -750,7 +763,7 @@
             $(".title-detail-name").text("Tambah")
             $(".id_detail").val('')
             $(".detail_address").val('')
-            
+
             $(".postal_code").val('')
 
             validator_detail.resetForm();
@@ -870,6 +883,7 @@
                         $(".no_rekening").val(res?.data?.no_rekening);
                         $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
+                        $(".country_code").val(res?.data?.country_code).change();
 
                         row = res?.data?.list_address.length;
 
@@ -910,18 +924,15 @@
                             tag_html += item.postal_code;
                             tag_html += "</td>";
                             tag_html += "<td class='actions'>";
-                            if(item.main_address == 1)
-                            {
+                            if (item.main_address == 1) {
                                 tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${index + 1}">`;
-                            }   
-                            else
-                            {
+                            } else {
                                 tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${index + 1}">`;
-                            } 
+                            }
                             tag_html += "</td>";
                             tag_html += "</tr>";
                         })
-                        
+
                         $(".body-detail-table").append(tag_html)
 
                         validator.resetForm();
@@ -975,7 +986,7 @@
                         $(".ap_id").append($apOption).trigger('change');
                         const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
                         $(".ar_id").append($arOption).trigger('change');
-                        
+
                         $(".add-modal").modal("show");
 
                     } else {
@@ -1254,144 +1265,144 @@
             // }
             // else
             // {
-                if ($(".create-form").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            let data = new FormData(document.querySelector(".create-form"));
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        let data = new FormData(document.querySelector(".create-form"));
 
-                            let update_list_address = [];
-                            // let main_address = document.querySelector('input[name="main"]:checked').value;
+                        let update_list_address = [];
+                        // let main_address = document.querySelector('input[name="main"]:checked').value;
 
-                            // if(list_delete.length !== 0)
-                            // {
-                            //     list_delete.map(obj => {
-                            //         update_list_address.push(
-                            //             {
-                            //                 id: obj.id,
-                            //                 supplier_id: obj.supplier_id,
-                            //                 address: obj.address,
-                            //                 province_id: obj.province_id,
-                            //                 city_id: obj.city_id,
-                            //                 main_address: 0,
-                            //                 isDelete: true
-                            //             }
-                            //         )
-                            //     })
-                            // }
-                            
-                            // list_address.map(obj => {
-                            //     if (main_address == obj.row) {
-                            //         if (obj.id) {
-                            //             update_list_address.push(
-                            //                 {
-                            //                     id: obj.id,
-                            //                     supplier_id: obj.supplier_id,
-                            //                     address: obj.address,
-                            //                     province_id: obj.province_id,
-                            //                     city_id: obj.city_id,
-                            //                     main_address: 1
-                            //                 }
-                            //             )
-                            //         }
-                            //         else
-                            //         {
-                            //             update_list_address.push(
-                            //                 {
-                            //                     address: obj.address,
-                            //                     province_id: obj.province_id,
-                            //                     city_id: obj.city_id,
-                            //                     main_address: 1
-                            //                 }
-                            //             )
-                            //         }
-                            //     }
-                            //     else
-                            //     {
-                            //         if (obj.id) {
-                            //             update_list_address.push(
-                            //                 {
-                            //                     id: obj.id,
-                            //                     supplier_id: obj.supplier_id,
-                            //                     address: obj.address,
-                            //                     province_id: obj.province_id,
-                            //                     city_id: obj.city_id,
-                            //                     main_address: 0
-                            //                 }
-                            //             )
-                            //         }
-                            //         else
-                            //         {
-                            //             update_list_address.push(
-                            //                 {
-                            //                     address: obj.address,
-                            //                     province_id: obj.province_id,
-                            //                     city_id: obj.city_id,
-                            //                     main_address: 0
-                            //                 }
-                            //             )
-                            //         }
-                            //     }
-                            // })
+                        // if(list_delete.length !== 0)
+                        // {
+                        //     list_delete.map(obj => {
+                        //         update_list_address.push(
+                        //             {
+                        //                 id: obj.id,
+                        //                 supplier_id: obj.supplier_id,
+                        //                 address: obj.address,
+                        //                 province_id: obj.province_id,
+                        //                 city_id: obj.city_id,
+                        //                 main_address: 0,
+                        //                 isDelete: true
+                        //             }
+                        //         )
+                        //     })
+                        // }
 
-                            // data.append("list_address", JSON.stringify(update_list_address))
+                        // list_address.map(obj => {
+                        //     if (main_address == obj.row) {
+                        //         if (obj.id) {
+                        //             update_list_address.push(
+                        //                 {
+                        //                     id: obj.id,
+                        //                     supplier_id: obj.supplier_id,
+                        //                     address: obj.address,
+                        //                     province_id: obj.province_id,
+                        //                     city_id: obj.city_id,
+                        //                     main_address: 1
+                        //                 }
+                        //             )
+                        //         }
+                        //         else
+                        //         {
+                        //             update_list_address.push(
+                        //                 {
+                        //                     address: obj.address,
+                        //                     province_id: obj.province_id,
+                        //                     city_id: obj.city_id,
+                        //                     main_address: 1
+                        //                 }
+                        //             )
+                        //         }
+                        //     }
+                        //     else
+                        //     {
+                        //         if (obj.id) {
+                        //             update_list_address.push(
+                        //                 {
+                        //                     id: obj.id,
+                        //                     supplier_id: obj.supplier_id,
+                        //                     address: obj.address,
+                        //                     province_id: obj.province_id,
+                        //                     city_id: obj.city_id,
+                        //                     main_address: 0
+                        //                 }
+                        //             )
+                        //         }
+                        //         else
+                        //         {
+                        //             update_list_address.push(
+                        //                 {
+                        //                     address: obj.address,
+                        //                     province_id: obj.province_id,
+                        //                     city_id: obj.city_id,
+                        //                     main_address: 0
+                        //                 }
+                        //             )
+                        //         }
+                        //     }
+                        // })
 
-                            let id = $(".id").val();
+                        // data.append("list_address", JSON.stringify(update_list_address))
 
-                            $.ajax({
-                                url: id ? "<?= base_url("supplier-bahan-penolong-import/update"); ?>" : "<?= base_url("supplier-bahan-penolong-import/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                $(".add-modal").modal("hide")
-                                                table.ajax.reload()
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
+                        let id = $(".id").val();
+
+                        $.ajax({
+                            url: id ? "<?= base_url("supplier-bahan-penolong-import/update"); ?>" : "<?= base_url("supplier-bahan-penolong-import/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
+                                        .then(() => {
+                                            $(".add-modal").modal("hide")
+                                            table.ajax.reload()
+                                        })
+                                } else {
                                     Swal.fire({
                                         icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
                                     stopLoading()
                                 }
-                            });
-                        }
-                    })
-                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+                })
+            }
             // }
         })
     })
@@ -1570,13 +1581,10 @@
     }
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "asc";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
@@ -1592,6 +1600,59 @@
             $(".kode").val("");
         }
     }
+
+    // COUNTRY
+    $('.country_code').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    });
+
+    $(".country_code")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $(".country_code")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $(".country_code")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    // DISABLED PROVINSI DAN KABUPATEN JIKA YANG DIPILIH BUKAN INDONESIA
+    $('.country_code').on('change', function() {
+        var codeCountry = $(this).val();
+        if (codeCountry != "ID") {
+            // DISABLED PROVINSI
+            $('.province_parent_id').val("").change();
+            $('.province_parent_id').attr('disabled', true);
+            // DISABLED KABUPATEN
+            $('.city_parent_id').val("").change();
+            $('.city_parent_id').attr('disabled', true);
+        } else {
+            // ENABLED
+            $('.province_parent_id').attr('disabled', false);
+            $('.city_parent_id').attr('disabled', false);
+        }
+    });
+
+    // RESTART SELECT2 KETIKA KLIK TAMBAH BUTTON
+    $('.btn-add').click(function() {
+        $('.country_code').val("").change();
+        $('.ap_id').val(null).trigger("change");
+        $('.ar_id').val(null).trigger("change");
+        $('.province_parent_id').attr('disabled', false);
+        $('.city_parent_id').attr('disabled', false);
+    });
 </script>
 
 

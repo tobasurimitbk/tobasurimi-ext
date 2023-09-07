@@ -15,15 +15,15 @@ class SupplierModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'company_id', 
-        'kode', 
-        'name', 
-        'address', 
-        'province_id', 
-        'city_id', 
+        'company_id',
+        'kode',
+        'name',
+        'address',
+        'province_id',
+        'city_id',
         'postal_code',
-        'no_npwp', 
-        'phone', 
+        'no_npwp',
+        'phone',
         'contact_person',
         'email',
         'no_rekening',
@@ -31,7 +31,8 @@ class SupplierModel extends Model
         'type',
         'kategori',
         'ap_id',
-        'ar_id'
+        'ar_id',
+        'country_code'
     ];
 
     // Dates
@@ -100,9 +101,9 @@ class SupplierModel extends Model
             $supplierDataQry->groupStart()
                 ->like('name', $addCondition['search'])
                 ->orLike('kode', $addCondition['search'])
-            ->groupEnd();
+                ->groupEnd();
         }
-        
+
         $totalFilteredData = $supplierDataQry->countAllResults(false);
         $data = $supplierDataQry->findAll($limit, $offset);
 
@@ -136,17 +137,17 @@ class SupplierModel extends Model
         $builder = $this->db->table('suppliers');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getResultArray();
     }
 
     public function generateSupplierCode(): string
-    {   
+    {
         $month = idate('m');
         $year = date('y');
         $romanMonth = romanMonthNumber($month);
         $numberTemplate = "/SUP/$romanMonth/$year";
-        
+
         $lastData = $this->asObject()
             ->like('kode', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
