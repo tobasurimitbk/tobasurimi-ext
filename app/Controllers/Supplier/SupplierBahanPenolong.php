@@ -3,7 +3,7 @@
 namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
-
+use App\Models\CountryModel;
 use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
 
@@ -21,11 +21,14 @@ class SupplierBahanPenolong extends BaseController
     public function supplierBahanPenolong()
     {
         $provinceModel = new ProvinceModel();
-        //Get Provinces
+        $countryModel = new CountryModel();
+
         $provinceData = $provinceModel->asObject()->findAll();
+        $countryData = $countryModel->asObject()->findAll();
 
         $data = [
             "dataProvinces" => $provinceData,
+            "country" => $countryData
         ];
 
         return view('Supplier/supplierBahanPenolong/index', $data);
@@ -72,13 +75,13 @@ class SupplierBahanPenolong extends BaseController
                 "address"       => $data->address,
                 "province_name" => $data->province_name,
                 "city_name"     => $data->city_name,
-                "postal_code"   => $data->postal_code, 
+                "postal_code"   => $data->postal_code,
                 "no_npwp"       => $data->no_npwp,
                 "phone"         => $data->phone,
-                "contact_person"=> $data->contact_person,
+                "contact_person" => $data->contact_person,
                 "email"         => $data->email,
                 "no_rekening"   => $data->no_rekening,
-                "supplier_buyer"=> $data->supplier_buyer,
+                "supplier_buyer" => $data->supplier_buyer,
                 "ap_name"       => $data->ap_name,
                 "ar_name"       => $data->ar_name
             ]);
@@ -99,7 +102,7 @@ class SupplierBahanPenolong extends BaseController
 
     public function saveSupplierBahanPenolong()
     {
-        try{
+        try {
             $supplierModel = new SupplierModel();
 
             $rules = [
@@ -130,11 +133,8 @@ class SupplierBahanPenolong extends BaseController
                 "supplier_buyer" => [
                     "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
                 ],
-                "province_parent_id" => [
-                    "rules" => "permit_empty|is_natural"
-                ],
-                "city_parent_id" => [
-                    "rules" => "permit_empty|is_natural"
+                "country_code" => [
+                    "rules" => "required"
                 ],
                 "postal_code" => [
                     "rules" => "permit_empty|numeric"
@@ -200,7 +200,8 @@ class SupplierBahanPenolong extends BaseController
                 "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                 "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "kategori"          => "LOKAL",
-                "type"              => "BAHAN PENOLONG"
+                "type"              => "BAHAN PENOLONG",
+                "country_code"      => $this->request->getPost("country_code")
             ];
             $insert = $supplierModel->insert($insertData);
             // $response = curl_request("POST", "/suppliers", $this->token, $payload);
@@ -215,7 +216,7 @@ class SupplierBahanPenolong extends BaseController
                 echo json_encode($data);
                 return;
             }
-                
+
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
@@ -224,9 +225,7 @@ class SupplierBahanPenolong extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -239,7 +238,7 @@ class SupplierBahanPenolong extends BaseController
 
     public function updateSupplierBahanPenolong()
     {
-        try{
+        try {
             $supplierModel = new SupplierModel();
 
             $rules = [
@@ -270,10 +269,7 @@ class SupplierBahanPenolong extends BaseController
                 "supplier_buyer" => [
                     "rules" => "required"
                 ],
-                "province_parent_id" => [
-                    "rules" => "required"
-                ],
-                "city_parent_id" => [
+                "country_code" => [
                     "rules" => "required"
                 ],
                 "postal_code" => [
@@ -318,7 +314,8 @@ class SupplierBahanPenolong extends BaseController
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "kategori"          => "LOKAL",
-                    "type"              => "BAHAN PENOLONG"
+                    "type"              => "BAHAN PENOLONG",
+                    "country_code"      => $this->request->getPost("country_code")
                     // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
                 ];
             }
@@ -335,9 +332,7 @@ class SupplierBahanPenolong extends BaseController
                 echo json_encode($data);
                 return;
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -350,7 +345,7 @@ class SupplierBahanPenolong extends BaseController
 
     public function getByIdSupplierBahanPenolong($id)
     {
-        
+
         $supplierModel = new SupplierModel();
         $supplierData = $supplierModel->getSupplierById($id);
 
@@ -369,13 +364,13 @@ class SupplierBahanPenolong extends BaseController
             "data"      => $supplierData,
         ];
         echo json_encode($data);
-        
+
         return;
     }
 
     public function deleteSupplierBahanPenolong()
     {
-        try{
+        try {
             $supplierModel = new SupplierModel();
             $id = $this->request->getPost("id");
 
@@ -397,9 +392,7 @@ class SupplierBahanPenolong extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
