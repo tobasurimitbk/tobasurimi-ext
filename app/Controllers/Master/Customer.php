@@ -8,8 +8,8 @@ use App\Models\ProvincesModel;
 use App\Models\CustomerModel;
 use App\Models\BanksModel;
 use App\Models\ListAddressesModel;
-use App\models\SalesOrderModel;
-use App\models\SalesOrderInvoiceModel;
+use App\Models\SalesOrderModel;
+use App\Models\SalesOrderInvoiceModel;
 
 class Customer extends BaseController
 {
@@ -83,7 +83,7 @@ class Customer extends BaseController
                 "kode"          => $data->kode,
                 "name"          => $data->name,
                 "phone"         => $data->phone,
-                "contact_person"=> $data->contact_person,
+                "contact_person" => $data->contact_person,
                 "saldo"         => number_format($data->saldo),
                 "currencyName"  => $data->currencyName,
             ]);
@@ -175,7 +175,7 @@ class Customer extends BaseController
                     'errors' => [
                         'required' => 'Alamat tidak boleh kosong'
                     ]
-                ], 
+                ],
                 "email" => [
                     "rules" => "valid_email",
                     'errors' => [
@@ -237,7 +237,7 @@ class Customer extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
+            }
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -434,9 +434,8 @@ class Customer extends BaseController
 
         $data = [
             'invList' => $invList,
-            'address'=> $customerData->address
+            'address' => $customerData->address
         ];
         echo json_encode($data);
     }
-
 }
