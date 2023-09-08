@@ -103,7 +103,7 @@
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select multiple class="form-select supplier_id" name="supplier_id[]" id="supplier_id[]">
-                                        <option value=""></option>
+
                                     </select>
                                     <label for="floatingInput">Supplier (Opsional)</label>
                                 </div>
@@ -557,7 +557,8 @@
         $('.kategori_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
+            dropdownParent: $(".add-modal .modal-content"),
+            allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -585,7 +586,8 @@
         $('.hs_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
+            dropdownParent: $(".add-modal .modal-content"),
+            allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -986,7 +988,6 @@
                                 dataType: "json",
                                 success: function(result) {
                                     $(".supplier_id").empty()
-                                    $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
@@ -1004,7 +1005,6 @@
                                 dataType: "json",
                                 success: function(result) {
                                     $(".supplier_id").empty()
-                                    $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
@@ -1022,7 +1022,6 @@
                                 dataType: "json",
                                 success: function(result) {
                                     $(".supplier_id").empty()
-                                    $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
@@ -1040,7 +1039,6 @@
                                 dataType: "json",
                                 success: function(result) {
                                     $(".supplier_id").empty()
-                                    $(".supplier_id").append(`<option value=""></option>`);
 
                                     result.data.forEach(function(item) {
                                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
@@ -1412,7 +1410,6 @@
                 dataType: "json",
                 success: function(res) {
                     $(".supplier_id").empty()
-                    $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
@@ -1430,7 +1427,6 @@
                 dataType: "json",
                 success: function(res) {
                     $(".supplier_id").empty()
-                    $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
@@ -1448,7 +1444,6 @@
                 dataType: "json",
                 success: function(res) {
                     $(".supplier_id").empty()
-                    $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
@@ -1466,7 +1461,6 @@
                 dataType: "json",
                 success: function(res) {
                     $(".supplier_id").empty()
-                    $(".supplier_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
                         $(".supplier_id").append(`<option value="${item.id}" data-name="${item.name}">${item.name}</option>`);
