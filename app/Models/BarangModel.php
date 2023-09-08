@@ -31,7 +31,6 @@ class BarangModel extends Model
         'ar_id',
         'stok',
         'tax',
-        'status',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -75,7 +74,6 @@ class BarangModel extends Model
             'sub_akun_ap'       => 'ap.nama_sub',
             'sub_akun_ar'       => 'ar.nama_sub',
             'stok'              => 'barangs.stok',
-            'status'            => 'barangs.status',
             'createdAt'         => 'barangs.createdAt',
             'updatedAt'         => 'barangs.updatedAt',
         ];
@@ -104,7 +102,7 @@ class BarangModel extends Model
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['status']) {
+        if ($addCondition['search'] || $addCondition['kategori']) {
             $barangDataQry->groupStart();
         }
 
@@ -116,11 +114,7 @@ class BarangModel extends Model
             $barangDataQry->where('metadata.id', $addCondition['kategori']);
         }
 
-        if ($addCondition['status']) {
-            $barangDataQry->where('barangs.status', $addCondition['status']);
-        }
-
-        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['status']) {
+        if ($addCondition['search'] || $addCondition['kategori']) {
             $barangDataQry->groupEnd();
         }
 
@@ -212,7 +206,6 @@ class BarangModel extends Model
     {
         $arrCondition = [
             'barangs.deletedAt' => null,
-            'barangs.status' => 'Aktif',
             // 'barangs.parent_id !=' => 0,
             'metadata.deletedAt' => null,
             'metadata.value' => $kategori
@@ -261,7 +254,6 @@ class BarangModel extends Model
     {
         $arrCondition = [
             'barangs.deletedAt' => null,
-            'barangs.status' => 'Aktif',
             // 'barangs.parent_id !=' => 0,
             'metadata.deletedAt' => null,
             'barangs.type' => $type
@@ -310,7 +302,6 @@ class BarangModel extends Model
     {
         $arrCondition = [
             'barangs.deletedAt' => null,
-            'barangs.status' => 'Aktif',
             // 'barangs.parent_id !=' => 0,
             'metadata.deletedAt' => null,
             'barangs.barang_condition' => $condition,

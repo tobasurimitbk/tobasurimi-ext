@@ -70,53 +70,6 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select type" onchange="changeType()" name="type" id="type" aria-label="Floating label select example">
-                                        <option value="">Pilih Tipe</option>
-                                        <option value="BAHAN PENOLONG LOKAL">Bahan Penolong Lokal</option>
-                                        <option value="BAHAN PENOLONG IMPORT">Bahan Penolong Import</option>
-                                        <option value="BAHAN BAKU IMPORT">Bahan Baku Import</option>
-                                        <option value="BAHAN BAKU LOKAL">Bahan Baku Lokal</option>
-                                    </select>
-
-                                    <label for="floatingInput">Tipe Supplier</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select multiple class="form-select supplier_id" name="supplier_id[]" id="supplier_id[]">
-                                        <option value=""></option>
-                                    </select>
-                                    <label for="floatingInput">Supplier</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
-                                        <option value=""></option>
-                                        <?php foreach ($kategoriBarangData as $kategori): ?>
-                                        <option value="<?= $kategori->id ?>"><?= $kategori->value ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label for="floatingInput">Kategori</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select hs_id" name="hs_id" id="hs_id">
-                                        <option value=""></option>
-                                        <?php foreach ($dataKodeHS as $dataAccount): ?>
-                                        <option value="<?= $dataAccount->id ?>"><?= $dataAccount->code ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label for="floatingInput">Kode HS</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                         <option value=""></option>
                                         <?php foreach ($satuanData as $satuan): ?>
@@ -130,6 +83,53 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" onkeyup="formatNumber(this)" class="form-control harga_barang" name="harga_barang" id="harga_barang" placeholder="Harga Barang">
                                     <label for="floatingInput">Harga Barang</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select type" onchange="changeType()" name="type" id="type" aria-label="Floating label select example">
+                                        <option value="">Pilih Tipe</option>
+                                        <option value="BAHAN PENOLONG LOKAL">Bahan Penolong Lokal</option>
+                                        <option value="BAHAN PENOLONG IMPORT">Bahan Penolong Import</option>
+                                        <option value="BAHAN BAKU IMPORT">Bahan Baku Import</option>
+                                        <option value="BAHAN BAKU LOKAL">Bahan Baku Lokal</option>
+                                    </select>
+
+                                    <label for="floatingInput">Tipe Supplier (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select multiple class="form-select supplier_id" name="supplier_id[]" id="supplier_id[]">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Supplier (Opsional)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
+                                        <option value=""></option>
+                                        <?php foreach ($kategoriBarangData as $kategori): ?>
+                                        <option value="<?= $kategori->id ?>"><?= $kategori->value ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Kategori (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select hs_id" name="hs_id" id="hs_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataKodeHS as $dataAccount): ?>
+                                        <option value="<?= $dataAccount->id ?>"><?= $dataAccount->code ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Kode HS (Opsional)</label>
                                 </div>
                             </div>
                         </div>
@@ -162,19 +162,6 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" onkeyup="formatNumber(this)" class="form-control" name="tax" id="tax" placeholder="Pajak Barang">
                                     <label for="floatingInput">Tax (%)</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3" style="height: 50px;">
-                                <label for="floatingInput" class="label-modal-master-barang">Status</label>
-                                <div>
-                                    <label class="switch">
-                                    <input autocomplete="one-time-code" class="status" name="status" id="status" type="checkbox" checked>
-                                    <span class="slider round"></span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -243,12 +230,6 @@
                     ?>
                 </select>
             </div>
-            <div class="col mb-3">
-                <select class="form-select filter_status" name="filter_status" id="filter_status" aria-label="Floating label select example">
-                    <option value="Aktif">Status: Aktif</option>
-                    <option value="Tidak Aktif">Status: Tidak Aktif</option>
-                </select>
-            </div>
         </div>
         <div class="row">
             <div class="table-responsive">
@@ -267,7 +248,6 @@
                             <th onclick="changeSort('sub_akun_ap')" class="sort">Akun Pembelian</th>
                             <th onclick="changeSort('sub_akun_ar')" class="sort">Akun Penjualan</th>
                             <th onclick="changeSort('stok')" class="sort">Stok</th>
-                            <th>Status</th> 
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -306,7 +286,6 @@
             data: function(data) {
                 data.search = $(".search").val();
                 data.kategori = $(".kategori").val();
-                data.status = $(".filter_status").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -372,23 +351,6 @@
                 return `
                 <div class="text-danger">
                 ${data}
-                </div>
-                `
-            }
-        },
-        {
-            data: "status",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                return `
-                <div class="mt-2">
-                <label class="switch">
-                <input autocomplete="one-time-code" class="status_table" id=${"status_table_" + id} onchange="changeStatus('${id}')" name="status_table" id="status_table" type="checkbox" ${data === "Aktif" ? 'checked' : ''}>
-                <span class="slider round"></span>
-                </label>
                 </div>
                 `
             }
@@ -651,6 +613,24 @@
             rules: {
                 nama_barang: {
                     required: true
+                },
+                spesifikasi: {
+                    required: true
+                },
+                satuan_id: {
+                    required: true
+                },
+                harga_barang: {
+                    required: true
+                },
+                ap_id: {
+                    required: true
+                },
+                ar_id: {
+                    required: true
+                },
+                tax: {
+                    required: true
                 }
             },
             messages: {
@@ -663,14 +643,8 @@
                 harga_barang: {
                     required: "Harga wajib diisi"
                 },
-                type: {
-                    required: "Tipe Supplier wajib diisi"
-                },
                 satuan_id: {
                     required: "Satuan wajib diisi"
-                },
-                kategori_id: {
-                    required: "Kategori wajib diisi"
                 },
                 hs_id: {
                     required: "Kode HS wajib diisi"
@@ -683,6 +657,9 @@
                 },
                 stok: {
                     required: "Stok wajib diisi"
+                },
+                tax: {
+                    required: "Tax (%) wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -719,13 +696,6 @@
             });
             $(".is_parent").css("display", "none");
             $('.stok').rules('remove', 'required');
-            $('.harga_barang').rules('remove', 'required');
-            $('.satuan_id').rules('remove', 'required');
-            $('.type').rules('remove', 'required');
-            $('.kategori_id').rules('remove', 'required');
-            $('.hs_id').rules('remove', 'required');
-            $('.ap_id').rules('remove', 'required');
-            $('.ar_id').rules('remove', 'required');
             $("#parent_id").val('').trigger('change');
             $("#kode_barang").val('');
             $("#nama_barang").val('');
@@ -905,16 +875,7 @@
                             $('.harga_barang').rules('add', {
                                 required: true
                             });
-                            $('.type').rules('add', {
-                                required: true
-                            });
                             $('.satuan_id').rules('add', {
-                                required: true
-                            });
-                            $('.kategori_id').rules('add', {
-                                required: true
-                            });
-                            $('.hs_id').rules('add', {
                                 required: true
                             });
                             $('.ap_id').rules('add', {
@@ -923,18 +884,19 @@
                             $('.ar_id').rules('add', {
                                 required: true
                             });
+                            $('.tax').rules('add', {
+                                required: true
+                            });
                         }
                         else
                         {
                             $(".is_parent").css("display", "none");
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('remove', 'required');
-                            $('.type').rules('remove', 'required');
                             $('.satuan_id').rules('remove', 'required');
-                            $('.kategori_id').rules('remove', 'required');
-                            $('.hs_id').rules('remove', 'required');
                             $('.ap_id').rules('remove', 'required');
                             $('.ar_id').rules('remove', 'required');
+                            $('.tax').rules('remove', 'required');
                         }
 
                         $(`[name="productSpec"][value="${res?.data?.spec_type}"]`).prop('checked', true);
@@ -1143,7 +1105,7 @@
             table.ajax.reload();
         })
 
-        $(".kategori, .filter_status").change(function () {
+        $(".kategori").change(function () {
             table.ajax.reload();
         })
 
@@ -1398,60 +1360,6 @@
         })
     })
 
-    const changeStatus = function(id)
-    {
-        const csrf = $(`[name="${csrfToken}"]`);
-        let value = document.getElementById('status_table_' + id).checked ? true : false;
-
-        let data = {
-            id: id
-        }
-
-        if(value)
-        {
-            data["status"] = true;
-        }
-
-        $.ajax({
-            url: "<?= base_url("barang/update-status"); ?>",
-            data: data,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            success: function(response) {
-                csrf.val(response.token);
-                if (response.status) {
-                    stopLoading()
-                    Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    .then(() => {
-                        table.ajax.reload()
-                    })
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                }
-            },
-            onError: function(response) {
-                csrf.val(response.token);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Data Gagal Disimpan, coba Lagi',
-                    confirmButtonColor: '#4e73df',
-                })
-                stopLoading()
-            }
-        });
-    }
-
     $(".btn-add-row").click(function() {
         row_detail++;
         list_spek.push(
@@ -1586,12 +1494,10 @@
         $(".is_parent").css("display", "none");
         $('.stok').rules('remove', 'required');
         $('.harga_barang').rules('remove', 'required');
-        $('.type').rules('remove', 'required');
         $('.satuan_id').rules('remove', 'required');
-        $('.kategori_id').rules('remove', 'required');
-        $('.hs_id').rules('remove', 'required');
         $('.ap_id').rules('remove', 'required');
         $('.ar_id').rules('remove', 'required');
+        $('.tax').rules('remove', 'required');
     };
 
     const haciu2 = () => {
@@ -1602,22 +1508,16 @@
         $('.harga_barang').rules('add', {
             required: true
         });
-        $('.type').rules('add', {
-            required: true
-        });
         $('.satuan_id').rules('add', {
-            required: true
-        });
-        $('.kategori_id').rules('add', {
-            required: true
-        });
-        $('.hs_id').rules('add', {
             required: true
         });
         $('.ap_id').rules('add', {
             required: true
         });
         $('.ar_id').rules('add', {
+            required: true
+        });
+        $('.tax').rules('add', {
             required: true
         });
     };

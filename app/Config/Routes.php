@@ -494,7 +494,6 @@ $routes->get('/barang/all', 'Warehouse\Barang::allBarang', ['filter' => 'Auth'])
 $routes->get('/barang/id/(:segment)', 'Warehouse\Barang::getByIdBarang/$1', ['filter' => 'Auth']);
 $routes->post('/barang/save', 'Warehouse\Barang::saveBarang', ['filter' => 'Auth']);
 $routes->post('/barang/update', 'Warehouse\Barang::updateBarang', ['filter' => 'Auth']);
-$routes->post('/barang/update-status', 'Warehouse\Barang::updateStatusBarang', ['filter' => 'Auth']);
 $routes->post('/barang/delete', 'Warehouse\Barang::deleteBarang', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL

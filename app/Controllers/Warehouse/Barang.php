@@ -73,7 +73,6 @@ class Barang extends BaseController
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
             "idCategory"    => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
-            "status"        => $this->request->getGet("status"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "idCompany"     => $this->this_company_id
@@ -86,8 +85,7 @@ class Barang extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "kategori"      => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
-            "status"        => $this->request->getGet("status")
+            "kategori"      => formatter($this->request->getGet("kategori"), "STR_TO_INT")
         ];
 
         $limit = $this->request->getGet("length");
@@ -112,8 +110,7 @@ class Barang extends BaseController
                 "code_hs"       => $data->code_hs,
                 "sub_akun_ap"   => $data->sub_akun_ap,
                 "sub_akun_ar"   => $data->sub_akun_ar,
-                "stok"          => $data->stok,
-                "status"        => $data->status,
+                "stok"          => $data->stok
             ]);
         }
 
@@ -173,7 +170,6 @@ class Barang extends BaseController
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
                     "tax"               => $this->request->getPost('tax') ?? 0,
-                    "status"            => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                     "spek"              => $this->request->getPost("spek")
                 ];
             } else {
@@ -183,7 +179,6 @@ class Barang extends BaseController
                     "parent_id"     => 0,
                     "kode_barang"   => $kodeBarang,
                     "nama_barang"   => $this->request->getPost("nama_barang"),
-                    "status"        => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                 ];
             }
 
@@ -291,7 +286,6 @@ class Barang extends BaseController
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
                     "tax"               => $this->request->getPost('tax') ?? 0,
-                    "status"            => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                     "spek"              => $this->request->getPost("spek")
                 ];
             } else {
@@ -300,7 +294,6 @@ class Barang extends BaseController
                     "parent_id"     => 0,
                     "company_id"    => $this->this_company_id,
                     "nama_barang"   => $this->request->getPost("nama_barang"),
-                    "status"        => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif",
                 ];
             }
 
@@ -340,51 +333,6 @@ class Barang extends BaseController
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function updateStatusBarang()
-    {
-        try {
-            $id = $this->request->getPost("id");
-
-            $payload = [
-                "status" => !empty($this->request->getPost("status")) ? "Aktif" : "Tidak Aktif"
-            ];
-
-            $condition = [
-                'id' => $id,
-                'company_id' => $this->this_company_id
-            ];
-
-            $response = $this->barangModel->where($condition)->set($payload)->update();
-
-            if ($response) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            } else {
-                $message = 'Data Gagal Diubah';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
             ];
             echo json_encode($data);
         }
