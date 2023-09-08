@@ -133,6 +133,22 @@
                             </div>
                         </div>
                     </div>
+                     <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select pendidikan" name="pendidikan" id="pendidikan" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Pendidikan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control golongan" id="golongan" name="golongan" placeholder="Golongan">
+                                <label for="floatingInput">Golongan</label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -496,6 +512,12 @@
             dropdownParent: $(".add-modal .modal-content")
         })
 
+        $('.pendidikan').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
         $('.tunjangan_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
@@ -615,6 +637,26 @@
             .find('label')
             .css('z-index', '1');
 
+        $('.pendidikan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.pendidikan')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.pendidikan')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         $(".tunjangan_id")
             .parent('div')
             .children('span')
@@ -692,6 +734,12 @@
                 },
                 bank_name: {
                     required: true,
+                },
+                pendidikan: {
+                    required: true,
+                },
+                golongan: {
+                    required: true,
                 }
             },
             messages: {
@@ -754,6 +802,12 @@
                 },
                 bank_name: {
                     required: "Bank wajib diisi"
+                },
+                pendidikan: {
+                    required: "Pendidikan wajib diisi"
+                },
+                golongan: {
+                    required: "Golongan wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -853,6 +907,24 @@
             row = 0
 
             $(".body-detail-table").empty()
+
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'pendidikan'
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".pendidikan").empty()
+                    $(".pendidikan").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".pendidikan").append(`<option value="${item.id}">${item.value}</option>`)
+                    })
+
+                    $(".pendidikan").val('').change();
+                }
+            })
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -1333,6 +1405,7 @@
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
                         $(".komponen_gaji").val(res?.data?.komponen_gaji).change();
+                        $(".golongan").val(res?.data?.golongan);
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
 
                         let tag_html = "";
@@ -1372,6 +1445,24 @@
 
                                 $(".city_id").val(res?.data?.city_id).change();
                                 //$(".zip_code").val(res?.data?.postalCode);
+                            }
+                        })
+
+                        $.ajax({
+                            url: `<?= base_url("metadata/dropdown"); ?>`,
+                            method: "GET",
+                            data: {
+                                name: 'pendidikan'
+                            },
+                            dataType: "json",
+                            success: function(result) {
+                                $(".pendidikan").empty()
+                                $(".pendidikan").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".pendidikan").append(`<option value="${item.id}">${item.value}</option>`)
+                                })
+
+                                $(".pendidikan").val(res?.data?.pendidikan).change();
                             }
                         })
 

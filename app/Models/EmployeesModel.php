@@ -28,6 +28,8 @@ class EmployeesModel extends Model
         'EOT',
         'BSOT',
         'BEOT',
+        'pendidikan',
+        'golongan',
         'nip',
         'gender',
         'dob',

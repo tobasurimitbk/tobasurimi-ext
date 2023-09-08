@@ -216,6 +216,12 @@ class Employee extends BaseController
                 ],
                 "owner_name" => [
                     "rules" => "required"
+                ],
+                "pendidikan" => [
+                    "rules" => "required"
+                ],
+                "golongan" => [
+                    "rules" => "required"
                 ]
             ];
 
@@ -248,6 +254,8 @@ class Employee extends BaseController
                     "owner_name" => $this->request->getPost("owner_name"),
                     "pin"  => $this->request->getPost("pin"),
                     "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
+                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT"),
+                    "golongan" => $this->request->getPost("golongan")
                 ];
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
@@ -413,6 +421,18 @@ class Employee extends BaseController
                     'errors' => [
                         'required' => 'Owner Name Tidak Boleh Kosong',
                     ]
+                ],
+                "pendidikan" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Pendidikan Tidak Boleh Kosong',
+                    ]
+                ],
+                "golongan" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Golongan Tidak Boleh Kosong',
+                    ]
                 ]
             ];
 
@@ -454,6 +474,8 @@ class Employee extends BaseController
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
                     "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
+                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT"),
+                    "golongan" => $this->request->getPost("golongan")
                 ];
                 $file = $this->request->getFile("employeeImg");
                 if (!empty($file->getName())) {
