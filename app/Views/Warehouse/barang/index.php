@@ -142,7 +142,7 @@
                                         <option value="<?= $accountData->id ?>"><?= "[$accountData->no_sub]$accountData->nama_sub" ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput">Akun Pembelian</label>
+                                    <label for="floatingInput">Akun Pembelian (Opsional)</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -153,7 +153,7 @@
                                         <option value="<?= $accountData->id ?>"><?= "[$accountData->no_sub]$accountData->nama_sub" ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput">Akun Penjualan</label>
+                                    <label for="floatingInput">Akun Penjualan (Opsional)</label>
                                 </div>
                             </div>
                         </div>
@@ -501,7 +501,8 @@
         $('.ap_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
+            dropdownParent: $(".add-modal .modal-content"),
+            allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -529,7 +530,8 @@
         $('.ar_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
+            dropdownParent: $(".add-modal .modal-content"),
+            allowClear: true
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -625,12 +627,6 @@
                 harga_barang: {
                     required: true
                 },
-                ap_id: {
-                    required: true
-                },
-                ar_id: {
-                    required: true
-                },
                 tax: {
                     required: true
                 }
@@ -647,15 +643,6 @@
                 },
                 satuan_id: {
                     required: "Satuan wajib diisi"
-                },
-                hs_id: {
-                    required: "Kode HS wajib diisi"
-                },
-                ap_id: {
-                    required: "Akun Pembelian wajib diisi"
-                },
-                ar_id: {
-                    required: "Akun Pembelian wajib diisi"
                 },
                 stok: {
                     required: "Stok wajib diisi"
@@ -880,12 +867,6 @@
                             $('.satuan_id').rules('add', {
                                 required: true
                             });
-                            $('.ap_id').rules('add', {
-                                required: true
-                            });
-                            $('.ar_id').rules('add', {
-                                required: true
-                            });
                             $('.tax').rules('add', {
                                 required: true
                             });
@@ -896,8 +877,6 @@
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('remove', 'required');
                             $('.satuan_id').rules('remove', 'required');
-                            $('.ap_id').rules('remove', 'required');
-                            $('.ar_id').rules('remove', 'required');
                             $('.tax').rules('remove', 'required');
                         }
 
@@ -1489,8 +1468,6 @@
         $('.stok').rules('remove', 'required');
         $('.harga_barang').rules('remove', 'required');
         $('.satuan_id').rules('remove', 'required');
-        $('.ap_id').rules('remove', 'required');
-        $('.ar_id').rules('remove', 'required');
         $('.tax').rules('remove', 'required');
     };
 
@@ -1503,12 +1480,6 @@
             required: true
         });
         $('.satuan_id').rules('add', {
-            required: true
-        });
-        $('.ap_id').rules('add', {
-            required: true
-        });
-        $('.ar_id').rules('add', {
             required: true
         });
         $('.tax').rules('add', {
