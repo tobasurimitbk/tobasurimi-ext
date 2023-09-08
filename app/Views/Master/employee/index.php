@@ -144,8 +144,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control golongan" id="golongan" name="golongan" placeholder="Golongan">
-                                <label for="floatingInput">Golongan</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control no_koperasi" id="no_koperasi" name="no_koperasi" placeholder="No. Koperasi (Opsional)">
+                                <label for="floatingInput">No. Koperasi (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -737,9 +737,6 @@
                 },
                 pendidikan: {
                     required: true,
-                },
-                golongan: {
-                    required: true,
                 }
             },
             messages: {
@@ -805,9 +802,6 @@
                 },
                 pendidikan: {
                     required: "Pendidikan wajib diisi"
-                },
-                golongan: {
-                    required: "Golongan wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -1405,7 +1399,7 @@
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
                         $(".komponen_gaji").val(res?.data?.komponen_gaji).change();
-                        $(".golongan").val(res?.data?.golongan);
+                        $(".no_koperasi").val(res?.data?.no_koperasi);
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
 
                         let tag_html = "";

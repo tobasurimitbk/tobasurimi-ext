@@ -219,9 +219,6 @@ class Employee extends BaseController
                 ],
                 "pendidikan" => [
                     "rules" => "required"
-                ],
-                "golongan" => [
-                    "rules" => "required"
                 ]
             ];
 
@@ -255,7 +252,7 @@ class Employee extends BaseController
                     "pin"  => $this->request->getPost("pin"),
                     "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
                     "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT"),
-                    "golongan" => $this->request->getPost("golongan")
+                    "no_koperasi" => $this->request->getPost("no_koperasi")
                 ];
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
@@ -427,12 +424,6 @@ class Employee extends BaseController
                     'errors' => [
                         'required' => 'Pendidikan Tidak Boleh Kosong',
                     ]
-                ],
-                "golongan" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Golongan Tidak Boleh Kosong',
-                    ]
                 ]
             ];
 
@@ -475,7 +466,7 @@ class Employee extends BaseController
                     "owner_name" => $this->request->getPost("owner_name"),
                     "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
                     "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT"),
-                    "golongan" => $this->request->getPost("golongan")
+                    "no_koperasi" => $this->request->getPost("no_koperasi")
                 ];
                 $file = $this->request->getFile("employeeImg");
                 if (!empty($file->getName())) {
