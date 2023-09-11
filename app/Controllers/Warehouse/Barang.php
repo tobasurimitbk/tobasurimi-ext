@@ -131,11 +131,51 @@ class Barang extends BaseController
     {
         try {
             $rules = [
+                "productSpec" => [
+                    "rules" => "required|in_list[single,multi]",
+                    'errors' => [
+                        'required' => 'Product Spec tidak boleh kosong'
+                    ]
+                ],
                 "nama_barang" => [
                     "rules" => "required",
                     'errors' => [
                         'required' => 'Nama Barang tidak boleh kosong'
                     ]
+                ],
+                "spek" => [
+                    "rules" => "permit_empty",
+                ],
+                "satuan_id" => [
+                    "rules" => "required|is_natural",
+                    'errors' => [
+                        'required' => 'Satuan tidak boleh kosong'
+                    ]
+                ],
+                "harga_barang" => [
+                    "rules" => "required|regex_match[/[0-9]|\,/]",
+                    'errors' => [
+                        'required' => 'Harga Barang tidak boleh kosong',
+                        "regex_match" => "Harga Barang harus numerik!"
+                    ]
+                ],
+                "type" => [
+                    "rules" => "permit_empty",
+                ],
+                "kategori_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "hs_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "ap_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "ar_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "tax" => [
+                    "rules" => "permit_empty|numeric",
                 ]
             ];
 
@@ -157,7 +197,7 @@ class Barang extends BaseController
                 $payload = [
                     "spec_type"         => $productSpec,
                     "company_id"        => $this->this_company_id,
-                    "parent_id"         => formatter($this->request->getPost("parent_id") ?? 0, "STR_TO_INT"),
+                    "parent_id"         => formatter($this->request->getPost("parent_id"), "STR_TO_INT"),
                     "kode_barang"       => $kodeBarang,
                     "nama_barang"       => $this->request->getPost("nama_barang"),
                     "type"              => $this->request->getPost("type"),
@@ -168,7 +208,8 @@ class Barang extends BaseController
                     "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    // "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
+                    "stok"              => 0,
                     "tax"               => $this->request->getPost('tax') ?? 0,
                     "spek"              => $this->request->getPost("spek")
                 ];
@@ -224,11 +265,41 @@ class Barang extends BaseController
     {
         try {
             $rules = [
+                "productSpec" => [
+                    "rules" => "permit_empty|in_list[single,multi]",
+                ],
                 "nama_barang" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Nama Barang tidak boleh kosong'
+                    "rules" => "permit_empty",
+                ],
+                "spek" => [
+                    "rules" => "permit_empty",
+                ],
+                "satuan_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "harga_barang" => [
+                    "rules" => "permit_empty|regex_match[/[0-9]|\,/]",
+                    "errors" => [
+                        "regex_match" => "Harga Barang harus numerik!"
                     ]
+                ],
+                "type" => [
+                    "rules" => "permit_empty",
+                ],
+                "kategori_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "hs_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "ap_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "ar_id" => [
+                    "rules" => "permit_empty|is_natural",
+                ],
+                "tax" => [
+                    "rules" => "permit_empty|numeric",
                 ]
             ];
 
@@ -242,7 +313,7 @@ class Barang extends BaseController
                 echo json_encode($data);
                 return;
             }
-
+die('Ok');
             $id = $this->request->getPost("id");
             $productSpec = $this->request->getPost('productSpec');
             $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
@@ -270,7 +341,7 @@ class Barang extends BaseController
                 return;
             }
 
-            if ($parent) {
+            if ($parent || $productSpec == 'single') {
                 $payload = [
                     "spec_type"         => $productSpec,
                     "parent_id"         => $parent,

@@ -62,7 +62,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="number" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control stok" name="stok" id="stok">
+                                    <input autocomplete="one-time-code" type="number" class="form-control stok" name="stok" id="stok" disabled>
                                     <label for="floatingInput">Stok</label>
                                 </div>
                             </div>
@@ -161,7 +161,7 @@
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" onkeyup="formatNumber(this)" class="form-control" name="tax" id="tax" placeholder="Pajak Barang">
-                                    <label for="floatingInput">Tax (%)</label>
+                                    <label for="floatingInput">Tax  (Opsional) (%)</label>
                                 </div>
                             </div>
                         </div>
@@ -626,9 +626,6 @@
                 },
                 harga_barang: {
                     required: true
-                },
-                tax: {
-                    required: true
                 }
             },
             messages: {
@@ -646,9 +643,6 @@
                 },
                 stok: {
                     required: "Stok wajib diisi"
-                },
-                tax: {
-                    required: "Tax (%) wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -884,6 +878,7 @@
                         $(".kode_barang").val(res?.data?.kode_barang);
                         $(".spek").val(res?.data?.spek);
                         $(".nama_barang").val(res?.data?.nama_barang);
+                        $(".stok").val(res?.data?.stok);
                         $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
                         $('#tax').val(res.data.tax);
                         
