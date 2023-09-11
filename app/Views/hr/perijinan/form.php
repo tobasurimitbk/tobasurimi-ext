@@ -10,7 +10,11 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("form-perijinan"); ?>">
                 Batal
             </a>
-
+            <?php if (!empty($data)) : ?>
+                <a href="#" class="btn btn-hapus delete-parent float-right delete-perizinan" data-perizinan_id="<?= $data->id ?>">
+                    Hapus
+                </a>
+            <?php endif; ?>
             <button class="btn btn-show-form btn-save float-right btn-submit">
                 Simpan
             </button>
@@ -254,7 +258,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("pinjaman-karyawan"); ?>";
+                                            window.location.href = "<?= base_url("form-perijinan"); ?>";
                                         })
                                 } else {
                                     Swal.fire({
@@ -323,7 +327,72 @@
                 }
             })
         }
-    })
+    });
+
+    $('.delete-perizinan').click(function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Perizinan ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            setLoading()
+            // csrf
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
+            var perizinanID = $(this).data('perizinan_id');
+
+            var formData = new FormData();
+            formData.append('id', perizinanID);
+
+            $.ajax({
+                url: "<?= base_url("form-perijinan/delete"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        stopLoading()
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                window.location.href = "<?= base_url("form-perijinan"); ?>";
+                            });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                },
+                onError: function(response) {
+                    csrf.val(response.token);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Perizinan gagal dihapus, coba Lagi',
+                        confirmButtonColor: '#4e73df',
+                    })
+                    stopLoading()
+                }
+            });
+
+        });
+    });
 </script>
 
 <?= $this->endSection(); ?>

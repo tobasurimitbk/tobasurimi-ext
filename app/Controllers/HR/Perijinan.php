@@ -32,7 +32,7 @@ class Perijinan extends BaseController
         $EmployeesModel = new EmployeesModel();
 
         $data = [
-            "status" => ["IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR"]
+            "status" => ["IJIN", "CUTI", "SAKIT"]
         ];
 
         //Get Employee
@@ -52,7 +52,7 @@ class Perijinan extends BaseController
         $EmployeesModel = new EmployeesModel();
 
         $data = [
-            "status" => ["HADIR", "IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR"]
+            "status" => ["IJIN", "CUTI", "SAKIT"]
         ];
 
         $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
@@ -141,28 +141,39 @@ class Perijinan extends BaseController
 
     public function save()
     {
-        try {
-            $rules = [
-                "employee_id" => [
-                    "rules" => "required"
-                ],
-                "start_date" => [
-                    "rules" => "required"
-                ],
-                "end_date" => [
-                    "rules" => "required"
-                ],
-                "status" => [
-                    "rules" => "required"
-                ],
-                "reason" => [
-                    "rules" => "required"
-                ],
-            ];
+        // validasi
+        $rules = [
+            "employee_id" => [
+                "rules" => "required"
+            ],
+            "start_date" => [
+                "rules" => "required"
+            ],
+            "end_date" => [
+                "rules" => "required"
+            ],
+            "status" => [
+                "rules" => "required"
+            ],
+        ];
 
-            $FormPerijinan = new FormPerijinanModel();
+        // declare model
+        $FormPerijinanModel = new FormPerijinanModel();
 
-            if ($this->validate($rules)) {
+        // validasi
+        if ($this->validate($rules)) {
+
+            $tglAkhir = strtotime($this->request->getVar('end_date'));
+            $tglAwal = strtotime($this->request->getVar('start_date'));
+
+            for ($currentDate = $tglAwal; $currentDate <= $tglAkhir; $currentDate += 86400) {
+                $currentDateFormatted = date('Y-m-d', $currentDate);
+                $insertData['periode'] = $currentDateFormatted;
+                // delete if sudah ada (menghindari duplikasi)
+                $FormPerijinanModel->where('periode', $currentDateFormatted)
+                    ->where('employee_id', $this->request->getPost("employee_id"))
+                    ->delete();
+                // insert data
                 $insertData = [
                     "company_id" => $this->this_company_id,
                     "employee_id" => $this->request->getPost("employee_id"),
@@ -170,59 +181,22 @@ class Perijinan extends BaseController
                     "end_date" => $this->request->getPost("end_date"),
                     "status" => $this->request->getPost("status"),
                     "reason" => $this->request->getPost("reason"),
-                    // "is_posted" => !empty($this->request->getPost("is_posted")) ? true : false,
+                    'periode' => $currentDateFormatted
                 ];
-
-                $payload = json_encode($insertData);
-
-                $tglAkhir = strtotime($insertData['end_date']);
-                $tglAwal = strtotime($insertData['start_date']);
-
-                $jarak = $tglAkhir - $tglAwal;
-
-                $selisih = $jarak / 60 / 60 / 24;
-
-                for ($i = 0; $i < $selisih; $i++) {
-                    $insertData['periode'] = date("Y-m-d", $tglAwal + ($i * 3600 * 24));
-
-                    $insert = $FormPerijinan->insert($insertData);
-                }
-
-                if ($insert) {
-                    $data = [
-                        "id" => $insert,
-                        "status"            => true,
-                        "message"   => "Data Berhasil disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Gagal Disimpan",
-                        "payload"   => $payload,
-                        'token' => csrf_hash(),
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                // insert again
+                $FormPerijinanModel->insert($insertData);
             }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+
+            return \response()->setJSON([
+                'message' => "Form Perijinan berhasil disimpan",
+                'status' => true
+            ]);
+        } else {
+            return \response()->setJSON([
+                'message' => "Ups terjadi kesalahan",
+                'status' => false
+            ]);
         }
-        return;
     }
 
     public function update()
@@ -230,9 +204,6 @@ class Perijinan extends BaseController
         try {
             $rules = [
                 "status" => [
-                    "rules" => "required"
-                ],
-                "reason" => [
                     "rules" => "required"
                 ],
             ];
@@ -276,44 +247,15 @@ class Perijinan extends BaseController
 
     public function delete()
     {
-        try {
-            $id = $this->request->getPost("id");
+        $id = $this->request->getPost("id");
 
-            if (!empty($id)) {
-                $response = curl_request("DELETE", "/perijinan/$id", $this->token);
+        $FormPerijinanModel = new FormPerijinanModel();
 
-                if ($response["code"] === 200) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
+        $FormPerijinanModel->where('id', $id)->delete();
+
+        return \response()->setJSON([
+            'status' => true,
+            'message' => "Form perizinan berhasil dihapus"
+        ]);
     }
 }

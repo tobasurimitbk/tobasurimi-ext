@@ -521,6 +521,19 @@ $routes->post('/penerimaan-barang-import/update-status', 'Warehouse\PenerimaanBa
 $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImport::deletePenerimaanBarangImport', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 
+// BEA CUKAI 2.3 - 4.1
+// BC 2.3
+$routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BeaCukaiController::bc23View');
+    $routes->get('create', 'BeaCukai\BeaCukaiController::bc23CreateFormView');
+});
+$routes->get('/bea-cukai-bc-25', 'BeaCukai\BeaCukaiController::bc25View', ['filter' => 'Auth']);
+$routes->get('/bea-cukai-bc-261', 'BeaCukai\BeaCukaiController::bc261View', ['filter' => 'Auth']);
+$routes->get('/bea-cukai-bc-262', 'BeaCukai\BeaCukaiController::bc262View', ['filter' => 'Auth']);
+$routes->get('/bea-cukai-bc-27', 'BeaCukai\BeaCukaiController::bc27View', ['filter' => 'Auth']);
+$routes->get('/bea-cukai-bc-40', 'BeaCukai\BeaCukaiController::bc40View', ['filter' => 'Auth']);
+$routes->get('/bea-cukai-bc-41', 'BeaCukai\beaCukaiController::bc41View', ['filter' => 'Auth']);
+
 // LAPORAN
 // BEA CUKAI
 $routes->get('/bea-cukai', 'Laporan\BeaCukai::index', ['filter' => 'Auth']);
@@ -569,9 +582,12 @@ $routes->post('/tunjangan/save', 'Master\Tunjangan::saveTunjangan', ['filter' =>
 $routes->post('/tunjangan/update', 'Master\Tunjangan::updateTunjangan', ['filter' => 'Auth']);
 $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter' => 'Auth']);
 
-
 // payroll
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
+$routes->get('/payroll/all', 'HR\Payroll::getAllPayRoll', ['filter' => 'Auth']);
+$routes->post('/payroll/generate', 'HR\Payroll::generatePayroll', ['filter' => 'Auth']);
+$routes->post('/payroll/posting', 'HR\Payroll::postingPayroll', ['filter' => 'Auth']);
+$routes->post('/payroll/detail', 'HR\Payroll::getComponentGaji', ['filter' => 'Auth']);
 // $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
 
 // formula payroll

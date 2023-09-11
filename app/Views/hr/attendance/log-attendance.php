@@ -115,6 +115,7 @@
                                 <?php
                                 $hadir = 0;
                                 $alpha = 0;
+                                $libur = 0;
                                 ?>
                                 <tr>
                                     <td style="vertical-align:middle;z-index:9999" nowrap>
@@ -128,10 +129,15 @@
 
                                         $dateFormat = ($year . "-" . $month . "-" . $no);
                                         $formPerizinanModel = new \App\Models\FormPerijinanModel();
+                                        $hariBesarModel = new \App\Models\BigDaysModel();
 
                                         $perizinanCheck = $formPerizinanModel
                                             ->where('employee_id', $res_user[$i]['employeeID'])
                                             ->where('periode', ($year . "-" . $month . "-" . $no))
+                                            ->first();
+
+                                        $hariBesarCheck = $hariBesarModel
+                                            ->where('date', $dateFormat)
                                             ->first();
 
                                         foreach ($res_user[$i]["list_attendance"] as $val) :
@@ -144,22 +150,37 @@
                                             endif;
                                         endforeach;
                                     ?>
-                                        <?php if ($perizinanCheck != null) : ?>
+                                        <?php if ($hariBesarCheck != null) : ?>
+                                            <?php $libur++; ?>
+                                            <td width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                            <td width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                        <?php elseif ($perizinanCheck != null) : ?>
                                             <!-- Ada perizinan -->
-                                            <?php if ($perizinanCheck['status']  != "ALPHA") : ?>
-                                                <!-- Ada perizinan bukan alpha -->
-                                                <td width=25 align=center style='background-color:#d6bc27; color:white;'>
+                                            <?php if ($perizinanCheck['status']  == "IJIN") : ?>
+                                                <!-- Ada perizinan ijin -->
+                                                <td width=25 align=center style='background-color:#17a2b8; color:white;'>
                                                     <b><?= $perizinanCheck['status'] ?></b>
                                                 </td>
-                                                <td width=25 align=center style='background-color:#d6bc27; color:white;'>
+                                                <td width=25 align=center style='background-color:#17a2b8; color:white;'>
                                                     <b><?= $perizinanCheck['status']  ?></b>
                                                 </td>
-                                            <?php else : ?>
-                                                <!-- Ada perizinan dengan status alpha -->
-                                                <?php $alpha++; ?>
-                                                <td width=25 align=center style='background-color:#e7323a'></td>
-                                                <td width=25 align=center style='background-color:#e7323a'></td>
-                                            <?php endif; ?>
+                                            <?php elseif ($perizinanCheck['status'] == "CUTI") : ?>
+                                                <!-- Ada perizinan cuti -->
+                                                <td width=25 align=center style='background-color:#ffc107; color:white;'>
+                                                    <b><?= $perizinanCheck['status'] ?></b>
+                                                </td>
+                                                <td width=25 align=center style='background-color:#ffc107; color:white;'>
+                                                    <b><?= $perizinanCheck['status']  ?></b>
+                                                </td>
+                                            <?php elseif ($perizinanCheck['status'] == "SAKIT") : ?>
+                                                <!-- Ada perizinan sakit -->
+                                                <td width=25 align=center style='background-color:#28a745; color:white;'>
+                                                    <b><?= $perizinanCheck['status'] ?></b>
+                                                </td>
+                                                <td width=25 align=center style='background-color:#28a745; color:white;'>
+                                                    <b><?= $perizinanCheck['status']  ?></b>
+                                                </td>
+                                            <?php endif ?>
                                         <?php else : ?>
                                             <?php if ($check == 1) : ?>
                                                 <?php $hadir++; ?>
@@ -170,11 +191,11 @@
                                                     <font color="white"><b><?= $jam_keluar; ?></b></font>
                                                 </td>
                                             <?php else : ?>
-
                                                 <?php
                                                 $temp = mktime(0, 0, 0, $month, $j, $year);
                                                 if (date("N", $temp) == 7) {
                                                     // Hari Minggu
+                                                    $libur++;
                                                     echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                                     echo "<td width=25 align=center style=\"vertical-align:middle;\"><img src='assets/img/stop.png' width='25' height='25'></td>";
                                                 } else {
@@ -204,12 +225,79 @@
                                         <b><?= $res_user[$i]['statusAttendances']['SAKIT']; ?></b>
                                     </td>
                                     <td align=center>
-                                        <b><?= $res_user[$i]['statusAttendances']['LIBUR']; ?></b>
+                                        <b><?= $libur ?></b>
                                     </td>
                                 </tr>
                             <?php endfor; ?>
                         </tbody>
                     </table>
+                </div>
+                <div class="card-text mt-4">
+                    <b class="text-black">Keterangan</b>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-sm-2 col-4">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="p-3" style="width: 5px; height:5px; background-color:#304de2"></div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="card-text mt-1 text-black">
+                                    HADIR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-4">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="p-3" style="width: 5px; height:5px; background-color:#e7323a"></div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="card-text mt-1 text-black">
+                                    ALPHA
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-4">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="p-3" style="width: 5px; height:5px; background-color:#17a2b8;"></div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="card-text mt-1 text-black">
+                                    IZIN
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 col-4">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="p-3" style="width: 5px; height:5px; background-color:#ffc107;"></div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="card-text mt-1 text-black">
+                                    CUTI
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-2 col-4">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="p-3" style="width: 5px; height:5px; background-color:#28a745;"></div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="card-text mt-1 text-black">
+                                    SAKIT
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

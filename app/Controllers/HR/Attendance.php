@@ -5,8 +5,10 @@ namespace App\Controllers\HR;
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
+use App\Models\BigDaysModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
+use App\Models\PayrollsModel;
 
 class Attendance extends BaseController
 {
@@ -175,7 +177,6 @@ class Attendance extends BaseController
                     'IJIN' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN", $year, $month),
                     'CUTI' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI", $year, $month),
                     'SAKIT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT", $year, $month),
-                    'LIBUR' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "LIBUR", $year, $month)
                 ]
             ];
         }
@@ -311,6 +312,7 @@ class Attendance extends BaseController
         // declare model
         $AttendanceModel = new AttendancesModel();
         $EmployeesModel = new EmployeesModel();
+        $payrollModel = new PayrollsModel();
 
         // get attendance Total (ngecek apakah sudah digenerate belum)
         $totalAttendances = $AttendanceModel->where('LEFT(periode, 7)', $year . "-" . $month)
@@ -322,13 +324,19 @@ class Attendance extends BaseController
             ->where('isPosting', 1)
             ->countAllResults();
 
+        $isPostingPayroll = $payrollModel->where('company_id', $this->this_company_id)
+            ->where('year_month', $year . "-" . $month)
+            ->where('isPosted', 1)
+            ->countAllResults();
+
         // Data Send To View
         $data = [
             'year' => $year,
             'month' => $month,
             'totalAttendances' => $totalAttendances,
             'employeesData' => $EmployeesModel->getEmployees($this->this_company_id),
-            'isPosting' =>  $isPosting
+            'isPosting' =>  $isPosting,
+            'isPostingPayroll' => $isPostingPayroll
         ];
 
         return \view('hr/attendance/attendance-generate', $data);
@@ -344,6 +352,7 @@ class Attendance extends BaseController
         $EmployeesModel = new EmployeesModel();
         $AttendanceModel = new AttendancesModel();
         $FormPerijinanModel = new FormPerijinanModel();
+        $hariLiburModel = new BigDaysModel();
 
         $employeeData = $EmployeesModel->getEmployees($this->this_company_id);
         // check employee
@@ -380,8 +389,19 @@ class Attendance extends BaseController
                 $formPerizinan = $FormPerijinanModel->where('periode', $dates)
                     ->where('employee_id', $e['id'])
                     ->first();
+                // check adakah data 
+                $hariLibur = $hariLiburModel->where('date', $dates)->first();
 
-                if ($formPerizinan != null) {
+                if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday") {
+                    // ada hari libur
+                    $AttendanceModel->insert([
+                        'company_id' => $this->this_company_id,
+                        'employee_id' => $e['id'],
+                        'periode' => $dates,
+                        'status' => "LIBUR",
+                        'reason' => ''
+                    ]);
+                } elseif ($formPerizinan != null) {
                     // ada perizinan 
                     $AttendanceModel->insert([
                         'company_id' => $this->this_company_id,
@@ -492,8 +512,8 @@ class Attendance extends BaseController
         $month = $this->request->getVar('month');
         $status = $this->request->getVar('statusPosting');
 
-        $query = "UPDATE attendances SET isPosting = ? WHERE DATE_FORMAT(periode, '%Y-%m') = ?";
-        $params = [$status, "$year-$month"];
+        $query = "UPDATE attendances SET isPosting = ? WHERE DATE_FORMAT(periode, '%Y-%m') = ? AND company_id = ?";
+        $params = [$status, "$year-$month", "$this->this_company_id"];
 
         $db = \Config\Database::connect();
         $db->query($query, $params);
