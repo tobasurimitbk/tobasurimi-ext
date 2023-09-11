@@ -38,4 +38,43 @@ class BeaCukai
             'namaJenisTPB' => "LAINNYA"
         ],
     ];
+
+    const Pengangkutan = [
+        [
+            'kodePengangkutan' => 1,
+            'caraPengangkutan' => 'LAUT'
+        ],
+        [
+            'kodePengangkutan' => 2,
+            'caraPengangkutan' => 'KERETA API'
+        ],
+        [
+            'kodePengangkutan' => 3,
+            'caraPengangkutan' => 'DARAT'
+        ],
+        [
+            'kodePengangkutan' => 4,
+            'caraPengangkutan' => 'UDARA'
+        ],
+        [
+            'kodePengangkutan' => 5,
+            'caraPengangkutan' => 'POS'
+        ],
+        [
+            'kodePengangkutan' => 6,
+            'caraPengangkutan' => 'MULTIMODA'
+        ],
+        [
+            'kodePengangkutan' => 7,
+            'caraPengangkutan' => 'INSTALASI/PIPA'
+        ],
+        [
+            'kodePengangkutan' => 8,
+            'caraPengangkutan' => 'PERAIRAN'
+        ],
+        [
+            'kodePengangkutan' => 9,
+            'caraPengangkutan' => 'LAINNYA'
+        ]
+    ];
 }

@@ -45,6 +45,7 @@
                     <input type="hidden" name="year" id="year" value="<?= $year ?>">
                     <input type="hidden" name="month" id="month" value="<?= $month ?>">
                     <?php if ($isPostingPayroll != 0) : ?>
+                        <input type="hidden" name="statusPosting" id="statusPosting" value="0">
                         <button disabled class="btn btn-show-form btn-save float-right btn-submit">
                             <i class="fa-solid fa-check mr-1 fa-lg"></i> Sudah Posting
                         </button>
@@ -483,7 +484,7 @@
                     confirmButtonColor: '#4e73df',
                 });
             } else {
-                setLoading()
+                setLoading();
                 // get var
                 var employeeID = $(this).data('employee_id');
                 var tanggal = $(this).data('tanggal');
@@ -555,10 +556,14 @@
             e.preventDefault();
             if ($(this).val() == "HADIR") {
                 // hadir
+                $("input[name='checkIn']").attr('required', true);
+                $("input[name='checkOut']").attr('required', true);
                 $('#reasonForm').hide();
                 $('#formInOut').show();
             } else {
                 // izin
+                $("input[name='checkIn']").attr('required', false);
+                $("input[name='checkOut']").attr('required', false);
                 $('#reasonForm').show();
                 $('#formInOut').hide();
             }
@@ -596,7 +601,6 @@
         // update attendance
         $('#updateAttendanceForm').submit(function(e) {
             e.preventDefault();
-            setLoading();
             // set variable
             const csrf = $(`[name="${csrfToken}"]`);
             var attendenceID = $('#attendenceID').val();

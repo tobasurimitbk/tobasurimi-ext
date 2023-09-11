@@ -3,18 +3,20 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Models\CountryModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\SupplierModel;
 
 class BeaCukaiController extends BaseController
 {
 
-    private $modelKantorBeaCuai, $modelSupplier, $this_company_id;
+    private $modelKantorBeaCuai, $modelSupplier, $modelCountry, $this_company_id;
 
     public function __construct()
     {
         $this->modelKantorBeaCuai = new KantorBeaCukaiModel();
         $this->modelSupplier = new SupplierModel();
+        $this->modelCountry = new CountryModel();
     }
 
 
@@ -26,9 +28,11 @@ class BeaCukaiController extends BaseController
 
     public function bc23CreateFormView()
     {
+
         $data = [
             'kantorBeaCukai' => $this->modelKantorBeaCuai->asObject()->findAll(),
-            'supplier' => $this->modelSupplier->asObject()->findAll()
+            'supplier' => $this->modelSupplier->asObject()->findAll(),
+            'country' => $this->modelCountry->asObject()->findAll()
         ];
         return \view('BeaCukai/bc-23/create', $data);
     }
