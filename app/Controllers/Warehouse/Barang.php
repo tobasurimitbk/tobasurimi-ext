@@ -313,7 +313,7 @@ class Barang extends BaseController
                 echo json_encode($data);
                 return;
             }
-die('Ok');
+
             $id = $this->request->getPost("id");
             $productSpec = $this->request->getPost('productSpec');
             $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
