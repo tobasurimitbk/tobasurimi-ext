@@ -251,8 +251,7 @@ class Employee extends BaseController
                     "owner_name" => $this->request->getPost("owner_name"),
                     "pin"  => $this->request->getPost("pin"),
                     "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
-                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT"),
-                    "no_koperasi" => $this->request->getPost("no_koperasi")
+                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT")
                 ];
                 if (!empty($file->getName())) {
                     $mime = $file->getMimeType();
@@ -465,8 +464,7 @@ class Employee extends BaseController
                     "bank_name" => $this->request->getPost("bank_name"),
                     "owner_name" => $this->request->getPost("owner_name"),
                     "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
-                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT"),
-                    "no_koperasi" => $this->request->getPost("no_koperasi")
+                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT")
                 ];
                 $file = $this->request->getFile("employeeImg");
                 if (!empty($file->getName())) {
