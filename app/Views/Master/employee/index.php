@@ -114,7 +114,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select gender" name="gender" id="floatingSelect" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -124,7 +124,7 @@
                                 <label for="floatingInput">Jenis Kelamin</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -132,20 +132,12 @@
                                 <label for="floatingInput">Agama</label>
                             </div>
                         </div>
-                    </div>
-                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select pendidikan" name="pendidikan" id="pendidikan" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Pendidikan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_koperasi" id="no_koperasi" name="no_koperasi" placeholder="No. Koperasi (Opsional)">
-                                <label for="floatingInput">No. Koperasi (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -1399,7 +1391,6 @@
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
                         $(".komponen_gaji").val(res?.data?.komponen_gaji).change();
-                        $(".no_koperasi").val(res?.data?.no_koperasi);
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
 
                         let tag_html = "";
