@@ -50,13 +50,19 @@
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer): ?>
-                                <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" disabled value="<?= $data->termin ?? '' ?>">
+                            <label for="floatingInput">Termin</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" disabled value="<?= $data->address ?? '' ?>">
                             <label for="floatingInput">Tagihan Ke</label>
@@ -396,9 +402,11 @@
             theme: "bootstrap-5"
         }).change(function() {
             const customerAddress = $(this).find(':selected').data('address');
+            const termin = $(this).find(':selected').data('termin');
             const salesName = $(this).find(':selected').data('salesname');
-console.log(salesName)
+
             $('#tagihan_ke').val(decodeURIComponent(customerAddress));
+            $('#termin').val(decodeURIComponent(termin));
             $('#sales_name').val(decodeURIComponent(salesName));
         });
 

@@ -311,9 +311,6 @@
             'id_so[]': {
                 required: true
             },
-            no_po: {
-                required: true
-            },
             no_surat_jalan: {
                 required: true
             },
@@ -330,9 +327,6 @@
             },
             'id_so[]': {
                 required: "SO wajib diisi"
-            },
-            no_po: {
-                required: "No PO wajib diisi"
             },
             no_surat_jalan: {
                 required: "No Surat jalan wajib diisi"
