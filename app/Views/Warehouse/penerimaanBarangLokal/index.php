@@ -43,12 +43,12 @@
                     <option value="finish">STATUS LPB:FINISH</option>
                 </select>
             </div>
-            <div class="col">
+            <!-- <div class="col">
                 <select class="form-select status_bc" name="status_bc" id="status_bc" aria-label="Floating label select example">
                     <option value="waiting">STATUS BC:WAITING</option>
                     <option value="finish">STATUS BC:FINISH</option>
                 </select>
-            </div>
+            </div> -->
             <div class="col">
                 <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No Penerimaan" value="" />
             </div>
@@ -65,7 +65,7 @@
                             <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                             <th onclick="changeSort('createdAt')" class="sort">Tanggal</th>
                             <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
-                            <th>Status BC</th>
+                            <!-- <th>Status BC</th> -->
                             <th>Jumlah Item</th>
                             <th>Actions</th>
                         </tr>
@@ -105,7 +105,7 @@
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.status = $(".status").val();
-                data.status_bc = $(".status_bc").val();
+                // data.status_bc = $(".status_bc").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -150,12 +150,12 @@
             data: "supplier_name",
             className: "text-center"
         },
-        {
-            data: "status_bc",
-            className: "text-center",
-            searchable: false,
-            sortable: false
-        },
+        // {
+        //     data: "status_bc",
+        //     className: "text-center",
+        //     searchable: false,
+        //     sortable: false
+        // },
         {
             data: "itemCount",
             className: "text-center",
@@ -240,7 +240,8 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .status, .status_bc").change(function () {
+        $(".dateStart, .dateEnd, .status").change(function () {
+        // $(".dateStart, .dateEnd, .status, .status_bc").change(function () {
             table.ajax.reload();
         })
 

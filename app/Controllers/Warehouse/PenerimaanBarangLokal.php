@@ -172,7 +172,7 @@ class PenerimaanBarangLokal extends BaseController
             "sorttype" => $this->request->getGet("sortType"),
             "statuspenerimaan" => "LOKAL",
             "status" => $this->request->getGet("status"),
-            "status_bc" => $this->request->getGet("status_bc"),
+            // "status_bc" => $this->request->getGet("status_bc"),
             "startdate" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "lastdate" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -201,84 +201,84 @@ class PenerimaanBarangLokal extends BaseController
 
         foreach ($penerimaanBarangData['data'] as $data) {
             $multiple_po_no = json_decode($data->multiple_po_no);
-            $status_bc = "WAITING";
-            $condition = false;
-            $conditionSecond = [];
+            // $status_bc = "WAITING";
+            // $condition = false;
+            // $conditionSecond = [];
 
-            foreach($multiple_po_no as $item)
-            {
-                if($data->tipe_bahan === "PENOLONG")
-                {
-                    $check = $this->beaCukaiModel->checkPostingBeaCukaiByPONo($item, $this->this_company_id);
+            // foreach($multiple_po_no as $item)
+            // {
+            //     if($data->tipe_bahan === "PENOLONG")
+            //     {
+            //         $check = $this->beaCukaiModel->checkPostingBeaCukaiByPONo($item, $this->this_company_id);
 
-                    if($check)
-                    {
-                        $arr = [];
-                        foreach($check as $secondItem)
-                        {
-                            if($secondItem["tipe_bahan"] === "PENOLONG")
-                            {
-                                array_push($arr, $secondItem["po_no"]);
-                            }
-                        }
+            //         if($check)
+            //         {
+            //             $arr = [];
+            //             foreach($check as $secondItem)
+            //             {
+            //                 if($secondItem["tipe_bahan"] === "PENOLONG")
+            //                 {
+            //                     array_push($arr, $secondItem["po_no"]);
+            //                 }
+            //             }
 
-                        if(strpos(implode($arr), $item))
-                        {
-                            array_push($conditionSecond, true);
-                        }
-                        else
-                        {
-                            array_push($conditionSecond, false);
-                        }
-                    }
-                    else
-                    {
-                        array_push($conditionSecond, false);
-                    }
-                }
-                if($data->tipe_bahan === "BAKU")
-                {
-                    $check = $this->beaCukaiModel->checkPostingBeaCukai($this->this_company_id);
+            //             if(strpos(implode($arr), $item))
+            //             {
+            //                 array_push($conditionSecond, true);
+            //             }
+            //             else
+            //             {
+            //                 array_push($conditionSecond, false);
+            //             }
+            //         }
+            //         else
+            //         {
+            //             array_push($conditionSecond, false);
+            //         }
+            //     }
+            //     if($data->tipe_bahan === "BAKU")
+            //     {
+            //         $check = $this->beaCukaiModel->checkPostingBeaCukai($this->this_company_id);
 
-                    if($check)
-                    {
-                        $arr = [];
-                        foreach($check as $secondItem)
-                        {
-                            if($secondItem["tipe_bahan"] === "BAKU")
-                            {
-                                array_push($arr, implode(json_decode($secondItem["multiple_po_no"])));
-                            }
-                        }
+            //         if($check)
+            //         {
+            //             $arr = [];
+            //             foreach($check as $secondItem)
+            //             {
+            //                 if($secondItem["tipe_bahan"] === "BAKU")
+            //                 {
+            //                     array_push($arr, implode(json_decode($secondItem["multiple_po_no"])));
+            //                 }
+            //             }
 
-                        if(strpos(implode($arr), $item))
-                        {
-                            array_push($conditionSecond, true);
-                        }
-                        else
-                        {
-                            array_push($conditionSecond, false);
-                        }
-                    }
-                    else
-                    {
-                        array_push($conditionSecond, false);
-                    }
-                }
-            }
+            //             if(strpos(implode($arr), $item))
+            //             {
+            //                 array_push($conditionSecond, true);
+            //             }
+            //             else
+            //             {
+            //                 array_push($conditionSecond, false);
+            //             }
+            //         }
+            //         else
+            //         {
+            //             array_push($conditionSecond, false);
+            //         }
+            //     }
+            // }
 
-            if(sizeof($conditionSecond) !== 0)
-            {
-                if(!in_array(false, $conditionSecond))
-                {
-                    $condition = true;
-                }
-            }
+            // if(sizeof($conditionSecond) !== 0)
+            // {
+            //     if(!in_array(false, $conditionSecond))
+            //     {
+            //         $condition = true;
+            //     }
+            // }
 
-            if($condition)
-            {
-                $status_bc = "FINISH";
-            }
+            // if($condition)
+            // {
+            //     $status_bc = "FINISH";
+            // }
 
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
@@ -292,63 +292,63 @@ class PenerimaanBarangLokal extends BaseController
                 "itemCount"             => $data->itemCount,
                 "multiple_po_no"        => json_decode($data->multiple_po_no),
                 "status_post"           => $data->status_post,
-                "status_bc"             => $status_bc
+                // "status_bc"             => $status_bc
             ]);
         }
 
         // filter status bc
-        $no = 1;
-        if($this->request->getGet("status_bc") === "waiting")
-        {
-            $newDataPenerimaanBarang = [];
-            foreach($dataPenerimaanBarang as $item)
-            {
-                if($item["status_bc"] === "WAITING")
-                {
-                    array_push($newDataPenerimaanBarang, [
-                        "no"                    => $no++,
-                        "id"                    => $item["id"],
-                        "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
-                        "warehouse_name"        => $item["warehouse_name"],
-                        "tipe_bahan"            => $item["tipe_bahan"],
-                        "createdAt"             => $item["createdAt"],
-                        "supplier_name"         => $item["supplier_name"],
-                        "itemCount"             => $item["itemCount"],
-                        "multiple_po_no"        => $item["multiple_po_no"],
-                        "status_post"           => $item["status_post"],
-                        "status_bc"             => $item["status_bc"]
-                    ]);
-                }
-            }  
-            $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
-            $dataPenerimaanBarang = $newDataPenerimaanBarang;
-        }
+        // $no = 1;
+        // if($this->request->getGet("status_bc") === "waiting")
+        // {
+        //     $newDataPenerimaanBarang = [];
+        //     foreach($dataPenerimaanBarang as $item)
+        //     {
+        //         if($item["status_bc"] === "WAITING")
+        //         {
+        //             array_push($newDataPenerimaanBarang, [
+        //                 "no"                    => $no++,
+        //                 "id"                    => $item["id"],
+        //                 "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
+        //                 "warehouse_name"        => $item["warehouse_name"],
+        //                 "tipe_bahan"            => $item["tipe_bahan"],
+        //                 "createdAt"             => $item["createdAt"],
+        //                 "supplier_name"         => $item["supplier_name"],
+        //                 "itemCount"             => $item["itemCount"],
+        //                 "multiple_po_no"        => $item["multiple_po_no"],
+        //                 "status_post"           => $item["status_post"],
+        //                 "status_bc"             => $item["status_bc"]
+        //             ]);
+        //         }
+        //     }  
+        //     $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
+        //     $dataPenerimaanBarang = $newDataPenerimaanBarang;
+        // }
 
-        if($this->request->getGet("status_bc") === "finish")
-        {
-            $newDataPenerimaanBarang = [];
-            foreach($dataPenerimaanBarang as $item)
-            {
-                if($item["status_bc"] === "FINISH")
-                {
-                    array_push($newDataPenerimaanBarang, [
-                        "no"                    => $no++,
-                        "id"                    => $item["id"],
-                        "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
-                        "warehouse_name"        => $item["warehouse_name"],
-                        "tipe_bahan"            => $item["tipe_bahan"],
-                        "createdAt"             => $item["createdAt"],
-                        "supplier_name"         => $item["supplier_name"],
-                        "itemCount"             => $item["itemCount"],
-                        "multiple_po_no"        => $item["multiple_po_no"],
-                        "status_post"           => $item["status_post"],
-                        "status_bc"             => $item["status_bc"]
-                    ]);
-                }
-            }  
-            $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
-            $dataPenerimaanBarang = $newDataPenerimaanBarang;
-        }
+        // if($this->request->getGet("status_bc") === "finish")
+        // {
+        //     $newDataPenerimaanBarang = [];
+        //     foreach($dataPenerimaanBarang as $item)
+        //     {
+        //         if($item["status_bc"] === "FINISH")
+        //         {
+        //             array_push($newDataPenerimaanBarang, [
+        //                 "no"                    => $no++,
+        //                 "id"                    => $item["id"],
+        //                 "no_penerimaan_barang"  => $item["no_penerimaan_barang"],
+        //                 "warehouse_name"        => $item["warehouse_name"],
+        //                 "tipe_bahan"            => $item["tipe_bahan"],
+        //                 "createdAt"             => $item["createdAt"],
+        //                 "supplier_name"         => $item["supplier_name"],
+        //                 "itemCount"             => $item["itemCount"],
+        //                 "multiple_po_no"        => $item["multiple_po_no"],
+        //                 "status_post"           => $item["status_post"],
+        //                 "status_bc"             => $item["status_bc"]
+        //             ]);
+        //         }
+        //     }  
+        //     $penerimaanBarangData['totalFilteredData'] = sizeof($newDataPenerimaanBarang);
+        //     $dataPenerimaanBarang = $newDataPenerimaanBarang;
+        // }
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),

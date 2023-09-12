@@ -98,9 +98,9 @@
                             <option value="">
                                 - PILIH TUJUAN -
                             </option>
-                            <?php foreach (\App\Constant\BeaCukai::DokumenTPB as $d) : ?>
-                                <option value="<?= $d['kodeJenisTPB'] ?>">
-                                    - <?= $d['namaJenisTPB'] ?> -
+                            <?php foreach ($jenisTPB as $d) : ?>
+                                <option value="<?= $d['id'] ?>">
+                                    - <?= $d['value'] ?> -
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -243,7 +243,7 @@
                     </div>
                 </div>
                 <div class="col-sm-6 mt-1">
-                    <div class="form-floating mb-3" style="height: 50px;">
+                    <div class="form-floating mb-3">
                         <textarea name="PpjkAlamat" cols="30" rows="10" class="form-control"></textarea>
                         <label for="floatingInput">Alamat (Opsional)</label>
                     </div>
@@ -259,9 +259,9 @@
                             <option value="">
                                 - Cara Pengangkutan -
                             </option>
-                            <?php foreach (\App\Constant\BeaCukai::Pengangkutan as $p) : ?>
-                                <option value="<?= $p['kodePengangkutan'] ?>">
-                                    - <?= $p['caraPengangkutan'] ?> -
+                            <?php foreach ($pengangkutan as $p) : ?>
+                                <option value="<?= $p['id'] ?>">
+                                    - <?= $p['value'] ?> -
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -352,8 +352,275 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
-                        <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
+                        <input autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
+                        <label for="floatingInput">Kode Fasilitas Import (Opsional)</label>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="noLc" type="text" placeholder="No LC (Opsional)" class="form-control target input-picker">
+                        <label for="floatingInput">No LC (Opsional)</label>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
+                        <label for="floatingInput">Tanggal LC (Opsional)</label>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="noBl" type="text" placeholder="No B/L (Opsional)" class="form-control target input-picker">
+                        <label for="floatingInput">No B/L (Opsional)</label>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
+                        <label for="floatingInput">Tanggal B/L (Opsional)</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="noBc" type="text" placeholder="No B.C 1.1" class="form-control target input-picker">
+                        <label for="floatingInput">No B.C 1.1</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
+                        <label for="floatingInput">Tanggal B.C 1.1</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="kodePos" type="text" placeholder="Kode Pos" class="form-control target input-picker">
+                        <label for="floatingInput">Kode Pos</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">List Dokumen</label>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-show-dokumen btn-add btn-block float-right" data-btn="dokumen-modal">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>Kode Dokumen</th>
+                                <th>Jenis Dokumen</th>
+                                <th>No Dokumen</th>
+                                <th>Tanggal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-dokumen-table" id="body-dokumen-table" style="cursor: pointer;">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <label class="form-label font-weight-bold lable-title mt-2">
+                Penimbunan
+            </label>
+            <div class="row mt-2">
+                <div class="col-sm-12">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="tempatPenimbunan" type="text" placeholder="Tempat Penimbunan" class="form-control target input-picker">
+                        <label for="floatingInput">Tempat Penimbunan</label>
+                    </div>
+                </div>
+            </div>
+            <label class="form-label font-weight-bold lable-title mt-2">
+                Harga
+            </label>
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="valuta" type="text" placeholder="Valuta" class="form-control target input-picker">
+                        <label for="floatingInput">Valuta</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="npdpbm" type="text" placeholder="NDPBM" class="form-control target input-picker">
+                        <label for="floatingInput">NDPBM</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="fob" type="text" placeholder="FOB" class="form-control target input-picker">
+                        <label for="floatingInput">FOB</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="freight" type="text" placeholder="Freight" class="form-control target input-picker">
+                        <label for="floatingInput">Freight</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="tipeAsuransi" type="text" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="form-control target input-picker">
+                        <label for="floatingInput">Asuransi Luar Negeri / Dalam Negeri</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="nilaiCif" type="text" placeholder="Nilai CIF" class="form-control target input-picker">
+                        <label for="floatingInput">Nilai CIF</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" onkeyup="formatNumber(this)" name="nilaiCifRupiah" type="text" placeholder="Nilai CIF Rupiah" class="form-control target input-picker">
+                        <label for="floatingInput">Nilai CIF Rupiah</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">List Kontainer</label>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-show-kontainer btn-add btn-block float-right" data-btn="kontainer-modal">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>No Kontainer</th>
+                                <th>Ukuran</th>
+                                <th>Tipe</th>
+                                <th>Keterangan</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-kontainer-table" id="body-kontainer-table" style="cursor: pointer;">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">List Kemasan</label>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-show-kemasan btn-add btn-block float-right" data-btn="kemasan-modal">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>Jumlah</th>
+                                <th>Kode</th>
+                                <th>Uraian</th>
+                                <th>Merk Kemasan</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-kemasan-table" id="body-kemasan-table" style="cursor: pointer;">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <label class="form-label font-weight-bold lable-title mt-2">
+                Barang
+            </label>
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="bruto" type="text" placeholder="Bruto (Kg)" class="form-control target input-picker">
+                        <label for="floatingInput">Bruto (Kg)</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="netto" type="text" placeholder="Netto (Kg)" class="form-control target input-picker">
+                        <label for="floatingInput">Netto (Kg)</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="jumlahBarang" type="text" placeholder="Jumlah Barang" class="form-control target input-picker">
+                        <label for="floatingInput">Jumlah Barang</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th>Jenis Pungutan</th>
+                                <th>Ditangguhkan (Rp)</th>
+                                <th>Dibebaskan (Rp)</th>
+                                <th>Tidak Dipungut (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-pungutan-table" id="body-pungutan-table" style="cursor: pointer;">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <label class="form-label font-weight-bold lable-title mt-2">
+                Pengesahan
+            </label>
+            <br/>
+            <label class="form-label mt-2">
+                Dengan ini saya menyatakan bertanggung jawab atas kebenaran hal-hal yang diberitahukan dalam pemberitahuan pabean ini.
+            </label>
+            <div class="row mt-2">
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="tempat" type="text" placeholder="Tempat" class="form-control target input-picker">
+                        <label for="floatingInput">Tempat</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="form-control target input-picker">
+                        <label for="floatingInput">Tanggal</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="pemberitahu" type="text" placeholder="Pemberitahu" class="form-control target input-picker">
+                        <label for="floatingInput">Pemberitahu</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input autocomplete="one-time-code" name="jabatan" type="text" placeholder="Jabatan" class="form-control target input-picker">
+                        <label for="floatingInput">Jabatan</label>
                     </div>
                 </div>
             </div>
@@ -415,6 +682,27 @@
     });
 
     $("input[name='tanggalFasilitasImport']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("input[name='tanggalLc']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("input[name='tanggalBl']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("input[name='tanggalBc']").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
