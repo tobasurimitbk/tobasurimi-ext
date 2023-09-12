@@ -57,6 +57,7 @@ class Tunjangan extends BaseController
                 "id"                    => $data->id,
                 "date"                  => date("d/m/Y", strtotime($data->date)),
                 "name"                  => $data->name,
+                "tipe"                  => ($data->tipe == "PLUS") ? "Penambahan Gaji" : "Pengurangan Gaji"
             ]);
         }
 
@@ -65,7 +66,6 @@ class Tunjangan extends BaseController
             "recordsTotal"      => $res['totalData'],
             "recordsFiltered"   => $res['totalFilteredData'],
             "data"              => $rdata,
-            // "response" => $response,
             "payload"           => $payload
         ];
 
@@ -79,6 +79,9 @@ class Tunjangan extends BaseController
             $rules = [
                 "nama" => [
                     "rules" => "required"
+                ],
+                "tipe" => [
+                    "rules" => "required"
                 ]
 
             ];
@@ -87,6 +90,7 @@ class Tunjangan extends BaseController
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
+                    "tipe" => $this->request->getPost("tipe")
                 ];
                 if ($this->TunjanganModel->insert($values)) {
                     $data = [
@@ -131,6 +135,9 @@ class Tunjangan extends BaseController
             $rules = [
                 "nama" => [
                     "rules" => "required"
+                ],
+                "tipe" => [
+                    "rules" => "required"
                 ]
             ];
 
@@ -141,7 +148,7 @@ class Tunjangan extends BaseController
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
-
+                    "tipe" => $this->request->getPost("tipe")
                 ];
 
                 if ($this->TunjanganModel->update($id, $values)) {
