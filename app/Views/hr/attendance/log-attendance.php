@@ -93,7 +93,7 @@
                         </form>
                     </div>
                     <div class="col-sm-4">
-                        <a href="<?= base_url("list-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary mt-1 p-2">
+                        <a href="<?= base_url("log-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary mt-1 p-2">
                             <i class="fa-solid fa-rotate-right"></i>
                             Reset
                         </a>
