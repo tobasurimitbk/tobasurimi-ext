@@ -191,7 +191,7 @@ class EmployeesModel extends Model
         return $query->getResultArray();
     }
 
-    public function getEmployeesWithPagination($companyID, $employeesID = null, $perPage = 1)
+    public function getEmployeesWithPagination($companyID, $employeesID = null, $perPage = 50)
     {
         $arrCondition = [
             'employees.deletedAt' => null,
