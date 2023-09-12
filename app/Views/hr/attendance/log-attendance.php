@@ -153,7 +153,6 @@
                                         $perizinanCheck = $formPerizinanModel
                                             ->where('employee_id', $res_user[$i]['employeeID'])
                                             ->where('periode', ($year . "-" . $month . "-" . $no))
-                                            ->whereNotIn('status', ["LEMBUR"])
                                             ->first();
 
                                         $hariBesarCheck = $hariBesarModel
