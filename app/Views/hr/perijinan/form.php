@@ -30,15 +30,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select employee_id" name="employee_id" id="employee_id">
                                 <option value=""></option>
-                                <?php
-                                if (!empty($dataEmployee)) {
-                                    foreach ($dataEmployee as $employee) {
-                                ?>
+                                <?php if (!empty($dataEmployee)) : ?>
+                                    <?php foreach ($dataEmployee as $employee) : ?>
                                         <option value="<?= $employee->id; ?>" <?= !empty($data) ? ($data->employee_id === $employee->id ? "selected" : "") : ""; ?>><?= $employee->nip; ?> - <?= $employee->name; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Nama Karyawan</label>
                         </div>
@@ -64,43 +60,40 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select status" name="status" id="status" <?= !empty($data) ? ($data->status === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
-                                <?php
-                                if (!empty($status)) {
-                                    foreach ($status as $s) {
-                                ?>
+                                <?php if (!empty($status)) : ?>
+                                    <?php foreach ($status as $s) : ?>
                                         <option value="<?= $s; ?>" <?= !empty($data) ? ($data->status === $s ? "selected" : "") : ""; ?>><?= $s; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Status</label>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea autocomplete="one-time-code" class="form-control reason text-area-all" id="reason" name="reason" <?= !empty($data) ? ($data->reason === true ? 'disabled=true' : '') : ''; ?> placeholder="Keterangan"><?= !empty($data) ? $data->reason : ""; ?></textarea>
-                            <label for="floatingInput">Keterangan</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control jamMulaiLembur" id="jamMulaiLembur" name="jamMulaiLembur" <?= !empty($data) ? 'disabled=true' :  ''; ?> value='<?= !empty($data) ? $data->periode :  ''; ?>' placeholder="Tanggal mulai">
+                            <label for="floatingInput">Jam mulai Lembur</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control jamSelesaiLembur" id="jamSelesaiLembur" name="jamSelesaiLembur" <?= !empty($data) ? 'disabled=true' : ''; ?> value='<?= !empty($data) ? $data->periode :  ''; ?>' placeholder="Tanggal akhir">
+                            <label for="floatingInput">Jam selesai Lembur</label>
                         </div>
                     </div>
                 </div>
-
-                <!-- <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3" style="height: 50px;">
-                            <label for="floatingInput">Posting</label>
-                            <div class="switch-form-form-perijinan">
-                                <label class="switch">
-                                    <input autocomplete="one-time-code" class="is_posted" <?= !empty($data) ? ($data === true ? 'disabled=true' : '') : ''; ?> name="is_posted" id="is_posted" type="checkbox" <?= !empty($data) ? ($data === true ? 'checked' : '') : ''; ?>>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <textarea autocomplete="one-time-code" class="form-control reason text-area-all" id="reason" name="reason" <?= !empty($data) ? ($data->reason === true ? 'disabled=true' : '') : ''; ?> placeholder="Keterangan"><?= !empty($data) ? $data->reason : ""; ?></textarea>
+                            <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
-                </div> -->
+                </div>
+            </form>
         </div>
-        </form>
     </div>
     </div>
 </section>
@@ -191,8 +184,14 @@
                 required: "Tanggal akhir wajib diisi"
             },
             status: {
-                required: "Status wajib diisi"
+                required: "Status perizinan wajib diisi"
             },
+            jamMulaiLembur: {
+                required: "Jam mulai lembur wajib diisi"
+            },
+            jamSelesaiLembur: {
+                required: "Jam selesai lembur wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -392,6 +391,57 @@
             });
 
         });
+    });
+
+    $(function() {
+        $('#jamMulaiLembur').datetimepicker({
+            format: 'HH:mm',
+            icons: {
+                up: 'fas fa-chevron-up',
+                down: 'fas fa-chevron-down'
+            },
+        });
+        $('#jamSelesaiLembur').datetimepicker({
+            format: 'HH:mm',
+            icons: {
+                up: 'fas fa-chevron-up',
+                down: 'fas fa-chevron-down'
+            },
+        });
+    });
+
+    $('#status').change(function(e) {
+        e.preventDefault();
+        var status = $(this).val();
+        var tanggalMulai = $('#start_date');
+        var tanggalSelesai = $('#end_date');
+        var jamMulaiLembur = $('#jamMulaiLembur');
+        var jamSelesaiLembur = $('#jamSelesaiLembur');
+
+        if (status === "LEMBUR") {
+            jamMulaiLembur.attr('readonly', false);
+            jamSelesaiLembur.attr('readonly', false);
+            jamMulaiLembur.attr('required', true);
+            jamSelesaiLembur.attr('required', true);
+            tanggalSelesai.attr('readonly', true);
+            tanggalSelesai.val(tanggalMulai.val());
+        } else {
+            jamMulaiLembur.attr('readonly', true);
+            jamSelesaiLembur.attr('readonly', true);
+            jamMulaiLembur.attr('required', false);
+            jamSelesaiLembur.attr('required', false);
+            tanggalSelesai.attr('readonly', false);
+            jamMulaiLembur.val(null);
+            jamSelesaiLembur.val(null);
+        }
+    });
+
+    $('#start_date').change(function(e) {
+        e.preventDefault();
+        if ($('#status').val() == "LEMBUR") {
+            var tanggalMulai = $(this).val();
+            $('#end_date').val(tanggalMulai);
+        }
     });
 </script>
 

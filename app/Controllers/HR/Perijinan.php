@@ -2,6 +2,7 @@
 
 namespace App\Controllers\HR;
 
+use App\Constant\Perizinan;
 use App\Controllers\BaseController;
 use Config\Services;
 use App\Models\FormPerijinanModel;
@@ -32,10 +33,9 @@ class Perijinan extends BaseController
         $EmployeesModel = new EmployeesModel();
 
         $data = [
-            "status" => ["IJIN", "CUTI", "SAKIT"]
+            "status" => Perizinan::status
         ];
 
-        //Get Employee
         $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
 
         foreach (array_keys($dataEmployee) as $key) {
@@ -52,7 +52,7 @@ class Perijinan extends BaseController
         $EmployeesModel = new EmployeesModel();
 
         $data = [
-            "status" => ["IJIN", "CUTI", "SAKIT"]
+            "status" => Perizinan::status
         ];
 
         $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);

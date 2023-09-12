@@ -402,6 +402,7 @@ class Attendance extends BaseController
                 // chek apakah data izin
                 $formPerizinan = $FormPerijinanModel->where('periode', $dates)
                     ->where('employee_id', $e['id'])
+                    ->whereNotIn('status', ["LEMBUR"])
                     ->first();
                 // check adakah data 
                 $hariLibur = $hariLiburModel->where('date', $dates)->first();
