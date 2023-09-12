@@ -5,17 +5,33 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Tunjangan</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Komponen Gaji</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control name" id="nama" name="nama" placeholder="Nama">
-                                <label for="floatingInput">Nama</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="nama" name="nama" placeholder="Nama Komponen Gaji">
+                                <label for="floatingInput">Nama Komponen Gaji</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select" required name="tipe" aria-label="Floating label select example">
+                                    <option value="">
+                                        - PILIH STATUS
+                                    </option>
+                                    <option value="PLUS">
+                                        - PENAMBAHAN GAJI -
+                                    </option>
+                                    <option value="MINUS">
+                                        - PENGURANGAN GAJI -
+                                    </option>
+                                </select>
+                                <label for="floatingInput">Pilih Status</label>
                             </div>
                         </div>
                     </div>
@@ -33,8 +49,8 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Tunjangan</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+        <h1>Komponen Gaji</h1>
+        <button class="btn btn-show-form btn-add float-right" id="createModal" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
     </div>
@@ -52,10 +68,10 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
+                                <th onclick="changeSort('tipe')" class="sort">Status</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
                         </tbody>
                     </table>
                 </div>
@@ -110,6 +126,10 @@
             {
                 data: "name",
                 className: "text-center"
+            },
+            {
+                data: "tipe",
+                className: "text-center"
             }
         ],
         columnDefs: [{
@@ -137,6 +157,9 @@
             messages: {
                 nama: {
                     required: "Nama wajib diisi"
+                },
+                tipe: {
+                    required: "Pilih status terlebih dahulu"
                 }
             },
             errorElement: 'span',
@@ -195,6 +218,7 @@
                     if (res.status) {
                         $(".id").val(id);
                         $("#nama").val(res?.data?.name);
+                        $("select[name='tipe']").val(res?.data?.tipe);
 
                         $(".add-modal").modal("show")
                     } else {

@@ -17,6 +17,7 @@ class TunjanganModel extends Model
     protected $allowedFields    = [
         'company_id',
         'name',
+        'tipe',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -50,6 +51,7 @@ class TunjanganModel extends Model
     {
         $availableSort = [
             'name'              => 'tunjangan.name',
+            'tipe'              => 'tunjangan.tipe',
             'createdAt'         => 'tunjangan.createdAt',
             'updatedAt'         => 'tunjangan.updatedAt',
         ];
