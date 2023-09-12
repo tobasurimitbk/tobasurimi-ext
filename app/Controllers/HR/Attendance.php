@@ -159,13 +159,15 @@ class Attendance extends BaseController
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
         // get data from model
-        $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
+        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'));
+        $pager = \Config\Services::pager();
+        $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
 
         // declare variable for store data
         $dataResult = array();
 
         // set data attendance
-        foreach ($dataEmployee as $value) {
+        foreach ($dataEmployeePager['data'] as $value) {
             // get log attendance by employee and $year-$month
             $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
             // store data
@@ -185,7 +187,11 @@ class Attendance extends BaseController
         $data = [
             'year' => $year,
             'month' => $month,
-            'res_user'  => $dataResult
+            'res_user'  => $dataResult,
+            'employeesData' => $dataEmployeePager['data'],
+            'pager' => $dataEmployeePager['pager'],
+            'employeeDetailFilter' => $employeeDetailFilter,
+            'pager' => $dataEmployeePager['pager']
 
         ];
         return view('hr/attendance/log-attendance', $data);
@@ -329,15 +335,23 @@ class Attendance extends BaseController
             ->where('isPosted', 1)
             ->countAllResults();
 
+        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'));
+        $pager = \Config\Services::pager();
+        $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
+
         // Data Send To View
         $data = [
             'year' => $year,
             'month' => $month,
             'totalAttendances' => $totalAttendances,
-            'employeesData' => $EmployeesModel->getEmployees($this->this_company_id),
+            'employeesData' => $dataEmployeePager['data'],
+            'pager' => $dataEmployeePager['pager'],
+            'employeeDetailFilter' => $employeeDetailFilter,
             'isPosting' =>  $isPosting,
             'isPostingPayroll' => $isPostingPayroll
         ];
+
+        $data['pager'] = $pager;
 
         return \view('hr/attendance/attendance-generate', $data);
     }
@@ -520,6 +534,31 @@ class Attendance extends BaseController
 
         return $this->response->setJSON([
             'message' => "Status posting presensi diperbaruhi"
+        ]);
+    }
+
+    public function getEmployeesLike()
+    {
+        $employeesName = $this->request->getVar('employeesName');
+
+        $employessModel = new EmployeesModel();
+
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $this->this_company_id,
+            'users.id' => null
+        ];
+
+        $result = $employessModel->select("employees.name, employees.id")
+            ->join('users', 'users.employee_id = employees.id', 'left')
+            ->groupStart()
+            ->where($arrCondition)
+            ->like('employees.name', $employeesName)
+            ->groupEnd()
+            ->findAll();
+
+        return \response()->setJSON([
+            'data' => $result
         ]);
     }
 }

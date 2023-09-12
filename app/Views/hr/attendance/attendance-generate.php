@@ -105,11 +105,29 @@
             <!-- Hasil Preview Form Generate -->
             <hr>
             <div class="row row-col-page-list-attendance mt-4">
-                <div class="row mb-3" style="text-align: right;">
-                    <div class="col-sm-4" style="margin-top: -10px; float: right;">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Nama Employee" value="" />
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <form action="#" method="get">
+                            <div class="form-floating">
+                                <select class="form-select" name="select2EmployeesName" aria-label="Floating label select example">
+                                    <?php if ($employeeDetailFilter != null) : ?>
+                                        <option value="<?= $employeeDetailFilter['id'] ?>">
+                                            <?= $employeeDetailFilter['name']; ?>
+                                        </option>
+                                    <?php endif; ?>
+                                </select>
+                                <label for="floatingInput">Cari Data Karyawan</label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-sm-4">
+                        <a href="<?= base_url("list-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary mt-1 p-2">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            Reset
+                        </a>
                     </div>
                 </div>
+                <br><br><br><br><br>
 
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="attendanceTable">
@@ -228,6 +246,13 @@
                         </tbody>
                     </table>
                 </div>
+
+                <?php if ($totalAttendances != 0) : ?>
+                    <?php if ($pager->hasMore() || ($pager->getCurrentPage() < $pager->getPageCount()) || (count($employeesData) > $pager->getPerPage())) : ?>
+                        <?= $pager->links('default', 'bootstrap4_pagination') ?>
+                    <?php endif ?>
+                <?php endif ?>
+
                 <div class="card-text mt-4">
                     <b class="text-black">Keterangan</b>
                 </div>
@@ -586,18 +611,6 @@
                 },
             });
         });
-        // search
-        $('.search').keyup(function() {
-            var searchText = $(this).val().toLowerCase();
-            $('#attendanceTable tbody tr').each(function() {
-                var employeeName = $(this).find('td:eq(0)').text().toLowerCase();
-                if (employeeName.includes(searchText)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        });
         // update attendance
         $('#updateAttendanceForm').submit(function(e) {
             e.preventDefault();
@@ -703,10 +716,61 @@
                         }
                     });
                 }
-            })
-
-
+            });
         });
+        // Search employee
+        $("select[name='select2EmployeesName']").select2({
+            placeholder: "Cari Nama Karyawan",
+            theme: "bootstrap-5",
+            allowClear: true,
+            minimumInputLength: 2,
+            ajax: {
+                url: "<?= base_url('attendance/like-employees') ?>",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        employeesName: params.term
+                    };
+                },
+                processResults: function(data) {
+                    var options = [];
+                    $.each(data.data, function(index, employee) {
+                        options.push({
+                            id: employee.id,
+                            text: employee.name
+                        });
+                    });
+                    return {
+                        results: options
+                    };
+                },
+                cache: true
+            }
+        });
+        $("select[name='select2EmployeesName']").on("change", function() {
+            var selectedValue = $(this).val();
+            window.location.href = "<?= base_url("list-attendance?month=$month&year=$year") ?>&employeesID=" + selectedValue;
+        });
+        $('.form-select')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.form-select')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.form-select')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
     });
 </script>
 

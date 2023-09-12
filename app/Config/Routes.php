@@ -557,6 +557,7 @@ $routes->post('/generate-attendance', 'HR\Attendance::generateAttendanceAction',
 $routes->post('/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter' => 'Auth']);
 $routes->post('/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
 $routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttendance', ['filter' => 'Auth']);
+$routes->get('/attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);

@@ -190,4 +190,30 @@ class EmployeesModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function getEmployeesWithPagination($companyID, $employeesID = null, $perPage = 1)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $companyID,
+            'users.id' => null,
+        ];
+
+        if ($employeesID !== null) {
+            $arrCondition['employees.id'] = $employeesID;
+        }
+
+        $this->builder()
+            ->select("employees.*, users.id as users_id, users.name as users_name")
+            ->join('users', 'users.employee_id = employees.id', 'left')
+            ->groupStart()->where($arrCondition)->groupEnd();
+
+
+        $result = [
+            'data' => $this->paginate($perPage),
+            'pager' => $this->pager,
+        ];
+
+        return $result;
+    }
 }
