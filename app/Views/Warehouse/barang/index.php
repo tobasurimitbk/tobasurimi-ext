@@ -133,7 +133,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select ap_id" name="ap_id" id="ap_id">
@@ -156,7 +156,7 @@
                                     <label for="floatingInput">Akun Penjualan (Opsional)</label>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">

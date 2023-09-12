@@ -126,6 +126,12 @@ class Invoice extends BaseController
         //echo json_encode($payload);
         //return;
         $rules = [
+            "no_faktur" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Nomor Faktur tidak boleh kosong',
+                ]
+            ],
             "tanggal_faktur" => [
                 "rules" => "required|valid_date[d/m/Y]",
                 'errors' => [
@@ -191,12 +197,13 @@ class Invoice extends BaseController
             // start transaction
             $this->SalesOrderInvoiceModel->db->transException(true)->transStart();
 
-            $code = "LKL/INV";
+            /* $code = "LKL/INV";
             $currentYear = date('Y');
             $currentMonth = date('m');
             $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
             $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
-            $noFaktur = $code . $number . "/" . $currentYear . "/" . $currentMonth;
+            $noFaktur = $code . $number . "/" . $currentYear . "/" . $currentMonth; */
+            $noFaktur = $postData['no_faktur'];
 
 
             $values = [
@@ -363,7 +370,12 @@ class Invoice extends BaseController
                     'required' => 'surat jalan tidak boleh kosong',
                 ]
             ],
-
+            "no_faktur" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Nomor Faktur tidak boleh kosong',
+                ]
+            ],
             "tipe_invoice" => [
                 "rules" => "required",
                 'errors' =>
@@ -562,10 +574,12 @@ class Invoice extends BaseController
             $includeTax = filter_var($soData->include_pa, FILTER_VALIDATE_BOOLEAN);
         } else {
             $suratJalanData = $this->SuratJalanModel->asObject()
-                ->select('surat_jalan_so.*, customers.name AS customerName, customers.address AS customerAddress')
+                ->select('surat_jalan_so.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName')
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer')
+                ->join('employees', 'employees.id = customers.sales_id')
                 ->find($docId);
 
+            $salesName = $suratJalanData->salesName;
             $soId = json_decode($suratJalanData->multiple_id_so);
             $customerName = $suratJalanData->customerName;
             $customerAddress = $suratJalanData->customerAddress;
