@@ -21,7 +21,7 @@ class JamKerja extends BaseController
 
     public function index()
     {
-        return view('master/jamKerja/index');
+        return view('Master/jamKerja/index');
     }
 
     public function all()
@@ -81,7 +81,7 @@ class JamKerja extends BaseController
             'hari' => $modelMetaData->where('name', "hari")->findAll()
         ];
 
-        return \view('master/jamKerja/form', $data);
+        return \view('Master/jamKerja/form', $data);
     }
 
     public function create()
@@ -150,7 +150,7 @@ class JamKerja extends BaseController
             'hari' => $modelMetaData->where('name', "hari")->findAll()
         ];
 
-        return \view('master/jamKerja/form', $data);
+        return \view('Master/jamKerja/form', $data);
     }
 
     public function update()
