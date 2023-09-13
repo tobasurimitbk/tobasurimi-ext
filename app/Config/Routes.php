@@ -319,6 +319,7 @@ $routes->get('/order-form-lokal/all', 'SalesLokal\OrderForm::all', ['filter' => 
 $routes->post('/order-form-lokal/save', 'SalesLokal\OrderForm::save', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/update', 'SalesLokal\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/delete', 'SalesLokal\OrderForm::delete', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/print/(:num)', 'SalesLokal\OrderForm::printOrder/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getItemList', 'SalesLokal\OrderForm::getItemListByIds', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getItemList/(:num)', 'SalesLokal\OrderForm::getItemListById/$1', ['filter' => 'Auth']);
 

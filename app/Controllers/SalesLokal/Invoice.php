@@ -12,6 +12,7 @@ use App\Models\SuratJalanModel;
 use App\Models\AllNoModel;
 use Config\Services;
 use ErrorException;
+use Exception;
 
 class Invoice extends BaseController
 {
@@ -555,6 +556,7 @@ class Invoice extends BaseController
         $customerName = '';
         $customerAddress = '';
         $salesName = '';
+        $termin = '';
         $taxStatus = false;
         $includeTax = false;
         $itemList = [];
@@ -562,24 +564,28 @@ class Invoice extends BaseController
         if ($docType == 'pesanan') {
             $soId = $docId;
             $soData = $this->SalesOrderModel->asObject()
-                ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+                ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
                 ->join('customers', 'customers.id = sales_order.id_customer')
                 ->join('employees', 'employees.id = sales_order.sales_id')
+                ->join('metadata', 'metadata.id = customers.termin')
                 ->find($docId);
             
             $salesName = $soData->salesName;
+            $termin = $soData->termin;
             $customerName = $soData->customerName;
             $customerAddress = $soData->customerAddress;
             $taxStatus = filter_var($soData->tax_status, FILTER_VALIDATE_BOOLEAN);
             $includeTax = filter_var($soData->include_pa, FILTER_VALIDATE_BOOLEAN);
         } else {
             $suratJalanData = $this->SuratJalanModel->asObject()
-                ->select('surat_jalan_so.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+                ->select('surat_jalan_so.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer')
                 ->join('employees', 'employees.id = customers.sales_id')
+                ->join('metadata', 'metadata.id = customers.termin')
                 ->find($docId);
 
             $salesName = $suratJalanData->salesName;
+            $termin = $suratJalanData->termin;
             $soId = json_decode($suratJalanData->multiple_id_so);
             $customerName = $suratJalanData->customerName;
             $customerAddress = $suratJalanData->customerAddress;
@@ -602,6 +608,7 @@ class Invoice extends BaseController
 
         $data = (object)[
             'salesName'         => $salesName,
+            'termin'            => $termin,
             'customerName'      => $customerName,
             'customerAddress'   => $customerAddress,
             'taxStatus'         => $taxStatus,
