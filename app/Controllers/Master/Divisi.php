@@ -4,6 +4,7 @@ namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
 use App\Models\DivisisModel;
+use App\Models\JamKerjaModel;
 
 class Divisi extends BaseController
 {
@@ -20,9 +21,11 @@ class Divisi extends BaseController
 
     public function divisi()
     {
+        $modelJamKerja = new JamKerjaModel();
         $dataDivisi = $this->DivisisModel->search_list(array(), 'divisi');
         $data = [
             "dataDivisi" => $dataDivisi,
+            "jamKerja" => $modelJamKerja->where('company_id', $this->this_company_id)->findAll()
         ];
 
 
@@ -31,48 +34,6 @@ class Divisi extends BaseController
 
     public function allDivisi()
     {
-        /*
-        $payload = [
-            "pageSize" => $this->request->getGet("length"),
-            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "idCompany" => $this->this_company_id
-        ];
-
-        $response = curl_request("GET", "/divisis", $this->token, $payload);
-        $dataCompany = [];
-        $totalRecords = 0;
-
-        if ($response["code"] === 200) {
-            $body = json_decode($response["body"])->data;
-            $totalRecords = json_decode($response["body"])->meta->totalData;
-
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($body as $data) {
-                array_push($dataCompany, [
-                    "no" => $no++,
-                    "id" => $data->id,
-                    "divisi" => $data->divisi
-                ]);
-            }
-        }
-
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
-            "recordsTotal"    => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $dataCompany,
-            "response" => $response,
-            "payload" => $payload
-        ];
-
-        echo json_encode($data);
-        return;
-        */
-
         $draw = $this->request->getVar('draw');
         $row = $this->request->getVar('start');
         $rowperpage = $this->request->getVar('length');
@@ -108,6 +69,7 @@ class Divisi extends BaseController
                 "no" => ($row + $i + 1),
                 "id" => $res[$i]["id"],
                 "divisi" => $res[$i]["divisi"],
+                "jamKerja" => $res[$i]["jenis"]
             );
         }
 
@@ -128,13 +90,17 @@ class Divisi extends BaseController
             $rules = [
                 "divisi" => [
                     "rules" => "required"
+                ],
+                "jam_kerja_id" => [
+                    "rules" => "required"
                 ]
             ];
 
             if ($this->validate($rules)) {
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "divisi" => $this->request->getPost("divisi")
+                    "divisi" => $this->request->getPost("divisi"),
+                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id')
                 ];
                 if ($this->DivisisModel->insert($values)) {
                     $data = [
@@ -179,6 +145,9 @@ class Divisi extends BaseController
             $rules = [
                 "divisi" => [
                     "rules" => "required"
+                ],
+                "jam_kerja_id" => [
+                    "rules" => "required"
                 ]
             ];
 
@@ -188,7 +157,8 @@ class Divisi extends BaseController
 
                 $values = [
                     "company_id" => $this->this_company_id,
-                    "divisi" => $this->request->getPost("divisi")
+                    "divisi" => $this->request->getPost("divisi"),
+                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id')
                 ];
 
                 if ($this->DivisisModel->update($id, $values)) {
