@@ -71,7 +71,15 @@ class BeaCukaiModel extends Model
         'cif_price',
         'bruto',
         'netto',
-        'item_count'
+        'item_count',
+        'tempat',
+        'tanggal',
+        'pemberitahu',
+        'jabatan',
+        'data_dokumen',
+        'data_kontainer',
+        'data_kemasan',
+        'status_posting'
     ];
 
     // Dates
@@ -97,4 +105,51 @@ class BeaCukaiModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'ajuNo'            => 'bea_cukai.aju_no',
+            'registrationNo'   => 'bea_cukai.registration_no',
+            'registrationDate' => 'bea_cukai.registration_date',
+            'tujuanTPBName'    => 'metadata.value',
+            'statusPosting'    => 'bea_cukai.status_posting',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bea_cukai.updatedAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "bea_cukai.*, 
+            metadata.value AS tujuan_tpb_name";
+
+        $bbLokalDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('metadata', 'bea_cukai.tujuan_tpb = metadata.id', 'left')
+            ->groupBy(('bea_cukai.id'))
+            ->orderBy($sort, $sortType);
+
+        $totalData = $bbLokalDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $bbLokalDataQry->groupStart();
+        }
+        if ($addCondition['search']) {
+            $bbLokalDataQry
+                ->like('aju_no', $addCondition['search']);
+        }
+        if ($addCondition['search']) {
+            $bbLokalDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $bbLokalDataQry->countAllResults(false);
+        $data = $bbLokalDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

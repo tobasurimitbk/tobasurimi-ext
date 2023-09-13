@@ -154,6 +154,7 @@ $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
 // SUPPLIER
+$routes->get('/supplier/ajax', 'Supplier\SupplierBahanBaku::supplierAjax', ['filter' => 'Auth']);
 // BAHAN BAKU LOKAL
 $routes->get('/supplier-bahan-baku', 'Supplier\SupplierBahanBaku::supplierBahanBaku', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku/all', 'Supplier\SupplierBahanBaku::allSupplierBahanBaku', ['filter' => 'Auth']);
@@ -525,7 +526,10 @@ $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Wareho
 // BC 2.3
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BeaCukaiController::bc23View');
+    $routes->get('all', 'BeaCukai\BeaCukaiController::bc23All');
     $routes->get('create', 'BeaCukai\BeaCukaiController::bc23CreateFormView');
+    $routes->post('save', 'BeaCukai\BeaCukaiController::bc23SaveForm');
+    $routes->post('delete', 'BeaCukai\BeaCukaiController::bc23Delete');
 });
 $routes->get('/bea-cukai-bc-25', 'BeaCukai\BeaCukaiController::bc25View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-261', 'BeaCukai\BeaCukaiController::bc261View', ['filter' => 'Auth']);
