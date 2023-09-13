@@ -620,8 +620,13 @@ $routes->post('/form-perijinan/save', 'HR\Perijinan::save', ['filter' => 'Auth']
 $routes->post('/form-perijinan/delete', 'HR\Perijinan::delete', ['filter' => 'Auth']);
 
 // jam kerja
-$routes->get('/jam-kerja', 'HR\JamKerja::jamKerja', ['filter' => 'Auth']);
-$routes->get('/jam-kerja/all', 'HR\JamKerja::all', ['filter' => 'Auth']);
+$routes->get('/jam-kerja', 'Master\JamKerja::index', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/all', 'Master\JamKerja::all', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/create', 'Master\JamKerja::createView', ['filter' => 'Auth']);
+$routes->post('/jam-kerja/create', 'Master\JamKerja::create', ['filter' => 'Auth']);
+$routes->post('/jam-kerja/delete', 'Master\JamKerja::delete', ['filter' => 'Auth']);
+$routes->post('/jam-kerja/update', 'Master\JamKerja::update', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/id/(:segment)', 'Master\JamKerja::getById/$1', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

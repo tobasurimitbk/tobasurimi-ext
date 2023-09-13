@@ -258,7 +258,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("form-perijinan"); ?>";
+                                            location.reload();
                                         })
                                 } else {
                                     Swal.fire({
