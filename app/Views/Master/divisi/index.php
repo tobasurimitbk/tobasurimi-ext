@@ -12,10 +12,24 @@
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control divisi" id="divisi" name="divisi">
+                                <input autocomplete="one-time-code" type="text" class="form-control divisi" placeholder="Masukkan Divisi" id="divisi" name="divisi">
                                 <label for="floatingInput">Divisi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select" name="jam_kerja_id" required>
+                                    <option value="">PILIH JAM KERJA</option>
+                                    <?php foreach ($jamKerja as $j) : ?>
+                                        <option value="<?= $j['id'] ?>">
+                                            <?= $j['jenis'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+
+                                </select>
+                                <label for="floatingInput">Pilih Jam Kerja</label>
                             </div>
                         </div>
                     </div>
@@ -52,6 +66,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Divisi</th>
+                                <th onclick="changeSort('jamKerja')" class="sort">Jam Kerja</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -109,6 +124,9 @@
         }, {
             data: "divisi",
             className: "text-center"
+        }, {
+            data: "jamKerja",
+            className: "text-center"
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -130,11 +148,17 @@
             rules: {
                 divisi: {
                     required: true
+                },
+                jam_kerja_id: {
+                    required: true
                 }
             },
             messages: {
                 divisi: {
                     required: "Divisi wajib diisi"
+                },
+                jam_kerja_id: {
+                    required: "Jam Kerja wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -192,6 +216,7 @@
                     if (res.status) {
                         $(".id").val(id);
                         $(".divisi").val(res?.data?.divisi);
+                        $("select[name='jam_kerja_id']").val(res?.data?.jam_kerja_id);
                         validator.resetForm();
                         validator.reset();
                         $(".add-modal").modal("show")

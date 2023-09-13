@@ -415,4 +415,36 @@ class SupplierBahanBaku extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function supplierAjax()
+    {
+        $supplierModel = new SupplierModel();
+        $id = $this->request->getGet("id");
+
+        if (!empty($id)) {
+            $response = $supplierModel->getSupplierById($id);
+            if ($response) {
+                $data = [
+                    "status"  => true,
+                    "data"  => $response
+                ];
+                echo json_encode($data);
+            } else {
+                $message = 'Data Gagal Ditemukan';
+                $data = [
+                    "status" => false,
+                    "message"  => $message
+                ];
+                echo json_encode($data);
+            }
+        } else {
+            $data = [
+                "status"            => false,
+                "message"    => "Tidak Ada Id"
+            ];
+            echo json_encode($data);
+        }
+
+        return;
+    }
 }

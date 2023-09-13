@@ -12,6 +12,7 @@ class DivisisModel extends Model
     protected $allowedFields = [
         'id',
         'company_id',
+        'jam_kerja_id',
         'divisi',
         'createdAt',
         'updatedAt',
@@ -36,21 +37,29 @@ class DivisisModel extends Model
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
-        $requete = "SELECT divisis.* FROM divisis ";
-        $requete .= "WHERE divisis.deletedAt is null ";
-        if (isset($values["company_id"]))
-            $requete .= ($values["company_id"] == "") ? "" : ("AND divisis.company_id ='" . $values["company_id"] . "' ");
-        if (isset($values["divisi"]))
-            $requete .= ($values["divisi"] == "") ? "" : ("AND UPPER(divisis.divisi) like '%" . strtoupper($values["divisi"]) . "%' ");
-        if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(divisis.divisi) like '%" . strtoupper($values["search"]) . "%') ");
+        $requete = "SELECT divisis.*, jam_kerja.jenis FROM divisis ";
+        $requete .= "LEFT JOIN jam_kerja ON jam_kerja.id = divisis.jam_kerja_id ";
+        $requete .= "WHERE divisis.deletedAt IS NULL ";
 
+        if (isset($values["company_id"]) && $values["company_id"] !== "") {
+            $requete .= "AND divisis.company_id = '" . $values["company_id"] . "' ";
+        }
 
-        if ($sortby != '')
+        if (isset($values["divisi"]) && $values["divisi"] !== "") {
+            $requete .= "AND UPPER(divisis.divisi) LIKE '%" . strtoupper($values["divisi"]) . "%' ";
+        }
+
+        if (isset($values["search"]) && $values["search"] !== "") {
+            $requete .= "AND (UPPER(divisis.divisi) LIKE '%" . strtoupper($values["search"]) . "%') ";
+        }
+
+        if ($sortby !== '') {
             $requete .= "ORDER BY $sortby ";
-        if ($limit >= 0)
+        }
+
+        if ($limit >= 0) {
             $requete .= "LIMIT $limit OFFSET $offset";
-        //echo $requete;
+        }
 
         $query = $this->db->query($requete);
         return $query->getResultArray();

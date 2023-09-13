@@ -117,7 +117,8 @@ class SupplierModel extends Model
     public function getSupplierById($id)
     {
         $supplierData = $this->asObject()
-            ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name')
+            ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name, country.country_name')
+            ->join('country', 'country.code = suppliers.country_code', 'left')
             ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id', 'left')
             ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id', 'left')
             ->find($id);

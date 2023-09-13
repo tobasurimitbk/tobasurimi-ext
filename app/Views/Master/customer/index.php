@@ -574,7 +574,7 @@
                 url: `<?= base_url("metadata/dropdown"); ?>`,
                 method: "GET",
                 data: {
-                    name: 'valuta_asing'
+                    name: 'Valuta'
                 },
                 dataType: "json",
                 success: function(result) {
@@ -684,7 +684,7 @@
                             url: `<?= base_url("metadata/dropdown"); ?>`,
                             method: "GET",
                             data: {
-                                name: 'valuta_asing'
+                                name: 'Valuta'
                             },
                             dataType: "json",
                             success: function(result) {
