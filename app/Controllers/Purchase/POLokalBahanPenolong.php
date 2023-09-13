@@ -61,8 +61,8 @@ class POLokalBahanPenolong extends BaseController
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
-        //Get Valuta Asing By Metadata
-        $dataValuta = $this->MetadataModel->get_by_name('Valuta Asing');
+        //Get Valuta By Metadata
+        $dataValuta = $this->MetadataModel->get_by_name('Valuta');
 
         foreach (array_keys($dataValuta) as $key) {
             $dataValuta[$key] = (object)$dataValuta[$key];
@@ -93,8 +93,8 @@ class POLokalBahanPenolong extends BaseController
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
-        //Get Valuta Asing By Metadata
-        $dataValuta = $this->MetadataModel->get_by_name('Valuta Asing');
+        //Get Valuta By Metadata
+        $dataValuta = $this->MetadataModel->get_by_name('Valuta');
 
         foreach (array_keys($dataValuta) as $key) {
             $dataValuta[$key] = (object)$dataValuta[$key];

@@ -127,7 +127,7 @@ class Kurs extends BaseController
                 if($valas)
                 {
                     $payload = [
-                        "name" => "Valuta Asing",
+                        "name" => "Valuta",
                         "description" => NULL,
                         "value" => $valas
                     ];
@@ -240,7 +240,7 @@ class Kurs extends BaseController
                 if($valas)
                 {
                     $payload = [
-                        "name" => "Valuta Asing",
+                        "name" => "Valuta",
                         "description" => NULL,
                         "value" => $valas
                     ];

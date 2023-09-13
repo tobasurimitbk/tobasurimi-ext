@@ -54,8 +54,8 @@ class POImportBahanPenolong extends BaseController
         //Get Supplier
         $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN PENOLONG', $this->this_company_id);
 
-        //Get Valuta Asing By Metadata
-        $dataValuta = $this->metadataModel->get_by_name('Valuta Asing');
+        //Get Valuta By Metadata
+        $dataValuta = $this->metadataModel->get_by_name('Valuta');
         
         $data = [
             "dataSPP" => $dataSPP,
@@ -74,8 +74,8 @@ class POImportBahanPenolong extends BaseController
         //Get Supplier
         $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN PENOLONG', $this->this_company_id);
 
-        //Get Valuta Asing By Metadata
-        $dataValuta = $this->metadataModel->get_by_name('Valuta Asing');
+        //Get Valuta By Metadata
+        $dataValuta = $this->metadataModel->get_by_name('Valuta');
         
         $data = [
             "dataSPP" => $dataSPP,
