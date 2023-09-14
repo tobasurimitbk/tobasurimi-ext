@@ -81,9 +81,6 @@ class FormLembur extends BaseController
 
         $addCondition = [
             "nip"           => $this->request->getGet("nip"),
-            "name"          => $this->request->getGet("name"),
-            "divisi"        => $this->request->getGet("divisi"),
-            "periode"       => $this->request->getGet("periode")
         ];
 
         $limit = $this->request->getGet("length");
