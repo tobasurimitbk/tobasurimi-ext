@@ -216,4 +216,20 @@ class EmployeesModel extends Model
 
         return $result;
     }
+
+    public function getEmployeesAndDivisi($company_id)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id,
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.*, divisis.divisi")
+            ->join('divisis', 'divisis.id = employees.division_id', 'left');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }

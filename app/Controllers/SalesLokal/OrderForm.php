@@ -4,6 +4,9 @@ namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
 use Config\Services;
+use Dompdf\Dompdf;
+
+use App\Models\CompaniesModel;
 use App\Models\SalesOrderModel;
 use App\Models\CustomerModel;
 use App\Models\BarangModel;
@@ -12,6 +15,7 @@ use App\Models\DetailStockBarang;
 use App\Models\StockDetailModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\AllNoModel;
+
 use Error;
 use ErrorException;
 
@@ -20,6 +24,8 @@ class OrderForm extends BaseController
     protected $token;
     protected $this_company_id;
     protected $encrypter;
+
+    private $companyModel;
     protected $SalesOrderModel;
     protected $CustomerModel;
     protected $BarangModel;
@@ -37,6 +43,8 @@ class OrderForm extends BaseController
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
+
+        $this->companyModel = new CompaniesModel();
         $this->SalesOrderModel = new SalesOrderModel();
         $this->CustomerModel = new CustomerModel();
         $this->BarangModel = new BarangModel();
@@ -792,5 +800,56 @@ class OrderForm extends BaseController
         $datas = $this->SalesOrderDetailModel->getItemListByIds($ids);
 
         echo json_encode($datas);
+    }
+
+    public function printOrder($id)
+    {
+        $domPdf = new Dompdf();
+
+        $fileName = 'Order Form';
+
+        $companyData = $this->companyModel->asObject()
+            ->find($this->this_company_id);
+
+        $soSelectQry = "sales_order.*,
+                        DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
+                        DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
+                        customers.name AS customerName, 
+                        customers.address AS customerAddress,
+                        metadata.value AS termin";
+        $salesOrderData = $this->SalesOrderModel->asObject()
+            ->select($soSelectQry)
+            ->join('customers', 'customers.id = sales_order.id_customer')
+            ->join('metadata', 'metadata.id = customers.termin')
+            ->find($id);
+
+        $soDet = $this->SalesOrderDetailModel->asObject()
+            ->select('barangs.nama_barang AS namaBarang, barangs.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
+            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
+            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->where('id_sales_order', $id)
+            ->findAll();
+
+        $data = [
+            'companyName'   => $companyData->company,
+            'soData'        => $salesOrderData,
+            'soDet'         => $soDet
+        ];
+
+        // return view('SalesLokal/OrderForm/print', $data);
+
+        // load HTML content
+        $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper([0, 0, 792.96, 528]);
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+        
+        exit();
     }
 }

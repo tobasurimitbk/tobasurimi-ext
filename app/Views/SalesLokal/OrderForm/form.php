@@ -11,9 +11,16 @@
                 Batal
             </a>
 
+            <?php if (!empty($data)): ?>
+            <a class="btn btn-save float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>">
+                Print
+            </a>
+            <?php endif; ?>
+            
             <button class="btn btn-show-form btn-save float-right btn-submit">
                 Simpan
             </button>
+
         </div>
     </div>
 
@@ -929,6 +936,7 @@
             $(".id_detail").val('')
             $(".id_barang").empty('')
             $(".id_barang").val('').change()
+            $("#warehouse").val('').change()
             $(".harga").val('')
             $(".qty").val('')
             $(".amount").val('')
@@ -1260,6 +1268,7 @@
             let itemSubTotal = 0;
             let discTotal = 0;
             let taxTotal = 0;
+            let taxTotalHtml = 0;
             const estimatedFreightVal = $('#estimated_freight').val() || '0';
             const estimatedFreight = +estimatedFreightVal.replace(/\,/g, '');
 
@@ -1269,12 +1278,15 @@
 
                 if (taxStatus && !includeTax) {
                     taxTotal += +obj.taxAmt;
+                    taxTotalHtml += +obj.taxAmt;
+                } else if (taxStatus && includeTax) {
+                    taxTotalHtml += +obj.taxAmt;
                 }
             });
 
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#discTotal').html(discTotal.toLocaleString());
-            $('#taxTotal').html(taxTotal.toLocaleString());
+            $('#taxTotal').html(taxTotalHtml.toLocaleString());
 
             // if (includeTax) taxTotal = 0;
 

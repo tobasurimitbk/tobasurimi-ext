@@ -320,6 +320,7 @@ $routes->get('/order-form-lokal/all', 'SalesLokal\OrderForm::all', ['filter' => 
 $routes->post('/order-form-lokal/save', 'SalesLokal\OrderForm::save', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/update', 'SalesLokal\OrderForm::update', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/delete', 'SalesLokal\OrderForm::delete', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/print/(:num)', 'SalesLokal\OrderForm::printOrder/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getItemList', 'SalesLokal\OrderForm::getItemListByIds', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getItemList/(:num)', 'SalesLokal\OrderForm::getItemListById/$1', ['filter' => 'Auth']);
 
@@ -629,6 +630,15 @@ $routes->post('/jam-kerja/create', 'Master\JamKerja::create', ['filter' => 'Auth
 $routes->post('/jam-kerja/delete', 'Master\JamKerja::delete', ['filter' => 'Auth']);
 $routes->post('/jam-kerja/update', 'Master\JamKerja::update', ['filter' => 'Auth']);
 $routes->get('/jam-kerja/id/(:segment)', 'Master\JamKerja::getById/$1', ['filter' => 'Auth']);
+
+// lembur
+$routes->get('/lembur', 'HR\FormLembur::index', ['filter' => 'Auth']);
+$routes->get('/lembur/create', 'HR\FormLembur::createView', ['filter' => 'Auth']);
+$routes->post('/lembur/generate-pay', 'HR\FormLembur::generateLemburPay', ['filter' => 'Auth']);
+$routes->get('/lembur/all', 'HR\FormLembur::all', ['filter' => 'Auth']);
+$routes->post('/lembur/create', 'HR\FormLembur::create', ['filter' => 'Auth']);
+$routes->post('/lembur/delete', 'HR\FormLembur::delete', ['filter' => 'Auth']);
+$routes->get('/lembur/id/(:segment)', 'HR\FormLembur::getById/$1', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

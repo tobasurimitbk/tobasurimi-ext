@@ -82,8 +82,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="terms" name="terms" value="<?= $data->terms ?? '' ?>">
-                            <label for="floatingInput">Terms</label>
+                            <input type="text" class="form-control" id="termin" name="termin" value="<?= $data->termin ?? '' ?>" disabled>
+                            <label for="floatingInput">Termin</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -421,7 +421,8 @@
                     $('#salesName').val(res.salesName);
                     $('#customerName').val(res.customerName);
                     $('#customerAddress').val(res.customerAddress);
-                    $('#salesName').val();
+                    $('#termin').val(res.termin);
+                    // $('#salesName').val();
                     $('#tax_status').prop('checked', res.taxStatus);
                     $('#include_tax').prop('checked', res.includeTax)
 
@@ -432,6 +433,14 @@
                     $('#itemSubTotal').html(res.dpp);
                     $('#taxTotal').html(res.tax);
                     $('#grandTotal').html(res.total);
+                },
+                onError: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                    stopLoading()
                 }
             });
         }
