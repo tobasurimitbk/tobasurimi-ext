@@ -68,25 +68,25 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" " class=" form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->customerAddress ?? ''; ?>" disabled>
                             <label for="floatingInput">Tagihan ke</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="no_telp" name="no_telp" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" " class=" form-control" id="no_telp" name="no_telp" value="<?= $data->customerPhone ?? ''; ?>" disabled>
                             <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="termin" name="termin" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" " class=" form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" disabled>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" " class=" form-control" id="salesName" name="salesName" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <input autocomplete="one-time-code" " class=" form-control" id="salesName" name="salesName" value="<?= $data->customerSales ?? ''; ?>" disabled>
                             <label for="floatingInput">Nama sales</label>
                         </div>
                     </div>
