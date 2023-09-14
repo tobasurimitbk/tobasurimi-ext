@@ -13,22 +13,37 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-23"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Simpan
+            <?php if(!empty($dataBC)){ 
+                if($dataBC->status_posting === "Belum Posting"){ 
+            ?> 
+            <button class="btn btn-hapus delete-parent float-right">
+                Hapus
             </button>
+            <button class="btn btn-success posting-spp float-right">
+                Posting
+            </button>
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan 
+            </button>
+            <?php }
+            } else { ?> 
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Simpan 
+            </button>
+            <?php } ?> 
         </div>
     </div>
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-bc" role="form" method="POST" enctype="multipart/form-data">
                 <?= csrf_field() ?>
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                <input value="<?= (!empty($dataBC)) ? $dataBC->id : '' ?>" autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                 <table width="100%" class="mb-3">
                     <tbody>
                         <tr style="color: black;">
                             <td width="150px"><b>Status</b></td>
                             <td width="10px">:</td>
-                            <td>-</td>
+                            <td><?= (!empty($dataBC)) ? $dataBC->status : '-' ?></td>
                         </tr>
                         <tr style="color: black; height: 20px;">
                             <td colspan="3"></td>
@@ -36,7 +51,7 @@
                         <tr style="color: black;">
                             <td width="150px"><b>Status Perbaikan</b></td>
                             <td width="30px">:</td>
-                            <td>-</td>
+                            <td><?= (!empty($dataBC)) ? $dataBC->status_perbaikan : '-' ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -47,19 +62,19 @@
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker" value="-">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->aju_no : '-' ?>" readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker" value="-">
                             <label for="floatingInput">Nomor AJU</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker" value="-">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->registration_no : '-' ?>" readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker" value="-">
                             <label for="floatingInput">Nomor Daftar</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker" value="-">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->registration_date : '-' ?>" readonly autocomplete="one-time-code" type="text" placeholder="" class="form-control target input-picker" value="-">
                             <label for="floatingInput">Tanggal Daftar</label>
                         </div>
                     </div>
@@ -75,7 +90,7 @@
                                     - Kantor KPPBC Bongkar -
                                 </option>
                                 <?php foreach ($kantorBeaCukai as $k) : ?>
-                                    <option value="<?= $k->id ?>">
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->kppbc_bongkar === $k->id ? 'selected' : '') : '' ?> value="<?= $k->id ?>">
                                         - (<?= $k->kode ?>) <?= $k->kantor_name ?> -
                                     </option>
                                 <?php endforeach; ?>
@@ -90,7 +105,7 @@
                                     - Kantor KPPBC Pengawas -
                                 </option>
                                 <?php foreach ($kantorBeaCukai as $k) : ?>
-                                    <option value="<?= $k->id ?>">
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->kppbc_pengawas === $k->id ? 'selected' : '') : '' ?> value="<?= $k->id ?>">
                                         - (<?= $k->kode ?>) <?= $k->kantor_name ?> -
                                     </option>
                                 <?php endforeach; ?>
@@ -105,7 +120,7 @@
                                     - PILIH TUJUAN -
                                 </option>
                                 <?php foreach ($jenisTPB as $d) : ?>
-                                    <option value="<?= $d['id'] ?>">
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->tujuan_tpb === $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
                                         - <?= $d['value'] ?> -
                                     </option>
                                 <?php endforeach; ?>
@@ -125,7 +140,7 @@
                                     - Pilih Nama Supplier -
                                 </option>
                                 <?php foreach ($supplier as $s) : ?>
-                                    <option value="<?= $s->id ?>">
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->supplier_id === $s->id ? 'selected' : '') : '' ?> value="<?= $s->id ?>">
                                         - (<?= $s->kode ?>) <?= $k->kantor_name ?> -
                                     </option>
                                 <?php endforeach; ?>
@@ -135,13 +150,13 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" readonly name="negara" type="text" placeholder="Negara Supplier" class="form-control negara target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->country_name . ' (' . $dataBC->country_code . ')' : '' ?>" autocomplete="one-time-code" readonly name="negara" type="text" placeholder="Negara Supplier" class="form-control negara target input-picker">
                             <label for="floatingInput">Negara</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3">
-                            <textarea name="alamat" class="form-control alamat text-area-all" readonly></textarea>
+                            <textarea name="alamat" class="form-control alamat text-area-all" readonly><?= (!empty($dataBC)) ? $dataBC->supplier_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
@@ -152,31 +167,31 @@
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="npwpImportir" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->importir_npwp : '' ?>" autocomplete="one-time-code" name="npwpImportir" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
                             <label for="floatingInput">Identitas (NPWP)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Importir" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Importir" class="form-control target input-picker">
                             <label for="floatingInput">Nama Importir</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="noIzinTPBImportir" type="text" placeholder="No Izin TPB" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->tpb_no : '' ?>" autocomplete="one-time-code" name="noIzinTPBImportir" type="text" placeholder="No Izin TPB" class="form-control target input-picker">
                             <label for="floatingInput">No Izin TPB</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="APIImportir" type="text" placeholder="APIImportir" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="APIImportir" class="form-control target input-picker">
                             <label for="floatingInput">API</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea name="alamatImportir" class="form-control text-area-all"></textarea>
+                            <textarea name="alamatImportir" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->importir_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
@@ -189,33 +204,33 @@
                 </label>
                 <div class="form-control border-0 custom-toggle-switch">
                     <div class="form-check form-switch form-switch-lg">
-                        <input class="form-check-input" type="checkbox" name="switchPemilikBarang" id="switchPemilikBarang">
+                        <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'checked' : '') : '' ?> class="form-check-input" type="checkbox" name="switchPemilikBarang" id="switchPemilikBarang">
                         <label class="form-check-label" for="switchPemilikBarang"></label>
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="npwpPemilikBarang" type="text" placeholder="Identitas (NPWP)" class="npwpPemilikBarang form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_npwp : '' ?>" autocomplete="one-time-code" name="npwpPemilikBarang" type="text" placeholder="Identitas (NPWP)" class="npwpPemilikBarang form-control target input-picker">
                             <label for="floatingInput">Identitas (NPWP)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="namaPemilikBarang" type="text" placeholder="Nama Importir" class="namaPemilikBarang form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_name : '' ?>" autocomplete="one-time-code" name="namaPemilikBarang" type="text" placeholder="Nama Importir" class="namaPemilikBarang form-control target input-picker">
                             <label for="floatingInput">Nama Pemilik Barang</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea name="alamatPemilikBarang" class="alamatPemilikBarang form-control text-area-all"></textarea>
+                            <textarea <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'readonly' : '') : '' ?> name="alamatPemilikBarang" class="alamatPemilikBarang form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->pemilik_barang_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
                         </div>
 
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="APIPemilikBarang" type="text" placeholder="APIPemilikBarang" class="APIPemilikBarang form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_api : '' ?>" autocomplete="one-time-code" name="APIPemilikBarang" type="text" placeholder="APIPemilikBarang" class="APIPemilikBarang form-control target input-picker">
                             <label for="floatingInput">API</label>
                         </div>
                     </div>
@@ -226,31 +241,31 @@
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="PpjkNpwp" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->ppjk_npwp : '' ?>" autocomplete="one-time-code" name="PpjkNpwp" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
                             <label for="floatingInput">NPWP (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="PpjkNama" type="text" placeholder="Nama (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->ppjk_name : '' ?>" autocomplete="one-time-code" name="PpjkNama" type="text" placeholder="Nama (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Nama (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="PpjkTanggal" type="text" placeholder="Tanggal PPJK (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? ($dataBC->ppjk_date ? date("d/m/Y", strtotime($dataBC->ppjk_date)) : "-") : '' ?>" autocomplete="one-time-code" name="PpjkTanggal" type="text" placeholder="Tanggal PPJK (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal PPJK (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="PpjkNo" type="text" placeholder="No PPJK (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->ppjk_no : '' ?>" autocomplete="one-time-code" name="PpjkNo" type="text" placeholder="No PPJK (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No PPJK (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3">
-                            <textarea name="PpjkAlamat" class="form-control text-area-all"></textarea>
+                            <textarea name="PpjkAlamat" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->ppjk_address : '' ?></textarea>
                             <label for="floatingInput">Alamat (Opsional)</label>
                         </div>
                     </div>
@@ -266,7 +281,7 @@
                                     - Cara Pengangkutan -
                                 </option>
                                 <?php foreach ($pengangkutan as $p) : ?>
-                                    <option value="<?= $p['id'] ?>">
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->pengangkutan === $p['id'] ? 'selected' : '') : '' ?> value="<?= $p['id'] ?>">
                                         - <?= $p['value'] ?> -
                                     </option>
                                 <?php endforeach; ?>
@@ -276,7 +291,7 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="namaSaranaPengangkut" type="text" placeholder="Nama Sarana Pengangkut" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->pengangkutan_sarana : '' ?>" autocomplete="one-time-code" name="namaSaranaPengangkut" type="text" placeholder="Nama Sarana Pengangkut" class="form-control target input-picker">
                             <label for="floatingInput">Nama Sarana Pengangkut</label>
                         </div>
                     </div>
@@ -284,7 +299,7 @@
                         <div class="row">
                             <div class="col-sm">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" name="noVoyFlight" type="text" placeholder="No Voy/Flight" class="form-control target input-picker">
+                                    <input value="<?= (!empty($dataBC)) ? $dataBC->voy_no : '' ?>" autocomplete="one-time-code" name="noVoyFlight" type="text" placeholder="No Voy/Flight" class="form-control target input-picker">
                                     <label for="floatingInput">No Voy / Flight</label>
                                 </div>
                             </div>
@@ -295,7 +310,7 @@
                                             - Pilih Negara -
                                         </option>
                                         <?php foreach ($country as $c) : ?>
-                                            <option value="<?= $c->code ?>">
+                                            <option <?= (!empty($dataBC)) ? ($dataBC->pengangkutan_country === $c->code ? 'selected' : '') : '' ?> value="<?= $c->code ?>">
                                                 - <?= $c->country_name ?> -
                                             </option>
                                         <?php endforeach; ?>
@@ -307,19 +322,19 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Kode Pelabuhan Muat" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Kode Pelabuhan Muat" class="form-control target input-picker">
                             <label for="floatingInput">Kode Pelabuhan Muat</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Kode Pelabuhan Transit" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Kode Pelabuhan Transit" class="form-control target input-picker">
                             <label for="floatingInput">Kode Pelabuhan Transit</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Kode Pelabuhan Bongkar" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Kode Pelabuhan Bongkar" class="form-control target input-picker">
                             <label for="floatingInput">Kode Pelabuhan Bongkar</label>
                         </div>
                     </div>
@@ -331,11 +346,11 @@
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select noInvoice" id="noInvoice" name="noInvoice" aria-label="Floating label select example">
-                                <option value="">
+                                <option value="" data-date="">
                                     - Pilih Nomor Invoice -
                                 </option>
                                 <?php foreach ($dokumen as $d) : ?>
-                                    <option value="<?= $d->id ?>">
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->invoice_id === $d->id ? 'selected' : '') : '' ?> value="<?= $d->id ?>" data-date="<?= date("d/m/Y", strtotime($d->createdAt)) ?>">
                                         - <?= $d->no_faktur ?> -
                                     </option>
                                 <?php endforeach; ?>
@@ -345,67 +360,67 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "-") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
                             <label for="floatingInput">Tanggal Invoice</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="Nomor Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_no : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="Nomor Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Nomor Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_code : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Kode Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="noLc" type="text" placeholder="No LC (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->lc_no : '' ?>" autocomplete="one-time-code" name="noLc" type="text" placeholder="No LC (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No LC (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? ($dataBC->lc_date ? date("d/m/Y", strtotime($dataBC->lc_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal LC (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="noBl" type="text" placeholder="No B/L (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->bl_no : '' ?>" autocomplete="one-time-code" name="noBl" type="text" placeholder="No B/L (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No B/L (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? ($dataBC->bl_date ? date("d/m/Y", strtotime($dataBC->bl_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B/L (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="noBc" type="text" placeholder="No B.C 1.1" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->bc_11_no : '' ?>" autocomplete="one-time-code" name="noBc" type="text" placeholder="No B.C 1.1" class="form-control target input-picker">
                             <label for="floatingInput">No B.C 1.1</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? ($dataBC->bc_11_date ? date("d/m/Y", strtotime($dataBC->bc_11_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B.C 1.1</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="kodePos" type="text" placeholder="Kode Pos" class="form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->bc_11_zip : '' ?>" autocomplete="one-time-code" name="kodePos" type="text" placeholder="Kode Pos" class="form-control target input-picker">
                             <label for="floatingInput">Kode Pos</label>
                         </div>
                     </div>
@@ -437,7 +452,45 @@
                             </tr>
                         </thead>
                         <tbody class="body-dokumen-table" id="body-dokumen-table" style="cursor: pointer;">
-                        
+                            <?php if(!empty($dataBC)){ 
+                                $list = json_decode($dataBC->data_dokumen);
+                                $row_dokumen = 0; 
+                                foreach($list as $item){    
+                                    $row_dokumen = $row_dokumen + 1;
+                                    if($dataBC->status_posting === "Belum Posting"){
+                                ?>
+                                        <tr>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $row_dokumen; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item->kode; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item->jenis; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item->no; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item->tanggal; ?>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <button onclick='deleteRowDokumen(<?= $row_dokumen; ?>)'>X</button>
+                                        </td>
+                                        </tr>
+                                <?php } else {?>
+                                        <tr>
+                                            <td style="text-align: center;"><?= $row_dokumen; ?></td>
+                                            <td style="text-align: center;"><?= $item->kode; ?></td>
+                                            <td style="text-align: center;"><?= $item->jenis; ?></td>
+                                            <td style="text-align: center;"><?= $item->no; ?></td>
+                                            <td style="text-align: center;"><?= $item->tanggal; ?></td>
+                                            <td></td>
+                                        </tr>
+                                <?php }
+                                } 
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -449,7 +502,7 @@
                 <div class="row mt-2">
                     <div class="col-sm-12">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tempatPenimbunan" type="text" placeholder="Tempat Penimbunan" class="tempatPenimbunan form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->penimbunan : '' ?>" autocomplete="one-time-code" name="tempatPenimbunan" type="text" placeholder="Tempat Penimbunan" class="tempatPenimbunan form-control target input-picker">
                             <label for="floatingInput">Tempat Penimbunan</label>
                         </div>
                     </div>
@@ -460,43 +513,52 @@
                 <div class="row mt-2">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="valuta" type="text" placeholder="Valuta" class="valuta form-control target input-picker">
+                            <select class="form-select valuta" id="valuta" name="valuta" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Valuta -
+                                </option>
+                                <?php foreach ($valuta as $v) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->valuta === $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>">
+                                        - <?= $v['value'] ?> - <?= $v['description'] ?> - 
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                             <label for="floatingInput">Valuta</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="npdpbm" type="text" placeholder="NDPBM" class="npdpbm form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->ndpbm : '' ?>" autocomplete="one-time-code" name="npdpbm" type="text" placeholder="NDPBM" class="npdpbm form-control target input-picker">
                             <label for="floatingInput">NDPBM</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="fob" type="text" placeholder="FOB" class="fob form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->fob : '' ?>" autocomplete="one-time-code" name="fob" type="text" placeholder="FOB" class="fob form-control target input-picker">
                             <label for="floatingInput">FOB</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="freight" type="text" placeholder="Freight" class="freight form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->freight : '' ?>" autocomplete="one-time-code" name="freight" type="text" placeholder="Freight" class="freight form-control target input-picker">
                             <label for="floatingInput">Freight</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tipeAsuransi" type="text" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->asuransi_type : '' ?>" autocomplete="one-time-code" name="tipeAsuransi" type="text" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
                             <label for="floatingInput">Asuransi Luar Negeri / Dalam Negeri</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="nilaiCif" type="text" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->cif_value : '' ?>" autocomplete="one-time-code" name="nilaiCif" type="text" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
                             <label for="floatingInput">Nilai CIF</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" onkeyup="formatNumber(this)" name="nilaiCifRupiah" type="text" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? number_format($dataBC->cif_price) : '' ?>" autocomplete="one-time-code" onkeyup="formatNumber(this)" name="nilaiCifRupiah" type="text" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
                             <label for="floatingInput">Nilai CIF Rupiah</label>
                         </div>
                     </div>
@@ -528,7 +590,45 @@
                             </tr>
                         </thead>
                         <tbody class="body-kontainer-table" id="body-kontainer-table" style="cursor: pointer;">
-                        
+                            <?php if(!empty($dataBC)){ 
+                                $list = json_decode($dataBC->data_kontainer);
+                                $row_kontainer = 0; 
+                                foreach($list as $item){    
+                                    $row_kontainer = $row_kontainer + 1;
+                                    if($dataBC->status_posting === "Belum Posting"){
+                                ?>
+                                        <tr>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $row_kontainer; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item->no; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item->ukuran; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item->tipe; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item->keterangan; ?>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <button onclick='deleteRowKontainer(<?= $row_kontainer; ?>)'>X</button>
+                                        </td>
+                                        </tr>
+                                <?php } else {?>
+                                        <tr>
+                                            <td style="text-align: center;"><?= $row_kontainer; ?></td>
+                                            <td style="text-align: center;"><?= $item->no; ?></td>
+                                            <td style="text-align: center;"><?= $item->ukuran; ?></td>
+                                            <td style="text-align: center;"><?= $item->tipe; ?></td>
+                                            <td style="text-align: center;"><?= $item->keterangan; ?></td>
+                                            <td></td>
+                                        </tr>
+                                <?php }
+                                } 
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -559,7 +659,45 @@
                             </tr>
                         </thead>
                         <tbody class="body-kemasan-table" id="body-kemasan-table" style="cursor: pointer;">
-                        
+                            <?php if(!empty($dataBC)){ 
+                                $list = json_decode($dataBC->data_kemasan);
+                                $row_kemasan = 0; 
+                                foreach($list as $item){    
+                                    $row_kemasan = $row_kemasan + 1;
+                                    if($dataBC->status_posting === "Belum Posting"){
+                                ?>
+                                        <tr>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                            <?= $row_kemasan; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                            <?= $item->jumlah; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                            <?= $item->kode; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                            <?= $item->uraian; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                            <?= $item->merk; ?>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <button onclick='deleteRowKemasan(<?= $row_kemasan; ?>)'>X</button>
+                                        </td>
+                                        </tr>
+                                <?php } else {?>
+                                        <tr>
+                                            <td style="text-align: center;"><?= $row_kemasan; ?></td>
+                                            <td style="text-align: center;"><?= $item->jumlah; ?></td>
+                                            <td style="text-align: center;"><?= $item->kode; ?></td>
+                                            <td style="text-align: center;"><?= $item->uraian; ?></td>
+                                            <td style="text-align: center;"><?= $item->merk; ?></td>
+                                            <td></td>
+                                        </tr>
+                                <?php }
+                                } 
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -571,19 +709,19 @@
                 <div class="row mt-2">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="bruto" type="number" placeholder="Bruto (Kg)" class="bruto form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? formatter($dataBC->bruto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="bruto" type="number" placeholder="Bruto (Kg)" class="bruto form-control target input-picker">
                             <label for="floatingInput">Bruto (Kg)</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="netto" type="number" placeholder="Netto (Kg)" class="netto form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? formatter($dataBC->netto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="netto" type="number" placeholder="Netto (Kg)" class="netto form-control target input-picker">
                             <label for="floatingInput">Netto (Kg)</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="jumlahBarang" type="number" placeholder="Jumlah Barang" class="jumlahBarang form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? formatter($dataBC->item_count, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="jumlahBarang" type="number" placeholder="Jumlah Barang" class="jumlahBarang form-control target input-picker">
                             <label for="floatingInput">Jumlah Barang</label>
                         </div>
                     </div>
@@ -627,25 +765,25 @@
                 <div class="row mt-2">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tempat" type="text" placeholder="Tempat" class="tempat form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->tempat : '' ?>" autocomplete="one-time-code" name="tempat" type="text" placeholder="Tempat" class="tempat form-control target input-picker">
                             <label for="floatingInput">Tempat</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="tanggal form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? ($dataBC->tanggal ? date("d/m/Y", strtotime($dataBC->tanggal)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="tanggal form-control target input-picker">
                             <label for="floatingInput">Tanggal</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="pemberitahu" type="text" placeholder="Pemberitahu" class="pemberitahu form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->pemberitahu : '' ?>" autocomplete="one-time-code" name="pemberitahu" type="text" placeholder="Pemberitahu" class="pemberitahu form-control target input-picker">
                             <label for="floatingInput">Pemberitahu</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" name="jabatan" type="text" placeholder="Jabatan" class="jabatan form-control target input-picker">
+                            <input value="<?= (!empty($dataBC)) ? $dataBC->jabatan : '' ?>" autocomplete="one-time-code" name="jabatan" type="text" placeholder="Jabatan" class="jabatan form-control target input-picker">
                             <label for="floatingInput">Jabatan</label>
                         </div>
                     </div>
@@ -826,6 +964,53 @@
     let row_kontainer = 0;
     let row_kemasan = 0;
 
+    <?php if(!empty($dataBC)){
+        $list_dokumen = json_decode($dataBC->data_dokumen);
+        foreach($list_dokumen as $item){
+    ?> 
+            row_dokumen = row_dokumen + 1;
+            list_dokumen.push({
+                "row": row_dokumen,
+                "kode": '<?= $item->kode ?>',
+                "jenis": '<?= $item->jenis ?>',
+                "no": '<?= $item->no ?>',
+                "tanggal": '<?= $item->tanggal ?>',
+                "keterangan": '<?= $item->keterangan ?>',
+            });
+    <?php } 
+    } ?>
+
+    <?php if(!empty($dataBC)){
+        $list_kontainer = json_decode($dataBC->data_kontainer);
+        foreach($list_kontainer as $item){
+    ?> 
+            row_kontainer = row_kontainer + 1;
+            list_kontainer.push({
+                "row": row_kontainer,
+                "no": '<?= $item->no ?>',
+                "ukuran": '<?= $item->ukuran ?>',
+                "tipe": '<?= $item->tipe ?>',
+                "keterangan": '<?= $item->keterangan ?>',
+            });
+    <?php } 
+    } ?>
+
+<?php if(!empty($dataBC)){
+        $list_kemasan = json_decode($dataBC->data_kemasan);
+        foreach($list_kemasan as $item){
+    ?> 
+            row_kemasan = row_kemasan + 1;
+            list_kemasan.push({
+                "row": row_kemasan,
+                "jumlah": '<?= $item->jumlah ?>',
+                "kode": '<?= $item->kode ?>',
+                "uraian": '<?= $item->uraian ?>',
+                "merk": '<?= $item->merk ?>',
+                "keterangan": '<?= $item->keterangan ?>',
+            });
+    <?php } 
+    } ?>
+
     var validator = $(".form-add-bc").validate({
         rules: {
             kppbcBongkar: {
@@ -877,9 +1062,6 @@
                 required: true
             },
             noInvoice: {
-                required: true
-            },
-            tanggalInvoice: {
                 required: true
             },
             noBc: {
@@ -944,9 +1126,6 @@
             noInvoice: {
                 required: "Nomor Invoice wajib diisi"
             },
-            tanggalInvoice: {
-                required: "Tanggal Invoice wajib diisi"
-            },
             noBc: {
                 required: "No B.C 1.1 wajib diisi"
             },
@@ -991,18 +1170,35 @@
         },
     });
 
-    $('.npwpPemilikBarang').rules('add', {
-        required: true
-    });
-    $('.namaPemilikBarang').rules('add', {
-        required: true
-    });
-    $('.alamatPemilikBarang').rules('add', {
-        required: true
-    });
-    $('.APIPemilikBarang').rules('add', {
-        required: true
-    });
+    <?php if(!empty($dataBC)){
+        if($dataBC->pemilik_barang === 0){
+    ?>
+            $('.npwpPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.namaPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.alamatPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.APIPemilikBarang').rules('add', {
+                required: true
+            });
+    <?php }} else { ?>
+        $('.npwpPemilikBarang').rules('add', {
+            required: true
+        });
+        $('.namaPemilikBarang').rules('add', {
+            required: true
+        });
+        $('.alamatPemilikBarang').rules('add', {
+            required: true
+        });
+        $('.APIPemilikBarang').rules('add', {
+            required: true
+        });
+    <?php } ?>
 
     var validator_second = $(".form-add-second").validate({
         rules: {
@@ -1366,14 +1562,6 @@
         autoclose: true
     });
 
-
-    $("input[name='tanggalInvoice']").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
-
     $("input[name='tanggalFasilitasImport']").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
@@ -1418,6 +1606,12 @@
 
     $("select[name='noInvoice']").select2({
         placeholder: "Pilih Nomor Invoice",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+    $("select[name='valuta']").select2({
+        placeholder: "Pilih Valuta",
         theme: "bootstrap-5",
         allowClear: true
     });
@@ -1592,93 +1786,144 @@
 
     // submit
     $('.btn-submit-parent').click(function() {
-        if ($(".form-add-bc").valid() && $(".form-add-second").valid()) {
-            if ($(".form-add-third").valid() && $(".form-add-four").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
-                        let data = new FormData(document.querySelector(".form-add-bc"));
-                        data.append("tempatPenimbunan", $(".tempatPenimbunan").val());
-                        data.append("valuta", $(".valuta").val());
-                        data.append("npdpbm", $(".npdpbm").val());
-                        data.append("fob", $(".fob").val());
-                        data.append("freight", $(".freight").val());
-                        data.append("tipeAsuransi", $(".tipeAsuransi").val());
-                        data.append("nilaiCif", $(".nilaiCif").val());
-                        data.append("nilaiCifRupiah", $(".nilaiCifRupiah").val());
-                        data.append("bruto", $(".bruto").val());
-                        data.append("netto", $(".netto").val());
-                        data.append("jumlahBarang", $(".jumlahBarang").val());
-                        data.append("tempat", $(".tempat").val());
-                        data.append("tanggal", $(".tanggal").val());
-                        data.append("pemberitahu", $(".pemberitahu").val());
-                        data.append("jabatan", $(".jabatan").val());
-                        data.append("data_dokumen", JSON.stringify(list_dokumen));
-                        data.append("data_kontainer", JSON.stringify(list_kontainer));
-                        data.append("data_kemasan", JSON.stringify(list_kemasan));
+        if(list_dokumen.length === 0)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: "List Dokumen Tidak Boleh Kosong",
+                confirmButtonColor: '#4e73df',
+            })
+        }
+        else
+        {
+            if ($(".form-add-bc").valid() && $(".form-add-second").valid()) {
+                if ($(".form-add-third").valid() && $(".form-add-four").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Simpan Data?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            setLoading()
+                            let data = new FormData(document.querySelector(".form-add-bc"));
+                            data.append("tempatPenimbunan", $(".tempatPenimbunan").val());
+                            data.append("valuta", $(".valuta").val());
+                            data.append("npdpbm", $(".npdpbm").val());
+                            data.append("fob", $(".fob").val());
+                            data.append("freight", $(".freight").val());
+                            data.append("tipeAsuransi", $(".tipeAsuransi").val());
+                            data.append("nilaiCif", $(".nilaiCif").val());
+                            data.append("nilaiCifRupiah", $(".nilaiCifRupiah").val());
+                            data.append("bruto", $(".bruto").val());
+                            data.append("netto", $(".netto").val());
+                            data.append("jumlahBarang", $(".jumlahBarang").val());
+                            data.append("tempat", $(".tempat").val());
+                            data.append("tanggal", $(".tanggal").val());
+                            data.append("pemberitahu", $(".pemberitahu").val());
+                            data.append("jabatan", $(".jabatan").val());
+                            data.append("data_dokumen", JSON.stringify(list_dokumen));
+                            data.append("data_kontainer", JSON.stringify(list_kontainer));
+                            data.append("data_kemasan", JSON.stringify(list_kemasan));
 
-                        // update
-                        if($(".id").val())
-                        {
-
-                        }
-                        // create
-                        else
-                        {
-                            $.ajax({
-                                url: "<?= base_url("bea-cukai-bc-23/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
+                            // update
+                            if($(".id").val())
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("bea-cukai-bc-23/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
                                             })
-                                            .then(() => {
-                                                window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
-                                            })
-                                    } else {
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: response.message,
+                                            title: 'Data Gagal Diubah, coba Lagi',
                                             confirmButtonColor: '#4e73df',
                                         })
                                         stopLoading()
                                     }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Diubah, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
+                                });
+                            }
+                            // create
+                            else
+                            {
+                                $.ajax({
+                                    url: "<?= base_url("bea-cukai-bc-23/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        csrf.val(response.token);
+                                        if (response.status) {
+                                            stopLoading()
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            stopLoading()
+                                        }
+                                    },
+                                    onError: function(response) {
+                                        csrf.val(response.token);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Data Gagal Diubah, coba Lagi',
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        stopLoading()
+                                    }
+                                });
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }
         }
     })
@@ -2094,6 +2339,19 @@
         }
     })
 
+    // get invoice date by selected no invoice
+    $(".noInvoice").change(function() {
+        if($(".noInvoice option:selected").val())
+        {
+            let date =  $(".noInvoice option:selected").attr("data-date");
+            $(".tanggalInvoice").val(date);
+        }
+        else
+        {
+            $(".tanggalInvoice").val('');
+        }
+    })
+
     // get country and address supplier
     $(".namaSupplier").change(function() {
         if($(".namaSupplier option:selected").val())
@@ -2497,6 +2755,66 @@
 
                 $(".body-kemasan-table").append(tag_html);
                 $(".kemasanModal").modal("hide");
+            }
+        })
+    })
+
+    // delete
+    $(".delete-parent").click(function() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                let id = $(".id").val();
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("bea-cukai-bc-23/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>"
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                        stopLoading()
+                    }
+                });
             }
         })
     })

@@ -123,33 +123,45 @@ class BeaCukaiModel extends Model
         $selectQry = "bea_cukai.*, 
             metadata.value AS tujuan_tpb_name";
 
-        $bbLokalDataQry = $this->asObject()
+        $bcDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('metadata', 'bea_cukai.tujuan_tpb = metadata.id', 'left')
             ->groupBy(('bea_cukai.id'))
             ->orderBy($sort, $sortType);
 
-        $totalData = $bbLokalDataQry->countAllResults(false);
+        $totalData = $bcDataQry->countAllResults(false);
 
         if ($addCondition['search']) {
-            $bbLokalDataQry->groupStart();
+            $bcDataQry->groupStart();
         }
         if ($addCondition['search']) {
-            $bbLokalDataQry
+            $bcDataQry
                 ->like('aju_no', $addCondition['search']);
         }
         if ($addCondition['search']) {
-            $bbLokalDataQry->groupEnd();
+            $bcDataQry->groupEnd();
         }
 
-        $totalFilteredData = $bbLokalDataQry->countAllResults(false);
-        $data = $bbLokalDataQry->findAll($limit, $offset);
+        $totalFilteredData = $bcDataQry->countAllResults(false);
+        $data = $bcDataQry->findAll($limit, $offset);
 
         return [
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+
+    public function getById($id)
+    {
+        $bcData = $this->asObject()
+            ->select('bea_cukai.*, country.code as country_code, country.country_name, suppliers.address as supplier_address, sales_order_invoice.createdAt as tanggal_invoice')
+            ->join('suppliers', 'bea_cukai.supplier_id = suppliers.id', 'left')
+            ->join('country', 'country.code = suppliers.country_code', 'left')
+            ->join('sales_order_invoice', 'bea_cukai.invoice_id = sales_order_invoice.id', 'left')
+            ->find($id);
+
+        return $bcData;
     }
 }

@@ -528,7 +528,9 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BeaCukaiController::bc23View');
     $routes->get('all', 'BeaCukai\BeaCukaiController::bc23All');
     $routes->get('create', 'BeaCukai\BeaCukaiController::bc23CreateFormView');
+    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc23GetByIdFormView/$1');
     $routes->post('save', 'BeaCukai\BeaCukaiController::bc23SaveForm');
+    $routes->post('update', 'BeaCukai\BeaCukaiController::bc23UpdateForm');
     $routes->post('delete', 'BeaCukai\BeaCukaiController::bc23Delete');
 });
 $routes->get('/bea-cukai-bc-25', 'BeaCukai\BeaCukaiController::bc25View', ['filter' => 'Auth']);
