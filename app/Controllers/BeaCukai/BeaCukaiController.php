@@ -270,7 +270,7 @@ class BeaCukaiController extends BaseController
                 "freight"               => $this->request->getPost("freight"),
                 "asuransi_type"         => $this->request->getPost("tipeAsuransi"),
                 "cif_value"             => $this->request->getPost("nilaiCif"),
-                "cif_price"             => formatter($this->request->getPost("nilaiCifRupiah"), "CURR_TO_INT"),
+                "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
                 
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),
@@ -496,7 +496,7 @@ class BeaCukaiController extends BaseController
                 "freight"               => $this->request->getPost("freight"),
                 "asuransi_type"         => $this->request->getPost("tipeAsuransi"),
                 "cif_value"             => $this->request->getPost("nilaiCif"),
-                "cif_price"             => formatter($this->request->getPost("nilaiCifRupiah"), "CURR_TO_INT"),
+                "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
                 
                 "bruto"                 => $this->request->getPost("bruto"),
                 "netto"                 => $this->request->getPost("netto"),

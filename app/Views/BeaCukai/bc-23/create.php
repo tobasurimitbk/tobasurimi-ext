@@ -528,37 +528,37 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ndpbm : '' ?>" autocomplete="one-time-code" name="npdpbm" type="text" placeholder="NDPBM" class="npdpbm form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->ndpbm, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="npdpbm" type="number" placeholder="NDPBM" class="npdpbm form-control target input-picker">
                             <label for="floatingInput">NDPBM</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fob : '' ?>" autocomplete="one-time-code" name="fob" type="text" placeholder="FOB" class="fob form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->fob, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="fob" type="number" placeholder="FOB" class="fob form-control target input-picker">
                             <label for="floatingInput">FOB</label>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->freight : '' ?>" autocomplete="one-time-code" name="freight" type="text" placeholder="Freight" class="freight form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->freight, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="freight" type="number" placeholder="Freight" class="freight form-control target input-picker">
                             <label for="floatingInput">Freight</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->asuransi_type : '' ?>" autocomplete="one-time-code" name="tipeAsuransi" type="text" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->asuransi_type, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="tipeAsuransi" type="number" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
                             <label for="floatingInput">Asuransi Luar Negeri / Dalam Negeri</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->cif_value : '' ?>" autocomplete="one-time-code" name="nilaiCif" type="text" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_value, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCif" type="number" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
                             <label for="floatingInput">Nilai CIF</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? number_format($dataBC->cif_price) : '' ?>" autocomplete="one-time-code" onkeyup="formatNumber(this)" name="nilaiCifRupiah" type="text" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_price, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCifRupiah" type="number" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
                             <label for="floatingInput">Nilai CIF Rupiah</label>
                         </div>
                     </div>
