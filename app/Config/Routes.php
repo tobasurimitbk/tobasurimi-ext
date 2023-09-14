@@ -629,6 +629,15 @@ $routes->post('/jam-kerja/delete', 'Master\JamKerja::delete', ['filter' => 'Auth
 $routes->post('/jam-kerja/update', 'Master\JamKerja::update', ['filter' => 'Auth']);
 $routes->get('/jam-kerja/id/(:segment)', 'Master\JamKerja::getById/$1', ['filter' => 'Auth']);
 
+// lembur
+$routes->get('/lembur', 'HR\FormLembur::index', ['filter' => 'Auth']);
+$routes->get('/lembur/create', 'HR\FormLembur::createView', ['filter' => 'Auth']);
+$routes->post('/lembur/generate-pay', 'HR\FormLembur::generateLemburPay', ['filter' => 'Auth']);
+$routes->get('/lembur/all', 'HR\FormLembur::all', ['filter' => 'Auth']);
+$routes->post('/lembur/create', 'HR\FormLembur::create', ['filter' => 'Auth']);
+$routes->post('/lembur/delete', 'HR\FormLembur::delete', ['filter' => 'Auth']);
+$routes->get('/lembur/id/(:segment)', 'HR\FormLembur::getById/$1', ['filter' => 'Auth']);
+
 // SETTINGS
 // USER
 $routes->get('/user', 'Setting\User::user', ['filter' => 'Auth']);
