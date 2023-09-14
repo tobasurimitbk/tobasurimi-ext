@@ -29,7 +29,7 @@ class MetadataModel extends Model
 
     public function get_by_name($name)
     {
-        $requete = "SELECT * FROM metadata WHERE name='" . $name . "'";
+        $requete = "SELECT * FROM metadata WHERE name='" . $name . "' ORDER BY value ASC";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();

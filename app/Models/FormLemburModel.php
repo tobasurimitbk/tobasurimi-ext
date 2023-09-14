@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class FormLemburModel extends Model
+{
+    protected $DBGroup          = 'default';
+    protected $table            = 'form_lembur';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $insertID         = 0;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+    protected $protectFields    = true;
+    protected $allowedFields    = [
+        'company_id',
+        'employee_id',
+        'periode',
+        'total_jam_lembur',
+        'total_uang_lembur',
+        'kurangi_jam_istirahat'
+    ];
+
+    // Dates
+    protected $useTimestamps = false;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
+
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'nip'    => 'employees.nip',
+            'name'   => 'employees.name',
+            'divisi' => 'divisis.divisi',
+            'periode' => 'form_lembur.periode',
+            'total_jam_lembur' => 'form_lembur.total_jam_lembur',
+            'total_uang_lembur' => 'form_lembur.total_uang_lembur',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        // Ensure the sort and sortType values are valid
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'form_lembur.id';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            form_lembur.*,
+            employees.name AS employeesName,
+            employees.nip AS employeesNIP,
+            divisis.divisi AS divisiName
+        ";
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('employees', 'employees.id = form_lembur.employee_id', 'INNER')
+            ->join('divisis', 'divisis.id = employees.division_id', 'LEFT')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if ($addCondition['nip']) {
+            $dataQry->groupStart();
+        }
+
+        if ($addCondition['nip']) {
+            $dataQry->like('employees.nip', $addCondition['nip']);
+        }
+
+        if ($addCondition['nip']) {
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+}
