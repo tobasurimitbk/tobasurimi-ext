@@ -244,6 +244,20 @@ class OrderForm extends BaseController
             return;
         }
 
+        // check customer
+        $customerData = $this->CustomerModel->asObject()
+            ->find($postData['id_customer']);
+
+        if (empty($customerData)) {
+            $data = [
+                "status"    => false,
+                "message"   => 'Customer tidak ditemukan!',
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
+        }
+
         // check stock
         foreach ($items as $row) {
             $barangData = $this->BarangModel->asObject()
@@ -289,6 +303,7 @@ class OrderForm extends BaseController
                 "no_sales_order"        => $noSalesOrder,
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
+                "sales_id"              => $customerData->sales_id,
                 "order_date"            => $orderDate,
                 "shipping_date"         => $shippingDate,
                 "payment_terms"         => $postData['payment_terms'],
