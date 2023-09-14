@@ -51,6 +51,9 @@
                         </button>
                     <?php else : ?>
                         <?php if ($isPosting == 0 && $totalAttendances != 0) : ?>
+                            <a class="btn btn-show-form btn-discard float-right btn-generate-ulang" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
+                                Generate Ulang
+                            </a>
                             <input type="hidden" name="statusPosting" id="statusPosting" value="1">
                             <button type="submit" class="btn btn-show-form btn-save float-right btn-submit">
                                 Posting
