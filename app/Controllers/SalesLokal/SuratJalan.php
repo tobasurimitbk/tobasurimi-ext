@@ -409,16 +409,27 @@ class SuratJalan extends BaseController
 
     public function dropDownSalesOrder($idCustomer)
     {
+        $customerData = $this->CustomerModel->asObject()
+            ->select('customers.*, metadata.value AS termin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('employees', 'employees.id = customers.sales_id ')
+            ->find($idCustomer);
+
         $condition = [
             'id_customer'               => $idCustomer, 
             'tipe_sales_order'          => 'LOKAL',
             'surat_jalan_so_id'         => null,
             'sales_order_invoice_id'    => null
         ];
-        $data = $this->SalesOrderModel->asObject()
+        $soList = $this->SalesOrderModel->asObject()
             ->where($condition)
             ->select(['id', 'no_sales_order'])
             ->findAll();
+
+        $data = [
+            'customerData'  => $customerData,
+            'soList'        => $soList
+        ];
 
         echo json_encode($data);
         return;

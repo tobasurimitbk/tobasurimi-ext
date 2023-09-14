@@ -152,9 +152,9 @@ class Invoice extends BaseController
                 ]
             ],
             "terms" => [
-                "rules" => "required",
+                "rules" => "permit_empty",
                 'errors' => [
-                    'required' => 'Term tidak boleh kosong',
+                    // 'required' => 'Term tidak boleh kosong',
                 ]
             ],
             "ship_via" => [

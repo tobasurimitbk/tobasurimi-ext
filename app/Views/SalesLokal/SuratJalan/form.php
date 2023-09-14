@@ -66,6 +66,33 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" " class=" form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <label for="floatingInput">Tagihan ke</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" " class=" form-control" id="no_telp" name="no_telp" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <label for="floatingInput">No. Telp</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" " class=" form-control" id="termin" name="termin" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <label for="floatingInput">Termin</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" " class=" form-control" id="salesName" name="salesName" value="<?= $data->no_po ?? ''; ?>" disabled>
+                            <label for="floatingInput">Nama sales</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> placeholder="Tanggal Pengiriman" value="<?= !empty($data) ? $data->shipping_date : ""; ?>">
@@ -264,9 +291,14 @@
                         $(".id_So").append(`<option value=""></option>`);
 
                         // console.log(res.dataWarehouse)
-                        res.forEach(function(item) {
+                        res.soList.forEach(function(item) {
                             $(".id_so").append(`<option  value="${item.id}">${item.no_sales_order}</option>`);
-                        })
+                        });
+
+                        $('#tagihan_ke').val(res.customerData.address);
+                        $('#no_telp').val(res.customerData.phone);
+                        $('#termin').val(res.customerData.termin);
+                        $('#salesName').val(res.customerData.salesName);
                     }
                 })
 

@@ -142,11 +142,13 @@ class SalesOrderModel extends Model
                       users.name as seller_name,
                       CONCAT(employees.nip , ' - ', employees.name) AS salesName,
                       customers.name as customer_name ,
-                      customers.address,customers.phone";
+                      customers.address,customers.phone,
+                      metadata.value AS termin";
 
         $dataSalesOrder = $this->asObject()
             ->join('users', 'users.id = sales_order.id_user')
             ->join('customers', 'customers.id = sales_order.id_customer ')
+            ->join('metadata', 'metadata.id = customers.termin')
             ->join('employees', 'employees.id = sales_order.sales_id ')
             ->select($selectQry)
             ->find($id);
