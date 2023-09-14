@@ -253,7 +253,7 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->ppjk_date ? date("d/m/Y", strtotime($dataBC->ppjk_date)) : "-") : '' ?>" autocomplete="one-time-code" name="PpjkTanggal" type="text" placeholder="Tanggal PPJK (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->ppjk_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->ppjk_date)) : "") : '' ?>" autocomplete="one-time-code" name="PpjkTanggal" type="text" placeholder="Tanggal PPJK (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal PPJK (Opsional)</label>
                         </div>
                     </div>
@@ -360,7 +360,7 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "-") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
                             <label for="floatingInput">Tanggal Invoice</label>
                         </div>
                     </div>
@@ -372,7 +372,7 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
@@ -390,7 +390,7 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->lc_date ? date("d/m/Y", strtotime($dataBC->lc_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->lc_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->lc_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal LC (Opsional)</label>
                         </div>
                     </div>
@@ -402,7 +402,7 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bl_date ? date("d/m/Y", strtotime($dataBC->bl_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bl_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bl_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B/L (Opsional)</label>
                         </div>
                     </div>
@@ -414,7 +414,7 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bc_11_date ? date("d/m/Y", strtotime($dataBC->bc_11_date)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bc_11_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bc_11_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B.C 1.1</label>
                         </div>
                     </div>
@@ -771,7 +771,7 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal ? date("d/m/Y", strtotime($dataBC->tanggal)) : "-") : '' ?>" autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="tanggal form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal)) : "") : '' ?>" autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="tanggal form-control target input-picker">
                             <label for="floatingInput">Tanggal</label>
                         </div>
                     </div>
