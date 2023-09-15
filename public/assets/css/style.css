@@ -5974,6 +5974,19 @@ table.dataTable .body-table tr td .btn.btn-danger {
   font-size: 13px;
 }
 
+.btn.btn-primary.btn_reset,
+.btn.btn-primary.btn_reset:hover,
+.btn.btn-primary.btn_reset:focus,
+.btn.btn-primary.btn_reset:active {
+  background: #e7323a !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  height: 50px;
+  box-shadow: none !important;
+  padding: 15px 15px !important;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 360px) and (max-width: 767px) {
