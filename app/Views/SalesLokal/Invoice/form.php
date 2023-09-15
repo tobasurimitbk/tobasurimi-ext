@@ -22,22 +22,19 @@
                 <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
-
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : ""; ?>" placeholder="Auto Generate">
                             <label for="floatingInput">No Faktur</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" value="<?= $data->tanggal_faktur ?? ""; ?>" placeholder="Tanggal Faktur"></input>
                             <label for="floatingInput">Tanggal Faktur</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select" name="doc_type" id="doc_type">
                                 <option value=""></option>
@@ -47,7 +44,9 @@
                             <label for="floatingInput">Jenis Dokumen</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select" name="doc_id" id="doc_id">
                                 <option value=""></option>
@@ -58,15 +57,13 @@
                             <label for="floatingInput">Nomor Dokumen</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="customerName" value="<?= $documentData->customerName ?? '' ?>" disabled>
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>" disabled>
                             <label for="floatingInput">Tagihan Ke</label>
@@ -82,7 +79,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="termin" name="termin" value="<?= $data->termin ?? '' ?>" disabled>
+                            <input type="text" class="form-control" id="termin" name="termin" value="<?= $documentData->termin ?? '' ?>" disabled>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
@@ -168,16 +165,16 @@
                     <div class="table-responsive">
                         <table class="table table-borderless" width="100%" cellspacing="0">
                             <tr>
-                                <td class="font-weight-bold">DPP</td>
-                                <td class="font-weight-bold text-right">Rp. <span id="itemSubTotal">0</span></td>
+                                <td class="font-weight-bold" style="height: 40px;">DPP</td>
+                                <td class="font-weight-bold text-right" style="height: 40px;">Rp. <span id="itemSubTotal">0</span></td>
                             </tr>
                             <tr>
-                                <td>PPn (11%)</td>
-                                <td class="text-right">Rp. <span id="taxTotal">0</span></td>
+                                <td style="height: 40px;">PPn (11%)</td>
+                                <td class="text-right" style="height: 40px;">Rp. <span id="taxTotal">0</span></td>
                             </tr>
                             <tr>
-                                <td class="font-weight-bold" style="border-top: 1px solid #929292">Total Invoice <span>(Termasuk Pajak)</span></td>
-                                <td style="border-top: 1px solid #929292" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
+                                <td class="font-weight-bold" style="border-top: 1px solid #929292; height: 40px;">Total Invoice <span>(Termasuk Pajak)</span></td>
+                                <td style="border-top: 1px solid #929292; height: 40px;" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
                             </tr>
                         </table>
                     </div>
@@ -727,7 +724,7 @@
                                             confirmButtonColor: '#4e73df',
                                         })
                                         .then(() => {
-                                            window.location.href = "<?= base_url("invoice-penjualan-lokal/id/"); ?>" + res.id;
+                                            window.location.href = `<?= base_url("invoice-penjualan-lokal/id/"); ?>${response.id}`;
                                         })
                                 } else {
                                     Swal.fire({

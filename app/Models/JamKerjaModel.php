@@ -16,6 +16,7 @@ class JamKerjaModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'jenis',
+        'jam_terlambat',
         'company_id'
     ];
 

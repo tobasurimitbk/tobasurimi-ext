@@ -79,4 +79,17 @@ class DivisisModel extends Model
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;
     }
+
+    public function getTunjanganByDivisi($divisionID)
+    {
+        $select = "
+            tunjangan.*
+        ";
+        return $this->asObject()
+            ->select($select)
+            ->join('gaji_divisi', 'gaji_divisi.division_id = divisis.id', 'INNER')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'INNER')
+            ->where('gaji_divisi.division_id', $divisionID)
+            ->findAll();
+    }
 }

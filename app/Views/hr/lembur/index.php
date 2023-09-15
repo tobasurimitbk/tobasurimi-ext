@@ -15,7 +15,7 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search fos-jk mb-3" placeholder="Cari Data" id="filterSearch" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search fos-jk mb-3" placeholder="Cari Data Berdasarkan NIP" id="filterSearch" value="" />
                 </div>
             </div>
             <div class="row">
@@ -24,7 +24,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;" class="sort">No</th>
-                                <th onclick="" class="sort">NIP</th>
+                                <th onclick="changeSort('nip')" class="sort">NIP</th>
                                 <th onclick="" class="sort">Nama Karyawan</th>
                                 <th onclick="" class="sort">Divisi</th>
                                 <th onclick="" class="sort">Tgl Lembur</th>
@@ -65,9 +65,6 @@
             dataSrc: "data",
             data: function(data) {
                 data.nip = $('#filterSearch').val();
-                data.name = $('#filterSearch').val();
-                data.divisi = $('#filterSearch').val();
-                data.periode = $('#filterSearch').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }

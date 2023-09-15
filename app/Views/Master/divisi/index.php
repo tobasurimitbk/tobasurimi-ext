@@ -33,6 +33,32 @@
                             </div>
                         </div>
                     </div>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="tabelGaji" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr style="text-align: center;">
+                                    <th scope="col" style="width: 10px;"><input type="checkbox" id="parent"></th>
+                                    <th style="width: 10px;">No</th>
+                                    <th>Nama Komponen Gaji</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                                <?php $no = 1; ?>
+                                <?php foreach ($tunjangan as $t) : ?>
+                                    <?php if ($t['is_gaji_harian']) : ?>
+                                        <input type="hidden" name="komponenGaji[]" value="<?= $t['id'] ?>">
+                                    <?php endif; ?>
+                                    <tr style="text-align: center;">
+                                        <td data-id="<?= $t['id'] ?>"><input name="komponenGaji[]" <?= $t['is_gaji_harian'] ? 'checked disabled' : '' ?> class="child" type="checkbox" value="<?= $t['id'] ?>"></td>
+                                        <td><?= $no++; ?></td>
+                                        <td><?= $t['name'] ?></td>
+                                        <td><?= ($t['tipe'] == "PLUS") ? "Penambahan Gaji" : "Pengurangan Gaji" ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -219,6 +245,17 @@
                         $("select[name='jam_kerja_id']").val(res?.data?.jam_kerja_id);
                         validator.resetForm();
                         validator.reset();
+
+                        $("input[name='komponenGaji[]']").each(function() {
+                            let komponenId = $(this).val();
+                            let isSelected = res.komponenGaji.some(function(komponen) {
+                                return komponen.id === komponenId;
+                            });
+                            if (isSelected) {
+                                $(this).prop('checked', true);
+                            }
+                        });
+
                         $(".add-modal").modal("show")
                     } else {
                         Swal.fire({
@@ -430,6 +467,18 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+
+    $('#parent').click(function() {
+        $('.child:not(:disabled)').prop('checked', this.checked);
+    });
+
+    $('.child').click(function() {
+        if ($('.child:checked').length == $('.child').length) {
+            $('#parent').prop('checked', true);
+        } else {
+            $('#parent').prop('checked', false);
+        }
+    });
 </script>
 
 <?= $this->endSection(); ?>

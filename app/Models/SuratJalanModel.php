@@ -106,11 +106,20 @@ class SuratJalanModel extends Model
 
     public function getSuratJalanById($id)
     {
-        $selectQry = "surat_jalan_so.*,users.name as seller_name,customers.name as customer_name ,customers.address,customers.phone";
+        $selectQry = "surat_jalan_so.*,
+                      users.name as seller_name,
+                      customers.name as customer_name ,
+                      customers.address,customers.phone,
+                      CONCAT(employees.nip , ' - ', employees.name) AS customerSales,
+                      customers.address AS customerAddress,
+                      customers.phone AS customerPhone,
+                      metadata.value AS customerTermin";
 
         $dataSuratJalan = $this->asObject()
             ->join('users', 'users.id = surat_jalan_so.id_user')
             ->join('customers', 'customers.id = surat_jalan_so.id_customer ')
+            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('employees', 'employees.id = customers.sales_id ')
             ->select($selectQry)
             ->find($id);
 

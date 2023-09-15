@@ -81,9 +81,6 @@ class FormLembur extends BaseController
 
         $addCondition = [
             "nip"           => $this->request->getGet("nip"),
-            "name"          => $this->request->getGet("name"),
-            "divisi"        => $this->request->getGet("divisi"),
-            "periode"       => $this->request->getGet("periode")
         ];
 
         $limit = $this->request->getGet("length");
@@ -98,6 +95,7 @@ class FormLembur extends BaseController
 
         foreach ($result['data'] as $p) {
             $tanggalObj = DateTime::createFromFormat('Y-m-d', $p->periode);
+            $splitJamMenit = \explode('.', $p->total_jam_lembur);
 
             array_push($dataFormLembur, [
                 "no" => $no++,
@@ -106,7 +104,7 @@ class FormLembur extends BaseController
                 "name"  => $p->employeesName,
                 "divisi" => $p->divisiName,
                 "periode" => $tanggalObj->format('d/m/Y'),
-                "jam_lembur" => $p->total_jam_lembur . " Jam",
+                "jam_lembur" => (\count($splitJamMenit) == 2) ? $splitJamMenit[0] . " Jam " . $splitJamMenit[1] . " Menit" : $splitJamMenit[0] . " Jam ",
                 "uang_lembur" => "Rp. " . number_format($p->total_uang_lembur, 0, ',', '.')
             ]);
         }
@@ -128,6 +126,7 @@ class FormLembur extends BaseController
         $employeeID = $this->request->getVar('employeeID');
         $tanggal = $this->request->getVar('tanggalLembur');
         $kurangiJamIstirahat = $this->request->getVar('kurangiJamIstirahat');
+        $jamSelesaiLembur = $this->request->getVar('jamSelesaiLembur');
 
         $modelJamKerja = new JamKerjaModel();
         $modelGaji = new GajiConjunctionModel();
@@ -148,7 +147,8 @@ class FormLembur extends BaseController
         if (empty($employeeID) || empty($tanggal)) {
             return \response()->setJSON([
                 'message' => "Inputan Nama Karyawan dan Tanggal lembur wajib diisi !",
-                'status' => false
+                'status' => false,
+                'code' => 422
             ]);
         }
 
@@ -180,8 +180,14 @@ class FormLembur extends BaseController
             // belum ada presensi pulang di log
             return \response()->setJSON([
                 'message' => "Karyawan belum melakukan presensi pulang pada tanggal $tanggal",
-                'status' => false
+                'status' => false,
+                'code' => 400
             ]);
+        }
+
+        // update checkout (jika dia input manual)
+        if (!empty($jamSelesaiLembur)) {
+            $checkOutLog = $jamSelesaiLembur;
         }
 
         // get jam kerja
@@ -193,10 +199,12 @@ class FormLembur extends BaseController
             ->where('jam_kerja_detail.hari', $hariInIndonesia)
             ->first();
 
+        // cek jam kerja detail apakah kosong
         if ($jamKerjaDetail == null) {
             return \response()->setJSON([
                 'message' => "Terjadi kesalahan, jam kerja belum diset untuk divisi ini",
-                'status' => \false
+                'status' => \false,
+                'code' => 400
             ]);
         }
 
@@ -221,7 +229,7 @@ class FormLembur extends BaseController
         }
 
         // gaji
-        $gaji = $modelGaji->select("tunjangan.name, gaji_conjunction.nominal")
+        $gaji = $modelGaji->select("tunjangan.name, gaji_conjunction.nominal, tunjangan.is_gaji_harian")
             ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
             ->where('gaji_conjunction.employee_id', $employeeID)
             ->where('tunjangan.tipe', "PLUS")
@@ -229,7 +237,7 @@ class FormLembur extends BaseController
 
         // get gaji pokok
         foreach ($gaji as $g) {
-            if ($g['name'] == "Gaji Pokok (Per Hari)") {
+            if ($g['is_gaji_harian'] == 1) {
                 $gajiPokok = $g['nominal'];
             }
         }
@@ -242,6 +250,14 @@ class FormLembur extends BaseController
 
         $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . "." . $waktuSelisihPulangLembur['menit'];
 
+        if ($totalJamLembur <= 1) {
+            return \response()->setJSON([
+                'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam",
+                'status' => \false,
+                'code' => 400
+            ]);
+        }
+
         // chek apakah lembur lebih dari satu jam
         if ($totalJamLembur >= 1) {
             // jam pertama
@@ -252,6 +268,7 @@ class FormLembur extends BaseController
                 $waktuSelisihPulangLembur['jam'] . ":" . $waktuSelisihPulangLembur['menit'],
                 60.00 // satu jam
             );
+
             // lebih satu jam
             $totalLemburJamBerikutnya = $sisaWaktu;
             $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
@@ -263,11 +280,15 @@ class FormLembur extends BaseController
 
         if ($totalLemburJamPertama <= 0) {
             return \response()->setJSON([
-                'message' => "Tidak memenuhi syarat melakukan lembur karena pegawai checkout sebelum jam pulang, cek menu log absensi",
+                'message' => "Tidak memenuhi syarat melakukan lembur karena pegawai checkout sebelum jam pulang, silahkan cek menu log absensi",
                 'status' => \false,
+                'code' => 400
 
             ]);
         }
+
+        $finalBayaranLemburJamPertama = \number_format($bayaranLemburJamPertama, 2, '.', '');
+        $finalBayaranLemburJamBerikutnya = \number_format($bayaranLemburJamBerikutnya, 2, '.', '');
 
         $result = [
             'jamKerja' => [
@@ -283,13 +304,13 @@ class FormLembur extends BaseController
             'lembur' => [
                 'lemburJamPertama' => [
                     'totalLemburJamPertama' => \number_format(\abs($totalLemburJamPertama), 2, '.', ''),
-                    'bayaran' => \number_format($bayaranLemburJamPertama, 2, '.', '')
+                    'bayaran' => $finalBayaranLemburJamPertama
                 ],
                 'lemburJamBerikutnya' => [
                     'totalLemburJamKedua' => \number_format(\abs($totalLemburJamBerikutnya), 2, '.', ''),
-                    'bayaran' => \number_format($bayaranLemburJamBerikutnya, 2, '.', '')
+                    'bayaran' => $finalBayaranLemburJamBerikutnya
                 ],
-                'totalBayaran' => \number_format($bayaranLemburJamPertama + $bayaranLemburJamPertama, 2, '.', ''),
+                'totalBayaran' => \number_format($finalBayaranLemburJamPertama + $finalBayaranLemburJamBerikutnya, 2, '.', ''),
                 'totalJamLembur' => $totalJamLembur
             ],
             'status' => true,
@@ -321,7 +342,9 @@ class FormLembur extends BaseController
             'periode' => $tanggalObj->format('Y-m-d'),
             'total_jam_lembur' => $this->request->getVar('totalJamLembur'),
             'total_uang_lembur' => $this->request->getVar('totalUangLembur'),
-            'kurangi_jam_istirahat' => $this->request->getVar('kurangiJamIstirahat')
+            'kurangi_jam_istirahat' => $this->request->getVar('kurangiJamIstirahat'),
+            'jam_mulai_lembur' => $this->request->getVar('jamMulaiLembur'),
+            'jam_selesai_lembur' => $this->request->getVar('jamSelesaiLembur')
         ]);
 
         return \response()->setJSON([
@@ -356,10 +379,11 @@ class FormLembur extends BaseController
     static function kurangiWaktu($waktu, $menitDikurangkan)
     {
         $waktuObj = DateTime::createFromFormat('H:i', $waktu);
-        $waktuObj->sub(new DateInterval('PT' . $menitDikurangkan . 'M'));
-        $selisihJamFloat = $waktuObj->format('H') + ($waktuObj->format('i') / 60);
-        $selisihJamBulat = round($selisihJamFloat);
-        return $selisihJamBulat;
+        $jam = $waktuObj->format('H');
+        $menit = $waktuObj->format('i');
+        $totalMenit = ($jam * 60) + $menit;
+        $totalMenit -= $menitDikurangkan;
+        return ($totalMenit / 60);
     }
 
     // helper

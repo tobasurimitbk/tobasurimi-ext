@@ -202,7 +202,7 @@ $(document).ready(function() {
         },
         {
             render: function(data, type, row) {
-                return `<input autocomplete="one-time-code" class="form-control" type="text" value="">`
+                return `<input autocomplete="one-time-code" class="form-control" style="height: 40px; padding-bottom:12px;" type="text" value="">`
             },
             targets: 4
         },

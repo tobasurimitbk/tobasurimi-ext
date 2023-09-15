@@ -20,7 +20,9 @@ class FormLemburModel extends Model
         'periode',
         'total_jam_lembur',
         'total_uang_lembur',
-        'kurangi_jam_istirahat'
+        'kurangi_jam_istirahat',
+        'jam_mulai_lembur',
+        'jam_selesai_lembur'
     ];
 
     // Dates
@@ -80,7 +82,7 @@ class FormLemburModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['nip'] || $addCondition['name'] || $addCondition['divisi'] || $addCondition['periode']) {
+        if ($addCondition['nip']) {
             $dataQry->groupStart();
         }
 
@@ -88,19 +90,7 @@ class FormLemburModel extends Model
             $dataQry->like('employees.nip', $addCondition['nip']);
         }
 
-        if ($addCondition['name']) {
-            $dataQry->like('employees.name', $addCondition['name']);
-        }
-
-        if ($addCondition['divisi']) {
-            $dataQry->like('divisis.divisi', $addCondition['divisi']);
-        }
-
-        if ($addCondition['periode']) {
-            $dataQry->like('form_lembur.periode', $addCondition['periode']);
-        }
-
-        if ($addCondition['nip'] || $addCondition['name'] || $addCondition['divisi'] || $addCondition['periode']) {
+        if ($addCondition['nip']) {
             $dataQry->groupEnd();
         }
 

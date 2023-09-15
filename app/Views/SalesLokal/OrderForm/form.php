@@ -12,11 +12,12 @@
             </a>
 
             <?php if (!empty($data)): ?>
-            <a class="btn btn-save float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>">
+            <!-- <a class="btn btn-save float-right" href="#"> -->
+            <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>">
                 Print
             </a>
             <?php endif; ?>
-            
+
             <button class="btn btn-show-form btn-save float-right btn-submit">
                 Simpan
             </button>
@@ -171,24 +172,24 @@
                 <div class="table-responsive">
                     <table class="table table-borderless" width="100%" cellspacing="0">
                         <tr>
-                            <td class="font-weight-bold">Sub Total</td>
-                            <td class="font-weight-bold text-right">Rp. <span id="itemSubTotal">0</span></td>
+                            <td class="font-weight-bold" style="height: 40px;">Sub Total</td>
+                            <td class="font-weight-bold text-right" style="height: 40px;">Rp. <span id="itemSubTotal">0</span></td>
                         </tr>
                         <tr>
-                            <td>Discount</td>
-                            <td class="text-right">Rp. <span id="discTotal">0</span></td>
+                            <td style="height: 40px;">Discount</td>
+                            <td class="text-right" style="height: 40px;">Rp. <span id="discTotal">0</span></td>
                         </tr>
                         <tr>
-                            <td>PPn (11%)</td>
-                            <td class="text-right">Rp. <span id="taxTotal">0</span></td>
+                            <td style="height: 40px;">PPn (11%)</td>
+                            <td class="text-right" style="height: 40px;">Rp. <span id="taxTotal">0</span></td>
                         </tr>
                         <tr>
-                            <td>Biaya Kirim</td>
-                            <td class="text-right">Rp. <span id="freightCost"><?= number_format($data->estimated_freight ?? 0); ?></span></td>
+                            <td style="height: 40px;">Biaya Kirim</td>
+                            <td class="text-right" style="height: 40px;">Rp. <span id="freightCost"><?= number_format($data->estimated_freight ?? 0); ?></span></td>
                         </tr>
                         <tr>
-                            <td class="font-weight-bold" style="border-top: 1px solid #929292">Total Order <span>(Termasuk Pajak)</span></td>
-                            <td style="border-top: 1px solid #929292" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
+                            <td class="font-weight-bold" style="border-top: 1px solid #929292; height:40px;">Total Order <span id="includeTaxText">(Termasuk Pajak)</span></td>
+                            <td style="border-top: 1px solid #929292; height: 40px;" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
                         </tr>
                     </table>
                 </div>
@@ -990,14 +991,53 @@
             const discAmt = amount * (discountPercentage / 100);
             const discountedAmt = amount - discAmt;
 
-            let validate_same = false;
+            const currentItemList = table.rows().data().toArray();console.log('hehoo')
+            let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
-            if (validate_same) {
-                Swal.fire({
+            if (validate_same >= 0) {
+                /* Swal.fire({
                     icon: 'error',
                     title: "Barang Sudah Ada",
                     confirmButtonColor: '#4e73df',
-                })
+                }) */
+
+                // table.row.add({
+                //     id_barang: id_barang,
+                //     kode_barang: selectedData.code,
+                //     nama_barang: nama_barang,
+                //     qty: qty,
+                //     satuan: selectedData.satuan,
+                //     harga_barang: harga,
+                //     barangTotal: amount,
+                //     disc: discountPercentage,
+                //     tax: tax,
+                //     taxAmt: amount * (tax / 100),
+                //     keterangan: keterangan,
+                //     discAmt: discAmt,
+                //     amount: discountedAmt,
+                //     dept: dept,
+                //     warehouse_id: warehouseId,
+                //     warehouse_name: warhouseName
+                // }).draw(false);
+                const currentData = table.row(validate_same).data();
+                const newQty = +currentData.qty + +qty;
+                const newBarangTotal = +currentData.barangTotal + +amount;
+                const newTax = +currentData.tax + +tax;
+                const aasd = {
+                    ...currentData,
+                    qty: newQty,
+                    harga_barang: Math.ceil(newBarangTotal / newQty),
+                    barangTotal: newBarangTotal,
+                    disc: 0, // ganti nanti
+                    tax: newTax,
+                    taxAmt: currentData.taxAmt + (amount * (tax / 100)),
+                    discAmt: currentData.discAmt + discAmt,
+                    amount: currentData.amount + discountedAmt,
+                };
+                table.row(0).data(aasd).draw(false);
+
+                reCountTotal();
+
             } else {
                 // update detail
                 if (row_detail) {
@@ -1283,6 +1323,12 @@
                     taxTotalHtml += +obj.taxAmt;
                 }
             });
+
+            if (taxStatus || includeTax) {
+                $('#includeTaxText').html('(Termasuk Pajak)');
+            } else {
+                $('#includeTaxText').html('');
+            }
 
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#discTotal').html(discTotal.toLocaleString());

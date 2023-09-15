@@ -152,9 +152,9 @@ class Invoice extends BaseController
                 ]
             ],
             "terms" => [
-                "rules" => "required",
+                "rules" => "permit_empty",
                 'errors' => [
-                    'required' => 'Term tidak boleh kosong',
+                    // 'required' => 'Term tidak boleh kosong',
                 ]
             ],
             "ship_via" => [
@@ -189,10 +189,23 @@ class Invoice extends BaseController
 
             if ($postData['doc_type'] === 'pesanan') {
                 $documentData = $this->SalesOrderModel->asObject()
+                    ->where('surat_jalan_so_id', null)
+                    ->where('sales_order_invoice_id', null)
                     ->find($postData['doc_id']);
             } else {
                 $documentData = $this->SuratJalanModel->asObject()
+                    ->where('sales_order_invoice_id', null)
                     ->find($postData['doc_id']);
+            }
+
+            if (empty($documentData)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Dokumen tidak ditemukan',
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
             }
 
             // start transaction
@@ -216,7 +229,7 @@ class Invoice extends BaseController
                 // "no_surat_jalan"    => $postData['no_surat_jalan'],
                 "no_faktur"         => $noFaktur,
                 "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-',$postData['tanggal_faktur']))),
-                "terms"             => $postData['terms'],
+                "terms"             => $postData['terms'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
                 // "dpp"               => $postData['dpp'],
@@ -313,7 +326,7 @@ class Invoice extends BaseController
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
 
-        $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type);
+        $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
         
         $tipeShipping = $this->MetadataModel->asObject()
             ->select(['id', 'value'])
@@ -321,7 +334,7 @@ class Invoice extends BaseController
             ->findAll();
         
         $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
-        // dd($documentData);
+        // dd($documentList);
         $data = [
             "data"          => $dataSalesInvoiceOrder,
             "documentList"  => $documentList,
@@ -529,24 +542,29 @@ class Invoice extends BaseController
         echo json_encode($documentData);
     }
 
-    private function getDocNumberList(string $documentType): array
+    private function getDocNumberList(string $documentType, int $documentId = null): array
     {
         $documentList = [];
 
         if ($documentType === 'pesanan') {
             $documentList = $this->SalesOrderModel->asObject()
-                ->where('surat_jalan_so_id', null)
-                ->where('sales_order_invoice_id', null)
                 ->select('id, no_sales_order AS doc_no')
-                ->findAll();
+                ->where('surat_jalan_so_id', null);
         } else { // pengiriman
             $documentList = $this->SuratJalanModel->asObject()
-                ->where('sales_order_invoice_id', null)
-                ->select('id, no_surat_jalan AS doc_no')
-                ->findAll();
+                ->select('id, no_surat_jalan AS doc_no');
         }
 
-        return $documentList;
+        $documentList->groupStart();
+        $documentList->where('sales_order_invoice_id', null);
+
+        if (!empty($documentId)) {
+            $documentList->orWhere('id', $documentId);    
+        }
+
+        $documentList->groupEnd();
+
+        return $documentList->findAll();
     }
 
     private function getDocDataaaa(string $docType, int $docId): object
@@ -577,11 +595,16 @@ class Invoice extends BaseController
             $taxStatus = filter_var($soData->tax_status, FILTER_VALIDATE_BOOLEAN);
             $includeTax = filter_var($soData->include_pa, FILTER_VALIDATE_BOOLEAN);
         } else {
+            $selectQry = "surat_jalan_so.*, 
+                          customers.name AS customerName, 
+                          customers.address AS customerAddress, 
+                          CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
+                          IFNULL(metadata.value, '-') AS termin";
             $suratJalanData = $this->SuratJalanModel->asObject()
-                ->select('surat_jalan_so.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
+                ->select($selectQry)
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer')
                 ->join('employees', 'employees.id = customers.sales_id')
-                ->join('metadata', 'metadata.id = customers.termin')
+                ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->find($docId);
 
             $salesName = $suratJalanData->salesName;

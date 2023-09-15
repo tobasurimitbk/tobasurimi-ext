@@ -5,7 +5,9 @@ namespace App\Controllers\SalesLokal;
 use App\Controllers\BaseController;
 
 use Config\Services;
+use Dompdf\Dompdf;
 
+use App\Models\CompaniesModel;
 use App\Models\SalesOrderModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\CustomerModel;
@@ -18,6 +20,7 @@ class SuratJalan extends BaseController
     private $this_company_id;
     private $userId;
 
+    private $companyModel;
     private $CustomerModel;
     private $SalesOrderModel;
     private $SalesOrderDetailModel;
@@ -32,6 +35,7 @@ class SuratJalan extends BaseController
         $this->userId = session()->get("login")->user_id;
 
         $this->encrypter = Services::encrypter();
+        $this->companyModel = new CompaniesModel();
         $this->CustomerModel = new CustomerModel();
         $this->SalesOrderModel = new SalesOrderModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
@@ -409,16 +413,27 @@ class SuratJalan extends BaseController
 
     public function dropDownSalesOrder($idCustomer)
     {
+        $customerData = $this->CustomerModel->asObject()
+            ->select('customers.*, metadata.value AS termin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('employees', 'employees.id = customers.sales_id ')
+            ->find($idCustomer);
+
         $condition = [
             'id_customer'               => $idCustomer, 
             'tipe_sales_order'          => 'LOKAL',
             'surat_jalan_so_id'         => null,
             'sales_order_invoice_id'    => null
         ];
-        $data = $this->SalesOrderModel->asObject()
+        $soList = $this->SalesOrderModel->asObject()
             ->where($condition)
             ->select(['id', 'no_sales_order'])
             ->findAll();
+
+        $data = [
+            'customerData'  => $customerData,
+            'soList'        => $soList
+        ];
 
         echo json_encode($data);
         return;
@@ -463,5 +478,81 @@ class SuratJalan extends BaseController
         ];
         echo json_encode($allData);
         return;
+    }
+
+    public function printSJ($id)
+    {
+        $domPdf = new Dompdf();
+
+        $fileName = 'Order Form';
+
+        $companyData = $this->companyModel->asObject()
+            ->find($this->this_company_id);
+
+        $sjData = $this->SuratJalanModel->asObject()
+            ->select('surat_jalan_so.*, DATE_FORMAT(surat_jalan_so.shipping_date, "%d %b %Y") AS shipping_date')
+            // ->join()
+            ->find($id);
+
+        $soIds = json_decode($sjData->multiple_id_so);
+
+        $soSelectQry = "sales_order.*,
+                        DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
+                        DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
+                        customers.name AS customerName, 
+                        customers.address AS customerAddress,
+                        metadata.value AS termin,
+                        barangs.nama_barang AS namaBarang, 
+                        barangs.kode_barang AS kodeBarang, 
+                        sales_order_detail.qty AS qty, 
+                        satuans.kode_satuan AS kodeSatuan,
+                        sales_order_detail.discount_percentage AS disc_pct,
+                        sales_order_detail.amount AS amt";
+        $salesOrderData = $this->SalesOrderModel->asObject()
+            ->select($soSelectQry)
+            ->join('customers', 'customers.id = sales_order.id_customer')
+            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
+            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
+            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->whereIn('sales_order.id', $soIds)
+            ->findAll();
+
+        /* $soDetQry = "barangs.nama_barang AS namaBarang, 
+                     barangs.kode_barang AS kodeBarang, 
+                     sales_order_detail.qty AS qty, 
+                     satuans.kode_satuan AS kodeSatuan,
+                     sales_order_detail.discount_percentage AS disc_pct,
+                     sales_order_detail.amount AS amt";
+        $soDet = $this->SalesOrderDetailModel->asObject()
+            ->select($soDetQry)
+            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
+            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->whereIn('id_sales_order', $soIds)
+            ->findAll(); */
+            // dd($soDet);
+
+        $data = [
+            'companyName'   => $companyData->company,
+            'sjData'        => $sjData,
+            'soData'        => $salesOrderData,
+            // 'soDet'         => $soDet
+        ];
+
+        // return view('SalesLokal/SuratJalan/print', $data);
+
+        // load HTML content
+        $domPdf->loadHtml(view('SalesLokal/SuratJalan/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper([0, 0, 792.96, 528]);
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+        
+        exit();
     }
 }
