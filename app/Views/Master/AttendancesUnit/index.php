@@ -75,7 +75,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-copy btn-discard mr-2">Batal</button>
-                <button type="button" class="btn btn-process-form">Process</button>
+                <button type="button" class="btn btn-submit-form btn-process-form">Process</button>
             </div>
         </div>
     </div>
