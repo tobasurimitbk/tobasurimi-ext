@@ -17,21 +17,18 @@
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" disabled value=" <?= $data->return_no ?? ""; ?>" placeholder="Nomor surat Return">
                             <label for="floatingInput">Nomor Surat Return</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control input-picker shipping_date" id="return_date" name="return_date" value="<?= $data->return_date ?? ""; ?>">
                             <label for="floatingInput">Tanggal Return</label>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->customer_id === true ? 'disabled=true' : '') : ''; ?>>
@@ -43,14 +40,15 @@
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control" id="customerAddress" name="customerAddress" disabled value="<?= $data->customerAddress ?? ''; ?>">
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control" id="nama_sales" name="nama_sales" disabled value=" <?= $data->no_surat_retur ?? ""; ?>" placeholder="Nomor surat Return">
@@ -66,6 +64,14 @@
                                 <?php endif; ?>
                             </select>
                             <label for="floatingInput">SO</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan"><?= $data->note ?? ""; ?></textarea>
+                            <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -92,15 +98,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan"><?= $data->note ?? ""; ?></textarea>
-                            <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
                 </div>
@@ -171,7 +168,7 @@
                 data: `<?= empty($data) ? "qty" : "returnQty" ?>`,
                 className: "text-center",
                 render: function(data, type, row) {
-                    return `<input type="text" class="form-control" value="${data}">`
+                    return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${data}">`
                 }
             },
             {
