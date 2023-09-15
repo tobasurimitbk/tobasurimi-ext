@@ -79,7 +79,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="termin" name="termin" value="<?= $data->termin ?? '' ?>" disabled>
+                            <input type="text" class="form-control" id="termin" name="termin" value="<?= $documentData->termin ?? '' ?>" disabled>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>

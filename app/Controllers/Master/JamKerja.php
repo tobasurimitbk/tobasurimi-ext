@@ -102,6 +102,7 @@ class JamKerja extends BaseController
 
         $jamKerja = $modelJamKerja->insert([
             'jenis' => $this->request->getVar('jenisJamKerja'),
+            'jam_terlambat' => $this->request->getVar('jamTerlambat'),
             'company_id' =>  $this->this_company_id
         ]);
 
@@ -161,6 +162,7 @@ class JamKerja extends BaseController
 
         $modelJamKerja->set('jenis', $this->request->getVar('jenisJamKerja'))
             ->set('company_id', $this->this_company_id)
+            ->set('jam_terlambat', $this->request->getVar('jamTerlambat'))
             ->where('id', $this->request->getVar('jamKerjaID'))
             ->update();
 

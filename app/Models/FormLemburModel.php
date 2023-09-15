@@ -20,7 +20,9 @@ class FormLemburModel extends Model
         'periode',
         'total_jam_lembur',
         'total_uang_lembur',
-        'kurangi_jam_istirahat'
+        'kurangi_jam_istirahat',
+        'jam_mulai_lembur',
+        'jam_selesai_lembur'
     ];
 
     // Dates

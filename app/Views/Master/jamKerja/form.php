@@ -30,8 +30,8 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" name="status" readonly value="<?= (!empty($jamKerja)) ? 'Jam Kerja Sudah Diatur' : 'Jam Kerja Belum Diatur' ?> " placeholder="Status">
-                            <label for="floatingInput">Status</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control" name="jamTerlambat" value="<?= (!empty($jamKerja)) ? $jamKerja['jam_terlambat'] : '' ?> " placeholder="Batas Jam Keterlambatan">
+                            <label for="floatingInput">Batas Jam Keterlambatan</label>
                         </div>
                     </div>
                 </div>
@@ -101,6 +101,9 @@
         ignore: ":disabled", // Mengabaikan input yang disabled
         rules: {
             jenisJamKerja: {
+                required: true
+            },
+            jamTerlambat: {
                 required: true
             },
             SENIN_mulaiMasuk: {
@@ -180,7 +183,9 @@
             jenisJamKerja: {
                 required: "Jenis jam kerja wajib diisi"
             },
-
+            jamTerlambat: {
+                required: "Jam terlambat wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -201,6 +206,14 @@
         unhighlight: function(element) {
             $(element).closest('.form-group').removeClass('has-error');
             $(element).removeClass('select-class');
+        },
+    });
+
+    $("input[name='jamTerlambat']").datetimepicker({
+        format: 'HH:mm',
+        icons: {
+            up: 'fas fa-chevron-up',
+            down: 'fas fa-chevron-down'
         },
     });
 

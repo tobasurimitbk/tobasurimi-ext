@@ -11,6 +11,12 @@
                 Batal
             </a>
 
+            <?php if (!empty($data)): ?>
+            <a class="btn btn-save float-right" href="<?= base_url("surat-jalan/print/{$data->id}"); ?>">
+                Print
+            </a>
+            <?php endif; ?>
+
             <button class="btn btn-show-form btn-save float-right btn-submit">
                 Simpan
             </button>
