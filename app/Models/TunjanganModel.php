@@ -18,6 +18,7 @@ class TunjanganModel extends Model
         'company_id',
         'name',
         'tipe',
+        'is_gaji_harian',
         'createdAt',
         'updatedAt',
         'deletedAt'

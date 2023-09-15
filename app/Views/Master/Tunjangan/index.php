@@ -1,6 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 <div class="modal add-modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
@@ -32,6 +37,17 @@
                                     </option>
                                 </select>
                                 <label for="floatingInput">Pilih Status</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="isGajiPokokPerHariForm">
+                        <label class="mt-2">
+                            Gaji Pokok Perhari
+                        </label>
+                        <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input class="form-check-input" type="checkbox" value="1" name="isGajiPokokPerHari" id="isGajiPokokPerHari">
+                                <label class="form-check-label" for="isGajiPokokPerHari"></label>
                             </div>
                         </div>
                     </div>
@@ -219,6 +235,18 @@
                         $(".id").val(id);
                         $("#nama").val(res?.data?.name);
                         $("select[name='tipe']").val(res?.data?.tipe);
+
+                        if (res?.data?.is_gaji_harian) {
+                            $("#isGajiPokokPerHari").prop('checked', true);
+                        } else {
+                            $("#isGajiPokokPerHari").prop('checked', false);
+                        }
+
+                        if (res?.data?.tipe == "PLUS") {
+                            $('#isGajiPokokPerHariForm').show();
+                        } else {
+                            $('#isGajiPokokPerHariForm').hide();
+                        }
 
                         $(".add-modal").modal("show")
                     } else {
@@ -419,6 +447,20 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+</script>
+
+<script>
+    // first hide
+    $('#isGajiPokokPerHariForm').hide();
+    // change
+    $("select[name='tipe']").change(function(e) {
+        e.preventDefault();
+        if ($(this).val() == "PLUS") {
+            $('#isGajiPokokPerHariForm').show();
+        } else {
+            $('#isGajiPokokPerHariForm').hide();
+        }
+    });
 </script>
 
 <?= $this->endSection(); ?>

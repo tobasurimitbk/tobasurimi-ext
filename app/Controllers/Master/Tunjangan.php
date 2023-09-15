@@ -55,7 +55,6 @@ class Tunjangan extends BaseController
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
-                "date"                  => date("d/m/Y", strtotime($data->date)),
                 "name"                  => $data->name,
                 "tipe"                  => ($data->tipe == "PLUS") ? "Penambahan Gaji" : "Pengurangan Gaji"
             ]);
@@ -87,10 +86,18 @@ class Tunjangan extends BaseController
             ];
 
             if ($this->validate($rules)) {
+
+                $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari');
+
+                if ($isGajiPokokPerHari) {
+                    $this->TunjanganModel->set('is_gaji_harian', 0)->where('company_id', $this->this_company_id)->update();
+                }
+
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
-                    "tipe" => $this->request->getPost("tipe")
+                    "tipe" => $this->request->getPost("tipe"),
+                    "is_gaji_harian" => $isGajiPokokPerHari
                 ];
                 if ($this->TunjanganModel->insert($values)) {
                     $data = [
@@ -144,11 +151,17 @@ class Tunjangan extends BaseController
             if ($this->validate($rules)) {
 
                 $id = $this->request->getPost("id");
+                $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari');
+
+                if ($isGajiPokokPerHari) {
+                    $this->TunjanganModel->set('is_gaji_harian', 0)->where('company_id', $this->this_company_id)->update();
+                }
 
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
-                    "tipe" => $this->request->getPost("tipe")
+                    "tipe" => $this->request->getPost("tipe"),
+                    "is_gaji_harian" => $isGajiPokokPerHari
                 ];
 
                 if ($this->TunjanganModel->update($id, $values)) {
@@ -193,7 +206,6 @@ class Tunjangan extends BaseController
         if (!empty($id)) {
             $res = $this->TunjanganModel->getById($id);
             if ($res) {
-                $res->date = date("d/m/Y", strtotime($res->date));
                 $data = [
                     "status"  => true,
                     "data"  => $res,
