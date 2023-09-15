@@ -107,16 +107,14 @@ class JamKerja extends BaseController
         ]);
 
         foreach ($modelMetaData->where('name', "hari")->findAll() as $h) {
-            if ($h['value'] != "MINGGU") {
-                $modelJamKerjaDetail->insert([
-                    'jam_kerja_id' => $jamKerja,
-                    'hari' => $h['value'],
-                    'jam_masuk' => $this->request->getVar($h['value'] . "_mulaiMasuk"),
-                    'jam_istirahat_mulai' => $this->request->getVar($h['value'] . "_mulaiIstirahat"),
-                    'jam_istirahat_selesai' => $this->request->getVar($h['value'] . "_selesaiIstirahat"),
-                    'jam_pulang' => $this->request->getVar($h['value'] . "_mulaiPulang")
-                ]);
-            }
+            $modelJamKerjaDetail->insert([
+                'jam_kerja_id' => $jamKerja,
+                'hari' => $h['value'],
+                'jam_masuk' => $this->request->getVar($h['value'] . "_mulaiMasuk"),
+                'jam_istirahat_mulai' => $this->request->getVar($h['value'] . "_mulaiIstirahat"),
+                'jam_istirahat_selesai' => $this->request->getVar($h['value'] . "_selesaiIstirahat"),
+                'jam_pulang' => $this->request->getVar($h['value'] . "_mulaiPulang")
+            ]);
         }
 
         return \response()->setJSON([
@@ -170,16 +168,14 @@ class JamKerja extends BaseController
         $modelJamKerjaDetail->where('jam_kerja_id', $this->request->getVar('jamKerjaID'))->delete();
 
         foreach ($modelMetaData->where('name', "hari")->findAll() as $h) {
-            if ($h['value'] != "MINGGU") {
-                $modelJamKerjaDetail->insert([
-                    'jam_kerja_id' => $this->request->getVar('jamKerjaID'),
-                    'hari' => $h['value'],
-                    'jam_masuk' => $this->request->getVar($h['value'] . "_mulaiMasuk"),
-                    'jam_istirahat_mulai' => $this->request->getVar($h['value'] . "_mulaiIstirahat"),
-                    'jam_istirahat_selesai' => $this->request->getVar($h['value'] . "_selesaiIstirahat"),
-                    'jam_pulang' => $this->request->getVar($h['value'] . "_mulaiPulang")
-                ]);
-            }
+            $modelJamKerjaDetail->insert([
+                'jam_kerja_id' => $this->request->getVar('jamKerjaID'),
+                'hari' => $h['value'],
+                'jam_masuk' => $this->request->getVar($h['value'] . "_mulaiMasuk"),
+                'jam_istirahat_mulai' => $this->request->getVar($h['value'] . "_mulaiIstirahat"),
+                'jam_istirahat_selesai' => $this->request->getVar($h['value'] . "_selesaiIstirahat"),
+                'jam_pulang' => $this->request->getVar($h['value'] . "_mulaiPulang")
+            ]);
         }
 
         return \response()->setJSON([
