@@ -95,6 +95,7 @@ class FormLembur extends BaseController
 
         foreach ($result['data'] as $p) {
             $tanggalObj = DateTime::createFromFormat('Y-m-d', $p->periode);
+            $splitJamMenit = \explode('.', $p->total_jam_lembur);
 
             array_push($dataFormLembur, [
                 "no" => $no++,
@@ -103,7 +104,7 @@ class FormLembur extends BaseController
                 "name"  => $p->employeesName,
                 "divisi" => $p->divisiName,
                 "periode" => $tanggalObj->format('d/m/Y'),
-                "jam_lembur" => $p->total_jam_lembur . " Jam",
+                "jam_lembur" => (\count($splitJamMenit) == 2) ? $splitJamMenit[0] . " Jam " . $splitJamMenit[1] . " Menit" : $splitJamMenit[0] . " Jam ",
                 "uang_lembur" => "Rp. " . number_format($p->total_uang_lembur, 0, ',', '.')
             ]);
         }
