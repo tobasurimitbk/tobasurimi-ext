@@ -58,7 +58,7 @@
                                 <tr>
                                     <td><?= $nomor++ ?></td>
                                     <td><b><?= $v['value'] ?></b></td>
-                                    <td style="height: 100px;">
+                                    <td style="height: 70px;">
                                         <div class="form-floating" style="height: 50px;width:auto;">
                                             <input type="text" <?= $i == 6 ? 'disabled' : '' ?> value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_masuk'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiMasuk" maxlength="30">
                                             <label for="mulaiMasuk">Mulai Masuk</label>
