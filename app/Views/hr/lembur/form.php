@@ -100,7 +100,7 @@
                     </div>
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" required name="jamSelesaiLembur" id="jamSelesaiLembur" class="form-control target input-picker" value="-">
+                            <input autocomplete="one-time-code" type="text" required name="jamSelesaiLembur" id="jamSelesaiLembur" class="form-control target input-picker" value="<?= !empty($lemburDetail) ? $lemburDetail['jam_selesai_lembur'] : "" ?>">
                             <label for="floatingInput">Jam Selesai Lembur</label>
                         </div>
                     </div>
@@ -134,26 +134,26 @@
                 </div>
 
                 <!-- Komponen Gaji -->
-                <div class="table-responsive mb-4">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi" id="tabelGaji" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="width: 10px;" class="sort">No</th>
-                                <th onclick="" class="sort">Jenis Komponen Gaji</th>
-                                <th onclick="" class="sort">Nominal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
-                            <tr>
-                                <td colspan="3" class="text-center">
-                                    Pilih karyawan dan tanggal lembur dulu yha
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
                 <div id="rincanLembur">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="tabelGaji" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 10px;" class="sort">No</th>
+                                    <th onclick="" class="sort">Jenis Komponen Gaji</th>
+                                    <th onclick="" class="sort">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        Pilih karyawan dan tanggal lembur dulu yha
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <label class="form-label font-weight-bold lable-title mt-2">
                         Rincan Perhitungan Uang Lembur
                     </label>
@@ -195,7 +195,21 @@
         autoclose: true
     });
 
+    $("input[name='jamSelesaiLembur']").datetimepicker({
+        format: 'HH:mm',
+        icons: {
+            up: 'fas fa-chevron-up',
+            down: 'fas fa-chevron-down'
+        },
+    }).on('dp.change', function(e) {
+        generateLembur();
+    });
+
     $("input[name='tanggalLembur'], select[name='kurangiJamIstirahat'], select[name='employeeID']").change(function() {
+        generateLembur();
+    });
+
+    $("input[name='jamSelesaiLembur']").on('change', function() {
         generateLembur();
     });
 
@@ -226,12 +240,14 @@
         var employeeID = $("select[name='employeeID']").val();
         var tanggalLembur = $("input[name='tanggalLembur']").val();
         var kurangiJamIstirahat = $("select[name='kurangiJamIstirahat']").val();
+        var jamSelesaiLembur = $("input[name='jamSelesaiLembur']").val();
 
         // append to form
         var formData = new FormData();
         formData.append('employeeID', employeeID);
         formData.append('tanggalLembur', tanggalLembur);
         formData.append('kurangiJamIstirahat', kurangiJamIstirahat);
+        formData.append('jamSelesaiLembur', jamSelesaiLembur);
 
         // generate action
         $.ajax({
@@ -246,8 +262,6 @@
             contentType: false,
             success: function(response) {
                 if (response.status) {
-                    // display
-                    $('#rincanLembur').show();
                     var table = $('#tabelGaji');
                     table.find('tbody').empty();
 
@@ -310,16 +324,18 @@
                         tbody.append(newRow);
                     });
 
+                    showRincianUangLembur();
 
-                } else {
+
+                } else if (!response.status && response.code == 400) {
                     Swal.fire({
                         icon: 'warning',
                         title: response.message,
                         confirmButtonColor: '#4e73df',
                     });
-                    $('#rincanLembur').hide();
                     var table = $('#tabelGaji');
                     table.find('tbody').empty();
+                    hideRincianUangLembur();
 
                     $('input[name="jamKerjaMasuk"]').val(null);
                     $('input[name="jamKerjaKeluar"]').val(null);
@@ -414,6 +430,8 @@
                     var totalJamLembur = $('input[name="totalJamLembur"]').val();
                     var totalUangLembur = $('input[name="totalUangLembur"]').val();
                     var kurangiJamIstirahat = $('select[name="kurangiJamIstirahat"]').val();
+                    var jamMulaiLembur = $('input[name="jamMulaiLembur"]').val();
+                    var jamSelesaiLembur = $('input[name="jamSelesaiLembur"]').val();
 
                     if (totalUangLembur != 0) {
                         setLoading()
@@ -424,9 +442,10 @@
                         formData.append('totalJamLembur', totalJamLembur);
                         formData.append('totalUangLembur', totalUangLembur);
                         formData.append('kurangiJamIstirahat', kurangiJamIstirahat);
+                        formData.append('jamMulaiLembur', jamMulaiLembur);
+                        formData.append('jamSelesaiLembur', jamSelesaiLembur);
 
                         // update dan delete
-
                         $.ajax({
                             url: "<?= base_url("lembur/create"); ?>",
                             data: formData,
@@ -498,6 +517,7 @@
         $('select[name="employeeID"]').prop('disabled', true);
         $('input[name="tanggalLembur"]').prop('disabled', true);
         $('select[name="kurangiJamIstirahat"]').prop('disabled', true);
+        $('input[name="jamSelesaiLembur"]').prop('disabled', true);
 
         generateLembur();
 
@@ -568,5 +588,15 @@
         });
     </script>
 <?php endif; ?>
+
+<script>
+    function hideRincianUangLembur() {
+        $('#rincanLembur').hide();
+    }
+
+    function showRincianUangLembur() {
+        $('#rincanLembur').show();
+    }
+</script>
 
 <?= $this->endSection(); ?>
