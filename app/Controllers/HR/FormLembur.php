@@ -250,6 +250,14 @@ class FormLembur extends BaseController
 
         $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . "." . $waktuSelisihPulangLembur['menit'];
 
+        if ($totalJamLembur <= 1) {
+            return \response()->setJSON([
+                'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam",
+                'status' => \false,
+                'code' => 400
+            ]);
+        }
+
         // chek apakah lembur lebih dari satu jam
         if ($totalJamLembur >= 1) {
             // jam pertama
