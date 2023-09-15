@@ -349,6 +349,7 @@ $routes->get('/surat-jalan/all', 'SalesLokal\SuratJalan::all', ['filter' => 'Aut
 $routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::save', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/update', 'SalesLokal\SuratJalan::update', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' => 'Auth']);
+$routes->get('/surat-jalan/print/(:num)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
 
 // Retur
 $routes->get('/retur', 'SalesLokal\Retur::index', ['filter' => 'Auth']);

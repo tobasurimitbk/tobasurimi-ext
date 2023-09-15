@@ -189,10 +189,23 @@ class Invoice extends BaseController
 
             if ($postData['doc_type'] === 'pesanan') {
                 $documentData = $this->SalesOrderModel->asObject()
+                    ->where('surat_jalan_so_id', null)
+                    ->where('sales_order_invoice_id', null)
                     ->find($postData['doc_id']);
             } else {
                 $documentData = $this->SuratJalanModel->asObject()
+                    ->where('sales_order_invoice_id', null)
                     ->find($postData['doc_id']);
+            }
+
+            if (empty($documentData)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Dokumen tidak ditemukan',
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
             }
 
             // start transaction
