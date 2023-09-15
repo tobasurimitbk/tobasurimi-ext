@@ -72,7 +72,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-page-list-attendance">
-                <div class="col-6 mb-4">
+                <div class="col-6 mb-2">
                     <form action="<?= base_url('list-attendance') ?>" class="kt-form kt-form--fit kt-margin-b-20" method="GET">
                         <select name="month" required id="month">
                             <?php for ($i = 1; $i <= 12; $i++) : ?>
@@ -101,14 +101,14 @@
                         </button>
                     </form>
                 </div>
-                <div class="col-6 mb-4">
+                <div class="col-6 mb-2">
                 </div>
             </div>
 
             <!-- Hasil Preview Form Generate -->
             <hr>
             <div class="row row-col-page-list-attendance mt-4">
-                <div class="row mb-3">
+                <div class="row mb-4">
                     <div class="col-sm-4">
                         <form action="#" method="get">
                             <div class="form-floating">
@@ -124,7 +124,7 @@
                         </form>
                     </div>
                     <div class="col-sm-4">
-                        <a href="<?= base_url("list-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary mt-1 p-2">
+                        <a href="<?= base_url("list-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary btn_reset">
                             <i class="fa-solid fa-rotate-right"></i>
                             Reset
                         </a>

@@ -112,7 +112,7 @@
         <div class="card-body">
 
             <div class="row justify-content-end row-col-page-list-attendance">
-                <div class="col-6 mb-4">
+                <div class="col-6 mb-0">
                     <form action="<?= base_url('payroll') ?>" class="kt-form kt-form--fit kt-margin-b-20" method="GET">
                         <select name="month" required id="month">
                             <?php for ($i = 1; $i <= 12; $i++) : ?>
@@ -141,7 +141,7 @@
                         </button>
                     </form>
                 </div>
-                <div class="col-6 mb-4">
+                <div class="col-6 mb-0">
                 </div>
             </div>
 

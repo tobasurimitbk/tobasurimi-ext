@@ -31,7 +31,7 @@
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control" name="jamTerlambat" value="<?= (!empty($jamKerja)) ? $jamKerja['jam_terlambat'] : '' ?> " placeholder="Batas Jam Keterlambatan">
-                            <label for="floatingInput">Batas Jam Keterlambatan</label>
+                            <label for="floatingInput">Batas Jam Keterlambatan Absen Masuk</label>
                         </div>
                     </div>
                 </div>
@@ -60,25 +60,25 @@
                                     <td><b><?= $v['value'] ?></b></td>
                                     <td style="height: 70px;">
                                         <div class="form-floating" style="height: 50px;width:auto;">
-                                            <input type="text" <?= $i == 6 ? 'disabled' : '' ?> value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_masuk'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiMasuk" maxlength="30">
+                                            <input type="text" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_masuk'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiMasuk" maxlength="30">
                                             <label for="mulaiMasuk">Mulai Masuk</label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-floating" style="height: 50px;">
-                                            <input type="text" <?= $i == 6 ? 'disabled' : '' ?> value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_istirahat_mulai'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiIstirahat" maxlength="30">
+                                            <input type="text" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_istirahat_mulai'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiIstirahat" maxlength="30">
                                             <label for="checkout">Mulai Istirahat</label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-floating" style="height: 50px;">
-                                            <input type="text" <?= $i == 6 ? 'disabled' : '' ?> class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_istirahat_selesai'] : '' ?>" name="<?= $v['value'] ?>_selesaiIstirahat" maxlength="30">
+                                            <input type="text" class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_istirahat_selesai'] : '' ?>" name="<?= $v['value'] ?>_selesaiIstirahat" maxlength="30">
                                             <label for="checkout">Selesai Istirahat</label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-floating" style="height: 50px;">
-                                            <input type="text" <?= $i == 6 ? 'disabled' : '' ?> class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_pulang'] : '' ?>" name="<?= $v['value'] ?>_mulaiPulang" maxlength="30">
+                                            <input type="text" class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_pulang'] : '' ?>" name="<?= $v['value'] ?>_mulaiPulang" maxlength="30">
                                             <label for="checkout">Mulai Pulang</label>
                                         </div>
                                     </td>
