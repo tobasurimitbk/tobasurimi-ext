@@ -43,4 +43,61 @@ class GajiDivisiModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getGajiByDivision($divisionID, $companyID)
+    {
+        return $this->asArray()->select('tunjangan.*')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id')
+            ->where('tunjangan.deletedAt', null)
+            ->where('gaji_divisi.division_id', $divisionID)
+            ->where('gaji_divisi.company_id', $companyID)
+            ->findAll();
+    }
+
+    public function getGajiByDivisionReturnIDOnArray($divisionID, $companyID)
+    {
+        $id = [];
+        $data = $this->asArray()->select('tunjangan.*')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id')
+            ->where('tunjangan.deletedAt', null)
+            ->where('gaji_divisi.division_id', $divisionID)
+            ->where('gaji_divisi.company_id', $companyID)
+            ->findAll();
+
+        foreach ($data as $d) {
+            \array_push($id, $d['id']);
+        }
+
+        return $id;
+    }
+
+    public function getGajiByDivisionAndEmployee($divisionID, $companyID, $employeeID)
+    {
+        $data = $this->asArray()->select('tunjangan.*')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id')
+            ->where('tunjangan.deletedAt', null)
+            ->where('gaji_divisi.division_id', $divisionID)
+            ->where('gaji_divisi.company_id', $companyID)
+            ->findAll();
+
+        $res = [];
+
+        $gajiConjunctionModel = new GajiConjunctionModel();
+
+        foreach ($data as $d) {
+            $gajiConjunction = $gajiConjunctionModel
+                ->where('tunjangan_id', $d['id'])
+                ->where('employee_id', $employeeID)
+                ->first();
+
+            $res[] = [
+                'id' => $d['id'],
+                'nominal' => $gajiConjunction == null ? '0' : $gajiConjunction['nominal'],
+                'name' => $d['name'],
+                'tipe' => $d['tipe']
+            ];
+        }
+
+        return $res;
+    }
 }
