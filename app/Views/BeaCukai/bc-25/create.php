@@ -637,7 +637,6 @@
                                 <td style="text-align: center;">0</td>
                                 <td style="text-align: center;">0</td>
                                 <td style="text-align: center;">0</td>
-                                <td style="text-align: center;">0</td>
                             </tr>
                         </tfoot>
                     </table>
