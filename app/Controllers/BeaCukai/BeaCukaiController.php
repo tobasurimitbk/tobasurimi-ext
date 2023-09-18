@@ -69,13 +69,13 @@ class BeaCukaiController extends BaseController
     public function bc23CreateFormView()
     {
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('valuta');
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('jenis_tpb');
+        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
 
         $data = [
             'valuta' => $valuta,
@@ -92,13 +92,13 @@ class BeaCukaiController extends BaseController
     public function bc23GetByIdFormView($id)
     {
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('valuta');
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('jenis_tpb');
+        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
 
         $data = [
             'valuta' => $valuta,
@@ -644,19 +644,19 @@ class BeaCukaiController extends BaseController
     public function bc25CreateFormView()
     {
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('valuta');
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('jenis_tpb');
+        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
 
         //Get Referensi Lokasi Bayar
-        $referensiLokasiBayar = $this->modelMetadata->get_by_name('referensi_lokasi_bayar');
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
 
         //Get Wajib Bayar
-        $wajibBayar = $this->modelMetadata->get_by_name('wajib_bayar');
+        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
 
         $data = [
             'wajibBayar' => $wajibBayar,
@@ -673,19 +673,19 @@ class BeaCukaiController extends BaseController
     public function bc25GetByIdFormView($id)
     {
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('valuta');
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('jenis_tpb');
+        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
 
         //Get Referensi Lokasi Bayar
-        $referensiLokasiBayar = $this->modelMetadata->get_by_name('referensi_lokasi_bayar');
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
 
         //Get Wajib Bayar
-        $wajibBayar = $this->modelMetadata->get_by_name('wajib_bayar');
+        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
 
         $data = [
             'wajibBayar' => $wajibBayar,
@@ -1181,6 +1181,60 @@ class BeaCukaiController extends BaseController
     public function bc261View()
     {
         return view('BeaCukai/bc-261/index');
+    }
+
+    public function bc261All()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "idCompany"     => $this->this_company_id,
+            "type"          => "BC 2.6.1"
+        ];
+
+        $condition = [
+            "bea_cukai.company_id"  => $this->this_company_id,
+            "type"                  => "BC 2.6.1"
+        ];
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType")
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $beaCukaiData = $this->modelBeaCukai->getList($condition, $addCondition, $limit, $offset);
+
+        $dataBeaCukai = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiData['data'] as $data) {
+            array_push($dataBeaCukai, [
+                "no"                    => $no++,
+                "id"                    => $data->id,
+                "aju_no"                => $data->aju_no,
+                "registration_no"       => $data->registration_no,
+                "registration_date"     => $data->registration_date,
+                "tujuan_tpb_name"       => $data->tujuan_tpb_name,
+                "status_posting"        => $data->status_posting
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $beaCukaiData['totalData'],
+            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
+            "data"              => $dataBeaCukai,
+            // "response" => $response,
+            "payload"           => $payload
+        ];
+
+        echo json_encode($data);
+        return;
     }
 
     public function bc262View()

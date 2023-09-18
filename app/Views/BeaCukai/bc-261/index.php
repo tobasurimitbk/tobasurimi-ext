@@ -3,8 +3,8 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Dokumen BC 2.5</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("bea-cukai-bc-25/create"); ?>">
+        <h1>Dokumen BC 2.6.1</h1>
+        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("bea-cukai-bc-261/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
@@ -59,7 +59,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("bea-cukai-bc-25/all"); ?>",
+            url: "<?= base_url("bea-cukai-bc-261/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -123,7 +123,7 @@
             targets: "_all"
         }],
         language: {
-            emptyTable: "Tidak ada data dokumen BC 2.5 yang tersedia.",
+            emptyTable: "Tidak ada data dokumen BC 2.6.1 yang tersedia.",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
@@ -141,7 +141,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("bea-cukai-bc-25/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("bea-cukai-bc-261/id"); ?>/${data.id}`);
         })
     })
 
@@ -159,7 +159,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-25/delete"); ?>",
+                    url: "<?= base_url("bea-cukai-bc-261/delete"); ?>",
                     data: {
                         id: id
                     },

@@ -123,7 +123,7 @@
             targets: "_all"
         }],
         language: {
-            emptyTable: "Tidak Ada Data",
+            emptyTable: "Tidak ada data dokumen BC 2.3 yang tersedia.",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',

@@ -548,7 +548,17 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
 });
 
-$routes->get('/bea-cukai-bc-261', 'BeaCukai\BeaCukaiController::bc261View', ['filter' => 'Auth']);
+// BC 2.5
+$routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
+    $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
+    $routes->get('create', 'BeaCukai\BeaCukaiController::bc261CreateFormView');
+    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc261GetByIdFormView/$1');
+    $routes->post('save', 'BeaCukai\BeaCukaiController::bc261SaveForm');
+    $routes->post('update', 'BeaCukai\BeaCukaiController::bc261UpdateForm');
+    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
+});
+
 $routes->get('/bea-cukai-bc-262', 'BeaCukai\BeaCukaiController::bc262View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-27', 'BeaCukai\BeaCukaiController::bc27View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-40', 'BeaCukai\BeaCukaiController::bc40View', ['filter' => 'Auth']);
