@@ -179,7 +179,6 @@
                             <textarea <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> name="alamatPemilikBarang" class="alamatPemilikBarang form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->pemilik_barang_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
                         </div>
-
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -191,7 +190,100 @@
                 <label class="form-label font-weight-bold lable-title mt-2">
                     Penerima Barang
                 </label>
-                
+                <div class="row mt-2">
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penerima_barang_npwp : '' ?>" autocomplete="one-time-code" name="npwpPenerimaBarang" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
+                            <label for="floatingInput">Identitas (NPWP)</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penerima_barang_name : '' ?>" autocomplete="one-time-code" name="namaPenerimaBarang" type="text" placeholder="Nama Penerima Barang" class="form-control target input-picker">
+                            <label for="floatingInput">Nama Penerima Barang</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penerima_barang_api : '' ?>" autocomplete="one-time-code" name="apiPenerimaBarang" type="text" placeholder="API" class="form-control target input-picker">
+                            <label for="floatingInput">API</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penerima_barang_niper : '' ?>" autocomplete="one-time-code" name="namaPenerimaBarang" type="text" placeholder="Niper" class="form-control target input-picker">
+                            <label for="floatingInput">Niper</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> name="alamatPenerimaBarang" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->penerima_barang_address : '' ?></textarea>
+                            <label for="floatingInput">Alamat</label>
+                        </div>
+                    </div>
+                </div>
+                <label class="form-label font-weight-bold lable-title mt-2">
+                    Dokumen
+                </label>
+                <div class="row mt-2">
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select noInvoice" id="noInvoice" name="noInvoice" aria-label="Floating label select example">
+                                <option value="" data-date="">
+                                    - Pilih Nomor Invoice -
+                                </option>
+                                <?php foreach ($dokumen as $d) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->invoice_id === $d->id ? 'selected' : '') : '' ?> value="<?= $d->id ?>" data-date="<?= date("d/m/Y", strtotime($d->createdAt)) ?>">
+                                        - <?= $d->no_faktur ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">No Invoice</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
+                            <label for="floatingInput">Tanggal Invoice</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_packing_list : '' ?>" autocomplete="one-time-code" name="noPackingList" type="text" placeholder="No Packing List" class="form-control target input-picker">
+                            <label for="floatingInput">No Packing List</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_packing_list !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_packing_list)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalPackingList" type="text" placeholder="Tanggal Packing List" class="form-control target input-picker">
+                            <label for="floatingInput">Tanggal Packing List</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_kontrak : '' ?>" autocomplete="one-time-code" name="noKontrak" type="text" placeholder="No Kontrak" class="form-control target input-picker">
+                            <label for="floatingInput">No Kontrak</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_kontrak !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_kontrak)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalKontrak" type="text" placeholder="Tanggal Kontrak" class="form-control target input-picker">
+                            <label for="floatingInput">Tanggal Kontrak</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import : '' ?>" autocomplete="one-time-code" name="fasilitasImport" type="text" placeholder="No Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <label for="floatingInput">Fasilitas Import (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_fasilitas_import !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_fasilitas_import)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasiitas Import (Opsional)" class="form-control target input-picker">
+                            <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

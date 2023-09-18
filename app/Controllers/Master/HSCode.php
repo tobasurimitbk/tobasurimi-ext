@@ -5,18 +5,14 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\HsCodesModel;
 
-use App\Models\HSCodeModel;
-
 class HSCode extends BaseController
 {
     protected $token;
-    protected $HSCodeModel;
     protected $HsCodesModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
-        $this->HSCodeModel = new HSCodeModel();
         $this->HsCodesModel = new HsCodesModel();
     }
 
@@ -27,57 +23,108 @@ class HSCode extends BaseController
 
     public function allHSCode()
     {
-        $draw = $this->request->getVar('draw');
-        $row = $this->request->getVar('start');
-        $rowperpage = $this->request->getVar('length');
-        $temp = $this->request->getVar('order');
-        $columnIndex = $temp[0]['column']; // Column index
-
-        $temp = $this->request->getVar('columns');
-        $columnName = $temp[$columnIndex]['data']; // Column index
-
-        $temp = $this->request->getVar('order');
-        $columnSortOrder = $temp[0]['dir']; // Column index
-
-        $search = $this->request->getVar('search');
-        //$searchValue = $temp['value']; // Column index
-
-        $values = [
-            "search"        => $search
+        $payload = [
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType")
         ];
 
-        $totalRecords = $this->HsCodesModel->total_list(array());
-        $totalRecordwithFilter = $this->HsCodesModel->total_list($values);
+        $condition = [];
 
-        $res = $this->HsCodesModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType")
+        ];
 
-        $number = $row * $rowperpage;
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $hsData = $this->HsCodesModel->getList($condition, $addCondition, $limit, $offset);
 
-        $data = [];
+        $dataHS = [];
 
-        for ($i = 0; $i < count($res); $i++) {
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            $data[] = array(
-                "no" => ($row + $i + 1),
-                "id" => $res[$i]["id"],
-                "komoditi" => $res[$i]["komoditi"],
-                "code" => $res[$i]["code"],
-                "uraian_barang" => $res[$i]["uraian_barang"],
-                "satuan_barang" => $res[$i]["satuan_barang"],
-                "uraian_satuan" => $res[$i]["uraian_satuan"],
-            );
+        foreach ($hsData['data'] as $data) {
+            array_push($dataHS, [
+                "no"                => $no++,
+                "id"                => $data->id,
+                "komoditi"          => $data->komoditi,
+                "code"              => $data->code,
+                "uraian_barang"     => $data->uraian_barang,
+                "kode_satuan"       => $data->kode_satuan,
+                "nama_satuan"       => $data->nama_satuan
+            ]);
         }
 
-        ## Response
-        $response = array(
-            "draw" => intval($draw),
-            "iTotalRecords" => $totalRecords,
-            "iTotalDisplayRecords" => $totalRecordwithFilter,
-            "aaData" => $data
-        );
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $hsData['totalData'],
+            "recordsFiltered"   => $hsData['totalFilteredData'],
+            "data"              => $dataHS,
+            // "response" => $response,
+            "payload"           => $payload
+        ];
 
-        return $this->response->setJSON($response);
+        echo json_encode($data);
+        return;
     }
+
+    // public function allHSCode()
+    // {
+    //     $draw = $this->request->getVar('draw');
+    //     $row = $this->request->getVar('start');
+    //     $rowperpage = $this->request->getVar('length');
+    //     $temp = $this->request->getVar('order');
+    //     $columnIndex = $temp[0]['column']; // Column index
+
+    //     $temp = $this->request->getVar('columns');
+    //     $columnName = $temp[$columnIndex]['data']; // Column index
+
+    //     $temp = $this->request->getVar('order');
+    //     $columnSortOrder = $temp[0]['dir']; // Column index
+
+    //     $search = $this->request->getVar('search');
+    //     //$searchValue = $temp['value']; // Column index
+
+    //     $values = [
+    //         "search"        => $search
+    //     ];
+
+    //     $totalRecords = $this->HsCodesModel->total_list(array());
+    //     $totalRecordwithFilter = $this->HsCodesModel->total_list($values);
+
+    //     $res = $this->HsCodesModel->search_list($values, $columnName . " " . $columnSortOrder, $row, $rowperpage);
+
+    //     $number = $row * $rowperpage;
+
+    //     $data = [];
+
+    //     for ($i = 0; $i < count($res); $i++) {
+
+    //         $data[] = array(
+    //             "no" => ($row + $i + 1),
+    //             "id" => $res[$i]["id"],
+    //             "komoditi" => $res[$i]["komoditi"],
+    //             "code" => $res[$i]["code"],
+    //             "uraian_barang" => $res[$i]["uraian_barang"],
+    //             "kode_satuan" => $res[$i]["kode_satuan"],
+    //             "nama_satuan" => $res[$i]["nama_satuan"]
+    //         );
+    //     }
+
+    //     ## Response
+    //     $response = array(
+    //         "draw" => intval($draw),
+    //         "iTotalRecords" => $totalRecords,
+    //         "iTotalDisplayRecords" => $totalRecordwithFilter,
+    //         "aaData" => $data
+    //     );
+
+    //     return $this->response->setJSON($response);
+    // }
 
     public function saveHSCode()
     {
@@ -92,10 +139,7 @@ class HSCode extends BaseController
                 "uraian_barang" => [
                     "rules" => "required"
                 ],
-                "satuan_barang" => [
-                    "rules" => "required"
-                ],
-                "uraian_satuan" => [
+                "unit" => [
                     "rules" => "required"
                 ]
             ];
@@ -105,8 +149,7 @@ class HSCode extends BaseController
                     "komoditi" => $this->request->getPost("komoditi"),
                     "code" => $this->request->getPost("code"),
                     "uraian_barang" => $this->request->getPost("uraian_barang"),
-                    "satuan_barang" => $this->request->getPost("satuan_barang"),
-                    "uraian_satuan" => $this->request->getPost("uraian_satuan")
+                    "unit" => $this->request->getPost("unit")
                 ];
 
                 if ($this->HsCodesModel->insert($values)) {
@@ -159,10 +202,7 @@ class HSCode extends BaseController
                 "uraian_barang" => [
                     "rules" => "required"
                 ],
-                "satuan_barang" => [
-                    "rules" => "required"
-                ],
-                "uraian_satuan" => [
+                "unit" => [
                     "rules" => "required"
                 ]
             ];
@@ -174,8 +214,7 @@ class HSCode extends BaseController
                     "komoditi" => $this->request->getPost("komoditi"),
                     "code" => $this->request->getPost("code"),
                     "uraian_barang" => $this->request->getPost("uraian_barang"),
-                    "satuan_barang" => $this->request->getPost("satuan_barang"),
-                    "uraian_satuan" => $this->request->getPost("uraian_satuan")
+                    "unit" => $this->request->getPost("unit")
                 ];
 
                 if ($this->HsCodesModel->update($id, $values)) {
@@ -290,7 +329,7 @@ class HSCode extends BaseController
 
     public function dropdownHSCode()
     {
-        $dataKodeHS = $this->HSCodeModel->asObject()->find();
+        $dataKodeHS = $this->HsCodesModel->asObject()->find();
 
         $data = [
             "data" => $dataKodeHS

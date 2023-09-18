@@ -343,7 +343,7 @@
                     Dokumen
                 </label>
                 <div class="row mt-2">
-                    <div class="col-sm-6">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select noInvoice" id="noInvoice" name="noInvoice" aria-label="Floating label select example">
                                 <option value="" data-date="">
@@ -355,70 +355,70 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Pilih No Invoice</label>
+                            <label for="floatingInput">No Invoice</label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
                             <label for="floatingInput">Tanggal Invoice</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_no : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="Nomor Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Nomor Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_code : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Kode Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->lc_no : '' ?>" autocomplete="one-time-code" name="noLc" type="text" placeholder="No LC (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No LC (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->lc_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->lc_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal LC (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bl_no : '' ?>" autocomplete="one-time-code" name="noBl" type="text" placeholder="No B/L (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No B/L (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bl_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bl_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B/L (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_no : '' ?>" autocomplete="one-time-code" name="noBc" type="text" placeholder="No B.C 1.1" class="form-control target input-picker">
                             <label for="floatingInput">No B.C 1.1</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bc_11_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bc_11_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal B.C 1.1</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_zip : '' ?>" autocomplete="one-time-code" name="kodePos" type="text" placeholder="Kode Pos" class="form-control target input-picker">
                             <label for="floatingInput">Kode Pos</label>
@@ -511,7 +511,7 @@
                     Harga
                 </label>
                 <div class="row mt-2">
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select valuta" id="valuta" name="valuta" aria-label="Floating label select example">
                                 <option value="">
@@ -526,7 +526,7 @@
                             <label for="floatingInput">Valuta</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->ndpbm, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="npdpbm" type="number" placeholder="NDPBM" class="npdpbm form-control target input-picker">
                             <label for="floatingInput">NDPBM</label>
@@ -544,19 +544,19 @@
                             <label for="floatingInput">Freight</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->asuransi_type, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="tipeAsuransi" type="number" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
                             <label for="floatingInput">Asuransi Luar Negeri / Dalam Negeri</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_value, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCif" type="number" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
                             <label for="floatingInput">Nilai CIF</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_price, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCifRupiah" type="number" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
                             <label for="floatingInput">Nilai CIF Rupiah</label>
@@ -707,19 +707,19 @@
             </label>
             <form class="create-form form-add-third" role="form" method="POST" enctype="multipart/form-data">
                 <div class="row mt-2">
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->bruto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="bruto" type="number" placeholder="Bruto (Kg)" class="bruto form-control target input-picker">
                             <label for="floatingInput">Bruto (Kg)</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->netto, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="netto" type="number" placeholder="Netto (Kg)" class="netto form-control target input-picker">
                             <label for="floatingInput">Netto (Kg)</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->item_count, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="jumlahBarang" type="number" placeholder="Jumlah Barang" class="jumlahBarang form-control target input-picker">
                             <label for="floatingInput">Jumlah Barang</label>
@@ -763,13 +763,13 @@
             </label>
             <form class="create-form form-add-four" role="form" method="POST" enctype="multipart/form-data">
                 <div class="row mt-2">
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->tempat : '' ?>" autocomplete="one-time-code" name="tempat" type="text" placeholder="Tempat" class="tempat form-control target input-picker">
                             <label for="floatingInput">Tempat</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal)) : "") : '' ?>" autocomplete="one-time-code" name="tanggal" type="text" placeholder="Tanggal" class="tanggal form-control target input-picker">
                             <label for="floatingInput">Tanggal</label>

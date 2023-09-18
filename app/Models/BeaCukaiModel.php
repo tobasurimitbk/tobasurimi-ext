@@ -79,7 +79,17 @@ class BeaCukaiModel extends Model
         'data_dokumen',
         'data_kontainer',
         'data_kemasan',
-        'status_posting'
+        'status_posting',
+
+        // bc 2.5
+        'kantor_pabean',
+        'penerima_barang_npwp',
+        'penerima_barang_name',
+        'penerima_barang_api',
+        'penerima_barang_niper',
+        'penerima_barang_address',
+        'no_packing_list',
+        'tanggal_packing_list'
     ];
 
     // Dates

@@ -6,7 +6,7 @@ use App\Controllers\BaseController;
 
 use App\Models\BarangModel;
 use App\Models\BarangSupplierModel;
-use App\Models\HSCodeModel;
+use App\Models\HSCodesModel;
 use App\Models\MetadataModel;
 use App\Models\SatuansModel;
 use App\Models\Sub_AkunsModel;
@@ -28,7 +28,7 @@ class Barang extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
         $this->barangSupplierModel = new BarangSupplierModel();
-        $this->HSCodeModel = new HSCodeModel();
+        $this->HSCodeModel = new HSCodesModel();
         $this->metadataModel = new MetadataModel();
         $this->SatuansModel = new SatuansModel();
         $this->Sub_AkunsModel = new Sub_AkunsModel();
