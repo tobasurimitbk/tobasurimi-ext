@@ -89,7 +89,15 @@ class BeaCukaiModel extends Model
         'penerima_barang_niper',
         'penerima_barang_address',
         'no_packing_list',
-        'tanggal_packing_list'
+        'tanggal_packing_list',
+        'no_kontrak',
+        'tanggal_kontrak',
+        'no_fasilitas_import',
+        'tanggal_fasilitas_import',
+        'kode_fasilitas_import',
+        'harga_penyerahan',
+        'pembayaran',
+        'wajib_bayar'
     ];
 
     // Dates
