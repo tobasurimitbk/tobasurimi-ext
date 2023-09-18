@@ -131,11 +131,13 @@ class Divisi extends BaseController
                 return \response()->setJSON([
                     "status"    => true,
                     "message"   => "Data Berhasil disimpan",
+                    'token' => csrf_hash()
                 ]);
             } else {
                 return \response()->setJSON([
                     "status"    => \false,
                     "message"   => "Terjadi kesalahan saat validasi data",
+                    'token' => csrf_hash()
                 ]);
             }
         } catch (\Exception $e) {
@@ -190,11 +192,13 @@ class Divisi extends BaseController
                 return \response()->setJSON([
                     "status"    => true,
                     "message"   => "Data Berhasil diupdate",
+                    'token' => csrf_hash()
                 ]);
             } else {
                 return \response()->setJSON([
                     "status"    => \false,
                     "message"   => "Terjadi kesalahan saat validasi data",
+                    'token' => csrf_hash()
                 ]);
             }
         } catch (\Exception $e) {

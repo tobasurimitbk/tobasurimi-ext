@@ -48,6 +48,7 @@ $routes->get('/employee/id/(:segment)', 'Master\Employee::getByIdEmployee/$1', [
 $routes->post('/employee/save', 'Master\Employee::saveEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/update', 'Master\Employee::updateEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/delete', 'Master\Employee::deleteEmployee', ['filter' => 'Auth']);
+$routes->post('/employee/getKomponenGaji', 'Master\Employee::getKomponenGaji', ['filter' => 'Auth']);
 
 // CUSTOMER
 $routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
@@ -545,7 +546,7 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('save', 'BeaCukai\BeaCukaiController::bc25SaveForm');
     $routes->post('update', 'BeaCukai\BeaCukaiController::bc25UpdateForm');
     $routes->post('delete', 'BeaCukai\BeaCukaiController::bc25Delete');
-}); 
+});
 
 $routes->get('/bea-cukai-bc-261', 'BeaCukai\BeaCukaiController::bc261View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-262', 'BeaCukai\BeaCukaiController::bc262View', ['filter' => 'Auth']);
