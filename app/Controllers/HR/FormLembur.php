@@ -218,11 +218,11 @@ class FormLembur extends BaseController
         // jam istirahat
         if ($kurangiJamIstirahat) {
             // get selisih waktu jam masuk dan jam pulang
-            $waktuSelisihMasukPulangIstirahat = static::selisihWaktu(
+            $waktuSelisihMasukPulangIstirahat = static::kurangiWaktus(
                 $waktuSelisihMasukPulang['jam'] . ":" . $waktuSelisihMasukPulang['menit'],
-                $waktuSelisihIstirahat['jam'] . ":" . $waktuSelisihIstirahat['menit']
+                60
             );
-            $jumlahJamKerjaBersih = \abs($waktuSelisihMasukPulangIstirahat['jam']) . " Jam , " . \abs($waktuSelisihMasukPulangIstirahat['menit']) . " Menit";
+            $jumlahJamKerjaBersih = $waktuSelisihMasukPulangIstirahat;
         } else {
             // jangan kurangi jam kerja bersih dengan jam istirahat
             $jumlahJamKerjaBersih = \abs($waktuSelisihMasukPulang['jam']) . " Jam , " . \abs($waktuSelisihMasukPulang['menit']) . " Menit";
@@ -250,7 +250,7 @@ class FormLembur extends BaseController
 
         $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . "." . $waktuSelisihPulangLembur['menit'];
 
-        if ($totalJamLembur <= 1) {
+        if ($totalJamLembur <= 0.9) {
             return \response()->setJSON([
                 'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam",
                 'status' => \false,
@@ -384,6 +384,27 @@ class FormLembur extends BaseController
         $totalMenit = ($jam * 60) + $menit;
         $totalMenit -= $menitDikurangkan;
         return ($totalMenit / 60);
+    }
+
+    static function kurangiWaktus($waktu, $menitDikurangkan)
+    {
+        $waktuObj = DateTime::createFromFormat('H:i', $waktu);
+        $jam = $waktuObj->format('H');
+        $menit = $waktuObj->format('i');
+        $totalMenit = ($jam * 60) + $menit;
+        $totalMenit -= $menitDikurangkan;
+
+        $jamBaru = floor($totalMenit / 60);
+        $menitBaru = $totalMenit % 60;
+
+        $hasil = "";
+        if ($jamBaru > 0) {
+            $hasil .= $jamBaru . " jam ";
+        }
+        if ($menitBaru > 0) {
+            $hasil .= $menitBaru . " menit";
+        }
+        return $hasil;
     }
 
     // helper
