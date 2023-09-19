@@ -581,6 +581,7 @@ $routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
 $routes->post('/check-pin-employee', 'HR\Attendance::CheckPinEmployee', ['filter' => 'Auth']);
+$routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
 $routes->post('/generate-attendance', 'HR\Attendance::generateAttendanceAction', ['filter' => 'Auth']);

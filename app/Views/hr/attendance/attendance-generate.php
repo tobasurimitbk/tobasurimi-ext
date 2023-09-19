@@ -58,6 +58,9 @@
                             <button type="submit" class="btn btn-show-form btn-save float-right btn-submit">
                                 Posting
                             </button>
+                            <button class="btn btn-warning btn-print float-right" onclick="alert('Fitur print belum tersedia')">
+                                <i class="fa-solid fa-print"></i> Print
+                            </button>
                         <?php else : ?>
                             <input type="hidden" id="statusPosting" name="statusPosting" value="0">
                             <button class="btn btn-show-form btn-save float-right btn-submit">
@@ -108,9 +111,24 @@
             <!-- Hasil Preview Form Generate -->
             <hr>
             <div class="row row-col-page-list-attendance mt-4">
-                <div class="row mb-4">
-                    <div class="col-sm-4">
-                        <form action="#" method="get">
+                <form action="#" method="get">
+                    <div class="row mb-4">
+                        <div class="col-sm-4">
+                            <div class="form-floating">
+                                <select class="form-select" name="divisiID" aria-label="Floating label select example">
+                                    <option value="">
+                                        Cari Berdasarkan Divisi
+                                    </option>
+                                    <?php foreach ($divisi as $d) : ?>
+                                        <option <?= @$_GET['divisiID'] == $d['id'] ? 'selected' : '' ?> value="<?= $d['id'] ?>">
+                                            <?= $d['divisi']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
                             <div class="form-floating">
                                 <select class="form-select" name="select2EmployeesName" aria-label="Floating label select example">
                                     <?php if ($employeeDetailFilter != null) : ?>
@@ -121,22 +139,23 @@
                                 </select>
                                 <label for="floatingInput">Cari Data Karyawan</label>
                             </div>
-                        </form>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="<?= base_url("list-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary btn_reset">
+                                <i class="fa-solid fa-rotate-right"></i>
+                                Reset
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-sm-4">
-                        <a href="<?= base_url("list-attendance?month=$month&year=$year") ?>" type="button" class="btn btn-primary btn_reset">
-                            <i class="fa-solid fa-rotate-right"></i>
-                            Reset
-                        </a>
-                    </div>
-                </div>
+                </form>
                 <br><br><br><br><br>
 
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="attendanceTable">
                         <thead>
                             <tr>
-                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;User</td>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Karyawan</td>
+                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Divisi</td>
                                 <?php
                                 $lastDate = date("t", strtotime($year . "-" . $month . "-01"));
                                 for ($i = 1; $i <= $lastDate; $i++) :
@@ -178,6 +197,9 @@
                                         <td style="vertical-align:middle;z-index:9999" nowrap>
                                             &nbsp; <?= $e['name']; ?>
                                         </td>
+                                        <td style="vertical-align:middle;z-index:9999" nowrap>
+                                            &nbsp;<?= $e["divisi"]; ?></td>
+                                        </td>
                                         <?php for ($j = 1; $j <= $lastDate; $j++) : ?>
                                             <?php
                                             // create format date yyyy-mm-dd
@@ -189,8 +211,8 @@
                                             <?php $temp = mktime(0, 0, 0, $month, $j, $year); ?>
                                             <?php if ($attandance == null) : ?>
                                                 <!-- Null -->
-                                                <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                                <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 al ign=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                             <?php else : ?>
                                                 <?php if ($attandance->status == "ALPHA") : ?>
                                                     <!-- Employe Tidak Hadir -->
@@ -232,8 +254,8 @@
                                                     </td>
                                                 <?php elseif ($attandance->status == "LIBUR") : ?>
                                                     <!-- LIBUR -->
-                                                    <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                                    <td class="hari-libur" data-tanggal="<?= $dateFormat ?>" width=25 al ign=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         <?php endfor; ?>
@@ -418,6 +440,17 @@
                         <label for="floatingInput">Reason</label>
                     </div>
 
+
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
+                        <label for="status">Keterangan Tambahan</label>
+                    </div>
+
+                    <div class="form-floating mb-2" style="height: 50px;">
+                        <input type="text" name="jamTerlambat" class="form-control" id="jamTerlambat" disabled>
+                        <label for="jamTerlambat">Jam Terlambat</label>
+                    </div>
+
                     <div class="row mb-2" id="formInOut">
                         <div class="col-md-6">
                             <div class="form-floating mb-2" style="height: 50px;">
@@ -450,6 +483,12 @@
         // hide modal
         $('.btn-discard').click(function() {
             $('#updateModal').hide();
+        });
+        // select2 divisi
+        $("select[name='divisiID']").select2({
+            placeholder: "Cari Berdasarkan Divisi",
+            theme: "bootstrap-5",
+            allowClear: true,
         });
         // post generate attendance
         $('#formGenerateAttendance').submit(function(e) {
@@ -538,8 +577,10 @@
 
                         $('#attendenceID').val(attendance.id);
                         $('#employeeName').val(employee.name);
-                        $('#tanggal').val(attendance.periode);
+                        $('#tanggal').val(response.data.tanggal);
                         $('#statusKehadiran').val(attendance.status);
+                        $('#keterangan').val(response.data.keterangan);
+                        $('#jamTerlambat').val(response.data.jamTerlambat);
 
                         if (attendance.status == 'HADIR') {
                             // hadir
@@ -733,7 +774,8 @@
                 delay: 250,
                 data: function(params) {
                     return {
-                        employeesName: params.term
+                        employeesName: params.term,
+                        divisiID: "<?= @$_GET['divisiID'] ?>",
                     };
                 },
                 processResults: function(data) {
@@ -754,6 +796,10 @@
         $("select[name='select2EmployeesName']").on("change", function() {
             var selectedValue = $(this).val();
             window.location.href = "<?= base_url("list-attendance?month=$month&year=$year") ?>&employeesID=" + selectedValue;
+        });
+        $("select[name='divisiID']").on("change", function() {
+            var selectedValue = $(this).val();
+            window.location.href = "<?= base_url("list-attendance?month=$month&year=$year") ?>&divisiID=" + selectedValue;
         });
         $('.form-select')
             .parent('div')

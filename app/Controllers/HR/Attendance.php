@@ -6,9 +6,13 @@ use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
+use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
+use App\Models\JamKerjaModel;
 use App\Models\PayrollsModel;
+use CodeIgniter\I18n\Time;
+use Locale;
 
 class Attendance extends BaseController
 {
@@ -24,142 +28,20 @@ class Attendance extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
     }
 
-    public function attendance()
-    {
-        $payload = [
-            "idCompany" => $this->this_company_id
-        ];
-
-        $res_employee = curl_request("GET", "/employees/all?idCompany=" . $this->this_company_id, $this->token);
-        $dataEmployee = [];
-        if ($res_employee["code"] === 200) {
-            $dataEmployee = json_decode($res_employee["body"])->data;
-        }
-
-        $data = [
-            "dataEmployee" => $dataEmployee,
-        ];
-
-        //return view('employee/index');
-        return view('hr/attendance/index', $data);
-
-        /*
-        // Get Kategori
-        $responseKategori = curl_request("GET", "/metadata/all?name=kategori_barang", $this->token);
-
-        $dataKategori = [];
-
-        $data = [
-            "dataKategori" => $dataKategori
-        ];
-
-        return view('barang/index', $data);
-        */
-    }
-
-    public function ListAttendance()
-    {
-        $AttendancesLogModel = new AttendancesLogModel();
-        $EmployeesModel = new EmployeesModel();
-        $FormPerijinanModel = new FormPerijinanModel();
-
-        $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
-        $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
-
-        $dataEmployee = $EmployeesModel->getEmployees($this->this_company_id,);
-
-        $data = array();
-        $hadir = 0;
-        $alpha = 0;
-        $sakit = 0;
-        $ijin = 0;
-        $cuti = 0;
-        $libur = 0;
-
-        foreach ($dataEmployee as $value) {
-            $dataPerijinan = $FormPerijinanModel->getPerijinanAmt($value["id"], $year, $month);
-            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
-
-            foreach ($dataPerijinan as $val1) {
-                switch ($val1->status) {
-                    case "HADIR":
-                        $hadir++;
-                        break;
-                    case "ALPHA":
-                        $alpha++;
-                        break;
-                    case "SAKIT":
-                        $sakit++;
-                        break;
-                    case "IJIN":
-                        $ijin++;
-                        break;
-                    case "CUTI":
-                        $cuti++;
-                        break;
-                    case "LIBUR":
-                        $libur++;
-                        break;
-                    default:
-                }
-            }
-
-            $list_att = array();
-
-            $constructor = [
-                "employeeName" => $value['name'],
-                "hadir" => $hadir,
-                "alpha" => $alpha,
-                "sakit" => $sakit,
-                "ijin" => $ijin,
-                "cuti" => $cuti,
-                "libur" => $libur,
-            ];
-
-            foreach ($dataLog as $val2) {
-                $dat = strtotime($val2->date_create);
-                $att = [
-                    "periode" => date('d-m-Y', $dat),
-                    "checkin" => date('H:i:s', $dat),
-                    "checkout" => date('H:i:s', $dat),
-                ];
-                $list_att[] = $att;
-            };
-
-            $groupList = array();
-
-            foreach ($list_att as $element) {
-                $groupList[$element["periode"]][] = $element;
-            };
-
-            $constructor['list_attendance'] = $groupList;
-
-            $data[] = $constructor;
-        }
-
-        $data = [
-            'year' => $year,
-            'month' => $month,
-            'res_user'  => $data
-
-        ];
-
-        return view('hr/attendance/list-attendance', $data);
-    }
-
     public function LogAttendance()
     {
         // declare model
         $AttendancesLogModel = new AttendancesLogModel();
         $EmployeesModel = new EmployeesModel();
         $FormPerijinanModel = new FormPerijinanModel();
+        $DivisiModel = new DivisisModel();
 
         // get data $_GET
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
         // get data from model
-        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'));
+        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'), $this->request->getGet('divisiID'));
         $pager = \Config\Services::pager();
         $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
 
@@ -173,6 +55,7 @@ class Attendance extends BaseController
             // store data
             $dataResult[] = [
                 "employeeID" => $value['id'],
+                "divisi" => $value['divisi'],
                 "employeeName" => $value['name'],
                 "list_attendance" => $dataLog,
                 'statusAttendances' => [
@@ -187,6 +70,7 @@ class Attendance extends BaseController
         $data = [
             'year' => $year,
             'month' => $month,
+            'divisi' => $DivisiModel->get_by_company_id($this->this_company_id),
             'res_user'  => $dataResult,
             'employeesData' => $dataEmployeePager['data'],
             'pager' => $dataEmployeePager['pager'],
@@ -197,119 +81,6 @@ class Attendance extends BaseController
         return view('hr/attendance/log-attendance', $data);
     }
 
-    public function SaveAttendance()
-    {
-        try {
-            $img = $this->request->getVar("pic");
-            //$img = str_replace('data:image/jpeg;base64,', '', $img);
-            $img = str_replace(' ', '+', $img);
-            $data = base64_decode($img);
-
-            $payload = json_encode([
-                "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
-                "employee_id"   => formatter($this->request->getVar("employee_id"), "STR_TO_INT"),
-                "checkin"   => date("Y-m-d H:i:s"),
-                "status"       => "HADIR",
-                "checkStatus"   => $this->request->getVar("state"),
-                "checkin_image" => $img,
-            ]);
-            $response = curl_request("POST", "/attendance", $this->token, $payload);
-            $dataAttendance = [];
-            if ($response["code"] === 200) {
-                $message = json_decode($response["body"]);
-                $data = [
-                    "status"    => true,
-                    "message"   => $message->message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-            }
-            echo json_encode($data);
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-
-        /*
-        $file = uniqid() . '.png';
-        $success = file_put_contents($file, $data);
-        */
-        return;
-    }
-
-    public function CheckPinEmployee()
-    {
-        try {
-            $employee_id = $this->request->getVar("employee_id");
-            $pin = $this->request->getVar("pin");
-
-            $payload = json_encode([
-                "employee_id"   => formatter($this->request->getVar("employee_id"), "STR_TO_INT"),
-                "pin"   => $this->request->getVar("pin"),
-            ]);
-
-            $response = curl_request("POST", "/attendance/pinValidation", $this->token, $payload);
-
-            if ($response["code"] === 200) {
-                $message = json_decode($response["body"]);
-                $data = [
-                    "status"    => true,
-                    "message"   => $message->message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-            } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Disimpan';
-                $data = [
-                    "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-            }
-            echo json_encode($data);
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-
-        return;
-    }
-
-    public function get_employee_by_company($employee_id)
-    {
-        $dataEmployee = [];
-
-        $responseEmployee = curl_request("GET", "/attendance/$employee_id", $this->token);
-        if ($responseEmployee["code"] === 200) {
-            $dataEmployee = json_decode($responseEmployee["body"])->data;
-        }
-
-        $data = [
-            "data" => $dataEmployee
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
-
     public function generateAttendanceView()
     {
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
@@ -319,6 +90,7 @@ class Attendance extends BaseController
         $AttendanceModel = new AttendancesModel();
         $EmployeesModel = new EmployeesModel();
         $payrollModel = new PayrollsModel();
+        $DivisiModel = new DivisisModel();
 
         // get attendance Total (ngecek apakah sudah digenerate belum)
         $totalAttendances = $AttendanceModel->where('LEFT(periode, 7)', $year . "-" . $month)
@@ -335,7 +107,7 @@ class Attendance extends BaseController
             ->where('isPosted', 1)
             ->countAllResults();
 
-        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'));
+        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'), $this->request->getGet('divisiID'));
         $pager = \Config\Services::pager();
         $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
 
@@ -348,7 +120,8 @@ class Attendance extends BaseController
             'pager' => $dataEmployeePager['pager'],
             'employeeDetailFilter' => $employeeDetailFilter,
             'isPosting' =>  $isPosting,
-            'isPostingPayroll' => $isPostingPayroll
+            'isPostingPayroll' => $isPostingPayroll,
+            'divisi' => $DivisiModel->get_by_company_id($this->this_company_id),
         ];
 
         $data['pager'] = $pager;
@@ -482,19 +255,34 @@ class Attendance extends BaseController
     {
         $employeeID = $this->request->getVar('employeeID');
         $tanggal = $this->request->getVar('tanggal');
+        $time = Time::createFromFormat('Y-m-d', $tanggal);
 
         $AttendanceModel = new AttendancesModel();
         $EmployeesModel = new EmployeesModel();
 
+        Locale::setDefault('id_ID');
+        $attendanceDetail = $AttendanceModel->where('periode', $tanggal)
+            ->where('employee_id', $employeeID)
+            ->first();
+
         $resultData = [
-            'attendance' => $AttendanceModel->where('periode', $tanggal)
-                ->where('employee_id', $employeeID)
-                ->first(),
-            'employee' => $EmployeesModel->where('id', $employeeID)->first()
+            'tanggal' => static::getDayIndonesia($time->format('l')) . ", " . $time->format('d F Y'),
+            'attendance' => $attendanceDetail,
+            'employee' => $EmployeesModel->where('id', $employeeID)->first(),
+            'keterangan' => "-",
+            'jamTerlambat' => "-"
         ];
 
+        $keterangan = static::ketelambatanCheck(
+            $this->this_company_id,
+            $attendanceDetail['checkin']
+        );
+
+        $resultData['keterangan'] = $keterangan[0];
+        $resultData['jamTerlambat'] = $keterangan[1];
+
         return $this->response->setJSON([
-            'data' => $resultData
+            'data' => $resultData,
         ]);
     }
 
@@ -540,6 +328,7 @@ class Attendance extends BaseController
     public function getEmployeesLike()
     {
         $employeesName = $this->request->getVar('employeesName');
+        $divisionID = $this->request->getVar('divisiID');
 
         $employessModel = new EmployeesModel();
 
@@ -548,6 +337,10 @@ class Attendance extends BaseController
             'employees.company_id' => $this->this_company_id,
             'users.id' => null
         ];
+
+        if ($divisionID != "") {
+            $arrCondition['division_id'] = $divisionID;
+        }
 
         $result = $employessModel->select("employees.name, employees.id")
             ->join('users', 'users.employee_id = employees.id', 'left')
@@ -560,5 +353,122 @@ class Attendance extends BaseController
         return \response()->setJSON([
             'data' => $result
         ]);
+    }
+
+    public function getLogAttendanceDetail()
+    {
+        // model declare
+        $AttendancesLogModel = new AttendancesLogModel();
+        $FormPerijinanModel = new FormPerijinanModel();
+        $hariLiburModel = new BigDaysModel();
+        $EmployeesModel = new EmployeesModel();
+
+        Locale::setDefault('id_ID');
+
+        $tanggal = $this->request->getVar('tanggal');
+        $employeeID = $this->request->getVar('employeeID');
+        $time = Time::createFromFormat('Y-m-d', $tanggal);
+
+        $result = [
+            'tanggal' => static::getDayIndonesia($time->format('l')) . ", " . $time->format('d F Y'),
+            'keterangan' => "-",
+            'checkIn' => "-",
+            'checkOut' => "-",
+            'status' => "-",
+            'employee' => $EmployeesModel->where('id', $employeeID)->first(),
+            'jamTerlambat' => "-"
+        ];
+
+        $formPerizinan = $FormPerijinanModel->where('periode', $tanggal)
+            ->where('employee_id', $employeeID)
+            ->first();
+        $hariLibur = $hariLiburModel->where('date', $tanggal)
+            ->first();
+        $logAttandance = $AttendancesLogModel->where('employees_id', $employeeID)
+            ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
+            ->orderBy('id', "DESC")
+            ->limit(2)
+            ->get()
+            ->getResult();
+
+        if ($hariLibur != null || date('l', strtotime($tanggal)) == "Sunday" && \count($logAttandance) == 0) {
+            $result['status'] = "Hari Libur";
+            $result['keterangan'] = $hariLibur != null ? $hariLibur['name'] : "Hari Minggu";
+        } elseif ($formPerizinan != null) {
+            $result['status'] = $formPerizinan['status'];
+            $result['keterangan'] = "Karyawan mengajukan perizinan";
+        } else {
+            // tidak ada data di log absen
+            if (count($logAttandance) == 0) {
+                $result['status'] = "ALPHA";
+            } else {
+                // ada absen di log
+                $result['status'] = "Hadir";
+                if (\count($logAttandance) == 2) {
+                    // ada attandance (in dan out)
+                    $keterangan = static::ketelambatanCheck(
+                        $this->this_company_id,
+                        $result['checkIn']
+                    );
+                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[1]->date_create));
+                    $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->date_create));
+
+                    $result['keterangan'] = $keterangan[0];
+                    $result['jamTerlambat'] = $keterangan[1];
+                } else {
+                    // ada attandance only(in)
+                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->date_create));
+                    $keterangan = static::ketelambatanCheck(
+                        $this->this_company_id,
+                        $result['checkIn']
+                    );
+                    $result['keterangan'] = $keterangan[0];
+                    $result['jamTerlambat'] = $keterangan[1];
+                }
+            }
+        }
+
+        return \response()->setJSON([
+            'status' => true,
+            'data' => $result,
+            'token' => \csrf_hash(),
+        ]);
+    }
+
+    // helper
+    static function ketelambatanCheck($companyID, $checkIN)
+    {
+        $jamKerjaModel = new JamKerjaModel();
+        $result = "-";
+
+        $jamKerjaDetail = $jamKerjaModel->where('company_id', $companyID)->first();
+
+        if ($jamKerjaDetail !== null && $checkIN != null) {
+            $checkInTimestamp = strtotime($checkIN);
+            $jamTerlambatTimestamp = strtotime($jamKerjaDetail['jam_terlambat']);
+
+            if ($checkInTimestamp > $jamTerlambatTimestamp) {
+                $result  = "Terlambat";
+            } else {
+                $result = "Tepat Waktu";
+            }
+        }
+
+        return [$result, ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_terlambat'] : "-"];
+    }
+
+    static function getDayIndonesia($day)
+    {
+        $translations = [
+            'Sunday'    => 'Minggu',
+            'Monday'    => 'Senin',
+            'Tuesday'   => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday'  => 'Kamis',
+            'Friday'    => 'Jumat',
+            'Saturday'  => 'Sabtu',
+        ];
+
+        return isset($translations[$day]) ? $translations[$day] : $day;
     }
 }
