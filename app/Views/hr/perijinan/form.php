@@ -378,10 +378,10 @@
             // csrf
             const csrfToken = '<?= csrf_token() ?>';
             const csrf = $(`[name="${csrfToken}"]`);
-            var perizinanID = $(this).data('perizinan_id');
+            var kode = $(this).data('kode');
 
             var formData = new FormData();
-            formData.append('id', perizinanID);
+            formData.append('kode', kode);
 
             $.ajax({
                 url: "<?= base_url("form-perijinan/delete"); ?>",

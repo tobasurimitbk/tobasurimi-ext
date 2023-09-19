@@ -227,11 +227,11 @@ class Perijinan extends BaseController
 
     public function delete()
     {
-        $id = $this->request->getPost("id");
+        $kode = $this->request->getPost("kode");
 
         $FormPerijinanModel = new FormPerijinanModel();
 
-        $FormPerijinanModel->where('id', $id)->delete();
+        $FormPerijinanModel->where('kode', $kode)->delete();
 
         return \response()->setJSON([
             'status' => true,

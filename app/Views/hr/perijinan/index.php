@@ -142,67 +142,6 @@
         }
     });
 
-    // delete
-    function handleDelete(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-
-                setLoading()
-                $.ajax({
-                    url: "<?= base_url("form-perijinan/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            stopLoading()
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                        stopLoading()
-                    }
-                });
-            }
-        })
-    }
-
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";
