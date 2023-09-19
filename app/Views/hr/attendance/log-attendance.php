@@ -424,7 +424,8 @@
             delay: 250,
             data: function(params) {
                 return {
-                    employeesName: params.term
+                    employeesName: params.term,
+                    divisiID: "<?= @$_GET['divisiID'] ?>",
                 };
             },
             processResults: function(data) {
