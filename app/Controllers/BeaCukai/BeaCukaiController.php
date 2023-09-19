@@ -857,9 +857,9 @@ class BeaCukaiController extends BaseController
                 "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
                 "no_kontrak"            => $this->request->getPost("noKontrak"),
                 "tanggal_kontrak"       => $this->request->getPost("tanggalKontrak") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalKontrak")))) : "",  
-                "no_fasilitas_import"   => $this->request->getPost("noFasilitasImport"),
-                "tanggal_fasilitas_import" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
-                "kode_fasilitas_import" => $this->request->getPost("kodeFasilitasImport"),
+                "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
 
                 "valuta"                => $this->request->getPost("valuta"),
                 "ndpbm"                 => $this->request->getPost("npdpbm"),
@@ -1065,9 +1065,9 @@ class BeaCukaiController extends BaseController
                 "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
                 "no_kontrak"            => $this->request->getPost("noKontrak"),
                 "tanggal_kontrak"       => $this->request->getPost("tanggalKontrak") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalKontrak")))) : "",  
-                "no_fasilitas_import"   => $this->request->getPost("noFasilitasImport"),
-                "tanggal_fasilitas_import" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
-                "kode_fasilitas_import" => $this->request->getPost("kodeFasilitasImport"),
+                "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
 
                 "valuta"                => $this->request->getPost("valuta"),
                 "ndpbm"                 => $this->request->getPost("npdpbm"),
@@ -1181,6 +1181,429 @@ class BeaCukaiController extends BaseController
     public function bc261View()
     {
         return view('BeaCukai/bc-261/index');
+    }
+
+    public function bc261CreateFormView()
+    {
+        //Get Valuta
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
+
+        //Get Jenis TPB
+        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+
+        //Get Pengangkutan
+        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+
+        //Get Referensi Lokasi Bayar
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
+
+        //Get Wajib Bayar
+        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
+
+        $data = [
+            'wajibBayar' => $wajibBayar,
+            'referensiLokasiBayar' => $referensiLokasiBayar,
+            'valuta' => $valuta,
+            'dokumen' => $this->modelSalesOrderInvoice->asObject()->findAll(),
+            'jenisTPB' => $jenisTPB,
+            'pengangkutan' => $pengangkutan,
+            'kantorBeaCukai' => $this->modelKantorBeaCukai->asObject()->findAll()
+        ];
+        return view('BeaCukai/bc-261/create', $data);
+    }
+
+    public function bc261GetByIdFormView($id)
+    {
+        //Get Valuta
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
+
+        //Get Jenis TPB
+        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+
+        //Get Pengangkutan
+        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+
+        //Get Referensi Lokasi Bayar
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
+
+        //Get Wajib Bayar
+        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
+
+        $data = [
+            'wajibBayar' => $wajibBayar,
+            'referensiLokasiBayar' => $referensiLokasiBayar,
+            'valuta' => $valuta,
+            'dokumen' => $this->modelSalesOrderInvoice->asObject()->findAll(),
+            'jenisTPB' => $jenisTPB,
+            'pengangkutan' => $pengangkutan,
+            'kantorBeaCukai' => $this->modelKantorBeaCukai->asObject()->findAll()
+        ];
+
+        if (!empty($id)) {
+            $dataBC = $this->modelBeaCukai->getById($id);
+            $data["dataBC"] = $dataBC;
+
+            if($dataBC->type !== "BC 2.6.1")
+            {
+                return view('BeaCukai/bc-261/index');
+            }
+        }
+        
+        return view('BeaCukai/bc-261/create', $data);
+    }
+
+    public function bc261SaveForm()
+    {
+        try {
+            $rules = [
+                "kantorPabean" => [
+                    "rules" => "required"
+                ],
+                "kodeTujuanTpb" => [
+                    "rules" => "required"
+                ],
+                "npwpImportir" => [
+                    "rules" => "required"
+                ],
+                "namaImportir" => [
+                    "rules" => "required"
+                ],
+                "noIzinTPBImportir" => [
+                    "rules" => "required"
+                ],
+                "tanggalIzinTPB" => [
+                    "rules" => "required"
+                ],
+                "APIImportir" => [
+                    "rules" => "required"
+                ],
+                "alamatImportir" => [
+                    "rules" => "required"
+                ],
+                "npwpPenerimaBarang" => [
+                    "rules" => "required"
+                ],
+                "namaPenerimaBarang" => [
+                    "rules" => "required"
+                ],
+                "alamatPenerimaBarang" => [
+                    "rules" => "required"
+                ],
+                "noPackingList" => [
+                    "rules" => "required"
+                ],
+                "tanggalPackingList" => [
+                    "rules" => "required"
+                ],
+                "valuta" => [
+                    "rules" => "required"
+                ],
+                "npdpbm" => [
+                    "rules" => "required"
+                ],
+                "nilaiCif" => [
+                    "rules" => "required"
+                ],
+                "nilaiCifRupiah" => [
+                    "rules" => "required"
+                ],
+                "caraPengangkutan" => [
+                    "rules" => "required"
+                ],
+                "bruto" => [
+                    "rules" => "required"
+                ],
+                "netto" => [
+                    "rules" => "required"
+                ],
+                "jumlahBarang" => [
+                    "rules" => "required"
+                ],
+                "tempat" => [
+                    "rules" => "required"
+                ],
+                "tanggal" => [
+                    "rules" => "required"
+                ],
+                "pemberitahu" => [
+                    "rules" => "required"
+                ],
+                "jabatan" => [
+                    "rules" => "required"
+                ]
+            ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $payload = [
+                "company_id"            => $this->this_company_id,
+                "status"                => "-",
+                "status_perbaikan"      => "-",
+                "aju_no"                => "-",
+                "registration_no"       => "-",
+                "registration_date"     => "-",
+                "type"                  => "BC 2.6.1",
+                "status_posting"        => "Belum Posting",
+
+                "kantor_pabean"         => $this->request->getPost("kantorPabean"),
+                "tujuan_tpb"            => $this->request->getPost("kodeTujuanTpb"),
+
+                "importir_npwp"         => $this->request->getPost("npwpImportir"),
+                "importir_name"         => $this->request->getPost("namaImportir"),
+                "tpb_no"                => $this->request->getPost("noIzinTPBImportir"),
+                "tpb_date"              => $this->request->getPost("tanggalIzinTPB") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalIzinTPB")))) : "",
+                "importir_api"          => $this->request->getPost("APIImportir"),
+                "importir_address"      => $this->request->getPost("alamatImportir"),
+
+                "penerima_barang_npwp"  => $this->request->getPost("npwpPenerimaBarang"),
+                "penerima_barang_name"  => $this->request->getPost("namaPenerimaBarang"),
+                "penerima_barang_address" => $this->request->getPost("alamatPenerimaBarang"),
+
+                "no_packing_list"       => $this->request->getPost("noPackingList"),
+                "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
+                "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
+
+                "valuta"                => $this->request->getPost("valuta"),
+                "ndpbm"                 => $this->request->getPost("npdpbm"),
+                "cif_value"             => $this->request->getPost("nilaiCif"),
+                "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
+
+                "pengangkutan"          => $this->request->getPost("caraPengangkutan"),
+                
+                "bruto"                 => $this->request->getPost("bruto"),
+                "netto"                 => $this->request->getPost("netto"),
+                "item_count"            => $this->request->getPost("jumlahBarang"),
+
+                "tempat"                => $this->request->getPost("tempat"),
+                "tanggal"               => $this->request->getPost("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggal")))) : "",
+                "pemberitahu"           => $this->request->getPost("pemberitahu"),
+                "jabatan"               => $this->request->getPost("jabatan"),
+
+                "data_dokumen"          => $this->request->getPost("data_dokumen"),
+                "data_kontainer"        => $this->request->getPost("data_kontainer"),
+                "data_kemasan"          => $this->request->getPost("data_kemasan"),
+                "data_jaminan"          => $this->request->getPost("data_jaminan")
+            ];
+            
+            $insert =  $this->modelBeaCukai->insert($payload);
+
+            if (!$insert) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Data Gagal Disimpan!',
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => json_encode($payload),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            $data = [
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        }
+    }
+
+    public function bc261UpdateForm()
+    {
+        try {
+            $rules = [
+                "kantorPabean" => [
+                    "rules" => "required"
+                ],
+                "kodeTujuanTpb" => [
+                    "rules" => "required"
+                ],
+                "npwpImportir" => [
+                    "rules" => "required"
+                ],
+                "namaImportir" => [
+                    "rules" => "required"
+                ],
+                "noIzinTPBImportir" => [
+                    "rules" => "required"
+                ],
+                "tanggalIzinTPB" => [
+                    "rules" => "required"
+                ],
+                "APIImportir" => [
+                    "rules" => "required"
+                ],
+                "alamatImportir" => [
+                    "rules" => "required"
+                ],
+                "npwpPenerimaBarang" => [
+                    "rules" => "required"
+                ],
+                "namaPenerimaBarang" => [
+                    "rules" => "required"
+                ],
+                "alamatPenerimaBarang" => [
+                    "rules" => "required"
+                ],
+                "noPackingList" => [
+                    "rules" => "required"
+                ],
+                "tanggalPackingList" => [
+                    "rules" => "required"
+                ],
+                "valuta" => [
+                    "rules" => "required"
+                ],
+                "npdpbm" => [
+                    "rules" => "required"
+                ],
+                "nilaiCif" => [
+                    "rules" => "required"
+                ],
+                "nilaiCifRupiah" => [
+                    "rules" => "required"
+                ],
+                "caraPengangkutan" => [
+                    "rules" => "required"
+                ],
+                "bruto" => [
+                    "rules" => "required"
+                ],
+                "netto" => [
+                    "rules" => "required"
+                ],
+                "jumlahBarang" => [
+                    "rules" => "required"
+                ],
+                "tempat" => [
+                    "rules" => "required"
+                ],
+                "tanggal" => [
+                    "rules" => "required"
+                ],
+                "pemberitahu" => [
+                    "rules" => "required"
+                ],
+                "jabatan" => [
+                    "rules" => "required"
+                ]
+            ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $id = $this->request->getPost("id");
+
+            $payload = [
+                "company_id"            => $this->this_company_id,
+                "status"                => "-",
+                "status_perbaikan"      => "-",
+                "aju_no"                => "-",
+                "registration_no"       => "-",
+                "registration_date"     => "-",
+                "type"                  => "BC 2.6.1",
+                "status_posting"        => "Belum Posting",
+
+                "kantor_pabean"         => $this->request->getPost("kantorPabean"),
+                "tujuan_tpb"            => $this->request->getPost("kodeTujuanTpb"),
+
+                "importir_npwp"         => $this->request->getPost("npwpImportir"),
+                "importir_name"         => $this->request->getPost("namaImportir"),
+                "tpb_no"                => $this->request->getPost("noIzinTPBImportir"),
+                "tpb_date"              => $this->request->getPost("tanggalIzinTPB") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalIzinTPB")))) : "",
+                "importir_api"          => $this->request->getPost("APIImportir"),
+                "importir_address"      => $this->request->getPost("alamatImportir"),
+
+                "penerima_barang_npwp"  => $this->request->getPost("npwpPenerimaBarang"),
+                "penerima_barang_name"  => $this->request->getPost("namaPenerimaBarang"),
+                "penerima_barang_address" => $this->request->getPost("alamatPenerimaBarang"),
+
+                "no_packing_list"       => $this->request->getPost("noPackingList"),
+                "tanggal_packing_list"  => $this->request->getPost("tanggalPackingList") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalPackingList")))) : "",
+                "fasilitas_import_no"   => $this->request->getPost("noFasilitasImport"),
+                "fasilitas_import_date" => $this->request->getPost("tanggalFasilitasImport") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggalFasilitasImport")))) : "",  
+                "fasilitas_import_code" => $this->request->getPost("kodeFasilitasImport"),
+
+                "valuta"                => $this->request->getPost("valuta"),
+                "ndpbm"                 => $this->request->getPost("npdpbm"),
+                "cif_value"             => $this->request->getPost("nilaiCif"),
+                "cif_price"             => $this->request->getPost("nilaiCifRupiah"),
+
+                "pengangkutan"          => $this->request->getPost("caraPengangkutan"),
+                
+                "bruto"                 => $this->request->getPost("bruto"),
+                "netto"                 => $this->request->getPost("netto"),
+                "item_count"            => $this->request->getPost("jumlahBarang"),
+
+                "tempat"                => $this->request->getPost("tempat"),
+                "tanggal"               => $this->request->getPost("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggal")))) : "",
+                "pemberitahu"           => $this->request->getPost("pemberitahu"),
+                "jabatan"               => $this->request->getPost("jabatan"),
+
+                "data_dokumen"          => $this->request->getPost("data_dokumen"),
+                "data_kontainer"        => $this->request->getPost("data_kontainer"),
+                "data_kemasan"          => $this->request->getPost("data_kemasan"),
+                "data_jaminan"          => $this->request->getPost("data_jaminan")
+            ];
+            
+            $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();
+
+            if (!$insert) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Data Gagal Disimpan!',
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => json_encode($payload),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            $data = [
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        }
     }
 
     public function bc261All()

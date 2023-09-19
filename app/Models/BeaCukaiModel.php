@@ -30,6 +30,7 @@ class BeaCukaiModel extends Model
         'importir_npwp',
         'importir_name',
         'tpb_no',
+        'tpb_date',
         'importir_api',
         'importir_address',
         'pemilik_barang',
@@ -92,12 +93,12 @@ class BeaCukaiModel extends Model
         'tanggal_packing_list',
         'no_kontrak',
         'tanggal_kontrak',
-        'no_fasilitas_import',
-        'tanggal_fasilitas_import',
-        'kode_fasilitas_import',
         'harga_penyerahan',
         'pembayaran',
-        'wajib_bayar'
+        'wajib_bayar',
+
+        // bc 2.6.1 
+        'data_jaminan'
     ];
 
     // Dates

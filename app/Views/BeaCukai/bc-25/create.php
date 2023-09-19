@@ -273,19 +273,19 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_fasilitas_import : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="No Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_no : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="No Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">No Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_fasilitas_import !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_fasilitas_import)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasiitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasiitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_fasilitas_import : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_code : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Kode Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
@@ -1384,20 +1384,17 @@
 
     $('#kantorPabean').select2({
         placeholder: "Pilih Kantor Pabean",
-        theme: "bootstrap-5",
-        allowClear: true
+        theme: "bootstrap-5"
     });
 
     $('#kodeTujuanTpb').select2({
         placeholder: "Pilih Jenis TPB",
-        theme: "bootstrap-5",
-        allowClear: true
+        theme: "bootstrap-5"
     });
 
     $("select[name='caraPengangkutan']").select2({
         placeholder: "Pilih Cara Pengangkutan",
-        theme: "bootstrap-5",
-        allowClear: true
+        theme: "bootstrap-5"
     });
 
     $("input[name='tanggalFasilitasImport']").datepicker({
@@ -1444,26 +1441,22 @@
 
     $("select[name='noInvoice']").select2({
         placeholder: "Pilih Nomor Invoice",
-        theme: "bootstrap-5",
-        allowClear: true
+        theme: "bootstrap-5"
     });
 
     $("select[name='valuta']").select2({
         placeholder: "Pilih Valuta",
-        theme: "bootstrap-5",
-        allowClear: true
+        theme: "bootstrap-5"
     });
 
     $("select[name='pembayaran']").select2({
         placeholder: "Pilih Pembayaran",
-        theme: "bootstrap-5",
-        allowClear: true
+        theme: "bootstrap-5"
     });
 
     $("select[name='wajibBayar']").select2({
         placeholder: "Pilih Wajib Bayar",
-        theme: "bootstrap-5",
-        allowClear: true
+        theme: "bootstrap-5"
     });
 
     $('.form-select')
@@ -1665,7 +1658,6 @@
                             data.append("valuta", $(".valuta").val());
                             data.append("npdpbm", $(".npdpbm").val());
                             data.append("nilaiCif", $(".nilaiCif").val());
-                            data.append("nilaiCifRupiah", $(".nilaiCifRupiah").val());
                             data.append("hargaPenyerahan", $(".hargaPenyerahan").val());
                             data.append("caraPengangkutan", $(".caraPengangkutan option:selected").val());
                             data.append("bruto", $(".bruto").val());
