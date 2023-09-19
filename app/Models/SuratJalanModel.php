@@ -118,7 +118,7 @@ class SuratJalanModel extends Model
         $dataSuratJalan = $this->asObject()
             ->join('users', 'users.id = surat_jalan_so.id_user')
             ->join('customers', 'customers.id = surat_jalan_so.id_customer ')
-            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->join('employees', 'employees.id = customers.sales_id ')
             ->select($selectQry)
             ->find($id);
