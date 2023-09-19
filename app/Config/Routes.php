@@ -646,6 +646,7 @@ $routes->get('/form-perijinan/create', 'HR\Perijinan::createView', ['filter' => 
 $routes->get('/form-perijinan/all', 'HR\Perijinan::allPerijinan', ['filter' => 'Auth']);
 $routes->post('/form-perijinan/save', 'HR\Perijinan::save', ['filter' => 'Auth']);
 $routes->post('/form-perijinan/delete', 'HR\Perijinan::delete', ['filter' => 'Auth']);
+$routes->post('/form-perijinan/employees', 'HR\Perijinan::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // jam kerja
 $routes->get('/jam-kerja', 'Master\JamKerja::index', ['filter' => 'Auth']);
