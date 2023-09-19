@@ -148,7 +148,7 @@ class SalesOrderModel extends Model
         $dataSalesOrder = $this->asObject()
             ->join('users', 'users.id = sales_order.id_user')
             ->join('customers', 'customers.id = sales_order.id_customer ')
-            ->join('metadata', 'metadata.id = customers.termin')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id ')
             ->select($selectQry)
             ->find($id);
