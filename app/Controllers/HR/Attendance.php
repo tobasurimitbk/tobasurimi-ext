@@ -6,9 +6,13 @@ use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
+use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
+use App\Models\JamKerjaModel;
 use App\Models\PayrollsModel;
+use CodeIgniter\I18n\Time;
+use Locale;
 
 class Attendance extends BaseController
 {
@@ -153,13 +157,14 @@ class Attendance extends BaseController
         $AttendancesLogModel = new AttendancesLogModel();
         $EmployeesModel = new EmployeesModel();
         $FormPerijinanModel = new FormPerijinanModel();
+        $DivisiModel = new DivisisModel();
 
         // get data $_GET
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
         $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
 
         // get data from model
-        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'));
+        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'), $this->request->getGet('divisiID'));
         $pager = \Config\Services::pager();
         $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
 
@@ -173,6 +178,7 @@ class Attendance extends BaseController
             // store data
             $dataResult[] = [
                 "employeeID" => $value['id'],
+                "divisi" => $value['divisi'],
                 "employeeName" => $value['name'],
                 "list_attendance" => $dataLog,
                 'statusAttendances' => [
@@ -187,6 +193,7 @@ class Attendance extends BaseController
         $data = [
             'year' => $year,
             'month' => $month,
+            'divisi' => $DivisiModel->get_by_company_id($this->this_company_id),
             'res_user'  => $dataResult,
             'employeesData' => $dataEmployeePager['data'],
             'pager' => $dataEmployeePager['pager'],
@@ -560,5 +567,122 @@ class Attendance extends BaseController
         return \response()->setJSON([
             'data' => $result
         ]);
+    }
+
+    public function getLogAttendanceDetail()
+    {
+        // model declare
+        $AttendancesLogModel = new AttendancesLogModel();
+        $FormPerijinanModel = new FormPerijinanModel();
+        $hariLiburModel = new BigDaysModel();
+        $EmployeesModel = new EmployeesModel();
+
+        Locale::setDefault('id_ID');
+
+        $tanggal = $this->request->getVar('tanggal');
+        $employeeID = $this->request->getVar('employeeID');
+        $time = Time::createFromFormat('Y-m-d', $tanggal);
+
+        $result = [
+            'tanggal' => static::getDayIndonesia($time->format('l')) . ", " . $time->format('d F Y'),
+            'keterangan' => "-",
+            'checkIn' => "-",
+            'checkOut' => "-",
+            'status' => "-",
+            'employee' => $EmployeesModel->where('id', $employeeID)->first(),
+            'jamTerlambat' => "-"
+        ];
+
+        $formPerizinan = $FormPerijinanModel->where('periode', $tanggal)
+            ->where('employee_id', $employeeID)
+            ->first();
+        $hariLibur = $hariLiburModel->where('date', $tanggal)
+            ->first();
+        $logAttandance = $AttendancesLogModel->where('employees_id', $employeeID)
+            ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
+            ->orderBy('id', "DESC")
+            ->limit(2)
+            ->get()
+            ->getResult();
+
+        if ($hariLibur != null || date('l', strtotime($tanggal)) == "Sunday" && \count($logAttandance) == 0) {
+            $result['status'] = "Hari Libur";
+            $result['keterangan'] = $hariLibur != null ? $hariLibur['name'] : "Hari Minggu";
+        } elseif ($formPerizinan != null) {
+            $result['status'] = $formPerizinan['status'];
+            $result['keterangan'] = "Karyawan mengajukan perizinan";
+        } else {
+            // tidak ada data di log absen
+            if (count($logAttandance) == 0) {
+                $result['status'] = "ALPHA";
+            } else {
+                // ada absen di log
+                $result['status'] = "Hadir";
+                if (\count($logAttandance) == 2) {
+                    // ada attandance (in dan out)
+                    $keterangan = static::ketelambatanCheck(
+                        $this->this_company_id,
+                        $result['checkIn']
+                    );
+                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[1]->date_create));
+                    $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->date_create));
+
+                    $result['keterangan'] = $keterangan[0];
+                    $result['jamTerlambat'] = $keterangan[1];
+                } else {
+                    // ada attandance only(in)
+                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->date_create));
+                    $keterangan = static::ketelambatanCheck(
+                        $this->this_company_id,
+                        $result['checkIn']
+                    );
+                    $result['keterangan'] = $keterangan[0];
+                    $result['jamTerlambat'] = $keterangan[1];
+                }
+            }
+        }
+
+        return \response()->setJSON([
+            'status' => true,
+            'data' => $result,
+            'token' => \csrf_hash(),
+        ]);
+    }
+
+    // helper
+    static function ketelambatanCheck($companyID, $checkIN)
+    {
+        $jamKerjaModel = new JamKerjaModel();
+        $result = "-";
+
+        $jamKerjaDetail = $jamKerjaModel->where('company_id', $companyID)->first();
+
+        if ($jamKerjaDetail !== null) {
+            $checkInTimestamp = strtotime($checkIN);
+            $jamTerlambatTimestamp = strtotime($jamKerjaDetail['jam_terlambat']);
+
+            if ($checkInTimestamp > $jamTerlambatTimestamp) {
+                $result  = "Terlambat";
+            } else {
+                $result = "Tepat Waktu";
+            }
+        }
+
+        return [$result, ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_terlambat'] : "-"];
+    }
+
+    static function getDayIndonesia($day)
+    {
+        $translations = [
+            'Sunday'    => 'Minggu',
+            'Monday'    => 'Senin',
+            'Tuesday'   => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday'  => 'Kamis',
+            'Friday'    => 'Jumat',
+            'Saturday'  => 'Sabtu',
+        ];
+
+        return isset($translations[$day]) ? $translations[$day] : $day;
     }
 }
