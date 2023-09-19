@@ -3,11 +3,14 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\DivisisModel;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
 use App\Models\GajiConjunctionModel;
+use App\Models\GajiDivisiModel;
 use App\Models\UserModel;
 use App\Models\TunjanganModel;
+use Exception;
 
 class Employee extends BaseController
 {
@@ -18,6 +21,8 @@ class Employee extends BaseController
     protected $GajiConjunctionModel;
     protected $UserModel;
     protected $TunjanganModel;
+    protected $GajiDivisiModel;
+    protected $DivisionModel;
 
     public function __construct()
     {
@@ -28,6 +33,8 @@ class Employee extends BaseController
         $this->GajiConjunctionModel = new GajiConjunctionModel();
         $this->UserModel = new UserModel();
         $this->TunjanganModel = new TunjanganModel();
+        $this->GajiDivisiModel = new GajiDivisiModel();
+        $this->DivisionModel = new DivisisModel();
     }
 
     public function employee()
@@ -109,16 +116,15 @@ class Employee extends BaseController
         $row = $this->request->getVar('start');
         $rowperpage = $this->request->getVar('length');
         $temp = $this->request->getVar('order');
-        $columnIndex = $temp[0]['column']; // Column index
+        $columnIndex = $temp[0]['column'];
 
         $temp = $this->request->getVar('columns');
-        $columnName = $temp[$columnIndex]['data']; // Column index
+        $columnName = $temp[$columnIndex]['data'];
 
         $temp = $this->request->getVar('order');
-        $columnSortOrder = $temp[0]['dir']; // Column index
+        $columnSortOrder = $temp[0]['dir'];
 
         $search = $this->request->getVar('search');
-        //$searchValue = $temp['value']; // Column index
 
         $values = [
             "company_id"    => $this->this_company_id,
@@ -165,377 +171,191 @@ class Employee extends BaseController
     public function saveEmployee()
     {
         try {
-            $rules = [
-                "nip" => [
-                    "rules" => "required"
-                ],
-                "name" => [
-                    "rules" => "required"
-                ],
-                "gender" => [
-                    "rules" => "required"
-                ],
-                "dob" => [
-                    "rules" => "required"
-                ],
-                "address" => [
-                    "rules" => "required"
-                ],
-                "division_id" => [
-                    "rules" => "required"
-                ],
-                "acc_no" => [
-                    "rules" => "required"
-                ],
-                "nik" => [
-                    "rules" => "required"
-                ],
-                "child" => [
-                    "rules" => "required"
-                ],
-                "religion_id" => [
-                    "rules" => "required"
-                ],
-                "marriage_id" => [
-                    "rules" => "required"
-                ],
-                "child" => [
-                    "rules" => "required"
-                ],
-                "province_id" => [
-                    "rules" => "required"
-                ],
-                "city_id" => [
-                    "rules" => "required"
-                ],
-                "join_date" => [
-                    "rules" => "required"
-                ],
-                "bank_name" => [
-                    "rules" => "required"
-                ],
-                "owner_name" => [
-                    "rules" => "required"
-                ],
-                "pendidikan" => [
-                    "rules" => "required"
-                ]
+
+            $file = $this->request->getFile("employeeImg");
+            $values = [
+                "company_id" => $this->this_company_id,
+                "nip" => $this->request->getPost("nip"),
+                "name" => $this->request->getPost("name"),
+                "gender" => $this->request->getPost("gender"),
+                "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
+                "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
+                "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                "phone_no" => $this->request->getPost("phone_no"),
+                "acc_no" => $this->request->getPost("acc_no"),
+                "email" => $this->request->getPost("email"),
+                "address" => $this->request->getPost("address"),
+                "status" => $this->request->getPost("status"),
+                "nik" => $this->request->getPost("nik"),
+                "child" => $this->request->getPost("child"),
+                "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                "postal_code" => $this->request->getPost("zip_code"),
+                "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                "jabatan_id" => $this->request->getPost("jabatan_id"),
+                "bank_name" => $this->request->getPost("bank_name"),
+                "owner_name" => $this->request->getPost("owner_name"),
+                "pin"  => $this->request->getPost("pin"),
+                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT")
             ];
+            if (!empty($file->getName())) {
+                $mime = $file->getMimeType();
+                if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
+                    $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
+                    $values["employee_img"] = $image;
+                }
+            }
 
-            if ($this->validate($rules)) {
-                $payload = '';
+            if (isset($values)) {
+                // insert employee
+                $insert = $this->EmployeesModel->insert($values);
+                $gajiDivisi = $this->GajiDivisiModel->getGajiByDivisionReturnIDOnArray(
+                    $this->request->getPost("division_id"),
+                    $this->this_company_id
+                );
 
-                $file = $this->request->getFile("employeeImg");
-                $values = [
-                    "company_id" => $this->this_company_id,
-                    "nip" => $this->request->getPost("nip"),
-                    "name" => $this->request->getPost("name"),
-                    "gender" => $this->request->getPost("gender"),
-                    "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
-                    "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                    "phone_no" => $this->request->getPost("phone_no"),
-                    "acc_no" => $this->request->getPost("acc_no"),
-                    "email" => $this->request->getPost("email"),
-                    "address" => $this->request->getPost("address"),
-                    "status" => $this->request->getPost("status"),
-                    "nik" => $this->request->getPost("nik"),
-                    "child" => $this->request->getPost("child"),
-                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                    "postal_code" => $this->request->getPost("zip_code"),
-                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan_id" => $this->request->getPost("jabatan_id"),
-                    "bank_name" => $this->request->getPost("bank_name"),
-                    "owner_name" => $this->request->getPost("owner_name"),
-                    "pin"  => $this->request->getPost("pin"),
-                    "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
-                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT")
-                ];
-                if (!empty($file->getName())) {
-                    $mime = $file->getMimeType();
-                    if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
-                        $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-                        $values["employee_img"] = $image;
+                $res = [];
+                foreach ($gajiDivisi as $g) {
+                    if (in_array($g, \array_keys($_POST))) {
+                        $res[] = [
+                            'employee_id' => $insert,
+                            'tunjangan_id' => $g,
+                            'nominal' => (int) preg_replace("/[^0-9]/", "", $this->request->getVar($g))
+                        ];
                     }
                 }
 
-                // var_dump($values);
-                // die;
+                $this->GajiConjunctionModel->insertBatch($res);
 
-                if (isset($values)) {
-                    $insert = $this->EmployeesModel->insert($values);
-                    foreach ($values["komponen_gaji"] as $value) {
-                        $value->employee_id = $insert;
-                    }
-
-                    $this->GajiConjunctionModel->insertBatch($values["komponen_gaji"]);
-
-                    if ($insert) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil disimpan",
-                            "payload"   => "",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Disimpan';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            "payload"   => "",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                        "payload"   => '',
+                if ($insert) {
+                    return \response()->setJSON([
+                        "status" => true,
+                        "message" => "Data Employee Baru Berhasil disimpan",
                         'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                    ]);
+                } else {
+                    return \response()->setJSON([
+                        "status" => \false,
+                        "message" => "Data Employee Baru gagal disimpan",
+                        'token' => csrf_hash()
+                    ]);
                 }
             } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
+                return \response()->setJSON([
+                    "status" => \false,
+                    "message" => "Format gambar harus bertipe png, jpg, jpeg",
                     'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                ]);
             }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        } catch (Exception $e) {
+
+            return \response()->setJSON([
+                'message' => "Terjadi kesalahan saat input data employee baru (Code: 500)",
+                'status' => \false
+            ]);
         }
-        return;
     }
 
     public function updateEmployee()
     {
         try {
-            $rules = [
-                "nip" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'NIP Tidak Boleh Kosong',
-                    ]
-                ],
-                "name" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Nama Karyawan Tidak Boleh Kosong',
-                    ]
-                ],
-                "gender" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Jenis Kelamin Tidak Boleh Kosong',
-                    ]
-                ],
-                "dob" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal Lahir Tidak Boleh Kosong',
-                    ]
-                ],
-                "address" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Alamat Tidak Boleh Kosong',
-                    ]
-                ],
-                "division_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Divisi Tidak Boleh Kosong',
-                    ]
-                ],
-                "acc_no" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'No Rekening Tidak Boleh Kosong',
-                    ]
-                ],
-                "nik" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'NIK Tidak Boleh Kosong',
-                    ]
-                ],
-                "religion_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Agama Tidak Boleh Kosong',
-                    ]
-                ],
-                "marriage_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Status Kawin Tidak Boleh Kosong',
-                    ]
-                ],
-                "child" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Jumlah Anak Tidak Boleh Kosong',
-                    ]
-                ],
-                "province_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Provinsi Tidak Boleh Kosong',
-                    ]
-                ],
-                "city_id" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Kota Tidak Boleh Kosong',
-                    ]
-                ],
-                "join_date" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Tanggal Bergabung Tidak Boleh Kosong',
-                    ]
-                ],
-                "bank_name" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Nama Bank Tidak Boleh Kosong',
-                    ]
-                ],
-                "owner_name" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Owner Name Tidak Boleh Kosong',
-                    ]
-                ],
-                "pendidikan" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Pendidikan Tidak Boleh Kosong',
-                    ]
-                ]
+
+            $id = $this->request->getPost("id");
+            $status = $this->request->getPost("status") === "Aktif" ? 'Aktif' : 'Non Aktif';
+            $name = $this->request->getPost("name");
+
+            // update status user when employee status changed
+            $user = $this->UserModel->getByEmployeeId($id);
+
+            if ($user) {
+                $this->UserModel->where(['id' => $user->id])->set(['status' => $status, 'name' => $name])->update();
+            }
+
+            $values = [
+                "company_id" => $this->this_company_id,
+                "nip" => $this->request->getPost("nip"),
+                "name" => $this->request->getPost("name"),
+                "gender" => $this->request->getPost("gender"),
+                "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
+                "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
+                "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
+                "phone_no" => $this->request->getPost("phone_no"),
+                "email" => $this->request->getPost("email"),
+                "address" => $this->request->getPost("address"),
+                "status" => $this->request->getPost("status"),
+                "nik" => $this->request->getPost("nik"),
+                "child" => $this->request->getPost("child"),
+                "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
+                "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                "postal_code" => $this->request->getPost("zip_code"),
+                "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
+                "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
+                "jabatan_id" => $this->request->getPost("jabatan_id"),
+                "acc_no" => $this->request->getPost("acc_no"),
+                "bank_name" => $this->request->getPost("bank_name"),
+                "owner_name" => $this->request->getPost("owner_name"),
+                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT")
             ];
-
-            if ($this->validate($rules)) {
-                $payload = '';
-
-                $id = $this->request->getPost("id");
-                $status = $this->request->getPost("status") === "Aktif" ? 'Aktif' : 'Non Aktif';
-                $name = $this->request->getPost("name");
-
-                // update status user when employee status changed
-                $user = $this->UserModel->getByEmployeeId($id);
-
-                if ($user) {
-                    $this->UserModel->where(['id' => $user->id])->set(['status' => $status, 'name' => $name])->update();
+            $file = $this->request->getFile("employeeImg");
+            if (!empty($file->getName())) {
+                $mime = $file->getMimeType();
+                if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
+                    $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
+                    $values["employee_img"] = $image;
                 }
+            }
 
-                $values = [
-                    "company_id" => $this->this_company_id,
-                    "nip" => $this->request->getPost("nip"),
-                    "name" => $this->request->getPost("name"),
-                    "gender" => $this->request->getPost("gender"),
-                    "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("join_date")))) : "",
-                    "dob" => $this->request->getPost("dob") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("dob")))) : "",
-                    "division_id" => formatter($this->request->getPost("division_id"), "STR_TO_INT"),
-                    "phone_no" => $this->request->getPost("phone_no"),
-                    "email" => $this->request->getPost("email"),
-                    "address" => $this->request->getPost("address"),
-                    "status" => $this->request->getPost("status"),
-                    "nik" => $this->request->getPost("nik"),
-                    "child" => $this->request->getPost("child"),
-                    "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
-                    "postal_code" => $this->request->getPost("zip_code"),
-                    "religion_id" => formatter($this->request->getPost("religion_id"), "STR_TO_INT"),
-                    "marriage_id" => formatter($this->request->getPost("marriage_id"), "STR_TO_INT"),
-                    "jabatan_id" => $this->request->getPost("jabatan_id"),
-                    "acc_no" => $this->request->getPost("acc_no"),
-                    "bank_name" => $this->request->getPost("bank_name"),
-                    "owner_name" => $this->request->getPost("owner_name"),
-                    "komponen_gaji" => json_decode($this->request->getPost("komponen_gaji")),
-                    "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT")
-                ];
-                $file = $this->request->getFile("employeeImg");
-                if (!empty($file->getName())) {
-                    $mime = $file->getMimeType();
-                    if (in_array($mime, ["image/png", "image/jpg", "image/jpeg"])) {
-                        $image = "data:$mime;base64, " . base64_encode(file_get_contents($file));
-                        $values["employee_img"] = $image;
-                    }
-                }
+            if (isset($values)) {
+                if ($this->EmployeesModel->update($id, $values)) {
 
-                if (isset($values)) {
-                    if ($this->EmployeesModel->update($id, $values)) {
-                        foreach ($values["komponen_gaji"] as $value) {
-                            if (!empty($value->isDeleted)) {
-                                $this->GajiConjunctionModel->where('id', $value->id)->delete();
-                            }
+                    $gajiDivisi = $this->GajiDivisiModel->getGajiByDivisionReturnIDOnArray(
+                        $this->request->getPost("division_id"),
+                        $this->this_company_id
+                    );
 
-                            $dataDetail = [
-                                "id" => $value->id ?? null,
-                                "employee_id" => $this->request->getPost("id"),
-                                "tunjangan_id" => $value->tunjangan_id,
-                                "nominal" => $value->nominal,
+                    // delete first
+                    $this->GajiConjunctionModel->where('employee_id', $id)
+                        ->delete();
+
+                    $res = [];
+                    foreach ($gajiDivisi as $g) {
+                        if (in_array($g, \array_keys($_POST))) {
+                            $res[] = [
+                                'employee_id' => $id,
+                                'tunjangan_id' => $g,
+                                'nominal' => (int) preg_replace("/[^0-9]/", "", $this->request->getVar($g))
                             ];
-
-                            $this->GajiConjunctionModel->upsert($dataDetail);
                         }
-
-                        $data = [
-                            "status"    => true,
-                            "message"   => "Data Berhasil diubah",
-                            "payload"   => "",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Diubah';
-                        $data = [
-                            "status"    => false,
-                            "message"   => $message,
-                            "payload"   => "",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
                     }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Format gambar harus bertipe png, jpg, jpeg",
-                        "payload"   => '',
+
+                    $this->GajiConjunctionModel->insertBatch($res);
+
+                    return \response()->setJSON([
+                        "status"    => true,
+                        "message"   => "Data Employee Berhasil diubah",
                         'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
+                    ]);
+                } else {
+                    return \response()->setJSON([
+                        "status" => \false,
+                        "message" => "Data Employee gagal diubah",
+                        'token' => csrf_hash()
+                    ]);
                 }
             } else {
-                $errorMsgs = $this->validator->getErrors();
-                $data = [
-                    "status"     => false,
-                    "message"    => $errorMsgs[array_key_first($errorMsgs)],
+                return \response()->setJSON([
+                    "status" => \false,
+                    "message" => "Format gambar harus bertipe png, jpg, jpeg",
                     'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                ]);
             }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'message' => "Terjadi kesalahan saat input data employee baru (Code: 500)",
+                'status' => \false
+            ]);
         }
-        return;
     }
 
     public function getByIdEmployee($id = null)
@@ -622,5 +442,29 @@ class Employee extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function getKomponenGaji()
+    {
+        // variable declare
+        $divisionID = $this->request->getVar('divisi_id');
+        $employeeID = $this->request->getVar('employee_id');
+
+        return \response()->setJSON([
+            'status' => true,
+            'komponenGaji' => (empty($employeeID)) ?
+                $this->GajiDivisiModel->getGajiByDivision(
+                    $divisionID,
+                    $this->this_company_id
+                )
+                : $this->GajiDivisiModel->getGajiByDivisionAndEmployee(
+                    $divisionID,
+                    $this->this_company_id,
+                    $employeeID
+                ),
+            'employeeID' => $employeeID,
+            'divisi' => $this->DivisionModel->where('id', $divisionID)->first(),
+            'divisionIID' => $divisionID
+        ]);
     }
 }

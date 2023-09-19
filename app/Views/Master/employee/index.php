@@ -160,7 +160,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example">
+                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example" onchange="generateKomponenGaji()">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Divisi</label>
@@ -238,29 +238,20 @@
                             </div>
                         </div>
                     </div>
-                </form>
-                <div class="col-subtitle-modal">
-                    <div class="row mt-3">
-                        <div class="col">
-                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                            </button>
-                        </div>
+                    <div class="table-responsive mt-2 mb-3">
+                        <table class="table-inside table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0" id="tabelKomponenGaji">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th width="10">No</th>
+                                    <th>Komponen Gaji</th>
+                                    <th>Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-detail-table" id="body-detail-table">
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                <div class="table-responsive mt-2 mb-3">
-                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Komponen Gaji</th>
-                                <th>Nominal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-
-                        </tbody>
-                    </table>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
@@ -271,41 +262,6 @@
     </div>
 </div>
 
-<div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Komponen Gaji</h5>
-            </div>
-            <div class="modal-body">
-                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select tunjangan_id" name="tunjangan_id" id="tunjangan_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Tunjangan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" oninput="this.value=this.value.replace(/[^0-9]/g,'');" type="text" class="form-control nominal" name="nominal" id="nominal" placeholder="Nominal">
-                                <label for="floatingInput">Nominal</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-                <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -353,7 +309,6 @@
     let sort = "nip";
     let sortType = "asc";
 
-    let komponen_gaji = [];
     let list_delete = [];
 
     var row = 0;
@@ -432,45 +387,6 @@
                 next: '<i class="fa fa-angle-right"></i>'
             }
         }
-    });
-
-    var validator_detail = $(".detail-form").validate({
-        rules: {
-            tunjangan_id: {
-                required: true
-            },
-            nominal: {
-                required: true
-            }
-        },
-        messages: {
-            tunjangan_id: {
-                required: "Tunjangan wajib diisi"
-            },
-            nominal: {
-                required: "Nominal wajib diisi"
-            },
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            } else {
-                error.insertAfter(element);
-            }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
-
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
     });
 
     $(document).ready(function() {
@@ -700,12 +616,6 @@
                 division_id: {
                     required: true,
                 },
-                // province_id: {
-                //     required: true,
-                // },
-                // city_id: {
-                //     required: true,
-                // },
                 religion_id: {
                     required: true,
                 },
@@ -761,12 +671,6 @@
                 division_id: {
                     required: "Divisi wajib diisi"
                 },
-                // province_id: {
-                //     required: "Provinsi wajib diisi"
-                // },
-                // city_id: {
-                //     required: "Kota wajib diisi"
-                // },
                 religion_id: {
                     required: "Agama wajib diisi"
                 },
@@ -889,7 +793,6 @@
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
 
-            komponen_gaji = [];
             row = 0
 
             $(".body-detail-table").empty()
@@ -997,150 +900,6 @@
             table.ajax.reload();
         })
 
-        $(".btn-submit-detail").click(function() {
-            let id = $(".id_detail").val();
-            let tunjangan_id = $(".tunjangan_id option:selected").val();
-            let tunjangan_name = $(".tunjangan_id option:selected").text();
-            let nominal = $(".nominal").val();
-
-            // update detail
-            if (id) {
-                let validate_exist = true;
-
-                komponen_gaji.map(item => {
-                    if (item.row != id) {
-                        if (item.tunjangan_id == tunjangan_id) {
-                            validate_exist = false;
-                        }
-                    }
-                })
-
-                if (validate_exist) {
-                    if ($(".detail-form").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                let new_komponen_gaji = []
-                                let tag_html = "";
-
-                                row = 0;
-
-                                $(".body-detail-table").empty()
-
-                                komponen_gaji.map(item => {
-                                    if (item.row == id) {
-                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${tunjangan_id}" data-nominal ="${nominal}">`;
-                                        tag_html += "<td>";
-                                        tag_html += tunjangan_name;
-                                        tag_html += "</td>";
-                                        tag_html += "<td>";
-                                        tag_html += nominal;
-                                        tag_html += "</td>";
-                                        tag_html += "</tr>";
-
-                                        new_komponen_gaji.push({
-                                            row: item.row,
-                                            id: item.id,
-                                            tunjangan_id: tunjangan_id,
-                                            nominal: nominal,
-                                            tunjangan_name: tunjangan_name,
-                                        });
-                                    } else {
-                                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-nominal ="${item.nominal}">`;
-                                        tag_html += "<td>";
-                                        tag_html += item.tunjangan_name;
-                                        tag_html += "</td>";
-                                        tag_html += "<td>";
-                                        tag_html += item.nominal;
-                                        tag_html += "</td>";
-                                        tag_html += "</tr>";
-
-                                        new_komponen_gaji.push(item);
-                                    }
-
-                                    row = row + 1;
-                                })
-
-                                komponen_gaji = new_komponen_gaji;
-
-                                $(".body-detail-table").append(tag_html)
-
-                                $(".detail-modal").modal("hide")
-                            }
-                        })
-                    }
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Komponen Already Exist',
-                        confirmButtonColor: '#4e73df',
-                    })
-                }
-            }
-            // create detail
-            else {
-                let validate_exist = true;
-
-                komponen_gaji.map(item => {
-                    if (item.tunjangan_id == tunjangan_id) {
-                        validate_exist = false;
-                    }
-                })
-
-                if (validate_exist) {
-                    if ($(".detail-form").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                komponen_gaji.push({
-                                    row: row + 1,
-                                    id: id,
-                                    tunjangan_id: tunjangan_id,
-                                    nominal: nominal,
-                                    tunjangan_name: tunjangan_name,
-                                })
-
-                                let tag_html = "";
-                                tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${tunjangan_id}" data-nominal ="${nominal}">`;
-                                tag_html += "<td>";
-                                tag_html += tunjangan_name;
-                                tag_html += "</td>";
-                                tag_html += "<td>";
-                                tag_html += nominal;
-                                tag_html += "</td>";
-                                tag_html += "</tr>";
-                                $(".body-detail-table").append(tag_html)
-                                $(".detail-modal").modal("hide")
-                                row = row + 1;
-                            }
-                        })
-                    }
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Komponen Already Exist',
-                        confirmButtonColor: '#4e73df',
-                    })
-                }
-            }
-        })
-
         $(".btn-submit-parent").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
@@ -1159,39 +918,6 @@
                         let data = new FormData(document.querySelector(".create-form"));
                         let id = $(".id").val();
 
-                        let update_komponen_gaji = [];
-
-                        if (list_delete.length !== 0) {
-                            list_delete.map(obj => {
-                                update_komponen_gaji.push({
-                                    id: obj.id ? Number(obj.id) : 0,
-                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
-                                    tunjangan_id: obj.tunjangan_id,
-                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
-                                    isDeleted: true
-                                })
-                            })
-                        }
-
-                        komponen_gaji.map(obj => {
-                            if (obj.id) {
-                                update_komponen_gaji.push({
-                                    id: obj.id ? Number(obj.id) : 0,
-                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
-                                    tunjangan_id: obj.tunjangan_id,
-                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
-                                })
-                            } else {
-                                update_komponen_gaji.push({
-                                    id: obj.id ? Number(obj.id) : 0,
-                                    employee_id: obj.employee_id ? Number(obj.employee_id) : 0,
-                                    tunjangan_id: obj.tunjangan_id,
-                                    nominal: obj.nominal ? Number(obj.nominal.replaceAll(",", "")) : 0,
-                                })
-                            }
-                        })
-
-                        data.append("komponen_gaji", JSON.stringify(update_komponen_gaji))
                         // UPDATE
                         if (id) {
                             $.ajax({
@@ -1208,6 +934,7 @@
                                     csrf.val(response.token);
                                     if (response.status) {
                                         stopLoading()
+                                        console.log(response);
                                         Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1268,8 +995,11 @@
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        stopLoading()
+                                        stopLoading();
                                     }
+                                    stopLoading();
+                                    csrf.val(response.token);
+
                                 },
                                 onError: function(response) {
                                     csrf.val(response.token);
@@ -1281,6 +1011,7 @@
                                     stopLoading()
                                 }
                             });
+                            stopLoading();
                         }
                     }
                 })
@@ -1361,10 +1092,9 @@
             validator.resetForm();
             validator.reset();
 
-            komponen_gaji = [];
             row = 0
 
-            $(".body-detail-table").empty()
+            $(".body-detail-table").empty();
 
             $.ajax({
                 url: "<?= base_url("employee/id"); ?>" + "/" + id,
@@ -1372,7 +1102,7 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".id").val(id);
+                        $(".id").val(res?.data?.id);
                         $(".join_date").val(res?.data?.join_date);
                         $(".address").val(res?.data?.address);
                         $(".acc_no").val(res?.data?.acc_no);
@@ -1390,30 +1120,8 @@
                         $(".zip_code").val(res?.data?.postal_code);
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
-                        $(".komponen_gaji").val(res?.data?.komponen_gaji).change();
+                        $(".division_id").val(res?.data?.division_id);
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
-
-                        let tag_html = "";
-
-                        res?.data?.komponen_gaji.map((item) => {
-                            tag_html += `<tr class="edit-table-detail" data-id="${row + 1}" data-employeeid="${item.employee_id}" data-tunjanganid="${item.tunjangan_id}" data-nominal="${item.nominal}">`;
-                            tag_html += "<td>";
-                            tag_html += item.tunjangan_name;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
-                            tag_html += Number(item.nominal).toLocaleString();
-                            tag_html += "</td>";
-                            tag_html += "</tr>";
-
-                            komponen_gaji.push({
-                                ...item,
-                                row: row + 1
-                            });
-
-                            row = row + 1;
-                        })
-
-                        $(".body-detail-table").append(tag_html)
 
                         // AJAX GET CITY
                         $.ajax({
@@ -1499,7 +1207,7 @@
                                     $(".division_id").append(`<option value="${item.id}">${item.divisi}</option>`)
                                 })
 
-                                $(".division_id").val(res?.data?.division_id);
+                                $(".division_id").val(res?.data?.division_id).change();
                                 $(".add-modal").modal("show")
                             }
                         })
@@ -1519,7 +1227,8 @@
                                 $(".jabatan_id").val(res?.data?.jabatan_id);
                                 $(".add-modal").modal("show")
                             }
-                        })
+                        });
+
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -1541,91 +1250,6 @@
         $(".add-modal").css("overflow-y", "auto");
     })
 
-    $(document).on('click', '.delete-detail', function() {
-        let id = $(".id_detail").val()
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let new_komponen_gaji = []
-                let tag_html = "";
-
-                row = 0;
-
-                $(".body-detail-table").empty()
-
-                komponen_gaji.map(item => {
-                    if (item.row != id) {
-                        tag_html += `<tr class="edit-table-detail" data-id ="${row + 1}" data-tunjanganid ="${item.tunjangan_id}" data-roleid ="${item.nominal}">`;
-                        tag_html += "<td>";
-                        tag_html += item.tunjangan_name;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
-                        tag_html += item.nominal;
-                        tag_html += "</td>";
-                        tag_html += "</tr>";
-
-                        new_komponen_gaji.push({
-                            ...item,
-                            row: row + 1
-                        });
-
-                        row = row + 1;
-                    } else {
-                        // sent parameter isDelete if have customer id and id
-                        if (item.id) {
-                            list_delete.push(item)
-                        }
-                    }
-                })
-
-                komponen_gaji = new_komponen_gaji;
-
-                $(".body-detail-table").append(tag_html)
-                $(".detail-modal").modal("hide")
-
-                $(".detail-modal").modal("hide")
-            }
-        })
-    })
-
-    $(document).on('click', '.edit-table-detail', function() {
-        $(".title-detail-name").text("Update")
-        $(".delete-detail").css('display', '');
-        let tunjangan_id = $(this).data('tunjanganid')
-        let nominal = $(this).data('nominal')
-        let id = $(this).data('id')
-
-        $(".id_detail").val(id)
-
-        $(".nominal").val(Number(nominal).toLocaleString())
-
-        validator_detail.resetForm();
-        validator_detail.reset();
-
-        $.ajax({
-            url: `<?= base_url("tunjangan/dropdown"); ?>`,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                $(".tunjangan_id").empty()
-                $(".tunjangan_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".tunjangan_id").append(`<option value="${item.id}">${item.name}</option>`)
-                })
-
-                $(".tunjangan_id").val(tunjangan_id).change();
-                $(".detail-modal").modal("show")
-            }
-        })
-    })
     //change picture
     const previewPhoto = function() {
         let file = document.getElementById("employeeImg").files[0];
@@ -1653,7 +1277,89 @@
     }
 
     const getZipCode = function() {
-        //        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
+        $(".zip_code").val($(".city_id option:selected").attr("data-code"))
+    }
+
+
+
+    function generateKomponenGaji() {
+        const csrf = $(`[name="${csrfToken}"]`);
+        var divisiID = $('select[name="division_id"]').val();
+        var employeeID = $('input[name="id"]').val();
+
+        var formData = new FormData();
+        formData.append('divisi_id', divisiID);
+        formData.append('employee_id', employeeID);
+
+        $.ajax({
+            url: "<?= base_url("employee/getKomponenGaji"); ?>",
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+
+                if (response.status) {
+                    var table = $('#tabelKomponenGaji');
+                    table.find('tbody').empty();
+                    var komponenGaji = response.komponenGaji;
+
+                    if (komponenGaji.length == 0 && response.divisi?.divisi != null) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Ups, Divisi ' + response.divisi.divisi + ' komponen gajinya belum diatur :)',
+                            confirmButtonColor: '#4e73df',
+                        });
+
+                        // $('#division_id').val("");
+                    } else {
+                        $.each(komponenGaji, function(index, data) {
+                            var newRow = $('<tr class="text-dark font-weight-bold">');
+                            var indexNumber = index + 1;
+                            var inputText = $('<div class="form-floating">').append(
+                                $('<input>').attr({
+                                    'type': 'text',
+                                    'name': data.id,
+                                    'class': 'form-control',
+                                    'value': (response.employeeID !== "" ? formatRupiah(data.nominal) : '0'),
+                                    'onkeyup': "this.value = this.value.replace(/[^0-9]/g, '');",
+                                    'onChange': 'this.value = formatRupiah(this.value);'
+                                })
+                            ).append(
+                                $('<label>').attr('for', 'floatingInput').text('Masukkan nominal gaji')
+                            );
+
+                            var komponenGajiName = "<div style='font-weight: bold; color: " + (data.tipe == "PLUS" ? "green" : "red") + ";'>" + (data.tipe == "PLUS" ? "(+) " : "(-) ") + data.name + "</div>";
+
+                            newRow.append($('<td>').text(indexNumber));
+                            newRow.append($('<td>').append(komponenGajiName));
+                            newRow.append($('<td>').append(inputText));
+                            table.append(newRow);
+                        });
+                    }
+
+                }
+
+            },
+            onError: function(response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi kesalahan pada sistem',
+                    confirmButtonColor: '#4e73df',
+                });
+            }
+        });
+    }
+
+    function formatRupiah(angka) {
+        var reverse = angka.toString().split('').reverse().join('');
+        var ribuan = reverse.match(/\d{1,3}/g);
+        var formatted = ribuan.join('.').split('').reverse().join('');
+        return 'Rp. ' + formatted;
     }
 
     const changeSort = function(val) {

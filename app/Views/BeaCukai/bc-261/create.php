@@ -8,9 +8,9 @@
 </style>
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah Dokumen BC 2.3</h1>
+        <h1 class="title-name">Tambah Dokumen BC 2.6.1</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-23"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("bea-cukai-bc-261"); ?>">
                 Batal
             </a>
             <?php if(!empty($dataBC)){ 
@@ -83,41 +83,26 @@
                     Informasi Tempat
                 </label>
                 <div class="row mt-2">
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select kppbcBongkar" name="kppbcBongkar" id="kppbcBongkar" aria-label="Floating label select example">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select kantorPabean" name="kantorPabean" id="kantorPabean" aria-label="Floating label select example">
                                 <option value="">
-                                    - Kantor KPPBC Bongkar -
+                                    - Kantor Pabean -
                                 </option>
                                 <?php foreach ($kantorBeaCukai as $k) : ?>
-                                    <option <?= (!empty($dataBC)) ? ($dataBC->kppbc_bongkar === $k->id ? 'selected' : '') : '' ?> value="<?= $k->id ?>">
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->kantor_pabean === $k->id ? 'selected' : '') : '' ?> value="<?= $k->id ?>">
                                         - (<?= $k->kode ?>) <?= $k->kantor_name ?> -
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">KPPBC Bongkar</label>
+                            <label for="floatingInput">Kantor Pabean</label>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select kppbcPengawas" name="kppbcPengawas" id="kppbcPengawas" aria-label="Floating label select example">
-                                <option value="">
-                                    - Kantor KPPBC Pengawas -
-                                </option>
-                                <?php foreach ($kantorBeaCukai as $k) : ?>
-                                    <option <?= (!empty($dataBC)) ? ($dataBC->kppbc_pengawas === $k->id ? 'selected' : '') : '' ?> value="<?= $k->id ?>">
-                                        - (<?= $k->kode ?>) <?= $k->kantor_name ?> -
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">KPPBC Pengawas</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select kodeTujuanTpb" name="kodeTujuanTpb" id="kodeTujuanTpb" aria-label="Floating label select example">
                                 <option value="">
-                                    - PILIH TUJUAN -
+                                    - PILIH JENIS TPB -
                                 </option>
                                 <?php foreach ($jenisTPB as $d) : ?>
                                     <option <?= (!empty($dataBC)) ? ($dataBC->tujuan_tpb === $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -125,44 +110,12 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Pilih Tujuan</label>
+                            <label for="floatingInput">Jenis TPB</label>
                         </div>
                     </div>
                 </div>
                 <label class="form-label font-weight-bold lable-title mt-2">
-                    Supplier
-                </label>
-                <div class="row mt-2">
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select namaSupplier" name="namaSupplier" id="namaSupplier" aria-label="Floating label select example">
-                                <option value="">
-                                    - Pilih Nama Supplier -
-                                </option>
-                                <?php foreach ($supplier as $s) : ?>
-                                    <option <?= (!empty($dataBC)) ? ($dataBC->supplier_id === $s->id ? 'selected' : '') : '' ?> value="<?= $s->id ?>">
-                                        - (<?= $s->kode ?>) <?= $k->kantor_name ?> -
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Nama Supplier</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->country_name . ' (' . $dataBC->country_code . ')' : '' ?>" autocomplete="one-time-code" readonly name="negara" type="text" placeholder="Negara Supplier" class="form-control negara target input-picker">
-                            <label for="floatingInput">Negara</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3">
-                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> name="alamat" class="form-control alamat text-area-all" readonly><?= (!empty($dataBC)) ? $dataBC->supplier_address : '' ?></textarea>
-                            <label for="floatingInput">Alamat</label>
-                        </div>
-                    </div>
-                </div>
-                <label class="form-label font-weight-bold lable-title mt-2">
-                    Importir
+                    Pengusaha TPB
                 </label>
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
@@ -173,19 +126,25 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Importir" class="form-control target input-picker">
-                            <label for="floatingInput">Nama Importir</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Pengusaha" class="form-control target input-picker">
+                            <label for="floatingInput">Nama Pengusaha</label>
                         </div>
                     </div>
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->tpb_no : '' ?>" autocomplete="one-time-code" name="noIzinTPBImportir" type="text" placeholder="No Izin TPB" class="form-control target input-picker">
                             <label for="floatingInput">No Izin TPB</label>
                         </div>
                     </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tpb_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tpb_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalIzinTPB" type="text" placeholder="Tanggal Izin TPB" class="form-control target input-picker">
+                            <label for="floatingInput">Tanggal Izin TPB</label>
+                        </div>
+                    </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="APIImportir" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="API" class="form-control target input-picker">
                             <label for="floatingInput">API</label>
                         </div>
                     </div>
@@ -197,145 +156,25 @@
                     </div>
                 </div>
                 <label class="form-label font-weight-bold lable-title mt-2">
-                    Pemilik Barang
-                </label><br>
-                <label class="mt-2">
-                    Sama dengan data importir
+                    Penerima Barang
                 </label>
-                <div class="form-control border-0 custom-toggle-switch">
-                    <div class="form-check form-switch form-switch-lg">
-                        <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'checked' : '') : '' ?> class="form-check-input" type="checkbox" name="switchPemilikBarang" id="switchPemilikBarang">
-                        <label class="form-check-label" for="switchPemilikBarang"></label>
-                    </div>
-                </div>
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_npwp : '' ?>" autocomplete="one-time-code" name="npwpPemilikBarang" type="text" placeholder="Identitas (NPWP)" class="npwpPemilikBarang form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penerima_barang_npwp : '' ?>" autocomplete="one-time-code" name="npwpPenerimaBarang" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
                             <label for="floatingInput">Identitas (NPWP)</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_name : '' ?>" autocomplete="one-time-code" name="namaPemilikBarang" type="text" placeholder="Nama Importir" class="namaPemilikBarang form-control target input-picker">
-                            <label for="floatingInput">Nama Pemilik Barang</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penerima_barang_name : '' ?>" autocomplete="one-time-code" name="namaPenerimaBarang" type="text" placeholder="Nama Penerima Barang" class="form-control target input-picker">
+                            <label for="floatingInput">Nama Penerima Barang</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> name="alamatPemilikBarang" class="alamatPemilikBarang form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->pemilik_barang_address : '' ?></textarea>
+                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> name="alamatPenerimaBarang" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->penerima_barang_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
-                        </div>
-
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_api : '' ?>" autocomplete="one-time-code" name="APIPemilikBarang" type="text" placeholder="APIPemilikBarang" class="APIPemilikBarang form-control target input-picker">
-                            <label for="floatingInput">API</label>
-                        </div>
-                    </div>
-                </div>
-                <label class="form-label font-weight-bold lable-title mt-2">
-                    PPJK
-                </label>
-                <div class="row mt-2">
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_npwp : '' ?>" autocomplete="one-time-code" name="PpjkNpwp" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
-                            <label for="floatingInput">NPWP (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_name : '' ?>" autocomplete="one-time-code" name="PpjkNama" type="text" placeholder="Nama (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">Nama (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->ppjk_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->ppjk_date)) : "") : '' ?>" autocomplete="one-time-code" name="PpjkTanggal" type="text" placeholder="Tanggal PPJK (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">Tanggal PPJK (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->ppjk_no : '' ?>" autocomplete="one-time-code" name="PpjkNo" type="text" placeholder="No PPJK (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">No PPJK (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3">
-                            <textarea <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> name="PpjkAlamat" class="form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->ppjk_address : '' ?></textarea>
-                            <label for="floatingInput">Alamat (Opsional)</label>
-                        </div>
-                    </div>
-                </div>
-                <label class="form-label font-weight-bold lable-title mt-2">
-                    Pengangkutan
-                </label>
-                <div class="row mt-2">
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select caraPengangkutan" name="caraPengangkutan" id="caraPengangkutan" aria-label="Floating label select example">
-                                <option value="">
-                                    - Cara Pengangkutan -
-                                </option>
-                                <?php foreach ($pengangkutan as $p) : ?>
-                                    <option <?= (!empty($dataBC)) ? ($dataBC->pengangkutan === $p['id'] ? 'selected' : '') : '' ?> value="<?= $p['id'] ?>">
-                                        - <?= $p['value'] ?> -
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Cara Pengangkutan</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pengangkutan_sarana : '' ?>" autocomplete="one-time-code" name="namaSaranaPengangkut" type="text" placeholder="Nama Sarana Pengangkut" class="form-control target input-picker">
-                            <label for="floatingInput">Nama Sarana Pengangkut</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->voy_no : '' ?>" autocomplete="one-time-code" name="noVoyFlight" type="text" placeholder="No Voy/Flight" class="form-control target input-picker">
-                                    <label for="floatingInput">No Voy / Flight</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select pengangkutanNegara" id="pengangkutanNegara" name="pengangkutanNegara" aria-label="Floating label select example">
-                                        <option value="">
-                                            - Pilih Negara -
-                                        </option>
-                                        <?php foreach ($country as $c) : ?>
-                                            <option <?= (!empty($dataBC)) ? ($dataBC->pengangkutan_country === $c->code ? 'selected' : '') : '' ?> value="<?= $c->code ?>">
-                                                - <?= $c->country_name ?> -
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label for="floatingInput">Pilih Negara</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Kode Pelabuhan Muat" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Muat</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Kode Pelabuhan Transit" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Transit</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Kode Pelabuhan Bongkar" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Bongkar</label>
                         </div>
                     </div>
                 </div>
@@ -345,83 +184,32 @@
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select noInvoice" id="noInvoice" name="noInvoice" aria-label="Floating label select example">
-                                <option value="" data-date="">
-                                    - Pilih Nomor Invoice -
-                                </option>
-                                <?php foreach ($dokumen as $d) : ?>
-                                    <option <?= (!empty($dataBC)) ? ($dataBC->invoice_id === $d->id ? 'selected' : '') : '' ?> value="<?= $d->id ?>" data-date="<?= date("d/m/Y", strtotime($d->createdAt)) ?>">
-                                        - <?= $d->no_faktur ?> -
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">No Invoice</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_packing_list : '' ?>" autocomplete="one-time-code" name="noPackingList" type="text" placeholder="No Packing List" class="form-control target input-picker">
+                            <label for="floatingInput">No Packing List</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_invoice !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_invoice)) : "") : '' ?>" readonly autocomplete="one-time-code" name="tanggalInvoice" type="text" placeholder="Tanggal Invoice" class="tanggalInvoice form-control target input-picker">
-                            <label for="floatingInput">Tanggal Invoice</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->tanggal_packing_list !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->tanggal_packing_list)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalPackingList" type="text" placeholder="Tanggal Packing List" class="form-control target input-picker">
+                            <label for="floatingInput">Tanggal Packing List</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_no : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="Nomor Fasilitas Import (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">Nomor Fasilitas Import (Opsional)</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_no : '' ?>" autocomplete="one-time-code" name="noFasilitasImport" type="text" placeholder="No Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <label for="floatingInput">No Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->fasilitas_import_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->fasilitas_import_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalFasilitasImport" type="text" placeholder="Tanggal Fasiitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Tanggal Fasilitas Import (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_code : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->fasilitas_import_code : '' ?>" autocomplete="one-time-code" name="kodeFasilitasImport" type="text" placeholder="Kode Fasilitas Import (Opsional)" class="form-control target input-picker">
                             <label for="floatingInput">Kode Fasilitas Import (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->lc_no : '' ?>" autocomplete="one-time-code" name="noLc" type="text" placeholder="No LC (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">No LC (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->lc_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->lc_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalLc" type="text" placeholder="Tanggal LC (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">Tanggal LC (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bl_no : '' ?>" autocomplete="one-time-code" name="noBl" type="text" placeholder="No B/L (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">No B/L (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bl_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bl_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBl" type="text" placeholder="Tanggal B/L (Opsional)" class="form-control target input-picker">
-                            <label for="floatingInput">Tanggal B/L (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_no : '' ?>" autocomplete="one-time-code" name="noBc" type="text" placeholder="No B.C 1.1" class="form-control target input-picker">
-                            <label for="floatingInput">No B.C 1.1</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? ($dataBC->bc_11_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataBC->bc_11_date)) : "") : '' ?>" autocomplete="one-time-code" name="tanggalBc" type="text" placeholder="Tanggal B.C 1.1" class="form-control target input-picker">
-                            <label for="floatingInput">Tanggal B.C 1.1</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->bc_11_zip : '' ?>" autocomplete="one-time-code" name="kodePos" type="text" placeholder="Kode Pos" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pos</label>
                         </div>
                     </div>
                 </div>
@@ -496,22 +284,11 @@
                 </div>
             </div>
             <label class="form-label font-weight-bold lable-title mt-2">
-                Penimbunan
+                Harga
             </label>
             <form class="create-form form-add-second" role="form" method="POST" enctype="multipart/form-data">
                 <div class="row mt-2">
-                    <div class="col-sm-12">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->penimbunan : '' ?>" autocomplete="one-time-code" name="tempatPenimbunan" type="text" placeholder="Tempat Penimbunan" class="tempatPenimbunan form-control target input-picker">
-                            <label for="floatingInput">Tempat Penimbunan</label>
-                        </div>
-                    </div>
-                </div>
-                <label class="form-label font-weight-bold lable-title mt-2">
-                    Harga
-                </label>
-                <div class="row mt-2">
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select valuta" id="valuta" name="valuta" aria-label="Floating label select example">
                                 <option value="">
@@ -526,44 +303,46 @@
                             <label for="floatingInput">Valuta</label>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->ndpbm, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="npdpbm" type="number" placeholder="NDPBM" class="npdpbm form-control target input-picker">
                             <label for="floatingInput">NDPBM</label>
                         </div>
                     </div>
-                    <div class="col-sm-2">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->fob, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="fob" type="number" placeholder="FOB" class="fob form-control target input-picker">
-                            <label for="floatingInput">FOB</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->freight, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="freight" type="number" placeholder="Freight" class="freight form-control target input-picker">
-                            <label for="floatingInput">Freight</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->asuransi_type, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="tipeAsuransi" type="number" placeholder="Asuransi Luar Negeri / Dalam Negeri" class="tipeAsuransi form-control target input-picker">
-                            <label for="floatingInput">Asuransi Luar Negeri / Dalam Negeri</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_value, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCif" type="number" placeholder="Nilai CIF" class="nilaiCif form-control target input-picker">
                             <label for="floatingInput">Nilai CIF</label>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_price, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCifRupiah" type="number" placeholder="Nilai CIF Rupiah" class="nilaiCifRupiah form-control target input-picker">
-                            <label for="floatingInput">Nilai CIF Rupiah</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? formatter($dataBC->cif_price, "STR_TO_FLOAT") : '' ?>" autocomplete="one-time-code" name="nilaiCifRupiah" type="number" placeholder="CIF (Rp)" class="nilaiCifRupiah form-control target input-picker">
+                            <label for="floatingInput">CIF (Rp)</label>
                         </div>
                     </div>
                 </div>
             </form>
+            <label class="form-label font-weight-bold lable-title mt-2">
+                Pengangkutan
+            </label>
+            <div class="row mt-2">
+                <div class="col-sm-12 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select caraPengangkutan" name="caraPengangkutan" id="caraPengangkutan" aria-label="Floating label select example">
+                            <option value="">
+                                - Jenis Sarana Pengangkut -
+                            </option>
+                            <?php foreach ($pengangkutan as $p) : ?>
+                                <option <?= (!empty($dataBC)) ? ($dataBC->pengangkutan === $p['id'] ? 'selected' : '') : '' ?> value="<?= $p['id'] ?>">
+                                    - <?= $p['value'] ?> -
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Jenis Sarana Pengangkut</label>
+                    </div>
+                </div>
+            </div>
             <div class="col-subtitle-modal">
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -702,10 +481,10 @@
                     </table>
                 </div>
             </div>
-            <label class="form-label font-weight-bold lable-title mt-2">
-                Barang
-            </label>
             <form class="create-form form-add-third" role="form" method="POST" enctype="multipart/form-data">
+                <label class="form-label font-weight-bold lable-title mt-2">
+                    Barang
+                </label>
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -726,31 +505,111 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mt-2">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="text-align: center;">No.</th>
+                                    <th style="text-align: center;">Jenis Pungutan</th>
+                                    <th style="text-align: center;">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-pungutan-table" id="body-pungutan-table" style="cursor: pointer;">
+                            
+                            </tbody>
+                            <tfoot class="foot-pungutan-table" id="foot-pungutan-table">
+                                <tr>
+                                    <td></td>
+                                    <td style="text-align: center;">Total</td>
+                                    <td style="text-align: center;">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
             </form>
-            <div class="row mt-2">
+            <div class="col-subtitle-modal">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">List Jaminan</label>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-show-jaminan btn-add btn-block float-right" data-btn="jaminan-modal">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No.</th>
-                                <th style="text-align: center;">Jenis Pungutan</th>
-                                <th style="text-align: center;">Ditangguhkan (Rp)</th>
-                                <th style="text-align: center;">Dibebaskan (Rp)</th>
-                                <th style="text-align: center;">Tidak Dipungut (Rp)</th>
+                                <th style="text-align: center;">Jenis</th>
+                                <th style="text-align: center;">Nomor</th>
+                                <th style="text-align: center;">Tanggal</th>
+                                <th style="text-align: center;">Nilai</th>
+                                <th style="text-align: center;">Jatuh Tempo</th>
+                                <th style="text-align: center;">Penjamin</th>
+                                <th style="text-align: center;">Nomor BPJ</th>
+                                <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-pungutan-table" id="body-pungutan-table" style="cursor: pointer;">
-                        
+                        <tbody class="body-jaminan-table" id="body-jaminan-table" style="cursor: pointer;">
+                        <?php if(!empty($dataBC)){ 
+                                $list = json_decode($dataBC->data_jaminan);
+                                $row_jaminan = 0; 
+                                foreach($list as $item){    
+                                    $row_jaminan = $row_jaminan + 1;
+                                    if($dataBC->status_posting === "Belum Posting"){
+                                ?>
+                                        <tr>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $row_jaminan; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $item->nama; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $item->nomor; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $item->tanggal; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $item->nilai; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $item->jatuh_tempo; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $item->penjamin; ?>
+                                        </td>
+                                        <td style="text-align: center;" class="edit-table-jaminan" data-jenis="<?= $item->jenis; ?>" data-nomor="<?= $item->nomor; ?>" data-tanggal="<?= $item->tanggal; ?>" data-nilai="<?= $item->nilai; ?>" data-jatuh_tempo="<?= $item->jatuh_tempo; ?>" data-penjamin="<?= $item->penjamin; ?>" data-nomor_bpj="<?= $item->nomor_bpj; ?>" data-keterangan="<?= $item->keterangan; ?>" data-row="<?= $row_jaminan; ?>">
+                                            <?= $item->nomor_bpj; ?>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <button onclick='deleteRowJaminan(<?= $row_jaminan; ?>)'>X</button>
+                                        </td>
+                                        </tr>
+                                <?php } else {?>
+                                        <tr>
+                                            <td style="text-align: center;"><?= $row_jaminan; ?></td>
+                                            <td style="text-align: center;"><?= $item->nama; ?></td>
+                                            <td style="text-align: center;"><?= $item->nomor; ?></td>
+                                            <td style="text-align: center;"><?= $item->tanggal; ?></td>
+                                            <td style="text-align: center;"><?= $item->nilai; ?></td>
+                                            <td style="text-align: center;"><?= $item->jatuh_tempo; ?></td>
+                                            <td style="text-align: center;"><?= $item->penjamin; ?></td>
+                                            <td style="text-align: center;"><?= $item->nomor_bpj; ?></td>
+                                            <td></td>
+                                        </tr>
+                                <?php }
+                                } 
+                            } ?>
                         </tbody>
-                        <tfoot class="foot-pungutan-table" id="foot-pungutan-table">
-                            <tr>
-                                <td></td>
-                                <td style="text-align: center;">Total</td>
-                                <td style="text-align: center;">0</td>
-                                <td style="text-align: center;">0</td>
-                                <td style="text-align: center;">0</td>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -790,9 +649,9 @@
                 </div>
             </form>
         </div>
-
     </div>
 </section>
+
 
 <div class="modal dokumenModal" tabindex="1">
     <div class="modal-dialog" style="min-width: 900px;">
@@ -953,16 +812,99 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal jaminanModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label class="title-jaminan-name"></label> Jaminan</h5>
+            </div>
+            <div class="modal-body">
+                <form class="jaminanForm" role="form" method="POST" enctype="multipart/form-data">
+                    <input autocomplete="one-time-code" type="hidden" class="idJaminan" name="idJaminan" />
+                    <div class="row">
+                    <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select jenisJaminan" name="jenisJaminan" id="jenisJaminan" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Jenis</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control nomorJaminan" name="nomorJaminan" placeholder="Nomor">
+                                <label for="floatingInput">Nomor</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control tanggalJaminan" name="tanggalJaminan" placeholder="Tanggal">
+                                <label for="floatingInput">Tanggal</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="number" class="form-control nilaiJaminan" name="nilaiJaminan" placeholder="Nilai">
+                                <label for="floatingInput">Nilai</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control jatuhTempoJaminan" name="jatuhTempoJaminan" placeholder="Jatuh Tempo">
+                                <label for="floatingInput">Jatuh Tempo</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control penjaminJaminan" name="penjaminJaminan" placeholder="Penjamin">
+                                <label for="floatingInput">Penjamin</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control nomorBPJJaminan" name="nomorBPJJaminan" placeholder="Nomor BPJ">
+                                <label for="floatingInput">Nomor BPJ</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keteranganJaminan" name="keteranganJaminan" placeholder="Keterangan (Opsional)">
+                                <label for="floatingInput">Keterangan (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-jaminan btn-discard mr-3">Batal</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-jaminan">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-jaminan delete-form">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let list_dokumen = [];
     let list_kontainer = [];
     let list_kemasan = [];
+    let list_jaminan = [];
     let list_pungutan = [];
 
     let row_dokumen = 0;
     let row_kontainer = 0;
     let row_kemasan = 0;
+    let row_jaminan = 0;
 
     <?php if(!empty($dataBC)){
         $list_dokumen = json_decode($dataBC->data_dokumen);
@@ -995,7 +937,7 @@
     <?php } 
     } ?>
 
-<?php if(!empty($dataBC)){
+    <?php if(!empty($dataBC)){
         $list_kemasan = json_decode($dataBC->data_kemasan);
         foreach($list_kemasan as $item){
     ?> 
@@ -1011,18 +953,32 @@
     <?php } 
     } ?>
 
+    <?php if(!empty($dataBC)){
+        $list_jaminan = json_decode($dataBC->data_jaminan);
+        foreach($list_jaminan as $item){
+    ?> 
+            row_jaminan = row_jaminan + 1;
+            list_jaminan.push({
+                "row": row_jaminan,
+                "jenis": '<?= $item->jenis ?>',
+                "nama": '<?= $item->nama ?>',
+                "nomor": '<?= $item->nomor ?>',
+                "tanggal": '<?= $item->tanggal ?>',
+                "nilai": '<?= $item->nilai ?>',
+                "jatuh_tempo": '<?= $item->jatuh_tempo ?>',
+                "penjamin": '<?= $item->penjamin ?>',
+                "nomor_bpj": '<?= $item->nomor_bpj ?>',
+                "keterangan": '<?= $item->keterangan ?>',
+            });
+    <?php } 
+    } ?>
+
     var validator = $(".form-add-bc").validate({
         rules: {
-            kppbcBongkar: {
-                required: true
-            },
-            kppbcPengawas: {
+            kantorPabean: {
                 required: true
             },
             kodeTujuanTpb: {
-                required: true
-            },
-            namaSupplier: {
                 required: true
             },
             npwpImportir: {
@@ -1034,67 +990,49 @@
             noIzinTPBImportir: {
                 required: true
             },
+            tanggalIzinTPB: {
+                required: true
+            },
             APIImportir: {
                 required: true
             },
             alamatImportir: {
                 required: true
             },
-            caraPengangkutan: {
+            npwpPenerimaBarang : {
                 required: true
             },
-            namaSaranaPengangkut: {
+            namaPenerimaBarang : {
                 required: true
             },
-            noVoyFlight: {
+            alamatPenerimaBarang : {
                 required: true
             },
-            pengangkutanNegara: {
+            noPackingList : {
                 required: true
             },
-            pelabuhanMuat: {
-                required: true
-            },
-            pelabuhanTransit: {
-                required: true
-            },
-            pelabuhanBongkar: {
-                required: true
-            },
-            noInvoice: {
-                required: true
-            },
-            noBc: {
-                required: true
-            },
-            tanggalBc: {
-                required: true
-            },
-            kodePos: {
+            tanggalPackingList : {
                 required: true
             }
         },
         messages: {
-            kppbcBongkar: {
-                required: "Kantor Bongkar wajib diisi"
-            },
-            kppbcPengawas: {
-                required: "Kantor Pengawas wajib diisi"
+            kantorPabean: {
+                required: "Kantor Pabean wajib diisi"
             },
             kodeTujuanTpb: {
                 required: "Tujuan wajib diisi"
-            },
-            namaSupplier: {
-                required: "Supplier wajib diisi"
             },
             npwpImportir: {
                 required: "Identitas (NPWP) wajib diisi"
             },
             namaImportir: {
-                required: "Nama Importir wajib diisi"
+                required: "Nama Pengusaha wajib diisi"
             },
             noIzinTPBImportir: {
                 required: "No Izin TPB wajib diisi"
+            },
+            tanggalIzinTPB: {
+                required: "Tanggal Izin TPB wajib diisi"
             },
             APIImportir: {
                 required: "API wajib diisi"
@@ -1102,50 +1040,20 @@
             alamatImportir: {
                 required: "Alamat wajib diisi"
             },
-            caraPengangkutan: {
-                required: "Cara Pengangkutan wajib diisi"
-            },
-            namaSaranaPengangkut: {
-                required: "Nama Sarana Pengangkut wajib diisi"
-            },
-            noVoyFlight: {
-                required: "No Voy / Flight wajib diisi"
-            },
-            pengangkutanNegara: {
-                required: "Negara wajib diisi"
-            },
-            pelabuhanMuat: {
-                required: "Kode Pelabuhan Muat wajib diisi"
-            },
-            pelabuhanTransit: {
-                required: "Kode Pelabuhan Transit wajib diisi"
-            },
-            pelabuhanBongkar: {
-                required: "Kode Pelabuhan Bongkar wajib diisi"
-            },
-            noInvoice: {
-                required: "Nomor Invoice wajib diisi"
-            },
-            noBc: {
-                required: "No B.C 1.1 wajib diisi"
-            },
-            tanggalBc: {
-                required: "Tanggal B.C 1.1 wajib diisi"
-            },
-            kodePos: {
-                required: "Kode Pos wajib diisi"
-            },
-            npwpPemilikBarang: {
+            npwpPenerimaBarang : {
                 required: "Identitas (NPWP) wajib diisi"
             },
-            namaPemilikBarang: {
-                required: "Nama Pemilik Barang wajib diisi"
+            namaPenerimaBarang : {
+                required: "Nama Penerima Barang wajib diisi"
             },
-            alamatPemilikBarang: {
+            alamatPenerimaBarang : {
                 required: "Alamat wajib diisi"
             },
-            APIPemilikBarang: {
-                required: "API wajib diisi"
+            noPackingList : {
+                required: "No Packing wajib diisi"
+            },
+            tanggalPackingList : {
+                required: "Tanggal Packing wajib diisi"
             }
         },
         errorElement: 'span',
@@ -1170,54 +1078,12 @@
         },
     });
 
-    <?php if(!empty($dataBC)){
-        if($dataBC->pemilik_barang === 0){
-    ?>
-            $('.npwpPemilikBarang').rules('add', {
-                required: true
-            });
-            $('.namaPemilikBarang').rules('add', {
-                required: true
-            });
-            $('.alamatPemilikBarang').rules('add', {
-                required: true
-            });
-            $('.APIPemilikBarang').rules('add', {
-                required: true
-            });
-    <?php }} else { ?>
-        $('.npwpPemilikBarang').rules('add', {
-            required: true
-        });
-        $('.namaPemilikBarang').rules('add', {
-            required: true
-        });
-        $('.alamatPemilikBarang').rules('add', {
-            required: true
-        });
-        $('.APIPemilikBarang').rules('add', {
-            required: true
-        });
-    <?php } ?>
-
     var validator_second = $(".form-add-second").validate({
         rules: {
-            tempatPenimbunan: {
-                required: true
-            },
             valuta: {
                 required: true
             },
             npdpbm: {
-                required: true
-            },
-            fob: {
-                required: true
-            },
-            freight: {
-                required: true
-            },
-            tipeAsuransi: {
                 required: true
             },
             nilaiCif: {
@@ -1225,32 +1091,26 @@
             },
             nilaiCifRupiah: {
                 required: true
+            },
+            caraPengangkutan: {
+                required: true
             }
         },
         messages: {
-            tempatPenimbunan: {
-                required: "Tempat Penimbunan wajib diisi"
-            },
             valuta: {
                 required: "Valuta wajib diisi"
             },
             npdpbm: {
                 required: "NPDPBM wajib diisi"
             },
-            fob: {
-                required: "FOB wajib diisi"
-            },
-            freight: {
-                required: "Freight wajib diisi"
-            },
-            tipeAsuransi: {
-                required: "Asuransi Luar Negeri / Dalam Negeri wajib diisi"
-            },
             nilaiCif: {
                 required: "Nilai CIF wajib diisi"
             },
             nilaiCifRupiah: {
-                required: "Nilai CIF Rupiah wajib diisi"
+                required: "CIF (Rp) wajib diisi"
+            },
+            caraPengangkutan: {
+                required: "Jenis Sarana Pengangkut wajib diisi"
             }
         },
         errorElement: 'span',
@@ -1518,23 +1378,82 @@
         },
     });
 
-    $('#kppbcBongkar').select2({
-        placeholder: "Pilih Kantor Bongkar",
-        theme: "bootstrap-5"
+    var validator_jaminan = $(".jaminanForm").validate({
+        rules: {
+            jenisJaminan: {
+                required: true
+            },
+            nomorJaminan: {
+                required: true
+            },
+            tanggalJaminan: {
+                required: true
+            },
+            nilaiJaminan: {
+                required: true
+            },
+            jatuhTempoJaminan: {
+                required: true
+            },
+            penjaminJaminan: {
+                required: true
+            },
+            nomorBPJJaminan: {
+                required: true
+            }
+        },
+        messages: {
+            jenisJaminan: {
+                required: "Jenis wajib diisi"
+            },
+            nomorJaminan: {
+                required: "Nomor wajib diisi"
+            },
+            tanggalJaminan: {
+                required: "Tanggal wajib diisi"
+            },
+            nilaiJaminan: {
+                required: "Nilai wajib diisi"
+            },
+            jatuhTempoJaminan: {
+                required: "Jatuh Tempo wajib diisi"
+            },
+            penjaminJaminan: {
+                required: "Penjamin wajib diisi"
+            },
+            nomorBPJJaminan: {
+                required: "Nomor BPJ wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
     });
 
-    $('#kppbcPengawas').select2({
-        placeholder: "Pilih Kantor Pengawas",
+    $('#kantorPabean').select2({
+        placeholder: "Pilih Kantor Pabean",
         theme: "bootstrap-5"
     });
 
     $('#kodeTujuanTpb').select2({
-        placeholder: "Pilih Tujuan",
-        theme: "bootstrap-5"
-    });
-
-    $('#namaSupplier').select2({
-        placeholder: "Pilih Supplier",
+        placeholder: "Pilih Jenis TPB",
         theme: "bootstrap-5"
     });
 
@@ -1543,13 +1462,7 @@
         theme: "bootstrap-5"
     });
 
-    $("select[name='pengangkutanNegara']").select2({
-        placeholder: "Pilih Negara",
-        theme: "bootstrap-5"
-    });
-
-
-    $("input[name='PpjkTanggal']").datepicker({
+    $("input[name='tanggalIzinTPB']").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -1563,28 +1476,28 @@
         autoclose: true
     });
 
-    $("input[name='tanggalLc']").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
-
-    $("input[name='tanggalBl']").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
-
-    $("input[name='tanggalBc']").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
-
     $("input[name='tanggal']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("input[name='tanggalPackingList']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("input[name='tanggalJaminan']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("input[name='tanggalFasilitasImport']").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -1598,15 +1511,23 @@
         autoclose: true
     });
 
-    $("select[name='noInvoice']").select2({
-        placeholder: "Pilih Nomor Invoice",
-        theme: "bootstrap-5"
+    $("input[name='jatuhTempoJaminan']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
     });
 
     $("select[name='valuta']").select2({
         placeholder: "Pilih Valuta",
         theme: "bootstrap-5"
     });
+
+    $("select[name='jenisJaminan']").select2({
+        placeholder: "Pilih Jenis Jaminan",
+        theme: "bootstrap-5",
+        dropdownParent: $(".jaminanModal .modal-content")
+    })
 
     $('.form-select')
         .parent('div')
@@ -1627,43 +1548,6 @@
         .parent('div')
         .find('label')
         .css('z-index', '1');
-
-    // SwitchBox
-    $('#switchPemilikBarang').click(function() {
-        var statusChecked = $(this).prop('checked');
-        var npwpImportir = $("input[name='npwpImportir']").val();
-        var namaImportir = $("input[name='namaImportir']").val();
-        var APIImportir = $("input[name='APIImportir']").val();
-        var alamatImportir = $("textarea[name='alamatImportir']").val();
-
-        if (statusChecked) {
-            $("input[name='npwpPemilikBarang']").attr('readonly', true).val(npwpImportir);
-            $("input[name='namaPemilikBarang']").attr('readonly', true).val(namaImportir);
-            $("textarea[name='alamatPemilikBarang']").attr('readonly', true).val(alamatImportir);
-            $("input[name='APIPemilikBarang']").attr('readonly', true).val(APIImportir);
-            $('.npwpPemilikBarang').rules('remove', 'required');
-            $('.namaPemilikBarang').rules('remove', 'required');
-            $('.alamatPemilikBarang').rules('remove', 'required');
-            $('.APIPemilikBarang').rules('remove', 'required');
-        } else {
-            $("input[name='npwpPemilikBarang']").attr('readonly', false).val(null);
-            $("input[name='namaPemilikBarang']").attr('readonly', false).val(null);
-            $("textarea[name='alamatPemilikBarang']").attr('readonly', false).val(null);
-            $("input[name='APIPemilikBarang']").attr('readonly', false).val(null);
-            $('.npwpPemilikBarang').rules('add', {
-                required: true
-            });
-            $('.namaPemilikBarang').rules('add', {
-                required: true
-            });
-            $('.alamatPemilikBarang').rules('add', {
-                required: true
-            });
-            $('.APIPemilikBarang').rules('add', {
-                required: true
-            });
-        }
-    });
 
     // open modal
     $('.btn-show-dokumen').click(function() {
@@ -1703,6 +1587,37 @@
 
     $('.btn-hide-kemasan').click(function() {
         $(".kemasanModal").modal("hide");
+    })
+
+    $('.btn-show-jaminan').click(function() {
+        $(".jaminanForm")[0].reset();
+        validator_jaminan.resetForm();
+        validator_jaminan.reset();
+        $(".title-jaminan-name").text("Create");
+        $(".delete-jaminan").css("display", "none");
+
+        $.ajax({
+            url: `<?= base_url("metadata/dropdown"); ?>`,
+            method: "GET",
+            data: {
+                name: 'Jenis Jaminan'
+            },
+            dataType: "json",
+            success: function(result) {
+                $(".jenisJaminan").empty()
+                $(".jenisJaminan").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $(".jenisJaminan").append(`<option value="${item.id}">${item.value}</option>`)
+                })
+
+                $(".jenisJaminan").val('').change();
+                $(".jaminanModal").modal("show");
+            }
+        })    
+    })
+
+    $('.btn-hide-jaminan').click(function() {
+        $(".jaminanModal").modal("hide");
     })
 
     // edit
@@ -1776,6 +1691,52 @@
         $(".kemasanModal").modal('show');
     })
 
+    $(document).on('click', '.edit-table-jaminan', function(evt) {
+        $(".title-jaminan-name").text("Update");
+        $(".delete-jaminan").css('display', '');
+        $(".jaminanForm")[0].reset();
+        let jenis = $(this).data('jenis');
+        let nomor = $(this).data('nomor');
+        let tanggal = $(this).data('tanggal');
+        let nilai = $(this).data('nilai');
+        let jatuh_tempo = $(this).data('jatuh_tempo');
+        let penjamin = $(this).data('penjamin');
+        let nomor_bpj = $(this).data('nomor_bpj');
+        let keterangan = $(this).data('keterangan');
+        let rowid = $(this).data('row');
+
+        validator_jaminan.resetForm();
+        validator_jaminan.reset();
+
+        $(".idJaminan").val(rowid);
+        $(".nomorJaminan").val(nomor);
+        $(".tanggalJaminan").val(tanggal);
+        $(".nilaiJaminan").val(nilai);
+        $(".jatuhTempoJaminan").val(jatuh_tempo);
+        $(".penjaminJaminan").val(penjamin);
+        $(".nomorBPJJaminan").val(nomor_bpj);
+        $(".keteranganJaminan").val(keterangan);
+
+        $.ajax({
+            url: `<?= base_url("metadata/dropdown"); ?>`,
+            method: "GET",
+            data: {
+                name: 'Jenis Jaminan'
+            },
+            dataType: "json",
+            success: function(result) {
+                $(".jenisJaminan").empty()
+                $(".jenisJaminan").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $(".jenisJaminan").append(`<option value="${item.id}">${item.value}</option>`)
+                })
+
+                $(".jenisJaminan").val(jenis).change();
+                $(".jaminanModal").modal("show");
+            }
+        })    
+    })
+
     // submit
     $('.btn-submit-parent').click(function() {
         if(list_dokumen.length === 0)
@@ -1804,14 +1765,11 @@
                             const csrf = $(`[name="${csrfToken}"]`);
                             setLoading()
                             let data = new FormData(document.querySelector(".form-add-bc"));
-                            data.append("tempatPenimbunan", $(".tempatPenimbunan").val());
                             data.append("valuta", $(".valuta").val());
                             data.append("npdpbm", $(".npdpbm").val());
-                            data.append("fob", $(".fob").val());
-                            data.append("freight", $(".freight").val());
-                            data.append("tipeAsuransi", $(".tipeAsuransi").val());
                             data.append("nilaiCif", $(".nilaiCif").val());
                             data.append("nilaiCifRupiah", $(".nilaiCifRupiah").val());
+                            data.append("caraPengangkutan", $(".caraPengangkutan option:selected").val());
                             data.append("bruto", $(".bruto").val());
                             data.append("netto", $(".netto").val());
                             data.append("jumlahBarang", $(".jumlahBarang").val());
@@ -1822,12 +1780,13 @@
                             data.append("data_dokumen", JSON.stringify(list_dokumen));
                             data.append("data_kontainer", JSON.stringify(list_kontainer));
                             data.append("data_kemasan", JSON.stringify(list_kemasan));
+                            data.append("data_jaminan", JSON.stringify(list_jaminan));
 
                             // update
                             if($(".id").val())
                             {
                                 $.ajax({
-                                    url: "<?= base_url("bea-cukai-bc-23/update"); ?>",
+                                    url: "<?= base_url("bea-cukai-bc-261/update"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1846,7 +1805,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
+                                                    window.location.href = "<?= base_url("bea-cukai-bc-261"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -1872,7 +1831,7 @@
                             else
                             {
                                 $.ajax({
-                                    url: "<?= base_url("bea-cukai-bc-23/save"); ?>",
+                                    url: "<?= base_url("bea-cukai-bc-261/save"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1891,7 +1850,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
+                                                    window.location.href = "<?= base_url("bea-cukai-bc-261"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -2331,47 +2290,180 @@
         }
     })
 
-    // get invoice date by selected no invoice
-    $(".noInvoice").change(function() {
-        if($(".noInvoice option:selected").val())
-        {
-            let date =  $(".noInvoice option:selected").attr("data-date");
-            $(".tanggalInvoice").val(date);
-        }
-        else
-        {
-            $(".tanggalInvoice").val('');
-        }
-    })
+    $('.btn-submit-jaminan').click(function() {
+        let row_detail = $(".idJaminan").val() ? Number($(".idJaminan").val()) : 0;
+        let jenis = $(".jenisJaminan option:selected").val();
+        let nama = $(".jenisJaminan option:selected").text();
+        let nomor = $(".nomorJaminan").val();
+        let tanggal = $(".tanggalJaminan").val();
+        let nilai = $(".nilaiJaminan").val();
+        let jatuh_tempo = $(".jatuhTempoJaminan").val();
+        let penjamin = $(".penjaminJaminan").val();
+        let nomor_bpj = $(".nomorBPJJaminan").val();
+        let keterangan = $(".keteranganJaminan").val();
 
-    // get country and address supplier
-    $(".namaSupplier").change(function() {
-        if($(".namaSupplier option:selected").val())
-        {
-            $.ajax({
-                url: `<?= base_url("supplier/ajax"); ?>`,
-                method: "GET",
-                data: {
-                    id: $(".namaSupplier option:selected").val()
-                },
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".negara").val(res?.data?.country_name + " (" + res?.data?.country_code + ")");
-                        $(".alamat").val(res?.data?.address);
+        if ($(".jaminanForm").valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // update detail
+                    if(row_detail)
+                    {
+                        let new_list_items = [];
+                        let tag_html = "";
+                        row_jaminan = 0;
+
+                        list_jaminan.map(item => {
+                            row_jaminan = row_jaminan + 1;
+                            if (item.row == row_detail) {
+                                tag_html += `<tr>`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += row_jaminan;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += nama;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += nomor;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += tanggal;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += nilai;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += jatuh_tempo;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += penjamin;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += nomor_bpj;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;">`;
+                                tag_html += `<button onclick='deleteRowJaminan(${row_jaminan})'>X</button>`;
+                                tag_html += "</td>";
+                                tag_html += "</tr>";
+
+                                new_list_items.push({
+                                    "row": row_jaminan,
+                                    "jenis": jenis,
+                                    "nama": nama,
+                                    "nomor": nomor,
+                                    "tanggal": tanggal,
+                                    "nilai": nilai,
+                                    "jatuh_tempo": jatuh_tempo,
+                                    "penjamin": penjamin,
+                                    "nomor_bpj": nomor_bpj,
+                                    "keterangan": keterangan
+                                });
+                            }
+                            else
+                            {
+                                tag_html += `<tr>`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.row_jaminan;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.nama;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.nomor;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.tanggal;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.nilai;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.jatuh_tempo;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.penjamin;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                                tag_html += item.nomor_bpj;
+                                tag_html += "</td>";
+                                tag_html += `<td style="text-align: center;">`;
+                                tag_html += `<button onclick='deleteRowJaminan(${row_jaminan})'>X</button>`;
+                                tag_html += "</td>";
+                                tag_html += "</tr>";
+
+                                new_list_items.push(item);
+                            }
+                        })
+
+                        list_jaminan = new_list_items;
+                        $(".body-jaminan-table").empty();
+                        $(".body-jaminan-table").append(tag_html);
+
+                        $(".jaminanModal").modal("hide");
                     }
+                    // create detail
                     else
                     {
-                        $(".negara").val('');
-                        $(".alamat").val('');
+                        row_jaminan = row_jaminan + 1;
+
+                        list_jaminan.push({
+                            "row": row_jaminan,
+                            "jenis": jenis,
+                            "nama": nama,
+                            "nomor": nomor,
+                            "tanggal": tanggal,
+                            "nilai": nilai,
+                            "jatuh_tempo": jatuh_tempo,
+                            "penjamin": penjamin,
+                            "nomor_bpj": nomor_bpj,
+                            "keterangan": keterangan
+                        });
+
+                        let tag_html = "";
+                        
+                        tag_html += `<tr>`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += row_jaminan;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += nama;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += nomor;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += tanggal;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += nilai;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += jatuh_tempo;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += penjamin;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${jenis}" data-nomor="${nomor}" data-tanggal="${tanggal}" data-nilai="${nilai}" data-jatuh_tempo="${jatuh_tempo}" data-penjamin="${penjamin}" data-nomor_bpj="${nomor_bpj}" data-keterangan="${keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += nomor_bpj;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;">`;
+                        tag_html += `<button onclick='deleteRowJaminan(${row_jaminan})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+                        $(".body-jaminan-table").append(tag_html);
+
+                        $(".jaminanModal").modal("hide");
                     }
                 }
             })
-        }
-        else
-        {
-            $(".negara").val('');
-            $(".alamat").val('');
         }
     })
 
@@ -2556,6 +2648,81 @@
                 list_kemasan = new_list_items;
 
                 $(".body-kemasan-table").append(tag_html);
+            }
+        })
+    }
+
+    const deleteRowJaminan = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(id)
+                let new_list_items = []
+                let tag_html = "";
+
+                $(".body-jaminan-table").empty()
+
+                row_jaminan = 0;
+
+                list_jaminan.map(item => {
+                    row_jaminan = row_jaminan + 1;
+                    if (item.row != id) {
+                        tag_html += `<tr>`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.row_jaminan;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nama;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nomor;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.tanggal;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nilai;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.jatuh_tempo;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.penjamin;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nomor_bpj;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;">`;
+                        tag_html += `<button onclick='deleteRowJaminan(${row_jaminan})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_list_items.push({
+                            "row": row_jaminan,
+                            "jenis": jenis,
+                            "nama": nama,
+                            "nomor": nomor,
+                            "tanggal": tanggal,
+                            "nilai": nilai,
+                            "jatuh_tempo": jatuh_tempo,
+                            "penjamin": penjamin,
+                            "nomor_bpj": nomor_bpj,
+                            "keterangan": keterangan
+                        });
+                    }
+                })
+
+                list_jaminan = new_list_items;
+
+                $(".body-jaminan-table").append(tag_html);
             }
         })
     }
@@ -2751,6 +2918,83 @@
         })
     })
 
+    $(document).on('click', '.delete-jaminan', function() {
+        let id = $(".idJaminan").val()
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(id)
+                let new_list_items = []
+                let tag_html = "";
+
+                $(".body-jaminan-table").empty()
+
+                row_jaminan = 0;
+
+                list_jaminan.map(item => {
+                    row_jaminan = row_jaminan + 1;
+                    if (item.row != id) {
+                        tag_html += `<tr>`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.row_jaminan;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nama;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nomor;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.tanggal;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nilai;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.jatuh_tempo;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.penjamin;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;" class="edit-table-jaminan" data-jenis="${item.jenis}" data-nomor="${item.nomor}" data-tanggal="${item.tanggal}" data-nilai="${item.nilai}" data-jatuh_tempo="${item.jatuh_tempo}" data-penjamin="${item.penjamin}" data-nomor_bpj="${item.nomor_bpj}" data-keterangan="${item.keterangan}" data-row="${row_jaminan}">`;
+                        tag_html += item.nomor_bpj;
+                        tag_html += "</td>";
+                        tag_html += `<td style="text-align: center;">`;
+                        tag_html += `<button onclick='deleteRowJaminan(${row_jaminan})'>X</button>`;
+                        tag_html += "</td>";
+                        tag_html += "</tr>";
+
+                        new_list_items.push({
+                            "row": row_jaminan,
+                            "jenis": jenis,
+                            "nama": nama,
+                            "nomor": nomor,
+                            "tanggal": tanggal,
+                            "nilai": nilai,
+                            "jatuh_tempo": jatuh_tempo,
+                            "penjamin": penjamin,
+                            "nomor_bpj": nomor_bpj,
+                            "keterangan": keterangan
+                        });
+                    }
+                })
+
+                list_jaminan = new_list_items;
+
+                $(".body-jaminan-table").append(tag_html);
+                $(".jaminanModal").modal("hide");
+            }
+        })
+    })
+
     // delete
     $(".delete-parent").click(function() {
         Swal.fire({
@@ -2768,7 +3012,7 @@
                 let id = $(".id").val();
                 setLoading()
                 $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-23/delete"); ?>",
+                    url: "<?= base_url("bea-cukai-bc-261/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -2786,7 +3030,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>"
+                                    window.location.href = "<?= base_url("bea-cukai-bc-261"); ?>"
                                 })
                         } else {
                             Swal.fire({

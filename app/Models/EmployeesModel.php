@@ -191,7 +191,7 @@ class EmployeesModel extends Model
         return $query->getResultArray();
     }
 
-    public function getEmployeesWithPagination($companyID, $employeesID = null, $perPage = 50)
+    public function getEmployeesWithPagination($companyID, $employeesID = null, $divisiID = null, $perPage = 20)
     {
         $arrCondition = [
             'employees.deletedAt' => null,
@@ -203,9 +203,14 @@ class EmployeesModel extends Model
             $arrCondition['employees.id'] = $employeesID;
         }
 
+        if ($divisiID !== null) {
+            $arrCondition['employees.division_id'] = $divisiID;
+        }
+
         $this->builder()
-            ->select("employees.*, users.id as users_id, users.name as users_name")
+            ->select("employees.*, users.id as users_id, users.name as users_name, divisis.divisi")
             ->join('users', 'users.employee_id = employees.id', 'left')
+            ->join('divisis', 'divisis.id = employees.division_id')
             ->groupStart()->where($arrCondition)->groupEnd();
 
 

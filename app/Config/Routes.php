@@ -48,6 +48,7 @@ $routes->get('/employee/id/(:segment)', 'Master\Employee::getByIdEmployee/$1', [
 $routes->post('/employee/save', 'Master\Employee::saveEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/update', 'Master\Employee::updateEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/delete', 'Master\Employee::deleteEmployee', ['filter' => 'Auth']);
+$routes->post('/employee/getKomponenGaji', 'Master\Employee::getKomponenGaji', ['filter' => 'Auth']);
 
 // CUSTOMER
 $routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
@@ -534,7 +535,7 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc23GetByIdFormView/$1');
     $routes->post('save', 'BeaCukai\BeaCukaiController::bc23SaveForm');
     $routes->post('update', 'BeaCukai\BeaCukaiController::bc23UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bc23Delete');
+    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
 });
 
 // BC 2.5
@@ -545,10 +546,20 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc25GetByIdFormView/$1');
     $routes->post('save', 'BeaCukai\BeaCukaiController::bc25SaveForm');
     $routes->post('update', 'BeaCukai\BeaCukaiController::bc25UpdateForm');
-    $routes->post('delete', 'BeaCukai\BeaCukaiController::bc25Delete');
-}); 
+    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
+});
 
-$routes->get('/bea-cukai-bc-261', 'BeaCukai\BeaCukaiController::bc261View', ['filter' => 'Auth']);
+// BC 2.5
+$routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
+    $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
+    $routes->get('create', 'BeaCukai\BeaCukaiController::bc261CreateFormView');
+    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc261GetByIdFormView/$1');
+    $routes->post('save', 'BeaCukai\BeaCukaiController::bc261SaveForm');
+    $routes->post('update', 'BeaCukai\BeaCukaiController::bc261UpdateForm');
+    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
+});
+
 $routes->get('/bea-cukai-bc-262', 'BeaCukai\BeaCukaiController::bc262View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-27', 'BeaCukai\BeaCukaiController::bc27View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-40', 'BeaCukai\BeaCukaiController::bc40View', ['filter' => 'Auth']);
@@ -571,6 +582,7 @@ $routes->get('/attendance', 'HR\Attendance::attendance', ['filter' => 'Auth']);
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/save-attendance', 'HR\Attendance::SaveAttendance', ['filter' => 'Auth']);
 $routes->post('/check-pin-employee', 'HR\Attendance::CheckPinEmployee', ['filter' => 'Auth']);
+$routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
 $routes->post('/generate-attendance', 'HR\Attendance::generateAttendanceAction', ['filter' => 'Auth']);

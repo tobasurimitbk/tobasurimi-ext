@@ -34,16 +34,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control satuan_barang" id="satuan_barang" name="satuan_barang" placeholder="Satuan Barang">
-                                <label for="floatingInput">Satuan Barang</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control uraian_satuan" id="uraian_satuan" name="uraian_satuan" placeholder="Uraian Satuan">
-                                <label for="floatingInput">Uraian Satuan</label>
+                                <select class="form-select unit" name="unit" id="unit" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Satuan</label>
                             </div>
                         </div>
                     </div>
@@ -82,8 +76,8 @@
                                 <th onclick="changeSort('komoditi')" class="sort">Komoditi</th>
                                 <th onclick="changeSort('code')" class="sort">HS Code</th>
                                 <th onclick="changeSort('uraian_barang')" class="sort">Uraian Barang</th>
-                                <th onclick="changeSort('satuan_barang')" class="sort">Satuan</th>
-                                <th onclick="changeSort('uraian_satuan')" class="sort">Uraian Satuan</th>
+                                <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
+                                <th onclick="changeSort('nama_satuan')" class="sort">Nama Satuan</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -106,9 +100,7 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [
-            [1, 'asc']
-        ],
+        order: [[1, 'asc']],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -125,10 +117,10 @@
             }
         },
         // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        "initComplete": function (settings, json) {    
+            $('.dataTables_length').empty();    
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
         },
         //responsive: true,
         display: "stripe",
@@ -148,11 +140,15 @@
             data: "uraian_barang",
             className: "text-center"
         }, {
-            data: "satuan_barang",
+            data: "kode_satuan",
             className: "text-center"
         }, {
-            data: "uraian_satuan",
+            data: "nama_satuan",
             className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
         }],
         columnDefs: [{
             defaultContent: "-",
@@ -169,6 +165,33 @@
     });
 
     $(document).ready(function() {
+        $('.unit').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.unit')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.unit')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.unit')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         var validator = $(".create-form").validate({
             rules: {
                 komoditi: {
@@ -180,10 +203,7 @@
                 uraian_barang: {
                     required: true
                 },
-                satuan_barang: {
-                    required: true
-                },
-                uraian_satuan: {
+                unit: {
                     required: true
                 }
             },
@@ -197,12 +217,9 @@
                 uraian_barang: {
                     required: "Uraian Barang wajib diisi"
                 },
-                satuan_barang: {
-                    required: "Satuan Barang wajib diisi"
-                },
-                uraian_satuan: {
-                    required: "Uraian Satuan wajib diisi"
-                },
+                unit: {
+                    required: "Satuan wajib diisi"
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -242,7 +259,21 @@
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
 
-            $(".add-modal").modal("show")
+            $.ajax({
+                url: `<?= base_url("satuan/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(result) {
+                    $(".unit").empty()
+                    $(".unit").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".unit").append(`<option value="${item.id}">${item.kode_satuan + ' - ' + item.nama_satuan}</option>`)
+                    })
+
+                    $(".unit").val('').change();
+                    $(".add-modal").modal("show");
+                }
+            })
         })
 
         $(".btn-hide-form").click(function() {
@@ -266,13 +297,25 @@
                         $(".komoditi").val(res?.data?.komoditi);
                         $(".code").val(res?.data?.code);
                         $(".uraian_barang").val(res?.data?.uraian_barang);
-                        $(".satuan_barang").val(res?.data?.satuan_barang);
-                        $(".uraian_satuan").val(res?.data?.uraian_satuan);
 
                         validator.resetForm();
                         validator.reset();
 
-                        $(".add-modal").modal("show")
+                        $.ajax({
+                            url: `<?= base_url("satuan/dropdown"); ?>`,
+                            method: "GET",
+                            dataType: "json",
+                            success: function(result) {
+                                $(".unit").empty()
+                                $(".unit").append(`<option value=""></option>`)
+                                result.data.forEach(function(item) {
+                                    $(".unit").append(`<option value="${item.id}">${item.kode_satuan + ' - ' + item.nama_satuan}</option>`)
+                                })
+
+                                $(".unit").val(res?.data?.unit).change();
+                                $(".add-modal").modal("show");
+                            }
+                        })
                     } else {
                         Swal.fire({
                             icon: 'error',
