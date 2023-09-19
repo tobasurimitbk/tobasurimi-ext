@@ -689,8 +689,9 @@
                         icon: 'success',
                         title: response.message,
                         confirmButtonColor: '#4e73df',
-                    });
-                    location.reload();
+                    }).then((result) => {
+                        location.reload();
+                    });;
                     stopLoading()
                 },
                 onError: function(response) {
@@ -746,8 +747,9 @@
                                 icon: 'success',
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                location.reload();
                             });
-                            location.reload();
                             stopLoading()
                         },
                         onError: function(response) {
