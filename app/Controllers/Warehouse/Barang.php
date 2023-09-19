@@ -6,7 +6,7 @@ use App\Controllers\BaseController;
 
 use App\Models\BarangModel;
 use App\Models\BarangSupplierModel;
-use App\Models\HSCodesModel;
+use App\Models\HsCodesModel;
 use App\Models\MetadataModel;
 use App\Models\SatuansModel;
 use App\Models\Sub_AkunsModel;
@@ -17,7 +17,7 @@ class Barang extends BaseController
     protected $this_company_id;
     protected $barangModel;
     protected $barangSupplierModel;
-    protected $HSCodeModel;
+    protected $HsCodesModel;
     protected $metadataModel;
     protected $SatuansModel;
     protected $Sub_AkunsModel;
@@ -28,7 +28,7 @@ class Barang extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangModel();
         $this->barangSupplierModel = new BarangSupplierModel();
-        $this->HSCodeModel = new HSCodesModel();
+        $this->HsCodesModel = new HsCodesModel();
         $this->metadataModel = new MetadataModel();
         $this->SatuansModel = new SatuansModel();
         $this->Sub_AkunsModel = new Sub_AkunsModel();
@@ -52,12 +52,12 @@ class Barang extends BaseController
         $satuanData = $this->SatuansModel->asObject()->findAll();
 
         // get data HS
-        $dataKodeHS = $this->HSCodeModel->asObject()->findAll();
+        $dataKodeHS = $this->HsCodesModel->asObject()->findAll();
 
         $data = [
             "dataKategori"      => $dataKategori,
             "dataBarangParent"  => $dataBarangParent,
-            "kategoriBarangData"=> $kategoriBarangData,
+            "kategoriBarangData" => $kategoriBarangData,
             "aparData"          => $dataAPAR,
             "satuanData"        => $satuanData,
             "dataKodeHS"        => $dataKodeHS
@@ -239,7 +239,7 @@ class Barang extends BaseController
             if (count($payload_supplier)) {
                 $this->barangSupplierModel->insertBatch($payload_supplier);
             }
-            
+
             $this->barangModel->db->transComplete();
 
             $data = [
@@ -249,7 +249,6 @@ class Barang extends BaseController
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);
-            
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,
@@ -373,7 +372,7 @@ class Barang extends BaseController
             ];
 
             $this->barangModel->db->transException(true)->transStart();
-            
+
             $this->barangModel->where($condition)->set($payload)
                 ->update();
 
@@ -398,7 +397,6 @@ class Barang extends BaseController
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);
-            
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,
