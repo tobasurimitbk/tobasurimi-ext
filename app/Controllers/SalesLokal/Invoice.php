@@ -3,6 +3,8 @@
 namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
+
+use App\Models\CompaniesModel;
 use App\Models\CustomerModel;
 use App\Models\MetadataModel;
 use App\Models\SalesOrderInvoiceModel;
@@ -10,7 +12,9 @@ use App\Models\SalesOrderModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
 use App\Models\AllNoModel;
+
 use Config\Services;
+use Dompdf\Dompdf;
 use ErrorException;
 use Exception;
 
@@ -18,6 +22,7 @@ class Invoice extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    private $companyModel;
     protected $CustomerModel;
     private $userId;
     protected $encrypter;
@@ -35,6 +40,8 @@ class Invoice extends BaseController
         $this->userId = session()->get("login")->user_id;
 
         $this->encrypter = Services::encrypter();
+
+        $this->companyModel = new CompaniesModel();
         $this->CustomerModel = new CustomerModel();
         $this->MetadataModel = new MetadataModel();
         $this->SalesOrderInvoiceModel = new SalesOrderInvoiceModel();
@@ -540,6 +547,84 @@ class Invoice extends BaseController
 
         $documentData = $this->getDocDataaaa($invData->document_type, $invData->document_id);
         echo json_encode($documentData);
+    }
+
+    public function printInvoice($id)
+    {
+        $domPdf = new Dompdf();
+
+        $fileName = 'Invoice';
+        $soIds = [];
+
+        $companyData = $this->companyModel->asObject()
+            ->find($this->this_company_id);
+
+        $invSelectQry = "sales_order_invoice.*,
+                         DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d %b %Y') AS tanggal_faktur, 
+                         customers.name AS customerName, 
+                         customers.address AS customerAddress";
+        $invData = $this->SalesOrderInvoiceModel->asObject()
+            ->select($invSelectQry)
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->find($id);
+
+        if ($invData->document_type == 'pengiriman') {
+            $sjData = $this->SuratJalanModel->asObject()
+                ->find($invData->document_id);
+
+            $soIds = json_decode($sjData->multiple_id_so);
+        } else {
+            $soIds = [$invData->document_id];
+        }
+
+        $soSelectQry = "sales_order.*,
+                        DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
+                        DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
+                        customers.name AS customerName, 
+                        customers.address AS customerAddress,
+                        metadata.value AS termin,
+                        barangs.nama_barang AS namaBarang, 
+                        barangs.kode_barang AS kodeBarang, 
+                        sales_order_detail.qty AS qty, 
+                        satuans.kode_satuan AS kodeSatuan,
+                        sales_order_detail.discount_percentage AS disc_pct,
+                        sales_order_detail.amount AS amt";
+        $salesOrderData = $this->SalesOrderModel->asObject()
+            ->select($soSelectQry)
+            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'left')
+            ->join('barangs', 'barangs.id = sales_order_detail.id_barang', 'left')
+            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
+            ->whereIn('sales_order.id', $soIds)
+            ->findAll();
+
+        $invTotal = $salesOrderData[0]->total_harga + $salesOrderData[0]->estimated_freight;
+        
+        $invData->docNo = ($invData->document_type == 'pengiriman') ? $sjData->no_surat_jalan : $salesOrderData[0]->no_sales_order;
+
+        $data = [
+            'companyName'   => $companyData->company,
+            'invData'       => $invData,
+            'soData'        => $salesOrderData,
+            'invTotal'      => $invTotal
+        ];
+
+        // return view('SalesLokal/Invoice/print', $data);
+
+        // load HTML content
+        $domPdf->loadHtml(view('SalesLokal/Invoice/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper([0, 0, 792.96, 528]);
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+        
+        exit();
     }
 
     private function getDocNumberList(string $documentType, int $documentId = null): array

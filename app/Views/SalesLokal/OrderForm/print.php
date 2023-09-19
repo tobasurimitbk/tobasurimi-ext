@@ -38,8 +38,9 @@
         .item-table {
             border: 1px solid;
             width: 100%;
-            height: 280px;
+            height: 230px;
             margin-top: 10px;
+            border-collapse: collapse;
         }
 
         .item-table th {
@@ -123,18 +124,20 @@
         </tr>
         <?php foreach($soDet as $detail): ?>
         <tr>
-            <td class="txt-center" style="height: 1px;">2001</td>
+            <td class="txt-center" style="width: 80px;height: 1px;"><?= $detail->kodeBarang ?></td>
             <td><?= $detail->namaBarang ?></td>
             <td class="txt-center"><?= $detail->qty ?></td>
             <td class="txt-center"><?= $detail->kodeSatuan ?></td>
         </tr>
         <?php endforeach; ?>
+        <?php for ($i = 0; $i < (9 - count($soDet)); $i++): ?>
         <tr>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
         </tr>
+        <?php endfor; ?>
     </table>
 
     <div class="description-container">

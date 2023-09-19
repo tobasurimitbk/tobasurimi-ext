@@ -12,7 +12,7 @@
             </a>
 
             <?php if (!empty($data)): ?>
-            <a class="btn btn-save float-right" href="<?= base_url("surat-jalan/print/{$data->id}"); ?>">
+            <a class="btn btn-warning btn-print float-right" href="<?= base_url("surat-jalan/print/{$data->id}"); ?>" target="_blank">
                 Print
             </a>
             <?php endif; ?>

@@ -10,6 +10,12 @@
                 Batal
             </a>
 
+            <?php if (!empty($data)): ?>
+            <a class="btn btn-warning btn-print float-right" href="<?= base_url("invoice-penjualan-lokal/print/{$data->id}"); ?>" target="_blank">
+                Print
+            </a>
+            <?php endif; ?>
+
             <button class="btn btn-show-form btn-save float-right btn-submit">
                 Simpan
             </button>

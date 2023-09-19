@@ -13,7 +13,7 @@
 
             <?php if (!empty($data)): ?>
             <!-- <a class="btn btn-save float-right" href="#"> -->
-            <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>">
+            <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>" target="_blank">
                 Print
             </a>
             <?php endif; ?>
