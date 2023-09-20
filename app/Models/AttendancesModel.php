@@ -21,7 +21,9 @@ class AttendancesModel extends Model
         'status',
         'reason',
         'checkin',
-        'checkout'
+        'checkout',
+        'isApproved',
+        'isPosting'
     ];
 
     // Dates
