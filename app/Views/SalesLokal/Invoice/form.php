@@ -109,6 +109,32 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="mb-3" style="height: 50px;">
+                                    <label for="floatingInput">Pajak</label>
+                                    <div class="switch-form-pinjaman-karyawan">
+                                        <label class="switch">
+                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= ($documentData->taxStatus ?? false) ? 'checked' : ''; ?>>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-3" style="height: 50px;">
+                                    <label for="floatingInput">Include Pajak</label>
+                                    <div class="switch-form-pinjaman-karyawan">
+                                        <label class="switch">
+                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= ($documentData->includeTax ?? false) ? 'checked' : ''; ?>>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- list barang -->
@@ -153,7 +179,7 @@
                                 <td class="text-right" style="height: 40px;">Rp. <span id="taxTotal">0</span></td>
                             </tr>
                             <tr>
-                                <td class="font-weight-bold" style="border-top: 1px solid #929292; height: 40px;">Total Invoice <span>(Termasuk Pajak)</span></td>
+                                <td class="font-weight-bold" style="border-top: 1px solid #929292; height: 40px;">Total Invoice <span id="includeTaxText">(Termasuk Pajak)</span></td>
                                 <td style="border-top: 1px solid #929292; height: 40px;" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
                             </tr>
                         </table>
@@ -400,8 +426,8 @@
                     $('#customerAddress').val(res.customerAddress);
                     $('#termin').val(res.termin);
                     // $('#salesName').val();
-                    $('#tax_status').prop('checked', res.taxStatus);
-                    $('#include_tax').prop('checked', res.includeTax)
+                    // $('#tax_status').prop('checked', res.taxStatus);
+                    // $('#include_tax').prop('checked', res.includeTax)
 
                     // add datatable data here
                     table.rows.add(res.itemList).draw(false);
@@ -429,6 +455,63 @@
         $('#taxTotal').html('<?= $documentData->tax ?>');
         $('#grandTotal').html('<?= $documentData->total ?>');
         <?php endif; ?>
+
+        const reCountTotal = () => {
+            const taxStatus = $('#tax_status').is(':checked');
+            const includeTax = $('#include_tax').is(':checked');
+            const itemList = table.rows().data();
+
+            let itemSubTotal = 0;
+            let discTotal = 0;
+            let taxTotal = 0;
+            let taxTotalHtml = 0;
+
+            itemList.map((obj) => {
+                // console.log(obj)
+                const itemAmt = +(obj.amount.replace(/\D/g, ''));
+                itemSubTotal += itemAmt;
+                discTotal += ((100 - +obj.disc) / 100) * itemAmt;
+                const taxAmt = itemAmt * (+obj.tax / 100);
+
+                if (taxStatus && !includeTax) {
+                    taxTotal += taxAmt;
+                    taxTotalHtml += taxAmt;
+                } else if (taxStatus && includeTax) {
+                    taxTotalHtml += taxAmt;
+                }
+            });
+
+            if (taxStatus && includeTax) {
+                $('#includeTaxText').html('(Termasuk Pajak)');
+            } else {
+                $('#includeTaxText').html('');
+            }
+
+            $('#itemSubTotal').html(itemSubTotal.toLocaleString());
+            $('#taxTotal').html(taxTotalHtml.toLocaleString());
+
+            const grandTotal = itemSubTotal + taxTotal - discTotal; 
+            $('#grandTotal').html(grandTotal.toLocaleString());
+        };
+
+        $('#tax_status').change(function() {
+
+            if (!this.checked) {
+                $('#include_tax').prop('checked', false);
+            }
+
+            reCountTotal();
+        });
+        $('#include_tax').change(function() {
+
+            const taxStatus = $('#tax_status').is(':checked');
+
+            if (this.checked && !taxStatus) {
+                $(this).prop('checked', false);
+            }
+
+            reCountTotal();
+        });
     })
 
     var validator = $(".create-form").validate({
@@ -729,7 +812,8 @@
                 }
             })
         }
-    })
+    });
+
 </script>
 
 <?= $this->endSection(); ?>
