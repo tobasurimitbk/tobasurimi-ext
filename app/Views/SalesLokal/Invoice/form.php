@@ -109,32 +109,6 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <div class="mb-3" style="height: 50px;">
-                                    <label for="floatingInput">Pajak</label>
-                                    <div class="switch-form-pinjaman-karyawan">
-                                        <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" disabled name="tax_status" id="tax_status" type="checkbox" <?= ($documentData->taxStatus ?? false) ? 'checked' : ''; ?>>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-9">
-                                <div class="mb-3" style="height: 50px;">
-                                    <label for="floatingInput">Include Pajak</label>
-                                    <div class="switch-form-pinjaman-karyawan">
-                                        <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" disabled name="include_tax" id="include_tax" type="checkbox" <?= ($documentData->includeTax ?? false) ? 'checked' : ''; ?>>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- list barang -->
