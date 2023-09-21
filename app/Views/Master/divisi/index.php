@@ -49,8 +49,11 @@
                                     <?php if ($t['is_gaji_harian']) : ?>
                                         <input type="hidden" name="komponenGaji[]" value="<?= $t['id'] ?>">
                                     <?php endif; ?>
+                                    <?php if ($t['is_cadangan']) : ?>
+                                        <input type="hidden" name="komponenGaji[]" value="<?= $t['id'] ?>">
+                                    <?php endif; ?>
                                     <tr style="text-align: center;">
-                                        <td data-id="<?= $t['id'] ?>"><input name="komponenGaji[]" <?= $t['is_gaji_harian'] ? 'checked disabled' : '' ?> class="child" type="checkbox" value="<?= $t['id'] ?>"></td>
+                                        <td data-id="<?= $t['id'] ?>"><input name="komponenGaji[]" <?= $t['is_gaji_harian'] || $t['is_cadangan']  ? 'checked disabled' : '' ?> class="child" type="checkbox" value="<?= $t['id'] ?>"></td>
                                         <td><?= $no++; ?></td>
                                         <td><?= $t['name'] ?></td>
                                         <td><?= ($t['tipe'] == "PLUS") ? "Penambahan Gaji" : "Pengurangan Gaji" ?></td>

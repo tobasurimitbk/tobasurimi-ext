@@ -619,9 +619,13 @@ $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 $routes->get('/payroll/all', 'HR\Payroll::getAllPayRoll', ['filter' => 'Auth']);
 $routes->post('/payroll/generate', 'HR\Payroll::generatePayroll', ['filter' => 'Auth']);
-$routes->post('/payroll/posting', 'HR\Payroll::postingPayroll', ['filter' => 'Auth']);
-$routes->post('/payroll/detail', 'HR\Payroll::getComponentGaji', ['filter' => 'Auth']);
-// $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
+$routes->post('/payroll/generate-single', 'HR\Payroll::repeatGeneratePayroll', ['filter' => 'Auth']);
+$routes->get('/payroll/id/(:segment)', 'HR\Payroll::detailPayrollView/$1', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-komponen-gaji', 'HR\Payroll::updateNominalKomponenGaji', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::updateNominalKeterlambatanPresensi', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-perizinan-not-approved', 'HR\Payroll::updateNominalPerizinanNotApproved', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-gaji-cadangan', 'HR\Payroll::updateNominalGajiPerHariAndCadangan', ['filter' => 'Auth']);
+$routes->post('/payroll/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // formula payroll
 $routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);

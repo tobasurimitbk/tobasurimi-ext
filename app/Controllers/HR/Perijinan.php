@@ -49,7 +49,6 @@ class Perijinan extends BaseController
                 ->orderBy('name', "ASC")
                 ->findAll(),
             'token' => \csrf_hash(),
-            'test' => $this->request->getVar('divisionID')
         ]);
     }
 

@@ -592,8 +592,6 @@
                         $('#jamTerlambat').val(response.data.jamTerlambat);
                         $('#isApproved').val(attendance.isApproved);
 
-                        console.log(response.data);
-
                         if (attendance.status == 'HADIR') {
                             // hadir
                             $('#reasonForm').hide();
