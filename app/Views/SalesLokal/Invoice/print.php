@@ -23,7 +23,7 @@
             margin-top: 20px;
             width: 100%;
             position: relative;
-            padding-top: 7px;
+            /* padding-top: 7px; */
             padding-left: 8px;
         }
 
@@ -50,6 +50,28 @@
 
         .item-table td {
             border-right: 1px solid;
+        }
+
+        .payment-list {
+            margin-left: 1.3em;
+            padding-left: 0;
+            font-size: 13px
+        }
+
+        .payment-list ul {
+            list-style-type: none;
+        }
+
+        .payment-list > li {
+            margin-bottom: 0.5em;
+        }
+
+        .payment-list ul > li {
+            text-indent: -2.4em;
+        }
+
+        .payment-list ul > li::before {
+            content: '- ';
         }
 
         .rounded-border {
@@ -194,7 +216,10 @@
                         <td valign="top" style="width: 65%;">
                             <div class="description-container">
                                 <label class="description-label">Description: </label>
-                                <?= $invData->keterangan ?>
+                                <ol class="payment-list">
+                                    <?= $companyAccount ?>
+                                </ol>
+                                <?= ''//$invData->keterangan ?>
                             </div>
                         </td>
                         <td valign="bottom">

@@ -20,6 +20,7 @@ class CompaniesModel extends Model
         'zip_code',
         'phone',
         'email',
+        'invoice_account',
         'createdAt',
         'updatedAt',
         'deletedAt'
