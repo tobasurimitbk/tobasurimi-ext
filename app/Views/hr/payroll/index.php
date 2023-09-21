@@ -90,21 +90,15 @@
         <h1>Payroll</h1>
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
-            <?php if (!$isGenerate && !$isPosted) : ?>
+            <?php if (!$isGenerate) : ?>
                 <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
                     Generate
                 </a>
             <?php else : ?>
-                <?php if (!$isPosted) : ?>
-                    <a id="posting" class="btn btn-show-form btn-save float-right btn-submit">
-                        Posting
-                    </a>
-                <?php else : ?>
-                    <button disabled class="btn btn-show-form btn-save float-right btn-submit">
-                        <i class="fa-solid fa-check mr-1 fa-lg"></i> Sudah Posting
-                    </button>
-                <?php endif ?>
-            <?php endif ?>
+                <button class="btn btn-warning btn-print float-right" onclick="alert('Fitur print belum tersedia')">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -142,6 +136,11 @@
                     </form>
                 </div>
                 <div class="col-6 mb-0">
+                    <div class="clearfix" id="loadingSpinner">
+                        <div class="spinner-border text-primary float-right" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -152,10 +151,29 @@
         <div class="card-body">
             <div class="row justify-content-start mb-3">
                 <div class="col-md-4">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" id="filterEmployeeName" placeholder="Ketik nama Employee" />
+                    <div class="form-floating">
+                        <select class="form-select" name="filterDivisiID" aria-label="Floating label select example">
+                            <option value="">
+                                Cari Berdasarkan Divisi
+                            </option>
+                            <?php foreach ($divisi as $d) : ?>
+                                <option value="<?= $d['id'] ?>">
+                                    <?= $d['divisi']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                    </div>
                 </div>
                 <div class="col-md-4">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" id="filterDivisiName" placeholder="Ketik Divisi" />
+                    <div class="form-floating">
+                        <select class="form-select" name="filterEmployeeID" aria-label="Floating label select example">
+                            <option value="">
+                                Cari Berdasarkan Nama Karyawan
+                            </option>
+                        </select>
+                        <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -167,16 +185,14 @@
                                 <th onclick="changeSort('nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
                                 <th onclick="changeSort('divisi')" class="sort">Divisi</th>
-                                <th onclick="changeSort('hadir')" class="sort">Hadir</th>
-                                <th onclick="changeSort('ijin')" class="sort">Ijin</th>
-                                <th onclick="changeSort('alpha')" class="sort">Alpha</th>
-                                <th onclick="changeSort('cuti')" class="sort">Cuti</th>
-                                <th onclick="changeSort('sakit')" class="sort">Sakit</th>
-                                <th onclick="changeSort('libur')" class="sort">Libur</th>
+                                <th>Hari Kerja</th>
+                                <th>Total Gaji & Lembur</th>
+                                <th>Total Pengurangan Gaji</th>
+                                <th>Gaji Diterima</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
                         </tbody>
                     </table>
                 </div>
@@ -189,6 +205,8 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nomor";
     let sortType = "asc";
+    $('#loadingSpinner').hide();
+
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -208,8 +226,8 @@
             url: "<?= base_url("payroll/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.name = $('#filterEmployeeName').val();
-                data.divisi = $('#filterDivisiName').val();
+                data.divisi_id = $("select[name='filterDivisiID']").val();
+                data.employee_id = $("select[name='filterEmployeeID']").val();
                 data.year = "<?= $year ?>";
                 data.month = "<?= $month; ?>";
                 data.sort = sort;
@@ -244,37 +262,47 @@
                 className: "text-center"
             },
             {
-                data: "hadir",
+                data: "hariKerja",
                 className: "text-center"
             },
             {
-                data: "ijin",
+                data: "totalGajiLembur",
                 className: "text-center"
             },
             {
-                data: "alpha",
+                data: "totalPenguranganGaji",
                 className: "text-center"
             },
             {
-                data: "cuti",
+                data: "sisaGaji",
                 className: "text-center"
             },
             {
-                data: "sakit",
-                className: "text-center"
-            },
-            {
-                data: "libur",
-                className: "text-center"
-            },
-
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let employee_id = row?.employee_id;
+                    return `
+                        <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="alert('Belum tersedia')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button onclick="generateUlang(${employee_id})" class="btn btn-success posting-spp">
+                                <i class="fa-solid fa-sm fa-repeat"></i>
+                            </button>
+                        </div>
+                    `
+                }
+            }
         ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
         language: {
-            emptyTable: "Data payroll belum digenerate", // Change this line
+            emptyTable: "Data payroll bulan ini belum digenerate", // Change this line
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
@@ -291,12 +319,72 @@
         }
     }
 
-    $("#filterEmployeeName").keyup(function() {
+    $("select[name='filterDivisiID']").change(function() {
         table.ajax.reload();
     });
-    $("#filterDivisiName").keyup(function() {
+    $("select[name='filterEmployeeID']").change(function() {
         table.ajax.reload();
     });
+
+    // generate ulang per employee
+    const generateUlang = function(employeeID) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Generate Ulang Payroll ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#loadingSpinner').show();
+                const csrf = $(`[name="${csrfToken}"]`);
+                var formData = new FormData();
+                var month = "<?= $month ?>";
+                var year = "<?= $year; ?>";
+
+                formData.append('month', month);
+                formData.append('year', year);
+                formData.append('employeeID', employeeID);
+
+                $.ajax({
+                    url: "<?= base_url("payroll/generate-single"); ?>",
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+
+                        }
+                        table.ajax.reload();
+                        $('#loadingSpinner').hide();
+                    },
+                    onError: function(response) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi kesalahan pada sistem',
+                            confirmButtonColor: '#4e73df',
+                        });
+                        $('#loadingSpinner').hide();
+
+                    }
+                });
+            }
+        });
+    }
 
     // Generate
     $('#generate').click(function(e) {
@@ -313,7 +401,7 @@
         }).then((result) => {
 
             if (result.isConfirmed) {
-                setLoading();
+                $('#loadingSpinner').show();
                 // set variable
                 const csrf = $(`[name="${csrfToken}"]`);
                 var month = "<?= $month ?>";
@@ -349,7 +437,7 @@
                                 confirmButtonColor: '#4e73df',
                             });
                         }
-                        stopLoading()
+                        $('#loadingSpinner').hide();
                     },
                     onError: function(response) {
                         Swal.fire({
@@ -357,130 +445,18 @@
                             title: 'Terjadi kesalahan pada sistem',
                             confirmButtonColor: '#4e73df',
                         });
-                        stopLoading()
+                        $('#loadingSpinner').hide();
                     }
                 });
             }
-            stopLoading();
         });
 
-    });
-
-    // psoting
-    $('#posting').click(function(e) {
-        e.preventDefault();
-        Swal.fire({
-            icon: 'question',
-            title: 'Posting Payroll (Setelah posting maka data payroll dibawah tidak dapat diposting ulang) ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-                setLoading();
-                // set variable
-                const csrf = $(`[name="${csrfToken}"]`);
-                var month = "<?= $month ?>";
-                var year = "<?= $year; ?>";
-                // append to form
-                var formData = new FormData();
-                formData.append('month', month);
-                formData.append('year', year);
-                // generate action
-                $.ajax({
-                    url: "<?= base_url("payroll/posting"); ?>",
-                    data: formData,
-                    method: "POST",
-                    dataType: "json",
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            });
-                            // update table
-                            location.reload();
-                        }
-                        stopLoading()
-                    },
-                    onError: function(response) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Terjadi kesalahan pada sistem',
-                            confirmButtonColor: '#4e73df',
-                        });
-                        stopLoading()
-                    }
-                });
-            }
-            stopLoading();
-        });
     });
 
     // Get and Show
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        let id = data.id;
-        let name = data.name;
-        let divisi = data.divisi;
-        let hadir = data.hadir;
-        let sakit = data.sakit;
-
-        $('#divisiName').val(data.divisi);
-        $('#employeesName').val(data.name);
-        $('#totalHadir').val((data.hadir == null) ? '-' : data.hadir + ' Kali');
-        $('#totalIjin').val((data.ijin == null) ? '-' : data.ijin + ' Kali');
-        $('#totalAlpha').val((data.alpha == null) ? '-' : data.alpha + ' Kali');
-        $('#totalCuti').val((data.cuti == null) ? '-' : data.cuti + ' Kali');
-        $('#totalLibur').val((data.libur == null) ? '-' : data.libur + ' Kali');
-        $('#totalSakit').val((data.sakit == null) ? '-' : data.sakit + ' Kali');
-
-        const csrf = $(`[name="${csrfToken}"]`);
-        // append to form
-        var formData = new FormData();
-        formData.append('payrollID', data.id);
-        // generate action
-        $.ajax({
-            url: "<?= base_url("payroll/detail"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                var table = $('#tabelGaji');
-                table.find('tbody').empty();
-
-                $.each(response.data.gaji, function(index, data) {
-                    var newRow = $('<tr>');
-                    newRow.append($('<td>').text(data.name)); // Ganti 'field1' dengan nama kolom yang sesuai
-                    newRow.append($('<td>').text(data.nominal != null ? formatRupiah(data.nominal) : 0)); // Ganti 'field2' dengan nama kolom yang sesuai
-                    table.append(newRow);
-                });
-            },
-            onError: function(response) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi kesalahan pada sistem',
-                    confirmButtonColor: '#4e73df',
-                });
-            }
-        });
-
-        $('#detailPayroll').modal('show');
+        location.replace(`<?= base_url("payroll/id"); ?>/${data.id}`);
     });
     // hide modal
     $('.btn-hide-detail').click(function() {
@@ -494,6 +470,80 @@
         var formatted = ribuan.join('.').split('').reverse().join('');
         return 'Rp. ' + formatted;
     }
+
+    // select2 divisi
+    $("select[name='filterDivisiID']").select2({
+        placeholder: "Cari Berdasarkan Divisi",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+
+    $("select[name='filterEmployeeID']").select2({
+        placeholder: "Cari Berdasarkan Karyawan",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+
+    $("select[name='filterDivisiID']").on('change', function(e) {
+        e.preventDefault();
+        const csrf = $(`[name="${csrfToken}"]`);
+        var divisionID = $(this).val();
+
+        var formData = new FormData();
+        formData.append('divisionID', divisionID);
+
+        $.ajax({
+            url: "<?= base_url("payroll/employees"); ?>",
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                var employeeSelect = $("select[name='filterEmployeeID']");
+                employeeSelect.empty();
+                employeeSelect.append($("<option></option>")
+                    .attr("value", "")
+                    .text("Silahkan pilih karyawan dahulu"));
+                $.each(response.data, function(index, data) {
+                    var option = $("<option></option>")
+                        .attr("value", data.id)
+                        .text(data.name);
+                    employeeSelect.append(option);
+                });
+
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+
+            }
+        });
+
+    });
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.form-select')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 </script>
 
 <?= $this->endSection(); ?>

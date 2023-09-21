@@ -88,16 +88,22 @@ class Tunjangan extends BaseController
             if ($this->validate($rules)) {
 
                 $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari');
+                $isCadangan = $this->request->getPost('isCadangan');
 
                 if ($isGajiPokokPerHari) {
                     $this->TunjanganModel->set('is_gaji_harian', 0)->where('company_id', $this->this_company_id)->update();
+                }
+
+                if ($isCadangan) {
+                    $this->TunjanganModel->set('is_cadangan', 0)->where('company_id', $this->this_company_id)->update();
                 }
 
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
                     "tipe" => $this->request->getPost("tipe"),
-                    "is_gaji_harian" => $isGajiPokokPerHari
+                    "is_gaji_harian" => $isGajiPokokPerHari,
+                    "is_cadangan" => $isCadangan
                 ];
                 if ($this->TunjanganModel->insert($values)) {
                     $data = [
@@ -152,16 +158,22 @@ class Tunjangan extends BaseController
 
                 $id = $this->request->getPost("id");
                 $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari');
+                $isCadangan = $this->request->getPost('isCadangan');
 
                 if ($isGajiPokokPerHari) {
                     $this->TunjanganModel->set('is_gaji_harian', 0)->where('company_id', $this->this_company_id)->update();
+                }
+
+                if ($isCadangan) {
+                    $this->TunjanganModel->set('is_cadangan', 0)->where('company_id', $this->this_company_id)->update();
                 }
 
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("nama"),
                     "tipe" => $this->request->getPost("tipe"),
-                    "is_gaji_harian" => $isGajiPokokPerHari
+                    "is_gaji_harian" => $isGajiPokokPerHari,
+                    "is_cadangan" => $isCadangan
                 ];
 
                 if ($this->TunjanganModel->update($id, $values)) {
