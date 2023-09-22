@@ -20,6 +20,10 @@ class BeaCukaiModel extends Model
         'type',
         'status',
         'status_perbaikan',
+
+        'jenis_dokumen',
+        'no_dokumen',
+
         'aju_no',
         'registration_no',
         'registration_date',

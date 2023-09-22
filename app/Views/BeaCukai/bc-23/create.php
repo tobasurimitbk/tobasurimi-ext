@@ -55,7 +55,29 @@
                         </tr>
                     </tbody>
                 </table>
-
+                <div class="row mt-2">
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisDokumen" name="jenisDokumen" id="jenisDokumen" aria-label="Floating label select example">
+                                <option value="">
+                                    - Jenis Dokumen -
+                                </option>
+                                <?php foreach ($jenisDokumen as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->jenis_dokumen === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Dokumen</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_dokumen : '' ?>" autocomplete="one-time-code" name="noDokumen" type="text" placeholder="No Dokumen" class="form-control target input-picker">
+                            <label for="floatingInput">No Dokumen</label>
+                        </div>
+                    </div>
+                </div>
                 <label class="form-label font-weight-bold lable-title mt-3">
                     Informasi Dokumen
                 </label>
@@ -164,6 +186,25 @@
                 <label class="form-label font-weight-bold lable-title mt-2">
                     Importir
                 </label>
+                <!-- <div class="row mt-2">
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisIdentitasImportir" id="jenisIdentitasImportir" name="jenisIdentitasImportir" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis Identitas -
+                                </option>
+                            </select>
+                            <label for="floatingInput">Jenis Identitas</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Importir" class="form-control target input-picker">
+                            <label for="floatingInput">Identitas</label>
+                        </div>
+                    </div>
+                </div> -->
+
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -315,27 +356,27 @@
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput">Pilih Negara</label>
+                                    <label for="floatingInput">Negara</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Kode Pelabuhan Muat" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Muat</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Pelabuhan Muat" class="form-control target input-picker">
+                            <label for="floatingInput">Pelabuhan Muat</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Kode Pelabuhan Transit" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Transit</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Pelabuhan Transit" class="form-control target input-picker">
+                            <label for="floatingInput">Pelabuhan Transit</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Kode Pelabuhan Bongkar" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Bongkar</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Pelabuhan Bongkar" class="form-control target input-picker">
+                            <label for="floatingInput">Pelabuhan Bongkar</label>
                         </div>
                     </div>
                 </div>
@@ -1516,6 +1557,11 @@
             $(element).closest('.form-group').removeClass('has-error');
             $(element).removeClass('select-class');
         },
+    });
+
+    $('#jenisDokumen').select2({
+        placeholder: "Pilih Jenis Dokumen",
+        theme: "bootstrap-5"
     });
 
     $('#kppbcBongkar').select2({

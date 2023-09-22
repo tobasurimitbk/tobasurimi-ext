@@ -549,7 +549,7 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
 });
 
-// BC 2.5
+// BC 2.6.1
 $routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
     $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
@@ -560,21 +560,20 @@ $routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
     $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
 });
 
-$routes->get('/bea-cukai-bc-262', 'BeaCukai\BeaCukaiController::bc262View', ['filter' => 'Auth']);
+// BC 2.6.2
+$routes->group('bea-cukai-bc-261', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'BeaCukai\BeaCukaiController::bc261View');
+    $routes->get('all', 'BeaCukai\BeaCukaiController::bc261All');
+    $routes->get('create', 'BeaCukai\BeaCukaiController::bc261CreateFormView');
+    $routes->get('id/(:segment)', 'BeaCukai\BeaCukaiController::bc261GetByIdFormView/$1');
+    $routes->post('save', 'BeaCukai\BeaCukaiController::bc261SaveForm');
+    $routes->post('update', 'BeaCukai\BeaCukaiController::bc261UpdateForm');
+    $routes->post('delete', 'BeaCukai\BeaCukaiController::bcDelete');
+});
+
 $routes->get('/bea-cukai-bc-27', 'BeaCukai\BeaCukaiController::bc27View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-40', 'BeaCukai\BeaCukaiController::bc40View', ['filter' => 'Auth']);
 $routes->get('/bea-cukai-bc-41', 'BeaCukai\beaCukaiController::bc41View', ['filter' => 'Auth']);
-
-// LAPORAN
-// BEA CUKAI
-$routes->get('/bea-cukai', 'Laporan\BeaCukai::index', ['filter' => 'Auth']);
-$routes->get('/bea-cukai/all', 'Laporan\BeaCukai::all', ['filter' => 'Auth']);
-$routes->get('/bea-cukai/create', 'Laporan\BeaCukai::createView', ['filter' => 'Auth']);
-$routes->get('/bea-cukai/id/(:segment)', 'Laporan\BeaCukai::getById/$1', ['filter' => 'Auth']);
-$routes->post('/bea-cukai/save', 'Laporan\BeaCukai::save', ['filter' => 'Auth']);
-$routes->post('/bea-cukai/update', 'Laporan\BeaCukai::update', ['filter' => 'Auth']);
-$routes->post('/bea-cukai/update-status', 'Laporan\BeaCukai::updateStatus', ['filter' => 'Auth']);
-$routes->post('/bea-cukai/delete', 'Laporan\BeaCukai::delete', ['filter' => 'Auth']);
 
 // HUMAN RESOURCE
 // Attendance
