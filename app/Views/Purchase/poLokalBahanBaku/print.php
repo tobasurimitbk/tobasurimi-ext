@@ -127,6 +127,19 @@
             margin-top: 2rem
         }
 
+        .sign-row-second {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .sign-row-second>div {
+            width: 150px;
+            border-top: 1px solid;
+            margin-top: 2rem
+        }
+
         .footer {
             position: absolute;
             bottom: 0;
@@ -389,17 +402,22 @@
                 </tr>
                 <tr>
                     <th>
-                        <div class="sign-row">
-                            <div>TTD Penerima Bahan Baku</div>
+                        <div class="sign-row-second">
+                            <div>Dibuat Oleh</div>
                         </div>
                     </th>
                     <th>
-                        <div class="sign-row">
+                        <div class="sign-row-second">
                             <div>Diketahui</div>
                         </div>
                     </th>
                     <th>
-                        <div class="sign-row">
+                        <div class="sign-row-second">
+                            <div>Disetujui</div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row-second">
                             <div>Yang Menerima</div>
                         </div>
                     </th>
