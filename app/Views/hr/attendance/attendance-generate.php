@@ -256,6 +256,10 @@
                                                     <!-- LIBUR -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                <?php elseif ($attandance->status == "RL") : ?>
+                                                    <!-- RL -->
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;">RL</td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;">RL</td>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         <?php endfor; ?>
@@ -427,7 +431,7 @@
                     <div class="form-floating mb-2" style="height: 50px;">
                         <select name="statusKehadiran" class="form-select" id="statusKehadiran">
                             <option selected>Pilih Status Kehadiran</option>
-                            <?php $statusKehadiran = ["HADIR", "IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR"]; ?>
+                            <?php $statusKehadiran = ["HADIR", "IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR", "RL"]; ?>
                             <?php foreach ($statusKehadiran as $sk) : ?>
                                 <option value="<?= $sk; ?>"><?= $sk; ?></option>
                             <?php endforeach ?>
