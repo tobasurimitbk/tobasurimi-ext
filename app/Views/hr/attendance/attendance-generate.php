@@ -58,10 +58,10 @@
                             <button type="submit" class="btn btn-show-form btn-save float-right btn-submit">
                                 Posting
                             </button>
+                        <?php else : ?>
                             <button class="btn btn-warning btn-print float-right" onclick="alert('Fitur print belum tersedia')">
                                 <i class="fa-solid fa-print"></i> Print
                             </button>
-                        <?php else : ?>
                             <input type="hidden" id="statusPosting" name="statusPosting" value="0">
                             <button class="btn btn-show-form btn-save float-right btn-submit">
                                 Batalkan Posting
@@ -162,11 +162,11 @@
                                     $temp = mktime(0, 0, 0, $month, $i, $year);
 
                                     if (date("N", $temp) == 7) {
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Masuk " . $i . "</font></td>";
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>INN " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>OUT " . $i . "</font></td>";
                                     } else {
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Masuk " . $i . "</td>";
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar<br> " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">INN <br>" . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">OUT<br> " . $i . "</td>";
                                     }
 
                                 endfor
@@ -528,9 +528,10 @@
                             icon: 'success',
                             title: response.message,
                             confirmButtonColor: '#4e73df',
+                        }).then((result) => {
+                            // update table
+                            location.reload();
                         });
-                        // update table
-                        location.reload();
                     } else if (response.code == 422) {
                         Swal.fire({
                             icon: 'error',
@@ -555,8 +556,8 @@
             e.preventDefault();
             if ($('#statusPosting').val() == 0) {
                 Swal.fire({
-                    icon: 'error',
-                    title: "Presensi sudah diposting",
+                    icon: 'warning',
+                    title: "Ups, Presensi sudah diposting",
                     confirmButtonColor: '#4e73df',
                 });
             } else {
