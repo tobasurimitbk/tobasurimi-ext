@@ -1330,7 +1330,7 @@
                                     'onChange': 'this.value = formatRupiah(this.value);'
                                 })
                             ).append(
-                                $('<label>').attr('for', 'floatingInput').text('Masukkan nominal gaji')
+                                $('<label>').attr('for', 'floatingInput').text(data.name)
                             );
 
                             var komponenGajiName = "<div style='font-weight: bold; color: " + (data.tipe == "PLUS" ? "green" : "red") + ";'>" + (data.tipe == "PLUS" ? "(+) " : "(-) ") + data.name + "</div>";

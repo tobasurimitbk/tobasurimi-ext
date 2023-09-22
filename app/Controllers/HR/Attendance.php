@@ -195,7 +195,8 @@ class Attendance extends BaseController
                         'employee_id' => $e['id'],
                         'periode' => $dates,
                         'status' => $formPerizinan['status'],
-                        'reason' => $formPerizinan['reason']
+                        'reason' => $formPerizinan['reason'],
+                        'isApproved' => $formPerizinan['is_approval']
                     ]);
                 } elseif ($formPerizinan == null) {
                     // tidak ada data perizinan jadi
@@ -293,6 +294,7 @@ class Attendance extends BaseController
         $checkOut = $this->request->getVar('checkOut');
         $statusKehadiran = $this->request->getVar('statusKehadiran');
         $reason = $this->request->getVar('reason');
+        $isApproved = $this->request->getVar('isApproved');
 
         $AttendanceModel = new AttendancesModel();
 
@@ -300,7 +302,8 @@ class Attendance extends BaseController
             'checkin' => $checkIN, // in
             'checkout' => $checkOut, // out
             'status' => $statusKehadiran,
-            'reason' => $reason
+            'reason' => $reason,
+            'isApproved' => $isApproved
         ]);
 
         return $this->response->setJSON([

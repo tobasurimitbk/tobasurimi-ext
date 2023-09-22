@@ -3,6 +3,8 @@
 namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
+
+use App\Models\CompaniesModel;
 use App\Models\CustomerModel;
 use App\Models\MetadataModel;
 use App\Models\SalesOrderInvoiceModel;
@@ -10,7 +12,9 @@ use App\Models\SalesOrderModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
 use App\Models\AllNoModel;
+
 use Config\Services;
+use Dompdf\Dompdf;
 use ErrorException;
 use Exception;
 
@@ -18,6 +22,7 @@ class Invoice extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    private $companyModel;
     protected $CustomerModel;
     private $userId;
     protected $encrypter;
@@ -35,6 +40,8 @@ class Invoice extends BaseController
         $this->userId = session()->get("login")->user_id;
 
         $this->encrypter = Services::encrypter();
+
+        $this->companyModel = new CompaniesModel();
         $this->CustomerModel = new CustomerModel();
         $this->MetadataModel = new MetadataModel();
         $this->SalesOrderInvoiceModel = new SalesOrderInvoiceModel();
@@ -219,7 +226,6 @@ class Invoice extends BaseController
             $noFaktur = $code . $number . "/" . $currentYear . "/" . $currentMonth; */
             $noFaktur = $postData['no_faktur'];
 
-
             $values = [
                 "id_user"           => $this->userId,
                 "document_type"     => $postData['doc_type'],
@@ -356,132 +362,137 @@ class Invoice extends BaseController
         //return;
 
         $validate = $this->validate([
-            "id" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'User tidak boleh kosong',
-                ]
-            ],
-            "id_user" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'User tidak boleh kosong',
-                ]
-            ],
-            "id_customer" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'Customer tidak boleh kosong',
-                ]
-            ],
-            "id_surat_jalan" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'surat jalan tidak boleh kosong',
-                ]
-            ],
             "no_faktur" => [
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Nomor Faktur tidak boleh kosong',
                 ]
             ],
-            "tipe_invoice" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'tanggal pemesanan ID tidak boleh kosong',
+            "tanggal_faktur" => [
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
+                    'required' => 'Tanggal Faktur tidak boleh kosong',
                 ]
             ],
-            /*
-            "tanggal_faktur" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'tanggal pengiriman tidak boleh kosong',
+            "doc_type" => [
+                "rules" => "required|in_list[pesanan,pengiriman]",
+                'errors' => [
+                    'required' => 'Jenis dokumen tidak boleh kosong',
                 ]
-            ],*/
-            "no_surat_jalan" => [
+            ],
+            "doc_id" => [
                 "rules" => "required",
                 'errors' => [
-                    'required' => 'no surat jalan tidak boleh kosong',
+                    'required' => 'Nomor Dokumen tidak boleh kosong',
                 ]
             ],
             "terms" => [
-                "rules" => "required",
+                "rules" => "permit_empty",
                 'errors' => [
-                    'required' => 'terms tidak boleh kosong',
+                    // 'required' => 'Term tidak boleh kosong',
                 ]
             ],
-            "total_invoice" => [
+            "ship_via" => [
                 "rules" => "required",
                 'errors' => [
-                    'required' => 'total harga tidak boleh kosong',
+                    'required' => 'Ship via tidak boleh kosong',
                 ]
             ],
-            "ppn" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'ppn tidak boleh kosong',
-                ],
-            ],
-            "dpp" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'dpp tidak boleh kosong',
-                ],
-            ],
-
-
+            "keterangan" => [
+                "rules" => "permit_empty",
+                'errors' => [
+                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ]
         ]);
         try {
             if (!$validate) {
-                $error = validation_errors();
+                $errorList = $this->validator->getErrors();
+                // $error = validation_errors();
                 //echo json_encode($error);
-                throw new ErrorException(json_encode($error));
+                throw new ErrorException($errorList[array_keys($errorList)[0]]);
                 //return;
                 // return redirect()->to('/invoice-penjualan-lokal/create')->back()->withInput();
             }
 
-            $values = [
-                "id_user" => $this->request->getPost('id_user'),
-                "id_customer" => $this->request->getPost('id_customer'),
-                "id_surat_jalan" => $this->request->getPost('id_surat_jalan'),
-                "no_surat_jalan" => $this->request->getPost('no_surat_jalan'),
-                "tanggal_faktur" => $this->request->getPost('tanggal_faktur'),
-                "terms" => $this->request->getPost('terms'),
-                "ship_via_id" => $this->request->getPost('ship_via'),
-                "keterangan" => $this->request->getPost('keterangan'),
-                "dpp" => $this->request->getPost('dpp'),
-                "ppn" => $this->request->getPost('ppn'),
-                "total_invoice" => $this->request->getPost('total_invoice'),
-                "termasuk_pa" => $this->request->getPost('include_pa') ? 'true' : 'false',
-                "status_tax" => $this->request->getPost('tax_status') ? 'true' : 'false',
-                "tipe_invoice" => $this->request->getPost('tipe_invoice'),
-            ];
+            $postData = $this->request->getPost();
 
+            $soInvData = $this->SalesOrderInvoiceModel->asObject()
+                ->find($payload['id']);
+            if (empty($soInvData)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Dokumen tidak ditemukan',
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            if ($postData['doc_type'] === 'pesanan') {
+                $documentData = $this->SalesOrderModel->asObject()
+                    ->where('surat_jalan_so_id', null)
+                    ->groupStart()
+                        ->where('sales_order_invoice_id', null)
+                        ->orWhere('id', $soInvData->document_id)
+                    ->groupEnd()
+                    ->find($postData['doc_id']);
+            } else {
+                $documentData = $this->SuratJalanModel->asObject()
+                    ->groupStart()
+                        ->where('sales_order_invoice_id', null)
+                        ->orWhere('id', $soInvData->document_id)
+                    ->groupEnd()
+                    ->find($postData['doc_id']);
+            }
+
+            if (empty($documentData)) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Dokumen tidak ditemukan',
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $this->SalesOrderInvoiceModel->db->transException(true)->transStart();
+            $values = [
+                "document_type"     => $postData['doc_type'],
+                "document_id"       => $postData['doc_id'],
+                "id_customer"       => $documentData->id_customer,
+                "no_faktur"         => $postData['no_faktur'],
+                "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-',$postData['tanggal_faktur']))),
+                "terms"             => $postData['terms'] ?? '',
+                "ship_via_id"       => $postData['ship_via'],
+                "keterangan"        => $postData['keterangan'],
+            ];
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
+
+            $updateData = [$documentData->id, ['sales_order_invoice_id' => $payload['id']]];
+            if ($postData['doc_type'] === 'pesanan') {
+                $this->SalesOrderModel->update(...$updateData);
+            } else {
+                $this->SuratJalanModel->update(...$updateData);
+            }
+
+            $this->SalesOrderInvoiceModel->db->transComplete();
+
             $data = [
-                "id" => $payload['id'],
-                "status"            => true,
+                "id"        => $payload['id'],
+                "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 "payload"   => $dataSalesOrderInvoice,
-                'token' => csrf_hash(),
+                'token'     => csrf_hash(),
             ];
             echo json_encode($data);
             return;
         } catch (\Exception $e) {
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                "status"    => false,
+                "message"   => $e->getMessage(),
                 "payload"   => $payload,
-                'token' => csrf_hash(),
+                'token'     => csrf_hash(),
             ];
             echo json_encode($data);
             return;
@@ -540,6 +551,85 @@ class Invoice extends BaseController
 
         $documentData = $this->getDocDataaaa($invData->document_type, $invData->document_id);
         echo json_encode($documentData);
+    }
+
+    public function printInvoice($id)
+    {
+        $domPdf = new Dompdf();
+
+        $fileName = 'Invoice';
+        $soIds = [];
+
+        $companyData = $this->companyModel->asObject()
+            ->find($this->this_company_id);
+
+        $invSelectQry = "sales_order_invoice.*,
+                         DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d %b %Y') AS tanggal_faktur, 
+                         customers.name AS customerName, 
+                         customers.address AS customerAddress";
+        $invData = $this->SalesOrderInvoiceModel->asObject()
+            ->select($invSelectQry)
+            ->join('customers', 'customers.id = sales_order_invoice.id_customer')
+            ->find($id);
+
+        if ($invData->document_type == 'pengiriman') {
+            $sjData = $this->SuratJalanModel->asObject()
+                ->find($invData->document_id);
+
+            $soIds = json_decode($sjData->multiple_id_so);
+        } else {
+            $soIds = [$invData->document_id];
+        }
+
+        $soSelectQry = "sales_order.*,
+                        DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
+                        DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
+                        customers.name AS customerName, 
+                        customers.address AS customerAddress,
+                        metadata.value AS termin,
+                        barangs.nama_barang AS namaBarang, 
+                        barangs.kode_barang AS kodeBarang, 
+                        sales_order_detail.qty AS qty, 
+                        satuans.kode_satuan AS kodeSatuan,
+                        sales_order_detail.discount_percentage AS disc_pct,
+                        sales_order_detail.amount AS amt";
+        $salesOrderData = $this->SalesOrderModel->asObject()
+            ->select($soSelectQry)
+            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'left')
+            ->join('barangs', 'barangs.id = sales_order_detail.id_barang', 'left')
+            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
+            ->whereIn('sales_order.id', $soIds)
+            ->findAll();
+
+        $invTotal = $salesOrderData[0]->total_harga + $salesOrderData[0]->estimated_freight;
+        
+        $invData->docNo = ($invData->document_type == 'pengiriman') ? $sjData->no_surat_jalan : $salesOrderData[0]->no_sales_order;
+
+        $data = [
+            'companyName'   => $companyData->company,
+            'companyAccount'=> $companyData->invoice_account,
+            'invData'       => $invData,
+            'soData'        => $salesOrderData,
+            'invTotal'      => $invTotal
+        ];
+
+        // return view('SalesLokal/Invoice/print', $data);
+
+        // load HTML content
+        $domPdf->loadHtml(view('SalesLokal/Invoice/print', $data));
+
+        // (optional) setup the paper size and orientation
+        $domPdf->setPaper([0, 0, 792.96, 528]);
+
+        // render html as PDF
+        $domPdf->render();
+
+        // output the generated pdf
+        $domPdf->stream($fileName, array("Attachment" => false));
+        
+        exit();
     }
 
     private function getDocNumberList(string $documentType, int $documentId = null): array

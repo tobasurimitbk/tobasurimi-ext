@@ -440,6 +440,15 @@
                         <label for="floatingInput">Reason</label>
                     </div>
 
+                    <div class="form-floating mb-2" style="height: 50px;" id="approvalForm">
+                        <select name="isApproved" class="form-select" id="isApproved">
+                            <?php $statusApproval = ["APPROVED", "NOT APPROVED"]; ?>
+                            <?php foreach ($statusApproval as $sa) : ?>
+                                <option value="<?= $sa == "APPROVED" ? '1' : '0' ?>"><?= $sa; ?></option>
+                            <?php endforeach ?>
+                        </select>
+                        <label for="floatingInput">Status Approval</label>
+                    </div>
 
                     <div class="form-floating mb-2" style="height: 50px;">
                         <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
@@ -581,11 +590,13 @@
                         $('#statusKehadiran').val(attendance.status);
                         $('#keterangan').val(response.data.keterangan);
                         $('#jamTerlambat').val(response.data.jamTerlambat);
+                        $('#isApproved').val(attendance.isApproved);
 
                         if (attendance.status == 'HADIR') {
                             // hadir
                             $('#reasonForm').hide();
                             $('#formInOut').show();
+                            $('#approvalForm').hide();
                             // set form
                             $('#checkout').val(attendance.checkout);
                             $('#checkin').val(attendance.checkin);
@@ -593,6 +604,7 @@
                             // ada perizinan
                             $('#reasonForm').show();
                             $('#formInOut').hide();
+                            $('#approvalForm').show();
                             $('#reason').val(attendance.reason);
                         }
 
@@ -628,12 +640,14 @@
                 $("input[name='checkIn']").attr('required', true);
                 $("input[name='checkOut']").attr('required', true);
                 $('#reasonForm').hide();
+                $('#approvalForm').hide();
                 $('#formInOut').show();
             } else {
                 // izin
                 $("input[name='checkIn']").attr('required', false);
                 $("input[name='checkOut']").attr('required', false);
                 $('#reasonForm').show();
+                $('#approvalForm').show();
                 $('#formInOut').hide();
             }
 
@@ -665,6 +679,7 @@
             var reason = $('#reason').val();
             var checkIn = $('#checkin').val();
             var checkOut = $('#checkout').val();
+            var isApproved = $('#isApproved').val();
             // append to form
             var formData = new FormData();
             formData.append('attendenceID', attendenceID);
@@ -673,6 +688,7 @@
             formData.append("reason", reason);
             formData.append("checkIn", checkIn);
             formData.append("checkOut", checkOut);
+            formData.append("isApproved", isApproved);
 
             $.ajax({
                 url: "<?= base_url("update-attendance"); ?>",

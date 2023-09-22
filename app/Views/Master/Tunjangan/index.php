@@ -40,14 +40,31 @@
                             </div>
                         </div>
                     </div>
-                    <div id="isGajiPokokPerHariForm">
-                        <label class="mt-2">
-                            Gaji Pokok Perhari
-                        </label>
-                        <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
-                            <div class="form-check form-switch form-switch-lg">
-                                <input class="form-check-input" type="checkbox" value="1" name="isGajiPokokPerHari" id="isGajiPokokPerHari">
-                                <label class="form-check-label" for="isGajiPokokPerHari"></label>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div id="isGajiPokokPerHariForm">
+                                <label class="mt-2">
+                                    Gaji Pokok Perhari
+                                </label>
+                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                    <div class="form-check form-switch form-switch-lg">
+                                        <input class="form-check-input" type="checkbox" value="1" name="isGajiPokokPerHari" id="isGajiPokokPerHari">
+                                        <label class="form-check-label" for="isGajiPokokPerHari"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div id="isCadanganForm">
+                                <label class="mt-2">
+                                    Cadangan
+                                </label>
+                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                    <div class="form-check form-switch form-switch-lg">
+                                        <input class="form-check-input" type="checkbox" value="1" name="isCadangan" id="isCadangan">
+                                        <label class="form-check-label" for="isCadangan"></label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -242,10 +259,18 @@
                             $("#isGajiPokokPerHari").prop('checked', false);
                         }
 
+                        if (res?.data?.is_cadangan) {
+                            $("#isCadangan").prop('checked', true);
+                        } else {
+                            $("#isCadangan").prop('checked', false);
+                        }
+
                         if (res?.data?.tipe == "PLUS") {
                             $('#isGajiPokokPerHariForm').show();
+                            $('#isCadanganForm').show();
                         } else {
                             $('#isGajiPokokPerHariForm').hide();
+                            $('#isCadanganForm').hide();
                         }
 
                         $(".add-modal").modal("show")
@@ -452,13 +477,31 @@
 <script>
     // first hide
     $('#isGajiPokokPerHariForm').hide();
+    $('#isCadanganForm').hide();
+
     // change
     $("select[name='tipe']").change(function(e) {
         e.preventDefault();
         if ($(this).val() == "PLUS") {
             $('#isGajiPokokPerHariForm').show();
+            $('#isCadanganForm').show();
         } else {
             $('#isGajiPokokPerHariForm').hide();
+            $('#isCadanganForm').hide();
+        }
+    });
+    // hindari duplikasi
+    $('#isCadangan').click(function() {
+        var val = $(this).val();
+        if (val) {
+            $("#isGajiPokokPerHari").prop('checked', false);
+        }
+    });
+
+    $('#isGajiPokokPerHari').click(function() {
+        var val = $(this).val();
+        if (val) {
+            $("#isCadangan").prop('checked', false);
         }
     });
 </script>

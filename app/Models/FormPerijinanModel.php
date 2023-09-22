@@ -20,6 +20,8 @@ class FormPerijinanModel extends Model
         'periode',
         'status',
         'reason',
+        'kode',
+        'is_approval'
     ];
 
     // Dates
@@ -49,46 +51,35 @@ class FormPerijinanModel extends Model
     public function getPerijinanList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'employeeName'          => 'employees.name',
+            'employeeName' => 'employees.name',
+            'employeeNip' => 'employees.nip',
+            'divisi' => 'employees.divisision_id'
         ];
+
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'form_perijinan.updatedAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "form_perijinan.* ,
-            employees.name AS employeeName,
-            employees.nip AS employeeNip,
-            divisis.divisi AS divisionName
-            ";
-
         $formPerijinanQry = $this->asObject()
-            ->select($selectQry)
-            ->join('employees', 'form_perijinan.employee_id = employees.id')
-            ->join('divisis', 'employees.division_id = divisis.id')
+            ->select("DISTINCT (form_perijinan.kode), employees.*, divisis.divisi, form_perijinan.status, form_perijinan.is_approval")
+            ->join('employees', 'employees.id = form_perijinan.employee_id')
+            ->join('divisis', 'divisis.id = employees.division_id', 'LEFT')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
         $totalData = $formPerijinanQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['nip']) {
             $formPerijinanQry->groupStart();
         }
 
-        if ($addCondition['search']) {
+        if ($addCondition['nip']) {
             $formPerijinanQry
-                ->like('employees.name', $addCondition['search']);
+                ->like('employees.nip', $addCondition['nip']);
         }
 
-        if ($addCondition['dateStart']) {
-            $formPerijinanQry->where('form_perijinan.periode >=', $addCondition['dateStart']);
-        }
-
-        if ($addCondition['dateEnd']) {
-            $formPerijinanQry->where('form_perijinan.periode <=', $addCondition['dateEnd']);
-        }
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['nip']) {
             $formPerijinanQry->groupEnd();
         }
 

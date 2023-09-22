@@ -19,6 +19,7 @@ class TunjanganModel extends Model
         'name',
         'tipe',
         'is_gaji_harian',
+        'is_cadangan',
         'createdAt',
         'updatedAt',
         'deletedAt'

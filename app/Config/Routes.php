@@ -338,6 +338,7 @@ $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', [
 $routes->get('/invoice-penjualan-lokal/getDocNumber/(:alpha)', 'SalesLokal\Invoice::getDocNumber/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getDocumentData/(:alpha)/(:num)', 'SalesLokal\Invoice::getDocData/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getItemList/(:num)', 'SalesLokal\Invoice::getItemList/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/print/(:num)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
 
 // Surat Jalan
 $routes->get('/surat-jalan', 'SalesLokal\SuratJalan::index', ['filter' => 'Auth']);
@@ -618,9 +619,13 @@ $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 $routes->get('/payroll/all', 'HR\Payroll::getAllPayRoll', ['filter' => 'Auth']);
 $routes->post('/payroll/generate', 'HR\Payroll::generatePayroll', ['filter' => 'Auth']);
-$routes->post('/payroll/posting', 'HR\Payroll::postingPayroll', ['filter' => 'Auth']);
-$routes->post('/payroll/detail', 'HR\Payroll::getComponentGaji', ['filter' => 'Auth']);
-// $routes->get('/employee/all', 'Master\Employee::allEmployee', ['filter' => 'Auth']);
+$routes->post('/payroll/generate-single', 'HR\Payroll::repeatGeneratePayroll', ['filter' => 'Auth']);
+$routes->get('/payroll/id/(:segment)', 'HR\Payroll::detailPayrollView/$1', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-komponen-gaji', 'HR\Payroll::updateNominalKomponenGaji', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::updateNominalKeterlambatanPresensi', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-perizinan-not-approved', 'HR\Payroll::updateNominalPerizinanNotApproved', ['filter' => 'Auth']);
+$routes->post('/payroll/update/nominal-gaji-cadangan', 'HR\Payroll::updateNominalGajiPerHariAndCadangan', ['filter' => 'Auth']);
+$routes->post('/payroll/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // formula payroll
 $routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);
@@ -645,6 +650,7 @@ $routes->get('/form-perijinan/create', 'HR\Perijinan::createView', ['filter' => 
 $routes->get('/form-perijinan/all', 'HR\Perijinan::allPerijinan', ['filter' => 'Auth']);
 $routes->post('/form-perijinan/save', 'HR\Perijinan::save', ['filter' => 'Auth']);
 $routes->post('/form-perijinan/delete', 'HR\Perijinan::delete', ['filter' => 'Auth']);
+$routes->post('/form-perijinan/employees', 'HR\Perijinan::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // jam kerja
 $routes->get('/jam-kerja', 'Master\JamKerja::index', ['filter' => 'Auth']);

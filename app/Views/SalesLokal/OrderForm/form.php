@@ -13,7 +13,7 @@
 
             <?php if (!empty($data)): ?>
             <!-- <a class="btn btn-save float-right" href="#"> -->
-            <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>">
+            <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>" target="_blank">
                 Print
             </a>
             <?php endif; ?>
@@ -995,48 +995,38 @@
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
             if (validate_same >= 0) {
-                /* Swal.fire({
-                    icon: 'error',
-                    title: "Barang Sudah Ada",
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
                     confirmButtonColor: '#4e73df',
-                }) */
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        const currentData = table.row(validate_same).data();
+                        const newQty = +currentData.qty + +qty;
+                        const newBarangTotal = +currentData.barangTotal + +amount;
+                        const newTax = +currentData.tax + +tax;
+                        const aasd = {
+                            ...currentData,
+                            qty: newQty,
+                            harga_barang: Math.ceil(newBarangTotal / newQty),
+                            barangTotal: newBarangTotal,
+                            disc: 0, // ganti nanti
+                            tax: newTax,
+                            taxAmt: currentData.taxAmt + (amount * (tax / 100)),
+                            discAmt: currentData.discAmt + discAmt,
+                            amount: currentData.amount + discountedAmt,
+                        };
+                        table.row(0).data(aasd).draw(false);
 
-                // table.row.add({
-                //     id_barang: id_barang,
-                //     kode_barang: selectedData.code,
-                //     nama_barang: nama_barang,
-                //     qty: qty,
-                //     satuan: selectedData.satuan,
-                //     harga_barang: harga,
-                //     barangTotal: amount,
-                //     disc: discountPercentage,
-                //     tax: tax,
-                //     taxAmt: amount * (tax / 100),
-                //     keterangan: keterangan,
-                //     discAmt: discAmt,
-                //     amount: discountedAmt,
-                //     dept: dept,
-                //     warehouse_id: warehouseId,
-                //     warehouse_name: warhouseName
-                // }).draw(false);
-                const currentData = table.row(validate_same).data();
-                const newQty = +currentData.qty + +qty;
-                const newBarangTotal = +currentData.barangTotal + +amount;
-                const newTax = +currentData.tax + +tax;
-                const aasd = {
-                    ...currentData,
-                    qty: newQty,
-                    harga_barang: Math.ceil(newBarangTotal / newQty),
-                    barangTotal: newBarangTotal,
-                    disc: 0, // ganti nanti
-                    tax: newTax,
-                    taxAmt: currentData.taxAmt + (amount * (tax / 100)),
-                    discAmt: currentData.discAmt + discAmt,
-                    amount: currentData.amount + discountedAmt,
-                };
-                table.row(0).data(aasd).draw(false);
-
-                reCountTotal();
+                        reCountTotal();
+                        $(".detail-modal").modal("hide");
+                    }
+                });
 
             } else {
                 // update detail

@@ -105,4 +105,11 @@ class FormLemburModel extends Model
             'sortType'          => $sortType
         ];
     }
+
+    public function rekap($employeeID, $yearMonth)
+    {
+        return $this->asArray()->where('employee_id', $employeeID)
+            ->where('LEFT(periode, 7)', $yearMonth)
+            ->findAll();
+    }
 }

@@ -1,0 +1,128 @@
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class PayrollGajiConjunctionModel extends Model
+{
+    protected $DBGroup          = 'default';
+    protected $table            = 'payroll_gaji_conjunction';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $insertID         = 0;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+    protected $protectFields    = true;
+    protected $allowedFields    = [
+        'company_id',
+        'employee_id',
+        'payroll_id',
+        'tunjangan_id',
+        'year_month',
+        'nominal'
+    ];
+
+    // Dates
+    protected $useTimestamps = false;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
+
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
+
+    public function generate($payrollID, $employeeID, $companyID, $yearMonth)
+    {
+        // delete first
+        $this->db->table('payroll_gaji_conjunction')
+            ->where('employee_id', $employeeID)
+            ->where('year_month', $yearMonth)
+            ->delete();
+
+        $gajiConjunctionModel = new GajiConjunctionModel();
+        $gajiList = $gajiConjunctionModel->where('employee_id', $employeeID)
+            ->findAll();
+
+        foreach ($gajiList as $g) {
+            $this->db->table('payroll_gaji_conjunction')
+                ->insert([
+                    'company_id' => $companyID,
+                    'employee_id' => $employeeID,
+                    'payroll_id' => $payrollID,
+                    'tunjangan_id' => $g['tunjangan_id'],
+                    'year_month' => $yearMonth,
+                    'nominal' => $g['nominal']
+                ]);
+        }
+    }
+
+    public function getPerhitunganKomponenGajiPayroll($payrollID)
+    {
+        $gajiConjunction = $this->asArray()->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('tunjangan.is_gaji_harian != ', 1)
+            ->where('tunjangan.is_cadangan != ', 1)
+            ->orderBy('tunjangan.name', "ASC")
+            ->findAll();
+
+        return $gajiConjunction;
+    }
+
+    public function getTotalKomponenGajiPayroll($payrollID)
+    {
+        $res = $this->asArray()->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('tunjangan.is_gaji_harian != ', 1)
+            ->where('tunjangan.is_cadangan != ', 1)
+            ->orderBy('tunjangan.name', "ASC")
+            ->findAll();
+
+        $nominal = 0;
+
+        foreach ($res as $r) {
+            if ($r['tipe'] == "PLUS") {
+                $nominal += $r['nominal'];
+            } else {
+                $nominal -= $r['nominal'];
+            }
+        }
+
+        return $nominal;
+    }
+
+    public function getNominalGajiPerHariPayroll($payrollID)
+    {
+        return $this->asArray()->select('payroll_gaji_conjunction.*')
+            ->join('tunjangan', 'payroll_gaji_conjunction.tunjangan_id = tunjangan.id')
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('tunjangan.is_gaji_harian', 1)
+            ->first();
+    }
+
+    public function getNominalUangCadanganPayroll($payrollID)
+    {
+        return $this->asArray()->select('payroll_gaji_conjunction.*')
+            ->join('tunjangan', 'payroll_gaji_conjunction.tunjangan_id = tunjangan.id')
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('tunjangan.is_cadangan', 1)
+            ->first();
+    }
+}

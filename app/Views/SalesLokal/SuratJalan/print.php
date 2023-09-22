@@ -40,6 +40,7 @@
             width: 100%;
             height: 230px;
             margin-top: 10px;
+            border-collapse: collapse;
         }
 
         .item-table th {
@@ -127,13 +128,14 @@
             <th>Jumlah</th>
         </tr>
         <?php
+        $rowNumber = 1;
         $totalInv = 0; 
         foreach($soData as $detail): 
             $totalWithoutDisc = $detail->amt / ((100 - $detail->disc_pct) / 100);
             $totalInv += $detail->amt;
         ?>
         <tr>
-            <td class="txt-center" style="height: 1px;"></td>
+            <td class="txt-center" style="height: 1px;"><?= $rowNumber; ?></td>
             <td><?= $detail->namaBarang ?></td>
             <td><?= $detail->no_sales_order ?></td>
             <td class="txt-center"><?= $detail->qty ?></td>
@@ -142,7 +144,11 @@
             <td class="txt-center"><?= $detail->disc_pct ?></td>
             <td class="txt-right"><?= number_format($detail->amt) ?></td>
         </tr>
-        <?php endforeach; ?>
+        <?php
+        $rowNumber++; 
+        endforeach; 
+        ?>
+        <?php for ($i = 0; $i < (9 - count($soData)); $i++): ?>
         <tr>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -153,6 +159,7 @@
             <td>&nbsp;</td>
             <td>&nbsp;</td>
         </tr>
+        <?php endfor; ?>
     </table>
 
     <table class="w-100" style="border-spacing: 3px 0;">

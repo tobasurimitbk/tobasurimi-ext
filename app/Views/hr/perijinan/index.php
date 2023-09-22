@@ -14,24 +14,8 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <?= csrf_field() ?>
-                <div class="col mb-3">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col mb-3">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                <div class="col-sm-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Berdasarkan NIP" value="" />
                 </div>
             </div>
             <div class="row">
@@ -40,24 +24,16 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-
                                 <th onclick="changeSort('employeeNip')" class="sort">NIP</th>
-
                                 <th onclick="changeSort('employeeName')" class="sort">Nama Karyawan</th>
-
                                 <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
-
-                                <th onclick="changeSort('periode')" class="sort">Tanggal</th>
-
-                                <th onclick="changeSort('status')" class="sort">Status</th>
-
-                                <!-- <th onclick="changeSort('is_posted')" class="sort">Posted</th> -->
-
-                                <!-- <th class="sort">Action</th> -->
+                                <th onclick="changeSort('mulai')" class="sort">Mulai</th>
+                                <th onclick="changeSort('selesai')" class="sort">Selesai</th>
+                                <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
+                                <th onclick="changeSort('approval')" class="sort">Status Approval</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
                         </tbody>
                     </table>
                 </div>
@@ -76,27 +52,6 @@
     var row = 0;
 
     $(document).ready(function() {
-        $(".dateStart").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $(".dateEnd").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
-
-        $('.icon-dateStart').click(function() {
-            $(".dateStart").focus();
-        });
-
-        $('.icon-dateEnd').click(function() {
-            $(".dateEnd").focus();
-        });
 
         $(".dataTable_info").addClass("pt-0");
 
@@ -110,7 +65,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("form-perijinan/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("form-perijinan/id"); ?>/${data.kode}`);
         })
     });
 
@@ -132,12 +87,9 @@
             url: "<?= base_url("form-perijinan/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search").val();
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
+                data.nip = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
-                data.year = year;
             }
         },
         // scrollX: true,
@@ -150,43 +102,32 @@
         display: "stripe",
         searching: false,
         columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false,
-                width: "5%"
-            }, {
-                data: "employeeNip",
-                className: "text-center"
-            }, {
-                data: "employeeName",
-                className: "text-center"
-            }, {
-                data: "divisionName",
-                className: "text-center"
-            }, {
-                data: "periode",
-                className: "text-center"
-            }, {
-                data: "status",
-                className: "text-center"
-            },
-            // {
-            //     data: "is_posted",
-            //     className: "text-center"
-            // },
-
-            // {
-            //     data: "id",
-            //     className: "text-center actions",
-            //     searchable: false,
-            //     sortable: false,
-            //     render: function(data, type, row) {
-            //         let id = row?.id;
-            //         return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn">Hapus</button>
-            //     `
-            //     }
-            // }
-        ],
+            data: "no",
+            className: "text-center",
+            sortable: false,
+            width: "5%"
+        }, {
+            data: "employeeNip",
+            className: "text-center"
+        }, {
+            data: "employeeName",
+            className: "text-center"
+        }, {
+            data: "divisionName",
+            className: "text-center"
+        }, {
+            data: "mulai",
+            className: "text-center"
+        }, {
+            data: "selesai",
+            className: "text-center"
+        }, {
+            data: "keterangan",
+            className: "text-center"
+        }, {
+            data: "approval",
+            className: "text-center"
+        }, ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -200,67 +141,6 @@
             }
         }
     });
-
-    // delete
-    function handleDelete(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Data?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-
-                setLoading()
-                $.ajax({
-                    url: "<?= base_url("form-perijinan/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            stopLoading()
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Disimpan, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                        stopLoading()
-                    }
-                });
-            }
-        })
-    }
 
     const changeSort = function(val) {
         if (sort !== val) {
