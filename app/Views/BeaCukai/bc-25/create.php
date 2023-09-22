@@ -55,7 +55,29 @@
                         </tr>
                     </tbody>
                 </table>
-
+                <div class="row mt-2">
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisDokumenBC" name="jenisDokumenBC" id="jenisDokumenBC" aria-label="Floating label select example">
+                                <option value="">
+                                    - Jenis Dokumen -
+                                </option>
+                                <?php foreach ($jenisDokumen as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->jenis_dokumen === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Dokumen</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_dokumen : '' ?>" autocomplete="one-time-code" name="noDokumen" type="text" placeholder="No Dokumen" class="form-control target input-picker">
+                            <label for="floatingInput">No Dokumen</label>
+                        </div>
+                    </div>
+                </div>
                 <label class="form-label font-weight-bold lable-title mt-3">
                     Informasi Dokumen
                 </label>
@@ -118,16 +140,31 @@
                     Pengusaha TPB
                 </label>
                 <div class="row mt-2">
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_npwp : '' ?>" autocomplete="one-time-code" name="npwpImportir" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
-                            <label for="floatingInput">Identitas (NPWP)</label>
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisIdentitasImportir" id="jenisIdentitasImportir" name="jenisIdentitasImportir" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis Identitas -
+                                </option>
+                                <?php foreach ($jenisIdentitas as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->importir_jenis_identitas === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Identitas</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_identitas : '' ?>" autocomplete="one-time-code" name="identitasImportir" type="text" placeholder="Identitas" class="form-control target input-picker">
+                            <label for="floatingInput">Identitas</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Pengusaha" class="form-control target input-picker">
-                            <label for="floatingInput">Nama Pengusaha</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_name : '' ?>" autocomplete="one-time-code" name="namaImportir" type="text" placeholder="Nama Importir" class="form-control target input-picker">
+                            <label for="floatingInput">Nama Importir</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
@@ -136,9 +173,24 @@
                             <label for="floatingInput">No Izin TPB</label>
                         </div>
                     </div>
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="API" class="form-control target input-picker">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisAPIImportir" id="jenisAPIImportir" name="jenisAPIImportir" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis API -
+                                </option>
+                                <?php foreach ($jenisAPI as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->importir_jenis_api === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis API</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="APIImportir" class="form-control target input-picker">
                             <label for="floatingInput">API</label>
                         </div>
                     </div>
@@ -162,10 +214,25 @@
                     </div>
                 </div>
                 <div class="row mt-2">
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_npwp : '' ?>" autocomplete="one-time-code" name="npwpPemilikBarang" type="text" placeholder="Identitas (NPWP)" class="npwpPemilikBarang form-control target input-picker">
-                            <label for="floatingInput">Identitas (NPWP)</label>
+                            <select <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'disabled' : '') : '' ?> class="form-select jenisIdentitasPemilikBarang" id="jenisIdentitasPemilikBarang" name="jenisIdentitasPemilikBarang" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis Identitas -
+                                </option>
+                                <?php foreach ($jenisIdentitas as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang_jenis_identitas === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Identitas</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_identitas : '' ?>" autocomplete="one-time-code" name="identitasPemilikBarang" type="text" placeholder="Identitas" class="identitasPemilikBarang form-control target input-picker">
+                            <label for="floatingInput">Identitas</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
@@ -180,7 +247,22 @@
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'disabled' : '') : '' ?> class="form-select jenisAPIPemilikBarang" id="jenisAPIPemilikBarang" name="jenisAPIPemilikBarang" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis API -
+                                </option>
+                                <?php foreach ($jenisAPI as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang_jenis_api === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis API</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_api : '' ?>" autocomplete="one-time-code" name="APIPemilikBarang" type="text" placeholder="APIPemilikBarang" class="APIPemilikBarang form-control target input-picker">
                             <label for="floatingInput">API</label>
@@ -901,13 +983,25 @@
 
     var validator = $(".form-add-bc").validate({
         rules: {
+            noDokumen: {
+                required: true
+            },
+            jenisDokumenBC: {
+                required: true
+            },
             kantorPabean: {
                 required: true
             },
             kodeTujuanTpb: {
                 required: true
             },
-            npwpImportir: {
+            jenisIdentitasImportir: {
+                required: true
+            },
+            identitasImportir: {
+                required: true
+            },
+            jenisAPIImportir: {
                 required: true
             },
             namaImportir: {
@@ -954,14 +1048,26 @@
             }
         },
         messages: {
+            noDokumen: {
+                required: "No Dokumen wajib diisi"
+            },
+            jenisDokumenBC: {
+                required: "Jenis Dokumen wajib diisi"
+            },
             kantorPabean: {
                 required: "Kantor Pabean wajib diisi"
             },
             kodeTujuanTpb: {
                 required: "Tujuan wajib diisi"
             },
-            npwpImportir: {
-                required: "Identitas (NPWP) wajib diisi"
+            jenisIdentitasImportir: {
+                required: "Jenis Identitas wajib diisi"
+            },
+            identitasImportir: {
+                required: "identitas wajib diisi"
+            },
+            jenisAPIImportir: {
+                required: "Jenis API wajib diisi"
             },
             namaImportir: {
                 required: "Nama Pengusaha wajib diisi"
@@ -1005,8 +1111,14 @@
             tanggalKontrak : {
                 required: "Tanggal Kontrak wajib diisi"
             },
-            npwpPemilikBarang: {
-                required: "Identitas (NPWP) wajib diisi"
+            jenisIdentitasPemilikBarang: {
+                required: "Jenis Identitas wajib diisi"
+            },
+            identitasPemilikBarang: {
+                required: "identitas wajib diisi"
+            },
+            jenisAPIPemilikBarang: {
+                required: "Jenis API wajib diisi"
             },
             namaPemilikBarang: {
                 required: "Nama Pemilik Barang wajib diisi"
@@ -1043,7 +1155,13 @@
     <?php if(!empty($dataBC)){
         if($dataBC->pemilik_barang === 0){
     ?>
-            $('.npwpPemilikBarang').rules('add', {
+            $('.jenisIdentitasPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.identitasPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.jenisAPIPemilikBarang').rules('add', {
                 required: true
             });
             $('.namaPemilikBarang').rules('add', {
@@ -1056,7 +1174,13 @@
                 required: true
             });
     <?php }} else { ?>
-        $('.npwpPemilikBarang').rules('add', {
+        $('.jenisIdentitasPemilikBarang').rules('add', {
+            required: true
+        });
+        $('.identitasPemilikBarang').rules('add', {
+            required: true
+        });
+        $('.jenisAPIPemilikBarang').rules('add', {
             required: true
         });
         $('.namaPemilikBarang').rules('add', {
@@ -1382,6 +1506,31 @@
         },
     });
 
+    $('#jenisDokumenBC').select2({
+        placeholder: "Pilih Jenis Dokumen",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenisIdentitasImportir').select2({
+        placeholder: "Pilih Jenis Identitas",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenisAPIImportir').select2({
+        placeholder: "Pilih Jenis API",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenisIdentitasPemilikBarang').select2({
+        placeholder: "Pilih Jenis Identitas",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenisAPIPemilikBarang').select2({
+        placeholder: "Pilih Jenis API",
+        theme: "bootstrap-5"
+    });
+
     $('#kantorPabean').select2({
         placeholder: "Pilih Kantor Pabean",
         theme: "bootstrap-5"
@@ -1482,26 +1631,40 @@
     // SwitchBox
     $('#switchPemilikBarang').click(function() {
         var statusChecked = $(this).prop('checked');
-        var npwpImportir = $("input[name='npwpImportir']").val();
+
+        var jenisIdentitasImportir = $(".jenisIdentitasImportir option:selected").val();
+        var identitasImportir = $("input[name='identitasImportir']").val();
         var namaImportir = $("input[name='namaImportir']").val();
+        var jenisAPIImportir = $(".jenisAPIImportir option:selected").val();
         var APIImportir = $("input[name='APIImportir']").val();
         var alamatImportir = $("textarea[name='alamatImportir']").val();
 
         if (statusChecked) {
-            $("input[name='npwpPemilikBarang']").attr('readonly', true).val(npwpImportir);
+            $(".jenisIdentitasPemilikBarang").attr('disabled', true).val(jenisIdentitasImportir).change();
+            $("input[name='identitasPemilikBarang']").attr('readonly', true).val(identitasImportir);
             $("input[name='namaPemilikBarang']").attr('readonly', true).val(namaImportir);
             $("textarea[name='alamatPemilikBarang']").attr('readonly', true).val(alamatImportir);
+            $(".jenisAPIPemilikBarang").attr('disabled', true).val(jenisAPIImportir).change();
             $("input[name='APIPemilikBarang']").attr('readonly', true).val(APIImportir);
-            $('.npwpPemilikBarang').rules('remove', 'required');
+
+            $('.jenisIdentitasPemilikBarang').rules('remove', 'required');
+            $('.identitasPemilikBarang').rules('remove', 'required');
+            $('.jenisAPIPemilikBarang').rules('remove', 'required');
             $('.namaPemilikBarang').rules('remove', 'required');
             $('.alamatPemilikBarang').rules('remove', 'required');
             $('.APIPemilikBarang').rules('remove', 'required');
         } else {
-            $("input[name='npwpPemilikBarang']").attr('readonly', false).val(null);
+            $(".jenisIdentitasPemilikBarang").attr('disabled', false).val('').change();
+            $("input[name='identitasPemilikBarang']").attr('readonly', false).val(null);
             $("input[name='namaPemilikBarang']").attr('readonly', false).val(null);
             $("textarea[name='alamatPemilikBarang']").attr('readonly', false).val(null);
+            $(".jenisAPIPemilikBarang").attr('disabled', false).val('').change();
             $("input[name='APIPemilikBarang']").attr('readonly', false).val(null);
-            $('.npwpPemilikBarang').rules('add', {
+
+            $('.jenisIdentitasPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.jenisAPIPemilikBarang').rules('add', {
                 required: true
             });
             $('.namaPemilikBarang').rules('add', {

@@ -263,9 +263,6 @@
                 <div class="row mt-2">
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="hidden" value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_jenis_identitas : '' ?>" class="hiddenJenisIdentitasPemilikBarang" name="hiddenJenisIdentitasPemilikBarang" />
-                            <input type="hidden" value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_identitas : '' ?>" class="hiddenJenisAPIPemilikBarang" name="hiddenJenisAPIPemilikBarang" />
-
                             <select <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'disabled' : '') : '' ?> class="form-select jenisIdentitasPemilikBarang" id="jenisIdentitasPemilikBarang" name="jenisIdentitasPemilikBarang" aria-label="Floating label select example">
                                 <option value="">
                                     - Pilih Jenis Identitas -
@@ -811,6 +808,25 @@
                     </div>
                 </div>
             </form>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">No.</th>
+                                <th style="text-align: center;">kode Barang</th>
+                                <th style="text-align: center;">Nama Barang</th>
+                                <th style="text-align: center;">Pos Tarif / HS</th>
+                                <th style="text-align: center;">Kategori</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-barang-table" id="body-barang-table" style="cursor: pointer;">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div class="row mt-2">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
@@ -1644,7 +1660,7 @@
         },
     });
 
-    $('#jenisDokumen').select2({
+    $('#jenisDokumenBC').select2({
         placeholder: "Pilih Jenis Dokumen",
         theme: "bootstrap-5"
     });
@@ -1791,9 +1807,6 @@
         var alamatImportir = $("textarea[name='alamatImportir']").val();
 
         if (statusChecked) {
-            $(".hiddenJenisIdentitasPemilikBarang").val(jenisIdentitasImportir);
-            $(".hiddenJenisAPIPemilikBarang").val(jenisAPIImportir);
-
             $(".jenisIdentitasPemilikBarang").attr('disabled', true).val(jenisIdentitasImportir).change();
             $("input[name='identitasPemilikBarang']").attr('readonly', true).val(identitasImportir);
             $("input[name='namaPemilikBarang']").attr('readonly', true).val(namaImportir);
@@ -1808,9 +1821,6 @@
             $('.alamatPemilikBarang').rules('remove', 'required');
             $('.APIPemilikBarang').rules('remove', 'required');
         } else {
-            $(".hiddenJenisIdentitasPemilikBarang").val('');
-            $(".hiddenJenisAPIPemilikBarang").val('');
-
             $(".jenisIdentitasPemilikBarang").attr('disabled', false).val('').change();
             $("input[name='identitasPemilikBarang']").attr('readonly', false).val(null);
             $("input[name='namaPemilikBarang']").attr('readonly', false).val(null);
