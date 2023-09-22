@@ -31,14 +31,24 @@ class BeaCukaiModel extends Model
         'kppbc_pengawas',
         'tujuan_tpb',
         'supplier_id',
-        'importir_npwp',
+
+        'importir_jenis_identitas', //baru
+        'importir_identitas', //baru
+        'importir_jenis_api', //baru
+
+        'importir_npwp', // hapus
         'importir_name',
         'tpb_no',
         'tpb_date',
         'importir_api',
         'importir_address',
         'pemilik_barang',
-        'pemilik_barang_npwp',
+
+        'pemilik_barang_jenis_identitas', //baru
+        'pemilik_barang_identitas', //baru
+        'pemilik_barang_jenis_api', //baru
+
+        'pemilik_barang_npwp', //hapus
         'pemilik_barang_name',
         'pemilik_barang_address',
         'pemilik_barang_api',
