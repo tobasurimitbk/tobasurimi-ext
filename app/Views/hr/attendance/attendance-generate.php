@@ -427,7 +427,7 @@
                     <div class="form-floating mb-2" style="height: 50px;">
                         <select name="statusKehadiran" class="form-select" id="statusKehadiran">
                             <option selected>Pilih Status Kehadiran</option>
-                            <?php $statusKehadiran = ["HADIR", "IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR"]; ?>
+                            <?php $statusKehadiran = ["HADIR", "IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR", "RL"]; ?>
                             <?php foreach ($statusKehadiran as $sk) : ?>
                                 <option value="<?= $sk; ?>"><?= $sk; ?></option>
                             <?php endforeach ?>
