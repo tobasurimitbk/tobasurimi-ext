@@ -162,11 +162,11 @@
                                     $temp = mktime(0, 0, 0, $month, $i, $year);
 
                                     if (date("N", $temp) == 7) {
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>INN " . $i . "</font></td>";
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>OUT " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle; width:25px !important;\"height=\"25\" ><font color='red'>IN " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle; width:25px !important;\" height=\"25\"><font color='red'>OUT " . $i . "</font></td>";
                                     } else {
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">INN <br>" . $i . "</td>";
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">OUT<br> " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle; width:25px !important;\" height=\"25\">IN <br>" . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle; width:25px !important;\"height=\"25\">OUT<br> " . $i . "</td>";
                                     }
 
                                 endfor
