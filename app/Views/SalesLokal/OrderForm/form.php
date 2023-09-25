@@ -444,7 +444,7 @@
             placeholder: "Pilih warehouse",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
+            // tags: true,
             allowClear: true
         })
 
@@ -474,7 +474,6 @@
             placeholder: "Pilih Barang",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
             allowClear: true
         })
 
