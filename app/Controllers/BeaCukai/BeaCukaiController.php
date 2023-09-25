@@ -68,8 +68,20 @@ class BeaCukaiController extends BaseController
 
     public function bc23CreateFormView()
     {
+        //Get Jenis Kontainer
+        $jenisKontainer = $this->modelMetadata->get_by_name_bc('Jenis Kontainer');
+
+        //Get Ukuran Kontainer
+        $ukuranKontainer = $this->modelMetadata->get_by_name_bc('Ukuran Kontainer');
+
+        //Get Tipe Kontainer
+        $tipeKontainer = $this->modelMetadata->get_by_name_bc('Tipe Kontainer');
+
         //Get Jenis Dokumen
         $jenisDokumen = $this->modelMetadata->get_by_name_bc('Dokumen');
+
+        //Get Jenis Kemasan
+        $jenisKemasan = $this->modelMetadata->get_by_name_bc('Jenis Kemasan');
 
         //Get Jenis Identitas
         $jenisIdentitas = $this->modelMetadata->get_by_name_bc('Jenis Identitas');
@@ -87,6 +99,10 @@ class BeaCukaiController extends BaseController
         $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         $data = [
+            'jenisKontainer' => $jenisKontainer,
+            'ukuranKontainer' => $ukuranKontainer,
+            'tipeKontainer' => $tipeKontainer,
+            'jenisKemasan' => $jenisKemasan,
             'jenisDokumen' => $jenisDokumen,
             'jenisIdentitas' => $jenisIdentitas,
             'jenisAPI' => $jenisAPI,
@@ -103,8 +119,20 @@ class BeaCukaiController extends BaseController
 
     public function bc23GetByIdFormView($id)
     {
+        //Get Jenis Kontainer
+        $jenisKontainer = $this->modelMetadata->get_by_name_bc('Jenis Kontainer');
+
+        //Get Ukuran Kontainer
+        $ukuranKontainer = $this->modelMetadata->get_by_name_bc('Ukuran Kontainer');
+
+        //Get Tipe Kontainer
+        $tipeKontainer = $this->modelMetadata->get_by_name_bc('Tipe Kontainer');
+
         //Get Jenis Dokumen
         $jenisDokumen = $this->modelMetadata->get_by_name_bc('Dokumen');
+
+        //Get Jenis Kemasan
+        $jenisKemasan = $this->modelMetadata->get_by_name_bc('Jenis Kemasan');
 
         //Get Jenis Identitas
         $jenisIdentitas = $this->modelMetadata->get_by_name_bc('Jenis Identitas');
@@ -122,7 +150,11 @@ class BeaCukaiController extends BaseController
         $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         $data = [
+            'jenisKontainer' => $jenisKontainer,
+            'ukuranKontainer' => $ukuranKontainer,
+            'tipeKontainer' => $tipeKontainer,
             'jenisDokumen' => $jenisDokumen,
+            'jenisKemasan' => $jenisKemasan,
             'jenisIdentitas' => $jenisIdentitas,
             'jenisAPI' => $jenisAPI,
             'valuta' => $valuta,

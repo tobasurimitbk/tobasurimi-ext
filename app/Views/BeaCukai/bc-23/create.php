@@ -62,10 +62,10 @@
                                 <option value="">
                                     - Jenis Dokumen -
                                 </option>
-                                <option value="No PO">
+                                <option <?= (!empty($dataBC)) ? ($dataBC->jenis_dokumen === 'No PO' ? 'selected' : '') : '' ?> value="No PO">
                                     - No PO -
                                 </option>
-                                <option value="No SJ">
+                                <option <?= (!empty($dataBC)) ? ($dataBC->jenis_dokumen === 'No SJ' ? 'selected' : '') : '' ?> value="No SJ">
                                     - No SJ -
                                 </option>
                             </select>
@@ -542,19 +542,19 @@
                                     if($dataBC->status_posting === "Belum Posting"){
                                 ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $row_dokumen; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $item->kode_number; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $item->jenis; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $item->no; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $item->tanggal; ?>
                                         </td>
                                         <td style="text-align: center;">
@@ -684,13 +684,13 @@
                                             <?= $row_kontainer; ?>
                                         </td>
                                         <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item->no; ?>
+                                            <?= $item->jenis_number . "-" . $item->jenis; ?>
                                         </td>
                                         <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item->ukuran; ?>
+                                            <?= $item->ukuran_number . "-" . $item->nama_ukuran; ?>
                                         </td>
                                         <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item->tipe; ?>
+                                            <?= $item->tipe_number . "-" . $item->nama_tipe; ?>
                                         </td>
                                         <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
                                             <?= $item->keterangan; ?>
@@ -702,9 +702,9 @@
                                 <?php } else {?>
                                         <tr>
                                             <td style="text-align: center;"><?= $row_kontainer; ?></td>
-                                            <td style="text-align: center;"><?= $item->no; ?></td>
-                                            <td style="text-align: center;"><?= $item->ukuran; ?></td>
-                                            <td style="text-align: center;"><?= $item->tipe; ?></td>
+                                            <td style="text-align: center;"><?= $item->jenis_number . "-" . $item->jenis; ?></td>
+                                            <td style="text-align: center;"><?= $item->ukuran_number . "-" . $item->nama_ukuran; ?></td>
+                                            <td style="text-align: center;"><?= $item->tipe_number . "-" . $item->nama_tipe; ?></td>
                                             <td style="text-align: center;"><?= $item->keterangan; ?></td>
                                             <td></td>
                                         </tr>
@@ -749,19 +749,19 @@
                                     if($dataBC->status_posting === "Belum Posting"){
                                 ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
                                             <?= $row_kemasan; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
                                             <?= $item->jumlah; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
-                                            <?= $item->kode; ?>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
+                                            <?= $item->kemasan_number . "-" . $item->jenis_kemasan; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
                                             <?= $item->uraian; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kemasan; ?>">
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
                                             <?= $item->merk; ?>
                                         </td>
                                         <td style="text-align: center;">
@@ -772,7 +772,7 @@
                                         <tr>
                                             <td style="text-align: center;"><?= $row_kemasan; ?></td>
                                             <td style="text-align: center;"><?= $item->jumlah; ?></td>
-                                            <td style="text-align: center;"><?= $item->kode; ?></td>
+                                            <td style="text-align: center;"><?= $item->kemasan_number . "-" . $item->jenis_kemasan; ?></td>
                                             <td style="text-align: center;"><?= $item->uraian; ?></td>
                                             <td style="text-align: center;"><?= $item->merk; ?></td>
                                             <td></td>
@@ -972,13 +972,31 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control noKontainer" name="noKontainer" placeholder="No Kontainer">
-                                <label for="floatingInput">No Kontainer</label>
+                                <select class="form-select jenisKontainer" name="jenisKontainer" id="jenisKontainer" aria-label="Floating label select example">
+                                    <option value="">
+                                        - Jenis -
+                                    </option>
+                                    <?php foreach ($jenisKontainer as $j) : ?>
+                                        <option data-code="<?= $j['description'] ?>" data-name="<?= $j['value'] ?>" value="<?= $j['id'] ?>">
+                                            - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Jenis</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control ukuranKontainer" name="ukuranKontainer" placeholder="Ukuran">
+                                <select class="form-select ukuranKontainer" name="ukuranKontainer" id="ukuranKontainer" aria-label="Floating label select example">
+                                    <option value="">
+                                        - Ukuran -
+                                    </option>
+                                    <?php foreach ($ukuranKontainer as $j) : ?>
+                                        <option data-code="<?= $j['description'] ?>" data-name="<?= $j['value'] ?>" value="<?= $j['id'] ?>">
+                                            - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                                 <label for="floatingInput">Ukuran</label>
                             </div>
                         </div>
@@ -986,7 +1004,16 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control tipeKontainer" name="tipeKontainer" placeholder="Tipe">
+                                <select class="form-select tipeKontainer" name="tipeKontainer" id="tipeKontainer" aria-label="Floating label select example">
+                                    <option value="">
+                                        - Tipe -
+                                    </option>
+                                    <?php foreach ($tipeKontainer as $j) : ?>
+                                        <option data-code="<?= $j['description'] ?>" data-name="<?= $j['value'] ?>" value="<?= $j['id'] ?>">
+                                            - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                                 <label for="floatingInput">Tipe</label>
                             </div>
                         </div>
@@ -1026,8 +1053,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control kodeKemasan" name="kodeKemasan" placeholder="Kode">
-                                <label for="floatingInput">Kode</label>
+                                <select class="form-select jenisKemasan" name="jenisKemasan" id="jenisKemasan" aria-label="Floating label select example">
+                                    <option value="">
+                                        - Jenis Kemasan -
+                                    </option>
+                                    <?php foreach ($jenisKemasan as $j) : ?>
+                                        <option data-code="<?= $j['description'] ?>" data-name="<?= $j['value'] ?>" value="<?= $j['id'] ?>">
+                                            - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Jenis Kemasan</label>
                             </div>
                         </div>
                     </div>
@@ -1042,14 +1078,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control merkKemasan" name="merkKemasan" placeholder="Merk Kemasan">
                                 <label for="floatingInput">Merk Kemasan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control keteranganKemasan" name="keteranganKemasan" placeholder="Keterangan (Opsional)">
-                                <label for="floatingInput">Keterangan (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -1081,7 +1109,6 @@
             row_dokumen = row_dokumen + 1;
             list_dokumen.push({
                 "row": row_dokumen,
-                "nama_kode": '<?= $item->nama_kode ?>',
                 "kode_number": '<?= $item->kode_number ?>',
                 "kode": '<?= $item->kode ?>',
                 "jenis": '<?= $item->jenis ?>',
@@ -1100,8 +1127,14 @@
             list_kontainer.push({
                 "row": row_kontainer,
                 "no": '<?= $item->no ?>',
+                "jenis": '<?= $item->jenis ?>',
+                "jenis_number": '<?= $item->jenis_number ?>',
                 "ukuran": '<?= $item->ukuran ?>',
+                "nama_ukuran": '<?= $item->nama_ukuran ?>',
+                "ukuran_number": '<?= $item->ukuran_number ?>',
                 "tipe": '<?= $item->tipe ?>',
+                "nama_tipe": '<?= $item->nama_tipe ?>',
+                "tipe_number": '<?= $item->tipe_number ?>',
                 "keterangan": '<?= $item->keterangan ?>',
             });
     <?php } 
@@ -1116,9 +1149,10 @@
                 "row": row_kemasan,
                 "jumlah": '<?= $item->jumlah ?>',
                 "kode": '<?= $item->kode ?>',
+                "kemasan_number": '<?= $item->kemasan_number ?>',
+                "jenis_kemasan": '<?= $item->jenis_kemasan ?>',
                 "uraian": '<?= $item->uraian ?>',
-                "merk": '<?= $item->merk ?>',
-                "keterangan": '<?= $item->keterangan ?>',
+                "merk": '<?= $item->merk ?>'
             });
     <?php } 
     } ?>
@@ -1578,7 +1612,7 @@
 
     var validator_kontainer = $(".kontainerForm").validate({
         rules: {
-            noKontainer: {
+            jenisKontainer: {
                 required: true
             },
             ukuranKontainer: {
@@ -1589,7 +1623,7 @@
             }
         },
         messages: {
-            noKontainer: {
+            jenisKontainer: {
                 required: "No Kontainer wajib diisi"
             },
             ukuranKontainer: {
@@ -1626,7 +1660,7 @@
             jumlahKemasan: {
                 required: true
             },
-            kodeKemasan: {
+            jenisKemasan: {
                 required: true
             },
             uraianKemasan: {
@@ -1640,8 +1674,8 @@
             jumlahKemasan: {
                 required: "Jumlah wajib diisi"
             },
-            kodeKemasan: {
-                required: "Kode wajib diisi"
+            jenisKemasan: {
+                required: "Jenis Kemasan wajib diisi"
             },
             uraianKemasan: {
                 required: "Uraian wajib diisi"
@@ -1726,6 +1760,30 @@
         placeholder: "Pilih Kode Dokumen",
         theme: "bootstrap-5",
         dropdownParent: $(".dokumenModal .modal-content")
+    })
+
+    $("select[name='jenisKontainer']").select2({
+        placeholder: "Pilih Jenis",
+        theme: "bootstrap-5",
+        dropdownParent: $(".kontainerModal .modal-content")
+    })
+
+    $("select[name='ukuranKontainer']").select2({
+        placeholder: "Pilih Ukuran",
+        theme: "bootstrap-5",
+        dropdownParent: $(".kontainerModal .modal-content")
+    })
+
+    $("select[name='tipeKontainer']").select2({
+        placeholder: "Pilih Tipe",
+        theme: "bootstrap-5",
+        dropdownParent: $(".kontainerModal .modal-content")
+    })
+
+    $("select[name='jenisKemasan']").select2({
+        placeholder: "Pilih Jenis Kemasan",
+        theme: "bootstrap-5",
+        dropdownParent: $(".kemasanModal .modal-content")
     })
 
     $("input[name='PpjkTanggal']").datepicker({
@@ -1861,8 +1919,10 @@
     // open modal
     $('.btn-show-dokumen').click(function() {
         $(".dokumenForm")[0].reset();
+        $(".kodeDokumen").val('').change();
         validator_dokumen.resetForm();
         validator_dokumen.reset();
+        $(".idDokumen").val('');
         $(".title-dokumen-name").text("Create");
         $(".delete-dokumen").css("display", "none");
         $(".dokumenModal").modal("show");
@@ -1874,6 +1934,10 @@
 
     $('.btn-show-kontainer').click(function() {
         $(".kontainerForm")[0].reset();
+        $(".jenisKontainer").val('').change();
+        $(".ukuranKontainer").val('').change();
+        $(".tipeKontainer").val('').change();
+        $(".idKontainer").val('');
         validator_kontainer.resetForm();
         validator_kontainer.reset();
         $(".title-kontainer-name").text("Create");
@@ -1887,6 +1951,8 @@
 
     $('.btn-show-kemasan').click(function() {
         $(".kemasanForm")[0].reset();
+        $(".idKemasan").val('');
+        $(".jenisKemasan").val('').change();
         validator_kemasan.resetForm();
         validator_kemasan.reset();
         $(".title-kemasan-name").text("Create");
@@ -1914,7 +1980,7 @@
         validator_dokumen.reset();
 
         $(".idDokumen").val(rowid);
-        $(".kodeDokumen").val(kode);
+        $(".kodeDokumen").val(kode).change();
         $(".jenisDokumen").val(jenis);
         $(".noDokumen").val(no);
         $(".tanggalDokumen").val(tanggal);
@@ -1937,9 +2003,9 @@
         validator_kontainer.reset();
 
         $(".idKontainer").val(rowid);
-        $(".noKontainer").val(no);
-        $(".ukuranKontainer").val(ukuran);
-        $(".tipeKontainer").val(tipe);
+        $(".jenisKontainer").val(no).change();
+        $(".ukuranKontainer").val(ukuran).change();
+        $(".tipeKontainer").val(tipe).change();
         $(".keteranganKontainer").val(keterangan);
 
         $(".kontainerModal").modal('show');
@@ -1953,7 +2019,6 @@
         let kode = $(this).data('kode');
         let uraian = $(this).data('uraian');
         let merk = $(this).data('merk');
-        let keterangan = $(this).data('keterangan');
         let rowid = $(this).data('row');
 
         validator_kemasan.resetForm();
@@ -1961,10 +2026,9 @@
 
         $(".idKemasan").val(rowid);
         $(".jumlahKemasan").val(jumlah);
-        $(".kodeKemasan").val(kode);
+        $(".jenisKemasan").val(kode).change();
         $(".uraianKemasan").val(uraian);
         $(".merkKemasan").val(merk);
-        $(".keteranganKemasan").val(keterangan);
 
         $(".kemasanModal").modal('show');
     })
@@ -2146,19 +2210,19 @@
                             row_dokumen = row_dokumen + 1;
                             if (item.row == row_detail) {
                                 tag_html += `<tr>`;
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += row_dokumen;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += kodenumber;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += jenis;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += no;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += tanggal;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;">`;
@@ -2168,7 +2232,6 @@
 
                                 new_list_items.push({
                                     "row": row_dokumen,
-                                    "nama_kode": namakode,
                                     "kode_number": kodenumber,
                                     "kode": kode,
                                     "jenis": jenis,
@@ -2180,19 +2243,19 @@
                             else
                             {
                                 tag_html += `<tr>`;
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += row_dokumen;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += item.kode_number;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += item.jenis;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += item.no;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += item.tanggal;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;">`;
@@ -2217,7 +2280,6 @@
 
                         list_dokumen.push({
                             "row": row_dokumen,
-                            "nama_kode": namakode,
                             "kode_number": kodenumber,
                             "kode": kode,
                             "jenis": jenis,
@@ -2229,19 +2291,19 @@
                         let tag_html = "";
                         
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += row_dokumen;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += kodenumber;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += jenis;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += no;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += tanggal;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2259,10 +2321,17 @@
 
     $('.btn-submit-kontainer').click(function() {
         let row_detail = $(".idKontainer").val() ? Number($(".idKontainer").val()) : 0;
-        let no = $(".noKontainer").val();
+        let no = $(".jenisKontainer option:selected").val();
         let ukuran = $(".ukuranKontainer").val();
         let tipe = $(".tipeKontainer").val();
         let keterangan = $(".keteranganKontainer").val();
+
+        let jenisnumber = $(".jenisKontainer option:selected").attr("data-code");
+        let namajenis = $(".jenisKontainer option:selected").attr("data-name");
+        let ukurannumber = $(".ukuranKontainer option:selected").attr("data-code");
+        let namaukuran = $(".ukuranKontainer option:selected").attr("data-name");
+        let tipenumber = $(".tipeKontainer option:selected").attr("data-code");
+        let namatipe = $(".tipeKontainer option:selected").attr("data-name");
 
         if ($(".kontainerForm").valid()) {
             Swal.fire({
@@ -2291,13 +2360,13 @@
                                 tag_html += row_kontainer;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += no;
+                                tag_html += namajenis + "-" + jenisnumber;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += ukuran;
+                                tag_html += namaukuran + "-" + ukurannumber;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += tipe;
+                                tag_html += namatipe + "-" + tipenumber;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
                                 tag_html += keterangan;
@@ -2312,7 +2381,14 @@
                                     "no": no,
                                     "ukuran": ukuran,
                                     "tipe": tipe,
-                                    "keterangan": keterangan
+                                    "keterangan": keterangan,
+
+                                    "jenis": namajenis,
+                                    "jenis_number": jenisnumber,
+                                    "nama_ukuran": namaukuran,
+                                    "ukuran_number": ukurannumber,
+                                    "nama_tipe": namatipe,
+                                    "tipe_number": tipenumber
                                 })
                             }
                             else
@@ -2322,13 +2398,13 @@
                                 tag_html += row_kontainer;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += item.no;
+                                tag_html += item.jenis + "-" + item.jenis_number;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += item.ukuran;
+                                tag_html += item.nama_ukuran + "-" + item.ukuran_number;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += item.tipe;
+                                tag_html += item.nama_tipe + "-" + item.tipe_number;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
                                 tag_html += item.keterangan;
@@ -2358,7 +2434,14 @@
                             "no": no,
                             "ukuran": ukuran,
                             "tipe": tipe,
-                            "keterangan": keterangan
+                            "keterangan": keterangan,
+
+                            "jenis": namajenis,
+                            "jenis_number": jenisnumber,
+                            "nama_ukuran": namaukuran,
+                            "ukuran_number": ukurannumber,
+                            "nama_tipe": namatipe,
+                            "tipe_number": tipenumber
                         })
 
                         let tag_html = "";
@@ -2368,13 +2451,13 @@
                         tag_html += row_kontainer;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += no;
+                        tag_html += namajenis + "-" + jenisnumber;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += ukuran;
+                        tag_html += namaukuran + "-" + ukurannumber;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += tipe;
+                        tag_html += namatipe + "-" + tipenumber;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
                         tag_html += keterangan;
@@ -2395,10 +2478,12 @@
     $('.btn-submit-kemasan').click(function() {
         let row_detail = $(".idKemasan").val() ? Number($(".idKemasan").val()) : 0;
         let jumlah = $(".jumlahKemasan").val();
-        let kode = $(".kodeKemasan").val();
+        let kode = $(".jenisKemasan option:selected").val();
         let uraian = $(".uraianKemasan").val();
         let merk = $(".merkKemasan").val();
-        let keterangan = $(".keteranganKemasan").val();
+
+        let jeniskemasan = $(".jenisKemasan option:selected").attr("data-name");
+        let kemasannumber = $(".jenisKemasan option:selected").attr("data-code");
 
         if ($(".kemasanForm").valid()) {
             Swal.fire({
@@ -2423,19 +2508,19 @@
                             row_kemasan = row_kemasan + 1;
                             if (item.row == row_detail) {
                                 tag_html += `<tr>`;
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                                 tag_html += row_kemasan;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                                 tag_html += jumlah;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
-                                tag_html += kode;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
+                                tag_html += kemasannumber + "-" + jeniskemasan;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                                 tag_html += uraian;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                                 tag_html += merk;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;">`;
@@ -2449,25 +2534,26 @@
                                     "kode": kode,
                                     "uraian": uraian,
                                     "merk": merk,
-                                    "keterangan": keterangan
+                                    "jenis_kemasan": jeniskemasan,
+                                    "kemasan_number": kemasannumber
                                 })
                             }
                             else
                             {
                                 tag_html += `<tr>`;
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                                 tag_html += row_kemasan;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                                 tag_html += item.jumlah;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
-                                tag_html += item.kode;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
+                                tag_html += item.kemasan_number + "-" + item.jenis_kemasan;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                                 tag_html += item.uraian;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                                 tag_html += item.merk;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;">`;
@@ -2496,25 +2582,26 @@
                             "kode": kode,
                             "uraian": uraian,
                             "merk": merk,
-                            "keterangan": keterangan
+                            "jenis_kemasan": jeniskemasan,
+                            "kemasan_number": kemasannumber
                         })
 
                         let tag_html = "";
                         
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                         tag_html += row_kemasan;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                         tag_html += jumlah;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
-                        tag_html += kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
+                        tag_html += kemasannumber + "-" + jeniskemasan;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                         tag_html += uraian;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-keterangan="${keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${jumlah}" data-kode="${kode}" data-uraian="${uraian}" data-merk="${merk}" data-row="${row_kemasan}">`;
                         tag_html += merk;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2607,22 +2694,23 @@
                 row_dokumen = 0;
 
                 list_dokumen.map(item => {
-                    row_dokumen = row_dokumen + 1;
                     if (item.row != id) {
+                        row_dokumen = row_dokumen + 1;
+
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += row_dokumen;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
-                        tag_html += item.nama_kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += item.kode_number;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.jenis;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.no;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.tanggal;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2632,7 +2720,6 @@
 
                         new_list_items.push({
                             "row": row_dokumen,
-                            "nama_kode": item.nama_kode,
                             "kode_number": item.kode_number,
                             "kode": item.kode,
                             "jenis": item.jenis,
@@ -2671,20 +2758,21 @@
                 row_kontainer = 0;
 
                 list_kontainer.map(item => {
-                    row_kontainer = row_kontainer + 1;
                     if (item.row != id) {
+                        row_kontainer = row_kontainer + 1;
+
                         tag_html += `<tr>`;
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
                         tag_html += row_kontainer;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += item.no;
+                        tag_html += item.jenis_number + "-" + item.jenis;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += item.ukuran;
+                        tag_html += item.ukuran_number + "-" + item.nama_ukuran;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += item.tipe;
+                        tag_html += item.tipe_number + "-" + item.nama_tipe;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
                         tag_html += item.keterangan;
@@ -2699,7 +2787,13 @@
                             "no": item.no,
                             "ukuran": item.ukuran,
                             "tipe": item.tipe,
-                            "keterangan": item.keterangan
+                            "keterangan": item.keterangan,
+                            "jenis": item.jenis,
+                            "jenis_number": item.jenis_number,
+                            "nama_ukuran": item.nama_ukuran,
+                            "ukuran_number": item.ukuran_number,
+                            "nama_tipe": item.nama_tipe,
+                            "tipe_number": item.tipe_number
                         })
                     }
                 })
@@ -2732,22 +2826,23 @@
                 row_kemasan = 0;
 
                 list_kemasan.map(item => {
-                    row_kemasan = row_kemasan + 1;
                     if (item.row != id) {
+                        row_kemasan = row_kemasan + 1;
+
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += row_kemasan;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += item.jumlah;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
-                        tag_html += item.kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
+                        tag_html += item.kemasan_number + "-" + item.jenis_kemasan;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += item.uraian;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += item.merk;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2761,7 +2856,9 @@
                             "kode": item.kode,
                             "uraian": item.uraian,
                             "merk": item.merk,
-                            "keterangan": item.keterangan
+                            "keterangan": item.keterangan,
+                            "jenis_kemasan": item.jenis_kemasan,
+                            "kemasan_number": item.kemasan_number
                         })
                     }
                 })
@@ -2795,22 +2892,22 @@
                 row_dokumen = 0;
 
                 list_dokumen.map(item => {
-                    row_dokumen = row_dokumen + 1;
                     if (item.row != id) {
+                        row_dokumen = row_dokumen + 1;
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += row_dokumen;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
-                        tag_html += item.nama_kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += item.kode_number;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.jenis;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.no;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.tanggal;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2820,7 +2917,6 @@
 
                         new_list_items.push({
                             "row": row_dokumen,
-                            "nama_kode": item.nama_kode,
                             "kode": item.kode,
                             "kode_number": item.kode_number,
                             "jenis": item.jenis,
@@ -2861,20 +2957,20 @@
                 row_kontainer = 0;
 
                 list_kontainer.map(item => {
-                    row_kontainer = row_kontainer + 1;
                     if (item.row != id) {
+                        row_kontainer = row_kontainer + 1;
                         tag_html += `<tr>`;
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
                         tag_html += row_kontainer;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += item.no;
+                        tag_html += item.jenis_number + "-" + item.jenis;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += item.ukuran;
+                        tag_html += item.ukuran_number + "-" + item.nama_ukuran;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += item.tipe;
+                        tag_html += item.tipe_number + "-" + item.nama_tipe;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
                         tag_html += item.keterangan;
@@ -2889,7 +2985,13 @@
                             "no": item.no,
                             "ukuran": item.ukuran,
                             "tipe": item.tipe,
-                            "keterangan": item.keterangan
+                            "keterangan": item.keterangan,
+                            "jenis": item.jenis,
+                            "jenis_number": item.jenis_number,
+                            "nama_ukuran": item.nama_ukuran,
+                            "ukuran_number": item.ukuran_number,
+                            "nama_tipe": item.nama_tipe,
+                            "tipe_number": item.tipe_number
                         })
                     }
                 })
@@ -2924,22 +3026,22 @@
                 row_kemasan = 0;
 
                 list_kemasan.map(item => {
-                    row_kemasan = row_kemasan + 1;
                     if (item.row != id) {
+                        row_kemasan = row_kemasan + 1;
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += row_kemasan;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += item.jumlah;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
-                        tag_html += item.kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
+                        tag_html += item.kemasan_number + "-" +item.jenis_kemasan;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += item.uraian;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-keterangan="${item.keterangan}" data-row="${row_kemasan}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-kemasan" data-jumlah="${item.jumlah}" data-kode="${item.kode}" data-uraian="${item.uraian}" data-merk="${item.merk}" data-row="${row_kemasan}">`;
                         tag_html += item.merk;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2953,7 +3055,9 @@
                             "kode": item.kode,
                             "uraian": item.uraian,
                             "merk": item.merk,
-                            "keterangan": item.keterangan
+                            "keterangan": item.keterangan,
+                            "jenis_kemasan": item.jenis_kemasan,
+                            "kemasan_number": item.kemasan_number
                         })
                     }
                 })
