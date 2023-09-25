@@ -934,7 +934,6 @@
                                     csrf.val(response.token);
                                     if (response.status) {
                                         stopLoading()
-                                        console.log(response);
                                         Swal.fire({
                                                 icon: 'success',
                                                 title: response.message,
@@ -1088,6 +1087,7 @@
             $(".delete-btn").css('display', '');
             let id = data.id;
             $(".title-name").text("Update");
+
 
             validator.resetForm();
             validator.reset();
@@ -1314,9 +1314,8 @@
                             title: 'Ups, Divisi ' + response.divisi.divisi + ' komponen gajinya belum diatur :)',
                             confirmButtonColor: '#4e73df',
                         });
-
-                        // $('#division_id').val("");
                     } else {
+
                         $.each(komponenGaji, function(index, data) {
                             var newRow = $('<tr class="text-dark font-weight-bold">');
                             var indexNumber = index + 1;
@@ -1325,8 +1324,9 @@
                                     'type': 'text',
                                     'name': data.id,
                                     'class': 'form-control',
-                                    'value': (response.employeeID !== "" ? formatRupiah(data.nominal) : '0'),
-                                    'onkeyup': "this.value = this.value.replace(/[^0-9]/g, '');",
+                                    'value': (data.nominal == null) ?
+                                        "Rp. 0,00" : formatRupiah(data.nominal),
+                                    'onkeyup': "this.value = this.value.replace(/[^0-9,]/g, '');",
                                     'onChange': 'this.value = formatRupiah(this.value);'
                                 })
                             ).append(
@@ -1356,10 +1356,14 @@
     }
 
     function formatRupiah(angka) {
-        var reverse = angka.toString().split('').reverse().join('');
-        var ribuan = reverse.match(/\d{1,3}/g);
-        var formatted = ribuan.join('.').split('').reverse().join('');
-        return 'Rp. ' + formatted;
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var desimal = parts[1] || '00';
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return 'Rp. ' + ribuanFormatted + ',' + desimal;
     }
 
     const changeSort = function(val) {

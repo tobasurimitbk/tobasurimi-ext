@@ -218,10 +218,14 @@ class Employee extends BaseController
                 $res = [];
                 foreach ($gajiDivisi as $g) {
                     if (in_array($g, \array_keys($_POST))) {
+                        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($g));
+                        $angka = str_replace(",", ".", $angka);
+                        $angkaDesimal = number_format((float) $angka, 3, '.', '');
+
                         $res[] = [
                             'employee_id' => $insert,
                             'tunjangan_id' => $g,
-                            'nominal' => (int) preg_replace("/[^0-9]/", "", $this->request->getVar($g))
+                            'nominal' => $angkaDesimal
                         ];
                     }
                 }
@@ -321,10 +325,14 @@ class Employee extends BaseController
                     $res = [];
                     foreach ($gajiDivisi as $g) {
                         if (in_array($g, \array_keys($_POST))) {
+                            $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($g));
+                            $angka = str_replace(",", ".", $angka);
+                            $angkaDesimal = number_format((float) $angka, 3, '.', '');
+
                             $res[] = [
                                 'employee_id' => $id,
                                 'tunjangan_id' => $g,
-                                'nominal' => (int) preg_replace("/[^0-9]/", "", $this->request->getVar($g))
+                                'nominal' => $angkaDesimal
                             ];
                         }
                     }
