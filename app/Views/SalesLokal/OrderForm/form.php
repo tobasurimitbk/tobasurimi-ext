@@ -740,7 +740,6 @@
                         var total = 0;
                         let taxAmt = 0;
                         const tableData = table.rows().data().toArray();
-                        console.log(tableData)
 
                         let update_list_items = [];
 
@@ -877,6 +876,7 @@
                                     title: "Barang Tidak Boleh Kosong",
                                     confirmButtonColor: '#4e73df',
                                 });
+                                stopLoading();
                                 return;
                             }
 
