@@ -17,7 +17,8 @@ class GajiDivisiModel extends Model
     protected $allowedFields    = [
         'tunjangan_id',
         'division_id',
-        'company_id'
+        'company_id',
+        'nominal'
     ];
 
     // Dates

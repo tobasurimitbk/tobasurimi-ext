@@ -40,10 +40,10 @@
                                     <th scope="col" style="width: 10px;"><input type="checkbox" id="parent"></th>
                                     <th style="width: 10px;">No</th>
                                     <th>Nama Komponen Gaji</th>
-                                    <th>Status</th>
+                                    <th>Nominal Awal</th>
                                 </tr>
                             </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                            <tbody class="body-table" id="body-table">
                                 <?php $no = 1; ?>
                                 <?php foreach ($tunjangan as $t) : ?>
                                     <?php if ($t['is_gaji_harian']) : ?>
@@ -55,8 +55,13 @@
                                     <tr style="text-align: center;">
                                         <td data-id="<?= $t['id'] ?>"><input name="komponenGaji[]" <?= $t['is_gaji_harian'] || $t['is_cadangan']  ? 'checked disabled' : '' ?> class="child" type="checkbox" value="<?= $t['id'] ?>"></td>
                                         <td><?= $no++; ?></td>
-                                        <td><?= $t['name'] ?></td>
-                                        <td><?= ($t['tipe'] == "PLUS") ? "Penambahan Gaji" : "Pengurangan Gaji" ?></td>
+                                        <td style="font-weight: bold;" class="<?= ($t['tipe'] == "PLUS") ? "text-success" : "text-danger" ?>"><?= ($t['tipe'] == "PLUS") ? "(+) " . $t['name'] : "(-) " . $t['name']; ?></td>
+                                        <td>
+                                            <div class="form-floating" style="height: 50px;">
+                                                <input required onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" data-id="<?= $t['id'] ?>" name="<?= $t['id'] ?>" class="form-control target input-picker" value="Rp. 0">
+                                                <label for="floatingInput"><?= ($t['tipe'] == "PLUS") ? "(+) " . $t['name'] : "(-) " . $t['name']; ?></label>
+                                            </div>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -257,6 +262,10 @@
                             if (isSelected) {
                                 $(this).prop('checked', true);
                             }
+                        });
+
+                        $.each(res.komponenGaji, function(i, v) {
+                            $("input[name=" + v.id + "]").val(formatRupiah(v.nominal || '0'));
                         });
 
                         $(".add-modal").modal("show")
@@ -482,6 +491,17 @@
             $('#parent').prop('checked', false);
         }
     });
+
+    function formatRupiah(angka) {
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var desimal = parts[1] || '00';
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return 'Rp. ' + ribuanFormatted + ',' + desimal;
+    }
 </script>
 
 <?= $this->endSection(); ?>

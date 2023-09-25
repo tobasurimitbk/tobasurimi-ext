@@ -121,11 +121,18 @@ class Divisi extends BaseController
                 }
 
                 foreach ($komponenGaji as $k) {
-                    $this->gajiDivisiModel->insert([
-                        "tunjangan_id" => $k,
-                        "division_id" => $divisiInserted,
-                        "company_id" => $this->this_company_id
-                    ]);
+                    if (in_array($k, array_keys($_POST))) {
+                        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($k));
+                        $angka = str_replace(",", ".", $angka);
+                        $angkaDesimal = number_format((float) $angka, 3, '.', '');
+
+                        $this->gajiDivisiModel->insert([
+                            "tunjangan_id" => $k,
+                            "division_id" => $divisiInserted,
+                            "company_id" => $this->this_company_id,
+                            "nominal" => $angkaDesimal
+                        ]);
+                    }
                 }
 
                 return \response()->setJSON([
@@ -182,11 +189,18 @@ class Divisi extends BaseController
                 $this->gajiDivisiModel->where('division_id', $id)->delete();
 
                 foreach ($komponenGaji as $k) {
-                    $this->gajiDivisiModel->insert([
-                        "tunjangan_id" => $k,
-                        "division_id" => $id,
-                        "company_id" => $this->this_company_id
-                    ]);
+                    if (in_array($k, array_keys($_POST))) {
+                        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($k));
+                        $angka = str_replace(",", ".", $angka);
+                        $angkaDesimal = number_format((float) $angka, 3, '.', '');
+
+                        $this->gajiDivisiModel->insert([
+                            "tunjangan_id" => $k,
+                            "division_id" => $id,
+                            "company_id" => $this->this_company_id,
+                            "nominal" => $angkaDesimal
+                        ]);
+                    }
                 }
 
                 return \response()->setJSON([
@@ -216,7 +230,7 @@ class Divisi extends BaseController
         return \response()->setJSON([
             'status' => true,
             'data' => (\count($data) == 0) ? null : (object)$this->DivisisModel->get_by_id($id)[0],
-            'komponenGaji' => $this->DivisisModel->getTunjanganByDivisi($id)
+            'komponenGaji' => $this->DivisisModel->getTunjanganByDivisi($id),
         ]);
     }
 
