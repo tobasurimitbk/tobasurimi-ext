@@ -17,7 +17,8 @@ class GajiDivisiModel extends Model
     protected $allowedFields    = [
         'tunjangan_id',
         'division_id',
-        'company_id'
+        'company_id',
+        'nominal'
     ];
 
     // Dates
@@ -46,7 +47,7 @@ class GajiDivisiModel extends Model
 
     public function getGajiByDivision($divisionID, $companyID)
     {
-        return $this->asArray()->select('tunjangan.*')
+        return $this->asArray()->select('tunjangan.*, gaji_divisi.nominal')
             ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id')
             ->where('tunjangan.deletedAt', null)
             ->where('gaji_divisi.division_id', $divisionID)
