@@ -58,7 +58,7 @@
                                         <td style="font-weight: bold;" class="<?= ($t['tipe'] == "PLUS") ? "text-success" : "text-danger" ?>"><?= ($t['tipe'] == "PLUS") ? "(+) " . $t['name'] : "(-) " . $t['name']; ?></td>
                                         <td>
                                             <div class="form-floating" style="height: 50px;">
-                                                <input required onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" data-id="<?= $t['id'] ?>" name="<?= $t['id'] ?>" class="form-control target input-picker" value="Rp. 0">
+                                                <input required onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" data-id="<?= $t['id'] ?>" name="<?= $t['id'] ?>" class="form-control target input-picker" value="Rp. 0,00">
                                                 <label for="floatingInput"><?= ($t['tipe'] == "PLUS") ? "(+) " . $t['name'] : "(-) " . $t['name']; ?></label>
                                             </div>
                                         </td>
