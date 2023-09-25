@@ -55,7 +55,30 @@
                         </tr>
                     </tbody>
                 </table>
-
+                <div class="row mt-2">
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisDokumenBC" name="jenisDokumenBC" id="jenisDokumenBC" aria-label="Floating label select example">
+                                <option value="">
+                                    - Jenis Dokumen -
+                                </option>
+                                <option value="No PO">
+                                    - No PO -
+                                </option>
+                                <option value="No SJ">
+                                    - No SJ -
+                                </option>
+                            </select>
+                            <label for="floatingInput">Jenis Dokumen</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_dokumen : '' ?>" autocomplete="one-time-code" name="noDokumen" type="text" placeholder="No Dokumen" class="form-control target input-picker">
+                            <label for="floatingInput">No Dokumen</label>
+                        </div>
+                    </div>
+                </div>
                 <label class="form-label font-weight-bold lable-title mt-3">
                     Informasi Dokumen
                 </label>
@@ -165,10 +188,25 @@
                     Importir
                 </label>
                 <div class="row mt-2">
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_npwp : '' ?>" autocomplete="one-time-code" name="npwpImportir" type="text" placeholder="Identitas (NPWP)" class="form-control target input-picker">
-                            <label for="floatingInput">Identitas (NPWP)</label>
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisIdentitasImportir" id="jenisIdentitasImportir" name="jenisIdentitasImportir" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis Identitas -
+                                </option>
+                                <?php foreach ($jenisIdentitas as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->importir_jenis_identitas === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Identitas</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_identitas : '' ?>" autocomplete="one-time-code" name="identitasImportir" type="text" placeholder="Identitas" class="form-control target input-picker">
+                            <label for="floatingInput">Identitas</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
@@ -183,7 +221,22 @@
                             <label for="floatingInput">No Izin TPB</label>
                         </div>
                     </div>
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select jenisAPIImportir" id="jenisAPIImportir" name="jenisAPIImportir" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis API -
+                                </option>
+                                <?php foreach ($jenisAPI as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->importir_jenis_api === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis API</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->importir_api : '' ?>" autocomplete="one-time-code" name="APIImportir" type="text" placeholder="APIImportir" class="form-control target input-picker">
                             <label for="floatingInput">API</label>
@@ -207,12 +260,27 @@
                         <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang ? 'checked' : '') : '' ?> class="form-check-input" type="checkbox" name="switchPemilikBarang" id="switchPemilikBarang">
                         <label class="form-check-label" for="switchPemilikBarang"></label>
                     </div>
-                </div>
+                </div>           
                 <div class="row mt-2">
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_npwp : '' ?>" autocomplete="one-time-code" name="npwpPemilikBarang" type="text" placeholder="Identitas (NPWP)" class="npwpPemilikBarang form-control target input-picker">
-                            <label for="floatingInput">Identitas (NPWP)</label>
+                            <select <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'disabled' : '') : '' ?> class="form-select jenisIdentitasPemilikBarang" id="jenisIdentitasPemilikBarang" name="jenisIdentitasPemilikBarang" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis Identitas -
+                                </option>
+                                <?php foreach ($jenisIdentitas as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang_jenis_identitas === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis Identitas</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_identitas : '' ?>" autocomplete="one-time-code" name="identitasPemilikBarang" type="text" placeholder="Identitas" class="identitasPemilikBarang form-control target input-picker">
+                            <label for="floatingInput">Identitas</label>
                         </div>
                     </div>
                     <div class="col-sm-6 mt-1">
@@ -226,9 +294,23 @@
                             <textarea <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> name="alamatPemilikBarang" class="alamatPemilikBarang form-control text-area-all"><?= (!empty($dataBC)) ? $dataBC->pemilik_barang_address : '' ?></textarea>
                             <label for="floatingInput">Alamat</label>
                         </div>
-
                     </div>
-                    <div class="col-sm-6 mt-1">
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'disabled' : '') : '' ?> class="form-select jenisAPIPemilikBarang" id="jenisAPIPemilikBarang" name="jenisAPIPemilikBarang" aria-label="Floating label select example">
+                                <option value="">
+                                    - Pilih Jenis API -
+                                </option>
+                                <?php foreach ($jenisAPI as $j) : ?>
+                                    <option <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang_jenis_api === $j['id'] ? 'selected' : '') : '' ?> value="<?= $j['id'] ?>">
+                                        - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Jenis API</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= (!empty($dataBC)) ? ($dataBC->pemilik_barang || $dataBC->status_posting !== 'Belum Posting' ? 'readonly' : '') : '' ?> value="<?= (!empty($dataBC)) ? $dataBC->pemilik_barang_api : '' ?>" autocomplete="one-time-code" name="APIPemilikBarang" type="text" placeholder="APIPemilikBarang" class="APIPemilikBarang form-control target input-picker">
                             <label for="floatingInput">API</label>
@@ -315,27 +397,27 @@
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput">Pilih Negara</label>
+                                    <label for="floatingInput">Negara</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Kode Pelabuhan Muat" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Muat</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_muat : '' ?>" autocomplete="one-time-code" name="pelabuhanMuat" type="text" placeholder="Pelabuhan Muat" class="form-control target input-picker">
+                            <label for="floatingInput">Pelabuhan Muat</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Kode Pelabuhan Transit" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Transit</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_transit : '' ?>" autocomplete="one-time-code" name="pelabuhanTransit" type="text" placeholder="Pelabuhan Transit" class="form-control target input-picker">
+                            <label for="floatingInput">Pelabuhan Transit</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Kode Pelabuhan Bongkar" class="form-control target input-picker">
-                            <label for="floatingInput">Kode Pelabuhan Bongkar</label>
+                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->kode_pelabuhan_bongkar : '' ?>" autocomplete="one-time-code" name="pelabuhanBongkar" type="text" placeholder="Pelabuhan Bongkar" class="form-control target input-picker">
+                            <label for="floatingInput">Pelabuhan Bongkar</label>
                         </div>
                     </div>
                 </div>
@@ -460,19 +542,19 @@
                                     if($dataBC->status_posting === "Belum Posting"){
                                 ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $row_dokumen; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item->kode; ?>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item->kode_number; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $item->jenis; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $item->no; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="<?= $item->nama_kode; ?>" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $item->tanggal; ?>
                                         </td>
                                         <td style="text-align: center;">
@@ -727,6 +809,25 @@
                     </div>
                 </div>
             </form>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">No.</th>
+                                <th style="text-align: center;">kode Barang</th>
+                                <th style="text-align: center;">Nama Barang</th>
+                                <th style="text-align: center;">Pos Tarif / HS</th>
+                                <th style="text-align: center;">Kategori</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-barang-table" id="body-barang-table" style="cursor: pointer;">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div class="row mt-2">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
@@ -806,13 +907,22 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control kodeDokumen" name="kodeDokumen" placeholder="Kode Dokumen">
+                                <select class="form-select kodeDokumen" name="kodeDokumen" id="kodeDokumen" aria-label="Floating label select example">
+                                    <option value="">
+                                        - Jenis Dokumen -
+                                    </option>
+                                    <?php foreach ($jenisDokumen as $j) : ?>
+                                        <option data-code="<?= $j['description'] ?>" data-name="<?= $j['value'] ?>" value="<?= $j['id'] ?>">
+                                            - <?= $j['description'] ?> - <?= $j['value'] ?> -
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                                 <label for="floatingInput">Kode Dokumen</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control jenisDokumen" name="jenisDokumen" placeholder="Jenis Dokumen">
+                                <input readonly="true" autocomplete="one-time-code" type="text" class="form-control jenisDokumen" name="jenisDokumen" placeholder="Jenis Dokumen">
                                 <label for="floatingInput">Jenis Dokumen</label>
                             </div>
                         </div>
@@ -971,6 +1081,8 @@
             row_dokumen = row_dokumen + 1;
             list_dokumen.push({
                 "row": row_dokumen,
+                "nama_kode": '<?= $item->nama_kode ?>',
+                "kode_number": '<?= $item->kode_number ?>',
                 "kode": '<?= $item->kode ?>',
                 "jenis": '<?= $item->jenis ?>',
                 "no": '<?= $item->no ?>',
@@ -1013,6 +1125,12 @@
 
     var validator = $(".form-add-bc").validate({
         rules: {
+            noDokumen: {
+                required: true
+            },
+            jenisDokumenBC: {
+                required: true
+            },
             kppbcBongkar: {
                 required: true
             },
@@ -1025,7 +1143,13 @@
             namaSupplier: {
                 required: true
             },
-            npwpImportir: {
+            jenisIdentitasImportir: {
+                required: true
+            },
+            identitasImportir: {
+                required: true
+            },
+            jenisAPIImportir: {
                 required: true
             },
             namaImportir: {
@@ -1075,6 +1199,12 @@
             }
         },
         messages: {
+            noDokumen: {
+                required: "No Dokumen wajib diisi"
+            },
+            jenisDokumenBC: {
+                required: "Jenis Dokumen wajib diisi"
+            },
             kppbcBongkar: {
                 required: "Kantor Bongkar wajib diisi"
             },
@@ -1087,8 +1217,14 @@
             namaSupplier: {
                 required: "Supplier wajib diisi"
             },
-            npwpImportir: {
-                required: "Identitas (NPWP) wajib diisi"
+            jenisIdentitasImportir: {
+                required: "Jenis Identitas wajib diisi"
+            },
+            identitasImportir: {
+                required: "identitas wajib diisi"
+            },
+            jenisAPIImportir: {
+                required: "Jenis API wajib diisi"
             },
             namaImportir: {
                 required: "Nama Importir wajib diisi"
@@ -1135,8 +1271,14 @@
             kodePos: {
                 required: "Kode Pos wajib diisi"
             },
-            npwpPemilikBarang: {
-                required: "Identitas (NPWP) wajib diisi"
+            jenisIdentitasPemilikBarang: {
+                required: "Jenis Identitas wajib diisi"
+            },
+            identitasPemilikBarang: {
+                required: "identitas wajib diisi"
+            },
+            jenisAPIPemilikBarang: {
+                required: "Jenis API wajib diisi"
             },
             namaPemilikBarang: {
                 required: "Nama Pemilik Barang wajib diisi"
@@ -1173,7 +1315,13 @@
     <?php if(!empty($dataBC)){
         if($dataBC->pemilik_barang === 0){
     ?>
-            $('.npwpPemilikBarang').rules('add', {
+            $('.jenisIdentitasPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.identitasPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.jenisAPIPemilikBarang').rules('add', {
                 required: true
             });
             $('.namaPemilikBarang').rules('add', {
@@ -1186,7 +1334,13 @@
                 required: true
             });
     <?php }} else { ?>
-        $('.npwpPemilikBarang').rules('add', {
+        $('.jenisIdentitasPemilikBarang').rules('add', {
+            required: true
+        });
+        $('.identitasPemilikBarang').rules('add', {
+            required: true
+        });
+        $('.jenisAPIPemilikBarang').rules('add', {
             required: true
         });
         $('.namaPemilikBarang').rules('add', {
@@ -1518,6 +1672,26 @@
         },
     });
 
+    $('#jenisIdentitasImportir').select2({
+        placeholder: "Pilih Jenis Identitas",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenisAPIImportir').select2({
+        placeholder: "Pilih Jenis API",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenisIdentitasPemilikBarang').select2({
+        placeholder: "Pilih Jenis Identitas",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenisAPIPemilikBarang').select2({
+        placeholder: "Pilih Jenis API",
+        theme: "bootstrap-5"
+    });
+
     $('#kppbcBongkar').select2({
         placeholder: "Pilih Kantor Bongkar",
         theme: "bootstrap-5"
@@ -1548,6 +1722,11 @@
         theme: "bootstrap-5"
     });
 
+    $("select[name='kodeDokumen']").select2({
+        placeholder: "Pilih Kode Dokumen",
+        theme: "bootstrap-5",
+        dropdownParent: $(".dokumenModal .modal-content")
+    })
 
     $("input[name='PpjkTanggal']").datepicker({
         todayHighlight: true,
@@ -1631,26 +1810,40 @@
     // SwitchBox
     $('#switchPemilikBarang').click(function() {
         var statusChecked = $(this).prop('checked');
-        var npwpImportir = $("input[name='npwpImportir']").val();
+
+        var jenisIdentitasImportir = $(".jenisIdentitasImportir option:selected").val();
+        var identitasImportir = $("input[name='identitasImportir']").val();
         var namaImportir = $("input[name='namaImportir']").val();
+        var jenisAPIImportir = $(".jenisAPIImportir option:selected").val();
         var APIImportir = $("input[name='APIImportir']").val();
         var alamatImportir = $("textarea[name='alamatImportir']").val();
 
         if (statusChecked) {
-            $("input[name='npwpPemilikBarang']").attr('readonly', true).val(npwpImportir);
+            $(".jenisIdentitasPemilikBarang").attr('disabled', true).val(jenisIdentitasImportir).change();
+            $("input[name='identitasPemilikBarang']").attr('readonly', true).val(identitasImportir);
             $("input[name='namaPemilikBarang']").attr('readonly', true).val(namaImportir);
             $("textarea[name='alamatPemilikBarang']").attr('readonly', true).val(alamatImportir);
+            $(".jenisAPIPemilikBarang").attr('disabled', true).val(jenisAPIImportir).change();
             $("input[name='APIPemilikBarang']").attr('readonly', true).val(APIImportir);
-            $('.npwpPemilikBarang').rules('remove', 'required');
+
+            $('.jenisIdentitasPemilikBarang').rules('remove', 'required');
+            $('.identitasPemilikBarang').rules('remove', 'required');
+            $('.jenisAPIPemilikBarang').rules('remove', 'required');
             $('.namaPemilikBarang').rules('remove', 'required');
             $('.alamatPemilikBarang').rules('remove', 'required');
             $('.APIPemilikBarang').rules('remove', 'required');
         } else {
-            $("input[name='npwpPemilikBarang']").attr('readonly', false).val(null);
+            $(".jenisIdentitasPemilikBarang").attr('disabled', false).val('').change();
+            $("input[name='identitasPemilikBarang']").attr('readonly', false).val(null);
             $("input[name='namaPemilikBarang']").attr('readonly', false).val(null);
             $("textarea[name='alamatPemilikBarang']").attr('readonly', false).val(null);
+            $(".jenisAPIPemilikBarang").attr('disabled', false).val('').change();
             $("input[name='APIPemilikBarang']").attr('readonly', false).val(null);
-            $('.npwpPemilikBarang').rules('add', {
+
+            $('.jenisIdentitasPemilikBarang').rules('add', {
+                required: true
+            });
+            $('.jenisAPIPemilikBarang').rules('add', {
                 required: true
             });
             $('.namaPemilikBarang').rules('add', {
@@ -1922,7 +2115,9 @@
 
     $('.btn-submit-dokumen').click(function() {
         let row_detail = $(".idDokumen").val() ? Number($(".idDokumen").val()) : 0;
-        let kode = $(".kodeDokumen").val();
+        let kode = $(".kodeDokumen option:selected").val();
+        let kodenumber = $(".kodeDokumen option:selected").attr("data-code");
+        let namakode = $(".kodeDokumen option:selected").text();
         let jenis = $(".jenisDokumen").val();
         let no = $(".noDokumen").val();
         let tanggal = $(".tanggalDokumen").val();
@@ -1951,19 +2146,19 @@
                             row_dokumen = row_dokumen + 1;
                             if (item.row == row_detail) {
                                 tag_html += `<tr>`;
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += row_dokumen;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
-                                tag_html += kode;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += kodenumber;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += jenis;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += no;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += tanggal;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;">`;
@@ -1973,6 +2168,8 @@
 
                                 new_list_items.push({
                                     "row": row_dokumen,
+                                    "nama_kode": namakode,
+                                    "kode_number": kodenumber,
                                     "kode": kode,
                                     "jenis": jenis,
                                     "no": no,
@@ -1983,19 +2180,19 @@
                             else
                             {
                                 tag_html += `<tr>`;
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += row_dokumen;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
-                                tag_html += item.kode;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += item.kode_number;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += item.jenis;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += item.no;
                                 tag_html += "</td>";
-                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                                tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                                 tag_html += item.tanggal;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;">`;
@@ -2020,6 +2217,8 @@
 
                         list_dokumen.push({
                             "row": row_dokumen,
+                            "nama_kode": namakode,
+                            "kode_number": kodenumber,
                             "kode": kode,
                             "jenis": jenis,
                             "no": no,
@@ -2030,19 +2229,19 @@
                         let tag_html = "";
                         
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += row_dokumen;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
-                        tag_html += kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += kodenumber;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += jenis;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += no;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${namakode}" data-kode="${kode}" data-jenis="${jenis}" data-no="${no}" data-tanggal="${tanggal}" data-keterangan="${keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += tanggal;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2331,6 +2530,18 @@
         }
     })
 
+    $(".kodeDokumen").change(function() {
+        if($(".kodeDokumen option:selected").val())
+        {
+            let jenis = $(".kodeDokumen option:selected").attr("data-name");
+            $(".jenisDokumen").val(jenis);
+        }
+        else
+        {
+            $(".jenisDokumen").val('');
+        }
+    })
+
     // get invoice date by selected no invoice
     $(".noInvoice").change(function() {
         if($(".noInvoice option:selected").val())
@@ -2399,19 +2610,19 @@
                     row_dokumen = row_dokumen + 1;
                     if (item.row != id) {
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += row_dokumen;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
-                        tag_html += item.kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += item.nama_kode;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.jenis;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.no;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.tanggal;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2421,6 +2632,8 @@
 
                         new_list_items.push({
                             "row": row_dokumen,
+                            "nama_kode": item.nama_kode,
+                            "kode_number": item.kode_number,
                             "kode": item.kode,
                             "jenis": item.jenis,
                             "no": item.no,
@@ -2585,19 +2798,19 @@
                     row_dokumen = row_dokumen + 1;
                     if (item.row != id) {
                         tag_html += `<tr>`;
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += row_dokumen;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
-                        tag_html += item.kode;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += item.nama_kode;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.jenis;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.no;
                         tag_html += "</td>";
-                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
+                        tag_html += `<td style="text-align: center;" class="edit-table-dokumen" data-nama_kode="${item.nama_kode}" data-kode="${item.kode}" data-jenis="${item.jenis}" data-no="${item.no}" data-tanggal="${item.tanggal}" data-keterangan="${item.keterangan}"  data-row="${row_dokumen}">`;
                         tag_html += item.tanggal;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;">`;
@@ -2607,7 +2820,9 @@
 
                         new_list_items.push({
                             "row": row_dokumen,
+                            "nama_kode": item.nama_kode,
                             "kode": item.kode,
+                            "kode_number": item.kode_number,
                             "jenis": item.jenis,
                             "no": item.no,
                             "tanggal": item.tanggal,

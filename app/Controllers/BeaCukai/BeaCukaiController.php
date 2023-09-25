@@ -68,16 +68,28 @@ class BeaCukaiController extends BaseController
 
     public function bc23CreateFormView()
     {
+        //Get Jenis Dokumen
+        $jenisDokumen = $this->modelMetadata->get_by_name_bc('Dokumen');
+
+        //Get Jenis Identitas
+        $jenisIdentitas = $this->modelMetadata->get_by_name_bc('Jenis Identitas');
+
+        //Get Jenis API
+        $jenisAPI = $this->modelMetadata->get_by_name_bc('Jenis API');
+
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('Valuta');
+        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+        $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         $data = [
+            'jenisDokumen' => $jenisDokumen,
+            'jenisIdentitas' => $jenisIdentitas,
+            'jenisAPI' => $jenisAPI,
             'valuta' => $valuta,
             'dokumen' => $this->modelSalesOrderInvoice->asObject()->findAll(),
             'jenisTPB' => $jenisTPB,
@@ -91,16 +103,28 @@ class BeaCukaiController extends BaseController
 
     public function bc23GetByIdFormView($id)
     {
+        //Get Jenis Dokumen
+        $jenisDokumen = $this->modelMetadata->get_by_name_bc('Dokumen');
+
+        //Get Jenis Identitas
+        $jenisIdentitas = $this->modelMetadata->get_by_name_bc('Jenis Identitas');
+
+        //Get Jenis API
+        $jenisAPI = $this->modelMetadata->get_by_name_bc('Jenis API');
+
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('Valuta');
+        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+        $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         $data = [
+            'jenisDokumen' => $jenisDokumen,
+            'jenisIdentitas' => $jenisIdentitas,
+            'jenisAPI' => $jenisAPI,
             'valuta' => $valuta,
             'dokumen' => $this->modelSalesOrderInvoice->asObject()->findAll(),
             'jenisTPB' => $jenisTPB,
@@ -127,6 +151,12 @@ class BeaCukaiController extends BaseController
     {
         try {
             $rules = [
+                "jenisDokumenBC" => [
+                    "rules" => "required"
+                ],
+                "noDokumen" => [
+                    "rules" => "required"
+                ],
                 "kppbcBongkar" => [
                     "rules" => "required"
                 ],
@@ -137,9 +167,6 @@ class BeaCukaiController extends BaseController
                     "rules" => "required"
                 ],
                 "namaSupplier" => [
-                    "rules" => "required"
-                ],
-                "npwpImportir" => [
                     "rules" => "required"
                 ],
                 "namaImportir" => [
@@ -255,20 +282,26 @@ class BeaCukaiController extends BaseController
                 "type"                  => "BC 2.3",
                 "status_posting"        => "Belum Posting",
 
+                "jenis_dokumen"         => $this->request->getPost("jenisDokumenBC"),
+                "no_dokumen"            => $this->request->getPost("noDokumen"),
+
                 "kppbc_bongkar"         => $this->request->getPost("kppbcBongkar"),
                 "kppbc_pengawas"        => $this->request->getPost("kppbcPengawas"),
                 "tujuan_tpb"            => $this->request->getPost("kodeTujuanTpb"),
 
                 "supplier_id"           => $this->request->getPost("namaSupplier"),
 
-                "importir_npwp"         => $this->request->getPost("npwpImportir"),
+                "importir_jenis_identitas"   => $this->request->getPost("jenisIdentitasImportir"),
+                "importir_identitas"   => $this->request->getPost("identitasImportir"),
+                "importir_jenis_api"   => $this->request->getPost("jenisAPIImportir"),
                 "importir_name"         => $this->request->getPost("namaImportir"),
                 "tpb_no"                => $this->request->getPost("noIzinTPBImportir"),
                 "importir_api"          => $this->request->getPost("APIImportir"),
                 "importir_address"      => $this->request->getPost("alamatImportir"),
 
                 "pemilik_barang"        => $this->request->getPost("switchPemilikBarang") ? 1 : 0,
-                "pemilik_barang_npwp"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("npwpImportir") : $this->request->getPost("npwpPemilikBarang"),
+                "pemilik_barang_jenis_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisIdentitasImportir") : $this->request->getPost("jenisIdentitasPemilikBarang"),
+                "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
                 "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
@@ -360,6 +393,12 @@ class BeaCukaiController extends BaseController
     {
         try {
             $rules = [
+                "jenisDokumenBC" => [
+                    "rules" => "required"
+                ],
+                "noDokumen" => [
+                    "rules" => "required"
+                ],
                 "kppbcBongkar" => [
                     "rules" => "required"
                 ],
@@ -370,9 +409,6 @@ class BeaCukaiController extends BaseController
                     "rules" => "required"
                 ],
                 "namaSupplier" => [
-                    "rules" => "required"
-                ],
-                "npwpImportir" => [
                     "rules" => "required"
                 ],
                 "namaImportir" => [
@@ -481,20 +517,27 @@ class BeaCukaiController extends BaseController
             $id = $this->request->getPost("id");
 
             $payload = [
+                "jenis_dokumen"         => $this->request->getPost("jenisDokumenBC"),
+                "no_dokumen"            => $this->request->getPost("noDokumen"),
+
                 "kppbc_bongkar"         => $this->request->getPost("kppbcBongkar"),
                 "kppbc_pengawas"        => $this->request->getPost("kppbcPengawas"),
                 "tujuan_tpb"            => $this->request->getPost("kodeTujuanTpb"),
 
                 "supplier_id"           => $this->request->getPost("namaSupplier"),
 
-                "importir_npwp"         => $this->request->getPost("npwpImportir"),
+                "importir_jenis_identitas"   => $this->request->getPost("jenisIdentitasImportir"),
+                "importir_identitas"   => $this->request->getPost("identitasImportir"),
+                "importir_jenis_api"   => $this->request->getPost("jenisAPIImportir"),
                 "importir_name"         => $this->request->getPost("namaImportir"),
                 "tpb_no"                => $this->request->getPost("noIzinTPBImportir"),
                 "importir_api"          => $this->request->getPost("APIImportir"),
                 "importir_address"      => $this->request->getPost("alamatImportir"),
 
                 "pemilik_barang"        => $this->request->getPost("switchPemilikBarang") ? 1 : 0,
-                "pemilik_barang_npwp"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("npwpImportir") : $this->request->getPost("npwpPemilikBarang"),
+                "pemilik_barang_jenis_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisIdentitasImportir") : $this->request->getPost("jenisIdentitasPemilikBarang"),
+                "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
+                "pemilik_barang_jenis_api"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisAPIImportir") : $this->request->getPost("jenisAPIPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
                 "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
@@ -643,22 +686,34 @@ class BeaCukaiController extends BaseController
 
     public function bc25CreateFormView()
     {
+        //Get Jenis Dokumen
+        $jenisDokumen = $this->modelMetadata->get_by_name_bc('Dokumen');
+
+        //Get Jenis Identitas
+        $jenisIdentitas = $this->modelMetadata->get_by_name_bc('Jenis Identitas');
+
+        //Get Jenis API
+        $jenisAPI = $this->modelMetadata->get_by_name_bc('Jenis API');
+
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('Valuta');
+        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+        $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         //Get Referensi Lokasi Bayar
-        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name_bc('Lokasi Bayar');
 
         //Get Wajib Bayar
-        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
+        $wajibBayar = $this->modelMetadata->get_by_name_bc('Entitas');
 
         $data = [
+            'jenisDokumen' => $jenisDokumen,
+            'jenisIdentitas' => $jenisIdentitas,
+            'jenisAPI' => $jenisAPI,
             'wajibBayar' => $wajibBayar,
             'referensiLokasiBayar' => $referensiLokasiBayar,
             'valuta' => $valuta,
@@ -672,22 +727,34 @@ class BeaCukaiController extends BaseController
 
     public function bc25GetByIdFormView($id)
     {
+        //Get Jenis Dokumen
+        $jenisDokumen = $this->modelMetadata->get_by_name_bc('Dokumen');
+
+        //Get Jenis Identitas
+        $jenisIdentitas = $this->modelMetadata->get_by_name_bc('Jenis Identitas');
+
+        //Get Jenis API
+        $jenisAPI = $this->modelMetadata->get_by_name_bc('Jenis API');
+
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('Valuta');
+        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+        $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         //Get Referensi Lokasi Bayar
-        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name_bc('Lokasi Bayar');
 
         //Get Wajib Bayar
-        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
+        $wajibBayar = $this->modelMetadata->get_by_name_bc('Entitas');
 
         $data = [
+            'jenisDokumen' => $jenisDokumen,
+            'jenisIdentitas' => $jenisIdentitas,
+            'jenisAPI' => $jenisAPI,
             'wajibBayar' => $wajibBayar,
             'referensiLokasiBayar' => $referensiLokasiBayar,
             'valuta' => $valuta,
@@ -718,9 +785,6 @@ class BeaCukaiController extends BaseController
                     "rules" => "required"
                 ],
                 "kodeTujuanTpb" => [
-                    "rules" => "required"
-                ],
-                "npwpImportir" => [
                     "rules" => "required"
                 ],
                 "namaImportir" => [
@@ -830,17 +894,23 @@ class BeaCukaiController extends BaseController
                 "type"                  => "BC 2.5",
                 "status_posting"        => "Belum Posting",
 
+                "jenis_dokumen"         => $this->request->getPost("jenisDokumenBC"),
+                "no_dokumen"            => $this->request->getPost("noDokumen"),
+
                 "kantor_pabean"         => $this->request->getPost("kantorPabean"),
                 "tujuan_tpb"            => $this->request->getPost("kodeTujuanTpb"),
 
-                "importir_npwp"         => $this->request->getPost("npwpImportir"),
+                "importir_jenis_identitas"   => $this->request->getPost("jenisIdentitasImportir"),
+                "importir_identitas"   => $this->request->getPost("identitasImportir"),
+                "importir_jenis_api"   => $this->request->getPost("jenisAPIImportir"),
                 "importir_name"         => $this->request->getPost("namaImportir"),
                 "tpb_no"                => $this->request->getPost("noIzinTPBImportir"),
                 "importir_api"          => $this->request->getPost("APIImportir"),
                 "importir_address"      => $this->request->getPost("alamatImportir"),
 
                 "pemilik_barang"        => $this->request->getPost("switchPemilikBarang") ? 1 : 0,
-                "pemilik_barang_npwp"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("npwpImportir") : $this->request->getPost("npwpPemilikBarang"),
+                "pemilik_barang_jenis_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisIdentitasImportir") : $this->request->getPost("jenisIdentitasPemilikBarang"),
+                "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
                 "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
@@ -924,9 +994,6 @@ class BeaCukaiController extends BaseController
                     "rules" => "required"
                 ],
                 "kodeTujuanTpb" => [
-                    "rules" => "required"
-                ],
-                "npwpImportir" => [
                     "rules" => "required"
                 ],
                 "namaImportir" => [
@@ -1038,17 +1105,23 @@ class BeaCukaiController extends BaseController
                 "type"                  => "BC 2.5",
                 "status_posting"        => "Belum Posting",
 
+                "jenis_dokumen"         => $this->request->getPost("jenisDokumenBC"),
+                "no_dokumen"            => $this->request->getPost("noDokumen"),
+
                 "kantor_pabean"         => $this->request->getPost("kantorPabean"),
                 "tujuan_tpb"            => $this->request->getPost("kodeTujuanTpb"),
 
-                "importir_npwp"         => $this->request->getPost("npwpImportir"),
+                "importir_jenis_identitas"   => $this->request->getPost("jenisIdentitasImportir"),
+                "importir_identitas"   => $this->request->getPost("identitasImportir"),
+                "importir_jenis_api"   => $this->request->getPost("jenisAPIImportir"),
                 "importir_name"         => $this->request->getPost("namaImportir"),
                 "tpb_no"                => $this->request->getPost("noIzinTPBImportir"),
                 "importir_api"          => $this->request->getPost("APIImportir"),
                 "importir_address"      => $this->request->getPost("alamatImportir"),
 
                 "pemilik_barang"        => $this->request->getPost("switchPemilikBarang") ? 1 : 0,
-                "pemilik_barang_npwp"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("npwpImportir") : $this->request->getPost("npwpPemilikBarang"),
+                "pemilik_barang_jenis_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("jenisIdentitasImportir") : $this->request->getPost("jenisIdentitasPemilikBarang"),
+                "pemilik_barang_identitas"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("identitasImportir") : $this->request->getPost("identitasPemilikBarang"),
                 "pemilik_barang_name"   => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("namaImportir") : $this->request->getPost("namaPemilikBarang"),
                 "pemilik_barang_address"=> $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("alamatImportir") : $this->request->getPost("alamatPemilikBarang"),
                 "pemilik_barang_api"    => $this->request->getPost("switchPemilikBarang") ? $this->request->getPost("APIImportir") : $this->request->getPost("APIPemilikBarang"),
@@ -1186,19 +1259,19 @@ class BeaCukaiController extends BaseController
     public function bc261CreateFormView()
     {
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('Valuta');
+        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+        $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         //Get Referensi Lokasi Bayar
-        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name_bc('Lokasi Bayar');
 
         //Get Wajib Bayar
-        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
+        $wajibBayar = $this->modelMetadata->get_by_name_bc('Entitas');
 
         $data = [
             'wajibBayar' => $wajibBayar,
@@ -1215,19 +1288,19 @@ class BeaCukaiController extends BaseController
     public function bc261GetByIdFormView($id)
     {
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name('Valuta');
+        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
 
         //Get Jenis TPB
-        $jenisTPB = $this->modelMetadata->get_by_name('Jenis TPB');
+        $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
 
         //Get Pengangkutan
-        $pengangkutan = $this->modelMetadata->get_by_name('Pengangkutan');
+        $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         //Get Referensi Lokasi Bayar
-        $referensiLokasiBayar = $this->modelMetadata->get_by_name('Lokasi Bayar');
+        $referensiLokasiBayar = $this->modelMetadata->get_by_name_bc('Lokasi Bayar');
 
         //Get Wajib Bayar
-        $wajibBayar = $this->modelMetadata->get_by_name('Entitas');
+        $wajibBayar = $this->modelMetadata->get_by_name_bc('Entitas');
 
         $data = [
             'wajibBayar' => $wajibBayar,
@@ -1663,6 +1736,60 @@ class BeaCukaiController extends BaseController
     public function bc262View()
     {
         return view('BeaCukai/bc-262/index');
+    }
+
+    public function bc262All()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "idCompany"     => $this->this_company_id,
+            "type"          => "BC 2.6.2"
+        ];
+
+        $condition = [
+            "bea_cukai.company_id"  => $this->this_company_id,
+            "type"                  => "BC 2.6.2"
+        ];
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType")
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $beaCukaiData = $this->modelBeaCukai->getList($condition, $addCondition, $limit, $offset);
+
+        $dataBeaCukai = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($beaCukaiData['data'] as $data) {
+            array_push($dataBeaCukai, [
+                "no"                    => $no++,
+                "id"                    => $data->id,
+                "aju_no"                => $data->aju_no,
+                "registration_no"       => $data->registration_no,
+                "registration_date"     => $data->registration_date,
+                "tujuan_tpb_name"       => $data->tujuan_tpb_name,
+                "status_posting"        => $data->status_posting
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $beaCukaiData['totalData'],
+            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
+            "data"              => $dataBeaCukai,
+            // "response" => $response,
+            "payload"           => $payload
+        ];
+
+        echo json_encode($data);
+        return;
     }
 
     public function bc27View()

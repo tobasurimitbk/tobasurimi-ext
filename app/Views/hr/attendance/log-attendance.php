@@ -35,9 +35,9 @@
     <div class="section-header">
         <h1>Log Attendance</h1>
         <div class="col-button-tambah-spp">
-            <button class="btn btn-warning btn-print float-right" onclick="alert('Fitur print belum tersedia')">
+            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month) ?>">
                 <i class="fa-solid fa-print"></i> Print
-            </button>
+            </a>
         </div>
     </div>
     <div class="card">
@@ -137,11 +137,11 @@
                                     $no = (strlen($i) == 1) ? ("0" . $i) : $i;
 
                                     if (date("N", $temp) == 7) :
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Masuk " . $i . "</font></td>";
-                                        echo "<td align=center  style=\"vertical-align:middle;\" width=\"25\" height=\"25\"><font color='red'>Keluar " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>IN " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>OUT " . $i . "</font></td>";
                                     else :
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Masuk " . $i . "</td>";
-                                        echo "<td align=center style=\"vertical-align:middle;\" width=\"25\" height=\"25\">Keluar " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\">IN<br> " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\">OUT<br> " . $i . "</td>";
                                     endif;
                                 endfor;
                                 ?>

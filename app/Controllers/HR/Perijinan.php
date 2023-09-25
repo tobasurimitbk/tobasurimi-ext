@@ -33,7 +33,7 @@ class Perijinan extends BaseController
         $DivisiModel = new DivisisModel();
 
         $data = [
-            "status" => ["IJIN", "CUTI", "SAKIT"],
+            "status" => ["IJIN", "CUTI", "SAKIT", "RL"],
             "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
         ];
 

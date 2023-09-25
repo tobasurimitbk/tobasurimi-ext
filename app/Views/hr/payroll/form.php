@@ -267,7 +267,7 @@
                 </div>
             </div>
             <label class="form-label font-weight-bold lable-title mt-2">
-                Rincan Perhitungan Uang Lembur
+                Rincan Perhitungan Final
             </label>
             <table class="table mt-3 p-3" width="100%" cellspacing="0">
                 <tbody class="body-table" style="color:black;">
