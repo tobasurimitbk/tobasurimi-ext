@@ -346,4 +346,77 @@ class BarangModel extends Model
 
         return $data;
     }
+
+    public function getStockList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'parent_barang'     => 'parent_barangs.nama_barang',
+            'kode_barang'       => 'barangs.kode_barang',
+            'nama_barang'       => 'barangs.nama_barang',
+            'type'              => 'barangs.type',
+            'harga_barang'      => 'barangs.harga_barang',
+            'kode_satuan'       => 'satuans.kode_satuan',
+            'kategori'          => 'metadata.value',
+            'code_hs'           => 'hs_codes.code',
+            'sub_akun_ap'       => 'ap.nama_sub',
+            'sub_akun_ar'       => 'ar.nama_sub',
+            'stok'              => 'barangs.stok',
+            'createdAt'         => 'barangs.createdAt',
+            'updatedAt'         => 'barangs.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'barangs.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "barangs.id AS id,
+                      barangs.kode_barang AS kodeBarang,
+                      barangs.nama_barang AS barangName,
+                      barangs.type AS type,
+                      parent_barangs.nama_barang AS barangParent,
+                      satuans.kode_satuan AS kodeSatuan, 
+                      metadata.value AS kategori,
+                      warehouses.id AS warehouseId,
+                      warehouses.warehouse_name AS warehouseName,
+                      SUM(stock_details.qty) AS qty";
+        $barangDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('barangs AS parent_barangs', 'parent_barangs.id = barangs.parent_id', 'left')
+            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
+            ->join('metadata', 'metadata.id = barangs.kategori_id', 'left')
+            ->join('stock_details', 'stock_details.barang_id = barangs.id')
+            ->join('warehouses', 'warehouses.id = stock_details.warehouse_id')
+            ->groupBy(['stock_details.barang_id', 'stock_details.warehouse_id'])
+            ->orderBy($sort, $sortType);
+
+        $totalData = $barangDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['kategori']) {
+            $barangDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $barangDataQry->like('barangs.nama_barang', $addCondition['search'])->orLike('barangs.kode_barang', $addCondition['search']);
+        }
+
+        if ($addCondition['kategori']) {
+            $barangDataQry->where('metadata.id', $addCondition['kategori']);
+        }
+
+        if ($addCondition['search'] || $addCondition['kategori']) {
+            $barangDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $barangDataQry->countAllResults(false);
+        $data = $barangDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
 }

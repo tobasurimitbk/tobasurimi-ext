@@ -444,7 +444,7 @@
             placeholder: "Pilih warehouse",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
+            // tags: true,
             allowClear: true
         })
 
@@ -474,7 +474,6 @@
             placeholder: "Pilih Barang",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal .modal-content"),
-            tags: true,
             allowClear: true
         })
 
@@ -741,7 +740,6 @@
                         var total = 0;
                         let taxAmt = 0;
                         const tableData = table.rows().data().toArray();
-                        console.log(tableData)
 
                         let update_list_items = [];
 
@@ -878,6 +876,7 @@
                                     title: "Barang Tidak Boleh Kosong",
                                     confirmButtonColor: '#4e73df',
                                 });
+                                stopLoading();
                                 return;
                             }
 

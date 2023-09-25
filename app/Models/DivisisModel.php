@@ -83,13 +83,14 @@ class DivisisModel extends Model
     public function getTunjanganByDivisi($divisionID)
     {
         $select = "
-            tunjangan.*
+            tunjangan.*, gaji_divisi.nominal
         ";
         return $this->asObject()
             ->select($select)
             ->join('gaji_divisi', 'gaji_divisi.division_id = divisis.id', 'INNER')
             ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'INNER')
             ->where('gaji_divisi.division_id', $divisionID)
+            ->where('tunjangan.deletedAt', null)
             ->findAll();
     }
 }
