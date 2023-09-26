@@ -119,9 +119,9 @@
                                     <th onclick="changeSort('due_date')" class="sort">Nama Barang</th>
                                     <th onclick="changeSort('date_of')" class="sort">Qty LPB</th>
                                     <th onclick="changeSort('date_of')" class="sort">Qty Retur</th>
-                                    <th onclick="changeSort('date_of')" class="sort">Qty telah terima</th>
-                                    <th onclick="changeSort('date_of')" class="sort">Qty akan diterima</th>
-                                    <th onclick="changeSort('recipient')" class="sort">satuan</th>
+                                    <th onclick="changeSort('date_of')" class="sort">Qty Telah Terima</th>
+                                    <th onclick="changeSort('date_of')" class="sort">Qty Akan Diterima</th>
+                                    <th onclick="changeSort('recipient')" class="sort">Satuan</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table" id="body-table" style="cursor: pointer;">
