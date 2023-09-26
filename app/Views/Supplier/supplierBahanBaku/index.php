@@ -118,7 +118,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
@@ -153,7 +153,7 @@
                                 <label for="floatingInput">Akun AR (Opsional)</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </form>
                 <!-- <div class="col-subtitle-modal">
                     <div class="row mt-5">
@@ -286,10 +286,10 @@
                                 <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
                                 <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
                                 <th onclick="changeSort('email')" class="sort">Email</th>
-                                <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
+                                <!-- <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
                                 <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
                                 <th onclick="changeSort('ap_name')" class="sort">AP</th>
-                                <th onclick="changeSort('ar_name')" class="sort">AR</th>
+                                <th onclick="changeSort('ar_name')" class="sort">AR</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -378,19 +378,21 @@
         }, {
             data: "email",
             className: "text-center"
-        }, {
-            data: "no_rekening",
-            className: "text-center"
-        }, {
-            data: "supplier_buyer",
-            className: "text-center"
-        }, {
-            data: "ap_name",
-            className: "text-center"
-        }, {
-            data: "ar_name",
-            className: "text-center"
-        }],
+        }
+        // , {
+        //     data: "no_rekening",
+        //     className: "text-center"
+        // }, {
+        //     data: "supplier_buyer",
+        //     className: "text-center"
+        // }, {
+        //     data: "ap_name",
+        //     className: "text-center"
+        // }, {
+        //     data: "ar_name",
+        //     className: "text-center"
+        // }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -578,61 +580,61 @@
             .find('label')
             .css('z-index', '1');
 
-        // AP
-        $('.ap_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
+        // // AP
+        // $('.ap_id').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".add-modal .modal-content")
+        // })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.ap_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+        // //CSS SELECT2 FLOATING LABEL
+        // $('.ap_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ap_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+        // $('.ap_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ap_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        // $('.ap_id')
+        //     .parent('div')
+        //     .find('label')
+        //     .css('z-index', '1');
 
-        // AR
-        $('.ar_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
+        // // AR
+        // $('.ar_id').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".add-modal .modal-content")
+        // })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.ar_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+        // //CSS SELECT2 FLOATING LABEL
+        // $('.ar_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ar_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+        // $('.ar_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ar_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        // $('.ar_id')
+        //     .parent('div')
+        //     .find('label')
+        //     .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -659,24 +661,24 @@
                 email: {
                     // required: true
                 },
-                no_rekening: {
-                    // required: true
-                },
-                supplier_buyer: {
-                    // required: true
-                },
+                // no_rekening: {
+                //     // required: true
+                // },
+                // supplier_buyer: {
+                //     // required: true
+                // },
                 province_parent_id: {
                     // required: true
                 },
                 city_parent_id: {
                     // required: true
                 },
-                ap_id: {
-                    // required: true
-                },
-                ar_id: {
-                    // required: true
-                }
+                // ap_id: {
+                //     // required: true
+                // },
+                // ar_id: {
+                //     // required: true
+                // }
             },
             messages: {
                 kode: {
@@ -702,24 +704,24 @@
                 email: {
                     required: "Email wajib diisi"
                 },
-                no_rekening: {
-                    required: "No. Rekening wajib diisi"
-                },
-                supplier_buyer: {
-                    required: "Supplier / Buyer wajib diisi"
-                },
+                // no_rekening: {
+                //     required: "No. Rekening wajib diisi"
+                // },
+                // supplier_buyer: {
+                //     required: "Supplier / Buyer wajib diisi"
+                // },
                 province_parent_id: {
                     required: "Provinsi wajib diisi"
                 },
                 city_parent_id: {
                     required: "Kota wajib diisi"
                 },
-                ap_id: {
-                    required: "Akun AP wajib diisi"
-                },
-                ar_id: {
-                    required: "Akun AR wajib diisi"
-                }
+                // ap_id: {
+                //     required: "Akun AP wajib diisi"
+                // },
+                // ar_id: {
+                //     required: "Akun AR wajib diisi"
+                // }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -749,7 +751,7 @@
 
         $(".no_npwp").mask("000000000000000")
 
-        $(".no_rekening").mask("000000000000000")
+        // $(".no_rekening").mask("000000000000000")
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -802,8 +804,8 @@
             $(".delete-form").css('display', 'none');
             $(".body-detail-table").empty()
 
-            $('.ap_id').select2(select2Prop);
-            $('.ar_id').select2(select2Prop);
+            // $('.ap_id').select2(select2Prop);
+            // $('.ar_id').select2(select2Prop);
 
             $(".add-modal").modal("show");
         })
@@ -861,8 +863,8 @@
                         $(".phone").val(res?.data?.phone);
                         $(".contact_person").val(res?.data?.contact_person);
                         $(".email").val(res?.data?.email);
-                        $(".no_rekening").val(res?.data?.no_rekening);
-                        $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
+                        // $(".no_rekening").val(res?.data?.no_rekening);
+                        // $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
                         $(".country_code").val(res?.data?.country_code).change();
 
@@ -959,13 +961,13 @@
                                 $(".add-modal").modal("show")
                             }
                         }) */
-                        $('.ap_id').select2(select2Prop);
-                        $('.ar_id').select2(select2Prop);
+                        // $('.ap_id').select2(select2Prop);
+                        // $('.ar_id').select2(select2Prop);
 
-                        const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
-                        $(".ap_id").append($apOption).trigger('change');
-                        const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
-                        $(".ar_id").append($arOption).trigger('change');
+                        // const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
+                        // $(".ap_id").append($apOption).trigger('change');
+                        // const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
+                        // $(".ar_id").append($arOption).trigger('change');
 
                         $(".add-modal").modal("show");
 

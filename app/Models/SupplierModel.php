@@ -26,12 +26,12 @@ class SupplierModel extends Model
         'phone',
         'contact_person',
         'email',
-        'no_rekening',
-        'supplier_buyer',
+        // 'no_rekening',
+        // 'supplier_buyer',
         'type',
         'kategori',
-        'ap_id',
-        'ar_id',
+        // 'ap_id',
+        // 'ar_id',
         'country_code'
     ];
 
@@ -68,8 +68,8 @@ class SupplierModel extends Model
             'no_npwp'           => 'suppliers.no_npwp',
             'phone'             => 'suppliers.phone',
             'contact_person'    => 'suppliers.contact_person',
-            'no_rekening'       => 'suppliers.no_rekening',
-            'supplier_buyer'    => 'suppliers.supplier_buyer',
+            // 'no_rekening'       => 'suppliers.no_rekening',
+            // 'supplier_buyer'    => 'suppliers.supplier_buyer',
             'province'          => 'provinces.province_name',
             'city'              => 'cities.city_name',
             'postal_code'       => 'suppliers.postal_code',
@@ -83,17 +83,27 @@ class SupplierModel extends Model
 
         $selectQry = "suppliers.*, 
                       cities.city_name AS city_name, 
-                      provinces.province_name AS province_name,
-                      ap.nama_sub AS ap_name,
-                      ar.nama_sub AS ar_name";
+                      provinces.province_name AS province_name";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('cities', 'suppliers.city_id = cities.id', 'left')
             ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
-            ->join('sub_akuns AS ap', 'suppliers.ap_id = ap.id', 'left')
-            ->join('sub_akuns AS ar', 'suppliers.ar_id = ar.id', 'left')
             ->orderBy($sort, $sortType);
+
+        // $selectQry = "suppliers.*, 
+        //               cities.city_name AS city_name, 
+        //               provinces.province_name AS province_name,
+        //               ap.nama_sub AS ap_name,
+        //               ar.nama_sub AS ar_name";
+        // $supplierDataQry = $this->asObject()
+        //     ->select($selectQry)
+        //     ->where($condition)
+        //     ->join('cities', 'suppliers.city_id = cities.id', 'left')
+        //     ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
+        //     ->join('sub_akuns AS ap', 'suppliers.ap_id = ap.id', 'left')
+        //     ->join('sub_akuns AS ar', 'suppliers.ar_id = ar.id', 'left')
+        //     ->orderBy($sort, $sortType);
 
         $totalData = $supplierDataQry->countAllResults(false);
 
@@ -117,10 +127,11 @@ class SupplierModel extends Model
     public function getSupplierById($id)
     {
         $supplierData = $this->asObject()
-            ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name, country.country_name')
+            ->select('suppliers.*, country.country_name')
+            // ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name, country.country_name')
             ->join('country', 'country.code = suppliers.country_code', 'left')
-            ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id', 'left')
-            ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id', 'left')
+            // ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id', 'left')
+            // ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id', 'left')
             ->find($id);
 
         return $supplierData;
