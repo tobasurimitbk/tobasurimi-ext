@@ -38,7 +38,7 @@
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
+                                <label for="floatingInput">Alamat (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Pilih Negara</label>
+                        <label for="floatingInput">Pilih Negara (Opsional)</label>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -70,7 +70,7 @@
                                             }
                                             ?>
                                         </select>
-                                        <label for="floatingInput">Provinsi</label>
+                                        <label for="floatingInput">Provinsi (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -78,13 +78,13 @@
                                         <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
                                             <option value="" data-code=""></option>
                                         </select>
-                                        <label for="floatingInput">Kota</label>
+                                        <label for="floatingInput">Kota (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="postal_code" placeholder="Postal Code">
-                                        <label for="floatingInput">Kode Pos</label>
+                                        <label for="floatingInput">Kode Pos (Opsional)</label>
                                     </div>
                                 </div>
                             </div>
@@ -94,13 +94,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
-                                <label for="floatingInput">Nomor NPWP</label>
+                                <label for="floatingInput">Nomor NPWP (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
-                                <label for="floatingInput">No. Telepon</label>
+                                <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -108,13 +108,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
-                                <label for="floatingInput">Contact Person</label>
+                                <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email</label>
+                                <label for="floatingInput">Email (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -122,7 +122,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
-                                <label for="floatingInput">No. Rekening</label>
+                                <label for="floatingInput">No. Rekening (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -132,7 +132,7 @@
                                     <option value="SUPPLIER">SUPPLIER</option>
                                     <option value="BUYER">BUYER</option>
                                 </select>
-                                <label for="floatingInput">Supplier / Buyer</label>
+                                <label for="floatingInput">Supplier / Buyer (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,7 @@
                                 <select class="form-select ap_id" name="ap_id" id="ap_id">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Akun AP</label>
+                                <label for="floatingInput">Akun AP (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -150,7 +150,7 @@
                                 <select class="form-select ar_id" name="ar_id" id="ar_id">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Akun AR</label>
+                                <label for="floatingInput">Akun AR (Opsional)</label>
                             </div>
                         </div>
                     </div>
