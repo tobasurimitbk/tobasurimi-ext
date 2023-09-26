@@ -165,7 +165,11 @@ class BeaCukaiController extends BaseController
         //Get Pengangkutan
         $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
+        //Get Kategori Barang
+        $kategoriBarang = $this->modelMetadata->get_by_name_bc('Kategori Barang BC');
+
         $data = [
+            'kategoriBarang' => $kategoriBarang,
             'dropdownDokumen' => [],
             'jenisKontainer' => $jenisKontainer,
             'ukuranKontainer' => $ukuranKontainer,
@@ -217,7 +221,11 @@ class BeaCukaiController extends BaseController
         //Get Pengangkutan
         $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
+        //Get Kategori Barang
+        $kategoriBarang = $this->modelMetadata->get_by_name_bc('Kategori Barang BC');
+
         $data = [
+            'kategoriBarang' => $kategoriBarang,
             'jenisKontainer' => $jenisKontainer,
             'ukuranKontainer' => $ukuranKontainer,
             'tipeKontainer' => $tipeKontainer,
@@ -507,7 +515,8 @@ class BeaCukaiController extends BaseController
 
                 "data_dokumen"          => $this->request->getPost("data_dokumen"),
                 "data_kontainer"        => $this->request->getPost("data_kontainer"),
-                "data_kemasan"          => $this->request->getPost("data_kemasan")
+                "data_kemasan"          => $this->request->getPost("data_kemasan"),
+                "data_barang"           => $this->request->getPost("data_barang")
             ];
             
             $insert =  $this->modelBeaCukai->insert($payload);
@@ -744,7 +753,8 @@ class BeaCukaiController extends BaseController
 
                 "data_dokumen"          => $this->request->getPost("data_dokumen"),
                 "data_kontainer"        => $this->request->getPost("data_kontainer"),
-                "data_kemasan"          => $this->request->getPost("data_kemasan")
+                "data_kemasan"          => $this->request->getPost("data_kemasan"),
+                "data_barang"           => $this->request->getPost("data_barang")
             ];
             
             $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();

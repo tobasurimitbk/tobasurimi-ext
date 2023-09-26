@@ -80,10 +80,10 @@ class SupplierBahanBakuImport extends BaseController
                 "phone"         => $data->phone,
                 "contact_person" => $data->contact_person,
                 "email"         => $data->email,
-                "no_rekening"   => $data->no_rekening,
-                "supplier_buyer" => $data->supplier_buyer,
-                "ap_name"       => $data->ap_name,
-                "ar_name"       => $data->ar_name
+                // "no_rekening"   => $data->no_rekening,
+                // "supplier_buyer" => $data->supplier_buyer,
+                // "ap_name"       => $data->ap_name,
+                // "ar_name"       => $data->ar_name
             ]);
         }
 
@@ -127,24 +127,24 @@ class SupplierBahanBakuImport extends BaseController
                 "email" => [
                     "rules" => "permit_empty|valid_email"
                 ],
-                "no_rekening" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "supplier_buyer" => [
-                    "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
-                ],
+                // "no_rekening" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "supplier_buyer" => [
+                //     "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
+                // ],
                 "country_code" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty"
                 ],
                 "postal_code" => [
                     "rules" => "permit_empty|numeric"
                 ],
-                "ap_id" => [
-                    "rules" => "permit_empty|is_natural"
-                ],
-                "ar_id" => [
-                    "rules" => "permit_empty|is_natural"
-                ]
+                // "ap_id" => [
+                //     "rules" => "permit_empty|is_natural"
+                // ],
+                // "ar_id" => [
+                //     "rules" => "permit_empty|is_natural"
+                // ]
             ];
 
             if (!$this->validate($rules)) {
@@ -167,12 +167,12 @@ class SupplierBahanBakuImport extends BaseController
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
                 "email" => $this->request->getPost("email"),
-                "no_rekening" => $this->request->getPost("no_rekening"),
-                "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                // "no_rekening" => $this->request->getPost("no_rekening"),
+                // "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                 "province_id" => $this->request->getPost("province_parent_id"),
                 "city_id" => $this->request->getPost("city_parent_id"),
-                "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                // "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                // "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "kategori" => "IMPORT",
                 "type" => "BAHAN BAKU"
                 // "list_address" => json_decode(stripslashes($this->request->getPost("list_address")))
@@ -192,13 +192,9 @@ class SupplierBahanBakuImport extends BaseController
                 "phone"             => $this->request->getPost("phone"),
                 "contact_person"    => $this->request->getPost("contact_person"),
                 "email"             => $this->request->getPost("email"),
-                "no_rekening"       => $this->request->getPost("no_rekening"),
-                "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
                 "province_id"       => $this->request->getPost("province_parent_id"),
                 "city_id"           => $this->request->getPost("city_parent_id"),
                 "postal_code"       => $this->request->getPost("postal_code"),
-                "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                 "kategori"          => "IMPORT",
                 "type"              => "BAHAN BAKU",
                 "country_code"      => $this->request->getPost("country_code")
@@ -249,38 +245,38 @@ class SupplierBahanBakuImport extends BaseController
                     "rules" => "required"
                 ],
                 "address" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "no_npwp" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "phone" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "contact_person" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|string"
                 ],
                 "email" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty|valid_email"
                 ],
-                "no_rekening" => [
-                    "rules" => "required"
-                ],
-                "supplier_buyer" => [
-                    "rules" => "required"
-                ],
+                // "no_rekening" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "supplier_buyer" => [
+                //     "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
+                // ],
                 "country_code" => [
-                    "rules" => "required"
+                    "rules" => "permit_empty"
                 ],
                 "postal_code" => [
-                    "rules" => "required|numeric"
+                    "rules" => "permit_empty|numeric"
                 ],
-                "ap_id" => [
-                    "rules" => "required"
-                ],
-                "ar_id" => [
-                    "rules" => "required"
-                ]
+                // "ap_id" => [
+                //     "rules" => "permit_empty|is_natural"
+                // ],
+                // "ar_id" => [
+                //     "rules" => "permit_empty|is_natural"
+                // ]
             ];
 
             if (!$this->validate($rules)) {
@@ -306,13 +302,13 @@ class SupplierBahanBakuImport extends BaseController
                     "phone"             => $this->request->getPost("phone"),
                     "contact_person"    => $this->request->getPost("contact_person"),
                     "email"             => $this->request->getPost("email"),
-                    "no_rekening"       => $this->request->getPost("no_rekening"),
-                    "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
+                    // "no_rekening"       => $this->request->getPost("no_rekening"),
+                    // "supplier_buyer"    => $this->request->getPost("supplier_buyer"),
                     "province_id"       => $this->request->getPost("province_parent_id"),
                     "city_id"           => $this->request->getPost("city_parent_id"),
                     "postal_code"       => $this->request->getPost("postal_code"),
-                    "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    // "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    // "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "kategori"          => "IMPORT",
                     "type"              => "BAHAN BAKU",
                     "country_code"      => $this->request->getPost("country_code")
