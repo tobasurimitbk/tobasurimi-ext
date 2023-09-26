@@ -181,12 +181,12 @@
                             <label for="floatingInput">Valas</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
                             <label for="floatingInput">Termin Pembayaran (Opsional)</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
