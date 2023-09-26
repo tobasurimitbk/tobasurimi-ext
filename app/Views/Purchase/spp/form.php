@@ -61,7 +61,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Departemen</label>
+                            <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -110,12 +110,12 @@
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataSPP) ? $dataSPP->createdByName : session()->get("login")->name; ?>">
                             <label for="floatingInput">Order Oleh</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </form>
             <div class="col-subtitle-modal">

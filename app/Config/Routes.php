@@ -582,7 +582,8 @@ $routes->get('/bea-cukai-bc-41', 'BeaCukai\beaCukaiController::bc41View', ['filt
 // Attendance
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
-$routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::printLogAbsensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogAbsensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelLogPresensi/$1', ['filter' => 'Auth']);
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);

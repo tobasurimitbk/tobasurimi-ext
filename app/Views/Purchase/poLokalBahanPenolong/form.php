@@ -120,14 +120,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOLokal) ? $dataPOLokal->createdByName : session()->get("login")->name; ?>">
                             <label for="floatingInput">Order Oleh</label>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="row">
                     <div class="col mb-3">
                         <label class="form-label font-weight-bold lable-title">Data Supplier</label>
@@ -151,7 +151,7 @@
                             <label for="floatingInput">Kode Supplier</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->supplierName : ""; ?>" readonly="true" class="form-control supplier" id="supplier" name="supplier" placeholder="Nama Supplier">
                             <label for="floatingInput">Nama Supplier</label>
@@ -181,12 +181,12 @@
                             <label for="floatingInput">Valas</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
                             <label for="floatingInput">Termin Pembayaran (Opsional)</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
@@ -206,8 +206,6 @@
                             <label for="floatingInput">DPP</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOLokal) ? $dataPOLokal->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
