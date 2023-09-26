@@ -35,7 +35,7 @@
     <div class="section-header">
         <h1>Log Attendance</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month) ?>">
+            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">
                 <i class="fa-solid fa-print"></i> Print
             </a>
         </div>

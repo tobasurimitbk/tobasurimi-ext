@@ -456,7 +456,7 @@ class Attendance extends BaseController
 
     public function printLogAbsensi($yearMonth)
     {
-        $divisiID = $this->request->getVar('divisiID');
+        $divisiID = $this->request->getGet('divisiID');
 
         $employeesModel = new EmployeesModel();
         $divisiModel = new DivisisModel();
@@ -468,7 +468,7 @@ class Attendance extends BaseController
         $dompdf = new Dompdf();
 
         if (!empty($divisiID)) {
-            $employeeData = $employeesModel->getEmployeesByDivision($this->this_company_id, $divisiID);
+            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
         } else {
             $employeeData = $employeesModel->getEmployees($this->this_company_id);
         }

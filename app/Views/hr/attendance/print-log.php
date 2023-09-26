@@ -231,11 +231,13 @@
         <?php endfor; ?>
     </table>
 
-    <small>
+    <small style="font-size: 10px;">
+        Keterangan:
         <?php foreach ($statusPerizinanAll as $s) : ?>
             <?= explode("_", $s['value'])[0] ?> (<?= explode("_", $s['value'])[1]; ?>),
         <?php endforeach; ?>
-        LIBUR (L)</small>
+        LIBUR (L)
+    </small>
 
 
     <div class="page-break">

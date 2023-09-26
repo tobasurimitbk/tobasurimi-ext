@@ -173,6 +173,24 @@ class EmployeesModel extends Model
         return $query->getResultArray();
     }
 
+    public function getEmployeesByDivisionID($company_id, $divisionID)
+    {
+        $arrCondition = [
+            'employees.deletedAt' => null,
+            'employees.company_id' => $company_id,
+            'divisis.id' => $divisionID,
+            'divisis.deletedAt' => null
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.*")
+            ->join('divisis', 'employees.division_id = divisis.id', 'left');
+        $builder->groupStart()->where($arrCondition)->groupEnd();
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
     public function getEmployeesNotSyncAttendances($company_id)
     {
         $arrCondition = [
