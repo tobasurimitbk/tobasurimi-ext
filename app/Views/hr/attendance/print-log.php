@@ -213,7 +213,25 @@
 
     <div class="page-break">
         <h3 style="text-align: center;">REKAP DATA KEHADIRAN TOTAL LOG ABSENSI</h3>
-
+        <table class="mb-3" style="font-size: 12px;">
+            <tbody>
+                <tr>
+                    <td width="100px"><b>Company Name</b></td>
+                    <td width="10px">:</td>
+                    <td><?= $company['company'] ?></td>
+                </tr>
+                <tr>
+                    <td width="100px"><b>Divisi</b></td>
+                    <td width="10px">:</td>
+                    <td><?= $divisi != null ? $divisi['divisi'] : "Semua Divisi" ?></td>
+                </tr>
+                <tr>
+                    <td width="100px"><b>Bulan</b></td>
+                    <td width="10px">:</td>
+                    <td><?= date('F - Y', strtotime($yearMonth)) ?></td>
+                </tr>
+            </tbody>
+        </table>
         <table class="table table-bordered" style="font-size:12px; margin-top:10px;" border="1">
             <thead>
                 <tr align="center" style="font-weight: bold;">
