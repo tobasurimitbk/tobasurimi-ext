@@ -83,7 +83,7 @@
                             <select class="form-select status" name="status" id="status" <?= !empty($data) ? ($data->status === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($status as $s) : ?>
-                                    <option <?= (!empty($formPerijinan)) ?  ($formPerijinan['status'] == $s ? "selected" : "") : ""  ?> value="<?= $s; ?>"><?= $s; ?></option>
+                                    <option <?= (!empty($formPerijinan)) ?  ($formPerijinan['status'] == $s['value'] ? "selected" : "") : ""  ?> value="<?= $s['value']; ?>"> <?= explode("_",  $s['value'])[0] ?> (<?= explode("_",  $s['value'])[1] ?>)</option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Status</label>

@@ -7,6 +7,7 @@ use App\Models\DivisisModel;
 use Config\Services;
 use App\Models\FormPerijinanModel;
 use App\Models\EmployeesModel;
+use App\Models\MetadataModel;
 
 class Perijinan extends BaseController
 {
@@ -31,9 +32,13 @@ class Perijinan extends BaseController
     public function createView()
     {
         $DivisiModel = new DivisisModel();
+        $metaDataModel = new MetadataModel();
 
         $data = [
-            "status" => ["IJIN", "CUTI", "SAKIT", "RL"],
+            "status" => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
             "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
         ];
 
@@ -56,6 +61,7 @@ class Perijinan extends BaseController
     {
         $FormPerijinanModel = new FormPerijinanModel();
         $DivisiModel = new DivisisModel();
+        $metaDataModel = new MetadataModel();
 
         $formPerijinanDate = $FormPerijinanModel
             ->selectMax('periode', 'max_tanggal')
@@ -64,7 +70,10 @@ class Perijinan extends BaseController
             ->first();
 
         $data = [
-            "status" => ["IJIN", "CUTI", "SAKIT"],
+            "status" => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
             "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
             "formPerijinan" => $FormPerijinanModel->select('form_perijinan.*, employees.division_id, employees.name')->where('kode', $id)
                 ->join('employees', 'employees.id = form_perijinan.employee_id')
@@ -86,6 +95,7 @@ class Perijinan extends BaseController
         ];
 
         $FormPerijinanModel = new FormPerijinanModel();
+        $metaDataModel = new MetadataModel();
 
         $condition = [
             'employees.deletedAt' => null,
@@ -113,6 +123,8 @@ class Perijinan extends BaseController
                 ->where('kode', $data->kode)
                 ->first();
 
+            $metaDataDetail = $metaDataModel->where('name', "Status Perizinan")->where('value', $data->status)->first();
+
             array_push($dataEmployee, [
                 "no" => $no++,
                 "id" =>  $data->id,
@@ -123,7 +135,8 @@ class Perijinan extends BaseController
                 "mulai" => date_format(date_create($formPerijinan['min_tanggal']), "d-m-Y"),
                 "selesai" => date_format(date_create($formPerijinan['max_tanggal']), "d-m-Y"),
                 "keterangan" => $data->status,
-                "approval" => ($data->is_approval) ? "Approved" : "Not Approved"
+                "approval" => ($data->is_approval) ? "Approved" : "Not Approved",
+                "statusName" => \explode("_", $metaDataDetail['value'])[0]
             ]);
         }
 
