@@ -824,47 +824,6 @@ class POImportBahanBaku extends BaseController
         return;
     }
 
-    public function dropdownBeaCukaiPOImportBahanBaku()
-    {
-        $dataPOImport = $this->rmImportPOModel->getNoPOBeaCukai($this->this_company_id);
-
-        $data = [
-            "data" => $dataPOImport
-        ];
-        // $dataBea = $this->beaCukaiModel->getNoPOBeaCukai("IMPORT", "BAKU", $this->this_company_id);
-        // $newData = [];
-        // $multi = [];
-
-        // foreach($dataPOImport as $item)
-        // {
-        //     // check exist
-        //     $validate = true;
-        //     foreach($dataBea as $bea)
-        //     {
-        //         $multi =  $bea["multiple_po_id"] ? json_decode($bea["multiple_po_id"]) : [];
-
-        //         foreach($multi as $check)
-        //         {
-        //             if(formatter($check, "STR_TO_INT") === formatter($item["id"], "STR_TO_INT"))
-        //             {
-        //                 $validate = false;
-        //             }
-        //         }
-        //     }
-        //     if($validate){
-        //         array_push($newData, $item);
-        //     }
-        // }
-        // $data = [
-        //     "data" => $newData,
-        //     "multi" => $multi,
-        //     "po" => $dataPOImport
-        // ];
-
-        echo json_encode($data);
-        return;
-    }
-
     public function purchaseOrderPaymentDropdown($id)
     {
         $condition = [

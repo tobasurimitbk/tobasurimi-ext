@@ -23,6 +23,7 @@ class BeaCukaiModel extends Model
 
         'jenis_dokumen',
         'no_dokumen',
+        'dokumen_type',
 
         'aju_no',
         'registration_no',

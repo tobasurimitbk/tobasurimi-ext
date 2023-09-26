@@ -412,13 +412,6 @@ $routes->get('/supplier-bahan-penolong/dropdown', 'Supplier\SupplierBahanPenolon
 $routes->get('/supplier-bahan-baku-import/dropdown', 'Supplier\SupplierBahanBakuImport::dropdownSupplier', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-penolong-import/dropdown', 'Supplier\SupplierBahanPenolongImport::dropdownSupplier', ['filter' => 'Auth']);
 
-// PO UTK BEA CUKAI
-$routes->get('/po-bea-cukai-lokal-baku/dropdown', 'Purchase\POLokalBahanBaku::dropdownBeaCukaiPOLokalBahanBaku', ['filter' => 'Auth']);
-$routes->get('/po-bea-cukai-import-baku/dropdown', 'Purchase\POImportBahanBaku::dropdownBeaCukaiPOImportBahanBaku', ['filter' => 'Auth']);
-$routes->get('/po-bea-cukai-lokal-penolong/dropdown', 'Purchase\POLokalBahanPenolong::dropdownBeaCukaiPOLokalBahanPenolong', ['filter' => 'Auth']);
-$routes->get('/po-bea-cukai-import-penolong/dropdown', 'Purchase\POImportBahanPenolong::dropdownBeaCukaiPOImportBahanPenolong', ['filter' => 'Auth']);
-
-
 // PO
 $routes->get('/po-lokal-bahan-baku/dropdown', 'Purchase\POLokalBahanBaku::dropdownPOLokalBahanBaku', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-penolong/dropdown', 'Purchase\POLokalBahanPenolong::dropdownPOLokalBahanPenolong', ['filter' => 'Auth']);
@@ -533,6 +526,10 @@ $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImp
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 
 // BEA CUKAI 2.3 - 4.1
+
+// PO UTK BEA CUKAI
+$routes->get('/po-bea-cukai/dropdown', 'BeaCukai\BeaCukaiController::dropdownBeaCukaiPO', ['filter' => 'Auth']);
+
 // BC 2.3
 $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BeaCukaiController::bc23View');

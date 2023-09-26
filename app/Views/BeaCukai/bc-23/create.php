@@ -38,6 +38,7 @@
             <form class="create-form form-add-bc" role="form" method="POST" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <input value="<?= (!empty($dataBC)) ? $dataBC->id : '' ?>" autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                <input value="<?= (!empty($dataBC)) ? $dataBC->dokumen_type : '' ?>" autocomplete="one-time-code" type="hidden" class="dokumenType" name="dokumenType" id="dokumenType" />
                 <table width="100%" class="mb-3">
                     <tbody>
                         <tr style="color: black;">
@@ -74,7 +75,16 @@
                     </div>
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> value="<?= (!empty($dataBC)) ? $dataBC->no_dokumen : '' ?>" autocomplete="one-time-code" name="noDokumen" type="text" placeholder="No Dokumen" class="form-control target input-picker">
+                            <select <?= (!empty($dataBC)) ? ($dataBC->status_posting === 'Belum Posting' ? '' : 'disabled'): '' ?> class="form-select noDokumenBC" name="noDokumenBC" id="noDokumenBC" aria-label="Floating label select example">
+                                <option data-type="" value="">
+                                    - No Dokumen -
+                                </option>
+                                <?php foreach ($dropdownDokumen as $k) : ?>
+                                    <option data-type="<?= $k["type"] ?>" <?= (!empty($dataBC)) ? ($dataBC->no_dokumen === $k["id"] ? 'selected' : '') : '' ?> value="<?= $k["id"] ?>">
+                                        - <?= $k["po_no"] ?> -
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                             <label for="floatingInput">No Dokumen</label>
                         </div>
                     </div>
@@ -1159,7 +1169,7 @@
 
     var validator = $(".form-add-bc").validate({
         rules: {
-            noDokumen: {
+            noDokumenBC: {
                 required: true
             },
             jenisDokumenBC: {
@@ -1233,7 +1243,7 @@
             }
         },
         messages: {
-            noDokumen: {
+            noDokumenBC: {
                 required: "No Dokumen wajib diisi"
             },
             jenisDokumenBC: {
@@ -1706,6 +1716,11 @@
         },
     });
 
+    $('#noDokumenBC').select2({
+        placeholder: "Pilih No Dokumen",
+        theme: "bootstrap-5"
+    });
+
     $('#jenisIdentitasImportir').select2({
         placeholder: "Pilih Jenis Identitas",
         theme: "bootstrap-5"
@@ -1915,6 +1930,42 @@
             });
         }
     });
+
+    // get no dokumen
+    $('.jenisDokumenBC').change(function() {
+        $(".noDokumenBC").empty();
+        $(".noDokumenBC").append(`<option data-type="" value=""></option>`);
+        $(".noDokumenBC").val("").change();
+
+        if($(".jenisDokumenBC option:selected").val())
+        {
+            $.ajax({
+                url: `<?= base_url("po-bea-cukai/dropdown"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    jenis_dokumen: $(".jenisDokumenBC option:selected").val()
+                },
+                success: function(res) {
+                    $(".noDokumenBC").empty();
+
+                    $(".noDokumenBC").append(`<option data-type="" value=""></option>`);
+
+                    res.data.forEach(function(item) {
+                        $(".noDokumenBC").append(`<option data-type="${item.type}" value="${item.id}">${item.po_no}</option>`);
+                    })
+
+                    $(".noDokumenBC").val("").change();
+                }
+            })
+        }
+    })
+
+    // get type
+    $('.noDokumenBC').change(function() {
+        let type = $(".noDokumenBC option:selected").attr("data-type");
+        $(".dokumenType").val(type)
+    })
 
     // open modal
     $('.btn-show-dokumen').click(function() {

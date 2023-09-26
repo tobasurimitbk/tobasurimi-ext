@@ -168,7 +168,7 @@ class RMImportPOModel extends Model
         $arrCondition = [
             'deletedAt' => null,
             'is_posted' => 1,
-            'status_penerimaan' => 0,
+            'status_penerimaan' => 1,
             'company_id' => $company_id
         ];
 

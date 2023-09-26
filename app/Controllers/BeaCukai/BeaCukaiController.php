@@ -10,13 +10,20 @@ use App\Models\SupplierModel;
 use App\Models\MetadataModel;
 use App\Models\SalesOrderInvoiceModel;
 
+use App\Models\RMPurchaseOrderModel;
+use App\Models\RMImportPOModel;
+use App\Models\AMPurchaseOrderModel;
+
 class BeaCukaiController extends BaseController
 {
 
-    private $modelBeaCukai, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
+    private $modelRMPurchaseOrder, $modelRMImportPO, $modelAMPurchaseOrder, $modelBeaCukai, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
 
     public function __construct()
     {
+        $this->modelRMPurchaseOrder = new RMPurchaseOrderModel();
+        $this->modelRMImportPO = new RMImportPOModel();
+        $this->modelAMPurchaseOrder = new AMPurchaseOrderModel();
         $this->modelBeaCukai = new BeaCukaiModel();
         $this->modelKantorBeaCukai = new KantorBeaCukaiModel();
         $this->modelSupplier = new SupplierModel();
@@ -60,6 +67,66 @@ class BeaCukaiController extends BaseController
         }
     }
 
+    public function dropdownBeaCukaiPO()
+    {
+        $dropdownDokumen = [];
+
+        if($this->request->getGet("jenis_dokumen") === "No PO")
+        {
+             //Get PO Bahan Baku BC
+            $bbLokal = $this->modelRMPurchaseOrder->getNoPOBeaCukai($this->this_company_id);
+            foreach($bbLokal as $x)
+            {
+                array_push($dropdownDokumen, [
+                    "id" => $x["id"],
+                    "po_no" => $x["po_no"],
+                    "type" => "BAHAN BAKU LOKAL"
+                ]);
+            }
+
+            $bbImport = $this->modelRMImportPO->getNoPOBeaCukai($this->this_company_id);
+
+            foreach($bbImport as $x)
+            {
+                array_push($dropdownDokumen, [
+                    "id" => $x["id"],
+                    "po_no" => $x["po_no"],
+                    "type" => "BAHAN BAKU IMPORT"
+                ]);
+            }
+        }
+        else
+        {
+            //Get PO Bahan Penolong BC
+            $bpLokal = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Lokal', $this->this_company_id);
+            foreach($bpLokal as $x)
+            {
+                array_push($dropdownDokumen, [
+                    "id" => $x["id"],
+                    "po_no" => $x["po_no"],
+                    "type" => "BAHAN PENOLONG LOKAL"
+                ]);
+            }
+
+            $bpImport = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Import', $this->this_company_id);
+            foreach($bpImport as $x)
+            {
+                array_push($dropdownDokumen, [
+                    "id" => $x["id"],
+                    "po_no" => $x["po_no"],
+                    "type" => "BAHAN PENOLONG IMPORT"
+                ]);
+            }
+        }
+
+        $data = [
+            "data" => $dropdownDokumen
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
     public function bc23View()
     {
 
@@ -90,7 +157,7 @@ class BeaCukaiController extends BaseController
         $jenisAPI = $this->modelMetadata->get_by_name_bc('Jenis API');
 
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
 
         //Get Jenis TPB
         $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
@@ -99,6 +166,7 @@ class BeaCukaiController extends BaseController
         $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
         $data = [
+            'dropdownDokumen' => [],
             'jenisKontainer' => $jenisKontainer,
             'ukuranKontainer' => $ukuranKontainer,
             'tipeKontainer' => $tipeKontainer,
@@ -141,7 +209,7 @@ class BeaCukaiController extends BaseController
         $jenisAPI = $this->modelMetadata->get_by_name_bc('Jenis API');
 
         //Get Valuta
-        $valuta = $this->modelMetadata->get_by_name_bc('Valuta');
+        $valuta = $this->modelMetadata->get_by_name('Valuta');
 
         //Get Jenis TPB
         $jenisTPB = $this->modelMetadata->get_by_name_bc('Jenis TPB');
@@ -170,6 +238,58 @@ class BeaCukaiController extends BaseController
             $dataBC = $this->modelBeaCukai->getById($id);
             $data["dataBC"] = $dataBC;
 
+            $dropdownDokumen = [];
+            if($dataBC->jenis_dokumen === "No PO")
+            {
+                //Get PO Bahan Baku BC
+                $bbLokal = $this->modelRMPurchaseOrder->getNoPOBeaCukai($this->this_company_id);
+                foreach($bbLokal as $x)
+                {
+                    array_push($dropdownDokumen, [
+                        "id" => $x["id"],
+                        "po_no" => $x["po_no"],
+                        "type" => "BAHAN BAKU LOKAL"
+                    ]);
+                }
+
+                $bbImport = $this->modelRMImportPO->getNoPOBeaCukai($this->this_company_id);
+
+                foreach($bbImport as $x)
+                {
+                    array_push($dropdownDokumen, [
+                        "id" => $x["id"],
+                        "po_no" => $x["po_no"],
+                        "type" => "BAHAN BAKU IMPORT"
+                    ]);
+                }
+            }
+
+            if($dataBC->jenis_dokumen === "No SJ")
+            {
+                //Get PO Bahan Penolong BC
+                $bpLokal = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Lokal', $this->this_company_id);
+                foreach($bpLokal as $x)
+                {
+                    array_push($dropdownDokumen, [
+                        "id" => $x["id"],
+                        "po_no" => $x["po_no"],
+                        "type" => "BAHAN PENOLONG LOKAL"
+                    ]);
+                }
+
+                $bpImport = $this->modelAMPurchaseOrder->getNoPOBeaCukai('Import', $this->this_company_id);
+                foreach($bpImport as $x)
+                {
+                    array_push($dropdownDokumen, [
+                        "id" => $x["id"],
+                        "po_no" => $x["po_no"],
+                        "type" => "BAHAN PENOLONG IMPORT"
+                    ]);
+                }
+            }
+
+            $data["dropdownDokumen"] = $dropdownDokumen;
+
             if($dataBC->type !== "BC 2.3")
             {
                 return view('BeaCukai/bc-23/index');
@@ -186,7 +306,7 @@ class BeaCukaiController extends BaseController
                 "jenisDokumenBC" => [
                     "rules" => "required"
                 ],
-                "noDokumen" => [
+                "noDokumenBC" => [
                     "rules" => "required"
                 ],
                 "kppbcBongkar" => [
@@ -315,7 +435,8 @@ class BeaCukaiController extends BaseController
                 "status_posting"        => "Belum Posting",
 
                 "jenis_dokumen"         => $this->request->getPost("jenisDokumenBC"),
-                "no_dokumen"            => $this->request->getPost("noDokumen"),
+                "no_dokumen"            => $this->request->getPost("noDokumenBC"),
+                "dokumen_type"          => $this->request->getPost("dokumenType"),
 
                 "kppbc_bongkar"         => $this->request->getPost("kppbcBongkar"),
                 "kppbc_pengawas"        => $this->request->getPost("kppbcPengawas"),
@@ -428,7 +549,7 @@ class BeaCukaiController extends BaseController
                 "jenisDokumenBC" => [
                     "rules" => "required"
                 ],
-                "noDokumen" => [
+                "noDokumenBC" => [
                     "rules" => "required"
                 ],
                 "kppbcBongkar" => [
@@ -550,7 +671,8 @@ class BeaCukaiController extends BaseController
 
             $payload = [
                 "jenis_dokumen"         => $this->request->getPost("jenisDokumenBC"),
-                "no_dokumen"            => $this->request->getPost("noDokumen"),
+                "no_dokumen"            => $this->request->getPost("noDokumenBC"),
+                "dokumen_type"          => $this->request->getPost("dokumenType"),
 
                 "kppbc_bongkar"         => $this->request->getPost("kppbcBongkar"),
                 "kppbc_pengawas"        => $this->request->getPost("kppbcPengawas"),

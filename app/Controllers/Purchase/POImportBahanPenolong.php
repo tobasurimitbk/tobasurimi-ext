@@ -827,18 +827,6 @@ class POImportBahanPenolong extends BaseController
         return;
     }
 
-    public function dropdownBeaCukaiPOImportBahanPenolong()
-    {
-        $dataPOImport = $this->amPurchaseOrderModel->getNoPOBeaCukai("Import", $this->this_company_id);
-
-        $data = [
-            "data" => $dataPOImport
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
     public function dropdownBarangPOImportBahanPenolong()
     {
         $id = $this->request->getGet("id");

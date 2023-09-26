@@ -568,18 +568,6 @@ class POLokalBahanPenolong extends BaseController
         return;
     }
 
-    public function dropdownBeaCukaiPOLokalBahanPenolong()
-    {
-        $dataPOLokal = $this->AMPurchaseOrderModel->getNoPOBeaCukai("LOKAL", $this->this_company_id);
-
-        $data = [
-            "data" => $dataPOLokal
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
     public function dropdownBarangPOLokalBahanPenolong()
     {
         $id = $this->request->getGet("id");
