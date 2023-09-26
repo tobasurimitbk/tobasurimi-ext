@@ -151,7 +151,7 @@
                             <label for="floatingInput">Kode Supplier</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->supplierName : ""; ?>" readonly="true" class="form-control supplier" id="supplier" name="supplier" placeholder="Nama Supplier">
                             <label for="floatingInput">Nama Supplier</label>
