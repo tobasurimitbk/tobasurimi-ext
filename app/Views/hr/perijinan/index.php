@@ -122,7 +122,7 @@
             data: "selesai",
             className: "text-center"
         }, {
-            data: "keterangan",
+            data: "statusName",
             className: "text-center"
         }, {
             data: "approval",

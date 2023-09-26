@@ -35,7 +35,7 @@
     <div class="section-header">
         <h1>Log Attendance</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month) ?>">
+            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">
                 <i class="fa-solid fa-print"></i> Print
             </a>
         </div>
@@ -145,15 +145,10 @@
                                     endif;
                                 endfor;
                                 ?>
-                                <td>Hadir</td>
-                                <td>Ijin</td>
-                                <td>Alpha</td>
-                                <td>Cuti</td>
-                                <td>Sakit</td>
-                                <td>Libur</td>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php $kehadiran = array(); ?>
                             <?php for ($i = 0; $i < count($res_user); $i++) : ?>
                                 <?php
                                 $hadir = 0;
@@ -202,35 +197,68 @@
                                             <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="vertical-align:middle;cursor:pointer;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                         <?php elseif ($perizinanCheck != null) : ?>
                                             <!-- Ada perizinan -->
-                                            <?php if ($perizinanCheck['status']  == "IJIN") : ?>
-                                                <!-- Ada perizinan ijin -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
-                                                    <b><?= $perizinanCheck['status'] ?></b>
-                                                </td>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
-                                                    <b><?= $perizinanCheck['status']  ?></b>
-                                                </td>
-                                            <?php elseif ($perizinanCheck['status'] == "CUTI") : ?>
-                                                <!-- Ada perizinan cuti -->
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ffc107; color:white;cursor:pointer;'>
-                                                    <b><?= $perizinanCheck['status'] ?></b>
+                                            <?php $statusKode = explode("_", $perizinanCheck['status'])[1]; ?>
+                                            <?php if ($perizinanCheck['status']  == "CUTI TAHUNAN_CT") : ?>
+                                                <!-- Ada perizinan Cuti Tahunan -->
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ffc107; color:white; cursor:pointer;'>
+                                                    <b><?= $statusKode ?></b>
                                                 </td>
                                                 <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ffc107; color:white;cursor:pointer;'>
-                                                    <b><?= $perizinanCheck['status']  ?></b>
+                                                    <b><?= $statusKode  ?></b>
                                                 </td>
-                                            <?php elseif ($perizinanCheck['status'] == "SAKIT") : ?>
-                                                <!-- Ada perizinan sakit -->
+                                            <?php elseif ($perizinanCheck['status'] == "CUTI HAID_CHD") : ?>
+                                                <!-- Ada perizinan Cuti Haid -->
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#242120; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode ?></b>
+                                                </td>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#242120; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode  ?></b>
+                                                </td>
+                                            <?php elseif ($perizinanCheck['status'] == "CUTI HAMIL_CHL") : ?>
+                                                <!-- Ada perizinan Cuti Hamil -->
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#C34A36; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode ?></b>
+                                                </td>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#C34A36; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode  ?></b>
+                                                </td>
+                                            <?php elseif ($perizinanCheck['status'] == "CUTI MELAHIRKAN_CM") : ?>
+                                                <!-- Ada perizinan Cuti Melahirkan -->
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#4B4453; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode ?></b>
+                                                </td>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#4B4453; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode  ?></b>
+                                                </td>
+                                            <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
+                                                <!-- Ada ijin -->
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode ?></b>
+                                                </td>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode  ?></b>
+                                                </td>
+                                            <?php elseif ($perizinanCheck['status'] == "SAKIT_S") : ?>
+                                                <!-- Ada sakit -->
                                                 <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#28a745; color:white;cursor:pointer;'>
-                                                    <b><?= $perizinanCheck['status'] ?></b>
+                                                    <b><?= $statusKode ?></b>
                                                 </td>
                                                 <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#28a745; color:white;cursor:pointer;'>
-                                                    <b><?= $perizinanCheck['status']  ?></b>
+                                                    <b><?= $statusKode  ?></b>
+                                                </td>
+                                            <?php elseif ($perizinanCheck['status'] == "RL_RL") : ?>
+                                                <!-- Ada RL -->
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ff7b00; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode ?></b>
+                                                </td>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#ff7b00; color:white;cursor:pointer;'>
+                                                    <b><?= $statusKode  ?></b>
                                                 </td>
                                             <?php endif ?>
                                         <?php else : ?>
                                             <?php if ($check == 1) : ?>
                                                 <?php $hadir++; ?>
-                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;cursor:pointer;'>
+                                                <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;cursor:pointer;'>
                                                     <font color="white"><b><?= $jam_masuk; ?></b></font>
                                                 </td>
                                                 <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;cursor:pointer;'>
@@ -247,38 +275,83 @@
                                                 } else {
                                                     // tidak absen = alpha
                                                     $alpha++;
-                                                    echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style='background-color:#e7323a;cursor:pointer;'></td>";
+                                                    echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style='background-color:#e7323a;;cursor:pointer;'></td>";
                                                     echo "<td class='detail'  data-tanggal='" . $dateFormat . "' data-employee_id='" . $res_user[$i]["employeeID"] . "' width=25 align=center style='background-color:#e7323a;cursor:pointer;'></td>";
                                                 }
-
                                                 ?>
                                             <?php endif; ?>
                                         <?php endif; ?>
                                     <?php endfor; ?>
-                                    <td>
-                                        <b><?= $hadir ?></b>
+                                </tr>
+                                <?php
+                                $kehadiran[] = [
+                                    'id' => $res_user[$i]['employeeID'],
+                                    'hadir' => $hadir,
+                                    'libur' => $libur,
+                                    'alpha' => $alpha
+                                ];
+                                ?>
+                            <?php endfor; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="table-responsive mt-5">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <td height="25">&nbsp;Karyawan</td>
+                                <td height="25">&nbsp;Divisi</td>
+                                <?php foreach ($statusPerizinan as $s) : ?>
+                                    <td width="20" align="center">
+                                        <b><?= explode("_", $s['value'])[1] ?></b>
                                     </td>
-                                    <td align=center>
-                                        <b><?= $res_user[$i]['statusAttendances']['IJIN']; ?></b>
+                                <?php endforeach; ?>
+                                <td width="20" align="center">
+                                    <b>L</b>
+                                </td>
+                                <td width="20" align="center">
+                                    <b>A</b>
+                                </td>
+                                <td width="20" align="center">
+                                    <b>H</b>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php for ($i = 0; $i < count($res_user); $i++) : ?>
+                                <tr>
+                                    <td width="150">
+                                        &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
+                                    <td width="110">
+                                        &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
                                     </td>
-                                    <td align=center>
-                                        <b><?= $alpha ?></b>
+                                    <?php foreach ($statusPerizinan as $s) : ?>
+                                        <td width="90" align="center">
+                                            <?= $res_user[$i]['statusAttendances'][explode("_", $s['value'])[1]] ?>
+                                        </td>
+                                    <?php endforeach; ?>
+                                    <td width="90" align="center">
+                                        <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
+                                            <b><?= $kehadiran[$i]['libur']; ?></b>
+                                        <?php endif; ?>
                                     </td>
-                                    <td align=center>
-                                        <b><?= $res_user[$i]['statusAttendances']['CUTI']; ?></b>
+                                    <td width="90" align="center">
+                                        <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
+                                            <b><?= $kehadiran[$i]['alpha']; ?></b>
+                                        <?php endif; ?>
                                     </td>
-                                    <td align=center>
-                                        <b><?= $res_user[$i]['statusAttendances']['SAKIT']; ?></b>
-                                    </td>
-                                    <td align=center>
-                                        <b><?= $libur ?></b>
+                                    <td width="90" align="center">
+                                        <?php if ($kehadiran[$i]['id'] == $res_user[$i]['employeeID']) : ?>
+                                            <b><?= $kehadiran[$i]['hadir']; ?></b>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endfor; ?>
                         </tbody>
                     </table>
                 </div>
-
                 <?php if ($pager->hasMore() || ($pager->getCurrentPage() < $pager->getPageCount()) || (count($employeesData) > $pager->getPerPage())) : ?>
                     <?= $pager->links('default', 'bootstrap4_pagination') ?>
                 <?php endif ?>
@@ -288,63 +361,30 @@
                 </div>
 
                 <div class="row mt-3">
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#304de2"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    HADIR
+                    <?php foreach ($statusPerizinanAll as $s) : ?>
+                        <div class="col-sm-2 col-4 mt-2">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="p-3" style="width: 5px; height:5px; background-color:<?= $s['description'] ?>"></div>
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="card-text mt-1 text-black">
+                                        <?= explode("_", $s['value'])[0] ?> (<?= explode("_", $s['value'])[1]; ?>)
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-2 col-4">
+                    <?php endforeach; ?>
+                    <div class="col-sm-2 col-4 mt-2">
                         <div class="row">
                             <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#e7323a"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    ALPHA
+                                <div class="text-center">
+                                    <img src='assets/img/stop.png' width='27' height='27'>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#17a2b8;"></div>
-                            </div>
                             <div class="col-sm-9">
                                 <div class="card-text mt-1 text-black">
-                                    IZIN
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#ffc107;"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    CUTI
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#28a745;"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    SAKIT
+                                    LIBUR (L)
                                 </div>
                             </div>
                         </div>
@@ -352,61 +392,60 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal" id="detailModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><label class="title-name"></label> Detail Log Attendance</h5>
+        <div class="modal" id="detailModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><label class="title-name"></label> Detail Log Attendance</h5>
+                    </div>
+                    <form id="updateAttendanceForm" role="form" method="POST">
+                        <div class="modal-body">
+                            <?= csrf_field() ?>
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="text" class="form-control" id="employeeName" disabled>
+                                <label for="employeeName">Employe Name</label>
+                            </div>
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="text" name="tanggal" class="form-control" id="tanggal" disabled>
+                                <label for="tanggal">Tanggal</label>
+                            </div>
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="text" name="statusKehadiran" class="form-control" id="statusKehadiran" disabled>
+                                <label for="status">Status Kehadiran</label>
+                            </div>
+
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
+                                <label for="status">Keterangan Tambahan</label>
+                            </div>
+
+                            <div class="form-floating mb-2" style="height: 50px;">
+                                <input type="text" name="jamTerlambat" class="form-control" id="jamTerlambat" disabled>
+                                <label for="jamTerlambat">Jam Terlambat</label>
+                            </div>
+
+                            <div class="row mb-2" id="formInOut">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2" style="height: 50px;">
+                                        <input type="text" class="form-control" id="checkIn" name="checkIn" disabled maxlength="30">
+                                        <label for="checkin">CheckIN</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-2" style="height: 50px;">
+                                        <input type="text" class="form-control" id="checkOut" name="checkOut" disabled maxlength="30">
+                                        <label for="checkout">CheckOut</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-hide-form btn-discard mr-3">Close</button>
+                        </div>
+                    </form>
                 </div>
-                <form id="updateAttendanceForm" role="form" method="POST">
-                    <div class="modal-body">
-                        <?= csrf_field() ?>
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input type="text" class="form-control" id="employeeName" disabled>
-                            <label for="employeeName">Employe Name</label>
-                        </div>
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input type="text" name="tanggal" class="form-control" id="tanggal" disabled>
-                            <label for="tanggal">Tanggal</label>
-                        </div>
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input type="text" name="statusKehadiran" class="form-control" id="statusKehadiran" disabled>
-                            <label for="status">Status Kehadiran</label>
-                        </div>
-
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
-                            <label for="status">Keterangan Tambahan</label>
-                        </div>
-
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input type="text" name="jamTerlambat" class="form-control" id="jamTerlambat" disabled>
-                            <label for="jamTerlambat">Jam Terlambat</label>
-                        </div>
-
-                        <div class="row mb-2" id="formInOut">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-2" style="height: 50px;">
-                                    <input type="text" class="form-control" id="checkIn" name="checkIn" disabled maxlength="30">
-                                    <label for="checkin">CheckIN</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-2" style="height: 50px;">
-                                    <input type="text" class="form-control" id="checkOut" name="checkOut" disabled maxlength="30">
-                                    <label for="checkout">CheckOut</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-hide-form btn-discard mr-3">Close</button>
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
 </section>
 <script>
     function printReport() {

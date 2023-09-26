@@ -6,12 +6,15 @@ use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
 use App\Models\JamKerjaModel;
+use App\Models\MetadataModel;
 use App\Models\PayrollsModel;
 use CodeIgniter\I18n\Time;
+use Dompdf\Dompdf;
 use Locale;
 
 class Attendance extends BaseController
@@ -35,6 +38,7 @@ class Attendance extends BaseController
         $EmployeesModel = new EmployeesModel();
         $FormPerijinanModel = new FormPerijinanModel();
         $DivisiModel = new DivisisModel();
+        $metaDataModel = new MetadataModel();
 
         // get data $_GET
         $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
@@ -59,9 +63,13 @@ class Attendance extends BaseController
                 "employeeName" => $value['name'],
                 "list_attendance" => $dataLog,
                 'statusAttendances' => [
-                    'IJIN' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN", $year, $month),
-                    'CUTI' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI", $year, $month),
-                    'SAKIT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT", $year, $month),
+                    'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $year, $month),
+                    'CHD' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAID_CHD", $year, $month),
+                    'CHL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAMIL_CHL", $year, $month),
+                    'CM' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI MELAHIRKAN_CM", $year, $month),
+                    'I' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN_I", $year, $month),
+                    'S' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT_S", $year, $month),
+                    'RL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "RL_RL", $year, $month),
                 ]
             ];
         }
@@ -75,7 +83,15 @@ class Attendance extends BaseController
             'employeesData' => $dataEmployeePager['data'],
             'pager' => $dataEmployeePager['pager'],
             'employeeDetailFilter' => $employeeDetailFilter,
-            'pager' => $dataEmployeePager['pager']
+            'pager' => $dataEmployeePager['pager'],
+            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
+            'statusPerizinanAll' => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['LIBUR_L'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
 
         ];
         return view('hr/attendance/log-attendance', $data);
@@ -436,6 +452,76 @@ class Attendance extends BaseController
             'data' => $result,
             'token' => \csrf_hash(),
         ]);
+    }
+
+    public function printLogAbsensi($yearMonth)
+    {
+        $divisiID = $this->request->getGet('divisiID');
+
+        $employeesModel = new EmployeesModel();
+        $divisiModel = new DivisisModel();
+        $companyModel = new CompaniesModel();
+        $metaDataModel = new MetadataModel();
+        $AttendancesLogModel = new AttendancesLogModel();
+        $FormPerijinanModel = new FormPerijinanModel();
+
+        $dompdf = new Dompdf();
+
+        if (!empty($divisiID)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        } else {
+            $employeeData = $employeesModel->getEmployees($this->this_company_id);
+        }
+
+        $splitYearMonth = \explode("-", $yearMonth);
+
+        // declare variable for store data
+        $dataResult = array();
+
+        // set data attendance
+        foreach ($employeeData as $value) {
+            // get log attendance by employee and $year-$month
+            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $splitYearMonth[0], $splitYearMonth[1]);
+            // store data
+            $dataResult[] = [
+                "employeeID" => $value['id'],
+                "employeeName" => $value['name'],
+                "list_attendance" => $dataLog,
+                'statusAttendances' => [
+                    'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $splitYearMonth[0], $splitYearMonth[1]),
+                    'CHD' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAID_CHD", $splitYearMonth[0], $splitYearMonth[1]),
+                    'CHL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAMIL_CHL", $splitYearMonth[0], $splitYearMonth[1]),
+                    'CM' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI MELAHIRKAN_CM", $splitYearMonth[0], $splitYearMonth[1]),
+                    'I' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN_I", $splitYearMonth[0], $splitYearMonth[1]),
+                    'S' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT_S", $splitYearMonth[0], $splitYearMonth[1]),
+                    'RL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "RL_RL", $splitYearMonth[0], $splitYearMonth[1]),
+                ]
+            ];
+        }
+
+        $data = [
+            'res_user'  => $dataResult,
+            'yearMonth' => $yearMonth,
+            'divisi' => $divisiModel->where('id', $divisiID)->first(),
+            'company' => $companyModel->where('id', $this->this_company_id)->first(),
+            'month' => $splitYearMonth[1],
+            'year' => $splitYearMonth[0],
+            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
+            'statusPerizinanAll' => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['LIBUR_L'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
+        ];
+
+        $dompdf->loadHtml(view('hr/attendance/print-log', $data));
+        $dompdf->setPaper('legal', 'landscape');
+        $dompdf->render();
+        $dompdf->stream("Log Absensi $yearMonth", array("Attachment" => false));
+
+        exit(0);
     }
 
     // helper

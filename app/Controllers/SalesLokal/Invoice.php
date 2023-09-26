@@ -675,7 +675,7 @@ class Invoice extends BaseController
                 ->select('sales_order.*, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
                 ->join('customers', 'customers.id = sales_order.id_customer')
                 ->join('employees', 'employees.id = sales_order.sales_id')
-                ->join('metadata', 'metadata.id = customers.termin')
+                ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->find($docId);
             
             $salesName = $soData->salesName;
