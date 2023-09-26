@@ -240,7 +240,7 @@
                                 <th>Biaya Tambahan</th>
                                 <th>PPN</th>
                                 <th>PPH</th>
-                                <th>Keterangan</th>
+                                <!-- <th>Keterangan</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -278,7 +278,7 @@
                                             <td class="edit-table-detail" data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= $details->totalPriceWithoutAdditional; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->additional_cost; ?></td>
                                             <td class="edit-table-detail" data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= $details->totalPriceWithoutAdditional; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->ppn; ?></td>
                                             <td class="edit-table-detail" data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= $details->totalPriceWithoutAdditional; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->pph; ?></td>
-                                            <td class="edit-table-detail" data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= $details->totalPriceWithoutAdditional; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->note; ?></td>
+                                            <!-- <td class="edit-table-detail" data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= $details->totalPriceWithoutAdditional; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>"><?= $details->note; ?></td> -->
 
                                         <?php } else { ?>
 
@@ -296,7 +296,7 @@
                                             <td><?= $details->additional_cost; ?></td>
                                             <td><?= $details->ppn; ?></td>
                                             <td><?= $details->pph; ?></td>
-                                            <td><?= $details->note; ?></td>
+                                            <!-- <td><?= $details->note; ?></td> -->
 
                                         <?php } ?>
                                     </tr>
@@ -314,7 +314,7 @@
                                 <td><b><?= $total_remaining_qty; ?></b></td>
                                 <td><b><?= $total_qty_diterima; ?></b></td>
                                 <td><b><?= number_format($total_harga); ?></b></td>
-                                <td colspan="5"></td>
+                                <td colspan="4"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -361,12 +361,12 @@
                                 <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <div class="form-floating mb-3">
                                 <textarea autocomplete="one-time-code" readonly="true" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="row mt-3">
                         <div class="col mb-3">
@@ -822,9 +822,9 @@
                                 tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.satuanName}" data-ppn="" data-pph="" data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${Number(item.qty)}" data-keterangan="${item.note}" data-id="" data-row="${row + 1}">`;
                                 tag_html += 0;
                                 tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.satuanName}" data-ppn="" data-pph="" data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${Number(item.qty)}" data-keterangan="${item.note}" data-id="" data-row="${row + 1}">`;
-                                tag_html += item.note;
-                                tag_html += "</td>";
+                                // tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.satuanName}" data-ppn="" data-pph="" data-total="${item.totalPrice}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-spesifikasi="${item.spec}" data-harga="${item.price}" data-qty="${Number(item.qty)}" data-keterangan="${item.note}" data-id="" data-row="${row + 1}">`;
+                                // tag_html += item.note;
+                                // tag_html += "</td>";
                                 tag_html += "</tr>";
 
                                 list_items.push({
@@ -883,7 +883,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString()}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='5'>";
+                            tag_total += "<td colspan='4'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -922,7 +922,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>0</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='5'>";
+                            tag_total += "<td colspan='4'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1138,9 +1138,9 @@
                             tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-ppn="${ppn}" data-pph="${pph}" data-total="${item.total}" data-additional_cost="${additional_cost}" data-disc="${disc}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                             tag_html += nilai_pph ? nilai_pph : 0;
                             tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-ppn="${ppn}" data-pph="${pph}" data-total="${item.total}" data-additional_cost="${additional_cost}" data-disc="${disc}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                            tag_html += item.keterangan;
-                            tag_html += "</td>";
+                            // tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-ppn="${ppn}" data-pph="${pph}" data-total="${item.total}" data-additional_cost="${additional_cost}" data-disc="${disc}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                            // tag_html += item.keterangan;
+                            // tag_html += "</td>";
                             tag_html += "</tr>";
 
                             new_list_items.push({
@@ -1198,9 +1198,9 @@
                             tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.nama_satuan} data-ppn="${item.ppn}" data-pph="${item.pph}" data-total="${item.total}" data-additional_cost="${item.additional_cost}" data-disc="${item.disc}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
                             tag_html += item.nilai_pph ? item.nilai_pph : 0;
                             tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.nama_satuan} data-ppn="${item.ppn}" data-pph="${item.pph}" data-total="${item.total}" data-additional_cost="${item.additional_cost}" data-disc="${item.disc}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                            tag_html += item.keterangan;
-                            tag_html += "</td>";
+                            // tag_html += `<td class="edit-table-detail" data-nama_satuan="${item.nama_satuan} data-ppn="${item.ppn}" data-pph="${item.pph}" data-total="${item.total}" data-additional_cost="${item.additional_cost}" data-disc="${item.disc}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                            // tag_html += item.keterangan;
+                            // tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
                             tag_html += "</td>";
@@ -1462,13 +1462,13 @@
         let spesifikasi = $(this).data('spesifikasi')
         let harga = $(this).data('harga')
         let qty = $(this).data('qty')
-        let keterangan = $(this).data('keterangan')
+        // let keterangan = $(this).data('keterangan')
         let rowid = $(this).data('row')
         let id = $(this).data('id')
 
         $(".id_detail").val(rowid)
         $(".kode").val(kode_barang)
-        $(".keterangan").val(keterangan)
+        // $(".keterangan").val(keterangan)
 
         $(".spesifikasi").val(spesifikasi);
 
