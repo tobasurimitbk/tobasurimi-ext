@@ -61,7 +61,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Departemen</label>
+                            <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
                     <div class="col-md-3">
