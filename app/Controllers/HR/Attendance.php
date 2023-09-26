@@ -410,12 +410,12 @@ class Attendance extends BaseController
             ->get()
             ->getResult();
 
-        if ($hariLibur != null || date('l', strtotime($tanggal)) == "Sunday" && \count($logAttandance) == 0) {
+        if ($hariLibur != null || date('l', strtotime($tanggal)) == "Sunday" && \count($logAttandance) == 0 && $formPerizinan == null) {
             $result['status'] = "Hari Libur";
             $result['keterangan'] = $hariLibur != null ? $hariLibur['name'] : "Hari Minggu";
         } elseif ($formPerizinan != null) {
-            $result['status'] = $formPerizinan['status'];
-            $result['keterangan'] = "Karyawan mengajukan perizinan";
+            $result['status'] = explode("_", $formPerizinan['status'])[0];
+            $result['keterangan'] = "-";
         } else {
             // tidak ada data di log absen
             if (count($logAttandance) == 0) {
@@ -454,7 +454,7 @@ class Attendance extends BaseController
         ]);
     }
 
-    public function printLogAbsensi($yearMonth)
+    public function exportPDFLogAbsensi($yearMonth)
     {
         $divisiID = $this->request->getGet('divisiID');
 
@@ -464,6 +464,7 @@ class Attendance extends BaseController
         $metaDataModel = new MetadataModel();
         $AttendancesLogModel = new AttendancesLogModel();
         $FormPerijinanModel = new FormPerijinanModel();
+        $divisiModel = new DivisisModel();
 
         $dompdf = new Dompdf();
 
@@ -487,6 +488,7 @@ class Attendance extends BaseController
                 "employeeID" => $value['id'],
                 "employeeName" => $value['name'],
                 "list_attendance" => $dataLog,
+                "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
                 'statusAttendances' => [
                     'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $splitYearMonth[0], $splitYearMonth[1]),
                     'CHD' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAID_CHD", $splitYearMonth[0], $splitYearMonth[1]),
@@ -522,6 +524,72 @@ class Attendance extends BaseController
         $dompdf->stream("Log Absensi $yearMonth", array("Attachment" => false));
 
         exit(0);
+    }
+
+    public function exportExcelLogPresensi($yearMonth)
+    {
+        $divisiID = $this->request->getGet('divisiID');
+
+        $employeesModel = new EmployeesModel();
+        $divisiModel = new DivisisModel();
+        $companyModel = new CompaniesModel();
+        $metaDataModel = new MetadataModel();
+        $AttendancesLogModel = new AttendancesLogModel();
+        $FormPerijinanModel = new FormPerijinanModel();
+        $divisiModel = new DivisisModel();
+
+        if (!empty($divisiID)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        } else {
+            $employeeData = $employeesModel->getEmployees($this->this_company_id);
+        }
+
+        $splitYearMonth = \explode("-", $yearMonth);
+
+        // declare variable for store data
+        $dataResult = array();
+
+        // set data attendance
+        foreach ($employeeData as $value) {
+            // get log attendance by employee and $year-$month
+            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $splitYearMonth[0], $splitYearMonth[1]);
+            // store data
+            $dataResult[] = [
+                "employeeID" => $value['id'],
+                "employeeName" => $value['name'],
+                "list_attendance" => $dataLog,
+                "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
+                'statusAttendances' => [
+                    'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $splitYearMonth[0], $splitYearMonth[1]),
+                    'CHD' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAID_CHD", $splitYearMonth[0], $splitYearMonth[1]),
+                    'CHL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAMIL_CHL", $splitYearMonth[0], $splitYearMonth[1]),
+                    'CM' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI MELAHIRKAN_CM", $splitYearMonth[0], $splitYearMonth[1]),
+                    'I' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN_I", $splitYearMonth[0], $splitYearMonth[1]),
+                    'S' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT_S", $splitYearMonth[0], $splitYearMonth[1]),
+                    'RL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "RL_RL", $splitYearMonth[0], $splitYearMonth[1]),
+                ]
+            ];
+        }
+
+        $data = [
+            'res_user'  => $dataResult,
+            'yearMonth' => $yearMonth,
+            'divisi' => $divisiModel->where('id', $divisiID)->first(),
+            'company' => $companyModel->where('id', $this->this_company_id)->first(),
+            'month' => $splitYearMonth[1],
+            'year' => $splitYearMonth[0],
+            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
+            'statusPerizinanAll' => $metaDataModel->where('name', "Status Perizinan")
+                ->whereNotIn('value', ['LIBUR_L'])
+                ->orderBy('name', "ASC")
+                ->findAll(),
+        ];
+
+
+        return view('hr/attendance/excel-log', $data);
     }
 
     // helper

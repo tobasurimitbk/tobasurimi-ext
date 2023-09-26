@@ -36,9 +36,13 @@
         <h1>Log Attendance</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">
-                <i class="fa-solid fa-print"></i> Print
+                <i class="fa-solid fa-print"></i> Export PDF
+            </a>
+            <a href="<?= base_url('log-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>" class="btn btn-success posting-spp float-right">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
             </a>
         </div>
+
     </div>
     <div class="card">
         <div class="card-body">
