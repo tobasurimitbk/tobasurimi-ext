@@ -302,7 +302,7 @@ class POImportBahanBaku extends BaseController
                             'purchase_request_detail_id' => $data->purchase_request_detail_id,
                             'barang_id' =>$barang_id,
                             'spec' => $data->spec,
-                            // 'note' => $data->note,
+                            'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
                             'remaining_qty' => $data->qty,
