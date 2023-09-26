@@ -66,6 +66,7 @@
     <table class="table table-bordered" style="font-size:7px; margin-top:10px;" border="1">
         <thead>
             <tr>
+                <td style="vertical-align:middle;z-index:9999" width="10">&nbsp;No</td>
                 <td style="vertical-align:middle;z-index:9999">&nbsp;User</td>
                 <?php
                 $last_date = date("t", strtotime($yearMonth . "-01"));
@@ -86,7 +87,8 @@
                 ?>
             </tr>
         </thead>
-        <?php $kehadiran = array(); ?>
+        <?php $kehadiran = array();
+        $nomor = 1; ?>
 
         <?php for ($i = 0; $i < count($res_user); $i++) : ?>
             <?php
@@ -95,6 +97,7 @@
             $libur = 0;
             ?>
             <tr>
+                <td><?= $nomor++; ?></td>
                 <td style="vertical-align:middle;z-index:9999" nowrap>
                     &nbsp;<?php echo $res_user[$i]["employeeName"]; ?>
                 </td>
@@ -246,6 +249,7 @@
         <table class="table table-bordered" style="font-size:12px; margin-top:10px;" border="1">
             <thead>
                 <tr>
+                    <td width="10">&nbsp;No</td>
                     <td>&nbsp;Karyawan</td>
                     <?php foreach ($statusPerizinan as $s) : ?>
                         <td align="center">
@@ -264,8 +268,12 @@
                 </tr>
             </thead>
             <tbody>
+                <?php $nomors = 1; ?>
                 <?php for ($i = 0; $i < count($res_user); $i++) : ?>
                     <tr>
+                        <td>
+                            &nbsp;<?= $nomors++; ?>
+                        </td>
                         <td>
                             &nbsp;<?php echo $res_user[$i]["employeeName"]; ?>
                         </td>
@@ -293,6 +301,14 @@
                 <?php endfor; ?>
             </tbody>
         </table>
+
+        <small style="font-size: 10px;">
+            Keterangan:
+            <?php foreach ($statusPerizinanAll as $s) : ?>
+                <?= explode("_", $s['value'])[0] ?> (<?= explode("_", $s['value'])[1]; ?>),
+            <?php endforeach; ?>
+            LIBUR (L)
+        </small>
     </div>
 </body>
 
