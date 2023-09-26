@@ -111,7 +111,7 @@
                 </div>
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($nominalUangCadangan['nominal'], 0, ',', '.') ?>">
+                        <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($nominalUangCadangan == null ? 0 : $nominalUangCadangan['nominal'], 0, ',', '.') ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
@@ -730,7 +730,7 @@
         formData.append('nominalCadangan', cadanganPerHari);
         formData.append("payrollID", "<?= $payrollDetail['id'] ?>");
         formData.append("gajiPerHariID", "<?= $gajiPerHari['id'] ?>");
-        formData.append("cadanganID", <?= $nominalUangCadangan['id'] ?>);
+        formData.append("cadanganID", <?= $nominalUangCadangan == null ? 0 : $nominalUangCadangan['id'] ?>);
 
         $.ajax({
             url: "<?= base_url("payroll/update/nominal-gaji-cadangan"); ?>",
