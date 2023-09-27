@@ -198,19 +198,30 @@ class POLokalBahanPenolong extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
-                "payment_term" => [
-                    "rules" => "required"
-                ],
+                // "payment_term" => [
+                //     "rules" => "required"
+                // ],
                 "currency" => [
                     "rules" => "required"
                 ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
-                "dpp" => [
-                    "rules" => "required"
-                ]
+                // "dpp" => [
+                //     "rules" => "required"
+                // ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
@@ -223,10 +234,10 @@ class POLokalBahanPenolong extends BaseController
                     "divisi_id"             => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                    //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                    //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note"                  => $this->request->getPost("note"),
                     "isPosted"              => false,
                     "createdBy"             => session()->get("login")->user_id,
@@ -292,14 +303,7 @@ class POLokalBahanPenolong extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Data Gagal Disimpan",
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,
@@ -324,19 +328,30 @@ class POLokalBahanPenolong extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
-                "payment_term" => [
-                    "rules" => "required"
-                ],
+                // "payment_term" => [
+                //     "rules" => "required"
+                // ],
                 "currency" => [
                     "rules" => "required"
                 ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
-                "dpp" => [
-                    "rules" => "required"
-                ]
+                // "dpp" => [
+                //     "rules" => "required"
+                // ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
@@ -347,10 +362,10 @@ class POLokalBahanPenolong extends BaseController
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                    //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                    //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note"                  => $this->request->getPost("note"),
                     "isPosted"              => false,
                     "createdBy"             => session()->get("login")->user_id,
@@ -403,14 +418,7 @@ class POLokalBahanPenolong extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -613,7 +621,8 @@ class POLokalBahanPenolong extends BaseController
                 $dataBPLokal->totalPrice = number_format($totalPrice);
                 $dataBPLokal->totalDisc = number_format($totalDisc);
                 $dataBPLokal->totalPpn = number_format($totalPpn);
-                $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
+                $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn);
+                // $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
 
                 $data["dataPOLokal"] = $dataBPLokal;
                 $data["dataPOLokal"]->am_purchase_order_details = $dataBPLokalDetail;

@@ -204,9 +204,9 @@
                 <div class="mt-025">
                     Diskon: <span class="txt-bold">Rp. <?= $dataPOLokal->totalDisc ?></span>
                 </div>
-                <div class="mt-025">
+                <!-- <div class="mt-025">
                     DPP: <span class="txt-bold">Rp. <?= $dataPOLokal->dpp ?></span>
-                </div>
+                </div> -->
                 <div class="mt-025">
                     PPN (dikreditkan): <span class="txt-bold">Rp. <?= $dataPOLokal->totalPpn ?></span>
                 </div>
