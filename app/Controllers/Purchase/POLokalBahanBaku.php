@@ -3,6 +3,8 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+
+use App\Models\BarangModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\SppModel;
@@ -19,6 +21,7 @@ class POLokalBahanBaku extends BaseController
     protected $SppModel;
     protected $SupplierModel;
     protected $BeaCukaiModel;
+    private $barangModel;
     protected $dompdf;
 
     public function __construct()
@@ -30,6 +33,7 @@ class POLokalBahanBaku extends BaseController
         $this->SppModel = new SppModel();
         $this->SupplierModel = new SupplierModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
+        $this->barangModel = new BarangModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -50,13 +54,18 @@ class POLokalBahanBaku extends BaseController
         //Get Supplier
         $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
 
+        // get Barang list
+        $barangData = $this->barangModel->asObject()
+            ->getBarangByType('BAHAN BAKU LOKAL');
+
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
         }
 
         $data = [
-            "dataSPP" => $dataSPP,
-            "dataSupplier" => $dataSupplier
+            "dataSPP"       => $dataSPP,
+            "dataSupplier"  => $dataSupplier,
+            "barangData"    => $barangData
         ];
 
         return view('Purchase/poLokalBahanBaku/form', $data);

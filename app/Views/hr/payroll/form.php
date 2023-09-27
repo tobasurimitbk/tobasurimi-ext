@@ -79,12 +79,6 @@
                 </div>
                 <div class="col-sm-2 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" required name="totalCuti" id="totalCuti" class="form-control target input-picker" value="<?= $payrollDetail['cuti'] ?? 0 ?> Kali">
-                        <label for="floatingInput">Cuti</label>
-                    </div>
-                </div>
-                <div class="col-sm-2 mt-1">
-                    <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalIzin" id="totalIzin" class="form-control target input-picker" value="<?= $payrollDetail['ijin'] ?? 0 ?> Kali">
                         <label for="floatingInput">Izin</label>
                     </div>
@@ -95,6 +89,49 @@
                         <label for="floatingInput">Sakit</label>
                     </div>
                 </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalCutiTahunan" id="totalCutiTahunan" class="form-control target input-picker" value="<?= $payrollDetail['cuti_tahunan'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Cuti Tahunan</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalCutiHaid" id="totalCutiHaid" class="form-control target input-picker" value="<?= $payrollDetail['cuti_haid'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Cuti Haid</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalCutiHamil" id="totalCutiHamil" class="form-control target input-picker" value="<?= $payrollDetail['cuti_hamil'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Cuti Hamil</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalCutiMelahirkan" id="totalCutiMelahirkan" class="form-control target input-picker" value="<?= $payrollDetail['cuti_melahirkan'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Cuti Melahirkan</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalRL" id="totalRL" class="form-control target input-picker" value="<?= $payrollDetail['rl'] ?? 0 ?> Kali">
+                        <label for="floatingInput">RL</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalLibur" id="totalLibur" class="form-control target input-picker" value="<?= $payrollDetail['libur'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Libur</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalHadir" id="totalHadir" class="form-control target input-picker" value="<?= $payrollDetail['hadir'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Hadir</label>
+                    </div>
+                </div>
+
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_uang_lembur'], 0, ',', '.') ?>">
@@ -105,13 +142,13 @@
             <div class="row">
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($gajiPerHari ? $gajiPerHari['nominal'] : 0, 0, ',', '.') ?>">
+                        <input readonly autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($gajiPerHari ? $gajiPerHari['nominal'] : 0, 0, ',', '.') ?>">
                         <label for="floatingInput">Gaji (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($nominalUangCadangan == null ? 0 : $nominalUangCadangan['nominal'], 0, ',', '.') ?>">
+                        <input readonly autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($nominalUangCadangan == null ? 0 : $nominalUangCadangan['nominal'], 0, ',', '.') ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
@@ -148,10 +185,10 @@
                                         <th class="sort">Nominal</th>
                                     </tr>
                                 </thead>
-                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                                <tbody class="body-table" id="body-table">
                                     <?php $no = 1; ?>
                                     <?php foreach ($perhitunganGaji as  $p) : ?>
-                                        <tr class="perhitunganGaji" data-id="<?= $p['id'] ?>" data-komponen_gaji="<?= $p['name'] ?>" data-nominal="<?= $p['nominal'] ?>" data-tipe="<?= $p['tipe'] == "PLUS" ? "+" : "-"  ?>">
+                                        <tr class="perhitunganGajis" data-id="<?= $p['id'] ?>" data-komponen_gaji="<?= $p['name'] ?>" data-nominal="<?= $p['nominal'] ?>" data-tipe="<?= $p['tipe'] == "PLUS" ? "+" : "-"  ?>">
                                             <td><?= $no++; ?></td>
                                             <td><b> <?= $p['name'] ?></b></td>
                                             <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 0, ',', '.') ?></b></td>
@@ -210,7 +247,7 @@
                                     <th class="sort">Uang Lembur</th>
                                 </tr>
                             </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                            <tbody class="body-table" id="body-table">
                                 <?php $no = 1; ?>
                                 <?php if (count($rekapLembur) == 0) : ?>
                                     <td colspan="6" class="text-center">Karyawan tidak pernah lembur </td>
@@ -251,7 +288,7 @@
                                     <?php foreach ($rekapPerizinanNotApproved as  $r) : ?>
                                         <tr class="rekapPerizinanTidakDisetujuiTabel" data-id="<?= $r['id'] ?>" data-tanggal="<?= date('d/m/Y', strtotime($r['periode'])) ?>" data-jenis="<?= $r['status'] ?>" data-nominal="<?= $r['nominal_pengurangan'] ?>">
                                             <td><?= $no++; ?></td>
-                                            <td><?= $r['status'] ?></td>
+                                            <td><?= explode("_", $r['status'])[0] ?></td>
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
                                             <td style="font-weight:bold;" class="text-danger"><b>(-) <?= "Rp " . number_format($r['nominal_pengurangan'], 0, ',', '.') ?></b></td>
                                         </tr>
@@ -631,7 +668,7 @@
 
         $("input[name='perizinanID']").val(id);
         $('#tanggalPerizinan').val(tanggal);
-        $('#jenisPerizinan').val(jenis);
+        $('#jenisPerizinan').val(jenis.split("_")[0]);
         $('#nominalPerizinanNotApproved').val(formatRupiah(nominal));
 
         $('#rekapPerizinanTidakDisetujuiModal').modal('show');
