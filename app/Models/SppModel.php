@@ -20,7 +20,7 @@ class SppModel extends Model
         'request_date',
         'spp_no',
         'spp_type',
-        'warehouse_id',
+        'divisi_id',
         'total',
         'note',
         'is_posted',
@@ -55,11 +55,11 @@ class SppModel extends Model
     public function getSppList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'spp_type'          => 'purchase_requests.spp_type',
-            'spp_no'            => 'purchase_requests.spp_no',
-            'warehouse_name'    => 'warehouse.warehouse_name',
+            'sppType'          => 'purchase_requests.spp_type',
+            'sppNo'            => 'purchase_requests.spp_no',
+            'divisi'            => 'divisis.divisi',
             'total'             => 'purchase_requests.total',
-            'request_date'      => 'purchase_requests.request_date',
+            'requestDate'      => 'purchase_requests.request_date',
             'createdAt'         => 'purchase_requests.createdAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -68,13 +68,13 @@ class SppModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "purchase_requests.*,
-                    warehouses.warehouse_name AS warehouseName, 
+                    divisis.divisi AS divisiName, 
                     COUNT(purchase_request_details.id) AS itemCount";
 
         $purchaseRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
+            ->join('divisis', 'purchase_requests.divisi_id = divisis.id', 'left')
             ->join('purchase_request_details', 'purchase_requests.id = purchase_request_details.purchase_request_id', 'left')
             ->groupBy(('purchase_requests.id'))
             ->orderBy($sort, $sortType);
@@ -118,13 +118,13 @@ class SppModel extends Model
     public function getSppById($id)
     {
         $selectQry = "purchase_requests.*,
-        warehouses.warehouse_name AS warehouseName,
+        divisis.divisi AS divisiName,
         createdBy.name AS createdByName
         ";
 
         $sppData = $this->asObject()
             ->select($selectQry)
-            ->join('warehouses', 'purchase_requests.warehouse_id = warehouses.id')
+            ->join('divisis', 'purchase_requests.divisi_id = divisis.id')
             ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id', 'left')
             ->find($id);
 
@@ -149,7 +149,7 @@ class SppModel extends Model
         return $query->getResultArray();
     }
 
-    public function generateNoSpp($warehouse)
+    public function generateNoSpp($divisi)
     {
         $romanNumb = [
             'I',
@@ -171,9 +171,9 @@ class SppModel extends Model
         $year = $today->getYear();
         $month = $today->getMonth() - 1;
 
-        $warehouse = str_replace(' ', '', $warehouse);
+        $divisi = str_replace(' ', '', $divisi);
 
-        $lastStr =  $warehouse . '/' . $romanNumb[$month] . '/' . $year;
+        $lastStr =  $divisi . '/' . $romanNumb[$month] . '/' . $year;
 
         $builder = $this->db->table('purchase_requests');
         $builder->select('spp_no');

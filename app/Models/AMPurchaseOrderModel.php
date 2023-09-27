@@ -20,7 +20,7 @@ class AMPurchaseOrderModel extends Model
         'purchase_request_id',
         'po_no',
         'po_date',
-        'warehouse_id',
+        'divisi_id',
         'po_type',
         'currency',
         'supplier_id',
@@ -126,7 +126,7 @@ class AMPurchaseOrderModel extends Model
     {
         $selectQry = "am_purchase_orders.*,
         purchase_requests.spp_no AS spp_no,
-        warehouses.warehouse_name AS warehouseName,
+        divisis.divisi AS divisiName,
         suppliers.name AS supplierName,
         suppliers.address AS supplierAddress,
         suppliers.phone AS supplierPhone,
@@ -140,7 +140,7 @@ class AMPurchaseOrderModel extends Model
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
-            ->join('warehouses', 'warehouses.id = am_purchase_orders.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.divisi_id', 'left')
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
             ->join('users', 'users.id = purchase_requests.createdBy', 'left')
             ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
@@ -199,14 +199,14 @@ class AMPurchaseOrderModel extends Model
         return $query->getResultArray();
     }
 
-    public function get_no($tgl, $bln, $thn, $warehouse, $thn2, $warehouse_id, $last_day)
+    public function get_no($tgl, $bln, $thn, $divisi, $thn2, $divisi_id, $last_day)
     {
         $lastStr =  $tgl . $bln . $thn;
 
         $builder = $this->db->table('am_purchase_orders');
         $builder->select('po_no');
         $builder->orderBy('po_no', 'desc')
-            ->where('warehouse_id', $warehouse_id)
+            ->where('divisi_id', $divisi_id)
             ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
             ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
@@ -220,7 +220,7 @@ class AMPurchaseOrderModel extends Model
             $lastPO = sprintf("%02d", $lastPO);
         };
 
-        $generatedNo =  $lastStr . '-' . $lastPO . '/' . $warehouse . '/TOBA/' . $thn2;
+        $generatedNo =  $lastStr . '-' . $lastPO . '/' . $divisi . '/TOBA/' . $thn2;
 
         return $generatedNo;
     }

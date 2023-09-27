@@ -154,7 +154,7 @@
             </tr>
             <tr>
                 <td>
-                    Departemen: <?= $dataPOLokal->warehouseName ?>
+                    Departemen: <?= $dataPOLokal->divisiName ?>
                 </td>
                 <td colspan="2">
                     Lokasi: <?= $dataPOLokal->companyName ?>
@@ -229,7 +229,7 @@
             <tr>
                 <th>
                     <div class="sign-row txt-left">
-                        <div>(Warehouse)</div>
+                        <div>(divisi)</div>
                     </div>
                 </th>
                 <th>

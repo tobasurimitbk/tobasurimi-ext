@@ -9,7 +9,7 @@ use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\SppModel;
 use App\Models\MetadataModel;
-use App\Models\WarehousesModel;
+use App\Models\DivisisModel;
 use App\Models\BeaCukaiModel;
 use Dompdf\Dompdf;
 
@@ -22,7 +22,7 @@ class POLokalBahanPenolong extends BaseController
     protected $MetadataModel;
     protected $SppModel;
     protected $SupplierModel;
-    protected $WarehousesModel;
+    protected $DivisisModel;
     protected $BeaCukaiModel;
     protected $dompdf;
 
@@ -35,7 +35,7 @@ class POLokalBahanPenolong extends BaseController
         $this->MetadataModel = new MetadataModel();
         $this->SppModel = new SppModel();
         $this->SupplierModel = new SupplierModel();
-        $this->WarehousesModel = new WarehousesModel();
+        $this->DivisisModel = new DivisisModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
     }
@@ -220,7 +220,7 @@ class POLokalBahanPenolong extends BaseController
                     "purchase_request_id"   => $purchase_request_id,
                     "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "warehouse_id"          => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                    "divisi_id"             => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
@@ -257,9 +257,9 @@ class POLokalBahanPenolong extends BaseController
                 $insertData["total"] = $totalPrice;
 
                 if ($insertData["po_no"] === "") {
-                    $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
+                    $dataDivisi = $this->DivisisModel->find($insertData["divisi_id"]);
                     $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataWarehouse["warehouse_name"], date('y'), $insertData["warehouse_id"], $last_day);
+                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi_name"], date('y'), $insertData["divisi_id"], $last_day);
                 };
 
                 $insert = $this->AMPurchaseOrderModel->insert($insertData);

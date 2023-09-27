@@ -61,7 +61,7 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
                                 <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
-                                <th onclick="changeSort('warehouse')" class="sort">Departemen</th>
+                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th>Jumlah Order</th>
                                 <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
@@ -142,7 +142,7 @@
                 className: "text-center"
             },
             {
-                data: "warehouseName",
+                data: "divisiName",
                 className: "text-center"
             },
             {
