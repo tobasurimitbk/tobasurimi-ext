@@ -306,7 +306,7 @@ class OrderForm extends BaseController
                 "sales_id"              => $customerData->sales_id,
                 "order_date"            => $orderDate,
                 "shipping_date"         => $shippingDate,
-                // "payment_terms"         => $postData['payment_terms'],
+                "payment_terms"         => $postData['payment_terms'],
                 "keterangan"            => $postData['parent_keterangan'],
                 // "discount_rupiah"       => $postData('discount_rupiah'),
                 // "discount_percentage"   => $postData('discount_percentage'),
