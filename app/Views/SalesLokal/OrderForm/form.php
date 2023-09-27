@@ -91,12 +91,12 @@
                             <label for="floatingInput">Biaya Kirim</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?= !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->payment_terms : ""; ?>">
                             <label for="floatingInput">Terms</label>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
