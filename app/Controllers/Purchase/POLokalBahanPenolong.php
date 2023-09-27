@@ -9,7 +9,7 @@ use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\SupplierModel;
 use App\Models\SppModel;
 use App\Models\MetadataModel;
-use App\Models\WarehousesModel;
+use App\Models\DivisisModel;
 use App\Models\BeaCukaiModel;
 use Dompdf\Dompdf;
 
@@ -22,7 +22,7 @@ class POLokalBahanPenolong extends BaseController
     protected $MetadataModel;
     protected $SppModel;
     protected $SupplierModel;
-    protected $WarehousesModel;
+    protected $DivisisModel;
     protected $BeaCukaiModel;
     protected $dompdf;
 
@@ -35,7 +35,7 @@ class POLokalBahanPenolong extends BaseController
         $this->MetadataModel = new MetadataModel();
         $this->SppModel = new SppModel();
         $this->SupplierModel = new SupplierModel();
-        $this->WarehousesModel = new WarehousesModel();
+        $this->DivisisModel = new DivisisModel();
         $this->BeaCukaiModel = new BeaCukaiModel();
         $this->dompdf = new Dompdf();
     }
@@ -198,19 +198,30 @@ class POLokalBahanPenolong extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
-                "payment_term" => [
-                    "rules" => "required"
-                ],
+                // "payment_term" => [
+                //     "rules" => "required"
+                // ],
                 "currency" => [
                     "rules" => "required"
                 ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
-                "dpp" => [
-                    "rules" => "required"
-                ]
+                // "dpp" => [
+                //     "rules" => "required"
+                // ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
@@ -220,13 +231,13 @@ class POLokalBahanPenolong extends BaseController
                     "purchase_request_id"   => $purchase_request_id,
                     "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "warehouse_id"          => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                    "divisi_id"             => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                    //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                    //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note"                  => $this->request->getPost("note"),
                     "isPosted"              => false,
                     "createdBy"             => session()->get("login")->user_id,
@@ -257,9 +268,9 @@ class POLokalBahanPenolong extends BaseController
                 $insertData["total"] = $totalPrice;
 
                 if ($insertData["po_no"] === "") {
-                    $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
+                    $dataDivisi = $this->DivisisModel->find($insertData["divisi_id"]);
                     $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataWarehouse["warehouse_name"], date('y'), $insertData["warehouse_id"], $last_day);
+                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi_name"], date('y'), $insertData["divisi_id"], $last_day);
                 };
 
                 $insert = $this->AMPurchaseOrderModel->insert($insertData);
@@ -292,14 +303,7 @@ class POLokalBahanPenolong extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Data Gagal Disimpan",
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,
@@ -324,19 +328,30 @@ class POLokalBahanPenolong extends BaseController
                 "supplier_id" => [
                     "rules" => "required"
                 ],
-                "payment_term" => [
-                    "rules" => "required"
-                ],
+                // "payment_term" => [
+                //     "rules" => "required"
+                // ],
                 "currency" => [
                     "rules" => "required"
                 ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
-                "dpp" => [
-                    "rules" => "required"
-                ]
+                // "dpp" => [
+                //     "rules" => "required"
+                // ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
@@ -347,10 +362,10 @@ class POLokalBahanPenolong extends BaseController
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                    //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                     "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    "dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                    //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note"                  => $this->request->getPost("note"),
                     "isPosted"              => false,
                     "createdBy"             => session()->get("login")->user_id,
@@ -403,14 +418,7 @@ class POLokalBahanPenolong extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Diubah",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -613,7 +621,8 @@ class POLokalBahanPenolong extends BaseController
                 $dataBPLokal->totalPrice = number_format($totalPrice);
                 $dataBPLokal->totalDisc = number_format($totalDisc);
                 $dataBPLokal->totalPpn = number_format($totalPpn);
-                $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
+                $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn);
+                // $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
 
                 $data["dataPOLokal"] = $dataBPLokal;
                 $data["dataPOLokal"]->am_purchase_order_details = $dataBPLokalDetail;

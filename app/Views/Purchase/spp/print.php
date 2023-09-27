@@ -85,7 +85,7 @@
                 <td>Jenis Order: <?= $dataSPP->spp_type ?></td>
             </tr>
             <tr>
-                <td>Departmen: <?= $dataSPP->warehouseName ?></td>
+                <td>Departmen: <?= $dataSPP->divisiName ?></td>
                 <td>No Spp: <?= $dataSPP->spp_no ?></td>
             </tr>
         </table>

@@ -113,10 +113,10 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataPOLokal) ? $dataPOLokal->warehouse_id : ""; ?>" class="form-control warehouse_id" id="warehouse_id" name="warehouse_id">
+                        <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataPOLokal) ? $dataPOLokal->divisi_id : ""; ?>" class="form-control divisi_id" id="divisi_id" name="divisi_id">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->warehouseName : ""; ?>" readonly="true" class="form-control warehouse" id="warehouse" name="warehouse" placeholder="Gudang">
-                            <label for="floatingInput">Gudang</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->divisiName : ""; ?>" readonly="true" class="form-control divisi" id="divisi" name="divisi" placeholder="Divisi">
+                            <label for="floatingInput">Divisi</label>
                         </div>
                     </div>
                 </div>
@@ -200,12 +200,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOLokal) ? $dataPOLokal->dpp : ""; ?>" onkeyup="formatNumber(this)" type="text" class="form-control dpp" id="dpp" name="dpp" placeholder="DPP">
                             <label for="floatingInput">DPP</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOLokal) ? $dataPOLokal->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
@@ -679,9 +679,6 @@
                 },
                 payment_date: {
                     required: true,
-                },
-                dpp: {
-                    required: true,
                 }
             },
             messages: {
@@ -699,9 +696,6 @@
                 },
                 payment_date: {
                     required: "Tanggal Pembayaran wajib diisi"
-                },
-                dpp: {
-                    required: "DPP wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -763,8 +757,8 @@
                     dataType: "json",
                     success: function(res) {
                         if (res.status) {
-                            $(".warehouse_id").val(res?.data?.warehouse_id)
-                            $(".warehouse").val(res?.data?.warehouseName)
+                            $(".divisi_id").val(res?.data?.divisi_id)
+                            $(".divisi").val(res?.data?.divisiName)
 
                             let new_list_items = []
                             let tag_html = "";
@@ -889,8 +883,8 @@
 
                             $(".foot-detail-table").append(tag_total);
                         } else {
-                            $(".warehouse_id").val()
-                            $(".warehouse").val()
+                            $(".divisi_id").val()
+                            $(".divisi").val()
 
                             list_items = []
 

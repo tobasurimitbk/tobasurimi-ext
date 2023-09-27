@@ -14,7 +14,7 @@ class RMImportPOModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'company_id', 'purchase_request_id', 'po_no', 'po_date', 'warehouse_id',
+    protected $allowedFields    = ['id', 'company_id', 'purchase_request_id', 'po_no', 'po_date', 'divisi_id',
     'currency', 'supplier_id', 'total', 'payment_term', 'note', 'is_posted', 'createdBy', 'status_penerimaan'];
 
     // Dates
@@ -109,7 +109,7 @@ class RMImportPOModel extends Model
     {
         $selectQry = "rm_import_pos.*,
         purchase_requests.spp_no AS spp_no,
-        warehouses.warehouse_name AS warehouseName,
+        divisis.divisi AS divisiName,
         suppliers.name AS supplierName,
         suppliers.address AS supplierAddress,
         suppliers.phone AS supplierPhone,
@@ -122,7 +122,7 @@ class RMImportPOModel extends Model
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id', 'left')
-            ->join('warehouses', 'warehouses.id = rm_import_pos.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = rm_import_pos.divisi_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
             ->join('users', 'users.id = purchase_requests.createdBy', 'left')
             ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
@@ -179,14 +179,14 @@ class RMImportPOModel extends Model
         return $query->getResultArray();
     }
 
-    public function get_no($tgl, $bln, $thn, $warehouse, $thn2, $warehouse_id, $last_day)
+    public function get_no($tgl, $bln, $thn, $divisi, $thn2, $divisi_id, $last_day)
     {
         $lastStr =  $tgl . $bln . $thn;
 
         $builder = $this->db->table('rm_import_pos');
         $builder->select('po_no');
         $builder->orderBy('po_no', 'desc')
-        ->where('warehouse_id', $warehouse_id)
+        ->where('divisi_id', $divisi_id)
         ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
         ->where('createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
@@ -200,7 +200,7 @@ class RMImportPOModel extends Model
             $lastPO = sprintf("%02d", $lastPO);
         };
 
-        $generatedNo =  $lastStr . '-' . $lastPO . '/' . $warehouse . '/TOBA/' . $thn2;
+        $generatedNo =  $lastStr . '-' . $lastPO . '/' . $divisi . '/TOBA/' . $thn2;
 
         return $generatedNo;
     }

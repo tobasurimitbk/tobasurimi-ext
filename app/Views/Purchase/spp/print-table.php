@@ -138,7 +138,7 @@
                         <td><?= $detail['no'] ?></td>
                         <td><?= $detail['spp_type'] ?></td>
                         <td><?= $detail['spp_no'] ?></td>
-                        <td><?= $detail['warehouseName'] ?></td>
+                        <td><?= $detail['divisiName'] ?></td>
                         <td><?= $detail['total'] ?></td>
                         <td><?= $detail['request_date'] ?></td>
                         <td><?= $detail['createdAt'] ?></td>

@@ -6,7 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\SppModel;
 use App\Models\SppDetailModel;
 use App\Models\MetadataModel;
-use App\Models\WarehousesModel;
+use App\Models\DivisisModel;
 
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
@@ -25,7 +25,7 @@ class SPP extends BaseController
     protected $SppDetailModel;
 
     protected $MetadataModel;
-    protected $WarehousesModel;
+    protected $DivisisModel;
 
     protected $RmImportPOModel;
     protected $RmImportPODetailModel;
@@ -44,7 +44,7 @@ class SPP extends BaseController
         $this->SppDetailModel = new SppDetailModel();
 
         $this->MetadataModel = new MetadataModel();
-        $this->WarehousesModel = new WarehousesModel();
+        $this->DivisisModel = new DivisisModel();
 
         $this->RmImportPOModel = new RMImportPOModel();
         $this->RmImportPODetailModel = new RMImportPODetailModel();
@@ -66,12 +66,12 @@ class SPP extends BaseController
         //Get Order Type By Metadata
         $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
-        //Get Warehouse
-        $dataWarehouse = $this->WarehousesModel->asObject()->findAll();
+        //Get Divisi
+        $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
             "dataOrderType" => $dataOrderType,
-            "dataWarehouse" => $dataWarehouse
+            "dataDivisi" => $dataDivisi
         ];
 
         return view('Purchase/spp/form', $data);
@@ -82,12 +82,12 @@ class SPP extends BaseController
         //Get Order Type By Metadata
         $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
-        //Get Warehouse
-        $dataWarehouse = $this->WarehousesModel->asObject()->findAll();
+        //Get Divisi
+        $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
             "dataOrderType" => $dataOrderType,
-            "dataWarehouse" => $dataWarehouse
+            "dataDivisi" => $dataDivisi
         ];
 
         if (!empty($id)) {
@@ -171,7 +171,7 @@ class SPP extends BaseController
                 "id"            => $data->id,
                 "spp_type"      => $data->spp_type,
                 "spp_no"        => $data->spp_no,
-                "warehouseName" => $data->warehouseName,
+                "divisiName" => $data->divisiName,
                 "spp_type"      => $data->spp_type,
                 "total"         => number_format($data->total),
                 "request_date"  => date('d/m/Y', strtotime($data->request_date)),
@@ -206,17 +206,28 @@ class SPP extends BaseController
                 "spp_no" => [
                     "rules" => "required"
                 ],
-                "warehouse_id" => [
+                "divisi_id" => [
                     "rules" => "required"
                 ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $insertData = [
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
-                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                    "divisi_id" => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
                     "createdBy" => session()->get("login")->user_id,
@@ -231,7 +242,7 @@ class SPP extends BaseController
 
                 $insertData["total"] = $totalPrice;
 
-                $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
+                // $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
 
                 // if ($insertData["spp_no"] === "") {
                 //     $insertData["spp_no"] = $SppModel->generateNoSpp($dataWarehouse["warehouse_name"]);
@@ -267,14 +278,7 @@ class SPP extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Disimpan",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -299,10 +303,21 @@ class SPP extends BaseController
                 "spp_no" => [
                     "rules" => "required"
                 ],
-                "warehouse_id" => [
+                "divisi_id" => [
                     "rules" => "required"
                 ]
             ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
@@ -311,7 +326,7 @@ class SPP extends BaseController
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
-                    "warehouse_id" => formatter($this->request->getPost("warehouse_id"), "STR_TO_INT"),
+                    "divisi_id" => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
                     "createdBy" => session()->get("login")->user_id,
@@ -326,7 +341,7 @@ class SPP extends BaseController
 
                 $insertData["total"] = $totalPrice;
 
-                $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
+                // $dataWarehouse = $this->WarehousesModel->find($insertData["warehouse_id"]);
 
                 // if ($insertData["spp_no"] === "") {
                 //     $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
@@ -597,14 +612,7 @@ class SPP extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } else {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Data Gagal Diubah",
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            } 
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,
@@ -694,8 +702,8 @@ class SPP extends BaseController
 
     public function generateSPP()
     {
-        $warehouse_name = $this->request->getGet("warehouse_name");
-        $response = $this->SppModel->generateNoSpp($warehouse_name);
+        $divisi_name = $this->request->getGet("divisi_name");
+        $response = $this->SppModel->generateNoSpp($divisi_name);
         if ($response) {
             $data = [
                 "status"  => true,
@@ -879,7 +887,7 @@ class SPP extends BaseController
                 "id"            => $data->id,
                 "spp_type"      => $data->spp_type,
                 "spp_no"        => $data->spp_no,
-                "warehouseName" => $data->warehouseName,
+                "divisiName"    => $data->divisiName,
                 "total"         => number_format($data->total),
                 "request_date"  => date('Y-m-d', strtotime($data->request_date)),
                 "is_posted"     => $data->is_posted,

@@ -49,19 +49,19 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select onchange="changeDepartment()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                            <select onchange="changeDepartment()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
-                                if (!empty($dataWarehouse)) {
-                                    foreach ($dataWarehouse as $warehouse) {
+                                if (!empty($dataDivisi)) {
+                                    foreach ($dataDivisi as $divisi) {
                                 ?>
-                                        <option value="<?= $warehouse->id; ?>" <?= !empty($dataSPP) ? ($dataSPP->warehouse_id === $warehouse->id ? "selected" : "") : ""; ?>><?= $warehouse->warehouse_name; ?></option>
+                                        <option value="<?= $divisi->id; ?>" <?= !empty($dataSPP) ? ($dataSPP->divisi_id === $divisi->id ? "selected" : "") : ""; ?>><?= $divisi->divisi; ?></option>
                                 <?php
                                     }
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Warehouse</label>
+                            <label for="floatingInput">Department</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -441,21 +441,21 @@
             .find('label')
             .css('z-index', '1');
 
-        // WAREHOUSE
-        $('.warehouse_id').select2({
+        // DIVISI
+        $('.divisi_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.warehouse_id')
+        $('.divisi_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.warehouse_id')
+        $('.divisi_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -463,7 +463,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.warehouse_id')
+        $('.divisi_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -538,7 +538,7 @@
                 spp_no: {
                     required: true
                 },
-                warehouse_id: {
+                divisi_id: {
                     required: true,
                 }
             },
@@ -549,7 +549,7 @@
                 spp_no: {
                     required: "No. SPP wajib diisi"
                 },
-                warehouse_id: {
+                divisi_id: {
                     required: "Departemen wajib diisi"
                 }
             },
@@ -1667,7 +1667,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    warehouse_name: $(".warehouse_id option:selected").text()
+                    divisi_name: $(".divisi_id option:selected").text()
                 },
                 success: function(res) {
                     $(".spp_no").val(res?.data);
@@ -1687,7 +1687,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    warehouse_name: $(".warehouse_id option:selected").text()
+                    divisi_name: $(".divisi_id option:selected").text()
                 },
                 success: function(res) {
                     $(".spp_no").val(res?.data);

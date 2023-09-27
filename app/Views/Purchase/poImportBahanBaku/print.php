@@ -154,7 +154,7 @@
             </tr>
             <tr>
                 <td>
-                    Department: <?= $dataPO->warehouseName ?>
+                    Department: <?= $dataPO->divisiName ?>
                 </td>
                 <td colspan="2">
                     Location: <?= $dataPO->companyName ?>
