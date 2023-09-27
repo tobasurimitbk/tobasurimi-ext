@@ -64,7 +64,7 @@ class AttendanceKeterlambatanModel extends Model
 
         foreach ($attendancesInMonth as $p) {
 
-            if ($p['status'] == "HADIR") {
+            if ($p['status'] == "HADIR_H") {
                 $keterlambatanCheck = static::ketelambatanCheck(
                     $companyID,
                     $p['checkin']
