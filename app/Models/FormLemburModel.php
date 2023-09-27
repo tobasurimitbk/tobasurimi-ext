@@ -22,7 +22,8 @@ class FormLemburModel extends Model
         'total_uang_lembur',
         'kurangi_jam_istirahat',
         'jam_mulai_lembur',
-        'jam_selesai_lembur'
+        'jam_selesai_lembur',
+        'gaji_pokok_per_hari'
     ];
 
     // Dates
