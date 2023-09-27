@@ -17,6 +17,7 @@ class FormLemburModel extends Model
     protected $allowedFields    = [
         'company_id',
         'employee_id',
+        'division_id',
         'periode',
         'total_jam_lembur',
         'total_uang_lembur',

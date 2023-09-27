@@ -5,6 +5,7 @@ namespace App\Controllers\HR;
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
 use App\Models\BigDaysModel;
+use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
 use App\Models\GajiConjunctionModel;
@@ -30,22 +31,36 @@ class FormLembur extends BaseController
 
     public function createView()
     {
-        $employeesModel = new EmployeesModel();
+        $DivisiModel = new DivisisModel();
 
         $data = [
-            'employees' => $employeesModel->getEmployeesAndDivisi($this->this_company_id),
+            "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
             'lemburDetail' => null
         ];
 
         return \view('hr/lembur/form', $data);
     }
 
+    public function getEmployeeByDivision()
+    {
+        $EmployeesModel = new EmployeesModel();
+        return \response()->setJSON([
+            'data' => $EmployeesModel->where('deletedAt', null)
+                ->where('division_id', $this->request->getVar('divisionID'))
+                ->orderBy('name', "ASC")
+                ->findAll(),
+            'token' => \csrf_hash(),
+        ]);
+    }
+
     public function getById($id)
     {
         $employeesModel = new EmployeesModel();
         $formLemburModel = new FormLemburModel();
+        $DivisiModel = new DivisisModel();
 
         $data = [
+            "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
             'employees' => $employeesModel->getEmployeesAndDivisi($this->this_company_id),
             'lemburDetail' => $formLemburModel->where('id', $id)->first()
         ];
@@ -128,6 +143,7 @@ class FormLembur extends BaseController
         $tanggal = $this->request->getVar('tanggalLembur');
         $kurangiJamIstirahat = $this->request->getVar('kurangiJamIstirahat');
         $jamSelesaiLembur = $this->request->getVar('jamSelesaiLembur');
+        $gajiPokokPerHari = $this->request->getVar('gajiPokokPerHari');
 
         $modelJamKerja = new JamKerjaModel();
         $modelGaji = new GajiConjunctionModel();
@@ -257,7 +273,7 @@ class FormLembur extends BaseController
         // get gaji pokok
         foreach ($gaji as $g) {
             if ($g['is_gaji_harian'] == 1) {
-                $gajiPokok = $g['nominal'];
+                $gajiPokok = $gajiPokokPerHari == "-" ? $g['nominal'] : $gajiPokokPerHari;
             }
         }
 
@@ -341,6 +357,7 @@ class FormLembur extends BaseController
     public function create()
     {
         $modelFormLembur = new FormLemburModel();
+        $modelEmployee = new EmployeesModel();
         $periode = $this->request->getVar('tanggalLembur');
         $tanggalObj = DateTime::createFromFormat('d/m/Y', $periode);
 
@@ -355,8 +372,11 @@ class FormLembur extends BaseController
             ]);
         }
 
+        $employee = $modelEmployee->where('id', $this->request->getVar('employeeID'))->first();
+
         $modelFormLembur->insert([
             'company_id' => $this->this_company_id,
+            'division_id' => $employee['division_id'],
             'employee_id' => $this->request->getVar('employeeID'),
             'periode' => $tanggalObj->format('Y-m-d'),
             'total_jam_lembur' => $this->request->getVar('totalJamLembur'),

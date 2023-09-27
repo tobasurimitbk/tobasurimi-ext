@@ -61,13 +61,13 @@
                                 <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Nama Customer</label>
+                            <label for="floatingInput">Nama Konsumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control" id="tagihan_ke" name="tagihan_ke" disabled value="<?= $data->address ?? '' ?>">
-                            <label for="floatingInput">Tagihan Ke</label>
+                            <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -91,12 +91,12 @@
                             <label for="floatingInput">Biaya Kirim</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control payment_terms" id="payment_terms" name="payment_terms" <?= !empty($data) ? ($data->payment_terms === true ? 'disabled=true' : '') : ''; ?> placeholder="Terms" value="<?= !empty($data) ? $data->payment_terms : ""; ?>">
                             <label for="floatingInput">Terms</label>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
