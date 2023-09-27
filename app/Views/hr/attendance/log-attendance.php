@@ -531,9 +531,6 @@
         formData.append('employeeID', employeeID);
         formData.append('tanggal', tanggal);
 
-        console.log(tanggal);
-        console.log(employeeID);
-
         $.ajax({
             url: "<?= base_url("log-attendance/detail"); ?>",
             data: formData,

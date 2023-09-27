@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\BigDaysModel;
 use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
 use App\Models\GajiConjunctionModel;
@@ -131,6 +132,8 @@ class FormLembur extends BaseController
         $modelJamKerja = new JamKerjaModel();
         $modelGaji = new GajiConjunctionModel();
         $modelLogAttendance = new AttendancesLogModel();
+        $modelEmployee = new EmployeesModel();
+        $modelBigDays = new BigDaysModel();
 
         // declare Variable
         $checkOutLog = ""; // di set sebagai selesai lembur
@@ -175,6 +178,17 @@ class FormLembur extends BaseController
             }
         }
 
+        // cek hari besar
+        $hariBesar = $modelBigDays->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
+        // jika hari besar yha libur gak ada lembur
+        if ($hariBesar != null) {
+            return \response()->setJSON([
+                'message' => "$tanggal adalah hari besar " . $hariBesar['name'] . ". jadi ga bisa ambil lembur di hari tersebut",
+                'status' => false,
+                'code' => 400
+            ]);
+        }
+
         // check apakah sudah presensi pulang di log
         if ($checkOutLog == "") {
             // belum ada presensi pulang di log
@@ -190,12 +204,16 @@ class FormLembur extends BaseController
             $checkOutLog = $jamSelesaiLembur;
         }
 
+        // employee get first
+        $employee = $modelEmployee->where('id', $employeeID)->first();
         // get jam kerja
         $hariInIndonesia = static::getDayIndonesia(date('l', strtotime($tanggal)));
         $jamKerjaDetail = $modelJamKerja
             ->select('jam_kerja_detail.*')
             ->join('jam_kerja_detail', 'jam_kerja.id = jam_kerja_detail.jam_kerja_id')
-            ->where('company_id', $this->this_company_id)
+            ->join('divisis', 'divisis.jam_kerja_id = jam_kerja.id')
+            ->where('jam_kerja.company_id', $this->this_company_id)
+            ->where('divisis.id', $employee['division_id'])
             ->where('jam_kerja_detail.hari', $hariInIndonesia)
             ->first();
 
@@ -233,6 +251,7 @@ class FormLembur extends BaseController
             ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
             ->where('gaji_conjunction.employee_id', $employeeID)
             ->where('tunjangan.tipe', "PLUS")
+            ->where('tunjangan.is_gaji_harian', 1)
             ->findAll();
 
         // get gaji pokok
@@ -344,7 +363,8 @@ class FormLembur extends BaseController
             'total_uang_lembur' => $this->request->getVar('totalUangLembur'),
             'kurangi_jam_istirahat' => $this->request->getVar('kurangiJamIstirahat'),
             'jam_mulai_lembur' => $this->request->getVar('jamMulaiLembur'),
-            'jam_selesai_lembur' => $this->request->getVar('jamSelesaiLembur')
+            'jam_selesai_lembur' => $this->request->getVar('jamSelesaiLembur'),
+            'gaji_pokok_per_hari' => $this->request->getVar('gajiPokokPerHari')
         ]);
 
         return \response()->setJSON([

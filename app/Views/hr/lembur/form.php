@@ -24,6 +24,7 @@
 
         <input type="hidden" name="totalUangLembur">
         <input type="hidden" name="totalJamLembur">
+        <input type="hidden" name="gajiPokokPerHari">
 
         <div class="card">
             <div class="card-body">
@@ -105,7 +106,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select" name="kurangiJamIstirahat" id="kurangiJamIstirahat" aria-label="Floating label select example">
@@ -131,7 +132,7 @@
                             <label for="floatingInput">Jumlah Jam Kerja Bersih</label>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Komponen Gaji -->
                 <div id="rincanLembur">
@@ -144,7 +145,7 @@
                                     <th onclick="" class="sort">Nominal</th>
                                 </tr>
                             </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                            <tbody class="body-table" id="body-table">
                                 <tr>
                                     <td colspan="3" class="text-center">
                                         Pilih karyawan dan tanggal lembur dulu yha
@@ -158,7 +159,7 @@
                         Rincan Perhitungan Uang Lembur
                     </label>
                     <table class="table mt-3 p-3" width="100%" cellspacing="0">
-                        <tbody class="body-table" id="rincanBiayaLembur" style="cursor: pointer;">
+                        <tbody class="body-table" id="rincanBiayaLembur">
                         </tbody>
                     </table>
                 </div>
@@ -313,6 +314,7 @@
 
                     $('input[name="totalUangLembur"]').val(response.lembur.totalBayaran);
                     $('input[name="totalJamLembur"]').val(response.lembur.totalJamLembur);
+                    $('input[name="gajiPokokPerHari"]').val(response.upah);
 
                     $.each(dataToAdd, function(index, data) {
                         var newRow = $("<tr class='text-dark font-weight-bold'>");
@@ -344,6 +346,7 @@
                     $('input[name="jumlahJamIstirahat"]').val(null);
                     $('input[name="jumlahJamKerjaBersih"]').val(null);
                     $('input[name="totalUangLembur"]').val(null);
+                    $('input[name="gajiPokokPerHari"]').val(null);
                 }
 
             },
@@ -432,6 +435,7 @@
                     var kurangiJamIstirahat = $('select[name="kurangiJamIstirahat"]').val();
                     var jamMulaiLembur = $('input[name="jamMulaiLembur"]').val();
                     var jamSelesaiLembur = $('input[name="jamSelesaiLembur"]').val();
+                    var gajiPokokPerHari = $('input[name="gajiPokokPerHari"]').val();
 
                     if (totalUangLembur != 0) {
                         setLoading()
@@ -444,6 +448,7 @@
                         formData.append('kurangiJamIstirahat', kurangiJamIstirahat);
                         formData.append('jamMulaiLembur', jamMulaiLembur);
                         formData.append('jamSelesaiLembur', jamSelesaiLembur);
+                        formData.append('gajiPokokPerHari', gajiPokokPerHari);
 
                         // update dan delete
                         $.ajax({
