@@ -673,6 +673,7 @@ $routes->get('/lembur/all', 'HR\FormLembur::all', ['filter' => 'Auth']);
 $routes->post('/lembur/create', 'HR\FormLembur::create', ['filter' => 'Auth']);
 $routes->post('/lembur/delete', 'HR\FormLembur::delete', ['filter' => 'Auth']);
 $routes->get('/lembur/id/(:segment)', 'HR\FormLembur::getById/$1', ['filter' => 'Auth']);
+$routes->post('/lembur/employees', 'HR\FormLembur::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER
