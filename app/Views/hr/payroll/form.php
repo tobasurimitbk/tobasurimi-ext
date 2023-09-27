@@ -142,13 +142,13 @@
             <div class="row">
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($gajiPerHari ? $gajiPerHari['nominal'] : 0, 0, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($gajiPerHari['nominal'], 2, ',', '.') ?>">
                         <label for="floatingInput">Gaji (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($nominalUangCadangan == null ? 0 : $nominalUangCadangan['nominal'], 0, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($nominalUangCadangan == null ? 0 : $nominalUangCadangan['nominal'], 2, ',', '.') ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
@@ -358,7 +358,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalKomponenGaji" class="form-control target input-picker" value="">
+                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalKomponenGaji" class="form-control target input-picker" value="">
                                 <label for="nominalKomponenGaji" id="nominalGajiModal">Nominal</label>
                             </div>
 
@@ -406,7 +406,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalDendaKeterlambatan" class="form-control target input-picker" value="">
+                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalDendaKeterlambatan" class="form-control target input-picker" value="">
                                 <label for="nominalDendaKeterlambatan" id="nominalDendaKeterlambatan">Nominal</label>
                             </div>
 
@@ -448,7 +448,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalPerizinanNotApproved" class="form-control target input-picker" value="">
+                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalPerizinanNotApproved" class="form-control target input-picker" value="">
                                 <label for="nominalPerizinanNotApproved" id="nominalPerizinanNotApproved">Nominal</label>
                             </div>
 
@@ -767,7 +767,7 @@
         formData.append('nominalCadangan', cadanganPerHari);
         formData.append("payrollID", "<?= $payrollDetail['id'] ?>");
         formData.append("gajiPerHariID", "<?= $gajiPerHari['id'] ?>");
-        formData.append("cadanganID", <?= $nominalUangCadangan == null ? 0 : $nominalUangCadangan['id'] ?>);
+        formData.append("cadanganID", "<?= $nominalUangCadangan == null ? 0 : $nominalUangCadangan['id'] ?>");
 
         $.ajax({
             url: "<?= base_url("payroll/update/nominal-gaji-cadangan"); ?>",
@@ -780,6 +780,7 @@
             processData: false,
             contentType: false,
             success: function(response) {
+                console.log(response);
                 location.reload();
             },
             onError: function(response) {
@@ -795,10 +796,19 @@
 
 <script>
     function formatRupiah(angka) {
-        var reverse = angka.toString().split('').reverse().join('');
-        var ribuan = reverse.match(/\d{1,3}/g);
-        var formatted = ribuan.join('.').split('').reverse().join('');
-        return 'Rp. ' + formatted;
+        if (angka === null) {
+            angka = 0;
+        }
+
+        angka = angka.toString();
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var desimal = parts[1] || '00';
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return 'Rp. ' + ribuanFormatted + ',' + desimal;
     }
 </script>
 <?= $this->endSection(); ?>

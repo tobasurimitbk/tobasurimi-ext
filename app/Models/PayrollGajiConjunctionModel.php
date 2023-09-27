@@ -122,7 +122,7 @@ class PayrollGajiConjunctionModel extends Model
         return $this->asArray()->select('payroll_gaji_conjunction.*')
             ->join('tunjangan', 'payroll_gaji_conjunction.tunjangan_id = tunjangan.id')
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-            ->where('tunjangan.is_cadangan', 1)
+            ->where('tunjangan.is_cadangan', '1')
             ->first();
     }
 }

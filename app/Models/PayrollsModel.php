@@ -146,16 +146,14 @@ class PayrollsModel extends Model
         $gajiHarian = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_gaji_harian', '1')
-            ->where('payroll_gaji_conjunction.company_id', $companyID)
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         // get nominal uang cadangan
         $gajiCadangan = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_cadangan', '1')
-            ->where('payroll_gaji_conjunction.company_id', $companyID)
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         $nominalGajiHarian = ($gajiHarian != null) ? $gajiHarian['nominal'] : 0;
@@ -179,9 +177,8 @@ class PayrollsModel extends Model
         $gajiMinus = $payrollGajiModel->select("SUM(payroll_gaji_conjunction.nominal) AS total")
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.tipe', 'MINUS')
-            ->where('tunjangan.is_cadangan != ', '1')
-            ->where('tunjangan.is_gaji_harian != ', '1')
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
+            ->where('tunjangan.is_cadangan != ', 1)
+            ->where('tunjangan.is_gaji_harian != ', 1)
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->findAll();
 
@@ -189,9 +186,8 @@ class PayrollsModel extends Model
         $gajiPlus = $payrollGajiModel->select("SUM(payroll_gaji_conjunction.nominal) AS total")
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.tipe', 'PLUS')
-            ->where('tunjangan.is_cadangan != ', '1')
-            ->where('tunjangan.is_gaji_harian != ', '1')
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
+            ->where('tunjangan.is_cadangan != ', 1)
+            ->where('tunjangan.is_gaji_harian != ', 1)
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->findAll();
 
@@ -247,16 +243,14 @@ class PayrollsModel extends Model
         $gajiHarian = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_gaji_harian', '1')
-            ->where('payroll_gaji_conjunction.company_id', $payroll['company_id'])
-            ->where('payroll_gaji_conjunction.employee_id', $payroll['employee_id'])
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         // get nominal uang cadangan
         $gajiCadangan = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_cadangan', '1')
-            ->where('payroll_gaji_conjunction.company_id', $payroll['company_id'])
-            ->where('payroll_gaji_conjunction.employee_id', $payroll['employee_id'])
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         $nominalGajiHarian = ($gajiHarian != null) ? $gajiHarian['nominal'] : 0;

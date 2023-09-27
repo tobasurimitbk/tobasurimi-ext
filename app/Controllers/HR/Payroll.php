@@ -293,7 +293,6 @@ class Payroll extends BaseController
             $year . "-" . $month,
             $payrollID,
             $status['HADIR_H'],
-            0
         );
 
         $payrollModel->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
@@ -343,13 +342,16 @@ class Payroll extends BaseController
     {
         $id = $this->request->getVar('komponenGajiID');
         $payrollID = $this->request->getVar('payrollID');
-        $nominal = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominal'));
+
+        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
+        $angka = str_replace(",", ".", $angka);
+        $angkaDesimal = number_format((float) $angka, 3, '.', '');
 
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $payrollModel = new PayrollsModel();
 
         $payrollGajiModel->update($id, [
-            'nominal' => $nominal
+            'nominal' => $angkaDesimal
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
@@ -365,13 +367,16 @@ class Payroll extends BaseController
     {
         $id = $this->request->getVar('rekapKeterlambatanPresensiID');
         $payrollID = $this->request->getVar('payrollID');
-        $nominal = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominal'));
+
+        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
+        $angka = str_replace(",", ".", $angka);
+        $angkaDesimal = number_format((float) $angka, 3, '.', '');
 
         $payrollModel = new PayrollsModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
 
         $attendanceTerlambatModel->update($id, [
-            'nominal_pengurangan' => $nominal,
+            'nominal_pengurangan' => $angkaDesimal,
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
@@ -387,13 +392,16 @@ class Payroll extends BaseController
     {
         $id = $this->request->getVar('perizinanID');
         $payrollID = $this->request->getVar('payrollID');
-        $nominal = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominal'));
+
+        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
+        $angka = str_replace(",", ".", $angka);
+        $angkaDesimal = number_format((float) $angka, 3, '.', '');
 
         $payrollModel = new PayrollsModel();
         $formPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
 
         $formPerizinanNotApprovedModel->update($id, [
-            'nominal_pengurangan' => $nominal,
+            'nominal_pengurangan' => $angkaDesimal,
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
@@ -408,20 +416,26 @@ class Payroll extends BaseController
     public function updateNominalGajiPerHariAndCadangan()
     {
         $payrollID = $this->request->getVar('payrollID');
-        $nominalGajiPerHari = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominalGajiPerHari'));
-        $nominalCadangan = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominalCadangan'));
         $gajiPerHariID = $this->request->getVar('gajiPerHariID');
         $cadanganID = $this->request->getVar('cadanganID');
+
+        $nominalGajiPerHari = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalGajiPerHari'));
+        $nominalGajiPerHari = str_replace(",", ".", $nominalGajiPerHari);
+        $angkaDesimalGajiPerHari = number_format((float) $nominalGajiPerHari, 3, '.', '');
+
+        $nominalCadangan = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalCadangan'));
+        $nominalCadangan = str_replace(",", ".", $nominalCadangan);
+        $angkaDesimalCadangan = number_format((float) $nominalCadangan, 3, '.', '');
 
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $payrollModel = new PayrollsModel();
 
         $payrollGajiModel->update($gajiPerHariID, [
-            'nominal' => $nominalGajiPerHari
+            'nominal' => $angkaDesimalGajiPerHari
         ]);
 
         $payrollGajiModel->update($cadanganID, [
-            'nominal' => $nominalCadangan
+            'nominal' => $angkaDesimalCadangan
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
