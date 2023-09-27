@@ -24,6 +24,7 @@
 
         <input type="hidden" name="totalUangLembur">
         <input type="hidden" name="totalJamLembur">
+        <input type="hidden" name="gajiPokokPerHari">
 
         <div class="card">
             <div class="card-body">
@@ -33,8 +34,15 @@
                 <div class="row mt-2">
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" id="nip" placeholder="" class="form-control target input-picker" value="-">
-                            <label for="floatingInput">NIP</label>
+                            <select <?= (!empty($lemburDetail)) ? "disabled" : "" ?> class="form-select" name="divisionID" id="divisionID">
+                                <option value=""> Pilih Nama Karyawan</option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option <?= (!empty($lemburDetail)) ?  ($lemburDetail['division_id'] == $d['id'] ? "selected" : "") : ""  ?> value="<?= $d['id'] ?>">
+                                        <?= $d['divisi'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Pilih Divisi</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
@@ -45,13 +53,7 @@
                                 </option>
                                 <?php if (!empty($lemburDetail)) : ?>
                                     <?php foreach ($employees as $e) : ?>
-                                        <option <?= $lemburDetail['employee_id'] == $e['id'] ? 'selected' : '' ?> data-divisi="<?= $e['divisi'] ?>" data-nip="<?= $e['nip'] ?>" value="<?= $e['id'] ?>">
-                                            - <?= $e['name'] ?> -
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php else : ?>
-                                    <?php foreach ($employees as $e) : ?>
-                                        <option data-divisi="<?= $e['divisi'] ?>" data-nip="<?= $e['nip'] ?>" value="<?= $e['id'] ?>">
+                                        <option <?= $lemburDetail['employee_id'] == $e['id'] ? 'selected' : '' ?> data-nip="<?= $e['nip'] ?>" value="<?= $e['id'] ?>">
                                             - <?= $e['name'] ?> -
                                         </option>
                                     <?php endforeach; ?>
@@ -62,8 +64,8 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly autocomplete="one-time-code" type="text" id="divisi" placeholder="" class="form-control target input-picker" value="-">
-                            <label for="floatingInput">Divisi</label>
+                            <input readonly autocomplete="one-time-code" type="text" id="nip" placeholder="" class="form-control target input-picker" value="-">
+                            <label for="floatingInput">NIP</label>
                         </div>
                     </div>
                 </div>
@@ -105,7 +107,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-sm-6 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select" name="kurangiJamIstirahat" id="kurangiJamIstirahat" aria-label="Floating label select example">
@@ -131,7 +133,7 @@
                             <label for="floatingInput">Jumlah Jam Kerja Bersih</label>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Komponen Gaji -->
                 <div id="rincanLembur">
@@ -144,7 +146,7 @@
                                     <th onclick="" class="sort">Nominal</th>
                                 </tr>
                             </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                            <tbody class="body-table" id="body-table">
                                 <tr>
                                     <td colspan="3" class="text-center">
                                         Pilih karyawan dan tanggal lembur dulu yha
@@ -158,7 +160,7 @@
                         Rincan Perhitungan Uang Lembur
                     </label>
                     <table class="table mt-3 p-3" width="100%" cellspacing="0">
-                        <tbody class="body-table" id="rincanBiayaLembur" style="cursor: pointer;">
+                        <tbody class="body-table" id="rincanBiayaLembur">
                         </tbody>
                     </table>
                 </div>
@@ -176,14 +178,18 @@
     $('#employeeID').change(function(e) {
         e.preventDefault();
         var selectedOption = $(this).find(":selected");
-        var divisi = selectedOption.data("divisi");
         var nip = selectedOption.data("nip");
         $('#nip').val(nip);
-        $('#divisi').val(divisi);
     });
 
     $("select[name='employeeID']").select2({
         placeholder: "Pilih Nama Karyawan",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
+    $("select[name='divisionID']").select2({
+        placeholder: "Pilih Divisi Dahulu",
         theme: "bootstrap-5",
         allowClear: true
     });
@@ -241,6 +247,7 @@
         var tanggalLembur = $("input[name='tanggalLembur']").val();
         var kurangiJamIstirahat = $("select[name='kurangiJamIstirahat']").val();
         var jamSelesaiLembur = $("input[name='jamSelesaiLembur']").val();
+        var gajiPokokPerHari = "<?= (!empty($lemburDetail)) ?  $lemburDetail['gaji_pokok_per_hari'] : "-" ?>";
 
         // append to form
         var formData = new FormData();
@@ -248,6 +255,7 @@
         formData.append('tanggalLembur', tanggalLembur);
         formData.append('kurangiJamIstirahat', kurangiJamIstirahat);
         formData.append('jamSelesaiLembur', jamSelesaiLembur);
+        formData.append('gajiPokokPerHari', gajiPokokPerHari);
 
         // generate action
         $.ajax({
@@ -271,10 +279,11 @@
 
                     $.each(response.komponenGaji, function(index, data) {
                         var newRow = $('<tr class="text-dark font-weight-bold">');
-                        var indexNumber = index + 1; // Tambahkan 1 pada index untuk membuatnya menjadi angka
+                        var indexNumber = index + 1;
+                        var nominal = "<?= !empty($lemburDetail) ? $lemburDetail['gaji_pokok_per_hari'] : "-" ?>"
                         newRow.append($('<td>').text(indexNumber));
                         newRow.append($('<td>').text(data.name));
-                        newRow.append($('<td>').text(data.nominal != null ? formatRupiah(data.nominal) : 0));
+                        newRow.append($('<td>').text(data.nominal != null ? formatRupiah(nominal == "-" ? data.nominal : nominal) : 0));
                         table.append(newRow);
                     });
 
@@ -313,6 +322,7 @@
 
                     $('input[name="totalUangLembur"]').val(response.lembur.totalBayaran);
                     $('input[name="totalJamLembur"]').val(response.lembur.totalJamLembur);
+                    $('input[name="gajiPokokPerHari"]').val(response.upah);
 
                     $.each(dataToAdd, function(index, data) {
                         var newRow = $("<tr class='text-dark font-weight-bold'>");
@@ -344,6 +354,7 @@
                     $('input[name="jumlahJamIstirahat"]').val(null);
                     $('input[name="jumlahJamKerjaBersih"]').val(null);
                     $('input[name="totalUangLembur"]').val(null);
+                    $('input[name="gajiPokokPerHari"]').val(null);
                 }
 
             },
@@ -432,6 +443,7 @@
                     var kurangiJamIstirahat = $('select[name="kurangiJamIstirahat"]').val();
                     var jamMulaiLembur = $('input[name="jamMulaiLembur"]').val();
                     var jamSelesaiLembur = $('input[name="jamSelesaiLembur"]').val();
+                    var gajiPokokPerHari = $('input[name="gajiPokokPerHari"]').val();
 
                     if (totalUangLembur != 0) {
                         setLoading()
@@ -444,6 +456,7 @@
                         formData.append('kurangiJamIstirahat', kurangiJamIstirahat);
                         formData.append('jamMulaiLembur', jamMulaiLembur);
                         formData.append('jamSelesaiLembur', jamSelesaiLembur);
+                        formData.append('gajiPokokPerHari', gajiPokokPerHari);
 
                         // update dan delete
                         $.ajax({
@@ -496,6 +509,50 @@
                 }
             })
         }
+    });
+
+    $("select[name='divisionID']").on('change', function(e) {
+        e.preventDefault();
+        const csrf = $(`[name="${csrfToken}"]`);
+        var divisionID = $(this).val();
+        var formData = new FormData();
+        formData.append('divisionID', divisionID);
+
+        $.ajax({
+            url: "<?= base_url("lembur/employees"); ?>",
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                var employeeSelect = $("select[name='employeeID']");
+                employeeSelect.empty();
+
+                var emptyOption = $("<option></option>")
+                    .attr("value", "")
+                    .text("Pilih Nama Karyawan");
+
+                employeeSelect.append(emptyOption);
+
+                $.each(response.data, function(index, data) {
+                    var option = $("<option data-nip=" + data.nip + "></option>")
+                        .attr("value", data.id)
+                        .text(data.name);
+                    employeeSelect.append(option);
+                });
+
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+
+            }
+        });
+
     });
 
     // function helper

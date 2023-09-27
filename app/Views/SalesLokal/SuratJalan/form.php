@@ -42,7 +42,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Nama Customer</label>
+                            <label for="floatingInput">Nama Konsumen</label>
                         </div>
                     </div>
 
@@ -75,7 +75,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control" id="tagihan_ke" name="tagihan_ke" value="<?= $data->customerAddress ?? ''; ?>" disabled>
-                            <label for="floatingInput">Tagihan ke</label>
+                            <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">

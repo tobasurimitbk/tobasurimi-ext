@@ -61,7 +61,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Departemen</label>
+                            <label for="floatingInput">Warehouse</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -110,12 +110,12 @@
                             <label for="floatingInput">Catatan (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataSPP) ? $dataSPP->createdByName : session()->get("login")->name; ?>">
                             <label for="floatingInput">Order Oleh</label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -1003,23 +1003,23 @@
 
             let validate_same = false;
 
-            // list_items.map(item => {
-            //     if(barang_id !== '')
-            //     {
-            //         if(item.barang_id == barang_id)
-            //         {
-            //             // kalau edit barang, barang tidak ganti tidak kena validasi
-            //             if(row_detail === item.row)
-            //             {
-            //                 validate_same = false;
-            //             }
-            //             else
-            //             {
-            //                 validate_same = true;
-            //             }
-            //         }
-            //     }
-            // })
+            list_items.map(item => {
+                if(barang_id !== '')
+                {
+                    if(item.barang_id == barang_id)
+                    {
+                        // kalau edit barang, barang tidak ganti tidak kena validasi
+                        if(row_detail === item.row)
+                        {
+                            validate_same = false;
+                        }
+                        else
+                        {
+                            validate_same = true;
+                        }
+                    }
+                }
+            })
 
             if (validate_same) {
                 Swal.fire({

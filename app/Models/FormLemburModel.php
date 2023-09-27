@@ -17,12 +17,14 @@ class FormLemburModel extends Model
     protected $allowedFields    = [
         'company_id',
         'employee_id',
+        'division_id',
         'periode',
         'total_jam_lembur',
         'total_uang_lembur',
         'kurangi_jam_istirahat',
         'jam_mulai_lembur',
-        'jam_selesai_lembur'
+        'jam_selesai_lembur',
+        'gaji_pokok_per_hari'
     ];
 
     // Dates

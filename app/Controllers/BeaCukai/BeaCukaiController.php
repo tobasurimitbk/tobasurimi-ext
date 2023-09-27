@@ -4,6 +4,7 @@ namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
 use App\Models\BeaCukaiModel;
+use App\Models\BeaCukaiBarangModel;
 use App\Models\CountryModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\SupplierModel;
@@ -17,7 +18,7 @@ use App\Models\AMPurchaseOrderModel;
 class BeaCukaiController extends BaseController
 {
 
-    private $modelRMPurchaseOrder, $modelRMImportPO, $modelAMPurchaseOrder, $modelBeaCukai, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
+    private $modelRMPurchaseOrder, $modelRMImportPO, $modelAMPurchaseOrder, $modelBeaCukai, $modelBeaCukaiBarang, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
 
     public function __construct()
     {
@@ -25,6 +26,7 @@ class BeaCukaiController extends BaseController
         $this->modelRMImportPO = new RMImportPOModel();
         $this->modelAMPurchaseOrder = new AMPurchaseOrderModel();
         $this->modelBeaCukai = new BeaCukaiModel();
+        $this->modelBeaCukaiBarang = new BeaCukaiBarangModel();
         $this->modelKantorBeaCukai = new KantorBeaCukaiModel();
         $this->modelSupplier = new SupplierModel();
         $this->modelCountry = new CountryModel();
@@ -165,7 +167,11 @@ class BeaCukaiController extends BaseController
         //Get Pengangkutan
         $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
+        //Get Kategori Barang
+        $kategoriBarang = $this->modelMetadata->get_by_name_bc('Kategori Barang BC');
+
         $data = [
+            'kategoriBarang' => $kategoriBarang,
             'dropdownDokumen' => [],
             'jenisKontainer' => $jenisKontainer,
             'ukuranKontainer' => $ukuranKontainer,
@@ -217,7 +223,11 @@ class BeaCukaiController extends BaseController
         //Get Pengangkutan
         $pengangkutan = $this->modelMetadata->get_by_name_bc('Pengangkutan');
 
+        //Get Kategori Barang
+        $kategoriBarang = $this->modelMetadata->get_by_name_bc('Kategori Barang BC');
+
         $data = [
+            'kategoriBarang' => $kategoriBarang,
             'jenisKontainer' => $jenisKontainer,
             'ukuranKontainer' => $ukuranKontainer,
             'tipeKontainer' => $tipeKontainer,
@@ -237,6 +247,16 @@ class BeaCukaiController extends BaseController
         if (!empty($id)) {
             $dataBC = $this->modelBeaCukai->getById($id);
             $data["dataBC"] = $dataBC;
+
+            $dataBCBarangDetail = $this->modelBeaCukaiBarang->getByBeaCukaiId($id);
+
+            if($dataBCBarangDetail)
+            {
+                $data["dataBCBarangDetail"] = $dataBCBarangDetail;
+            }
+
+            // var_dump($dataBCBarangDetail);
+            // die;
 
             $dropdownDokumen = [];
             if($dataBC->jenis_dokumen === "No PO")
@@ -511,8 +531,35 @@ class BeaCukaiController extends BaseController
             ];
             
             $insert =  $this->modelBeaCukai->insert($payload);
+            
+            $data_barang = json_decode($this->request->getPost("data_barang"));
 
             if (!$insert) {
+                foreach($data_barang as $data)
+                {
+                    $detailPayload = [];
+
+                    $detailPayload = [
+                        'bea_cukai_id' => $insert,
+                        'barang_id' => $data->barang_id,
+                        'kategori_id' => $data->kategori_id
+                    ];
+
+                    $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
+
+                    if(!$responseDetail) {
+                        $message =  'Data Gagal Disimpan';
+                        $data = [
+                            "status"            => false,
+                            "message"    => $message,
+                            "payload"   => $payload,
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
+
                 $data = [
                     "status"    => false,
                     "message"   => 'Data Gagal Disimpan!',
@@ -749,7 +796,89 @@ class BeaCukaiController extends BaseController
             
             $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();
 
-            if (!$insert) {
+            $data_barang = json_decode($this->request->getPost("data_barang"));
+
+            if ($insert) {
+                foreach($data_barang as $data)
+                {
+                    $detailPayload = [];
+
+                    $detailPayload = [
+                        'bea_cukai_id' => $id,
+                        'barang_id' => $data->barang_id,
+                        'kategori_id' => $data->kategori_id
+                    ];
+
+                    // kalau hapus dan ada id
+                    if($data->isDeleted && $data->id)
+                    {
+                        $responseDetail = $this->modelBeaCukaiBarang->delete($data->id);
+
+                        if(!$responseDetail) {
+                            $message =  'Data Gagal Dihapus';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                            return;
+                        }
+                    }
+
+                     // kalau update
+                    if($data->id)
+                    {
+                        $conditionDetail = [
+                            'id' => $data->id
+                        ];
+
+                        $responseDetail = $this->modelBeaCukaiBarang->where($conditionDetail)->set($detailPayload)->update();
+
+                        if(!$responseDetail) {
+                            $message =  'Data Gagal Disimpan';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                            return;
+                        }
+                    }
+
+                    // kalau create
+                    else
+                    {
+                        $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
+
+                        if(!$responseDetail) {
+                            $message =  'Data Gagal Diubah';
+                            $data = [
+                                "status"            => false,
+                                "message"    => $message,
+                                "payload"   => $payload,
+                                'token' => csrf_hash()
+                            ];
+                            echo json_encode($data);
+                            return;
+                        }
+                    }
+                }
+
+                $data = [
+                    "status"    => true,
+                    "message"   => "Data Berhasil disimpan",
+                    "payload"   => json_encode($payload),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
                 $data = [
                     "status"    => false,
                     "message"   => 'Data Gagal Disimpan!',
@@ -759,15 +888,6 @@ class BeaCukaiController extends BaseController
                 echo json_encode($data);
                 return;
             }
-
-            $data = [
-                "status"    => true,
-                "message"   => "Data Berhasil disimpan",
-                "payload"   => json_encode($payload),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
         } catch (\Exception $e) {
             $data = [
                 "status"    => false,

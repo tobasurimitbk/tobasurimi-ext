@@ -34,7 +34,7 @@
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
+                                <label for="floatingInput">Alamat (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -47,7 +47,7 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Pilih Negara</label>
+                        <label for="floatingInput">Pilih Negara (Opsional)</label>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -66,7 +66,7 @@
                                             }
                                             ?>
                                         </select>
-                                        <label for="floatingInput">Provinsi</label>
+                                        <label for="floatingInput">Provinsi (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -74,13 +74,13 @@
                                         <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
                                             <option value="" data-code=""></option>
                                         </select>
-                                        <label for="floatingInput">Kota</label>
+                                        <label for="floatingInput">Kota (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="postal_code" placeholder="Postal Code">
-                                        <label for="floatingInput">Kode Pos</label>
+                                        <label for="floatingInput">Kode Pos (Opsional)</label>
                                     </div>
                                 </div>
                             </div>
@@ -90,13 +90,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
-                                <label for="floatingInput">Nomor NPWP</label>
+                                <label for="floatingInput">Nomor NPWP (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
-                                <label for="floatingInput">No. Telepon</label>
+                                <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -104,21 +104,21 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
-                                <label for="floatingInput">Contact Person</label>
+                                <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email</label>
+                                <label for="floatingInput">Email (Opsional)</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
-                                <label for="floatingInput">No. Rekening</label>
+                                <label for="floatingInput">No. Rekening (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -128,7 +128,7 @@
                                     <option value="SUPPLIER">SUPPLIER</option>
                                     <option value="BUYER">BUYER</option>
                                 </select>
-                                <label for="floatingInput">Supplier / Buyer</label>
+                                <label for="floatingInput">Supplier / Buyer (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -138,7 +138,7 @@
                                 <select class="form-select ap_id" name="ap_id" id="ap_id">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Akun AP</label>
+                                <label for="floatingInput">Akun AP (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -146,10 +146,10 @@
                                 <select class="form-select ar_id" name="ar_id" id="ar_id">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Akun AR</label>
+                                <label for="floatingInput">Akun AR (Opsional)</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </form>
                 <!-- <div class="col-subtitle-modal">
                     <div class="row mt-5">
@@ -282,10 +282,10 @@
                                 <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
                                 <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
                                 <th onclick="changeSort('email')" class="sort">Email</th>
-                                <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
+                                <!-- <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
                                 <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
                                 <th onclick="changeSort('ap_name')" class="sort">AP</th>
-                                <th onclick="changeSort('ar_name')" class="sort">AR</th>
+                                <th onclick="changeSort('ar_name')" class="sort">AR</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -374,19 +374,21 @@
         }, {
             data: "email",
             className: "text-center"
-        }, {
-            data: "no_rekening",
-            className: "text-center"
-        }, {
-            data: "supplier_buyer",
-            className: "text-center"
-        }, {
-            data: "ap_name",
-            className: "text-center"
-        }, {
-            data: "ar_name",
-            className: "text-center"
-        }],
+        }
+        // , {
+        //     data: "no_rekening",
+        //     className: "text-center"
+        // }, {
+        //     data: "supplier_buyer",
+        //     className: "text-center"
+        // }, {
+        //     data: "ap_name",
+        //     className: "text-center"
+        // }, {
+        //     data: "ar_name",
+        //     className: "text-center"
+        // }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -574,61 +576,61 @@
             .find('label')
             .css('z-index', '1');
 
-        // AP
-        $('.ap_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
+        // // AP
+        // $('.ap_id').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".add-modal .modal-content")
+        // })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.ap_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+        // //CSS SELECT2 FLOATING LABEL
+        // $('.ap_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ap_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+        // $('.ap_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ap_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        // $('.ap_id')
+        //     .parent('div')
+        //     .find('label')
+        //     .css('z-index', '1');
 
-        // AR
-        $('.ar_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
+        // // AR
+        // $('.ar_id').select2({
+        //     placeholder: "",
+        //     theme: "bootstrap-5",
+        //     dropdownParent: $(".add-modal .modal-content")
+        // })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.ar_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+        // //CSS SELECT2 FLOATING LABEL
+        // $('.ar_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ar_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+        // $('.ar_id')
+        //     .parent('div')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .children('span')
+        //     .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ar_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        // $('.ar_id')
+        //     .parent('div')
+        //     .find('label')
+        //     .css('z-index', '1');
 
         var validator = $(".create-form").validate({
             rules: {
@@ -655,24 +657,24 @@
                 email: {
                     // required: true
                 },
-                no_rekening: {
-                    // required: true
-                },
-                supplier_buyer: {
-                    // required: true
-                },
+                // no_rekening: {
+                //     // required: true
+                // },
+                // supplier_buyer: {
+                //     // required: true
+                // },
                 province_parent_id: {
                     // required: true
                 },
                 city_parent_id: {
                     // required: true
                 },
-                ap_id: {
-                    // required: true
-                },
-                ar_id: {
-                    // required: true
-                }
+                // ap_id: {
+                //     // required: true
+                // },
+                // ar_id: {
+                //     // required: true
+                // }
             },
             messages: {
                 kode: {
@@ -698,24 +700,24 @@
                 email: {
                     required: "Email wajib diisi"
                 },
-                no_rekening: {
-                    required: "No. Rekening wajib diisi"
-                },
-                supplier_buyer: {
-                    required: "Supplier / Buyer wajib diisi"
-                },
+                // no_rekening: {
+                //     required: "No. Rekening wajib diisi"
+                // },
+                // supplier_buyer: {
+                //     required: "Supplier / Buyer wajib diisi"
+                // },
                 province_parent_id: {
                     required: "Provinsi wajib diisi"
                 },
                 city_parent_id: {
                     required: "Kota wajib diisi"
                 },
-                ap_id: {
-                    required: "Akun AP wajib diisi"
-                },
-                ar_id: {
-                    required: "Akun AR wajib diisi"
-                }
+                // ap_id: {
+                //     required: "Akun AP wajib diisi"
+                // },
+                // ar_id: {
+                //     required: "Akun AR wajib diisi"
+                // }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -745,7 +747,7 @@
 
         $(".no_npwp").mask("000000000000000")
 
-        $(".no_rekening").mask("000000000000000")
+        // $(".no_rekening").mask("000000000000000")
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -798,8 +800,8 @@
             $(".delete-form").css('display', 'none');
             $(".body-detail-table").empty()
 
-            $('.ap_id').select2(select2Prop);
-            $('.ar_id').select2(select2Prop);
+            // $('.ap_id').select2(select2Prop);
+            // $('.ar_id').select2(select2Prop);
 
             $(".add-modal").modal("show");
         })
@@ -857,8 +859,8 @@
                         $(".phone").val(res?.data?.phone);
                         $(".contact_person").val(res?.data?.contact_person);
                         $(".email").val(res?.data?.email);
-                        $(".no_rekening").val(res?.data?.no_rekening);
-                        $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
+                        // $(".no_rekening").val(res?.data?.no_rekening);
+                        // $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
                         $(".province_parent_id").val(res?.data?.province_id).change();
                         $(".country_code").val(res?.data?.country_code).change();
 
@@ -956,13 +958,13 @@
                             }
                         }) */
 
-                        $('.ap_id').select2(select2Prop);
-                        $('.ar_id').select2(select2Prop);
+                        // $('.ap_id').select2(select2Prop);
+                        // $('.ar_id').select2(select2Prop);
 
-                        const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
-                        $(".ap_id").append($apOption).trigger('change');
-                        const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
-                        $(".ar_id").append($arOption).trigger('change');
+                        // const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
+                        // $(".ap_id").append($apOption).trigger('change');
+                        // const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
+                        // $(".ar_id").append($arOption).trigger('change');
 
                         $(".add-modal").modal("show");
 

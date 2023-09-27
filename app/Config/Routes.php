@@ -582,7 +582,8 @@ $routes->get('/bea-cukai-bc-41', 'BeaCukai\beaCukaiController::bc41View', ['filt
 // Attendance
 $routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
 $routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
-$routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::printLogAbsensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogPresensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelLogPresensi/$1', ['filter' => 'Auth']);
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
@@ -591,6 +592,8 @@ $routes->post('/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter'
 $routes->post('/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
 $routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttendance', ['filter' => 'Auth']);
 $routes->get('/attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
+$routes->get('/list-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFPresensi/$1', ['filter' => 'Auth']);
+$routes->get('/list-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelPresensi/$1', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
@@ -670,6 +673,7 @@ $routes->get('/lembur/all', 'HR\FormLembur::all', ['filter' => 'Auth']);
 $routes->post('/lembur/create', 'HR\FormLembur::create', ['filter' => 'Auth']);
 $routes->post('/lembur/delete', 'HR\FormLembur::delete', ['filter' => 'Auth']);
 $routes->get('/lembur/id/(:segment)', 'HR\FormLembur::getById/$1', ['filter' => 'Auth']);
+$routes->post('/lembur/employees', 'HR\FormLembur::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER

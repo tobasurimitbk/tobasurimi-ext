@@ -63,7 +63,7 @@ class FormPerizinanNotApprovedModel extends Model
 
         foreach ($attendancesInMonth as $p) {
 
-            if ($p['status'] != "HADIR" && !$p['isApproved']) {
+            if ($p['status'] != "HADIR_H" && !$p['isApproved']) {
 
                 $this->db->table('form_perizinan_not_approved')->insert([
                     'company_id' => $companyID,

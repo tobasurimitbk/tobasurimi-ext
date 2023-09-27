@@ -36,9 +36,13 @@
         <h1>Log Attendance</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('log-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">
-                <i class="fa-solid fa-print"></i> Print
+                <i class="fa-solid fa-print"></i> Export PDF
+            </a>
+            <a href="<?= base_url('log-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>" class="btn btn-success posting-spp float-right">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
             </a>
         </div>
+
     </div>
     <div class="card">
         <div class="card-body">
@@ -128,8 +132,8 @@
                     <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="attendanceTable">
                         <thead>
                             <tr>
-                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Karyawan</td>
-                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Divisi</td>
+                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
+                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
                                 <?php
                                 $last_date = date("t", strtotime($year . "-" . $month . "-01"));
                                 for ($i = 1; $i <= $last_date; $i++) :
@@ -156,9 +160,9 @@
                                 $libur = 0;
                                 ?>
                                 <tr>
-                                    <td style="vertical-align:middle;z-index:9999" nowrap>
+                                    <td style="vertical-align:middle;z-index:1" nowrap>
                                         &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
-                                    <td style="vertical-align:middle;z-index:9999" nowrap>
+                                    <td style="vertical-align:middle;z-index:1" nowrap>
                                         &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
                                     </td>
                                     <?php
@@ -296,7 +300,6 @@
                     </table>
                 </div>
 
-
                 <div class="table-responsive mt-5">
                     <table class="table table-bordered table-striped">
                         <thead>
@@ -392,7 +395,7 @@
                 </div>
             </div>
         </div>
-        <div class="modal" id="detailModal" tabindex="-1">
+        <div class="modal" id="detailModal" tabindex="2">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -527,9 +530,6 @@
         var formData = new FormData();
         formData.append('employeeID', employeeID);
         formData.append('tanggal', tanggal);
-
-        console.log(tanggal);
-        console.log(employeeID);
 
         $.ajax({
             url: "<?= base_url("log-attendance/detail"); ?>",
