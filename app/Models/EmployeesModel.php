@@ -183,7 +183,7 @@ class EmployeesModel extends Model
         ];
 
         $builder = $this->db->table('employees')
-            ->select("employees.*")
+            ->select("employees.*, divisis.divisi")
             ->join('divisis', 'employees.division_id = divisis.id', 'left');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();

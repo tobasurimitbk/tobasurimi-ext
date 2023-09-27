@@ -17,6 +17,7 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
         <tr align="center" style="font-weight: bold;">
             <td>No</td>
             <td>Karyawan</td>
+            <td>Divisi</td>
             <?php
             $last_date = date("t", strtotime($yearMonth . "-01"));
             for ($i = 1; $i <= $last_date; $i++) :
@@ -42,6 +43,9 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
                 <td><?= $nomor++; ?></td>
                 <td style="vertical-align:middle;z-index:9999" nowrap>
                     <?= $res_user[$i]["employeeName"]; ?>
+                </td>
+                <td style="vertical-align:middle;z-index:9999" nowrap>
+                    <?= $res_user[$i]["divisi"]; ?>
                 </td>
                 <?php
                 for ($j = 1; $j <= $last_date; $j++) :
@@ -158,7 +162,7 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
         <tr align="center" style="font-weight: bold;">
             <td width="10">No</td>
             <td>Karyawan</td>
-            <!-- <td>Divisi</td> -->
+            <td>Divisi</td>
             <?php foreach ($statusPerizinan as $s) : ?>
                 <td>
                     <b><?= explode("_", $s['value'])[1] ?></b>
@@ -185,9 +189,9 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
                 <td>
                     <?= $res_user[$i]["employeeName"]; ?>
                 </td>
-                <!-- <td width="10">
+                <td width="10">
                     <?= $res_user[$i]["divisi"]; ?>
-                </td> -->
+                </td>
                 <?php foreach ($statusPerizinan as $s) : ?>
                     <td>
                         <?= $res_user[$i]['statusAttendances'][explode("_", $s['value'])[1]] ?>
