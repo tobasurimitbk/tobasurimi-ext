@@ -597,10 +597,10 @@
                 data: "monthly_price",
                 className: "text-center"
             },
-            {
+            /* {
                 data: "keterangan",
                 className: "text-center"
-            },
+            }, */
             /* {
                 data: "status",
                 className: "text-center actions",
@@ -1131,6 +1131,21 @@
                             // warehouse_id: warehouseId,
                             bagianName: bagianName // warehouse name
                         }).draw(false);
+
+                        list_items.push({
+                            barang_id: id_barang,
+                            kode_barang: itemCode,
+                            nama_barang: selectedData.nama,
+                            qty: qty,
+                            harga: harga,
+                            // keterangan: ,
+                            spesifikasi: spec,
+                            bagian: bagian,
+                            peti: peti,
+                            quality: quality,
+                            daily_price: daily_price,
+                            monthly_price: monthly_price
+                        });
 
                         // $(".body-detail-table").append(tag_html)
 
