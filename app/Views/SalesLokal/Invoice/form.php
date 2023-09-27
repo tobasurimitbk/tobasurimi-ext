@@ -66,13 +66,13 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="customerName" value="<?= $documentData->customerName ?? '' ?>" disabled>
-                            <label for="floatingInput">Nama Customer</label>
+                            <label for="floatingInput">Nama Konsumen</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>" disabled>
-                            <label for="floatingInput">Tagihan Ke</label>
+                            <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
                 </div>
