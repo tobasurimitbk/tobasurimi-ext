@@ -89,9 +89,9 @@ class Vendor extends BaseController
                 "contact_person" => $res[$i]["contact_person"],
                 "email" => $res[$i]["email"],
                 "no_rekening" => $res[$i]["no_rekening"],
-                "supplier_buyer" => $res[$i]["supplier_buyer"],
-                "ap_name" => $res[$i]["ap_name"],
-                "ar_name" => $res[$i]["ar_name"]
+                // "supplier_buyer" => $res[$i]["supplier_buyer"],
+                // "ap_name" => $res[$i]["ap_name"],
+                // "ar_name" => $res[$i]["ar_name"]
             );
         }
 
@@ -134,21 +134,21 @@ class Vendor extends BaseController
                 "no_rekening" => [
                     "rules" => "required"
                 ],
-                "supplier_buyer" => [
-                    "rules" => "required"
-                ],
+                // "supplier_buyer" => [
+                //     "rules" => "required"
+                // ],
                 // "province_parent_id" => [
                 //     "rules" => "required"
                 // ],
                 // "city_parent_id" => [
                 //     "rules" => "required"
                 // ],
-                "ap_id" => [
-                    "rules" => "required"
-                ],
-                "ar_id" => [
-                    "rules" => "required"
-                ]
+                // "ap_id" => [
+                //     "rules" => "required"
+                // ],
+                // "ar_id" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if ($this->validate($rules)) {
@@ -164,12 +164,12 @@ class Vendor extends BaseController
                     "bank_id" => $this->request->getPost("bank_id"),
                     "nama_rekening" => $this->request->getPost("nama_rekening"),
                     "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                    // "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                     "province_id" => $this->request->getPost("province_parent_id"),
                     "city_id" => $this->request->getPost("city_parent_id"),
                     "postal_code" => $this->request->getPost("parent_postal_code"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    // "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    // "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "list_address" => json_decode($this->request->getPost("list_address"))
                 ];
                 $id = $this->VendorModel->insert($values);
@@ -251,21 +251,21 @@ class Vendor extends BaseController
                 "no_rekening" => [
                     "rules" => "required"
                 ],
-                "supplier_buyer" => [
-                    "rules" => "required"
-                ],
+                // "supplier_buyer" => [
+                //     "rules" => "required"
+                // ],
                 // "province_parent_id" => [
                 //     "rules" => "required"
                 // ],
                 // "city_parent_id" => [
                 //     "rules" => "required"
                 // ],
-                "ap_id" => [
-                    "rules" => "required"
-                ],
-                "ar_id" => [
-                    "rules" => "required"
-                ]
+                // "ap_id" => [
+                //     "rules" => "required"
+                // ],
+                // "ar_id" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if ($this->validate($rules)) {
@@ -281,12 +281,12 @@ class Vendor extends BaseController
                     "contact_person" => $this->request->getPost("contact_person"),
                     "email" => $this->request->getPost("email"),
                     "no_rekening" => $this->request->getPost("no_rekening"),
-                    "supplier_buyer" => $this->request->getPost("supplier_buyer"),
+                    // "supplier_buyer" => $this->request->getPost("supplier_buyer"),
                     "province_id" => $this->request->getPost("province_parent_id"),
                     "city_id" => $this->request->getPost("city_parent_id"),
                     "postal_code" => $this->request->getPost("parent_postal_code"),
-                    "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    // "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    // "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "list_address" => json_decode($this->request->getPost("list_address"))
                 ];
 

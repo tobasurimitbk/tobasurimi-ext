@@ -110,27 +110,27 @@ class Warehouse extends BaseController
                 "warehouse_name" => [
                     "rules" => "required"
                 ],
-                "address" => [
-                    "rules" => "required"
-                ],
-                "province_id" => [
-                    "rules" => "required"
-                ],
-                "city_id" => [
-                    "rules" => "required"
-                ],
-                "zip_code" => [
-                    "rules" => "required"
-                ],
-                "phone" => [
-                    "rules" => "required"
-                ],
-                "email" => [
-                    "rules" => "required"
-                ],
-                "pic_id" => [
-                    "rules" => "required"
-                ]
+                // "address" => [
+                //     "rules" => "required"
+                // ],
+                // "province_id" => [
+                //     "rules" => "required"
+                // ],
+                // "city_id" => [
+                //     "rules" => "required"
+                // ],
+                // "zip_code" => [
+                //     "rules" => "required"
+                // ],
+                // "phone" => [
+                //     "rules" => "required"
+                // ],
+                // "email" => [
+                //     "rules" => "required"
+                // ],
+                // "pic_id" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if ($this->validate($rules)) {
@@ -194,27 +194,27 @@ class Warehouse extends BaseController
                 "warehouse_name" => [
                     "rules" => "required"
                 ],
-                "address" => [
-                    "rules" => "required"
-                ],
-                "province_id" => [
-                    "rules" => "required"
-                ],
-                "city_id" => [
-                    "rules" => "required"
-                ],
-                "zip_code" => [
-                    "rules" => "required"
-                ],
-                "phone" => [
-                    "rules" => "required"
-                ],
-                "email" => [
-                    "rules" => "required"
-                ],
-                "pic_id" => [
-                    "rules" => "required"
-                ]
+                // "address" => [
+                //     "rules" => "required"
+                // ],
+                // "province_id" => [
+                //     "rules" => "required"
+                // ],
+                // "city_id" => [
+                //     "rules" => "required"
+                // ],
+                // "zip_code" => [
+                //     "rules" => "required"
+                // ],
+                // "phone" => [
+                //     "rules" => "required"
+                // ],
+                // "email" => [
+                //     "rules" => "required"
+                // ],
+                // "pic_id" => [
+                //     "rules" => "required"
+                // ]
             ];
 
             if ($this->validate($rules)) {

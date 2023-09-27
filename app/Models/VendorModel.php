@@ -22,10 +22,10 @@ class VendorModel extends Model
         'contact_person',
         'email',
         'no_rekening',
-        'supplier_buyer',
+        // 'supplier_buyer',
         'postal_code',
-        'ap_id',
-        'ar_id',
+        // 'ap_id',
+        // 'ar_id',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -33,9 +33,10 @@ class VendorModel extends Model
 
     public function get_by_id($id)
     {
-        $requete = "SELECT vendors.*,ap.nama_sub as ap_name, ar.nama_sub as ar_name FROM vendors ";
-        $requete .= "LEFT JOIN sub_akuns ap ON (ap.id=vendors.ap_id) ";
-        $requete .= "LEFT JOIN sub_akuns ar ON (ar.id=vendors.ar_id) ";
+        $requete = "SELECT vendors.* FROM vendors ";
+        // $requete = "SELECT vendors.*,ap.nama_sub as ap_name, ar.nama_sub as ar_name FROM vendors ";
+        // $requete .= "LEFT JOIN sub_akuns ap ON (ap.id=vendors.ap_id) ";
+        // $requete .= "LEFT JOIN sub_akuns ar ON (ar.id=vendors.ar_id) ";
         $requete .= "WHERE vendors.deletedAt is null and vendors.id='" . $id . "'";
 
         //echo $requete;
@@ -45,11 +46,12 @@ class VendorModel extends Model
 
     public function search_list($values, $sortby = '', $offset = 0, $limit = -1)
     {
-        $requete = "SELECT vendors.*,provinces.province_name,cities.city_name,s1.nama_sub as ap_name,s2.nama_sub as ar_name FROM vendors ";
+        $requete = "SELECT vendors.*,provinces.province_name,cities.city_name FROM vendors ";
+        // $requete = "SELECT vendors.*,provinces.province_name,cities.city_name,s1.nama_sub as ap_name,s2.nama_sub as ar_name FROM vendors ";
         $requete .= "LEFT JOIN provinces ON (vendors.province_id=provinces.id) ";
         $requete .= "LEFT JOIN cities ON (vendors.city_id=cities.id) ";
-        $requete .= "LEFT JOIN sub_akuns s1 ON (vendors.ap_id=s1.id) ";
-        $requete .= "LEFT JOIN sub_akuns s2 ON (vendors.ar_id=s2.id) ";
+        // $requete .= "LEFT JOIN sub_akuns s1 ON (vendors.ap_id=s1.id) ";
+        // $requete .= "LEFT JOIN sub_akuns s2 ON (vendors.ar_id=s2.id) ";
         $requete .= "WHERE vendors.deletedAt is null ";
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND UPPER(vendors.name) like '%" . strtoupper($values["name"]) . "%' ");

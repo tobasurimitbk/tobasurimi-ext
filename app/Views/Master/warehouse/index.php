@@ -29,13 +29,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
+                                <label for="floatingInput">Alamat (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
-                                <label for="floatingInput">Nomor Telepon</label>
+                                <label for="floatingInput">Nomor Telepon (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Provinsi</label>
+                                <label for="floatingInput">Provinsi (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -62,13 +62,13 @@
                                 <select class="form-select city_id" name="city_id" id="city_id">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Kota</label>
+                                <label for="floatingInput">Kota (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
-                                <label for="floatingInput">Kode Pos</label>
+                                <label for="floatingInput">Kode Pos (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email</label>
+                                <label for="floatingInput">Email (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -93,7 +93,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">PIC</label>
+                                <label for="floatingInput">PIC (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -244,28 +244,28 @@
                 warehouse_name: {
                     required: true
                 },
-                address: {
-                    required: true
-                },
-                province_id: {
-                    required: true
-                },
-                city_id: {
-                    required: true
-                },
-                zip_code: {
-                    required: true
-                },
-                phone: {
-                    required: true
-                },
-                email: {
-                    required: true,
-                    email: true,
-                },
-                pic_id: {
-                    required: true
-                },
+                // address: {
+                //     required: true
+                // },
+                // province_id: {
+                //     required: true
+                // },
+                // city_id: {
+                //     required: true
+                // },
+                // zip_code: {
+                //     required: true
+                // },
+                // phone: {
+                //     required: true
+                // },
+                // email: {
+                //     required: true,
+                //     email: true,
+                // },
+                // pic_id: {
+                //     required: true
+                // },
             },
             messages: {
                 code_warehouse: {
@@ -274,28 +274,28 @@
                 warehouse_name: {
                     required: "Nama wajib diisi"
                 },
-                address: {
-                    required: "Address wajib diisi"
-                },
-                province_id: {
-                    required: "Province wajib diisi"
-                },
-                city_id: {
-                    required: "City wajib diisi"
-                },
-                zip_code: {
-                    required: "Zip code wajib diisi"
-                },
-                phone: {
-                    required: "Phone wajib diisi"
-                },
-                email: {
-                    required: "Email wajib diisi",
-                    email: "Email must be valid",
-                },
-                pic_id: {
-                    required: "PIC wajib diisi"
-                },
+                // address: {
+                //     required: "Address wajib diisi"
+                // },
+                // province_id: {
+                //     required: "Province wajib diisi"
+                // },
+                // city_id: {
+                //     required: "City wajib diisi"
+                // },
+                // zip_code: {
+                //     required: "Zip code wajib diisi"
+                // },
+                // phone: {
+                //     required: "Phone wajib diisi"
+                // },
+                // email: {
+                //     required: "Email wajib diisi",
+                //     email: "Email must be valid",
+                // },
+                // pic_id: {
+                //     required: "PIC wajib diisi"
+                // },
             },
             errorElement: 'span',
             errorClass: 'text-danger',
