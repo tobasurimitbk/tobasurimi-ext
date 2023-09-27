@@ -59,9 +59,12 @@
                                 Posting
                             </button>
                         <?php else : ?>
-                            <button class="btn btn-warning btn-print float-right" onclick="alert('Fitur print belum tersedia')">
-                                <i class="fa-solid fa-print"></i> Print
-                            </button>
+                            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">
+                                <i class="fa-solid fa-print"></i> Export PDF
+                            </a>
+                            <a href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>" class="btn btn-success posting-spp float-right">
+                                <i class="fa-solid fa-file-excel"></i> Export Excel
+                            </a>
                             <input type="hidden" id="statusPosting" name="statusPosting" value="0">
                             <button class="btn btn-show-form btn-save float-right btn-submit">
                                 Batalkan Posting
@@ -154,32 +157,26 @@
                     <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="attendanceTable">
                         <thead>
                             <tr>
-                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Karyawan</td>
-                                <td height="25" style="vertical-align:middle;z-index:9999">&nbsp;Divisi</td>
+                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
+                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
                                 <?php
                                 $lastDate = date("t", strtotime($year . "-" . $month . "-01"));
                                 for ($i = 1; $i <= $lastDate; $i++) :
                                     $temp = mktime(0, 0, 0, $month, $i, $year);
 
-                                    if (date("N", $temp) == 7) {
+                                    if (date("N", $temp) == 7) :
                                         echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\"height=\"25\" ><font color='red'>IN " . $i . "</font></td>";
                                         echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>OUT " . $i . "</font></td>";
-                                    } else {
+                                    else :
                                         echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\">IN <br>" . $i . "</td>";
                                         echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\"height=\"25\">OUT<br> " . $i . "</td>";
-                                    }
-
-                                endfor
+                                    endif;
+                                endfor;
                                 ?>
-                                <td>Hadir</td>
-                                <td>Ijin</td>
-                                <td>Alpha</td>
-                                <td>Cuti</td>
-                                <td>Sakit</td>
-                                <td>Libur</td>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php $attandanceModel = new \App\Models\AttendancesModel(); ?>
                             <!-- Cek apakah sudah digenerate apa belum -->
                             <?php if ($totalAttendances == 0) : ?>
                                 <td colspan="<?= $temp ?>" align="left">
@@ -187,17 +184,12 @@
                                 </td>
                             <?php else : ?>
                                 <?php foreach ($employeesData as $i => $e) : ?>
-                                    <?php
-                                    // declare model
-                                    $attandanceModel = new \App\Models\AttendancesModel();
-                                    $status = $attandanceModel->getStatusAttendances($year, $month, $e['id']);
-                                    ?>
                                     <?php $libur = 0; ?>
                                     <tr>
-                                        <td style="vertical-align:middle;z-index:9999" nowrap>
+                                        <td style="vertical-align:middle;z-index:1" nowrap>
                                             &nbsp; <?= $e['name']; ?>
                                         </td>
-                                        <td style="vertical-align:middle;z-index:9999" nowrap>
+                                        <td style="vertical-align:middle;z-index:1" nowrap>
                                             &nbsp;<?= $e["divisi"]; ?></td>
                                         </td>
                                         <?php for ($j = 1; $j <= $lastDate; $j++) : ?>
@@ -214,67 +206,128 @@
                                                 <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                                 <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                             <?php else : ?>
-                                                <?php if ($attandance->status == "ALPHA") : ?>
+                                                <?php $statusKode = explode("_", $attandance->status)[1]; ?>
+                                                <?php if ($statusKode == "A") : ?>
                                                     <!-- Employe Tidak Hadir -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#e7323a; color:white;'>
                                                     </td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#e7323a; color:white;'>
                                                     </td>
-                                                <?php elseif ($attandance->status == "HADIR") : ?>
+                                                <?php elseif ($statusKode == "H") : ?>
                                                     <!-- Employe Hadir -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;'>
                                                         <font color="white"><b><?= $attandance->checkin; ?></b></font>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2" style='vertical-align: middle;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;'>
                                                         <font color="white"><b><?= $attandance->checkout; ?></b></font>
                                                     </td>
-                                                <?php elseif ($attandance->status == "IJIN") : ?>
+                                                <?php elseif ($statusKode == "I") : ?>
                                                     <!-- Employe Ijin -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;'>
-                                                        <b><?= $attandance->status ?></b>
+                                                        <b><?= $statusKode ?></b>
                                                     </td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;'>
-                                                        <b><?= $attandance->status ?></b>
+                                                        <b><?= $statusKode ?></b>
                                                     </td>
-                                                <?php elseif ($attandance->status == "CUTI") : ?>
-                                                    <!-- Employe Cuti -->
+                                                <?php elseif ($statusKode == "CT") : ?>
+                                                    <!-- Employe Cuti Tahunan -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ffc107; color:white;'>
-                                                        <b><?= $attandance->status ?></b>
+                                                        <b><?= $statusKode ?></b>
                                                     </td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ffc107; color:white;'>
-                                                        <b><?= $attandance->status ?></b>
+                                                        <b><?= $statusKode ?></b>
                                                     </td>
-                                                <?php elseif ($attandance->status == "SAKIT") : ?>
+                                                <?php elseif ($statusKode == "CHD") : ?>
+                                                    <!-- Employe Cuti Haid -->
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#242120; color:white;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#242120; color:white;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                <?php elseif ($statusKode == "CHL") : ?>
+                                                    <!-- Employe Cuti Hamil -->
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                <?php elseif ($statusKode == "CM") : ?>
+                                                    <!-- Employe Cuti Melahirkan -->
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                <?php elseif ($statusKode == "S") : ?>
                                                     <!-- Employe Sakit -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#28a745; color:white;'>
-                                                        <b><?= $attandance->status ?></b>
+                                                        <b><?= $statusKode ?></b>
                                                     </td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#28a745; color:white;'>
-                                                        <b><?= $attandance->status ?></b>
+                                                        <b><?= $statusKode ?></b>
                                                     </td>
-                                                <?php elseif ($attandance->status == "LIBUR") : ?>
+                                                <?php elseif ($statusKode == "L") : ?>
                                                     <!-- LIBUR -->
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                                     <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                                <?php elseif ($attandance->status == "RL") : ?>
+                                                <?php elseif ($statusKode == "RL") : ?>
                                                     <!-- RL -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;">RL</td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;">RL</td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#ff7b00; vertical-align:middle; color:white;"><b>RL</b></td>
+                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#ff7b00; vertical-align:middle; color:white;"><b>RL</b></td>
                                                 <?php endif; ?>
                                             <?php endif; ?>
                                         <?php endfor; ?>
-                                        <td align="center"><b><?= $status['HADIR'] ?></b></td>
-                                        <td align="center"><b><?= $status['IJIN'] ?></b></td>
-                                        <td align="center"><b><?= $status['ALPHA'] - $libur ?></b></td>
-                                        <td align="center"><b><?= $status['CUTI'] ?></b></td>
-                                        <td align="center"><b><?= $status['SAKIT'] ?></b></td>
-                                        <td align="center"><b><?= $status['LIBUR'] ?></b></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif ?>
                         </tbody>
                     </table>
                 </div>
+
+                <?php if ($totalAttendances != 0) : ?>
+                    <div class="table-responsive mt-4">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
+                                    <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
+                                    <?php foreach ($statusPerizinan as $s) : ?>
+                                        <td width="20" align="center">
+                                            <b><?= explode("_", $s['value'])[1] ?></b>
+                                        </td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Cek apakah sudah digenerate apa belum -->
+                                <?php if ($totalAttendances == 0) : ?>
+                                    <td colspan="<?= count($statusPerizinan) + 2 ?>" align="left">
+                                        Presensi Belum digenerate
+                                    </td>
+                                <?php else : ?>
+                                    <?php foreach ($employeesData as $i => $e) : ?>
+                                        <?php $status = $attandanceModel->getStatusAttendances($year, $month, $e['id']); ?>
+                                        <tr>
+                                            <td width="150">
+                                                &nbsp;<?= $e['name'] ?></td>
+                                            <td width="110">
+                                                &nbsp;<?= $e['divisi'] ?></td>
+                                            </td>
+                                            <?php foreach ($statusPerizinan as $s) : ?>
+                                                <td width="20" align="center">
+                                                    <?= $status[$s['value']] ?>
+                                                </td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
 
                 <?php if ($totalAttendances != 0) : ?>
                     <?php if ($pager->hasMore() || ($pager->getCurrentPage() < $pager->getPageCount()) || (count($employeesData) > $pager->getPerPage())) : ?>
@@ -287,67 +340,37 @@
                 </div>
 
                 <div class="row mt-3">
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#304de2"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    HADIR
+                    <?php foreach ($statusPerizinan as $s) : ?>
+                        <?php if ($s['value'] == "LIBUR_L") : ?>
+                            <div class="col-sm-2 col-4 mt-2">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="text-center">
+                                            <img src='assets/img/stop.png' width='28' height='28'>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="card-text mt-1 text-black">
+                                            LIBUR (L)
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#e7323a"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    ALPHA
+                        <?php else : ?>
+                            <div class="col-sm-2 col-4 mt-2">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="p-3" style="width: 5px; height:5px; background-color:<?= $s['description'] ?>"></div>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="card-text mt-1 text-black">
+                                            <?= explode("_", $s['value'])[0] ?> (<?= explode("_", $s['value'])[1]; ?>)
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#17a2b8;"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    IZIN
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#ffc107;"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    CUTI
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-2 col-4">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <div class="p-3" style="width: 5px; height:5px; background-color:#28a745;"></div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
-                                    SAKIT
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -418,6 +441,11 @@
             </div>
             <form id="updateAttendanceForm" role="form" method="POST">
                 <div class="modal-body">
+                    <div class="alert bg-info text-white" style="margin-top: -10px;">
+                        <div class="card-text">
+                            Status perizinan yang status Approvalnya adalah UnApproval akan dimasukkan kedalam komponen potongan pada menu payroll.
+                        </div>
+                    </div>
                     <input type="hidden" name="attendanceID" id="attendenceID" />
                     <?= csrf_field() ?>
                     <div class="form-floating mb-2" style="height: 50px;">
@@ -431,9 +459,8 @@
                     <div class="form-floating mb-2" style="height: 50px;">
                         <select name="statusKehadiran" class="form-select" id="statusKehadiran">
                             <option selected>Pilih Status Kehadiran</option>
-                            <?php $statusKehadiran = ["HADIR", "IJIN", "ALPHA", "CUTI", "SAKIT", "LIBUR", "RL"]; ?>
-                            <?php foreach ($statusKehadiran as $sk) : ?>
-                                <option value="<?= $sk; ?>"><?= $sk; ?></option>
+                            <?php foreach ($statusPerizinan as $sk) : ?>
+                                <option value="<?= $sk['value']; ?>"><?= explode("_", $sk['value'])[0] . " (" . explode("_", $sk['value'])[1] . ")"; ?></option>
                             <?php endforeach ?>
                         </select>
                         <label for="status">Status Kehadiran</label>
@@ -597,7 +624,7 @@
                         $('#jamTerlambat').val(response.data.jamTerlambat);
                         $('#isApproved').val(attendance.isApproved);
 
-                        if (attendance.status == 'HADIR') {
+                        if (attendance.status == 'HADIR_H') {
                             // hadir
                             $('#reasonForm').hide();
                             $('#formInOut').show();
@@ -605,6 +632,8 @@
                             // set form
                             $('#checkout').val(attendance.checkout);
                             $('#checkin').val(attendance.checkin);
+                        } else if (attendance.status == "ALPHA_A" || attendance.status == "LIBUR_L" || attendance.status == "RL_RL") {
+                            $('#approvalForm').hide();
                         } else {
                             // ada perizinan
                             $('#reasonForm').show();
@@ -640,13 +669,15 @@
         // on change status kehadiran
         $('#statusKehadiran').change(function(e) {
             e.preventDefault();
-            if ($(this).val() == "HADIR") {
+            if ($(this).val() == "HADIR_H") {
                 // hadir
                 $("input[name='checkIn']").attr('required', true);
                 $("input[name='checkOut']").attr('required', true);
                 $('#reasonForm').hide();
                 $('#approvalForm').hide();
                 $('#formInOut').show();
+            } else if ($(this).val() == "ALPHA_A" || $(this).val() == "LIBUR_L" || $(this).val() == "RL_RL") {
+                $('#approvalForm').hide();
             } else {
                 // izin
                 $("input[name='checkIn']").attr('required', false);

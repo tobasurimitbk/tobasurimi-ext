@@ -63,7 +63,11 @@ class AttendancesModel extends Model
 
     public function getStatusAttendances($year, $month, $employeeID)
     {
-        $statusArr = ['IJIN', 'ALPHA', 'CUTI', 'SAKIT', 'LIBUR', 'HADIR'];
+        $modelMetaData = new MetadataModel();
+        $statusArr = [];
+        foreach ($modelMetaData->where('name', "Status Perizinan")->findAll() as $s) {
+            \array_push($statusArr, $s['value']);
+        }
         $date = $year . "-" . $month;
 
         $resultTotal = [];

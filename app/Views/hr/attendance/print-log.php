@@ -41,6 +41,7 @@
 </head>
 
 <body>
+    <h5 style="text-align: center;">PT TOBA SURIMI</h5>
     <h3 style="text-align: center;">REKAP DATA LOG ABSENSI</h3>
 
     <table class="mb-3" style="font-size: 12px;">
@@ -66,8 +67,9 @@
     <table class="table table-bordered" style="font-size:12px; margin-top:10px;" border="1">
         <thead>
             <tr align="center" style="font-weight: bold;">
-                <td style="vertical-align:middle;z-index:9999" width="10">&nbsp;No</td>
-                <td style="vertical-align:middle;z-index:9999">&nbsp;Karyawan</td>
+                <td style="vertical-align:middle;z-index:1" width="10">&nbsp;No</td>
+                <td style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
+                <td style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
                 <?php
                 $last_date = date("t", strtotime($yearMonth . "-01"));
                 for ($i = 1; $i <= $last_date; $i++) :
@@ -92,8 +94,11 @@
                 ?>
                 <tr align="center">
                     <td><?= $nomor++; ?></td>
-                    <td style="vertical-align:middle;z-index:9999" nowrap>
+                    <td style="vertical-align:middle;z-index:1" nowrap>
                         &nbsp;<?= $res_user[$i]["employeeName"]; ?>
+                    </td>
+                    <td>
+                        &nbsp;<?= $res_user[$i]["divisi"]; ?>
                     </td>
                     <?php
                     for ($j = 1; $j <= $last_date; $j++) :
@@ -212,6 +217,7 @@
 
 
     <div class="page-break">
+        <h5 style="text-align: center;">PT TOBA SURIMI</h5>
         <h3 style="text-align: center;">REKAP DATA KEHADIRAN TOTAL LOG ABSENSI</h3>
         <table class="mb-3" style="font-size: 12px;">
             <tbody>

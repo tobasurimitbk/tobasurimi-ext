@@ -107,6 +107,7 @@ class Attendance extends BaseController
         $EmployeesModel = new EmployeesModel();
         $payrollModel = new PayrollsModel();
         $DivisiModel = new DivisisModel();
+        $metaDataModel = new MetadataModel();
 
         // get attendance Total (ngecek apakah sudah digenerate belum)
         $totalAttendances = $AttendanceModel->where('LEFT(periode, 7)', $year . "-" . $month)
@@ -138,6 +139,9 @@ class Attendance extends BaseController
             'isPosting' =>  $isPosting,
             'isPostingPayroll' => $isPostingPayroll,
             'divisi' => $DivisiModel->get_by_company_id($this->this_company_id),
+            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
+                ->orderBy('name', "ASC")
+                ->findAll(),
         ];
 
         $data['pager'] = $pager;
@@ -194,14 +198,20 @@ class Attendance extends BaseController
                     ->first();
                 // check adakah data 
                 $hariLibur = $hariLiburModel->where('date', $dates)->first();
+                $logAttandance = $AttendancesLogModel->where('employees_id', $e['id'])
+                    ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
+                    ->orderBy('id', "DESC") // ambil terbaru
+                    ->limit(2) // get 2 date in log attandance 
+                    ->get()
+                    ->getResult();
 
-                if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday") {
+                if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
                     // ada hari libur
                     $AttendanceModel->insert([
                         'company_id' => $this->this_company_id,
                         'employee_id' => $e['id'],
                         'periode' => $dates,
-                        'status' => "LIBUR",
+                        'status' => "LIBUR_L",
                         'reason' => ''
                     ]);
                 } elseif ($formPerizinan != null) {
@@ -216,13 +226,7 @@ class Attendance extends BaseController
                     ]);
                 } elseif ($formPerizinan == null) {
                     // tidak ada data perizinan jadi
-                    // get attendance by date and employee
-                    $logAttandance = $AttendancesLogModel->where('employees_id', $e['id'])
-                        ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
-                        ->orderBy('id', "DESC") // ambil terbaru
-                        ->limit(2) // get 2 date in log attandance 
-                        ->get()
-                        ->getResult();
+                    // get attendance by date and employee by log
 
                     if (\count($logAttandance) == 0) {
                         // rekap absen tidak ditemukan
@@ -231,7 +235,7 @@ class Attendance extends BaseController
                             'company_id' => $this->this_company_id,
                             'employee_id' => $e['id'],
                             'periode' => $dates,
-                            'status' => 'ALPHA',
+                            'status' => 'ALPHA_A',
                         ]);
                     } else {
                         // data absen ada di log
@@ -244,7 +248,7 @@ class Attendance extends BaseController
                                 'periode' => $dates,
                                 'checkin' => \date('H:i:s', \strtotime($logAttandance[1]->date_create)), // in
                                 'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // out
-                                'status' => 'HADIR'
+                                'status' => 'HADIR_H'
                             ]);
                         } else {
                             // ada attandance only(in)
@@ -254,7 +258,7 @@ class Attendance extends BaseController
                                 'periode' => $dates,
                                 'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // in
                                 'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // out
-                                'status' => 'HADIR',
+                                'status' => 'HADIR_H',
                             ]);
                         }
                     }
@@ -454,7 +458,7 @@ class Attendance extends BaseController
         ]);
     }
 
-    public function exportPDFLogAbsensi($yearMonth)
+    public function exportPDFLogPresensi($yearMonth)
     {
         $divisiID = $this->request->getGet('divisiID');
 
@@ -590,6 +594,77 @@ class Attendance extends BaseController
 
 
         return view('hr/attendance/excel-log', $data);
+    }
+
+    public function exportPDFPresensi($yearMonth)
+    {
+        $divisiID = $this->request->getGet('divisiID');
+
+        $dompdf = new Dompdf();
+
+        $employeesModel = new EmployeesModel();
+        $metaDataModel = new MetadataModel();
+        $companyModel = new CompaniesModel();
+        $divisiModel = new DivisisModel();
+
+        if (!empty($divisiID)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        } else {
+            $employeeData = $employeesModel->getEmployeesAndDivisi($this->this_company_id);
+        }
+
+        $splitYearMonth = \explode("-", $yearMonth);
+
+        $data = [
+            'yearMonth' => $yearMonth,
+            'company' => $companyModel->where('id', $this->this_company_id)->first(),
+            'divisi' => $divisiModel->where('id', $divisiID)->first(),
+            'employeesData' => $employeeData,
+            'month' => $splitYearMonth[1],
+            'year' => $splitYearMonth[0],
+            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
+                ->orderBy('name', "ASC")
+                ->findAll(),
+        ];
+
+        $dompdf->loadHtml(view('hr/attendance/print-attendance', $data));
+        $dompdf->setPaper('legal', 'landscape');
+        $dompdf->render();
+        $dompdf->stream("Data Absensi Final $yearMonth", array("Attachment" => false));
+
+        exit(0);
+    }
+
+    public function exportExcelPresensi($yearMonth)
+    {
+        $divisiID = $this->request->getGet('divisiID');
+
+        $employeesModel = new EmployeesModel();
+        $metaDataModel = new MetadataModel();
+        $companyModel = new CompaniesModel();
+        $divisiModel = new DivisisModel();
+
+        if (!empty($divisiID)) {
+            $employeeData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $divisiID);
+        } else {
+            $employeeData = $employeesModel->getEmployeesAndDivisi($this->this_company_id);
+        }
+
+        $splitYearMonth = \explode("-", $yearMonth);
+
+        $data = [
+            'yearMonth' => $yearMonth,
+            'company' => $companyModel->where('id', $this->this_company_id)->first(),
+            'divisi' => $divisiModel->where('id', $divisiID)->first(),
+            'employeesData' => $employeeData,
+            'month' => $splitYearMonth[1],
+            'year' => $splitYearMonth[0],
+            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
+                ->orderBy('name', "ASC")
+                ->findAll(),
+        ];
+
+        return \view('hr/attendance/excel-attendance', $data);
     }
 
     // helper
