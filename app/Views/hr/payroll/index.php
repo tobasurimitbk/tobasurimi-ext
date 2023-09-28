@@ -95,7 +95,7 @@
                     Generate
                 </a>
             <?php else : ?>
-                <button class="btn btn-warning btn-print float-right" onclick="alert('Fitur print belum tersedia')">
+                <button class="btn btn-warning btn-print float-right" onclick="printPerDivisi('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">
                     <i class="fa-solid fa-print"></i> Print
                 </button>
             <?php endif; ?>
@@ -284,9 +284,10 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let employee_id = row?.employee_id;
+                    let id = row?.id;
                     return `
                         <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="alert('Belum tersedia')" style="box-shadow: none !important;">
+                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("payroll/print/single/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <button onclick="generateUlang(${employee_id})" class="btn btn-success posting-spp">
@@ -544,6 +545,23 @@
         .parent('div')
         .find('label')
         .css('z-index', '1');
+
+    const print = function(url) {
+        window.open(url, "_blank");
+    }
+
+    const printPerDivisi = function(url) {
+        var divisionID = $("select[name='filterDivisiID']").val();
+        if (divisionID == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Pilih Divisi Dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+        } else {
+            window.open(url + '/' + divisionID, "_blank");
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

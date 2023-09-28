@@ -87,8 +87,8 @@ class Tunjangan extends BaseController
 
             if ($this->validate($rules)) {
 
-                $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari');
-                $isCadangan = $this->request->getPost('isCadangan');
+                $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari') ?? 0;
+                $isCadangan = $this->request->getPost('isCadangan') ?? 0;
 
                 if ($isGajiPokokPerHari) {
                     $this->TunjanganModel->set('is_gaji_harian', 0)->where('company_id', $this->this_company_id)->update();
@@ -157,8 +157,8 @@ class Tunjangan extends BaseController
             if ($this->validate($rules)) {
 
                 $id = $this->request->getPost("id");
-                $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari');
-                $isCadangan = $this->request->getPost('isCadangan');
+                $isGajiPokokPerHari = $this->request->getPost('isGajiPokokPerHari') ?? 0;
+                $isCadangan = $this->request->getPost('isCadangan') ?? 0;
 
                 if ($isGajiPokokPerHari) {
                     $this->TunjanganModel->set('is_gaji_harian', 0)->where('company_id', $this->this_company_id)->update();
