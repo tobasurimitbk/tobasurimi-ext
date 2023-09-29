@@ -114,4 +114,29 @@ class FormLemburModel extends Model
             ->where('LEFT(periode, 7)', $yearMonth)
             ->findAll();
     }
+
+    public function getTotalLemburJamPertamaKedua($employeeID, $yearMonth)
+    {
+        $formLemburModel = new FormLemburModel();
+        $lembur = $formLemburModel->rekap($employeeID, $yearMonth);
+        $totalLembur = count($lembur);
+        $totalJam = 0;
+        $lemburJamPertama = 0;
+        $lemburJamKedua = 0;
+
+        foreach ($lembur as $l) {
+            $totalJam += $l['total_jam_lembur'];
+        }
+
+        for ($i = 0; $i < $totalLembur; $i++) {
+            $totalJam--;
+            $lemburJamPertama++;
+            $lemburJamKedua = $totalJam;
+        }
+
+        return [
+            'jamPertama' => $lemburJamPertama,
+            'jamKedua' => $lemburJamKedua
+        ];
+    }
 }

@@ -118,7 +118,7 @@ class PayrollsModel extends Model
         ];
     }
 
-    public function generate($companyID, $employeeID, $yearMonth, $payrollID, $totalKehadiran)
+    public function generate($employeeID, $yearMonth, $payrollID, $totalKehadiran)
     {
         $result = [
             'nominal_uang_gaji' => 0,
@@ -146,16 +146,14 @@ class PayrollsModel extends Model
         $gajiHarian = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_gaji_harian', '1')
-            ->where('payroll_gaji_conjunction.company_id', $companyID)
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         // get nominal uang cadangan
         $gajiCadangan = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_cadangan', '1')
-            ->where('payroll_gaji_conjunction.company_id', $companyID)
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         $nominalGajiHarian = ($gajiHarian != null) ? $gajiHarian['nominal'] : 0;
@@ -181,7 +179,6 @@ class PayrollsModel extends Model
             ->where('tunjangan.tipe', 'MINUS')
             ->where('tunjangan.is_cadangan != ', '1')
             ->where('tunjangan.is_gaji_harian != ', '1')
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->findAll();
 
@@ -191,7 +188,6 @@ class PayrollsModel extends Model
             ->where('tunjangan.tipe', 'PLUS')
             ->where('tunjangan.is_cadangan != ', '1')
             ->where('tunjangan.is_gaji_harian != ', '1')
-            ->where('payroll_gaji_conjunction.employee_id', $employeeID)
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->findAll();
 
@@ -247,16 +243,14 @@ class PayrollsModel extends Model
         $gajiHarian = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_gaji_harian', '1')
-            ->where('payroll_gaji_conjunction.company_id', $payroll['company_id'])
-            ->where('payroll_gaji_conjunction.employee_id', $payroll['employee_id'])
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         // get nominal uang cadangan
         $gajiCadangan = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('tunjangan.is_cadangan', '1')
-            ->where('payroll_gaji_conjunction.company_id', $payroll['company_id'])
-            ->where('payroll_gaji_conjunction.employee_id', $payroll['employee_id'])
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
         $nominalGajiHarian = ($gajiHarian != null) ? $gajiHarian['nominal'] : 0;
@@ -311,5 +305,107 @@ class PayrollsModel extends Model
             'nominal_gaji_diterima' => $result['nominal_gaji_diterima'],
             'nominal_penambahan_gaji' => $gajiPlus[0]['total']
         ]);
+    }
+
+    public function getListPrintPayrollByDivision($divisionID, $adminID, $year, $month, $companyID)
+    {
+        $condition = [
+            'employees.company_id' => $companyID,
+            "employees.deletedAt" => null,
+            "employees.company_id" => $companyID,
+            "employees.division_id" => $divisionID,
+            "employees.id != " => $adminID, // kecualikan admin yg akses
+            "year_month" => $year . "-" . $month,
+        ];
+
+        $selectQry = "
+        payrolls.*,
+        employees.name AS employeesName,
+        employees.nip AS employeesNIP,
+        divisis.divisi AS divisiName
+        ";
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('employees', 'employees.id = payrolls.employee_id', 'INNER')
+            ->join('divisis', 'divisis.id = employees.division_id', 'LEFT') // Corrected the join condition
+            ->findAll();
+
+        $no = 1;
+        // set variable
+        $dataPayRolls = [];
+        $upahPokok = 0;
+        $upahLembur = 0;
+        $totalUpah = 0;
+        $potongan = 0;
+        $jumlahUpah = 0;
+
+        foreach ($dataQry as $p) {
+            $upahPokok += $p->nominal_uang_gaji;
+            $upahLembur += $p->nominal_uang_lembur;
+            $totalUpah += ($p->nominal_uang_gaji + $p->nominal_uang_lembur);
+            $potongan += $p->nominal_pengurangan_gaji;
+            $jumlahUpah += $p->nominal_gaji_diterima;
+
+            array_push($dataPayRolls, [
+                "no" => $no++,
+                "id" => $p->id,
+                "employee_id" => $p->employee_id,
+                "nip" => $p->employeesNIP,
+                "name"  => $p->employeesName,
+                "divisi" => $p->divisiName,
+                "hariKerja" => $p->hadir . "",
+                "upahPokok" => number_format($p->nominal_uang_gaji, 2, ',', '.'),
+                "upahLembur" => number_format($p->nominal_uang_lembur, 2, ',', '.'),
+                "totalUpah" => number_format($p->nominal_uang_gaji + $p->nominal_uang_lembur, 2, ',', '.'),
+                "potongan" => number_format($p->nominal_pengurangan_gaji,  2, ',', '.'),
+                "jumlahUpah" => number_format($p->nominal_gaji_diterima,  2, ',', '.'),
+            ]);
+        }
+
+        return [
+            'dataPayroll' => $dataPayRolls,
+            'total' => [
+                'upahPokok' => $upahPokok,
+                'upahLembur' => $upahLembur,
+                'totalUpah' => $totalUpah,
+                'potongan' => $potongan,
+                'jumlahUpah' => $jumlahUpah,
+            ]
+        ];
+    }
+
+    static function convertionIDRMoneyTotal($nilai)
+    {
+        $pecahan = array(
+            '100000' => 'Lembar 100000',
+            '50000' => 'Lembar 50000',
+            '20000' => 'Lembar 20000',
+            '10000' => 'Lembar 10000',
+            '5000' => 'Lembar 5000',
+            '2000' => 'Lembar 2000',
+            '1000' => 'Lembar 1000',
+            '500' => 'Pecahan 500',
+            '200' => 'Pecahan 200',
+            '100' => 'Pecahan 100',
+            '50' => 'Pecahan 50',
+            '25' => 'Pecahan 25'
+        );
+
+        $result = [];
+
+        foreach ($pecahan as $nilaiPecahan => $namaPecahan) {
+            $jumlahPecahan = floor($nilai / $nilaiPecahan);
+            if ($jumlahPecahan > 0) {
+                $result[] = [
+                    'lembar' => $namaPecahan,
+                    'totalLembar' => $jumlahPecahan
+                ];
+                $nilai %= $nilaiPecahan;
+            }
+        }
+
+        return $result;
     }
 }

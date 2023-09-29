@@ -255,4 +255,12 @@ class EmployeesModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function getSingleEmployee($employeesID)
+    {
+        return $this->asArray()->select("employees.*, divisis.divisi")
+            ->join('divisis', 'divisis.id = employees.division_id')
+            ->where('employees.id', $employeesID)
+            ->first();
+    }
 }

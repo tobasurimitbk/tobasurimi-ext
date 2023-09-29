@@ -5,12 +5,15 @@ namespace App\Controllers\HR;
 use App\Controllers\BaseController;
 use App\Models\AttendanceKeterlambatanModel;
 use App\Models\AttendancesModel;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
 use App\Models\FormPerizinanNotApprovedModel;
+use App\Models\GajiDivisiModel;
 use App\Models\PayrollGajiConjunctionModel;
 use App\Models\PayrollsModel;
+use Dompdf\Dompdf;
 
 class Payroll extends BaseController
 {
@@ -94,9 +97,9 @@ class Payroll extends BaseController
                 "name"  => $p->employeesName,
                 "divisi" => $p->divisiName,
                 "hariKerja" => $p->hadir . " Hari",
-                "totalGajiLembur" => "Rp " . number_format($p->nominal_uang_gaji + $p->nominal_uang_lembur, 0, ',', '.'),
-                "totalPenguranganGaji" => "Rp " . number_format($p->nominal_pengurangan_gaji, 0, ',', '.'),
-                "sisaGaji" => "Rp " . number_format($p->nominal_gaji_diterima, 0, ',', '.'),
+                "totalGajiLembur" => "Rp " . number_format($p->nominal_uang_gaji + $p->nominal_uang_lembur, 2, ',', '.'),
+                "totalPenguranganGaji" => "Rp " . number_format($p->nominal_pengurangan_gaji, 2, ',', '.'),
+                "sisaGaji" => "Rp " . number_format($p->nominal_gaji_diterima, 2, ',', '.'),
             ]);
         }
 
@@ -191,7 +194,6 @@ class Payroll extends BaseController
 
                 // update payroll
                 $payrollFinal = $payrollModel->generate(
-                    $this->this_company_id,
                     $e['id'],
                     $year . "-" . $month,
                     $payrollID,
@@ -288,12 +290,10 @@ class Payroll extends BaseController
 
         // update payroll
         $payrollFinal = $payrollModel->generate(
-            $this->this_company_id,
             $employeesData['id'],
             $year . "-" . $month,
             $payrollID,
             $status['HADIR_H'],
-            0
         );
 
         $payrollModel->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
@@ -322,6 +322,11 @@ class Payroll extends BaseController
 
         $payroll = $payrollModel->where('id', $id)->first();
 
+        // validation
+        if ($payroll == null) {
+            return redirect()->to('payroll');
+        }
+
         $data = [
             'payrollDetail' => $payrollModel->detailPayroll($id),
             'gajiPerHari' => $payrollGajiModel->getNominalGajiPerHariPayroll($id),
@@ -343,13 +348,16 @@ class Payroll extends BaseController
     {
         $id = $this->request->getVar('komponenGajiID');
         $payrollID = $this->request->getVar('payrollID');
-        $nominal = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominal'));
+
+        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
+        $angka = str_replace(",", ".", $angka);
+        $angkaDesimal = number_format((float) $angka, 3, '.', '');
 
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $payrollModel = new PayrollsModel();
 
         $payrollGajiModel->update($id, [
-            'nominal' => $nominal
+            'nominal' => $angkaDesimal
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
@@ -365,13 +373,16 @@ class Payroll extends BaseController
     {
         $id = $this->request->getVar('rekapKeterlambatanPresensiID');
         $payrollID = $this->request->getVar('payrollID');
-        $nominal = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominal'));
+
+        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
+        $angka = str_replace(",", ".", $angka);
+        $angkaDesimal = number_format((float) $angka, 3, '.', '');
 
         $payrollModel = new PayrollsModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
 
         $attendanceTerlambatModel->update($id, [
-            'nominal_pengurangan' => $nominal,
+            'nominal_pengurangan' => $angkaDesimal,
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
@@ -387,13 +398,16 @@ class Payroll extends BaseController
     {
         $id = $this->request->getVar('perizinanID');
         $payrollID = $this->request->getVar('payrollID');
-        $nominal = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominal'));
+
+        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
+        $angka = str_replace(",", ".", $angka);
+        $angkaDesimal = number_format((float) $angka, 3, '.', '');
 
         $payrollModel = new PayrollsModel();
         $formPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
 
         $formPerizinanNotApprovedModel->update($id, [
-            'nominal_pengurangan' => $nominal,
+            'nominal_pengurangan' => $angkaDesimal,
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
@@ -408,20 +422,26 @@ class Payroll extends BaseController
     public function updateNominalGajiPerHariAndCadangan()
     {
         $payrollID = $this->request->getVar('payrollID');
-        $nominalGajiPerHari = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominalGajiPerHari'));
-        $nominalCadangan = (int) preg_replace("/[^0-9]/", "", $this->request->getVar('nominalCadangan'));
         $gajiPerHariID = $this->request->getVar('gajiPerHariID');
         $cadanganID = $this->request->getVar('cadanganID');
+
+        $nominalGajiPerHari = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalGajiPerHari'));
+        $nominalGajiPerHari = str_replace(",", ".", $nominalGajiPerHari);
+        $angkaDesimalGajiPerHari = number_format((float) $nominalGajiPerHari, 3, '.', '');
+
+        $nominalCadangan = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalCadangan'));
+        $nominalCadangan = str_replace(",", ".", $nominalCadangan);
+        $angkaDesimalCadangan = number_format((float) $nominalCadangan, 3, '.', '');
 
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $payrollModel = new PayrollsModel();
 
         $payrollGajiModel->update($gajiPerHariID, [
-            'nominal' => $nominalGajiPerHari
+            'nominal' => $angkaDesimalGajiPerHari
         ]);
 
         $payrollGajiModel->update($cadanganID, [
-            'nominal' => $nominalCadangan
+            'nominal' => $angkaDesimalCadangan
         ]);
 
         $payrollModel->generateIfPayrollChanged($payrollID);
@@ -444,5 +464,85 @@ class Payroll extends BaseController
                 ->findAll(),
             'token' => \csrf_hash(),
         ]);
+    }
+
+    public function exportPdfPayrollSingle($payrollID)
+    {
+        $dompdf = new Dompdf();
+
+        // set model
+        $payrollModel = new PayrollsModel();
+        $employeeModel = new EmployeesModel();
+        $payrollGajiModel = new PayrollGajiConjunctionModel();
+        $formLemburModel = new FormLemburModel();
+        $companyModel = new CompaniesModel();
+
+        // set payroll detail
+        $payrollDetail = $payrollModel->where('id', $payrollID)->first();
+        // validation
+        if ($payrollDetail == null) {
+            return redirect()->to('payroll');
+        }
+        // set variable
+        $employee = $employeeModel->getSingleEmployee($payrollDetail['employee_id']);
+        $splitJamLembur = $formLemburModel->getTotalLemburJamPertamaKedua($payrollDetail['employee_id'], $payrollDetail['year_month']);
+        $company =  $companyModel->where('id', $this->this_company_id)->first();
+
+        $data = [
+            'payroll' => $payrollDetail,
+            'employee' => $employee,
+            'year' => explode("-", $payrollDetail['year_month'])[0],
+            'month' => explode("-", $payrollDetail['year_month'])[1],
+            'gajiPerHari' => $payrollGajiModel->getNominalGajiPerHariPayroll($payrollID),
+            'nominalUangCadangan' => $payrollGajiModel->getNominalUangCadanganPayroll($payrollID),
+            'rekapLembur' => $formLemburModel->rekap($payrollDetail['employee_id'], $payrollDetail['year_month']),
+            'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
+            'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
+            'perhitunganGaji' => $payrollGajiModel->getPerhitunganKomponenGajiPayroll($payrollID),
+            'company' => $company
+        ];
+
+        $dompdf->loadHtml(view('hr/payroll/payroll_single_print', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Tanda Terima Upah Karyawan ", array("Attachment" => false));
+
+        exit(0);
+    }
+
+    public function exportPdfPayrollDivision($yearMonth, $divisionID)
+    {
+        $dompdf = new Dompdf();
+
+        // set model
+        $divisiModel = new DivisisModel();
+        $payrollModel = new PayrollsModel();
+        $gajiDivisi = new GajiDivisiModel();
+
+        // set variable
+        $divisi = $divisiModel->where('id', $divisionID)->first();
+        $year = explode("-", $yearMonth)[0];
+        $month = explode("-", $yearMonth)[1];
+        $payrollData = $payrollModel->getListPrintPayrollByDivision($divisionID, $this->userID, $year, $month, $this->this_company_id);
+
+        // validation
+        if ($payrollData == null) {
+            return redirect()->to('payroll');
+        }
+
+        $data = [
+            'year' => $year,
+            'month' => $month,
+            'divisi' => $divisi,
+            'payrollData' => $payrollData,
+            'komponenGaji' => $gajiDivisi->getGajiByDivision($divisionID, $this->this_company_id),
+        ];
+
+        $dompdf->loadHtml(view('hr/payroll/payroll_division_print', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Daftar Upah Karyawan ", array("Attachment" => false));
+
+        exit(0);
     }
 }

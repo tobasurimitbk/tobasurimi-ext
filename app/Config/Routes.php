@@ -630,6 +630,8 @@ $routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::upd
 $routes->post('/payroll/update/nominal-perizinan-not-approved', 'HR\Payroll::updateNominalPerizinanNotApproved', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-gaji-cadangan', 'HR\Payroll::updateNominalGajiPerHariAndCadangan', ['filter' => 'Auth']);
 $routes->post('/payroll/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
+$routes->get('/payroll/print/single/(:segment)', 'HR\Payroll::exportPdfPayrollSingle/$1', ['filter' => 'Auth']);
+$routes->get('/payroll/print/division/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivision/$1/$2', ['filter' => 'Auth']);
 
 // formula payroll
 $routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);
