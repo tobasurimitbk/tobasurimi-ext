@@ -63,6 +63,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         $data = [
+            "today"         => date("d/m/Y"),
             "dataSPP"       => $dataSPP,
             "dataSupplier"  => $dataSupplier,
             "barangData"    => $barangData
@@ -81,6 +82,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         $data = [
+            "today" => date("d/m/Y"),
             "dataSupplier" => $dataSupplier
         ];
 

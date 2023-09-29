@@ -101,7 +101,11 @@ class Auth extends BaseController
                                         "url"   => $res_child_access[$j]["url"],
                                         "access"    => $access
                                     ];
-                                    array_push($arr_child, (object) $values);
+                                    
+                                    if(sizeof($access) !== 0)
+                                    {
+                                        array_push($arr_child, (object) $values);
+                                    }
                                 }
                             }
                             $values = [
@@ -112,7 +116,11 @@ class Auth extends BaseController
                                 "isParent"      => $res_access_list[$i]["parent_id"],
                                 "child"         => $arr_child
                             ];
-                            array_push($arr, (object) $values);
+                            
+                            if(sizeof($arr_child) !== 0)
+                            {
+                                array_push($arr, (object) $values);
+                            }
                         }
 
                         $this_company_id = $res_company[0]["id"];
@@ -139,6 +147,13 @@ class Auth extends BaseController
                             "employee_id" => $res_user[0]["employee_id"],
                             "status" => $res_user[0]["status"],
                         ];
+
+                        // $data = [
+                        //     "status"            => false,
+                        //     "message"    => json_encode($this_access),
+                        //     'token' => csrf_hash()
+                        // ];
+                        // return json_encode($data);
 
                         session()->setTempdata("login", $session, 36000);
 

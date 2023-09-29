@@ -69,6 +69,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         $data = [
+            "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
             "dataValuta" => $dataValuta
@@ -101,6 +102,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         $data = [
+            "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
             "dataValuta" => $dataValuta

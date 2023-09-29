@@ -7,6 +7,7 @@ use App\Models\RolesModel;
 use App\Models\CompaniesModel;
 use App\Models\AccessListsModel;
 use App\Models\MenuUrlsModel;
+use App\Models\UserModel;
 
 class Akses extends BaseController
 {
@@ -15,6 +16,7 @@ class Akses extends BaseController
     protected $CompaniesModel;
     protected $AccessListsModel;
     protected $MenuUrlsModel;
+    protected $UserModel;
     
     public function __construct()
     {
@@ -23,6 +25,7 @@ class Akses extends BaseController
         $this->CompaniesModel = new CompaniesModel();
         $this->AccessListsModel = new AccessListsModel();
         $this->MenuUrlsModel = new MenuUrlsModel();
+        $this->UserModel = new UserModel();
     }
 
     public function akses()
@@ -202,6 +205,112 @@ class Akses extends BaseController
                                 echo json_encode($data);
                             }
                         }
+                    }
+                }
+
+                // set new session if this account login have same access edited
+                $change_session = false;
+                foreach(session()->get("login")->arr_company as $allCompany)
+                {
+
+                    if(formatter($this->request->getPost("company_id"), "STR_TO_INT") === formatter($allCompany["id"], "STR_TO_INT"))
+                    {
+                        if(formatter($this->request->getPost("role_id"), "STR_TO_INT") === formatter($allCompany["role_id"], "STR_TO_INT"))
+                        {
+                            $change_session = true;
+                        }
+                    }
+                }
+
+                if($change_session)
+                {
+                    $res_user = $this->UserModel->get_by_username(session()->get("login")->username);
+                    if (count($res_user) > 0) {
+                        $arr_companies = json_decode($res_user[0]["company_role"], true);
+                        $in_company_id = implode(', ', array_column($arr_companies, 'company_id'));
+                        $in_roles_id = implode(', ', array_column($arr_companies, 'role_id'));
+    
+                        $res_company = $this->CompaniesModel->get_by_in_id($in_company_id);
+                        $res_roles = $this->RolesModel->get_by_in_id($in_roles_id);
+    
+                        for ($i = 0; $i < count($res_company); $i++) {
+                            $check = 1;
+                            for ($j = 0; $j < count($res_roles); $j++) {
+                                for ($k = 0; $k < count($arr_companies); $k++) {
+                                    if ($res_company[$i]["id"] == $arr_companies[$k]["company_id"] && $res_roles[$j]["id"] == $arr_companies[$k]["role_id"]) {
+                                        $res_company[$i]["role_id"] = $res_roles[$j]["id"];
+                                        $res_company[$i]["role_name"] = $res_roles[$j]["name"];
+                                        $check = 0;
+                                        break;
+                                    }
+                                }
+                                if ($check == 0) break;
+                            }
+                        }
+    
+                        $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($res_roles[0]["id"], $res_company[0]["id"]);
+                        $res_child_access = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_not_parent($res_roles[0]["id"], $res_company[0]["id"]);
+                        $arr = [];
+                        for ($i = 0; $i < count($res_access_list); $i++) {
+                            $arr_child = [];
+                            for ($j = 0; $j < count($res_child_access); $j++) {
+                                if ($res_child_access[$j]["parent_id"] == $res_access_list[$i]["menu_url_id"]) {
+                                    $access = json_decode($res_child_access[$j]["action"]);
+                                    $values = [
+                                        "name"  => $res_child_access[$j]["menuName"],
+                                        "menu_url_id"   => $res_child_access[$j]["menu_url_id"],
+                                        "url"   => $res_child_access[$j]["url"],
+                                        "access"    => $access
+                                    ];
+                                    
+                                    if(sizeof($access) !== 0)
+                                    {
+                                        array_push($arr_child, (object) $values);
+                                    }
+                                }
+                            }
+
+                            $values = [
+                                "menu_url_id"   => $res_access_list[$i]["menu_url_id"],
+                                "icon"          => $res_access_list[$i]["icon"],
+                                "menuName"      => $res_access_list[$i]["menuName"],
+                                "url"           => $res_access_list[$i]["url"],
+                                "isParent"      => $res_access_list[$i]["parent_id"],
+                                "child"         => $arr_child
+                            ];
+
+                            if(sizeof($arr_child) !== 0)
+                            {
+                                array_push($arr, (object) $values);
+                            }
+                        }
+
+                        $this_company_id = $res_company[0]["id"];
+                        $this_company = $res_company[0]["company"];
+                        $this_access = $arr;
+                        $this_role_id = $res_roles[0]["id"];
+                        $this_role_name = $res_roles[0]["name"];
+
+                        // token add bearer
+                        $session = (object) [
+                            "isLogin" => true,
+                            "token" => $this->token,
+                            "name" => $res_user[0]["employee_name"],
+                            "username" => $res_user[0]["username"],
+                            "this_role_id" => $this_role_id,
+                            "this_role_name" => $this_role_name,
+                            //"company_role" => $data->company_role,
+                            //"company_role" => $data->company_role,
+                            "arr_company"   => $res_company,
+                            "this_company_id" => $this_company_id,
+                            "this_company" => $this_company,
+                            "this_access" => $this_access,
+                            "user_id" => $res_user[0]["id"],
+                            "employee_id" => $res_user[0]["employee_id"],
+                            "status" => $res_user[0]["status"],
+                        ];
+
+                        session()->setTempdata("login", $session, 36000);
                     }
                 }
 

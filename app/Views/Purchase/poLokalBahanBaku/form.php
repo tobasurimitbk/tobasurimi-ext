@@ -96,7 +96,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOLokal) ? ($dataPOLokal->po_date ? date("d/m/Y", strtotime($dataPOLokal->po_date)) : "") : ""; ?>">
+                                    <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker po_date" id="po_date" name="po_date" placeholder="Tanggal Dibuat" value="<?= !empty($dataPOLokal) ? ($dataPOLokal->po_date ? date("d/m/Y", strtotime($dataPOLokal->po_date)) : "") : $today; ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -174,11 +174,6 @@
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
-                    </div>
-                    <div class="col-md-6">
-                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
                     </div>
                 </div>
             </div>
@@ -310,12 +305,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
-                                    <option data-barang_id="" data-nama="" data-satuan="" data-stok="" data-harga="" value=""></option>
-                                    <?php foreach($barangData as $barang): ?>
-                                    <option data-barang_id="<?= $barang->id ?>" data-nama="<?= $barang->nama_barang ?>" data-satuan_id="<?= $barang->satuan_id ?>" data-satuan="<?= $barang->nama_satuan ?>" data-stok="<?= $barang->stok ?>" data-harga="<?= number_format($barang->harga_barang) ?>" value="<?= $barang->kode_barang ?>"><?= "$barang->kode_barang - $barang->nama_barang" ?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <input autocomplete="one-time-code" readonly="true" type="text" class="form-control kode" name="kode" id="kode" placeholder="Kode Barang" />
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
@@ -530,104 +520,6 @@
     });
 
     $(document).ready(function() {
-
-        // tableData
-        const table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            info: false,
-            paging: false,
-            fixedHeader: true,
-            display: "stripe",
-            searching: false,
-            ordering: false,
-            columns: [{
-                data: "no",
-                className: "text-center",
-            },
-            {
-                data: "kode_barang",
-                className: "text-center"
-            }, 
-            {
-                data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: "spesifikasi",
-                className: "text-center"
-            },
-            {
-                data: "nama_satuan",
-                className: "text-center"
-            },
-            {
-                data: "harga",
-                className: "text-center"
-            },
-            {
-                data: "qty",
-                className: "text-center"
-            },
-            {
-                data: "sisa",
-                className: "text-center"
-            },
-            {
-                data: "jumlahDIterima",
-                className: "text-center"
-            },
-            {
-                data: "bagianName",
-                className: "text-center"
-            },
-            {
-                data: "peti",
-                className: "text-center"
-            },
-            {
-                data: "quality",
-                className: "text-center"
-            },
-            {
-                data: "daily_price",
-                className: "text-center"
-            },
-            {
-                data: "monthly_price",
-                className: "text-center"
-            },
-            {
-                data: "keterangan",
-                className: "text-center"
-            },
-            /* {
-                data: "status",
-                className: "text-center actions",
-                render: function(data, type, row) {
-                    let id = row?.id;
-                    return `
-                    <div class="mt-2">
-                        <button>X</button>
-                    </div>
-                    `
-                }
-            } */],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-        // tableData
-
         $(".po_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -720,14 +612,6 @@
         $('.icon-po-date').click(function() {
             $(".po_date").focus();
         });
-
-        $('.kode_barang').select2({
-            placeholder: "Pilih Kode Barang",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content"),
-            tags: false,
-            allowClear: true
-        })
 
         var validator = $(".create-form").validate({
             rules: {
@@ -1077,22 +961,14 @@
         })
 
         $(".btn-submit-detail").click(function() {
-            const row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
+            let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
 
-            const itemCode = $('#kode_barang').val();
-            const selectedData = $("#kode_barang option:selected").data();
-            console.log(selectedData)
-            const id_barang = selectedData.barang_id;
-            const bagian = $(".bagian option:selected").val()
-            const bagianName = $(".bagian option:selected").text()
-            const spec = $("#spesifikasi").val()
-            const peti = $(".peti").val()
-            const keterangan = $('#keterangan').val();
-            const qty = $(".qty").val();
-            const harga = $("#harga").val();
-            const quality = $(".quality").val()
-            const daily_price = $(".daily_price").val()
-            const monthly_price = $(".monthly_price").val()
+            let bagian = $(".bagian option:selected").val()
+            let bagianName = $(".bagian option:selected").text()
+            let peti = $(".peti").val()
+            let quality = $(".quality").val()
+            let daily_price = $(".daily_price").val()
+            let monthly_price = $(".monthly_price").val()
 
             if ($(".detail-form").valid()) {
                 Swal.fire({
@@ -1106,33 +982,142 @@
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        
-                        table.row.add({
-                            id_barang: id_barang,
-                            kode_barang: itemCode,
-                            nama_barang: selectedData.nama,
-                            qty: qty,
-                            nama_satuan: selectedData.satuan,
-                            harga_barang: selectedData.harga,
-                            spesifikasi: spec,
-                            harga: harga,
-                            peti: peti,
-                            quality: quality,
-                            daily_price: daily_price,
-                            monthly_price: monthly_price,
-                            // barangTotal: amount,
-                            // disc: discountPercentage,
-                            // tax: tax,
-                            // taxAmt: amount * (tax / 100),
-                            keterangan: keterangan,
-                            // discAmt: discAmt,
-                            // amount: discountedAmt,
-                            // dept: dept,
-                            // warehouse_id: warehouseId,
-                            bagianName: bagianName // warehouse name
-                        }).draw(false);
+                        let new_list_items = []
+                        let tag_html = "";
+                        let tag_total = "";
 
-                        // $(".body-detail-table").append(tag_html)
+                        row = 0;
+
+                        $(".body-detail-table").empty()
+
+                        total_harga_barang = 0;
+                        total_qty = 0;
+                        total_harga = 0;
+
+                        list_items.map(item => {
+                            if (item.row == row_detail) {
+                                tag_html += `<tr>`;
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += row + 1;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.kode_barang;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.nama_barang;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.spesifikasi;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.nama_satuan;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.harga;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.qty;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.remaining_qty;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.qty_diterima;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += bagianName;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += peti;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += quality;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += daily_price;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += monthly_price;
+                                tag_html += "</td>";
+                                // tag_html += `<td class="edit-table-detail"  data-daily_price="${daily_price}" data-monthly_price="${monthly_price}"  data-quality="${quality}" data-peti="${peti}" data-bagian="${bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                // tag_html += item.keterangan;
+                                // tag_html += "</td>";
+                                tag_html += "</tr>";
+
+                                new_list_items.push({
+                                    ...item,
+                                    bagian: bagian,
+                                    bagianName: bagianName,
+                                    peti: peti,
+                                    quality: quality,
+                                    daily_price: daily_price,
+                                    monthly_price: monthly_price
+                                });
+
+                                row = row + 1;
+                            } else {
+                                tag_html += `<tr>`;
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += row + 1;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.kode_barang;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.nama_barang;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.spesifikasi;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.nama_satuan;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.harga;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.qty;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.remaining_qty;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.qty_diterima;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.bagianName;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.peti;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.quality;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.daily_price;
+                                tag_html += "</td>";
+                                tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                tag_html += item.monthly_price;
+                                tag_html += "</td>";
+                                // tag_html += `<td class="edit-table-detail"  data-daily_price="${item.daily_price}" data-monthly_price="${item.monthly_price}" data-quality="${item.quality}" data-peti="${item.peti}" data-bagian="${item.bagian}"  data-total="${item.total}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}"  data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
+                                // tag_html += item.keterangan;
+                                // tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
+                                tag_html += "</td>";
+                                tag_html += "</tr>";
+
+                                new_list_items.push(item);
+
+                                row = row + 1;
+                            }
+                        })
+
+                        list_items = [];
+
+                        list_items = new_list_items;
+
+                        $(".body-detail-table").append(tag_html)
 
                         $(".detail-modal").modal("hide")
                     }
@@ -1466,94 +1451,6 @@
                 $(".detail-modal").modal("show");
             }
         })
-    });
-
-    $('[data-btn="detail-modal"]').on('click', function(evt) {
-        $(".title-detail-name").text("Tambah")
-        // $(".delete-detail").css('display', '');
-
-        validator_detail.resetForm();
-        validator_detail.reset();
-
-        $(".id_detail").val('')
-        $(".kode").val('')
-        $(".keterangan").val('').prop('readonly', false);
-
-        $(".spesifikasi").val('');
-
-        $(".kode").val('')
-
-        $(".barang_id").val('')
-        $(".nama_barang").val('')
-        $(".nama_satuan").val('')
-
-        $(".harga").val('').prop('readonly', false);
-        $(".qty").val('').prop('readonly', false);
-        $(".total").val('')
-
-        $(".peti").val('')
-        $(".quality").val('')
-        $(".daily_price").val('')
-        $(".monthly_price").val('')
-
-        $.ajax({
-            url: `<?= base_url("warehouse/dropdown"); ?>`,
-            method: "GET",
-            dataType: "json",
-            success: function(res) {
-                $(".bagian").empty()
-                $(".bagian").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".bagian").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-
-                $(".bagian").val(bagian).change()
-                $(".detail-modal").modal("show");
-            }
-        })
-    });
-
-    $(".kode_barang").change(function() {
-        if ($(".kode_barang option:selected").val()) {
-            let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
-            let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
-            let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
-            let stok = $(".kode_barang option:selected").data("stok") ? $(".kode_barang option:selected").data("stok") : "";
-            let harga = $(".kode_barang option:selected").data("harga") ? $(".kode_barang option:selected").data("harga") : "";
-            let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-
-            $.ajax({
-                url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    let spek = res?.data?.spek;
-                    $(".spesifikasi").val(spek);
-                }
-            })
-
-            $(".nama_barang").attr("readonly", nama ? true : false);
-
-            $(".kode").val($(".kode_barang option:selected").val());
-            $(".nama_barang").val(nama);
-            $(".barang_id").val(barang_id);
-            $(".nama_satuan").val(satuan);
-            $(".satuan_id").val(satuan_id);
-            $(".qty").val(stok);
-            $(".harga").val(harga ? harga.toLocaleString() : "");
-            $(".total").val(harga && stok ? (Number(harga.includes(",") ? (harga.replaceAll(",", "")) : harga) * stok).toLocaleString() : "");
-        } else {
-            $(".spesifikasi").val("")
-            $(".nama_barang").attr("readonly", false)
-            $(".kode").val("");
-            $(".nama_barang").val("");
-            $(".barang_id").val("");
-            $(".nama_satuan").val("");
-            $(".satuan_id").val("");
-            $(".qty").val("");
-            $(".harga").val("");
-            $(".total").val("");
-        }
     })
 
     const addBarang = function(url) {

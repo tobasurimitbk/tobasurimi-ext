@@ -58,6 +58,7 @@ class POImportBahanBaku extends BaseController
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
         
         $data = [
+            "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
             "dataValuta" => $dataValuta
@@ -78,6 +79,7 @@ class POImportBahanBaku extends BaseController
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
         
         $data = [
+            "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
             "dataValuta" => $dataValuta
