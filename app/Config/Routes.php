@@ -485,15 +485,32 @@ $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount'
 $routes->get('/sub-account/dropdown', 'Master\Account::dropdownSubAccount', ['filter' => 'Auth']);
 $routes->get('/ap-ar/dropdown', 'Master\Account::dropdownAPAR', ['filter' => 'Auth']);
 
-// WAREHOUSE
 // MASTER BARANG
-$routes->get('/barang', 'Warehouse\Barang::barang', ['filter' => 'Auth']);
-$routes->get('/barang/all', 'Warehouse\Barang::allBarang', ['filter' => 'Auth']);
-$routes->get('/barang/id/(:segment)', 'Warehouse\Barang::getByIdBarang/$1', ['filter' => 'Auth']);
-$routes->post('/barang/save', 'Warehouse\Barang::saveBarang', ['filter' => 'Auth']);
-$routes->post('/barang/update', 'Warehouse\Barang::updateBarang', ['filter' => 'Auth']);
-$routes->post('/barang/delete', 'Warehouse\Barang::deleteBarang', ['filter' => 'Auth']);
+$routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');
+});
 
+$routes->group('barang-bahan-baku', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'Warehouse\Barang::barang/Bahan Baku');
+});
+
+$routes->group('barang-bahan-jadi', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'Warehouse\Barang::barang/Bahan Jadi');
+});
+
+$routes->group('barang-scrap', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('/', 'Warehouse\Barang::barang/Scrap');
+});
+
+$routes->group('barang', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('all', 'Warehouse\Barang::allBarang');
+    $routes->get('id/(:segment)', 'Warehouse\Barang::getByIdBarang/$1');
+    $routes->post('save', 'Warehouse\Barang::saveBarang');
+    $routes->post('update', 'Warehouse\Barang::updateBarang');
+    $routes->post('delete', 'Warehouse\Barang::deleteBarang');
+});
+
+// WAREHOUSE
 // MASTER STOCK
 $routes->get('/stock', 'Warehouse\Stock::index', ['filter' => 'Auth']);
 $routes->get('/stock/all', 'Warehouse\Stock::allStock', ['filter' => 'Auth']);

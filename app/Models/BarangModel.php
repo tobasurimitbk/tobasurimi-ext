@@ -26,11 +26,13 @@ class BarangModel extends Model
         'harga_barang',
         'satuan_id',
         'kategori_id',
+        'kategori_barang',
         'hs_id',
         'ap_id',
         'ar_id',
         'stok',
-        'tax',
+        'ppn',
+        'pph',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -85,10 +87,11 @@ class BarangModel extends Model
         $selectQry = "barangs.*, 
                       parent_barangs.nama_barang AS parent_barang,
                       satuans.kode_satuan AS kode_satuan, 
-                      metadata.value AS kategori,
+                    
                       hs_codes.code AS code_hs,
                       ap.nama_sub AS sub_akun_ap,
                       ar.nama_sub AS sub_akun_ar";
+                    //     metadata.value AS kategori,
         $barangDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
@@ -102,7 +105,7 @@ class BarangModel extends Model
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['kategori']) {
+        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['kategori_barang']) {
             $barangDataQry->groupStart();
         }
 
@@ -114,7 +117,11 @@ class BarangModel extends Model
             $barangDataQry->where('metadata.id', $addCondition['kategori']);
         }
 
-        if ($addCondition['search'] || $addCondition['kategori']) {
+        if ($addCondition['kategori_barang']) {
+            $barangDataQry->where('barangs.kategori_barang', $addCondition['kategori_barang']);
+        }
+
+        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['kategori_barang']) {
             $barangDataQry->groupEnd();
         }
 

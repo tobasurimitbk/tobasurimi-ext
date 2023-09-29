@@ -11,9 +11,10 @@
                 <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                     <input autocomplete="one-time-code" type="hidden" class="parent" name="parent" id="parent" />
+                    <input autocomplete="one-time-code" value="<?= $kategoriBarang; ?>" type="hidden" class="kategori_barang" name="kategori_barang" id="kategori_barang" />
                     <?= csrf_field() ?>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="mb-3" style="height: 50px;">
                                 <div for="floatingInput" class="label-modal-master-barang">Product Spec</div>
                                 <div class="form-check form-check-inline">
@@ -160,8 +161,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" onkeyup="formatNumber(this)" class="form-control" name="tax" id="tax" placeholder="Pajak Barang">
-                                    <label for="floatingInput">Tax  (Opsional) (%)</label>
+                                    <input autocomplete="one-time-code" class="form-control ppn" type="number" class="form-control" name="ppn" id="ppn" placeholder="Pajak Barang">
+                                    <label for="floatingInput">PPN (Opsional) (%)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control pph" type="number" class="form-control" name="pph" id="pph" placeholder="Pajak Barang">
+                                    <label for="floatingInput">PPH (Opsional) (%)</label>
                                 </div>
                             </div>
                         </div>
@@ -205,7 +212,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Barang</h1>
+    <h1>Barang <?= $kategoriBarang; ?></h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
@@ -229,7 +236,7 @@
                     }
                     ?>
                 </select>
-            </div>
+            </div> 
         </div>
         <div class="row">
             <div class="table-responsive">
@@ -286,6 +293,7 @@
             data: function(data) {
                 data.search = $(".search").val();
                 data.kategori = $(".kategori").val();
+                data.kategori_barang = '<?= $kategoriBarang; ?>';
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -861,9 +869,12 @@
                             $('.satuan_id').rules('add', {
                                 required: true
                             });
-                            $('.tax').rules('add', {
-                                required: true
-                            });
+                            // $('.ppn').rules('add', {
+                            //     required: true
+                            // });
+                            // $('.pph').rules('add', {
+                            //     required: true
+                            // });
                         }
                         else
                         {
@@ -871,7 +882,8 @@
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('remove', 'required');
                             $('.satuan_id').rules('remove', 'required');
-                            $('.tax').rules('remove', 'required');
+                            // $('.ppn').rules('remove', 'required');
+                            // $('.pph').rules('remove', 'required');
                         }
 
                         $(`[name="productSpec"][value="${res?.data?.spec_type}"]`).prop('checked', true);
@@ -880,7 +892,8 @@
                         $(".nama_barang").val(res?.data?.nama_barang);
                         $(".stok").val(res?.data?.stok);
                         $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
-                        $('#tax').val(res.data.tax);
+                        $('#ppn').val(res.data.ppn);
+                        $('#pph').val(res.data.pph);
                         
                         validator.resetForm();
                         validator.reset();
@@ -1071,6 +1084,32 @@
                     }
                 }
             })
+        })
+
+        $(".ppn").keyup(function() {
+            if ($(".ppn").val()) {
+                if ($(".ppn").val() > 100) {
+                    $(".ppn").val(100)
+                }
+                if ($(".ppn").val() < 0) {
+                    $(".ppn").val();
+                }
+            } else {
+                $(".ppn").val();
+            }
+        })
+
+        $(".pph").keyup(function() {
+            if ($(".pph").val()) {
+                if ($(".pph").val() > 100) {
+                    $(".pph").val(100)
+                }
+                if ($(".pph").val() < 0) {
+                    $(".pph").val();
+                }
+            } else {
+                $(".pph").val();
+            }
         })
 
         $(".search").keyup(function () {
@@ -1463,7 +1502,8 @@
         $('.stok').rules('remove', 'required');
         $('.harga_barang').rules('remove', 'required');
         $('.satuan_id').rules('remove', 'required');
-        $('.tax').rules('remove', 'required');
+        // $('.ppn').rules('remove', 'required');
+        // $('.pph').rules('remove', 'required');
     };
 
     const haciu2 = () => {
@@ -1477,9 +1517,12 @@
         $('.satuan_id').rules('add', {
             required: true
         });
-        $('.tax').rules('add', {
-            required: true
-        });
+        // $('.ppn').rules('add', {
+        //     required: true
+        // });
+        // $('.pph').rules('add', {
+        //     required: true
+        // });
     };
 </script>
 

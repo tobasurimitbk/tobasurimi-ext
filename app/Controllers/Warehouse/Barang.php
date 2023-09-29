@@ -34,7 +34,7 @@ class Barang extends BaseController
         $this->Sub_AkunsModel = new Sub_AkunsModel();
     }
 
-    public function barang()
+    public function barang($kategori)
     {
         // Get Kategori
         $dataKategori = $this->metadataModel->get_by_name('Kategori Barang');
@@ -54,7 +54,9 @@ class Barang extends BaseController
         // get data HS
         $dataKodeHS = $this->HsCodesModel->asObject()->findAll();
 
+
         $data = [
+            "kategoriBarang"       => $kategori,
             "dataKategori"      => $dataKategori,
             "dataBarangParent"  => $dataBarangParent,
             "kategoriBarangData" => $kategoriBarangData,
@@ -85,7 +87,8 @@ class Barang extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "kategori"      => formatter($this->request->getGet("kategori"), "STR_TO_INT")
+            "kategori"      => $this->request->getGet("kategori"),
+            "kategori_barang" => $this->request->getGet("kategori_barang")
         ];
 
         $limit = $this->request->getGet("length");
@@ -106,7 +109,6 @@ class Barang extends BaseController
                 "type"          => $data->type,
                 "harga_barang"  => number_format($data->harga_barang),
                 "kode_satuan"   => $data->kode_satuan,
-                "kategori"      => $data->kategori,
                 "code_hs"       => $data->code_hs,
                 "sub_akun_ap"   => $data->sub_akun_ap,
                 "sub_akun_ar"   => $data->sub_akun_ar,
@@ -174,7 +176,10 @@ class Barang extends BaseController
                 "ar_id" => [
                     "rules" => "permit_empty|is_natural",
                 ],
-                "tax" => [
+                "ppn" => [
+                    "rules" => "permit_empty|numeric",
+                ],
+                "pph" => [
                     "rules" => "permit_empty|numeric",
                 ]
             ];
@@ -195,6 +200,7 @@ class Barang extends BaseController
             $productSpec = $this->request->getPost('productSpec');
             if ($parent_id || $productSpec == 'single') {
                 $payload = [
+                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
                     "spec_type"         => $productSpec,
                     "company_id"        => $this->this_company_id,
                     "parent_id"         => formatter($this->request->getPost("parent_id"), "STR_TO_INT"),
@@ -210,11 +216,13 @@ class Barang extends BaseController
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     // "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
                     "stok"              => 0,
-                    "tax"               => $this->request->getPost('tax') ?? 0,
+                    "ppn"               => $this->request->getPost('ppn') ?? 0,
+                    "pph"               => $this->request->getPost('pph') ?? 0,
                     "spek"              => $this->request->getPost("spek")
                 ];
             } else {
                 $payload = [
+                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
                     "spec_type"     => $productSpec,
                     "company_id"    => $this->this_company_id,
                     "parent_id"     => 0,
@@ -297,7 +305,10 @@ class Barang extends BaseController
                 "ar_id" => [
                     "rules" => "permit_empty|is_natural",
                 ],
-                "tax" => [
+                "ppn" => [
+                    "rules" => "permit_empty|numeric",
+                ],
+                "pph" => [
                     "rules" => "permit_empty|numeric",
                 ]
             ];
@@ -342,6 +353,7 @@ class Barang extends BaseController
 
             if ($parent || $productSpec == 'single') {
                 $payload = [
+                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
                     "spec_type"         => $productSpec,
                     "parent_id"         => $parent,
                     "type"              => $this->request->getPost("type"),
@@ -355,11 +367,13 @@ class Barang extends BaseController
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
                     "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                    "tax"               => $this->request->getPost('tax') ?? 0,
+                    "ppn"               => $this->request->getPost('ppn') ?? 0,
+                    "pph"               => $this->request->getPost('pph') ?? 0,
                     "spek"              => $this->request->getPost("spek")
                 ];
             } else {
                 $payload = [
+                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
                     "spec_type"     => $productSpec,
                     "parent_id"     => 0,
                     "company_id"    => $this->this_company_id,
