@@ -235,6 +235,11 @@
                             <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
                         </tr>
                     <?php endforeach; ?>
+                    <tr>
+                        <td>Potongan Lain-Lain</td>
+                        <td>:</td>
+                        <td>(-) <?= "Rp " . number_format($totalNominalKeterlambatanPresensi + $totalNominalRekapPerizinanNotApproved, 2, ',', '.') ?></td>
+                    </tr>
                 </table>
             </td>
             <td>
@@ -254,6 +259,11 @@
                             <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
                         </tr>
                     <?php endforeach; ?>
+                    <tr>
+                        <td>Potongan Lain-Lain</td>
+                        <td>:</td>
+                        <td>(-) <?= "Rp " . number_format($totalNominalKeterlambatanPresensi + $totalNominalRekapPerizinanNotApproved, 2, ',', '.') ?></td>
+                    </tr>
                 </table>
             </td>
         </tr>

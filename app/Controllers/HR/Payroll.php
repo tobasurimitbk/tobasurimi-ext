@@ -476,6 +476,8 @@ class Payroll extends BaseController
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $formLemburModel = new FormLemburModel();
         $companyModel = new CompaniesModel();
+        $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
+        $rekapPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
 
         // set payroll detail
         $payrollDetail = $payrollModel->where('id', $payrollID)->first();
@@ -499,7 +501,9 @@ class Payroll extends BaseController
             'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
             'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
             'perhitunganGaji' => $payrollGajiModel->getPerhitunganKomponenGajiPayroll($payrollID),
-            'company' => $company
+            'company' => $company,
+            'totalNominalKeterlambatanPresensi' => $attendanceTerlambatModel->getTotalRekap($payrollID),
+            'totalNominalRekapPerizinanNotApproved' => $rekapPerizinanNotApprovedModel->getTotalRekap($payrollID)
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_single_print', $data));
