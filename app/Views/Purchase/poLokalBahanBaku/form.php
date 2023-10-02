@@ -27,12 +27,12 @@
                     </button>
                 <?php } ?>
 
-                <?php if ($dataPOLokal->is_posted === "1") { 
+                <?php if ($dataPOLokal->is_posted === "1") {
                     if ($dataPOLokal->status_penerimaan === "0") { ?>
-                    <button class="btn btn-hapus close-parent float-right">
-                        Close PO
-                    </button>
-                <?php } 
+                        <button class="btn btn-hapus close-parent float-right">
+                            Close PO
+                        </button>
+                <?php }
                 } ?>
 
             <?php } ?>
@@ -69,28 +69,24 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <?php if (!empty($dataPOLokal)) { ?>
+                        <?php if (!empty($dataPOLokal)) : ?>
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
                                 <label for="floatingInput">No. SPP</label>
                             </div>
-                        <?php } else { ?>
+                        <?php else : ?>
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select purchase_request_id" id="purchase_request_id" name="purchase_request_id" aria-label="Floating label select example">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataSPP)) {
-                                        foreach ($dataSPP as $spp) {
-                                    ?>
+                                    <?php if (!empty($dataSPP)) : ?>
+                                        <?php foreach ($dataSPP as $spp) : ?>
                                             <option value="<?= $spp->id; ?>"><?= $spp->spp_no; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </select>
                                 <label for="floatingInput">No. SPP</label>
                             </div>
-                        <?php } ?>
+                        <?php endif; ?>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -110,14 +106,11 @@
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php
-                                if (!empty($dataSupplier)) {
-                                    foreach ($dataSupplier as $supplier) {
-                                ?>
+                                if (!empty($dataSupplier)) : ?>
+                                    <?php foreach ($dataSupplier as $supplier) : ?>
                                         <option <?= !empty($dataPOLokal) ? ($dataPOLokal->supplier_id === $supplier->id ? "selected" : "") : ""; ?> value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->kode; ?> - <?= $supplier->name; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Supplier</label>
                         </div>
@@ -216,7 +209,7 @@
                                     $total_qty_diterima = $total_qty_diterima + ($details->qty_diterima ? formatter($details->qty_diterima, "STR_TO_FLOAT") : 0);
                                     $total_remaining_qty = $total_remaining_qty + ($details->remaining_qty ? formatter($details->remaining_qty, "STR_TO_FLOAT") : 0);
                                     $total_harga = $total_harga + ($details->general_price ? formatter(str_replace(",", "", $details->general_price), "STR_TO_INT") : 0) * $details->qty;
-                                    
+
                             ?>
 
                                     <tr>
@@ -532,77 +525,78 @@
             searching: false,
             ordering: false,
             columns: [{
-                data: "no",
-                className: "text-center",
-            },
-            {
-                data: "kode_barang",
-                className: "text-center"
-            }, 
-            {
-                data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: "spesifikasi",
-                className: "text-center"
-            },
-            {
-                data: "nama_satuan",
-                className: "text-center"
-            },
-            {
-                data: "harga",
-                className: "text-center"
-            },
-            {
-                data: "qty",
-                className: "text-center"
-            },
-            {
-                data: "sisa",
-                className: "text-center"
-            },
-            {
-                data: "jumlahDIterima",
-                className: "text-center"
-            },
-            {
-                data: "bagianName",
-                className: "text-center"
-            },
-            {
-                data: "peti",
-                className: "text-center"
-            },
-            {
-                data: "quality",
-                className: "text-center"
-            },
-            {
-                data: "daily_price",
-                className: "text-center"
-            },
-            {
-                data: "monthly_price",
-                className: "text-center"
-            },
-            /* {
-                data: "keterangan",
-                className: "text-center"
-            }, */
-            /* {
-                data: "status",
-                className: "text-center actions",
-                render: function(data, type, row) {
-                    let id = row?.id;
-                    return `
-                    <div class="mt-2">
-                        <button>X</button>
-                    </div>
-                    `
-                }
-            } */],
+                    data: "no",
+                    className: "text-center",
+                },
+                {
+                    data: "kode_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "spesifikasi",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_satuan",
+                    className: "text-center"
+                },
+                {
+                    data: "harga",
+                    className: "text-center"
+                },
+                {
+                    data: "qty",
+                    className: "text-center"
+                },
+                {
+                    data: "sisa",
+                    className: "text-center"
+                },
+                {
+                    data: "jumlahDIterima",
+                    className: "text-center"
+                },
+                {
+                    data: "bagianName",
+                    className: "text-center"
+                },
+                {
+                    data: "peti",
+                    className: "text-center"
+                },
+                {
+                    data: "quality",
+                    className: "text-center"
+                },
+                {
+                    data: "daily_price",
+                    className: "text-center"
+                },
+                {
+                    data: "monthly_price",
+                    className: "text-center"
+                },
+                /* {
+                    data: "keterangan",
+                    className: "text-center"
+                }, */
+                /* {
+                    data: "status",
+                    className: "text-center actions",
+                    render: function(data, type, row) {
+                        let id = row?.id;
+                        return `
+                        <div class="mt-2">
+                            <button>X</button>
+                        </div>
+                        `
+                    }
+                } */
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -1080,7 +1074,7 @@
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        
+
                         table.row.add({
                             id_barang: id_barang,
                             kode_barang: itemCode,
@@ -1134,22 +1128,18 @@
             let validate_peti_and_other = false;
 
             list_items.map(obj => {
-                if(obj.peti === "")
-                {
+                if (obj.peti === "") {
                     validate_peti_and_other = true;
-                }    
+                }
             })
 
-            if(validate_peti_and_other)
-            {
+            if (validate_peti_and_other) {
                 Swal.fire({
                     icon: 'error',
                     title: "Harap Lengkapi Data Bagian, Peti, Kualitas, Harga Harian, Harga Bulanan",
                     confirmButtonColor: '#4e73df',
                 })
-            }
-            else
-            {
+            } else {
                 Swal.fire({
                     icon: 'question',
                     title: 'Yakin akan di Posting?',
@@ -1224,22 +1214,18 @@
                 let validate_peti_and_other = false;
 
                 list_items.map(obj => {
-                    if(obj.peti === "")
-                    {
+                    if (obj.peti === "") {
                         validate_peti_and_other = true;
-                    }    
+                    }
                 })
 
-                if(validate_peti_and_other)
-                {
+                if (validate_peti_and_other) {
                     Swal.fire({
                         icon: 'error',
                         title: "Harap Lengkapi Data Bagian, Peti, Kualitas, Harga Harian, Harga Bulanan",
                         confirmButtonColor: '#4e73df',
                     })
-                }
-                else
-                {
+                } else {
                     if ($(".create-form").valid()) {
                         Swal.fire({
                             icon: 'question',

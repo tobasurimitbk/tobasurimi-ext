@@ -27,7 +27,7 @@ class PembayaranPOLokal extends BaseController
     }
 
     public function createPembayaranPOLokal()
-    {   
+    {
         $supplierModel = new SupplierModel();
 
         $supplierList = $supplierModel->asObject()
@@ -36,14 +36,14 @@ class PembayaranPOLokal extends BaseController
             ->findAll();
 
         $data = [
-            "suppliers"=> $supplierList
+            "suppliers" => $supplierList
         ];
-        
+
         return view('Pembayaran/pembayaranPOLokal/form', $data);
     }
 
     public function getByIdPembayaranPOLokal($id)
-    {   
+    {
         $localPOPaymentModel = new LocalPOPaymentModel();
         $localPOPaymentDetModel = new LocalPOPaymentDetailModel();
         $supplierModel = new SupplierModel();
@@ -83,6 +83,7 @@ class PembayaranPOLokal extends BaseController
                       DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       penerimaan_barang_detail.qty AS qty,
+                      local_po_inv_sum_details.id AS local_po_inv_sum_detail_id,
                       local_po_inv_sum_details.inv_amt AS total,
                       satuans.kode_satuan AS unit";
         $itemList = $localPOInvSummaryModel->asObject()
@@ -116,8 +117,8 @@ class PembayaranPOLokal extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $dataPembayaranPOLokal = [];
@@ -128,7 +129,9 @@ class PembayaranPOLokal extends BaseController
         $addCondition = [
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType")
+            "sortType"  => $this->request->getGet("sortType"),
+            "dateStart" => $this->request->getGet('dateStart'),
+            "dateEnd" => $this->request->getGet('dateEnd')
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
@@ -145,7 +148,7 @@ class PembayaranPOLokal extends BaseController
                 "due_date"          => $data->due_date,
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => $data->payment_method,
-                "amount"            => $data->amount
+                "amount"            => "Rp " . number_format($data->amount ?? 0, 0, ',', '.')
             ]);
         }
 
@@ -154,14 +157,13 @@ class PembayaranPOLokal extends BaseController
             "recordsTotal"      => $paymentData['totalData'],
             "recordsFiltered"   => $paymentData['totalFilteredData'],
             "data"              => $dataPembayaranPOLokal,
-            // "response"          => $response,
             "payload"           => $payload
         ];
 
         echo json_encode($data);
         return;
     }
-    
+
     public function savePembayaranPOLokal()
     {
         try {
@@ -172,7 +174,7 @@ class PembayaranPOLokal extends BaseController
 
             $postData = $this->request->getPost();
             $postData["local_po_inv_sum_detail_id"] = json_decode($postData["local_po_inv_sum_detail_id"]);
-            
+
             $rules = [
                 "supplier_id" => [
                     "rules" => "required|is_natural_no_zero"
@@ -252,8 +254,8 @@ class PembayaranPOLokal extends BaseController
                 "local_po_inv_summary_id"   => $summaryId,
                 "payment_no"                => $this->generatePaymentNo(),
                 "amount"                    => $paymentTotal,
-                "payment_date"              => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
-                "due_date"                  => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
+                "payment_date"              => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("payment_date")))),
+                "due_date"                  => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("due_date")))),
                 "payment_method"            => $this->request->getPost("payment_method")
             ];
 
@@ -281,9 +283,7 @@ class PembayaranPOLokal extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -296,62 +296,60 @@ class PembayaranPOLokal extends BaseController
 
     public function updatePembayaranPOLokal()
     {
-        try{
-        $rules = [
-            "nominal_faktur" => [
-                "rules" => "required"
-            ]
-        ];
+        try {
+            $rules = [
+                "nominal_faktur" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "multiple_faktur_id" => json_decode($this->request->getPost("multiple_faktur_id")),
-                "multiple_faktur_no" => json_decode($this->request->getPost("multiple_faktur_no")),
-                "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
-                "payment_type" => "LOKAL"
-            ]);
+                $payload = json_encode([
+                    "multiple_faktur_id" => json_decode($this->request->getVar("multiple_faktur_id")),
+                    "multiple_faktur_no" => json_decode($this->request->getVar("multiple_faktur_no")),
+                    "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
+                    "payment_type" => "LOKAL"
+                ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/buktiPembayaran/$id", $this->token, $payload);
+                $response = curl_request("PATCH", "/buktiPembayaran/$id", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Diubah",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -364,38 +362,36 @@ class PembayaranPOLokal extends BaseController
 
     public function deletePembayaranPOLokal()
     {
-        try{
-        $id = $this->request->getPost("id");
+        try {
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/buktiPembayaran/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/buktiPembayaran/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -421,7 +417,7 @@ class PembayaranPOLokal extends BaseController
             ->first();
 
         $paymentNo = "{$numberTemplate}0001";
-        
+
         if (!empty($lastData)) {
             $exploded = explode('/', $lastData->payment_no);
             $lastIncrement = (int)$exploded[3] + 1;
@@ -433,6 +429,3 @@ class PembayaranPOLokal extends BaseController
         return $paymentNo;
     }
 }
-
-?>
-    

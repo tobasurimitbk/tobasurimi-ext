@@ -78,13 +78,26 @@ class LocalPOPaymentModel extends Model
 
         $totalData = $supplierDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
-            $supplierDataQry->groupStart()
-                ->like('payment_no', $addCondition['search'])
-                ->orLike('suppliers.name', $addCondition['search'])
-            ->groupEnd();
+        if ($addCondition['search'] != "" || $addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "") {
+            $supplierDataQry->groupStart();
         }
-        
+
+        if ($addCondition['search'] != "") {
+            $supplierDataQry
+                ->where('payment_no', $addCondition['search'])
+                ->orWhere('suppliers.name', $addCondition['search']);
+        }
+
+        if ($addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "") {
+            $supplierDataQry
+                ->where("DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y')", $addCondition['dateStart'])
+                ->orWhere("DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y')", $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] != "" || $addCondition['dateStart'] != "" || $addCondition['dateEnd'] != "") {
+            $supplierDataQry->groupEnd();
+        }
+
         $totalFilteredData = $supplierDataQry->countAllResults(false);
         $data = $supplierDataQry->findAll($limit, $offset);
 

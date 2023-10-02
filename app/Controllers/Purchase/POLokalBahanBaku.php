@@ -195,8 +195,7 @@ class POLokalBahanBaku extends BaseController
                 // spp number cannot be used again
                 $responsespp = $this->SppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
 
-                if(!$responsespp)
-                {
+                if (!$responsespp) {
                     $data = [
                         "status"            => false,
                         "message"    => "No. SPP gagal di close",
@@ -206,7 +205,7 @@ class POLokalBahanBaku extends BaseController
                     echo json_encode($data);
                     return;
                 }
-                
+
 
                 $insertData["po_no"] = $this->RMPurchaseOrderModel->generateNoPo();
 
@@ -240,7 +239,7 @@ class POLokalBahanBaku extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
+            }
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -339,7 +338,7 @@ class POLokalBahanBaku extends BaseController
                     ];
                     echo json_encode($data);
                 }
-            } 
+            }
         } catch (\Exception $e) {
             $data = [
                 "status"            => false,
@@ -399,8 +398,7 @@ class POLokalBahanBaku extends BaseController
             // spp close
             $responsespp = $this->SppModel->where(['id' => $spp])->set(['is_posted' => 1])->update();
 
-            if(!$responsespp)
-            {
+            if (!$responsespp) {
                 $data = [
                     "status"            => false,
                     "message"    => "Gagal close SPP",

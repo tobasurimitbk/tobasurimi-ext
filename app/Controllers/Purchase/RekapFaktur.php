@@ -42,7 +42,7 @@ class RekapFaktur extends BaseController
 
     public function saveRekapFaktur()
     {
-        try { 
+        try {
             $localPOInvSum = new LocalPOInvSummaryModel();
             $localPOInvSumDet = new LocalPOInvSumDetailModel();
             $penerimaanBarangModel = new PenerimaanBarangModel();
@@ -137,9 +137,7 @@ class RekapFaktur extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -189,7 +187,7 @@ class RekapFaktur extends BaseController
                 "supplier_name" => $data->supplierName,
                 "due_date"      => $data->due_date,
                 "total"         => $data->total,
-                "summary_status"=> $data->summary_status,
+                "summary_status" => $data->summary_status,
                 // "is_posted"     => (bool)$data->is_posted
             ]);
         }
@@ -209,7 +207,7 @@ class RekapFaktur extends BaseController
 
     public function getRekapFakturBySupplier($supplierId)
     {
-        
+
         $localPOInvSumModel = new LocalPOInvSummaryModel();
 
         $fakturList = $localPOInvSumModel->asObject()
@@ -222,7 +220,7 @@ class RekapFaktur extends BaseController
             ->findAll();
 
         $data = [
-            'data'=> $fakturList
+            'data' => $fakturList
         ];
 
         echo json_encode($data);
@@ -241,14 +239,14 @@ class RekapFaktur extends BaseController
         $summaryData = $localPOInvSum->asObject()
             ->select($selectQry)
             ->join('local_po_inv_sum_details', 'local_po_inv_sum_details.local_po_inv_summary_id = local_po_inv_summaries.id')
-            ->where('company_id', $this->this_company_id)   
+            ->where('company_id', $this->this_company_id)
             ->groupBy('local_po_inv_summaries.id') // if this line is commented, $summaryData will return object instead of null (because of GROUP_CONCAT)
             ->find($id);
 
         if (empty($summaryData)) {
             return view('errors/html/error_404', ['message' => 'Not Found!']);
         }
-        
+
         $summaryData->is_posted = (bool)$summaryData->is_posted;
         $selectedFaktur = explode(',', $summaryData->penerimaan_barang_id);
 
@@ -268,7 +266,7 @@ class RekapFaktur extends BaseController
             "rekapData"     => $summaryData,
             "supplierList"  => $supplierList,
             "fakturList"    => $fakturList,
-            "selectedFaktur"=> $selectedFaktur
+            "selectedFaktur" => $selectedFaktur
         ];
 
         return view('Purchase/rekapFaktur/form', $data);
@@ -276,7 +274,7 @@ class RekapFaktur extends BaseController
 
     public function getInvItemsBySummaryId($summaryId)
     {
-        
+
         $localPOInvSumModel = new LocalPOInvSummaryModel();
 
         /* $selectQry = "local_po_inv_sum_details.id AS local_po_inv_sum_detail_id,
@@ -306,7 +304,7 @@ class RekapFaktur extends BaseController
             ->findAll();
 
         $data = [
-            'data'=> $fakturList
+            'data' => $fakturList
         ];
 
         echo json_encode($data);
@@ -315,7 +313,7 @@ class RekapFaktur extends BaseController
 
     public function updateRekap()
     {
-        try{
+        try {
             $localPOInvSum = new LocalPOInvSummaryModel();
             $localPOInvSumDet = new LocalPOInvSumDetailModel();
             $penerimaanBarangModel = new PenerimaanBarangModel();
@@ -347,7 +345,7 @@ class RekapFaktur extends BaseController
                 echo json_encode($data);
                 return;
             }
-            
+
             $detData = [];
             $totalSummary = 0;
 
@@ -363,7 +361,7 @@ class RekapFaktur extends BaseController
                 "due_date"      => $due_date ? date("Y-m-d", strtotime(str_replace("/", "-", $due_date))) : null,
                 "is_posted"     => $isPosted ?? null
             ];
-            $filteredData = array_filter($arrData, fn($value) => !empty($value));
+            $filteredData = array_filter($arrData, fn ($value) => !empty($value));
             $detailData = $this->request->getPost('invoices') ?? [];
 
             foreach ($detailData as $invoice) {
@@ -402,7 +400,7 @@ class RekapFaktur extends BaseController
 
             $localPOInvSum->db->transStart();
             $localPOInvSum->update($id, $filteredData);
-            
+
             $localPOInvSumDet->where('local_po_inv_summary_id', $id)->delete();
             $localPOInvSumDet->insertBatch($detData);
             $localPOInvSum->db->transComplete();
@@ -416,9 +414,7 @@ class RekapFaktur extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -431,7 +427,7 @@ class RekapFaktur extends BaseController
 
     public function deleteRekap()
     {
-        try{
+        try {
             $localPOInvSum = new LocalPOInvSummaryModel();
 
             $id = $this->request->getPost("id");
@@ -447,7 +443,7 @@ class RekapFaktur extends BaseController
             }
 
             $localPOInvSum->delete($id);
-        
+
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil dihapus",
@@ -455,9 +451,7 @@ class RekapFaktur extends BaseController
             ];
             echo json_encode($data);
             return;
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -483,7 +477,7 @@ class RekapFaktur extends BaseController
             ->first();
 
         $summaryNo = "{$numberTemplate}0001";
-        
+
         if (!empty($lastData)) {
             $exploded = explode('/', $lastData->summary_no);
             $lastIncrement = (int)$exploded[3] + 1;
