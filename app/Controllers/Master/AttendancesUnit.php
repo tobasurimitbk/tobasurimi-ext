@@ -107,7 +107,7 @@ class AttendancesUnit extends BaseController
                     "name" => $this->request->getPost("nama"),
                     "ip" => $this->request->getPost("ip"),
                     "unit_key" => $this->request->getPost("unit_key"),
-                    "master" => $this->request->getPost("master")
+                    "master" => (empty($this->request->getPost("master"))) ? '0' : '1'
                 ];
                 if ($this->AttendancesUnitModel->insert($values)) {
                     $data = [
@@ -173,7 +173,7 @@ class AttendancesUnit extends BaseController
                     "name" => $this->request->getPost("nama"),
                     "ip" => $this->request->getPost("ip"),
                     "unit_key" => $this->request->getPost("unit_key"),
-                    "master" => $this->request->getPost("master")
+                    "master" => (empty($this->request->getPost("master"))) ? '0' : '1'
                 ];
 
                 if ($this->AttendancesUnitModel->update($id, $values)) {
