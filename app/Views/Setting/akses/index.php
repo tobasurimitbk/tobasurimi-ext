@@ -276,27 +276,40 @@
                     contentType: false,
                     success: function(response) {
                         csrf.val(response.token);
-                        if (response.status) {
-                            document.getElementById('submit-btn').setAttribute("disabled", "disabled");
-                            $(".body-akses").empty();
-                            $(".view_access").css("display", "none")
-                            $(".role_id").val('').trigger('change');
-                            $(".company_id").val('').trigger('change');
-
-                            stopLoading()
-                            
+                        if(response.refresh)
+                        {
                             Swal.fire({
                                 icon: 'success',
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                window.location.href = `<?= base_url("akses"); ?>`;
                             })
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
+                        }
+                        else
+                        {
+                            if (response.status) {
+                                document.getElementById('submit-btn').setAttribute("disabled", "disabled");
+                                $(".body-akses").empty();
+                                $(".view_access").css("display", "none")
+                                $(".role_id").val('').trigger('change');
+                                $(".company_id").val('').trigger('change');
+
+                                stopLoading()
+                                
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
                         }
                     },
                     onError: function(response) {

@@ -7,6 +7,7 @@ use App\Models\CompaniesModel;
 use App\Models\AccessListsModel;
 use App\Models\RolesModel;
 use App\Models\UserModel;
+use App\Models\MenuUrlsModel;
 
 use DateTime;
 
@@ -20,6 +21,7 @@ class User extends BaseController
     protected $AccessListsModel;
     protected $RolesModel;
     protected $UserModel;
+    protected $MenuUrlsModel;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class User extends BaseController
         $this->AccessListsModel = new AccessListsModel();
         $this->RolesModel = new RolesModel();
         $this->UserModel = new UserModel();
+        $this->MenuUrlsModel = new MenuUrlsModel();
     }
 
     public function changeCompany()
@@ -54,13 +57,16 @@ class User extends BaseController
         if ($id) {
             $this_access = "";
 
-            $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($role_id, $id);
+            // $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($role_id, $id);
             $res_child_access = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_not_parent($role_id, $id);
+
+            $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
+
             $arr = [];
             for ($i = 0; $i < count($res_access_list); $i++) {
                 $arr_child = [];
                 for ($j = 0; $j < count($res_child_access); $j++) {
-                    if ($res_child_access[$j]["parent_id"] == $res_access_list[$i]["menu_url_id"]) {
+                    if ($res_child_access[$j]["parent_id"] == $res_access_list[$i]["id"]) {
                         $access = json_decode($res_child_access[$j]["action"]);
                         $values = [
                             "name"  => $res_child_access[$j]["menuName"],
@@ -68,19 +74,31 @@ class User extends BaseController
                             "url"   => $res_child_access[$j]["url"],
                             "access"    => $access
                         ];
-                        array_push($arr_child, (object) $values);
+                        if(sizeof($access) !== 0)
+                        {
+                            array_push($arr_child, (object) $values);
+                        }
                     }
                 }
                 $values = [
-                    "menu_url_id"   => $res_access_list[$i]["menu_url_id"],
+                    "menu_url_id"   => $res_access_list[$i]["id"],
                     "icon"          => $res_access_list[$i]["icon"],
-                    "menuName"      => $res_access_list[$i]["menuName"],
+                    "menuName"      => $res_access_list[$i]["name"],
                     "url"           => $res_access_list[$i]["url"],
                     "isParent"      => $res_access_list[$i]["parent_id"],
                     "child"         => $arr_child
                 ];
-                array_push($arr, (object) $values);
+                if(sizeof($arr_child) !== 0)
+                {
+                    array_push($arr, (object) $values);
+                }
             }
+
+            // $data = [
+            //     "status"            => true,
+            //     "message" => $arr
+            // ];
+            // return json_encode($data);
 
             $this->session->this_company_id = $id;
             $this->session->this_company = $name;

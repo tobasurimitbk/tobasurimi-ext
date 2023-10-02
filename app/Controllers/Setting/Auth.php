@@ -7,6 +7,7 @@ use App\Models\UserModel;
 use App\Models\CompaniesModel;
 use App\Models\RolesModel;
 use App\Models\AccessListsModel;
+use App\Models\MenuUrlsModel;
 
 use DateTime;
 
@@ -16,6 +17,7 @@ class Auth extends BaseController
     protected $CompaniesModel;
     protected $RolesModel;
     protected $AccessListsModel;
+    protected $MenuUrlsModel;
 
     public function __construct()
     {
@@ -23,6 +25,7 @@ class Auth extends BaseController
         $this->CompaniesModel = new CompaniesModel();
         $this->RolesModel = new RolesModel();
         $this->AccessListsModel = new AccessListsModel();
+        $this->MenuUrlsModel = new MenuUrlsModel();
     }
 
     public function login()
@@ -87,13 +90,14 @@ class Auth extends BaseController
                         //$data = json_decode($response["body"]);
                         //(object)
 
-                        $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($res_roles[0]["id"], $res_company[0]["id"]);
+                        $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
+                        // $res_access_list = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_parent($res_roles[0]["id"], $res_company[0]["id"]);
                         $res_child_access = $this->AccessListsModel->get_by_role_id_and_company_id_join_menu_url_not_parent($res_roles[0]["id"], $res_company[0]["id"]);
                         $arr = [];
                         for ($i = 0; $i < count($res_access_list); $i++) {
                             $arr_child = [];
                             for ($j = 0; $j < count($res_child_access); $j++) {
-                                if ($res_child_access[$j]["parent_id"] == $res_access_list[$i]["menu_url_id"]) {
+                                if ($res_child_access[$j]["parent_id"] == $res_access_list[$i]["id"]) {
                                     $access = json_decode($res_child_access[$j]["action"]);
                                     $values = [
                                         "name"  => $res_child_access[$j]["menuName"],
@@ -109,9 +113,9 @@ class Auth extends BaseController
                                 }
                             }
                             $values = [
-                                "menu_url_id"   => $res_access_list[$i]["menu_url_id"],
+                                "menu_url_id"   => $res_access_list[$i]["id"],
                                 "icon"          => $res_access_list[$i]["icon"],
-                                "menuName"      => $res_access_list[$i]["menuName"],
+                                "menuName"      => $res_access_list[$i]["name"],
                                 "url"           => $res_access_list[$i]["url"],
                                 "isParent"      => $res_access_list[$i]["parent_id"],
                                 "child"         => $arr_child
@@ -150,7 +154,7 @@ class Auth extends BaseController
 
                         // $data = [
                         //     "status"            => false,
-                        //     "message"    => json_encode($this_access),
+                        //     "message"    => json_encode($res_company),
                         //     'token' => csrf_hash()
                         // ];
                         // return json_encode($data);
