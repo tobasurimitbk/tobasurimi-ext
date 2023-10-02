@@ -50,7 +50,7 @@
             <label class="form-label font-weight-bold lable-title mt-2">
                 Detail & Komponen Payroll
             </label>
-            <div class="row mt-2">
+            <!-- <div class="row mt-2">
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" id="hariKerja" class="form-control target input-picker" value="<?= $payrollDetail['hadir'] ?> Hari">
@@ -69,8 +69,8 @@
                         <label for="floatingInput">Total Hari Libur (Termasuk Hari Besar)</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
+            </div> -->
+            <div class="row mt-2">
                 <div class="col-sm-2 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalAlpha" id="totalAlpha" class="form-control target input-picker" value="<?= $payrollDetail['alpha'] ?? 0 ?> Kali">
@@ -153,10 +153,10 @@
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
-                    <!-- <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" required name="totalGajiDiterima" id="totalGajiDiterima" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_gaji_diterima'],  2, ',', '.') ?>">
-                        <label for="floatingInput">Total Gaji Diterima (+ Lembur + Tunjangan + Pengurangan)</label>
-                    </div> -->
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" id="hariKerja" class="form-control target input-picker" value="<?= $payrollDetail['hadir'] ?> Hari">
+                        <label for="floatingInput">Hari Kerja (Total Masuk)</label>
+                    </div>
                 </div>
             </div>
             <div class="tabelKomponen">
