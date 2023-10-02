@@ -631,7 +631,7 @@ class TerimaFakturImport extends BaseController
                     'tanda_terima_faktur_id'        => $id,
                     'penerimaan_barang_detail_id'   => $data['id'],
                     'po_no'                         => $data['no_po'],
-                    'lpb_date'                      => date("Y/m/d", strtotime(str_replace("/", "-", $data['lpb_date']))),
+                    'lpb_date'                      => $data['lpb_date'] ? date("Y/m/d", strtotime(str_replace("/", "-", $data['lpb_date']))) : "",
                     'lpb_no'                        => $data['no_lpb'],
                     'item_name'                     => $data['item_name'],
                     'qty'                           => $data['qty'],
@@ -647,7 +647,7 @@ class TerimaFakturImport extends BaseController
 
             foreach ($postData['pengenaan_pajak'] as $data) {
                 $taxData[] = [
-                    'tax_inv_date'  => date("Y/m/d", strtotime(str_replace("/", "-", $data['taxInvDate']))),
+                    'tax_inv_date'  => $data['taxInvDate'] ? date("Y/m/d", strtotime(str_replace("/", "-", $data['taxInvDate']))) : "",
                     'tax_inv_no'    => $data['taxInvNo'],
                     'tax_type'      => $data['taxType'],
                     'tax_amt'       => $data['taxAmt'],
@@ -660,7 +660,7 @@ class TerimaFakturImport extends BaseController
             $tandaTerimaData = [
                 // 'supplier_id'       => $postData['supplier_id'],
                 // 'invoice_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['invoice_date']))),
-                'receive_date'      => date("Y-m-d", strtotime(str_replace("/", "-", $postData['receive_date']))),
+                'receive_date'      => $postData['receive_date'] ? date("Y-m-d", strtotime(str_replace("/", "-", $postData['receive_date']))) : "",
                 'potongan'          => $postData['potongan'] ?? 0,
                 'tambahan'          => $postData['tambahan'] ?? 0,
                 // 'faktur_type'       => 'LOKAL',

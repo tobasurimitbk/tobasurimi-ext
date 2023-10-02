@@ -46,7 +46,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->invoice_date ?? ""; ?>" class="form-control input-picker datepicker" id="invoice_date" name="invoice_date" placeholder="Tanggal Faktur">
+                        <input autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->invoice_date ?? ""; ?>" class="form-control input-picker datepicker" id="invoice_date" name="invoice_date" placeholder="Tanggal Faktur">
                         <label for="floatingInput">Tanggal Faktur</label>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
+                        <select <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> onchange="changeTipeBahan()" class="form-select tipe_bahan" id="tipe_bahan" name="tipe_bahan" aria-label="Floating label select example">
                             <option value="" disabled <?= empty($dataTerimaFaktur) ? 'selected' : '' ?>></option>
                             <option value="BAKU" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "BAKU" ? "selected" : "") : ""; ?>>Bahan Baku</option>
                             <option value="PENOLONG" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->tipe_bahan === "PENOLONG" ? "selected" : "") : ""; ?>>Bahan Penolong</option>
@@ -77,7 +77,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                        <select <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
                             <option value=""></option>
                             <?php
                             if (!empty($dataSupplier)) {
@@ -103,6 +103,7 @@
             </div>
 
             <?php if ($isUpdate ?? false): ?>
+            <?php if ($statusUpdate == false): ?>
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Daftar Penerimaan Barang</label>
@@ -132,6 +133,7 @@
                     <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
                 </div>
             </div>
+            <?php endif; ?>
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Daftar penerimaan barang yang akan dibuat tanda terima</label>
