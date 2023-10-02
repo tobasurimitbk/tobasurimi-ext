@@ -180,7 +180,8 @@ class TerimaFakturImport extends BaseController
                 "nominal_faktur"=> number_format($data->nominal_faktur),
                 "invoice_date"  => $data->invoice_date,
                 "receive_date"  => $data->receive_date,
-                "recipient"     => $data->userName
+                "recipient"     => $data->recipient
+                // "recipient"     => $data->userName
             ]);
         }
 
@@ -508,11 +509,17 @@ class TerimaFakturImport extends BaseController
                 "potongan" => [
                     "rules" => "permit_empty|is_natural"
                 ],
+                "recipient" => [
+                    "rules" => "required"
+                ],
                 "tambahan" => [
                     "rules" => "permit_empty|is_natural"
                 ],
                 "penerimaan_barang.*.id" => [
-                    "rules" => "required|is_natural_no_zero"
+                    "rules" => "required|is_natural_no_zero",
+                    'errors' => [
+                        'required' => 'Daftar penerimaan barang yang akan dibuat tanda terima tidak boleh kosong'
+                    ]
                 ],
                 "penerimaan_barang.*.no_po" => [
                     "rules" => "required"
@@ -658,6 +665,7 @@ class TerimaFakturImport extends BaseController
             
             $tandaTerimaFakturModel->db->transException(true)->transStart();
             $tandaTerimaData = [
+                'recipient'       => $postData['recipient'],
                 // 'supplier_id'       => $postData['supplier_id'],
                 // 'invoice_date'      => date("Y/m/d", strtotime(str_replace("/", "-", $postData['invoice_date']))),
                 'receive_date'      => $postData['receive_date'] ? date("Y-m-d", strtotime(str_replace("/", "-", $postData['receive_date']))) : "",

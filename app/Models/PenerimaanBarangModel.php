@@ -98,11 +98,11 @@ class PenerimaanBarangModel extends Model
         }
 
         if ($addCondition['startdate']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.validation_date >=', $addCondition['startdate']);
+            $penerimaanBarangDataQry->where('penerimaan_barang.createdAt >=', $addCondition['startdate'] . " 00:00:00");
         }
 
         if ($addCondition['lastdate']) {
-            $penerimaanBarangDataQry->where('penerimaan_barang.validation_date <=', $addCondition['lastdate']);
+            $penerimaanBarangDataQry->where('penerimaan_barang.createdAt <=', $addCondition['lastdate'] . " 23:59:59");
         }
 
         if ($addCondition['search'] || $addCondition['status'] || $addCondition['startdate'] || $addCondition['lastdate']) {
@@ -190,7 +190,7 @@ class PenerimaanBarangModel extends Model
         $sortType = $availableSortType[$condition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "penerimaan_barang_detail.id AS id,
-                      DATE_FORMAT(penerimaan_barang.validation_date, '%d/%m/%Y') AS lpb_date,
+                      DATE_FORMAT(penerimaan_barang.createdAt, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang.no_penerimaan_barang AS no_lpb,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       (`penerimaan_barang_detail`.`qty` - `penerimaan_barang_detail`.`summarized_qty`) AS lpb_qty,

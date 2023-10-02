@@ -197,7 +197,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" readonly="true" value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
+                        <input autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> value="<?= !empty($dataTerimaFaktur) ? $dataTerimaFaktur->recipient : session()->get("login")->name; ?>" type="text" class="form-control recipient" name="recipient" id="recipient" placeholder="Penerima">
                         <label for="floatingInput">Penerima</label>
                     </div>
                 </div>
@@ -548,6 +548,12 @@ $(document).ready(function() {
             nominal_faktur: {
                 required: true
             },
+            recipient: {
+                required: true
+            },
+            receive_date: {
+                required: true
+            },
             due_date: {
                 required: true
             },
@@ -567,6 +573,12 @@ $(document).ready(function() {
             },
             nominal_faktur: {
                 required: "Nominal Faktur wajib diisi"
+            },
+            recipient: {
+                required: "Penerima wajib diisi"
+            },
+            receive_date: {
+                required: "Tanggal Penerimaan wajib diisi"
             },
             due_date: {
                 required: "Tanggal Jatuh Tempo wajib diisi"

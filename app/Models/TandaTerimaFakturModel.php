@@ -21,6 +21,7 @@ class TandaTerimaFakturModel extends Model
         'invoice_date',
         'receive_date',
         'potongan',
+        'recipient',
         'tambahan',
         'faktur_type',
         'information',
