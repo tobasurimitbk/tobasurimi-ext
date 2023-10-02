@@ -134,7 +134,7 @@
 
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_uang_lembur'], 0, ',', '.') ?>">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?>">
                         <label for="floatingInput">Total Uang Lembur Dalam Sebulan</label>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
                 </div>
                 <div class="col-sm-4 mt-1">
                     <!-- <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" required name="totalGajiDiterima" id="totalGajiDiterima" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_gaji_diterima'], 0, ',', '.') ?>">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalGajiDiterima" id="totalGajiDiterima" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_gaji_diterima'],  2, ',', '.') ?>">
                         <label for="floatingInput">Total Gaji Diterima (+ Lembur + Tunjangan + Pengurangan)</label>
                     </div> -->
                 </div>
@@ -191,12 +191,12 @@
                                         <tr class="perhitunganGajis" data-id="<?= $p['id'] ?>" data-komponen_gaji="<?= $p['name'] ?>" data-nominal="<?= $p['nominal'] ?>" data-tipe="<?= $p['tipe'] == "PLUS" ? "+" : "-"  ?>">
                                             <td><?= $no++; ?></td>
                                             <td><b> <?= $p['name'] ?></b></td>
-                                            <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 0, ',', '.') ?></b></td>
+                                            <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="2" align="right"><b>Tunjangan Diterima</b></td>
-                                        <td><b><?= "Rp " . number_format($totalPerhitunganGaji, 0, ',', '.') ?></b></td>
+                                        <td><b><?= "Rp " . number_format($totalPerhitunganGaji,  2, ',', '.') ?></b></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -224,12 +224,12 @@
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
                                             <td><?= $r['checkin'] ?></td>
                                             <td><?= $r['total_jam_keterlambatan'] ?></td>
-                                            <td class="text-danger" style="font-weight:bold;"><b>(-) <?= "Rp " . number_format($r['nominal_pengurangan'], 0, ',', '.') ?></b></td>
+                                            <td class="text-danger" style="font-weight:bold;"><b>(-) <?= "Rp " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="4" align="right"><b>Denda Keterlambatan Presensi</b></td>
-                                        <td><b class="text-danger"> (-) <?= "Rp " . number_format($totalNominalKeterlambatanPresensi, 0, ',', '.') ?></b></td>
+                                        <td><b class="text-danger"> (-) <?= "Rp " . number_format($totalNominalKeterlambatanPresensi,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -259,12 +259,12 @@
                                             <td><?= $r['total_jam_lembur'] ?> Jam</td>
                                             <td><?= $r['jam_mulai_lembur'] ?></td>
                                             <td><?= $r['jam_selesai_lembur'] ?></td>
-                                            <td style="font-weight:bold;" class="text-success"><b>(+) <?= "Rp " . number_format($r['total_uang_lembur'], 0, ',', '.') ?></b></td>
+                                            <td style="font-weight:bold;" class="text-success"><b>(+) <?= "Rp " . number_format($r['total_uang_lembur'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="5" align="right"><b>Total Uang Lembur Selama Sebulan</b></td>
-                                        <td><b class="text-success">(+) <?= "Rp " . number_format($payrollDetail['nominal_uang_lembur'], 0, ',', '.') ?></b></td>
+                                        <td><b class="text-success">(+) <?= "Rp " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -290,12 +290,12 @@
                                             <td><?= $no++; ?></td>
                                             <td><?= explode("_", $r['status'])[0] ?></td>
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
-                                            <td style="font-weight:bold;" class="text-danger"><b>(-) <?= "Rp " . number_format($r['nominal_pengurangan'], 0, ',', '.') ?></b></td>
+                                            <td style="font-weight:bold;" class="text-danger"><b>(-) <?= "Rp " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="3" align="right"><b>Total Denda Perizinan Tidak Disetujui Atasan</b></td>
-                                        <td><b class="text-danger">(-) <?= "Rp " . number_format($totalNominalRekapPerizinanNotApproved, 0, ',', '.') ?></b></td>
+                                        <td><b class="text-danger">(-) <?= "Rp " . number_format($totalNominalRekapPerizinanNotApproved,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
