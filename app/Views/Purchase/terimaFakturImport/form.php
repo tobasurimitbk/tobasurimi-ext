@@ -103,37 +103,37 @@
             </div>
 
             <?php if ($isUpdate ?? false): ?>
-            <?php if ($statusUpdate == false): ?>
-            <div class="row">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Daftar Penerimaan Barang</label>
-                </div>
-                <div class="col-md-12 col-table-button-tts">
-                    <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>No.</th>
-                                    <th onclick="changeSort('faktur_no')" class="sort">No. PO</th>
-                                    <th onclick="changeSort('sender')" class="sort">Tgl. LPB</th>
-                                    <th onclick="changeSort('nominal_faktur')" class="sort">No. LPB</th>
-                                    <th onclick="changeSort('due_date')" class="sort">Nama Barang</th>
-                                    <th onclick="changeSort('date_of')" class="sort">Qty LPB</th>
-                                    <th onclick="changeSort('date_of')" class="sort">Qty Retur</th>
-                                    <th onclick="changeSort('date_of')" class="sort">Qty Telah Terima</th>
-                                    <th onclick="changeSort('date_of')" class="sort">Qty Akan Diterima</th>
-                                    <th onclick="changeSort('recipient')" class="sort">Satuan</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
-
-                            </tbody>
-                        </table>
+                <?php if ($statusUpdate == false): ?>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Daftar Penerimaan Barang</label>
                     </div>
-                    <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
+                    <div class="col-md-12 col-table-button-tts">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th onclick="changeSort('faktur_no')" class="sort">No. PO</th>
+                                        <th onclick="changeSort('sender')" class="sort">Tgl. LPB</th>
+                                        <th onclick="changeSort('nominal_faktur')" class="sort">No. LPB</th>
+                                        <th onclick="changeSort('due_date')" class="sort">Nama Barang</th>
+                                        <th onclick="changeSort('date_of')" class="sort">Qty LPB</th>
+                                        <th onclick="changeSort('date_of')" class="sort">Qty Retur</th>
+                                        <th onclick="changeSort('date_of')" class="sort">Qty Telah Terima</th>
+                                        <th onclick="changeSort('date_of')" class="sort">Qty Akan Diterima</th>
+                                        <th onclick="changeSort('recipient')" class="sort">Satuan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
+                    </div>
                 </div>
-            </div>
-            <?php endif; ?>
+                <?php endif; ?>
             <div class="row">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Daftar penerimaan barang yang akan dibuat tanda terima</label>
@@ -163,7 +163,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker datepicker" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
+                        <input autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> value="<?= $dataTerimaFaktur->receive_date ?? ""; ?>" class="form-control input-picker datepicker" id="receive_date" name="receive_date" placeholder="Tanggal Penerimaan">
                         <label for="floatingInput">Tanggal Penerimaan</label>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                 </div> -->
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= number_format($dataTerimaFaktur->potongan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= number_format($dataTerimaFaktur->potongan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Potongan</label>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= number_format($dataTerimaFaktur->tambahan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= number_format($dataTerimaFaktur->tambahan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Tambahan</label>
                     </div>
                 </div>
@@ -203,7 +203,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <textarea autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
+                        <textarea autocomplete="one-time-code" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information text-area-all" name="information" id="information" placeholder="Keterangan"><?= $dataTerimaFaktur->information ?? ""; ?></textarea>
                         <label for="floatingInput">Keterangan</label>
                     </div>
                 </div>
@@ -214,6 +214,7 @@
                     <label class="form-label font-weight-bold lable-title">Pengenaan Pajak</label>
                 </div>
             </div>
+            <?php if ($statusUpdate == false): ?>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
@@ -272,6 +273,7 @@
                     <button type="button" class="btn btn-primary" id="add-tax-btn">Tambah Pengenaan Pajak</button>
                 </div>
             </div>
+            <?php endif; ?>
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
@@ -456,7 +458,15 @@
         }],
         columnDefs: [{
             render: function(data, type, row) {
-                return `<button type="button" class="btn btn-danger" data-action="delete-item">Delete</button>`;
+                <?php if(!empty($dataTerimaFaktur)){ 
+                    if($statusUpdate){ ?>    
+                        return ``;
+                    <?php } else { ?>
+                        return `<button type="button" class="btn btn-danger" data-action="delete-item">Delete</button>`;
+                <?php }
+                } else { ?>
+                    return `<button type="button" class="btn btn-danger" data-action="delete-item">Delete</button>`;
+                <?php } ?>
             },
             targets: -1
         }]
@@ -510,7 +520,15 @@
         }],
         columnDefs: [{
             render: function(data, type, row) {
-                return `<button type="button" class="btn btn-danger" data-action="delete-tax-item">Delete</button>`;
+                <?php if(!empty($dataTerimaFaktur)){ 
+                    if($statusUpdate){ ?>    
+                        return ``;
+                    <?php } else { ?>
+                        return `<button type="button" class="btn btn-danger" data-action="delete-tax-item">Delete</button>`;
+                <?php }
+                } else { ?>
+                    return `<button type="button" class="btn btn-danger" data-action="delete-tax-item">Delete</button>`;
+                <?php } ?>
             },
             targets: -1
         }]
