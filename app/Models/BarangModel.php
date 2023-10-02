@@ -206,6 +206,7 @@ class BarangModel extends Model
     {
         $arrCondition = [
             'barangs.deletedAt' => null,
+            'barangs.kategori_barang' => $kategori
             // 'barangs.parent_id !=' => 0,
         ];
 

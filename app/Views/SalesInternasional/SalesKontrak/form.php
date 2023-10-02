@@ -50,11 +50,11 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <input autocomplete="one-time-code" <?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? 'readonly=true' : '') : 'readonly=true'; ?> value="<?= !empty($dataSO) ? $dataSO->sales_contract_no : "AUTO GENERATE"; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
                                     <label for="floatingInput">No. SC</label>
                                 </div>
                                 <div style="<?= !empty($dataSO) ? ($dataSO->status === "POSTED" ? "display: none" : "") : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input <?= empty($dataSO) ? 'checked' : ''; ?> autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
