@@ -96,7 +96,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= $dataTerimaFaktur->nominal_faktur ?? ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" onkeyup="formatNumber(this)" placeholder="Nominal Faktur">
+                        <input autocomplete="one-time-code" <?= ($isUpdate ?? false) ? "disabled=true" : ""; ?> value="<?= !empty($dataTerimaFaktur) ? number_format($dataTerimaFaktur->nominal_faktur) : ''; ?>" class="form-control" id="nominal_faktur" name="nominal_faktur" onkeyup="formatNumber(this)" placeholder="Nominal Faktur">
                         <label for="floatingInput">Nominal Faktur</label>
                     </div>
                 </div>
@@ -173,7 +173,7 @@
                 </div> -->
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= $dataTerimaFaktur->potongan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= number_format($dataTerimaFaktur->potongan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Potongan</label>
                     </div>
                 </div>
@@ -181,13 +181,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-floating mb-3">
-                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= $dataTerimaFaktur->tambahan ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
+                        <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($dataTerimaFaktur->status_update === 2 ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= number_format($dataTerimaFaktur->tambahan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
                         <label for="floatingInput">Tambahan</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= $dataTerimaFaktur->nominal_faktur ?? 0; ?>" />
+                        <input autocomplete="one-time-code" readonly disabled type="text" class="form-control recipient" id="InvFinalAmt" value="<?= number_format($dataTerimaFaktur->nominal_faktur) ?? 0; ?>" />
                         <label for="floatingInput">Total Setelah Potongan dan Tambahan</label>
                     </div>
                 </div>
@@ -242,7 +242,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
+                        <input autocomplete="one-time-code" onkeyup="formatNumber(this)" class="form-control" id="tax_amt" name="tax_amt" placeholder="Jumlah">
                         <label for="floatingInput">Jumlah</label>
                     </div>
                 </div>
@@ -433,7 +433,10 @@
         },
         {
             data: "qty",
-            className: "text-center"
+            className: "text-center",
+            render: function(data, type, row) {
+                return Number(data);
+            }
         },
         {
             data: "unit",
@@ -441,7 +444,10 @@
         },
         {
             data: "total",
-            className: "text-center"
+            className: "text-center",
+            render: function(data, type, row) {
+                return Number(data).toLocaleString();
+            }
         },
         {
             className: "text-center"
@@ -484,7 +490,10 @@
         },
         {
             data: "taxAmt",
-            className: "text-center"
+            className: "text-center",
+            render: function(data, type, row) {
+                return Number(data).toLocaleString();
+            }
         },
         {
             data: "taxStatus",
@@ -1035,7 +1044,7 @@ $(document).ready(function() {
                         item_name: data.item_name,
                         qty: qty,
                         unit: data.unit,
-                        total: data.price * qty,
+                        total: Number(data.price.replaceAll(",", "")) * qty,
                     };
                     selectedItemTable.row.add(obj).draw(false);
                 }
@@ -1045,7 +1054,7 @@ $(document).ready(function() {
             const selectedItemTotal = selectedItemTable.rows().data().toArray().reduce((total, obj) => {
                 return total += +obj.total;
             }, 0);
-            $('#nominal_faktur').val(selectedItemTotal);
+            $('#nominal_faktur').val(selectedItemTotal.toLocaleString());
             $('#nominal_faktur').trigger('change');
         }
         
@@ -1090,7 +1099,7 @@ $(document).ready(function() {
             taxInvDate: taxInvDate.val(),
             taxInvNo: taxInvNo.val(),
             taxType: taxType.val(),
-            taxAmt: taxAmt.val(),
+            taxAmt: taxAmt.val().replaceAll(",", ""),
             taxStatus: taxStatus.val(),
             taxNote: taxNote.val()
         };
@@ -1117,7 +1126,7 @@ $(document).ready(function() {
         const tambahanNumber = tambahan.replace(/\D/g, '');
 
         const total = +invAmtNumber + +potonganNumber - +tambahanNumber;
-        $('#InvFinalAmt').val(total);
+        $('#InvFinalAmt').val(total.toLocaleString());
     }
 
     if (id) {

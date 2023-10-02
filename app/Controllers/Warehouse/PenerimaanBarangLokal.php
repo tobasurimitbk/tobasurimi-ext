@@ -1232,11 +1232,11 @@ class PenerimaanBarangLokal extends BaseController
                 "lpb_date"              => $data->lpb_date,
                 "no_lpb"                => $data->no_lpb,
                 "item_name"             => $data->item_name,
-                "lpb_qty"               => $data->lpb_qty,
-                "price"                 => floatval($data->price),
+                "lpb_qty"               => formatter($data->lpb_qty, "STR_TO_FLOAT"),
+                "price"                 => number_format($data->price),
                 "return_qty"            => 0, 
                 "received_qty"          => 0,
-                "qty_will_be_received"  => $data->lpb_qty,
+                "qty_will_be_received"  => formatter($data->lpb_qty, "STR_TO_FLOAT"),
                 "unit"                  => $data->unit
             ]);
         }

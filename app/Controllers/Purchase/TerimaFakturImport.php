@@ -41,7 +41,7 @@ class TerimaFakturImport extends BaseController
         //Get Supplier
         $supplierCond = [
             'company_id'        => $this->this_company_id,
-            'supplier_buyer'    => 'SUPPLIER',
+            // 'supplier_buyer'    => 'SUPPLIER',
             'kategori'          => 'IMPORT'
         ];
         $supplierList = $supplierModel->asObject()
@@ -81,7 +81,7 @@ class TerimaFakturImport extends BaseController
         ];
         $supplierList = $supplierModel->asObject()
             ->where($supplierCond)
-            ->whereIn('supplier_buyer', ['SUPPLIER', 'SUPPLIER + BUYER'])
+            // ->whereIn('supplier_buyer', ['SUPPLIER', 'SUPPLIER + BUYER'])
             ->findAll();
 
         $detSelectQry = "penerimaan_barang_detail_id AS id,
@@ -177,7 +177,7 @@ class TerimaFakturImport extends BaseController
                 "id"            => $data->id,
                 "faktur_no"     => $data->faktur_no,
                 "supplier_name" => $data->supplierName,
-                "nominal_faktur"=> $data->nominal_faktur,
+                "nominal_faktur"=> number_format($data->nominal_faktur),
                 "invoice_date"  => $data->invoice_date,
                 "receive_date"  => $data->receive_date,
                 "recipient"     => $data->userName
