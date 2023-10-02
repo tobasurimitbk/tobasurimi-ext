@@ -25,7 +25,6 @@ class BarangModel extends Model
         'spek',
         'harga_barang',
         'satuan_id',
-        'kategori_id',
         'kategori_barang',
         'hs_id',
         'ap_id',
@@ -71,7 +70,6 @@ class BarangModel extends Model
             'type'              => 'barangs.type',
             'harga_barang'      => 'barangs.harga_barang',
             'kode_satuan'       => 'satuans.kode_satuan',
-            'kategori'          => 'metadata.value',
             'code_hs'           => 'hs_codes.code',
             'sub_akun_ap'       => 'ap.nama_sub',
             'sub_akun_ar'       => 'ar.nama_sub',
@@ -91,13 +89,11 @@ class BarangModel extends Model
                       hs_codes.code AS code_hs,
                       ap.nama_sub AS sub_akun_ap,
                       ar.nama_sub AS sub_akun_ar";
-                    //     metadata.value AS kategori,
         $barangDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('barangs AS parent_barangs', 'parent_barangs.id = barangs.parent_id', 'left')
             ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
-            ->join('metadata', 'metadata.id = barangs.kategori_id', 'left')
             ->join('hs_codes', 'hs_codes.id = barangs.hs_id', 'left')
             ->join('sub_akuns AS ap', 'ap.id = barangs.ap_id', 'left')
             ->join('sub_akuns AS ar', 'ar.id = barangs.ar_id', 'left')
@@ -105,7 +101,7 @@ class BarangModel extends Model
 
         $totalData = $barangDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['kategori_barang']) {
+        if ($addCondition['search'] || $addCondition['kategori_barang']) {
             $barangDataQry->groupStart();
         }
 
@@ -113,15 +109,11 @@ class BarangModel extends Model
             $barangDataQry->like('barangs.nama_barang', $addCondition['search'])->orLike('barangs.kode_barang', $addCondition['search']);
         }
 
-        if ($addCondition['kategori']) {
-            $barangDataQry->where('metadata.id', $addCondition['kategori']);
-        }
-
         if ($addCondition['kategori_barang']) {
             $barangDataQry->where('barangs.kategori_barang', $addCondition['kategori_barang']);
         }
 
-        if ($addCondition['search'] || $addCondition['kategori'] || $addCondition['kategori_barang']) {
+        if ($addCondition['search'] || $addCondition['kategori_barang']) {
             $barangDataQry->groupEnd();
         }
 
@@ -194,12 +186,13 @@ class BarangModel extends Model
         return $query->getResult();
     }
 
-    public function getParentBarang($company_id)
+    public function getParentBarang($company_id, $kategori)
     {
         $arrCondition = [
             'deletedAt' => null,
             'company_id' => $company_id,
-            'parent_id' => 0
+            'parent_id' => 0,
+            'kategori_barang' => $kategori
         ];
 
         $builder = $this->db->table('barangs');
@@ -214,8 +207,6 @@ class BarangModel extends Model
         $arrCondition = [
             'barangs.deletedAt' => null,
             // 'barangs.parent_id !=' => 0,
-            'metadata.deletedAt' => null,
-            'metadata.value' => $kategori
         ];
 
         /* $selectQry = "barangs.*,
@@ -234,11 +225,10 @@ class BarangModel extends Model
         return $query->getResultArray(); */
 
         $selectQry = "barangs.*,
-        metadata.value AS value, 
+        barangs.kategori_barang AS value, 
         satuans.nama_satuan AS nama_satuan, 
         ";
         $data = $this->select($selectQry)
-            ->join('metadata', 'metadata.id = barangs.kategori_id')
             ->join('satuans', 'satuans.id = barangs.satuan_id')
             ->where($arrCondition)
             ->groupStart()
@@ -262,7 +252,6 @@ class BarangModel extends Model
         $arrCondition = [
             'barangs.deletedAt' => null,
             // 'barangs.parent_id !=' => 0,
-            'metadata.deletedAt' => null,
             'barangs.type' => $type
         ];
 
@@ -282,11 +271,10 @@ class BarangModel extends Model
         return $query->getResultArray(); */
 
         $selectQry = "barangs.*,
-        metadata.value AS value, 
+        barangs.kategori_barang AS value, 
         satuans.nama_satuan AS nama_satuan, 
         ";
         $data = $this->select($selectQry)
-            ->join('metadata', 'metadata.id = barangs.kategori_id')
             ->join('satuans', 'satuans.id = barangs.satuan_id')
             ->where($arrCondition)
             ->groupStart()
@@ -305,54 +293,52 @@ class BarangModel extends Model
         return $data;
     }
 
-    public function getPackagingByCondition($condition)
-    {
-        $arrCondition = [
-            'barangs.deletedAt' => null,
-            // 'barangs.parent_id !=' => 0,
-            'metadata.deletedAt' => null,
-            'barangs.barang_condition' => $condition,
-            'barangs.kategori_id' => 61
-        ];
+    // public function getPackagingByCondition($condition)
+    // {
+    //     $arrCondition = [
+    //         'barangs.deletedAt' => null,
+    //         // 'barangs.parent_id !=' => 0,
+    //         'barangs.barang_condition' => $condition,
+    //         'barangs.kategori_barang' => "Bahan Penolong"
+    //     ];
 
-        /* $selectQry = "barangs.*,
-        metadata.value AS value, 
-        satuans.kode_satuan AS kode_satuan, 
-        ";
+    //     /* $selectQry = "barangs.*,
+    //     metadata.value AS value, 
+    //     satuans.kode_satuan AS kode_satuan, 
+    //     ";
 
-        $builder = $this->db->table('barangs')
-            ->select($selectQry)
-            ->join('metadata', 'metadata.id = barangs.kategori_id')
-            ->join('satuans', 'satuans.id = barangs.satuan_id');
-        $builder->where($arrCondition)
-            ->orderBy('barangs.nama_barang', 'ASC');
-        $query = $builder->get();
+    //     $builder = $this->db->table('barangs')
+    //         ->select($selectQry)
+    //         ->join('metadata', 'metadata.id = barangs.kategori_id')
+    //         ->join('satuans', 'satuans.id = barangs.satuan_id');
+    //     $builder->where($arrCondition)
+    //         ->orderBy('barangs.nama_barang', 'ASC');
+    //     $query = $builder->get();
 
-        return $query->getResultArray(); */
+    //     return $query->getResultArray(); */
 
-        $selectQry = "barangs.*,
-        metadata.value AS value, 
-        satuans.nama_satuan AS nama_satuan, 
-        ";
-        $data = $this->select($selectQry)
-            ->join('metadata', 'metadata.id = barangs.kategori_id')
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
-            ->where($arrCondition)
-            ->groupStart()
-                ->groupStart()
-                    ->where('barangs.parent_id !=', 0)
-                    ->where('barangs.spec_type', 'multi')
-                ->groupEnd()
-                ->orGroupStart()
-                    ->where('barangs.parent_id', 0)
-                    ->where('barangs.spec_type', 'single')
-                ->groupEnd()
-            ->groupEnd()
-            ->orderBy('barangs.nama_barang', 'ASC')
-            ->findAll();
+    //     $selectQry = "barangs.*,
+    //     barangs.kategori_barang AS value, 
+    //     satuans.nama_satuan AS nama_satuan, 
+    //     ";
+    //     $data = $this->select($selectQry)
+    //         ->join('satuans', 'satuans.id = barangs.satuan_id')
+    //         ->where($arrCondition)
+    //         ->groupStart()
+    //             ->groupStart()
+    //                 ->where('barangs.parent_id !=', 0)
+    //                 ->where('barangs.spec_type', 'multi')
+    //             ->groupEnd()
+    //             ->orGroupStart()
+    //                 ->where('barangs.parent_id', 0)
+    //                 ->where('barangs.spec_type', 'single')
+    //             ->groupEnd()
+    //         ->groupEnd()
+    //         ->orderBy('barangs.nama_barang', 'ASC')
+    //         ->findAll();
 
-        return $data;
-    }
+    //     return $data;
+    // }
 
     public function getStockList($condition, $addCondition, $limit = 10, $offset = 0)
     {
@@ -363,7 +349,7 @@ class BarangModel extends Model
             'type'              => 'barangs.type',
             'harga_barang'      => 'barangs.harga_barang',
             'kode_satuan'       => 'satuans.kode_satuan',
-            'kategori'          => 'metadata.value',
+            'kategori'          => 'barangs.kategori_barang',
             'code_hs'           => 'hs_codes.code',
             'sub_akun_ap'       => 'ap.nama_sub',
             'sub_akun_ar'       => 'ar.nama_sub',
@@ -382,7 +368,7 @@ class BarangModel extends Model
                       barangs.type AS type,
                       parent_barangs.nama_barang AS barangParent,
                       satuans.kode_satuan AS kodeSatuan, 
-                      metadata.value AS kategori,
+                      barangs.kategori_barang AS kategori,
                       warehouses.id AS warehouseId,
                       warehouses.warehouse_name AS warehouseName,
                       SUM(stock_details.qty) AS qty";
@@ -391,7 +377,6 @@ class BarangModel extends Model
             ->where($condition)
             ->join('barangs AS parent_barangs', 'parent_barangs.id = barangs.parent_id', 'left')
             ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
-            ->join('metadata', 'metadata.id = barangs.kategori_id', 'left')
             ->join('stock_details', 'stock_details.barang_id = barangs.id')
             ->join('warehouses', 'warehouses.id = stock_details.warehouse_id')
             ->groupBy(['stock_details.barang_id', 'stock_details.warehouse_id'])
@@ -408,7 +393,7 @@ class BarangModel extends Model
         }
 
         if ($addCondition['kategori']) {
-            $barangDataQry->where('metadata.id', $addCondition['kategori']);
+            $barangDataQry->where('barangs.kategori_barang', $addCondition['kategori']);
         }
 
         if ($addCondition['search'] || $addCondition['kategori']) {

@@ -495,7 +495,7 @@ $routes->group('barang-bahan-baku', ['filter' => 'Auth'], function ($routes) {
 });
 
 $routes->group('barang-bahan-jadi', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'Warehouse\Barang::barang/Bahan Jadi');
+    $routes->get('/', 'Warehouse\Barang::barang/Jadi');
 });
 
 $routes->group('barang-scrap', ['filter' => 'Auth'], function ($routes) {

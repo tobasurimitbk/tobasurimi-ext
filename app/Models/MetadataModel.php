@@ -8,6 +8,7 @@ class MetadataModel extends Model
 {
     protected $table = 'metadata';
     protected $primaryKey = 'id';
+    protected $useSoftDeletes   = true;
     protected $useAutoIncrement = true;
     protected $allowedFields = [
         'id',
@@ -18,6 +19,30 @@ class MetadataModel extends Model
         'updatedAt',
         'deletedAt'
     ];
+
+    // Dates
+    protected $useTimestamps = false;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'createdAt';
+    protected $updatedField  = 'updatedAt';
+    protected $deletedField  = 'deletedAt';
+
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
 
     public function get_by_id($id)
     {

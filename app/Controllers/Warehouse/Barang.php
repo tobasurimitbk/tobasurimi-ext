@@ -40,10 +40,7 @@ class Barang extends BaseController
         $dataKategori = $this->metadataModel->get_by_name('Kategori Barang');
 
         // get parent barang
-        $dataBarangParent = $this->barangModel->getParentBarang($this->this_company_id);
-
-        // get kategori barang
-        $kategoriBarangData = $this->metadataModel->getByName('kategori barang');
+        $dataBarangParent = $this->barangModel->getParentBarang($this->this_company_id, $kategori);
 
         // get ap ar account
         $dataAPAR = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
@@ -54,12 +51,10 @@ class Barang extends BaseController
         // get data HS
         $dataKodeHS = $this->HsCodesModel->asObject()->findAll();
 
-
         $data = [
-            "kategoriBarang"       => $kategori,
+            "kategoriBarang"    => $kategori,
             "dataKategori"      => $dataKategori,
             "dataBarangParent"  => $dataBarangParent,
-            "kategoriBarangData" => $kategoriBarangData,
             "aparData"          => $dataAPAR,
             "satuanData"        => $satuanData,
             "dataKodeHS"        => $dataKodeHS
@@ -74,7 +69,7 @@ class Barang extends BaseController
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
-            "idCategory"    => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
+            // "idCategory"    => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "idCompany"     => $this->this_company_id
@@ -87,7 +82,7 @@ class Barang extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "kategori"      => $this->request->getGet("kategori"),
+            // "kategori"      => $this->request->getGet("kategori"),
             "kategori_barang" => $this->request->getGet("kategori_barang")
         ];
 
@@ -105,6 +100,7 @@ class Barang extends BaseController
                 "id"            => $data->id,
                 "parent_barang"   => $data->parent_barang,
                 "kode_barang"   => $data->kode_barang,
+                // "kategori"      => $data->kategori,
                 "nama_barang"   => $data->nama_barang,
                 "type"          => $data->type,
                 "harga_barang"  => number_format($data->harga_barang),
@@ -164,9 +160,6 @@ class Barang extends BaseController
                 "type" => [
                     "rules" => "permit_empty",
                 ],
-                "kategori_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
                 "hs_id" => [
                     "rules" => "permit_empty|is_natural",
                 ],
@@ -210,7 +203,6 @@ class Barang extends BaseController
                     "supplier_id"       => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
                     "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "kategori_id"       => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
                     "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
@@ -293,9 +285,6 @@ class Barang extends BaseController
                 "type" => [
                     "rules" => "permit_empty",
                 ],
-                "kategori_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
                 "hs_id" => [
                     "rules" => "permit_empty|is_natural",
                 ],
@@ -362,7 +351,6 @@ class Barang extends BaseController
                     "nama_barang"       => $this->request->getPost("nama_barang"),
                     "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
                     "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "kategori_id"       => formatter($this->request->getPost("kategori_id"), "STR_TO_INT"),
                     "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
                     "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),

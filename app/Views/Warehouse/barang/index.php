@@ -113,17 +113,6 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select kategori_id" name="kategori_id" id="kategori_id">
-                                        <option value=""></option>
-                                        <?php foreach ($kategoriBarangData as $kategori): ?>
-                                        <option value="<?= $kategori->id ?>"><?= $kategori->value ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label for="floatingInput">Kategori (Opsional)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select hs_id" name="hs_id" id="hs_id">
                                         <option value=""></option>
                                         <?php foreach ($dataKodeHS as $dataAccount): ?>
@@ -220,10 +209,10 @@
 <div class="card">
     <div class="card-body">
         <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
-            <div class="col mb-3">
+            <div class="col-md-3 col mb-3">
                 <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
             </div>
-            <div class="col mb-3">
+            <!-- <div class="col mb-3">
                 <select class="form-select kategori form-out-search" name="kategori" id="kategori" aria-label="Floating label select example">
                     <option value="">Kategori: All</option>
                     <?php
@@ -236,7 +225,7 @@
                     }
                     ?>
                 </select>
-            </div> 
+            </div>  -->
         </div>
         <div class="row">
             <div class="table-responsive">
@@ -250,7 +239,7 @@
                             <th onclick="changeSort('type')" class="sort">Tipe Supplier</th>
                             <th onclick="changeSort('harga_barang')" class="sort">Harga Barang</th>
                             <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
-                            <th onclick="changeSort('kategori')" class="sort">Kategori</th>
+                            <!-- <th onclick="changeSort('kategori')" class="sort">Kategori</th> -->
                             <th onclick="changeSort('code_hs')" class="sort">Kode HS</th>
                             <th onclick="changeSort('sub_akun_ap')" class="sort">Akun Pembelian</th>
                             <th onclick="changeSort('sub_akun_ar')" class="sort">Akun Penjualan</th>
@@ -292,7 +281,7 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                data.kategori = $(".kategori").val();
+                // data.kategori = $(".kategori").val();
                 data.kategori_barang = '<?= $kategoriBarang; ?>';
                 data.sort = sort;
                 data.sortType = sortType;
@@ -336,10 +325,10 @@
             data: "kode_satuan",
             className: "text-center"
         },
-        {
-            data: "kategori",
-            className: "text-center"
-        },
+        // {
+        //     data: "kategori",
+        //     className: "text-center"
+        // },
         {
             data: "code_hs",
             className: "text-center"
@@ -563,35 +552,6 @@
             .find('label')
             .css('z-index', '1');
 
-        // KATEGORI
-        $('.kategori_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content"),
-            allowClear: true
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.kategori_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.kategori_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.kategori_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         // KODE HS
         $('.hs_id').select2({
             placeholder: "",
@@ -682,6 +642,7 @@
             // $(".body-detail-spek").empty()
             // list_spek = [];
             // row_detail = 0;
+            document.getElementById("inlineRadio2").checked = true;
             $('.kode_barang').rules('add', {
                 required: true
             });
@@ -716,24 +677,6 @@
                     })
 
                     $(".parent_id").val("").change();
-                }
-            }) */
-
-            /* $.ajax({
-                url: `<?= base_url("metadata/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    name: 'kategori_barang'
-                },
-                dataType: "json",
-                success: function(res) {
-                    $(".kategori_id").empty()
-                    $(".kategori_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".kategori_id").append(`<option value="${item.id}">${item.value}</option>`)
-                    })
-
-                    $(".kategori_id").val("").change();
                 }
             }) */
 
@@ -918,24 +861,6 @@
                             }
                         })
 
-                        $.ajax({
-                            url: `<?= base_url("metadata/dropdown"); ?>`,
-                            method: "GET",
-                            data: {
-                                name: 'kategori_barang'
-                            },
-                            dataType: "json",
-                            success: function(result) {
-                                $(".kategori_id").empty()
-                                $(".kategori_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".kategori_id").append(`<option value="${item.id}">${item.value}</option>`)
-                                })
-
-                                $(".kategori_id").val(res?.data?.kategori_id).change();
-                            }
-                        })
-
                         $(".ap_id").val(res?.data?.ap_id).change();
                         $(".ar_id").val(res?.data?.ar_id).change();
                         /* $.ajax({
@@ -1116,9 +1041,9 @@
             table.ajax.reload();
         })
 
-        $(".kategori").change(function () {
-            table.ajax.reload();
-        })
+        // $(".kategori").change(function () {
+        //     table.ajax.reload();
+        // })
 
         $(".parent_id").change(function () {
             if(changeParent){
@@ -1127,7 +1052,6 @@
             $(".satuan_id").val("").change();
             $(".harga_barang").val("");
             $(".supplier_id").val([]).change();
-            $(".kategori_id").val("").change();
             $(".hs_id").val("").change();
             $(".ap_id").val("").change();
             $(".ar_id").val("").change();
@@ -1151,9 +1075,6 @@
                 // $('.satuan_id').rules('add', {
                 //     required: true
                 // });
-                // $('.kategori_id').rules('add', {
-                //     required: true
-                // });
                 // $('.hs_id').rules('add', {
                 //     required: true
                 // });
@@ -1172,7 +1093,6 @@
                 // $('.harga_barang').rules('remove', 'required');
                 // $('.type').rules('remove', 'required');
                 // $('.satuan_id').rules('remove', 'required');
-                // $('.kategori_id').rules('remove', 'required');
                 // $('.hs_id').rules('remove', 'required');
                 // $('.ap_id').rules('remove', 'required');
                 // $('.ar_id').rules('remove', 'required');

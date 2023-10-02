@@ -66,7 +66,7 @@ class Stock extends BaseController
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
-            "idCategory"    => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
+            "Category"    => $this->request->getGet("kategori"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             // "idCompany"     => $this->companyId
@@ -79,7 +79,7 @@ class Stock extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "kategori"      => formatter($this->request->getGet("kategori"), "STR_TO_INT")
+            "kategori"      => $this->request->getGet("kategori")
         ];
 
         $limit = $this->request->getGet("length");

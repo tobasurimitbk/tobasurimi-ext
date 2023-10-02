@@ -94,9 +94,10 @@
                 <div class="col mb-3">
                     <select class="form-select kategori form-out-search" name="kategori" id="kategori" aria-label="Floating label select example">
                         <option value="">Kategori: All</option>
-                        <?php foreach ($kategoriData ?? [] as $kategori): ?>
-                        <option value="<?= $kategori["id"]; ?>"><?= $kategori["value"]; ?></option>
-                        <?php endforeach; ?>
+                        <option value="Bahan Baku">Bahan Baku</option>
+                        <option value="Bahan Penolong">Bahan Penolong</option>
+                        <option value="Jadi">Barang Jadi</option>
+                        <option value="Scrap">Barang Scrap</option>
                     </select>
                 </div>
             </div>

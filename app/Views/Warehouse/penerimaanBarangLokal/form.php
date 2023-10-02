@@ -2298,7 +2298,7 @@
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "Barang Kemasan"
+                kategori: "Bahan Penolong"
             },
             success: function(res) {
                 $(".packaging").empty();

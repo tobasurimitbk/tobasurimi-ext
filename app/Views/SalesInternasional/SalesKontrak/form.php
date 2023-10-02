@@ -1276,7 +1276,7 @@
                 method: "GET",
                 dataType: "json",
                 data: {
-                    kategori: "Barang Jadi"
+                    kategori: "Jadi"
                 },
                 success: function(res) {
                     $(".kode_barang").empty();
@@ -1613,7 +1613,7 @@
             method: "GET",
             dataType: "json",
             data: {
-                kategori: "Barang Jadi"
+                kategori: "Jadi"
             },
             success: function(res) {
                 $(".kode_barang").empty();
