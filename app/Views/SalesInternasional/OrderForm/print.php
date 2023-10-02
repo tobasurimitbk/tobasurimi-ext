@@ -47,14 +47,6 @@
             margin-top: 1rem;
         }
 
-        .mt-2 {
-            margin-top: 2rem;
-        }
-
-        .mt-3 {
-            margin-top: 3rem;
-        }
-
         .txt-left {
             text-align: left;
         }
@@ -85,7 +77,12 @@
 
         .label-header {
             font-weight: bold;
-            font-size: 12px;
+            font-size: 10px;
+        }
+
+        .label-child {
+            font-weight: bold;
+            font-size: 8px;
         }
 
         .po-customer {
@@ -104,31 +101,31 @@
         <div class="txt-center"><label class="label-header">NO. <?= $dataSO->sales_order_export_no; ?></label></div>
         <div class="d-flex flex-column">
             <div class="txt-left">
-                <label class="label-header">DATE: <?= date('d M Y', strtotime($dataSO->createdAt)); ?></label>
+                <label class="label-header">DATE: <?= date('F d, Y', strtotime($dataSO->createdAt)); ?></label>
             </div>
             <div class="txt-right po-customer">
                 <label class="label-header">PO CUST: <?= $dataSO->customer_po_no; ?></label>
             </div>
         </div>
         <div class="txt-left"><label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label></div>
-        <div class="mt-2 justify-content-center"><label class="label-header">THIS SALES CONTRACT 
+        <div class="mt-1 justify-content-center"><label class="label-header">THIS SALES CONTRACT 
         IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER 
         AGREES TO SELL THE UNDER MENTIONED COMMODITIES AS PER THE TERMS AND CONDITIONS STIPULATED BELOW:</label></div>
     </div>
-    <table class="mt-2 item-table border-collapse">
+    <table class="mt-1 item-table border-collapse">
         <thead>
             <tr>
                 <th>
-                    DESCRIPTION OF GOODS,
+                    <label class="label-header">DESCRIPTION OF GOODS</label>
                 </th>
                 <th>
-                    QTTY
+                    <label class="label-header">QTY</label>
                 </th>
                 <th>
-                    UNIT PRICE FOB/CNF
+                    <label class="label-header">UNIT PRICE FOB/CNF</label>
                 </th>
                 <th>
-                    TOTAL AMOUNT (US$)
+                    <label class="label-header">TOTAL AMOUNT (US$)</label>
                 </th>
             </tr>
         </thead>
@@ -141,10 +138,14 @@
                 $total_amount = $total_amount + formatter($detail["total_price"], "STR_TO_INT");
             ?>
             <tr>
-                <td><label class="label-header"><?= $detail["kode_barang"]; ?> <?= $detail["nama_barang"]; ?> (Unit: <?= $detail["nama_satuan"]; ?>) (Remark: <?= $detail["remark"]; ?>)</label></td>
+                <td><label class="label-header"><?= $detail["kode_barang"]; ?> <?= $detail["nama_barang"]; ?></label></td>
                 <td><label class="label-header"><?= formatter($detail["qty"], "STR_TO_INT"); ?></label></td>
                 <td><label class="label-header"><?= number_format(formatter($detail["price"], "STR_TO_INT")); ?></label></td>
                 <td><label class="label-header"><?= number_format(formatter($detail["total_price"], "STR_TO_INT")); ?></label></td>
+            </tr>
+            <tr>
+                <td><label class="label-child"><?= $detail["remark"]; ?></label></td>
+                <td colspan="3"></td>
             </tr>
             <?php } ?>
             <tr>
@@ -156,21 +157,21 @@
         </tbody>
     </table>
     <div class="header">
-        <div class="mt-2 txt-left"><label class="label-header">TOTAL AMOUNT: <?= $dataSO->total_amount ? number_format($dataSO->total_amount) : 0; ?></label></div>
-        <div class="mt-2 txt-left"><label class="label-header">TOLERANCE: <?= $dataSO->tolerance; ?></label></div>
-        <div class="mt-2 txt-left"><label class="label-header">DUE DATE: <?= date('d M Y', strtotime($dataSO->due_date)); ?></label></div>
-        <div class="mt-2 txt-left"><label class="label-header">ESTIMATED SHIPMENT DATE: <?= date('d M Y', strtotime($dataSO->shipment_date)); ?></label></div>
-        <div class="mt-2 txt-left"><label class="label-header">PORT LOADING: <?= $dataSO->loading_port; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">TOTAL AMOUNT: <?= $dataSO->total_amount ? number_format($dataSO->total_amount) : 0; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">TOLERANCE: <?= $dataSO->tolerance; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">DUE DATE: <?= date('d M Y', strtotime($dataSO->due_date)); ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">ESTIMATED SHIPMENT DATE: <?= date('d M Y', strtotime($dataSO->shipment_date)); ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">PORT LOADING: <?= $dataSO->loading_port; ?></label></div>
         <div class="txt-left"><label class="label-header">PORT OF DISCHARGE: <?= $dataSO->dicharge_port; ?></label></div>
-        <div class="mt-2 txt-left"><label class="label-header">PAYMENT TERM: <?= $dataSO->payment_term; ?></label></div>
-        <div class="mt-2 txt-left"><label class="label-header">DOCUMENT REQUIRED:</label></div>
+        <div class="mt-1 txt-left"><label class="label-header">PAYMENT TERM: <?= $dataSO->payment_term; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">DOCUMENT REQUIRED:</label></div>
         <div class="txt-left"><label class="label-header"><?=  nl2br($dataSO->documents_required); ?></label></div>
-        <div class="mt-2 txt-left"><label class="label-header">SPECIAL INSTRUCTIONS:</label></div>
+        <div class="mt-1 txt-left"><label class="label-header">SPECIAL INSTRUCTIONS:</label></div>
         <div class="txt-left"><label class="label-header"><?= nl2br($dataSO->special_instructions); ?></label></div>
-        <div class="mt-3 txt-left"><label class="label-header">FOR THOSE ITEMS WHICH ARE NOT COVERED IN 
+        <div class="mt-1 txt-left"><label class="label-header">FOR THOSE ITEMS WHICH ARE NOT COVERED IN 
         THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.</label></div>
     </div>
-    <table class="mt-2 sign-table border-collapse">
+    <table class="mt-1 sign-table border-collapse">
         <thead>
             <tr>
                 <th style="width: 110px;">
