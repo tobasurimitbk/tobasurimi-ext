@@ -25,7 +25,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Nama Lengkap</label>
+                                <label for="floatingInput">Nama Lengkap (Wajib)</label>
                             </div>
                         </div>
                     </div>
@@ -33,13 +33,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK">
-                                <label for="floatingInput">NIK</label>
+                                <label for="floatingInput">NIK (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
-                                <label for="floatingInput">NIP</label>
+                                <label for="floatingInput">NIP (Wajib)</label>
                             </div>
                         </div>
                     </div>
@@ -47,7 +47,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat</label>
+                                <label for="floatingInput">Alamat (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -55,7 +55,7 @@
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" class="form-control input-picker dob" id="dob" name="dob" placeholder="Date of Birth">
-                                        <label for="floatingInput">Tanggal Lahir</label>
+                                        <label for="floatingInput">Tanggal Lahir (Optional)</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
@@ -72,16 +72,13 @@
                                 <select onchange="getCity()" class="form-select province_id" name="province_id" id="province_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php
-                                    if (!empty($dataProvinces)) {
-                                        foreach ($dataProvinces as $province) {
-                                    ?>
+                                    if (!empty($dataProvinces)) : ?>
+                                        <?php foreach ($dataProvinces as $province) : ?>
                                             <option value="<?= $province["id"]; ?>"><?= $province["province_name"]; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </select>
-                                <label for="floatingInput">Provinsi</label>
+                                <label for="floatingInput">Provinsi (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -89,13 +86,13 @@
                                 <select class="form-select city_id" name="city_id" id="city_id" aria-label="Floating label select example" onchange="getZipCode()">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Kota</label>
+                                <label for="floatingInput">Kota (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
-                                <label for="floatingInput">Kode Pos</label>
+                                <label for="floatingInput">Kode Pos (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -121,7 +118,7 @@
                                     <option value="Pria">Pria</option>
                                     <option value="Wanita">Wanita</option>
                                 </select>
-                                <label for="floatingInput">Jenis Kelamin</label>
+                                <label for="floatingInput">Jenis Kelamin (Wajib)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -129,7 +126,7 @@
                                 <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Agama</label>
+                                <label for="floatingInput">Agama (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -137,7 +134,7 @@
                                 <select class="form-select pendidikan" name="pendidikan" id="pendidikan" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Pendidikan</label>
+                                <label for="floatingInput">Pendidikan (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -147,13 +144,13 @@
                                 <select class="form-select marriage_id" name="marriage_id" id="marriage_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Status Kawin</label>
+                                <label for="floatingInput">Status Kawin (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control child" id="child" name="child" placeholder="Jumlah Anak">
-                                <label for="floatingInput">Jumlah Anak</label>
+                                <label for="floatingInput">Jumlah Anak (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -163,7 +160,7 @@
                                 <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example" onchange="generateKomponenGaji()">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">Divisi</label>
+                                <label for="floatingInput">Divisi (Wajib)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -172,7 +169,7 @@
                                     <option value=""></option>
 
                                 </select>
-                                <label for="floatingInput">Jabatan</label>
+                                <label for="floatingInput">Jabatan (Wajib)</label>
                             </div>
                         </div>
                     </div>
@@ -182,7 +179,7 @@
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
-                                        <label for="floatingInput">Tanggal Bergabung</label>
+                                        <label for="floatingInput">Tanggal Bergabung (Wajib)</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
                                         <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
@@ -201,7 +198,7 @@
                                     <option value="BRI">BRI</option>
                                     <option value="MANDIRI">MANDIRI</option>
                                 </select>
-                                <label for="floatingInput">Nama Bank</label>
+                                <label for="floatingInput">Nama Bank (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -209,13 +206,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control acc_no" id="acc_no" name="acc_no" placeholder="No. Rekening" maxlength="30">
-                                <label for="floatingInput">No. Rekening</label>
+                                <label for="floatingInput">No. Rekening (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control owner_name" id="owner_name" name="owner_name" placeholder="Nama Pemilik Rekening" maxlength="100">
-                                <label for="floatingInput">Nama Pemilik Rekening</label>
+                                <label for="floatingInput">Nama Pemilik Rekening (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -234,7 +231,7 @@
                                     <option value="Resign">Resign</option>
                                     <option value="Pensiun">Pensiun</option>
                                 </select>
-                                <label for="floatingInput">Status</label>
+                                <label for="floatingInput">Status (Wajib)</label>
                             </div>
                         </div>
                     </div>
@@ -591,7 +588,6 @@
                     required: true
                 },
                 nik: {
-                    required: true,
                     minlength: 16,
                     maxlength: 16
                 },
@@ -601,29 +597,12 @@
                 gender: {
                     required: true
                 },
-                dob: {
-                    required: true
-                },
-                address: {
-                    required: true,
-                },
-                email: {
-                    email: true
-                },
-                acc_no: {
-                    required: true
-                },
                 division_id: {
                     required: true,
                 },
-                religion_id: {
-                    required: true,
-                },
-                marriage_id: {
-                    required: true,
-                },
-                child: {
-                    required: true,
+                pin: {
+                    minlength: 6,
+                    maxlength: 6
                 },
                 jabatan_id: {
                     required: true,
@@ -631,22 +610,12 @@
                 join_date: {
                     required: true,
                 },
-                owner_name: {
-                    required: true,
-                },
-                bank_name: {
-                    required: true,
-                },
-                pendidikan: {
-                    required: true,
-                }
             },
             messages: {
                 nip: {
                     required: "NIP wajib diisi"
                 },
                 nik: {
-                    required: "NIK wajib diisi",
                     minlength: "NIK Minimal 16 Digit",
                     maxlength: "NIK Maksimal 16 Digit"
                 },
@@ -656,49 +625,19 @@
                 gender: {
                     required: "Jenis Kelamin wajib diisi"
                 },
-                dob: {
-                    required: "Tanggal Lahir wajib diisi"
-                },
-                address: {
-                    required: "Alamat wajib diisi"
-                },
-                email: {
-                    email: "Email harus benar"
-                },
-                acc_no: {
-                    required: "Nomor Rekening wajib diisi"
-                },
                 division_id: {
                     required: "Divisi wajib diisi"
-                },
-                religion_id: {
-                    required: "Agama wajib diisi"
-                },
-                marriage_id: {
-                    required: "Status Kawin wajib diisi"
-                },
-                child: {
-                    required: "Anak wajib diisi"
                 },
                 pin: {
                     minlength: "Minimal dan Maksimal 6 Karakter",
                     maxlength: "Minimal dan Maksimal 6 Karakter"
                 },
-                jabatan: {
+                jabatan_id: {
                     required: "Jabatan wajib diisi"
                 },
                 join_date: {
                     required: "Tanggal Bergabung wajib diisi"
                 },
-                owner_name: {
-                    required: "Nama Pemilik Rekening wajib diisi"
-                },
-                bank_name: {
-                    required: "Bank wajib diisi"
-                },
-                pendidikan: {
-                    required: "Pendidikan wajib diisi"
-                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
