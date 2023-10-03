@@ -9,7 +9,13 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3">
+                    <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
+                        <option value="NEW">NEW</option>
+                        <option value="POSTED">POSTED</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Sales Order Form" value="" />
                 </div>
             </div>
@@ -24,7 +30,8 @@
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
                                 <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
-                                <th onclick="changeSort('crreatedAt')" class="sort">Tanggal Pembuatan</th>
+                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Pembuatan</th>
+                                <th onclick="changeSort('status')" class="sort">Status</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -96,6 +103,9 @@ const table = $('.dataTable').DataTable({
         className: "text-center"
     },{
         data: "createdAt",
+        className: "text-center"
+    },{
+        data: "status",
         className: "text-center"
     }],
     columnDefs: [{

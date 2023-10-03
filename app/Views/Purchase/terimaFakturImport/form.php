@@ -725,7 +725,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = `<?= base_url("terima-faktur-import/"); ?>${id}`;
+                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>`;
                                     })
                                 } else {
                                     Swal.fire({
@@ -768,7 +768,7 @@ $(document).ready(function() {
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>/${response.id}`;
+                                        window.location.href = `<?= base_url("terima-faktur-import"); ?>`;
                                     })
                                 } else {
                                     Swal.fire({

@@ -289,7 +289,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("order-form-internasional"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("order-form-internasional"); ?>"
                                     })
                             } else {
                                 Swal.fire({
@@ -347,7 +347,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("order-form-internasional"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("order-form-internasional"); ?>"
                                     })
                             } else {
                                 Swal.fire({

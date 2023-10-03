@@ -74,7 +74,8 @@ class OrderForm extends BaseController
                 "customer_name"             => $data->customer_name,
                 "dicharge_port"             => $data->dicharge_port,
                 "shipment_date"             => $data->shipment_date,
-                "createdAt"                 => date('Y-m-d', strtotime($data->createdAt))
+                "createdAt"                 => date('Y-m-d', strtotime($data->createdAt)),
+                "status"                    => $data->status
             ]);
         }
 

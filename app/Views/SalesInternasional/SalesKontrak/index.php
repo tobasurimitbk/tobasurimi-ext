@@ -33,7 +33,8 @@
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
                                 <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
-                                <th onclick="changeSort('crreatedAt')" class="sort">Tanggal Pembuatan</th>
+                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Pembuatan</th>
+                                <th onclick="changeSort('status')" class="sort">Status</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -105,6 +106,9 @@ const table = $('.dataTable').DataTable({
         className: "text-center"
     },{
         data: "createdAt",
+        className: "text-center"
+    },{
+        data: "status",
         className: "text-center"
     }],
     columnDefs: [{

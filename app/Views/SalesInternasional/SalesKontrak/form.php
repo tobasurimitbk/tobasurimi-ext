@@ -20,7 +20,7 @@
                         Posting
                     </button>
                 <?php } ?>
-                <?php if ($dataSO->status === "POSTED" && $dataSO->so_export_status !== "POSTED") { ?>
+                <?php if ($dataSO->status === "POSTED" && $statusSOExport !== "POSTED") { ?>
                     <button class="btn btn-success posting-spp unposting-so float-right">
                         Unposting
                     </button>
@@ -1173,7 +1173,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("sales-kontrak"); ?>"
                                     })
                             } else {
                                 Swal.fire({
@@ -1231,7 +1231,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        window.location.href = "<?= base_url("sales-kontrak"); ?>" + "/id/" + $(".id").val()
+                                        window.location.href = "<?= base_url("sales-kontrak"); ?>"
                                     })
                             } else {
                                 Swal.fire({

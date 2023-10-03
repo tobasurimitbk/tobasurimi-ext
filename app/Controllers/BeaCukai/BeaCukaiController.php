@@ -810,60 +810,65 @@ class BeaCukaiController extends BaseController
                     ];
 
                     // kalau hapus dan ada id
-                    if($data->isDeleted && $data->id)
+                    if($data->isDeleted === true)
                     {
-                        $responseDetail = $this->modelBeaCukaiBarang->delete($data->id);
+                        if($data->id)
+                        {
+                            $responseDetail = $this->modelBeaCukaiBarang->delete($data->id);
 
-                        if(!$responseDetail) {
-                            $message =  'Data Gagal Dihapus';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Dihapus';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
                         }
                     }
-
-                     // kalau update
-                    if($data->id)
-                    {
-                        $conditionDetail = [
-                            'id' => $data->id
-                        ];
-
-                        $responseDetail = $this->modelBeaCukaiBarang->where($conditionDetail)->set($detailPayload)->update();
-
-                        if(!$responseDetail) {
-                            $message =  'Data Gagal Disimpan';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
-                            ];
-                            echo json_encode($data);
-                            return;
-                        }
-                    }
-
-                    // kalau create
                     else
                     {
-                        $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
-
-                        if(!$responseDetail) {
-                            $message =  'Data Gagal Diubah';
-                            $data = [
-                                "status"            => false,
-                                "message"    => $message,
-                                "payload"   => $payload,
-                                'token' => csrf_hash()
+                         // kalau update
+                        if($data->id)
+                        {
+                            $conditionDetail = [
+                                'id' => $data->id
                             ];
-                            echo json_encode($data);
-                            return;
+
+                            $responseDetail = $this->modelBeaCukaiBarang->where($conditionDetail)->set($detailPayload)->update();
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Disimpan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+
+                        // kalau create
+                        else
+                        {
+                            $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Diubah';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
                         }
                     }
                 }

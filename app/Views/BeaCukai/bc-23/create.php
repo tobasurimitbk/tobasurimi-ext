@@ -2095,7 +2095,7 @@
         $(".body-barang-table").empty();
         $(".jumlahBarang").val("");
         list_barang.map(item => {
-            list_delete_barang.push(list_barang);
+            list_delete_barang.push(item);
         })
         list_barang = [];
 
@@ -2132,7 +2132,7 @@
         row_barang = 0;
 
         list_barang.map(item => {
-            list_delete_barang.push(list_barang);
+            list_delete_barang.push(item);
         })
         list_barang = [];
         
@@ -2624,162 +2624,184 @@
             }
             else
             {
-                if ($(".form-add-bc").valid() && $(".form-add-second").valid()) {
-                    if ($(".form-add-third").valid() && $(".form-add-four").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: 'Simpan Data?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const csrf = $(`[name="${csrfToken}"]`);
-                                setLoading()
-                                let data = new FormData(document.querySelector(".form-add-bc"));
-                                data.append("tempatPenimbunan", $(".tempatPenimbunan").val());
-                                data.append("valuta", $(".valuta").val());
-                                data.append("npdpbm", $(".npdpbm").val());
-                                data.append("fob", $(".fob").val());
-                                data.append("freight", $(".freight").val());
-                                data.append("tipeAsuransi", $(".tipeAsuransi").val());
-                                data.append("nilaiCif", $(".nilaiCif").val());
-                                data.append("nilaiCifRupiah", $(".nilaiCifRupiah").val());
-                                data.append("bruto", $(".bruto").val());
-                                data.append("netto", $(".netto").val());
-                                data.append("jumlahBarang", $(".jumlahBarang").val());
-                                data.append("tempat", $(".tempat").val());
-                                data.append("tanggal", $(".tanggal").val());
-                                data.append("pemberitahu", $(".pemberitahu").val());
-                                data.append("jabatan", $(".jabatan").val());
-                                data.append("data_dokumen", JSON.stringify(list_dokumen));
-                                data.append("data_kontainer", JSON.stringify(list_kontainer));
-                                data.append("data_kemasan", JSON.stringify(list_kemasan));
+                let status_barang = false;
+                list_barang.map((item) => {
+                    if(item.kategori === "")
+                    {
+                        status_barang = true;
+                    }
+                })
+                if(status_barang)
+                {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Harap lengkapi data barang",
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+                else
+                {
+                    if ($(".form-add-bc").valid() && $(".form-add-second").valid()) {
+                        if ($(".form-add-third").valid() && $(".form-add-four").valid()) {
+                            Swal.fire({
+                                icon: 'question',
+                                title: 'Simpan Data?',
+                                confirmButtonColor: '#4e73df',
+                                cancelButtonColor: '#d33',
+                                showCancelButton: true,
+                                reverseButtons: true,
+                                confirmButtonText: 'Simpan',
+                                cancelButtonText: 'Batal',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const csrf = $(`[name="${csrfToken}"]`);
+                                    setLoading()
+                                    let data = new FormData(document.querySelector(".form-add-bc"));
+                                    data.append("tempatPenimbunan", $(".tempatPenimbunan").val());
+                                    data.append("valuta", $(".valuta").val());
+                                    data.append("npdpbm", $(".npdpbm").val());
+                                    data.append("fob", $(".fob").val());
+                                    data.append("freight", $(".freight").val());
+                                    data.append("tipeAsuransi", $(".tipeAsuransi").val());
+                                    data.append("nilaiCif", $(".nilaiCif").val());
+                                    data.append("nilaiCifRupiah", $(".nilaiCifRupiah").val());
+                                    data.append("bruto", $(".bruto").val());
+                                    data.append("netto", $(".netto").val());
+                                    data.append("jumlahBarang", $(".jumlahBarang").val());
+                                    data.append("tempat", $(".tempat").val());
+                                    data.append("tanggal", $(".tanggal").val());
+                                    data.append("pemberitahu", $(".pemberitahu").val());
+                                    data.append("jabatan", $(".jabatan").val());
+                                    data.append("data_dokumen", JSON.stringify(list_dokumen));
+                                    data.append("data_kontainer", JSON.stringify(list_kontainer));
+                                    data.append("data_kemasan", JSON.stringify(list_kemasan));
 
-                                let update_list_items = [];
+                                    let update_list_items = [];
 
-                                if (list_delete_barang.length !== 0) {
-                                    list_delete_barang.map(obj => {
-                                        update_list_items.push({
-                                            id: obj.id ? Number(obj.id) : 0,
-                                            isDeleted: true
-                                        })
-                                    })
-                                }
-
-                                list_barang.map(obj => {
-                                    if (obj.id) {
-                                        update_list_items.push({
-                                            id: obj.id ? Number(obj.id) : 0,
-                                            barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            kategori_id: obj.kategori ? Number(obj.kategori) : 0
-                                        })
-                                    } else {
-                                        update_list_items.push({
-                                            item_id: "",
-                                            barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
-                                            kategori_id: obj.kategori ? Number(obj.kategori) : 0
+                                    if (list_delete_barang.length !== 0) {
+                                        list_delete_barang.map(obj => {
+                                            update_list_items.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                kategori_id: obj.kategori ? Number(obj.kategori) : 0,
+                                                isDeleted: true
+                                            })
                                         })
                                     }
-                                })
 
-                                data.append("data_barang", JSON.stringify(update_list_items));
+                                    list_barang.map(obj => {
+                                        if (obj.id) {
+                                            update_list_items.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                kategori_id: obj.kategori ? Number(obj.kategori) : 0,
+                                                isDeleted: false
+                                            })
+                                        } else {
+                                            update_list_items.push({
+                                                id: "",
+                                                barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                                kategori_id: obj.kategori ? Number(obj.kategori) : 0,
+                                                isDeleted: false
+                                            })
+                                        }
+                                    })
 
-                                // update
-                                if($(".id").val())
-                                {
-                                    $.ajax({
-                                        url: "<?= base_url("bea-cukai-bc-23/update"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            csrf.val(response.token);
-                                            if (response.status) {
-                                                stopLoading()
-                                                Swal.fire({
-                                                        icon: 'success',
+                                    data.append("data_barang", JSON.stringify(update_list_items));
+
+                                    // update
+                                    if($(".id").val())
+                                    {
+                                        $.ajax({
+                                            url: "<?= base_url("bea-cukai-bc-23/update"); ?>",
+                                            data: data,
+                                            beforeSend: function(xhr) {
+                                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            },
+                                            method: "POST",
+                                            dataType: "json",
+                                            processData: false,
+                                            contentType: false,
+                                            success: function(response) {
+                                                csrf.val(response.token);
+                                                if (response.status) {
+                                                    stopLoading()
+                                                    Swal.fire({
+                                                            icon: 'success',
+                                                            title: response.message,
+                                                            confirmButtonColor: '#4e73df',
+                                                        })
+                                                        .then(() => {
+                                                            window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
+                                                        })
+                                                } else {
+                                                    Swal.fire({
+                                                        icon: 'error',
                                                         title: response.message,
                                                         confirmButtonColor: '#4e73df',
                                                     })
-                                                    .then(() => {
-                                                        window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
-                                                    })
-                                            } else {
+                                                    stopLoading()
+                                                }
+                                            },
+                                            onError: function(response) {
+                                                csrf.val(response.token);
                                                 Swal.fire({
                                                     icon: 'error',
-                                                    title: response.message,
+                                                    title: 'Data Gagal Diubah, coba Lagi',
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 stopLoading()
                                             }
-                                        },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Diubah, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    });
-                                }
-                                // create
-                                else
-                                {
-                                    $.ajax({
-                                        url: "<?= base_url("bea-cukai-bc-23/save"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            csrf.val(response.token);
-                                            if (response.status) {
-                                                stopLoading()
-                                                Swal.fire({
-                                                        icon: 'success',
+                                        });
+                                    }
+                                    // create
+                                    else
+                                    {
+                                        $.ajax({
+                                            url: "<?= base_url("bea-cukai-bc-23/save"); ?>",
+                                            data: data,
+                                            beforeSend: function(xhr) {
+                                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                            },
+                                            method: "POST",
+                                            dataType: "json",
+                                            processData: false,
+                                            contentType: false,
+                                            success: function(response) {
+                                                csrf.val(response.token);
+                                                if (response.status) {
+                                                    stopLoading()
+                                                    Swal.fire({
+                                                            icon: 'success',
+                                                            title: response.message,
+                                                            confirmButtonColor: '#4e73df',
+                                                        })
+                                                        .then(() => {
+                                                            window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
+                                                        })
+                                                } else {
+                                                    Swal.fire({
+                                                        icon: 'error',
                                                         title: response.message,
                                                         confirmButtonColor: '#4e73df',
                                                     })
-                                                    .then(() => {
-                                                        window.location.href = "<?= base_url("bea-cukai-bc-23"); ?>";
-                                                    })
-                                            } else {
+                                                    stopLoading()
+                                                }
+                                            },
+                                            onError: function(response) {
+                                                csrf.val(response.token);
                                                 Swal.fire({
                                                     icon: 'error',
-                                                    title: response.message,
+                                                    title: 'Data Gagal Diubah, coba Lagi',
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 stopLoading()
                                             }
-                                        },
-                                        onError: function(response) {
-                                            csrf.val(response.token);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Data Gagal Diubah, coba Lagi',
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            stopLoading()
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
                 }
             }

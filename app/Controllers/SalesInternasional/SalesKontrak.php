@@ -70,15 +70,22 @@ class SalesKontrak extends BaseController
             $dataSO = $this->salesKontrakModel->getById($id);
             $data["dataSO"] = $dataSO;
 
+            $statusSOExport = "";
+            $dataSOExport = $this->salesOrderExportModel->getBySalesContractId($id);
+
+            if($dataSOExport)
+            {
+                $statusSOExport = $dataSOExport[0]->status;
+            }
+
+            $data["statusSOExport"] = $statusSOExport;
+
             $dataSODetail = $this->salesKontrakDetailModel->getSalesContractDetailBySalesContractId($id);
 
             if($dataSODetail)
             {
                 $data["dataSODetail"] = $dataSODetail;
             }
-
-            // var_dump($dataSO);
-            // die ;
         }
 
         return view('SalesInternasional/SalesKontrak/form', $data);
@@ -123,7 +130,8 @@ class SalesKontrak extends BaseController
                 "customer_name"         => $data->customer_name,
                 "dicharge_port"         => $data->dicharge_port,
                 "shipment_date"         => $data->shipment_date,
-                "createdAt"             => date('Y-m-d', strtotime($data->createdAt))
+                "createdAt"             => date('Y-m-d', strtotime($data->createdAt)),
+                "status"                => $data->status
             ]);
         }
 
