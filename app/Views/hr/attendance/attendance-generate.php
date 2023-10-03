@@ -59,12 +59,13 @@
                                 Posting
                             </button>
                         <?php else : ?>
-                            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">
-                                <i class="fa-solid fa-print"></i> Export PDF
-                            </a>
-                            <a href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>" class="btn btn-success posting-spp float-right">
-                                <i class="fa-solid fa-file-excel"></i> Export Excel
-                            </a>
+                            <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-print"></i> Export
+                            </button>
+                            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                                <li><a target="_blank" class="dropdown-item" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">PDF</a></li>
+                                <li><a class="dropdown-item" href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Excel</a></li>
+                            </ul>
                             <input type="hidden" id="statusPosting" name="statusPosting" value="0">
                             <button class="btn btn-show-form btn-save float-right btn-submit">
                                 Batalkan Posting

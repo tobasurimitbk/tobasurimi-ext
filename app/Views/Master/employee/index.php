@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
+                                <input autocomplete="one-time-code" type="number" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
                                 <label for="floatingInput">NIP (Wajib)</label>
                             </div>
                         </div>
@@ -113,7 +113,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select gender" name="gender" id="floatingSelect" aria-label="Floating label select example">
+                                <select class="form-select gender" name="gender" id="gender" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <option value="Pria">Pria</option>
                                     <option value="Wanita">Wanita</option>

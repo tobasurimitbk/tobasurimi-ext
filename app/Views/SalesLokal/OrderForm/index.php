@@ -10,6 +10,14 @@
         </a>
     </div>
     <div class="card">
+        <?php if (session()->getFlashdata('error') != null) : ?>
+            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                <strong>Error : <?= session()->getFlashdata('error'); ?></strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <?php endif; ?>
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-4 mb-3">

@@ -95,9 +95,13 @@
                     Generate
                 </a>
             <?php else : ?>
-                <button class="btn btn-warning btn-print float-right" onclick="printPerDivisi('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">
-                    <i class="fa-solid fa-print"></i> Print
+                <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-print"></i> Export
                 </button>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                    <li><button class="dropdown-item" onclick="printPerDivisi('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Per Divisi</button></li>
+                    <li><button class="dropdown-item" onclick="detailPerDivisi('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Detail Per Divisi</button></li>
+                </ul>
             <?php endif; ?>
         </div>
     </div>
@@ -551,6 +555,19 @@
     }
 
     const printPerDivisi = function(url) {
+        var divisionID = $("select[name='filterDivisiID']").val();
+        if (divisionID == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Pilih Divisi Dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+        } else {
+            window.open(url + '/' + divisionID, "_blank");
+        }
+    }
+
+    const detailPerDivisi = function(url) {
         var divisionID = $("select[name='filterDivisiID']").val();
         if (divisionID == "") {
             Swal.fire({

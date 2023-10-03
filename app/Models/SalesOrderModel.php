@@ -169,7 +169,7 @@ class SalesOrderModel extends Model
             ->select($selectQueryDetail)
             ->findAll();
 
-        $dataSalesOrder->detail = $detail;
+        $dataSalesOrder = $dataSalesOrder != null ? $dataSalesOrder->detail = $detail : null;
 
         return $dataSalesOrder;
     }

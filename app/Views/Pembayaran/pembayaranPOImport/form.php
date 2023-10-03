@@ -3,471 +3,473 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1 class="title-name">Tambah</h1>
-    <div class="col-button-tambah-spp">
-        <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
-            Batal
-        </a>
-        <button class="btn btn-show-form btn-save float-right btn-submit-form">
-            Simpan
-        </button>
+    <div class="section-header">
+        <h1 class="title-name">Tambah</h1>
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
+                Batal
+            </a>
+            <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                Simpan
+            </button>
+        </div>
     </div>
-</div>
-<div class="card">
-    <div class="card-body">
-        <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-            <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
-            <?= csrf_field() ?>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" value="<?= $paymentData->payment_no ?? '' ?>" placeholder="No. Pembayaran" disabled>
-                                <label for="floatingInput">No. Pembayaran</label>
+    <div class="card">
+        <div class="card-body">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
+                <?= csrf_field() ?>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" value="<?= $paymentData->payment_no ?? '' ?>" placeholder="No. Pembayaran" disabled>
+                                    <label for="floatingInput">No. Pembayaran</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select" name="payment_type" id="payment_type">
-                            <option value="" disabled selected></option>
-                            <option value="DP" <?= (!empty($paymentData) && $paymentData->payment_type == 'DP') ? 'selected' : '' ?>>DP</option>
-                            <option value="Pelunasan" <?= (!empty($paymentData) && $paymentData->payment_type == 'Pelunasan') ? 'selected' : '' ?>>Pelunasan</option>
-                        </select>
-                        <label for="floatingInput">Payment Type</label>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select" name="payment_type" id="payment_type">
+                                <option value="" disabled selected></option>
+                                <option value="DP" <?= (!empty($paymentData) && $paymentData->payment_type == 'DP') ? 'selected' : '' ?>>DP</option>
+                                <option value="Pelunasan" <?= (!empty($paymentData) && $paymentData->payment_type == 'Pelunasan') ? 'selected' : '' ?>>Pelunasan</option>
+                            </select>
+                            <label for="floatingInput">Payment Type</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                        <select class="form-select " name="po_type" id="po_type">
-                            <option disabled selected value=""></option>
-                            <option value="BAKU" <?= (!empty($paymentData) && $paymentData->po_type == 'BAKU') ? 'selected' : '' ?>>Baku</option>
-                            <option value="PENOLONG" <?= (!empty($paymentData) && $paymentData->po_type == 'PENOLONG') ? 'selected' : '' ?>>Penolong</option>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">PO Type</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select " name="po_type" id="po_type">
+                                <option disabled selected value=""></option>
+                                <option value="BAKU" <?= (!empty($paymentData) && $paymentData->po_type == 'BAKU') ? 'selected' : '' ?>>Baku</option>
+                                <option value="PENOLONG" <?= (!empty($paymentData) && $paymentData->po_type == 'PENOLONG') ? 'selected' : '' ?>>Penolong</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">PO Type</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select " name="supplier_id" id="supplier">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($supplierList ?? [] as $supplier) : ?>
+                                    <option value="<?= $supplier->id ?>" <?= (!empty($paymentData) && $paymentData->supplier_id == $supplier->id) ? 'selected' : '' ?>><?= $supplier->name ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Supplier</label>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                        <select class="form-select " name="supplier_id" id="supplier">
-                            <option disabled selected value=""></option>
-                            <?php foreach ($supplierList ?? [] as $supplier): ?>
-                            <option value="<?= $supplier->id ?>" <?= (!empty($paymentData) && $paymentData->supplier_id == $supplier->id) ? 'selected' : '' ?>><?= $supplier->name ?></option>
-                            <?php endforeach ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Supplier</label>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select " name="import_po" id="import_po" disabled>
+                                <option disabled selected value=""></option>
+                                <?php foreach ($poList ?? [] as $po) : ?>
+                                    <option value="<?= $po->id ?>" <?= (!empty($paymentData) && $paymentData->po_id == $po->id) ? 'selected' : '' ?>><?= $po->po_no ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">PO Import</label>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                        <select class="form-select " name="import_po" id="import_po" disabled>
-                            <option disabled selected value=""></option>
-                            <?php foreach ($poList ?? [] as $po): ?>
-                            <option value="<?= $po->id ?>" <?= (!empty($paymentData) && $paymentData->po_id == $po->id) ? 'selected' : '' ?>><?= $po->po_no ?></option>
-                            <?php endforeach ?>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">PO Import</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                     <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                         <select class="form-select " name="import_lpb" id="import_lpb" disabled>
                             <option disabled selected value=""></option>
-                            <?php foreach ($lpbList ?? [] as $lpb): ?>
+                            <?php foreach ($lpbList ?? [] as $lpb) : ?>
                             <option value="<?= $lpb->id ?>" <?= (!empty($paymentData) && $paymentData->penerimaan_barang_id == $lpb->id) ? 'selected' : '' ?>><?= $lpb->lpb_no ?></option>
                             <?php endforeach ?>
                         </select>
                         <label for="floatingInput" style="z-index: 1;">LPB Import</label>
                     </div>
+                </div> -->
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="currency" value="<?= $paymentData->currency ?? '' ?>" placeholder="Currency" disabled>
-                                <label for="floatingInput">Currency</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="currency" value="<?= $paymentData->currency ?? '' ?>" placeholder="Currency" disabled>
+                                    <label for="floatingInput">Currency</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="po_amt" name="po_amt" value="<?= $poData->total ?? '' ?>" disabled>
+                            <label for="floatingInput">PO Amount</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="payment_amt" name="payment_amt" value="<?= $paymentData->payment_amt ?? '' ?>" onkeyup="formatNumber(this)">
+                                    <label for="floatingInput">Payment Amount</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" name="current_exchange_rate" value="<?= $paymentData->current_exchange_rate ?? '' ?>" onkeyup="formatNumber(this)">
+                            <label for="floatingInput">Kurs saat ini</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control" id="payment_date" name="payment_date" value="<?= $paymentData->payment_date ?? '' ?>" placeholder="Payment Date">
+                                    <label for="floatingInput">Payment Date</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control" name="termin" id="termin" value="<?= $paymentData->termin ?? '' ?>" placeholder="Termin">
+                                    <label for="floatingInput">Termin</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" type="text" class="form-control" id="po_amt" name="po_amt" value="<?= $poData->total ?? '' ?>" disabled>
-                        <label for="floatingInput">PO Amount</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select " name="payment_method" id="payment_method">
+                                <option disabled selected value=""></option>
+                                <option value="CASH" <?= (!empty($paymentData) && $paymentData->payment_method == 'CASH') ? 'selected' : '' ?>>Cash</option>
+                                <option value="TRANSFER" <?= (!empty($paymentData) && $paymentData->payment_method == 'TRANSFER') ? 'selected' : '' ?>>Transfer</option>
+                                <option value="LC" <?= (!empty($paymentData) && $paymentData->payment_method == 'LC') ? 'selected' : '' ?>>LC</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Payment Method</label>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="payment_amt" name="payment_amt" value="<?= $paymentData->payment_amt ?? '' ?>" onkeyup="formatNumber(this)">
-                                <label for="floatingInput">Payment Amount</label>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control" id="voucher_no" name="voucher_no" value="<?= $paymentData->voucher_no ?? '' ?>" placeholder="No. Voucher">
+                                    <label for="floatingInput">No. Voucher</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" name="current_exchange_rate" value="<?= $paymentData->current_exchange_rate ?? '' ?>" onkeyup="formatNumber(this)">
-                        <label for="floatingInput">Kurs saat ini</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <textarea autocomplete="one-time-code" name="note" class="form-control information text-area-all"><?= $paymentData->note ?? '' ?></textarea>
+                            <label for="floatingInput">Note</label>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" id="payment_date" name="payment_date" value="<?= $paymentData->payment_date ?? '' ?>" placeholder="Payment Date">
-                                <label for="floatingInput">Payment Date</label>
-                            </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
+                            <label for="floatingInput">Pembayaran Oleh</label>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" name="termin" id="termin" value="<?= $paymentData->termin ?? '' ?>" placeholder="Termin">
-                                <label for="floatingInput">Termin</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select " name="payment_method" id="payment_method">
-                            <option disabled selected value=""></option>
-                            <option value="CASH" <?= (!empty($paymentData) && $paymentData->payment_method == 'CASH') ? 'selected' : '' ?>>Cash</option>
-                            <option value="TRANSFER" <?= (!empty($paymentData) && $paymentData->payment_method == 'TRANSFER') ? 'selected' : '' ?>>Transfer</option>
-                            <option value="LC" <?= (!empty($paymentData) && $paymentData->payment_method == 'LC') ? 'selected' : '' ?>>LC</option>
-                        </select>
-                        <label for="floatingInput" style="z-index: 1;">Payment Method</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" id="voucher_no" name="voucher_no" value="<?= $paymentData->voucher_no ?? '' ?>" placeholder="No. Voucher">
-                                <label for="floatingInput">No. Voucher</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3">
-                        <textarea autocomplete="one-time-code" name="note" class="form-control information text-area-all"><?= $paymentData->note ?? '' ?></textarea>
-                        <label for="floatingInput">Note</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input autocomplete="one-time-code" value="<?= session()->get("login")->name; ?>" type="text" readonly="true" class="form-control" placeholder="Pembayaran Oleh">
-                        <label for="floatingInput">Pembayaran Oleh</label>
-                    </div>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 </section>
 
 <script>
-$(document).ready(function() {
-    const csrfToken = '<?= csrf_token() ?>';
-    const csrf = $(`[name="${csrfToken}"]`);
+    $(document).ready(function() {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
 
-    var validator = $(".create-form").validate({
-        rules: {
-            no_bukti_pembayaran: {
-                required: true
+        var validator = $(".create-form").validate({
+            rules: {
+                no_bukti_pembayaran: {
+                    required: true
+                },
+                "multiple_faktur_id[]": {
+                    required: true
+                },
+                nominal_faktur: {
+                    required: true
+                },
+                due_date: {
+                    required: "Tanggal Pembayaran wajib diisi"
+                }
             },
-            "multiple_faktur_id[]": {
-                required: true
+            messages: {
+                no_bukti_pembayaran: {
+                    required: "No. Pembayaran wajib diisi"
+                },
+                "multiple_faktur_id[]": {
+                    required: "No. Terima Faktur wajib diisi"
+                },
+                nominal_faktur: {
+                    required: "Nominal Faktur wajib diisi"
+                },
+                due_date: {
+                    required: "Tanggal Pembayaran wajib diisi"
+                }
             },
-            nominal_faktur: {
-                required: true
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                console.log(elem);
+                if (elem.hasClass("multiple_po_id")) {
+                    element = $(".select2-selection--multiple").parent();
+                    error.insertAfter(element);
+                } else if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
             },
-            due_date: {
-                required: "Tanggal Pembayaran wajib diisi"
-            }
-        },
-        messages: {
-            no_bukti_pembayaran: {
-                required: "No. Pembayaran wajib diisi"
+            highlight: function(element) {
+                $(element).closest('.col-md-6').addClass('has-error');
+                $(element).addClass('select-class');
+
             },
-            "multiple_faktur_id[]": {
-                required: "No. Terima Faktur wajib diisi"
+            unhighlight: function(element) {
+                $(element).closest('.col-md-6').removeClass('has-error');
+                $(element).removeClass('select-class');
             },
-            nominal_faktur: {
-                required: "Nominal Faktur wajib diisi"
-            },
-            due_date: {
-                required: "Tanggal Pembayaran wajib diisi"
-            }
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            console.log(elem);
-            if (elem.hasClass("multiple_po_id")) {
-                element = $(".select2-selection--multiple").parent();
-                error.insertAfter(element);
-            } else if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent(); 
-                error.insertAfter(element);
+        });
+
+        $("#payment_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        });
+
+        $("#payment_type").change(function() {
+
+            if ($(this).val() == 'DP') {
+                $('#import_lpb').prop('disabled', true);
+                $('#import_po').prop('disabled', false);
             } else {
-                error.insertAfter(element);
+                $('#import_lpb').prop('disabled', false);
+                $('#import_po').prop('disabled', true);
             }
-        },
-        highlight: function(element) {
-            $(element).closest('.col-md-6').addClass('has-error');
-            $(element).addClass('select-class');
 
-        },
-        unhighlight: function(element) {
-            $(element).closest('.col-md-6').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
+        });
 
-    $("#payment_date").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
+        $('#po_type').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        }).change(function(e) {
+            const url = ($(this).val() == 'BAKU') ? '<?= base_url('supplier-bahan-baku-import/dropdown') ?>' : '<?= base_url('supplier-bahan-penolong-import/dropdown') ?>';
+            $("#supplier").empty();
+            $("#supplier").select2({
+                // placeholder: "Pilih Bro",
+                theme: "bootstrap-5",
+                ajax: {
+                    url: url,
+                    dataType: 'json',
+                    processResults: function(res) {
+                        return {
+                            results: $.map(res.data, function(item) {
+                                return {
+                                    id: item.id,
+                                    text: item.name,
+                                    /* amount: +item.total,
+                                    dueDate: item.due_date */
+                                }
+                            })
+                        };
+                    }
+                },
+                /* templateSelection: function(container) {
+                    $(container.element).attr("data-amount", container.amount);
+                    $(container.element).attr("data-dueDate", container.dueDate);
+                    return container.text;
+                } */
+            });
+        });
 
-    $("#payment_type").change(function() {
+        $('#supplier').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        }).change(function(e) {
+            const supplierId = $(this).val();
+            const paymentType = $('#payment_type').val();
 
-        if ($(this).val() == 'DP') {
-            $('#import_lpb').prop('disabled', true);
-            $('#import_po').prop('disabled', false);
-        } else {
-            $('#import_lpb').prop('disabled', false);
-            $('#import_po').prop('disabled', true);
+            if (paymentType == 'DP') {
+                gokilDP(supplierId);
+            } else {
+                console.log('hahaha')
+                gokilPelunasan(supplierId);
+            }
+        });
+
+        function gokilDP(supplierId) {
+            const url = ($('#po_type').val() == 'BAKU') ? '<?= base_url('/po-import-bahan-baku/payment-dropdown/'); ?>' : '<?= base_url('/po-import-bahan-penolong/payment-dropdown/'); ?>';
+
+            $("#import_po").empty();
+            $("#import_po").select2({
+                // placeholder: "Pilih Bro",
+                theme: "bootstrap-5",
+                ajax: {
+                    url: `${url}${supplierId}`,
+                    dataType: 'json',
+                    processResults: function(res) {
+                        return {
+                            results: $.map(res.data, function(item) {
+                                return {
+                                    id: item.id,
+                                    text: item.po_no,
+                                    amount: +item.total,
+                                    currency: item.currency
+                                }
+                            })
+                        };
+                    }
+                },
+                templateSelection: function(container) {
+                    $(container.element).attr("data-amount", container.amount);
+                    $(container.element).attr("data-currency", container.currency);
+                    return container.text;
+                }
+            });
         }
 
-    });
-
-    $('#po_type').select2({
-        placeholder: "",
-        theme: "bootstrap-5"
-    }).change(function(e) {
-        const url = ($(this).val() == 'BAKU') ? '<?= base_url('supplier-bahan-baku-import/dropdown') ?>' : '<?= base_url('supplier-bahan-penolong-import/dropdown') ?>';
-        $("#supplier").empty();
-        $("#supplier").select2({
-            // placeholder: "Pilih Bro",
-            theme: "bootstrap-5",
-            ajax: {
-                url: url,
-                dataType: 'json',
-                processResults: function (res) {
-                    return {
-                        results: $.map(res.data, function (item) {
-                            return {
-                                id: item.id,
-                                text: item.name,
-                                /* amount: +item.total,
-                                dueDate: item.due_date */
-                            }
-                        })
-                    };
+        function gokilPelunasan(supplierId) {
+            $("#import_lpb").empty();
+            $("#import_lpb").select2({
+                // placeholder: "Pilih Bro",
+                theme: "bootstrap-5",
+                ajax: {
+                    url: `<?= base_url('/penerimaan-barang-import/receivedItemsBySupplier/') ?>${supplierId}`,
+                    dataType: 'json',
+                    processResults: function(res) {
+                        console.log('whyyyyyyyyyyyyyyyyyyyy')
+                        return {
+                            results: $.map(res.data, function(item) {
+                                console.log('heheheheheheheh')
+                                return {
+                                    id: item.id,
+                                    text: item.lpb_no,
+                                    amount: +item.total,
+                                    currency: item.currency
+                                }
+                            })
+                        };
+                    }
+                },
+                templateSelection: function(container) {
+                    $(container.element).attr("data-amount", container.amount);
+                    $(container.element).attr("data-currency", container.currency);
+                    return container.text;
                 }
-            },
-            /* templateSelection: function(container) {
-                $(container.element).attr("data-amount", container.amount);
-                $(container.element).attr("data-dueDate", container.dueDate);
-                return container.text;
-            } */
-        });
-    });
-
-    $('#supplier').select2({
-        placeholder: "",
-        theme: "bootstrap-5"
-    }).change(function(e) {
-        const supplierId = $(this).val();
-        const paymentType = $('#payment_type').val();
-        
-        if (paymentType == 'DP') {
-            gokilDP(supplierId);
-        } else {
-            console.log('hahaha')
-            gokilPelunasan(supplierId);
+            });
         }
-    });
 
-    function gokilDP(supplierId) {
-        const url = ($('#po_type').val() == 'BAKU') ? '<?= base_url('/po-import-bahan-baku/payment-dropdown/'); ?>' : '<?= base_url('/po-import-bahan-penolong/payment-dropdown/'); ?>';
+        $('#import_po, #import_lpb').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        }).change(function() {
+            const attr = $(this).select2('data');
+            const amount = attr[0]?.amount;
+            const currency = attr[0]?.currency;
 
-        $("#import_po").empty();
-        $("#import_po").select2({
-            // placeholder: "Pilih Bro",
-            theme: "bootstrap-5",
-            ajax: {
-                url: `${url}${supplierId}`,
-                dataType: 'json',
-                processResults: function (res) {
-                    return {
-                        results: $.map(res.data, function (item) {
-                            return {
-                                id: item.id,
-                                text: item.po_no,
-                                amount: +item.total,
-                                currency: item.currency
-                            }
-                        })
-                    };
-                }
-            },
-            templateSelection: function(container) {
-                $(container.element).attr("data-amount", container.amount);
-                $(container.element).attr("data-currency", container.currency);
-                return container.text;
-            }
+            $('#po_amt').val(amount);
+            $('#currency').val(currency);
         });
-    }
 
-    function gokilPelunasan(supplierId) {
-        $("#import_lpb").empty();
-        $("#import_lpb").select2({
-            // placeholder: "Pilih Bro",
-            theme: "bootstrap-5",
-            ajax: {
-                url: `<?= base_url('/penerimaan-barang-import/receivedItemsBySupplier/') ?>${supplierId}`,
-                dataType: 'json',
-                processResults: function (res) {
-                    console.log('whyyyyyyyyyyyyyyyyyyyy')
-                    return {
-                        results: $.map(res.data, function (item) {
-                            console.log('heheheheheheheh')
-                            return {
-                                id: item.id,
-                                text: item.lpb_no,
-                                amount: +item.total,
-                                currency: item.currency
-                            }
-                        })
-                    };
-                }
-            },
-            templateSelection: function(container) {
-                $(container.element).attr("data-amount", container.amount);
-                $(container.element).attr("data-currency", container.currency);
-                return container.text;
-            }
-        });
-    }
+        $(".btn-submit-form").click(function() {
+            if ($(".create-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const paymentAmt = $('#payment_amt').val().replace(/\,/g, '');
+                        const currentExchangeRate = $('#current_exchange_rate').val().replace(/\,/g, '');
+                        const data = $(".create-form").serializeArray();
+                        data.push({
+                            name: 'payment_amt',
+                            value: paymentAmt
+                        });
+                        data.push({
+                            name: 'current_exchange_rate',
+                            value: currentExchangeRate
+                        });
 
-    $('#import_po, #import_lpb').select2({
-        placeholder: "",
-        theme: "bootstrap-5"
-    }).change(function () {
-        const attr = $(this).select2('data');
-        const amount = attr[0]?.amount;
-        const currency = attr[0]?.currency;
-        
-        $('#po_amt').val(amount);
-        $('#currency').val(currency);
-    });
-
-    $(".btn-submit-form").click(function() {
-        if ($(".create-form").valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const paymentAmt = $('#payment_amt').val().replace(/\,/g, '');
-                    const currentExchangeRate = $('#current_exchange_rate').val().replace(/\,/g, '');
-                    const data = $(".create-form").serializeArray();
-                    data.push({ name: 'payment_amt', value: paymentAmt });
-                    data.push({ name: 'current_exchange_rate', value: currentExchangeRate });
-
-                    $.ajax({
-                        url: "<?= base_url("pembayaran-po-import/create"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    window.location.href = `<?= base_url("pembayaran-po-import"); ?>/${response.id}`;
-                                })
-                            } else {
+                        $.ajax({
+                            url: "<?= base_url("pembayaran-po-import/create"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = `<?= base_url("pembayaran-po-import"); ?>/${response.id}`;
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
                                 Swal.fire({
                                     icon: 'error',
-                                    title: response.message,
+                                    title: 'Data Gagal Disimpan, coba Lagi',
                                     confirmButtonColor: '#4e73df',
                                 })
                                 stopLoading()
                             }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        }
+                        });
+                    }
+                })
+            }
+        })
     })
-})
 
-const changeStatus = function()
-{
-    let value = document.getElementById('auto_generate').checked ? true : false;
+    const changeStatus = function() {
+        let value = document.getElementById('auto_generate').checked ? true : false;
 
-    if(value)
-    {
-        $(".no_bukti_pembayaran").attr("readonly", true);
-        $(".no_bukti_pembayaran").val("AUTO GENERATE");
+        if (value) {
+            $(".no_bukti_pembayaran").attr("readonly", true);
+            $(".no_bukti_pembayaran").val("AUTO GENERATE");
+        } else {
+            $(".no_bukti_pembayaran").attr("readonly", false);
+            $(".no_bukti_pembayaran").val("");
+        }
     }
-    else
-    {
-        $(".no_bukti_pembayaran").attr("readonly", false);
-        $(".no_bukti_pembayaran").val("");
-    }
-}
 </script>
 
 <?= $this->endSection(); ?>

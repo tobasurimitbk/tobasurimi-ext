@@ -11,11 +11,11 @@
                 Batal
             </a>
 
-            <?php if (!empty($data)): ?>
-            <!-- <a class="btn btn-save float-right" href="#"> -->
-            <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>" target="_blank">
-                Print
-            </a>
+            <?php if (!empty($data)) : ?>
+                <!-- <a class="btn btn-save float-right" href="#"> -->
+                <a class="btn btn-warning btn-print float-right" href="<?= base_url("order-form-lokal/print/{$data->id}"); ?>" target="_blank">
+                    Print
+                </a>
             <?php endif; ?>
 
             <button class="btn btn-show-form btn-save float-right btn-submit">
@@ -57,8 +57,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
-                                <?php foreach ($dataCustomers ?? [] as $customer): ?>
-                                <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                <?php foreach ($dataCustomers ?? [] as $customer) : ?>
+                                    <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Konsumen</label>
@@ -327,49 +327,50 @@
             searching: false,
             ordering: false,
             columns: [{
-                data: "no",
-                className: "text-center",
-            },
-            {
-                data: "kode_barang",
-                className: "text-center"
-            }, 
-            {
-                data: "nama_barang",
-                className: "text-center"
-            },
-            {
-                data: "qty",
-                className: "text-center"
-            },
-            {
-                data: "satuan",
-                className: "text-center"
-            },
-            {
-                data: "harga_barang",
-                className: "text-center"
-            },
-            {
-                data: "disc",
-                className: "text-center"
-            },
-            {
-                data: "amount",
-                className: "text-center"
-            },
-            {
-                data: "status",
-                className: "text-center actions",
-                render: function(data, type, row) {
-                    let id = row?.id;
-                    return `
+                    data: "no",
+                    className: "text-center",
+                },
+                {
+                    data: "kode_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "qty",
+                    className: "text-center"
+                },
+                {
+                    data: "satuan",
+                    className: "text-center"
+                },
+                {
+                    data: "harga_barang",
+                    className: "text-center"
+                },
+                {
+                    data: "disc",
+                    className: "text-center"
+                },
+                {
+                    data: "amount",
+                    className: "text-center"
+                },
+                {
+                    data: "status",
+                    className: "text-center actions",
+                    render: function(data, type, row) {
+                        let id = row?.id;
+                        return `
                     <div class="mt-2">
                         <button>X</button>
                     </div>
                     `
+                    }
                 }
-            }],
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -384,7 +385,7 @@
             }
         });
 
-        $('.dataTable tbody').on('click', 'button', function () { // delete datatable row
+        $('.dataTable tbody').on('click', 'button', function() { // delete datatable row
             table.row($(this).parents('tr')).remove().draw();
 
             reCountTotal();
@@ -769,7 +770,7 @@
                             console.log(obj)
                             // total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
                             total += obj.amount || 0;
-                            
+
                             if (taxStatus && !includeTaxStatus) {
                                 taxAmt += obj.taxAmt ?? 0;
                                 total += obj.taxAmt ?? 0;
@@ -990,7 +991,8 @@
             const discAmt = amount * (discountPercentage / 100);
             const discountedAmt = amount - discAmt;
 
-            const currentItemList = table.rows().data().toArray();console.log('hehoo')
+            const currentItemList = table.rows().data().toArray();
+            console.log('hehoo')
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
             if (validate_same >= 0) {
@@ -1283,7 +1285,7 @@
             }
         });
 
-        $('#estimated_freight').keyup(function () {
+        $('#estimated_freight').keyup(function() {
             const estimatedFreight = $(this).val();
             $('#freightCost').html(estimatedFreight);
             reCountTotal();
@@ -1325,7 +1327,7 @@
 
             // if (includeTax) taxTotal = 0;
 
-            const grandTotal = itemSubTotal + estimatedFreight + taxTotal - discTotal; 
+            const grandTotal = itemSubTotal + estimatedFreight + taxTotal - discTotal;
             $('#grandTotal').html(grandTotal.toLocaleString());
         };
 
@@ -1348,10 +1350,10 @@
             reCountTotal()
         });
 
-        <?php if (!empty($data)): ?>
-        const dataHaciu = <?= json_encode($data->detail) ?>;
-        table.rows.add(dataHaciu).draw(false);
-        reCountTotal();
+        <?php if (!empty($data)) : ?>
+            const dataHaciu = <?= json_encode($data->detail) ?>;
+            table.rows.add(dataHaciu).draw(false);
+            reCountTotal();
         <?php endif; ?>
 
     })

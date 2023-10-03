@@ -766,7 +766,7 @@
         formData.append('nominalGajiPerHari', gajiPerHari);
         formData.append('nominalCadangan', cadanganPerHari);
         formData.append("payrollID", "<?= $payrollDetail['id'] ?>");
-        formData.append("gajiPerHariID", "<?= $gajiPerHari['id'] ?>");
+        formData.append("gajiPerHariID", "<?= $gajiPerHari == null ? 0 : $gajiPerHari['id'] ?>");
         formData.append("cadanganID", "<?= $nominalUangCadangan == null ? 0 : $nominalUangCadangan['id'] ?>");
 
         $.ajax({

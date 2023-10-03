@@ -549,4 +549,21 @@ class Payroll extends BaseController
 
         exit(0);
     }
+
+    public function exportPdfPayrollDivisionDetail($yearMonth, $divisionID)
+    {
+        $dompdf = new Dompdf();
+        $payrollModel = new PayrollsModel();
+
+        $data = [
+            'payrollData' => $payrollModel->getPayrollDetail($yearMonth, $divisionID, $this->this_company_id)
+        ];
+
+        $dompdf->loadHtml(view('hr/payroll/payroll_detail_division', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Detail Payroll Berdasarkan Divisi ", array("Attachment" => false));
+
+        exit(0);
+    }
 }
