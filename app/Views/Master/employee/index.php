@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" minlength="18" maxlength="18" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" minlength="18" maxlength="18" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
                                 <label for="floatingInput">NIP (Wajib)</label>
                             </div>
                         </div>
