@@ -14,12 +14,19 @@
 
         h4 {
             font-weight: normal;
-            font-size: large;
+            font-size: 15px;
+            margin-bottom: 10px;
         }
 
         hr {
             border: none;
             border-top: 1px dashed #000;
+        }
+
+        @page {
+            size: 9.44in 10.00in landscape;
+            margin: 29px;
+            padding: 29px;
         }
     </style>
 </head>

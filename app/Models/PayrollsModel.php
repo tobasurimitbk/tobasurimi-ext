@@ -376,6 +376,56 @@ class PayrollsModel extends Model
         ];
     }
 
+
+    public function getPayrollDetail($yearMonth, $divisionID, $companyID)
+    {
+
+        $payrollModel = new PayrollsModel();
+        $employeeModel = new EmployeesModel();
+        $formLemburModel = new FormLemburModel();
+        $payrollGajiModel = new PayrollGajiConjunctionModel();
+        $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
+        $rekapPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
+        $companyModel = new CompaniesModel();
+        $divisiModel = new DivisisModel();
+
+        $employeePayroll = $this->asArray()->select('payrolls.*, employees.division_id')
+            ->join('employees', 'employees.id = payrolls.employee_id')
+            ->where('payrolls.year_month', $yearMonth)
+            ->where('employees.company_id', $companyID)
+            ->where('employees.division_id', $divisionID)
+            ->findAll();
+
+        $data = [];
+
+        foreach ($employeePayroll as $ep) {
+            $payrollDetail = $payrollModel->where('id', $ep['id'])->first();
+            $employee = $employeeModel->where('id', $ep['employee_id'])->first();
+            $splitJamLembur = $formLemburModel->getTotalLemburJamPertamaKedua($payrollDetail['employee_id'], $payrollDetail['year_month']);
+
+            $data[] = [
+                'payroll' => $payrollDetail,
+                'employee' => $employee,
+                'gajiPerHari' => $payrollGajiModel->getNominalGajiPerHariPayroll($ep['id']),
+                'nominalUangCadangan' => $payrollGajiModel->getNominalUangCadanganPayroll($ep['id']),
+                'rekapLembur' => $formLemburModel->rekap($payrollDetail['employee_id'], $payrollDetail['year_month']),
+                'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
+                'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
+                'perhitunganGaji' => $payrollGajiModel->getPerhitunganKomponenGajiPayroll($ep['id']),
+                'totalNominalKeterlambatanPresensi' => $attendanceTerlambatModel->getTotalRekap($ep['id']),
+                'totalNominalRekapPerizinanNotApproved' => $rekapPerizinanNotApprovedModel->getTotalRekap($ep['id'])
+            ];
+        }
+
+        return [
+            'year' => explode("-", $yearMonth)[0],
+            'month' => explode("-", $yearMonth)[1],
+            'company'  => $companyModel->where('id', $companyID)->first(),
+            'divisi' =>  $divisiModel->where('id', $divisionID)->first(),
+            'data' => $data
+        ];
+    }
+
     static function convertionIDRMoneyTotal($nilai)
     {
         $pecahan = array(
