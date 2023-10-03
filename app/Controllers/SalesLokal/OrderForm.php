@@ -104,8 +104,8 @@ class OrderForm extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $dataOrderForm = $this->SalesOrderModel
@@ -141,7 +141,7 @@ class OrderForm extends BaseController
 
     public function save()
     {
-        $items = json_decode($this->request->getPost("items"));
+        $items = json_decode($this->request->getVar("items"));
 
         $postData = $this->request->getPost();
         $postData["items"] = json_decode($postData["items"], true);
@@ -374,6 +374,13 @@ class OrderForm extends BaseController
         //Get data sales order
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
 
+        // validation
+        if ($dataSalesOrder == null) {
+            $session = session();
+            $session->setFlashdata('error', "Nama Sales tidak ditemukan");
+            return redirect()->to('order-form-lokal');
+        }
+
         foreach ($dataSalesOrder->detail as &$detail) {
             $detail['harga_barang'] = floatval($detail['harga_barang']);
             $detail['amount'] = floatval($detail['amount']);
@@ -388,7 +395,7 @@ class OrderForm extends BaseController
             ->join('employees', 'employees.id = customers.sales_id')
             ->where('customers.company_id', $this->this_company_id)
             ->findAll();
-// dd($dataSalesOrder->detail);
+        // dd($dataSalesOrder->detail);
         $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
         $dataSalesOrder->shipping_date = $dataSalesOrder->shipping_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->shipping_date)) : "";
         $data = [
@@ -430,7 +437,7 @@ class OrderForm extends BaseController
     public function update()
     {
         $payload = $this->request->getVar();
-        $items = json_decode($this->request->getPost("items"));
+        $items = json_decode($this->request->getVar("items"));
 
 
         $data = [
@@ -549,8 +556,8 @@ class OrderForm extends BaseController
             return redirect()->to('/order-form-lokal/id/' . $payload['id'])->back()->withInput();
         }
 
-        $orderDate = $this->request->getPost('order_date');
-        $shippingDate = $this->request->getPost('shipping_date');
+        $orderDate = $this->request->getVar('order_date');
+        $shippingDate = $this->request->getVar('shipping_date');
 
         $values = [
             "id_user" => $this->request->getPost('id_user'),
@@ -811,7 +818,7 @@ class OrderForm extends BaseController
             echo json_encode('[]');
             return;
         }
-        
+
         $datas = $this->SalesOrderDetailModel->getItemListByIds($ids);
 
         echo json_encode($datas);
@@ -864,7 +871,7 @@ class OrderForm extends BaseController
 
         // output the generated pdf
         $domPdf->stream($fileName, array("Attachment" => false));
-        
+
         exit();
     }
 }
