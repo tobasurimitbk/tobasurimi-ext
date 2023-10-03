@@ -108,7 +108,7 @@ class RekapFaktur extends BaseController
                 'company_id'    => $this->this_company_id,
                 'summary_no'    => $this->generateSummaryNo(),
                 'supplier_id'   => $this->request->getPost("supplier_id"),
-                'due_date'      => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("due_date")))),
+                'due_date'      => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("due_date")))),
                 'total'         => $totalSummary,
                 'is_posted'     => $this->request->getPost('is_posted') ?? 0
             ];
@@ -164,6 +164,7 @@ class RekapFaktur extends BaseController
         $localPOInvSumModel = new LocalPOInvSummaryModel();
         $condition = [
             "local_po_inv_summaries.company_id"  => $this->this_company_id,
+            "local_po_inv_summaries.is_posted" => 0
             // "faktur_type"           => "LOKAL"
         ];
         $addCondition = [
@@ -186,7 +187,7 @@ class RekapFaktur extends BaseController
                 "summary_no"    => $data->summary_no,
                 "supplier_name" => $data->supplierName,
                 "due_date"      => $data->due_date,
-                "total"         => $data->total,
+                "total"         => "Rp " . number_format($data->total ?? 0, 0, ',', '.'),
                 "summary_status" => $data->summary_status,
                 // "is_posted"     => (bool)$data->is_posted
             ]);
@@ -352,7 +353,7 @@ class RekapFaktur extends BaseController
             $id = $this->request->getPost("id");
             $supplierId = $this->request->getPost("supplier_id");
             $invoices = $this->request->getPost("invoices");
-            $due_date = $this->request->getPost("due_date");
+            $due_date = $this->request->getVar("due_date");
             $isPosted = $this->request->getPost("is_posted");
 
             $arrData = [
