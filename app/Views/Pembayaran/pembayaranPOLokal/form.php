@@ -9,9 +9,15 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-lokal"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button>
+            <?php if (!empty($dataPembayaranPOLokal)) : ?>
+                <a class="btn btn-warning btn-print float-right text-white" target="_blank" onclick="alert('Fitur Print Belum Tersedia')">
+                    <i class="fa-solid fa-print"></i> Print
+                </a>
+            <?php else : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -35,7 +41,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->payment_date ?? '' ?>">
+                            <input <?= (!empty($dataPembayaranPOLokal)) ? "disabled" : "" ?> autocomplete="one-time-code" class="form-control input-picker due_date" id="payment_date" name="payment_date" placeholder="Tanggal Jatuh Tempo" value="<?= $dataPembayaranPOLokal->payment_date ?? '' ?>">
                             <label for="floatingInput">Tanggal Pembayaran</label>
                         </div>
                     </div>
@@ -43,7 +49,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select " name="supplier_id" id="supplier">
+                            <select <?= (!empty($dataPembayaranPOLokal)) ? "disabled" : "" ?> class="form-select " name="supplier_id" id="supplier">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($suppliers as $supplier) : ?>
                                     <option value="<?= $supplier->id ?>" <?= (!empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->supplier_id == $supplier->id) ? 'selected' : '' ?>><?= $supplier->name ?></option>
@@ -55,7 +61,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" name="summary_id" id="supplier-faktur">
+                            <select <?= (!empty($dataPembayaranPOLokal)) ? "disabled" : "" ?> class="form-select" name="summary_id" id="supplier-faktur">
                                 <option value=""></option>
                                 <?php foreach ($summaryList ?? [] as $summary) : ?>
                                     <option value="<?= $summary->id ?>" data-amount="<?= floatval($summary->total) ?>" <?= ($summary->id === $dataPembayaranPOLokal->local_po_inv_summary_id) ? 'selected' : '' ?>><?= $summary->summary_no ?></option>
@@ -82,7 +88,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select " name="payment_method" id="payment_method">
+                            <select <?= (!empty($dataPembayaranPOLokal)) ? "disabled" : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value=""></option>
                                 <option value="Cash" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_method == 'Cash' ? 'selected' : '' ?>>Cash</option>
                                 <option value="Debit" <?= !empty($dataPembayaranPOLokal) && $dataPembayaranPOLokal->payment_method == 'Debit' ? 'selected' : '' ?>>Debit</option>

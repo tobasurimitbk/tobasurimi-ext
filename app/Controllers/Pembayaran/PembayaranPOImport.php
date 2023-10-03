@@ -27,22 +27,12 @@ class PembayaranPOImport extends BaseController
     }
 
     public function createPembayaranPOImport()
-    {   
-        $supplierModel = new SupplierModel();
-
-        $supplierList = $supplierModel->asObject()
-            ->where('kategori', 'IMPORT')
-            ->findAll();
-
-        $data = [
-            // 'supplierList'=> $supplierList
-        ];
-        
-        return view('Pembayaran/pembayaranPOImport/form', $data);
+    {
+        return view('Pembayaran/pembayaranPOImport/form');
     }
 
     public function getByIdPembayaranPOImport($id)
-    {   
+    {
         $importPOPaymentModel = new ImportPOPaymentModel();
         $supplierModel = new SupplierModel();
         $penerimaanBarangModel = new PenerimaanBarangModel();
@@ -52,7 +42,6 @@ class PembayaranPOImport extends BaseController
                       metadata.value AS currency";
         $paymentData = $importPOPaymentModel->asObject()
             ->select($selectQry)
-            // ->where()
             ->join('metadata', 'metadata.id = import_po_payments.currency')
             ->find($id);
 
@@ -61,9 +50,9 @@ class PembayaranPOImport extends BaseController
         $supplierCondition = [
             'kategori'  => 'IMPORT',
             'type'      => $poType,
-            'company_id'=> $this->this_company_id
+            'company_id' => $this->this_company_id
         ];
-    
+
         $supplierList = $supplierModel->asObject()
             ->where($supplierCondition)
             ->findAll();
@@ -102,22 +91,21 @@ class PembayaranPOImport extends BaseController
             'poList'        => $poList,
             'lpbList'        => $lpbList
         ];
-// dd($data);
         return view('Pembayaran/pembayaranPOImport/form', $data);
     }
 
     public function allPembayaranPOImport()
     {
         $importPOPaymentModel = new ImportPOPaymentModel();
-        
+
         $payload = [
             "pageSize" => $this->request->getGet("length"),
             "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "startdate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastdate" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $dataPembayaranPOImport = [];
@@ -126,8 +114,8 @@ class PembayaranPOImport extends BaseController
             "suppliers.company_id"  => $this->this_company_id
         ];
         $addCondition = [
-            "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "startDate" => $this->request->getGet("dateStart") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "lastDate"  => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
             "sortType"  => $this->request->getGet("sortType")
@@ -145,7 +133,7 @@ class PembayaranPOImport extends BaseController
                 "payment_no"        => $data->payment_no,
                 "supplier_name"     => $data->supplier_name,
                 "currency"          => $data->currency,
-                "amount"            => $data->payment_amt,
+                "amount"            => "Rp " . number_format($data->payment_amt ?? 0, 0, ',', '.'),
                 "payment_date"      => $data->payment_date
             ]);
         }
@@ -155,58 +143,92 @@ class PembayaranPOImport extends BaseController
             "recordsTotal"      => $paymentList['totalData'],
             "recordsFiltered"   => $paymentList['totalFilteredData'],
             "data"              => $dataPembayaranPOImport,
-            // "response"          => $response,
             "payload"           => $payload
         ];
 
         echo json_encode($data);
         return;
     }
-    
+
     public function savePembayaranPOImport()
     {
-        try{
+        try {
             $supplierModel = new SupplierModel();
             $importPOPaymentModel = new ImportPOPaymentModel();
 
             $rules = [
                 "payment_type" => [
-                    "rules" => "required|in_list[DP,Pelunasan]"
+                    "rules" => "required|in_list[DP,Pelunasan]",
+                    "messages" => [
+                        "required" => "Jenis pembayaran harus diisi.",
+                        "in_list" => "Jenis pembayaran harus salah satu dari DP atau Pelunasan."
+                    ]
                 ],
                 "po_type" => [
-                    "rules" => "required|in_list[BAKU,PENOLONG]"
+                    "rules" => "required|in_list[BAKU,PENOLONG]",
+                    "messages" => [
+                        "required" => "Tipe PO harus diisi.",
+                        "in_list" => "Tipe PO harus salah satu dari BAKU atau PENOLONG."
+                    ]
                 ],
                 "supplier_id" => [
-                    "rules" => "required|is_natural"
+                    "rules" => "required|is_natural",
+                    "messages" => [
+                        "required" => "ID Supplier harus diisi.",
+                        "is_natural" => "ID Supplier harus berupa angka."
+                    ]
                 ],
                 "import_po" => [
-                    "rules" => "permit_empty|is_natural"
+                    "rules" => "permit_empty|is_natural",
+                    "messages" => [
+                        "is_natural" => "Import PO harus berupa angka."
+                    ]
                 ],
                 "import_lpb" => [
-                    "rules" => "permit_empty|is_natural"
+                    "rules" => "permit_empty|is_natural",
+                    "messages" => [
+                        "is_natural" => "Import LPB harus berupa angka."
+                    ]
                 ],
                 "payment_amt" => [
-                    "rules" => "required|numeric"
+                    "rules" => "required",
+                    "messages" => [
+                        "required" => "Jumlah pembayaran harus diisi."
+                    ]
                 ],
                 "current_exchange_rate" => [
-                    "rules" => "required|numeric"
+                    "rules" => "required",
+                    "messages" => [
+                        "required" => "Kurs saat ini harus diisi."
+                    ]
                 ],
                 "payment_date" => [
-                    "rules" => "required|valid_date[d/m/Y]"
+                    "rules" => "required|valid_date[d/m/Y]",
+                    "messages" => [
+                        "required" => "Tanggal pembayaran harus diisi.",
+                        "valid_date" => "Format tanggal tidak valid. Gunakan format dd/mm/yyyy."
+                    ]
                 ],
                 "termin" => [
-                    "rules" => "permit_empty|is_natural"
+                    "rules" => "permit_empty|is_natural",
+                    "messages" => [
+                        "is_natural" => "Termin harus berupa angka."
+                    ]
                 ],
                 "payment_method" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    "messages" => [
+                        "required" => "Metode pembayaran harus diisi."
+                    ]
                 ],
                 "voucher_no" => [
-                    "rules" => "permit_empty"
+                    "rules" => "permit_empty",
                 ],
                 "note" => [
-                    "rules" => "permit_empty"
+                    "rules" => "permit_empty",
                 ],
             ];
+
 
             if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
@@ -236,7 +258,7 @@ class PembayaranPOImport extends BaseController
             $supplierData = $supplierModel->asObject()
                 ->where('id', $supplierId)
                 ->find();
-            
+
             if (empty($supplierData)) {
                 $data = [
                     "status"    => false,
@@ -265,6 +287,14 @@ class PembayaranPOImport extends BaseController
                 }
             }
 
+            $paymentAmtNatural = preg_replace("/[^0-9,]/", "", $this->request->getPost('payment_amt'));
+            $paymentAmtNatural = str_replace(",", ".", $paymentAmtNatural);
+            $paymentAmt = number_format((float) $paymentAmtNatural, 3, '.', '');
+
+            $currentExchangeRateNatural = preg_replace("/[^0-9,]/", "", $this->request->getPost('current_exchange_rate'));
+            $currentExchangeRateNatural = str_replace(",", ".", $currentExchangeRateNatural);
+            $currentExchangeRate = number_format((float) $paymentAmtNatural, 3, '.', '');
+
             $payload = [
                 'company_id'            => $this->this_company_id,
                 'payment_no'            => $this->generatePaymentNo(),
@@ -275,9 +305,9 @@ class PembayaranPOImport extends BaseController
                 'penerimaan_barang_id'  => $penerimaanBarangId,
                 'voucher_no'            => $this->request->getPost('voucher_no'),
                 'currency'              => $poData->currency ?? 32,
-                'payment_amt'           => $this->request->getPost('payment_amt'),
-                'current_exchange_rate' => $this->request->getPost('current_exchange_rate'),
-                'payment_date'          => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))),
+                'payment_amt'           => $paymentAmt,
+                'current_exchange_rate' => $currentExchangeRate,
+                'payment_date'          => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("payment_date")))),
                 'termin'                => $this->request->getPost('termin'),
                 'payment_method'        => $this->request->getPost('payment_method'),
                 'voucher_no'            => $this->request->getPost('voucher_no'),
@@ -299,9 +329,7 @@ class PembayaranPOImport extends BaseController
                 'code'      => 201
             ];
             echo json_encode($data);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -314,62 +342,60 @@ class PembayaranPOImport extends BaseController
 
     public function updatePembayaranPOImport()
     {
-        try{
-        $rules = [
-            "nominal_faktur" => [
-                "rules" => "required"
-            ]
-        ];
+        try {
+            $rules = [
+                "nominal_faktur" => [
+                    "rules" => "required"
+                ]
+            ];
 
-        if ($this->validate($rules)) {
-            $id = $this->request->getPost("id");
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
 
-            $payload = json_encode([
-                "multiple_faktur_id" => json_decode($this->request->getPost("multiple_faktur_id")),
-                "multiple_faktur_no" => json_decode($this->request->getPost("multiple_faktur_no")),
-                "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
-                "payment_type" => "IMPORT"
-            ]);
+                $payload = json_encode([
+                    "multiple_faktur_id" => json_decode($this->request->getVar("multiple_faktur_id")),
+                    "multiple_faktur_no" => json_decode($this->request->getVar("multiple_faktur_no")),
+                    "nominal_faktur" => formatter($this->request->getPost("nominal_faktur"), "CURR_TO_INT"),
+                    "payment_type" => "IMPORT"
+                ]);
 
-            // $data = [
-            //     "status"            => false,
-            //     "message"    => $payload,
-            //     "payload"   => $payload,
-            //     'token' => csrf_hash()
-            // ];
-            // echo json_encode($data);
+                // $data = [
+                //     "status"            => false,
+                //     "message"    => $payload,
+                //     "payload"   => $payload,
+                //     'token' => csrf_hash()
+                // ];
+                // echo json_encode($data);
 
-            $response = curl_request("PATCH", "/buktiPembayaran/$id", $this->token, $payload);
+                $response = curl_request("PATCH", "/buktiPembayaran/$id", $this->token, $payload);
 
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil diubah",
-                    "payload"   => $payload,
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil diubah",
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Diubah';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
-                    "payload"   => $payload,
+                    "message"    => "Data Gagal Diubah",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Diubah",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -382,38 +408,36 @@ class PembayaranPOImport extends BaseController
 
     public function deletePembayaranPOImport()
     {
-        try{
-        $id = $this->request->getPost("id");
+        try {
+            $id = $this->request->getPost("id");
 
-        if (!empty($id)) {
-            $response = curl_request("DELETE", "/buktiPembayaran/$id", $this->token);
-            if ($response["code"] === 200) {
-                $data = [
-                    "status"            => true,
-                    "message"   => "Data Berhasil dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+            if (!empty($id)) {
+                $response = curl_request("DELETE", "/buktiPembayaran/$id", $this->token);
+                if ($response["code"] === 200) {
+                    $data = [
+                        "status"            => true,
+                        "message"   => "Data Berhasil dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
+                    $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                }
             } else {
-                $message = is_object(json_decode($response["body"])) ? json_decode($response["body"])->message : 'Data Gagal Dihapus';
                 $data = [
                     "status"            => false,
-                    "message"    => $message,
+                    "message"    => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
-        } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Data Gagal Dihapus",
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $data = [
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -439,7 +463,7 @@ class PembayaranPOImport extends BaseController
             ->first();
 
         $summaryNo = "{$numberTemplate}0001";
-        
+
         if (!empty($lastData)) {
             $exploded = explode('/', $lastData->payment_no);
             $lastIncrement = (int)$exploded[4] + 1;
@@ -460,7 +484,6 @@ class PembayaranPOImport extends BaseController
                 ->find($POId);
 
             return $poData;
-
         } else if ($poType == 'PENOLONG') {
             $aMPurchaseOrderModel = new AMPurchaseOrderModel();
             $poData = $aMPurchaseOrderModel->asObject()
@@ -493,7 +516,6 @@ class PembayaranPOImport extends BaseController
                 ->findAll();
 
             return $poData;
-
         } else if ($poType == 'PENOLONG') {
             $aMPurchaseOrderModel = new AMPurchaseOrderModel();
             $selectQry = "am_purchase_orders.*,
@@ -511,6 +533,3 @@ class PembayaranPOImport extends BaseController
         return null;
     }
 }
-
-?>
-    

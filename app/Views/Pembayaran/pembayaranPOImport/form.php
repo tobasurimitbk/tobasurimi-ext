@@ -9,9 +9,15 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
                 Batal
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                Simpan
-            </button>
+            <?php if (!empty($paymentData)) : ?>
+                <a class="btn btn-warning btn-print float-right text-white" target="_blank" onclick="alert('Fitur Print Belum Tersedia')">
+                    <i class="fa-solid fa-print"></i> Print
+                </a>
+            <?php else : ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                    Simpan
+                </button>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -32,7 +38,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select" name="payment_type" id="payment_type">
+                            <select <?= !empty($paymentData) ? "disabled" : "" ?> class="form-select" name="payment_type" id="payment_type">
                                 <option value="" disabled selected></option>
                                 <option value="DP" <?= (!empty($paymentData) && $paymentData->payment_type == 'DP') ? 'selected' : '' ?>>DP</option>
                                 <option value="Pelunasan" <?= (!empty($paymentData) && $paymentData->payment_type == 'Pelunasan') ? 'selected' : '' ?>>Pelunasan</option>
@@ -44,7 +50,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select " name="po_type" id="po_type">
+                            <select <?= !empty($paymentData) ? "disabled" : "" ?> class="form-select " name="po_type" id="po_type">
                                 <option disabled selected value=""></option>
                                 <option value="BAKU" <?= (!empty($paymentData) && $paymentData->po_type == 'BAKU') ? 'selected' : '' ?>>Baku</option>
                                 <option value="PENOLONG" <?= (!empty($paymentData) && $paymentData->po_type == 'PENOLONG') ? 'selected' : '' ?>>Penolong</option>
@@ -54,7 +60,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select " name="supplier_id" id="supplier">
+                            <select <?= !empty($paymentData) ? "disabled" : "" ?> class="form-select " name="supplier_id" id="supplier">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($supplierList ?? [] as $supplier) : ?>
                                     <option value="<?= $supplier->id ?>" <?= (!empty($paymentData) && $paymentData->supplier_id == $supplier->id) ? 'selected' : '' ?>><?= $supplier->name ?></option>
@@ -101,7 +107,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="po_amt" name="po_amt" value="<?= $poData->total ?? '' ?>" disabled>
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="po_amt" name="po_amt" value="Rp. <?= number_format($poData->total ?? 0, 2, ',', '.')  ?>" disabled>
                             <label for="floatingInput">PO Amount</label>
                         </div>
                     </div>
@@ -111,7 +117,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="payment_amt" name="payment_amt" value="<?= $paymentData->payment_amt ?? '' ?>" onkeyup="formatNumber(this)">
+                                    <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="payment_amt" <?= !empty($paymentData) ? "readonly" : "" ?> name="payment_amt" value="<?= "Rp. " . number_format($paymentData->payment_amt ?? 0, 2, ',', '.')  ?>" onchange="this.value = formatRupiah(this.value);">
                                     <label for="floatingInput">Payment Amount</label>
                                 </div>
                             </div>
@@ -119,7 +125,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" name="current_exchange_rate" value="<?= $paymentData->current_exchange_rate ?? '' ?>" onkeyup="formatNumber(this)">
+                            <input onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" autocomplete="one-time-code" type="text" class="form-control" id="current_exchange_rate" <?= !empty($paymentData) ? "readonly" : "" ?> name="current_exchange_rate" value="<?= "Rp. " . number_format($paymentData->current_exchange_rate ??  0, 2, ',', '.')  ?>" onchange="this.value = formatRupiah(this.value);">
                             <label for="floatingInput">Kurs saat ini</label>
                         </div>
                     </div>
@@ -129,7 +135,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control" id="payment_date" name="payment_date" value="<?= $paymentData->payment_date ?? '' ?>" placeholder="Payment Date">
+                                    <input autocomplete="one-time-code" type="text" class="form-control" id="payment_date" <?= !empty($paymentData) ? "readonly" : "" ?> name="payment_date" value="<?= $paymentData->payment_date ?? '' ?>" placeholder="Payment Date">
                                     <label for="floatingInput">Payment Date</label>
                                 </div>
                             </div>
@@ -139,7 +145,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control" name="termin" id="termin" value="<?= $paymentData->termin ?? '' ?>" placeholder="Termin">
+                                    <input autocomplete="one-time-code" type="text" class="form-control" name="termin" <?= !empty($paymentData) ? "readonly" : "" ?> id="termin" value="<?= $paymentData->termin ?? '' ?>" placeholder="Termin">
                                     <label for="floatingInput">Termin</label>
                                 </div>
                             </div>
@@ -149,7 +155,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select " name="payment_method" id="payment_method">
+                            <select class="form-select " <?= !empty($paymentData) ? "disabled" : "" ?> name="payment_method" id="payment_method">
                                 <option disabled selected value=""></option>
                                 <option value="CASH" <?= (!empty($paymentData) && $paymentData->payment_method == 'CASH') ? 'selected' : '' ?>>Cash</option>
                                 <option value="TRANSFER" <?= (!empty($paymentData) && $paymentData->payment_method == 'TRANSFER') ? 'selected' : '' ?>>Transfer</option>
@@ -162,7 +168,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control" id="voucher_no" name="voucher_no" value="<?= $paymentData->voucher_no ?? '' ?>" placeholder="No. Voucher">
+                                    <input autocomplete="one-time-code" type="text" class="form-control" id="voucher_no" <?= !empty($paymentData) ? "readonly" : "" ?> name="voucher_no" value="<?= $paymentData->voucher_no ?? '' ?>" placeholder="No. Voucher">
                                     <label for="floatingInput">No. Voucher</label>
                                 </div>
                             </div>
@@ -172,7 +178,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <textarea autocomplete="one-time-code" name="note" class="form-control information text-area-all"><?= $paymentData->note ?? '' ?></textarea>
+                            <textarea autocomplete="one-time-code" name="note" class="form-control information text-area-all" <?= !empty($paymentData) ? "readonly" : "" ?>><?= $paymentData->note ?? '' ?></textarea>
                             <label for="floatingInput">Note</label>
                         </div>
                     </div>
@@ -385,7 +391,7 @@
             const amount = attr[0]?.amount;
             const currency = attr[0]?.currency;
 
-            $('#po_amt').val(amount);
+            $('#po_amt').val(formatRupiah(amount || 0));
             $('#currency').val(currency);
         });
 
@@ -469,6 +475,23 @@
             $(".no_bukti_pembayaran").attr("readonly", false);
             $(".no_bukti_pembayaran").val("");
         }
+    }
+</script>
+<script>
+    function formatRupiah(angka) {
+        if (angka === null) {
+            angka = 0;
+        }
+
+        angka = angka.toString();
+        angka = angka.replace(/\./g, ',');
+        angka = angka.replace(/[^\d,]/g, '');
+        var parts = angka.split(',');
+        var ribuan = parts[0];
+        var desimal = parts[1] || '00';
+        var reverse = ribuan.toString().split('').reverse().join('');
+        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
+        return "Rp. " + ribuanFormatted + ',' + desimal;
     }
 </script>
 

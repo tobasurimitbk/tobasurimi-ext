@@ -177,22 +177,45 @@ class PembayaranPOLokal extends BaseController
 
             $rules = [
                 "supplier_id" => [
-                    "rules" => "required|is_natural_no_zero"
+                    "rules" => "required|is_natural_no_zero",
+                    "errors" => [
+                        "required" => "Kolom Supplier wajib diisi.",
+                        "is_natural_no_zero" => "Kolom Supplier harus berisi angka yang lebih besar dari 0."
+                    ]
                 ],
                 "summary_id" => [
-                    "rules" => "required|is_natural_no_zero"
+                    "rules" => "required|is_natural_no_zero",
+                    "errors" => [
+                        "required" => "Kolom Nominal Pembayaran wajib diisi.",
+                        "is_natural_no_zero" => "Kolom Nominal Pembayaran harus berisi angka yang lebih besar dari 0."
+                    ]
                 ],
                 "due_date" => [
-                    "rules" => "required|valid_date[d/m/Y]"
+                    "rules" => "required|valid_date[d/m/Y]",
+                    "errors" => [
+                        "required" => "Kolom Jatuh Tempo wajib diisi.",
+                        "valid_date" => "Kolom Jatuh Tempo harus berisi tanggal dengan format dd/mm/yyyy."
+                    ]
                 ],
                 "payment_date" => [
-                    "rules" => "required|valid_date[d/m/Y]"
+                    "rules" => "required|valid_date[d/m/Y]",
+                    "errors" => [
+                        "required" => "Kolom Tanggal Pembayaran wajib diisi.",
+                        "valid_date" => "Kolom Tanggal Pembayaran harus berisi tanggal dengan format dd/mm/yyyy."
+                    ]
                 ],
                 "payment_method" => [
-                    "rules" => "required"
+                    "rules" => "required",
+                    "errors" => [
+                        "required" => "Kolom Metode Pembayaran wajib diisi."
+                    ]
                 ],
                 "local_po_inv_sum_detail_id.*" => [
-                    "rules" => "required|is_natural_no_zero"
+                    "rules" => "required|is_natural_no_zero",
+                    "errors" => [
+                        "required" => "Checklist item yang ingin dibayar.",
+                        "is_natural_no_zero" => "Kolom {field} harus berisi angka yang lebih besar dari 0."
+                    ]
                 ]
             ];
 
