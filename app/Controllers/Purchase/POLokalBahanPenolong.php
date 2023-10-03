@@ -246,21 +246,6 @@ class POLokalBahanPenolong extends BaseController
                     "items"                 => json_decode($this->request->getPost("items"))
                 ];
 
-                // spp number cannot be used again
-                $responsespp = $this->SppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
-
-                if(!$responsespp)
-                {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "No. SPP gagal di close",
-                        "payload"   => "",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                    return;
-                }
-
                 $totalPrice = 0;
 
                 foreach ($insertData["items"] as $value) {
@@ -272,7 +257,7 @@ class POLokalBahanPenolong extends BaseController
                 if ($insertData["po_no"] === "") {
                     $dataDivisi = $this->DivisisModel->find($insertData["divisi_id"]);
                     $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi_name"], date('y'), $insertData["divisi_id"], $last_day);
+                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $insertData["divisi_id"], $last_day);
                 };
 
                 $insert = $this->AMPurchaseOrderModel->insert($insertData);
@@ -288,6 +273,21 @@ class POLokalBahanPenolong extends BaseController
                 $payload = json_encode($insertData);
 
                 if ($insert) {
+                    // spp number cannot be used again
+                    $responsespp = $this->SppModel->where(['id' => $purchase_request_id])->set(['request_status' => 'finished'])->update();
+
+                    if(!$responsespp)
+                    {
+                        $data = [
+                            "status"            => false,
+                            "message"    => "No. SPP gagal di close",
+                            "payload"   => "",
+                            'token' => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                    
                     $data = [
                         "id"        => $insert,
                         "status"    => true,

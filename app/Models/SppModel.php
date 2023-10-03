@@ -124,7 +124,7 @@ class SppModel extends Model
 
         $sppData = $this->asObject()
             ->select($selectQry)
-            ->join('divisis', 'purchase_requests.divisi_id = divisis.id')
+            ->join('divisis', 'purchase_requests.divisi_id = divisis.id', 'left')
             ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id', 'left')
             ->find($id);
 
