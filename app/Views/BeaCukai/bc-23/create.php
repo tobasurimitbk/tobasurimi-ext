@@ -739,28 +739,27 @@
                             </tr>
                         </thead>
                         <tbody class="body-kontainer-table" id="body-kontainer-table" style="cursor: pointer;">
-                            <?php if(!empty($dataBC)){ 
-                                $list = json_decode($dataBC->data_kontainer);
+                            <?php if(!empty($dataBCKontainerDetail)){ 
                                 $row_kontainer = 0; 
-                                foreach($list as $item){    
+                                foreach($dataBCKontainerDetail as $item){    
                                     $row_kontainer = $row_kontainer + 1;
                                     if($dataBC->status_posting === "Belum Posting"){
                                 ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
                                             <?= $row_kontainer; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item->jenis_number . "-" . $item->jenis; ?>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item["jenis_description"] . "-" . $item["jenis_value"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item->ukuran_number . "-" . $item->nama_ukuran; ?>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item["ukuran_description"] . "-" . $item["ukuran_value"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item->tipe_number . "-" . $item->nama_tipe; ?>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item["tipe_description"] . "-" . $item["tipe_value"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item->no; ?>" data-ukuran="<?= $item->ukuran; ?>" data-tipe="<?= $item->tipe; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_kontainer; ?>">
-                                            <?= $item->keterangan; ?>
+                                        <td style="text-align: center;" class="edit-table-kontainer" data-no="<?= $item["jenis_id"]; ?>" data-ukuran="<?= $item["ukuran_id"]; ?>" data-tipe="<?= $item["tipe_id"]; ?>" data-keterangan="<?= $item["keterangan"]; ?>"  data-row="<?= $row_kontainer; ?>">
+                                            <?= $item["keterangan"]; ?>
                                         </td>
                                         <td style="text-align: center;">
                                             <button onclick='deleteRowKontainer(<?= $row_kontainer; ?>)'>X</button>
@@ -769,10 +768,10 @@
                                 <?php } else {?>
                                         <tr>
                                             <td style="text-align: center;"><?= $row_kontainer; ?></td>
-                                            <td style="text-align: center;"><?= $item->jenis_number . "-" . $item->jenis; ?></td>
-                                            <td style="text-align: center;"><?= $item->ukuran_number . "-" . $item->nama_ukuran; ?></td>
-                                            <td style="text-align: center;"><?= $item->tipe_number . "-" . $item->nama_tipe; ?></td>
-                                            <td style="text-align: center;"><?= $item->keterangan; ?></td>
+                                            <td style="text-align: center;"><?= $item["jenis_description"] . "-" . $item["jenis_value"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["ukuran_description"] . "-" . $item["ukuran_value"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["tipe_description"] . "-" . $item["tipe_value"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["keterangan"]; ?></td>
                                             <td></td>
                                         </tr>
                                 <?php }
@@ -1202,6 +1201,7 @@
     let list_kemasan = [];
     let list_pungutan = [];
     let list_barang = [];
+    let list_delete_kontainer = [];
     let list_delete_kemasan = [];
     let list_delete_barang = [];
 
@@ -1227,23 +1227,23 @@
     <?php } 
     } ?>
 
-    <?php if(!empty($dataBC)){
-        $list_kontainer = json_decode($dataBC->data_kontainer);
-        foreach($list_kontainer as $item){
+    <?php if(!empty($dataBCKontainerDetail)){
+        foreach($dataBCKontainerDetail as $item){
     ?> 
             row_kontainer = row_kontainer + 1;
             list_kontainer.push({
                 "row": row_kontainer,
-                "no": '<?= $item->no ?>',
-                "jenis": '<?= $item->jenis ?>',
-                "jenis_number": '<?= $item->jenis_number ?>',
-                "ukuran": '<?= $item->ukuran ?>',
-                "nama_ukuran": '<?= $item->nama_ukuran ?>',
-                "ukuran_number": '<?= $item->ukuran_number ?>',
-                "tipe": '<?= $item->tipe ?>',
-                "nama_tipe": '<?= $item->nama_tipe ?>',
-                "tipe_number": '<?= $item->tipe_number ?>',
-                "keterangan": '<?= $item->keterangan ?>',
+                "id": '<?= $item["id"] ?>',
+                "no": '<?= $item["jenis_id"] ?>',
+                "jenis": '<?= $item["jenis_value"] ?>',
+                "jenis_number": '<?= $item["jenis_description"] ?>',
+                "ukuran": '<?= $item["ukuran_id"] ?>',
+                "nama_ukuran": '<?= $item["ukuran_value"] ?>',
+                "ukuran_number": '<?= $item["ukuran_description"] ?>',
+                "tipe": '<?= $item["tipe_id"] ?>',
+                "nama_tipe": '<?= $item["tipe_value"] ?>',
+                "tipe_number": '<?= $item["tipe_description"] ?>',
+                "keterangan": '<?= $item["keterangan"] ?>',
             });
     <?php } 
     } ?>
@@ -2673,7 +2673,45 @@
                                     data.append("pemberitahu", $(".pemberitahu").val());
                                     data.append("jabatan", $(".jabatan").val());
                                     data.append("data_dokumen", JSON.stringify(list_dokumen));
-                                    data.append("data_kontainer", JSON.stringify(list_kontainer));
+
+                                    let update_list_kontainer = [];
+
+                                    if (list_delete_kontainer.length !== 0) {
+                                        list_delete_kontainer.map(obj => {
+                                            update_list_kontainer.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                ukuran_id: obj.ukuran ? Number(obj.ukuran) : 0,
+                                                tipe_id: obj.tipe ? Number(obj.tipe) : 0,
+                                                jenis_id: obj.no ? Number(obj.no) : 0,
+                                                keterangan: obj.keterangan,
+                                                isDeleted: true
+                                            })
+                                        })
+                                    }
+
+                                    list_kontainer.map(obj => {
+                                        if (obj.id) {
+                                            update_list_kontainer.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                ukuran_id: obj.ukuran ? Number(obj.ukuran) : 0,
+                                                tipe_id: obj.tipe ? Number(obj.tipe) : 0,
+                                                jenis_id: obj.no ? Number(obj.no) : 0,
+                                                keterangan: obj.keterangan,
+                                                isDeleted: false
+                                            })
+                                        } else {
+                                            update_list_kontainer.push({
+                                                id: "",
+                                                ukuran_id: obj.ukuran ? Number(obj.ukuran) : 0,
+                                                tipe_id: obj.tipe ? Number(obj.tipe) : 0,
+                                                jenis_id: obj.no ? Number(obj.no) : 0,
+                                                keterangan: obj.keterangan,
+                                                isDeleted: false
+                                            })
+                                        }
+                                    })
+
+                                    data.append("data_kontainer", JSON.stringify(update_list_kontainer));
 
                                     let update_list_kemasan = [];
 
@@ -2990,7 +3028,7 @@
 
     $('.btn-submit-kontainer').click(function() {
         let row_detail = $(".idKontainer").val() ? Number($(".idKontainer").val()) : 0;
-        let no = $(".jenisKontainer option:selected").val();
+        let no = $(".jenisKontainer").val();
         let ukuran = $(".ukuranKontainer").val();
         let tipe = $(".tipeKontainer").val();
         let keterangan = $(".keteranganKontainer").val();
@@ -3029,13 +3067,13 @@
                                 tag_html += row_kontainer;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += namajenis + "-" + jenisnumber;
+                                tag_html += jenisnumber + "-" + namajenis;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += namaukuran + "-" + ukurannumber;
+                                tag_html += ukurannumber + "-" + namaukuran;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += namatipe + "-" + tipenumber;
+                                tag_html += tipenumber + "-" + namatipe;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
                                 tag_html += keterangan;
@@ -3047,6 +3085,7 @@
 
                                 new_list_items.push({
                                     "row": row_kontainer,
+                                    "id": item.id,
                                     "no": no,
                                     "ukuran": ukuran,
                                     "tipe": tipe,
@@ -3067,13 +3106,13 @@
                                 tag_html += row_kontainer;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += item.jenis + "-" + item.jenis_number;
+                                tag_html += item.jenis_number + "-" + item.jenis;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += item.nama_ukuran + "-" + item.ukuran_number;
+                                tag_html += item.ukuran_number + "-" + item.nama_ukuran;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
-                                tag_html += item.nama_tipe + "-" + item.tipe_number;
+                                tag_html += item.tipe_number + "-" + item.nama_tipe;
                                 tag_html += "</td>";
                                 tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${item.no}" data-ukuran="${item.ukuran}" data-tipe="${item.tipe}" data-keterangan="${item.keterangan}" data-row="${row_kontainer}">`;
                                 tag_html += item.keterangan;
@@ -3100,6 +3139,7 @@
 
                         list_kontainer.push({
                             "row": row_kontainer,
+                            "id": "",
                             "no": no,
                             "ukuran": ukuran,
                             "tipe": tipe,
@@ -3120,13 +3160,13 @@
                         tag_html += row_kontainer;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += namajenis + "-" + jenisnumber;
+                        tag_html += jenisnumber + "-" + namajenis;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += namaukuran + "-" + ukurannumber;
+                        tag_html += ukurannumber + "-" + namaukuran;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
-                        tag_html += namatipe + "-" + tipenumber;
+                        tag_html += tipenumber + "-" + namatipe;
                         tag_html += "</td>";
                         tag_html += `<td style="text-align: center;" class="edit-table-kontainer" data-no="${no}" data-ukuran="${ukuran}" data-tipe="${tipe}" data-keterangan="${keterangan}" data-row="${row_kontainer}">`;
                         tag_html += keterangan;
@@ -3453,19 +3493,18 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({
-                            "row": row_kontainer,
-                            "no": item.no,
-                            "ukuran": item.ukuran,
-                            "tipe": item.tipe,
-                            "keterangan": item.keterangan,
-                            "jenis": item.jenis,
-                            "jenis_number": item.jenis_number,
-                            "nama_ukuran": item.nama_ukuran,
-                            "ukuran_number": item.ukuran_number,
-                            "nama_tipe": item.nama_tipe,
-                            "tipe_number": item.tipe_number
-                        })
+                        new_list_items.push.push({...item,
+                            row: row_kontainer
+                        });
+                    }
+                    else
+                    {
+                        if(item.id)
+                        {
+                            list_delete_kontainer.push({...item,
+                                isDeleted: true
+                            });
+                        }
                     }
                 })
 
@@ -3521,16 +3560,8 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({
-                            "row": row_kemasan,
-                            "id": item.id,
-                            "jumlah": item.jumlah,
-                            "kode": item.kode,
-                            "uraian": item.uraian,
-                            "merk": item.merk,
-                            "keterangan": item.keterangan,
-                            "jenis_kemasan": item.jenis_kemasan,
-                            "kemasan_number": item.kemasan_number
+                        new_list_items.push({...item,
+                            row: row_kemasan
                         })
                     }
                     else
@@ -3737,19 +3768,18 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({
-                            "row": row_kontainer,
-                            "no": item.no,
-                            "ukuran": item.ukuran,
-                            "tipe": item.tipe,
-                            "keterangan": item.keterangan,
-                            "jenis": item.jenis,
-                            "jenis_number": item.jenis_number,
-                            "nama_ukuran": item.nama_ukuran,
-                            "ukuran_number": item.ukuran_number,
-                            "nama_tipe": item.nama_tipe,
-                            "tipe_number": item.tipe_number
-                        })
+                        new_list_items.push.push({...item,
+                            row: row_kontainer
+                        });
+                    }
+                    else
+                    {
+                        if(item.id)
+                        {
+                            list_delete_kontainer.push({...item,
+                                isDeleted: true
+                            });
+                        }
                     }
                 })
 
@@ -3806,17 +3836,9 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({
-                            "row": row_kemasan,
-                            "id": item.id,
-                            "jumlah": item.jumlah,
-                            "kode": item.kode,
-                            "uraian": item.uraian,
-                            "merk": item.merk,
-                            "keterangan": item.keterangan,
-                            "jenis_kemasan": item.jenis_kemasan,
-                            "kemasan_number": item.kemasan_number
-                        })
+                        new_list_items.push.push({...item,
+                            row: row_kemasan
+                        });
                     }
                     else
                     {
