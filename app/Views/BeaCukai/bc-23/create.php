@@ -808,28 +808,27 @@
                             </tr>
                         </thead>
                         <tbody class="body-kemasan-table" id="body-kemasan-table" style="cursor: pointer;">
-                            <?php if(!empty($dataBC)){ 
-                                $list = json_decode($dataBC->data_kemasan);
+                            <?php if(!empty($dataBCKemasanDetail)){ 
                                 $row_kemasan = 0; 
-                                foreach($list as $item){    
+                                foreach($dataBCKemasanDetail as $item){    
                                     $row_kemasan = $row_kemasan + 1;
                                     if($dataBC->status_posting === "Belum Posting"){
                                 ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
                                             <?= $row_kemasan; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $item->jumlah; ?>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                            <?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $item->kemasan_number . "-" . $item->jenis_kemasan; ?>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                            <?= $item["description"] . "-" . $item["value"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $item->uraian; ?>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                            <?= $item["uraian"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= $item->jumlah; ?>" data-kode="<?= $item->kode; ?>" data-uraian="<?= $item->uraian; ?>" data-merk="<?= $item->merk; ?>" data-row="<?= $row_kemasan; ?>">
-                                            <?= $item->merk; ?>
+                                        <td style="text-align: center;" class="edit-table-kemasan" data-jumlah="<?= formatter($item["jumlah"], "STR_TO_FLOAT"); ?>" data-kode="<?= $item["kemasan_id"]; ?>" data-uraian="<?= $item["uraian"]; ?>" data-merk="<?= $item["merk"]; ?>" data-row="<?= $row_kemasan; ?>">
+                                            <?= $item["merk"]; ?>
                                         </td>
                                         <td style="text-align: center;">
                                             <button onclick='deleteRowKemasan(<?= $row_kemasan; ?>)'>X</button>
@@ -838,10 +837,10 @@
                                 <?php } else {?>
                                         <tr>
                                             <td style="text-align: center;"><?= $row_kemasan; ?></td>
-                                            <td style="text-align: center;"><?= $item->jumlah; ?></td>
-                                            <td style="text-align: center;"><?= $item->kemasan_number . "-" . $item->jenis_kemasan; ?></td>
-                                            <td style="text-align: center;"><?= $item->uraian; ?></td>
-                                            <td style="text-align: center;"><?= $item->merk; ?></td>
+                                            <td style="text-align: center;"><?= $item["jumlah"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["description"] . "-" . $item["value"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["uraian"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["merk"]; ?></td>
                                             <td></td>
                                         </tr>
                                 <?php }
@@ -1203,6 +1202,7 @@
     let list_kemasan = [];
     let list_pungutan = [];
     let list_barang = [];
+    let list_delete_kemasan = [];
     let list_delete_barang = [];
 
     let row_dokumen = 0;
@@ -1248,19 +1248,19 @@
     <?php } 
     } ?>
 
-    <?php if(!empty($dataBC)){
-        $list_kemasan = json_decode($dataBC->data_kemasan);
-        foreach($list_kemasan as $item){
+    <?php if(!empty($dataBCKemasanDetail)){
+        foreach($dataBCKemasanDetail as $item){
     ?> 
             row_kemasan = row_kemasan + 1;
             list_kemasan.push({
                 "row": row_kemasan,
-                "jumlah": '<?= $item->jumlah ?>',
-                "kode": '<?= $item->kode ?>',
-                "kemasan_number": '<?= $item->kemasan_number ?>',
-                "jenis_kemasan": '<?= $item->jenis_kemasan ?>',
-                "uraian": '<?= $item->uraian ?>',
-                "merk": '<?= $item->merk ?>'
+                "id": '<?= $item["id"] ?>',
+                "jumlah": '<?= formatter($item["jumlah"], "STR_TO_FLOAT") ?>',
+                "kode": '<?= $item["kemasan_id"] ?>',
+                "kemasan_number": '<?= $item["description"] ?>',
+                "jenis_kemasan": '<?= $item["value"] ?>',
+                "uraian": '<?= $item["uraian"] ?>',
+                "merk": '<?= $item["merk"] ?>'
             });
     <?php } 
     } ?>
@@ -2674,7 +2674,45 @@
                                     data.append("jabatan", $(".jabatan").val());
                                     data.append("data_dokumen", JSON.stringify(list_dokumen));
                                     data.append("data_kontainer", JSON.stringify(list_kontainer));
-                                    data.append("data_kemasan", JSON.stringify(list_kemasan));
+
+                                    let update_list_kemasan = [];
+
+                                    if (list_delete_kemasan.length !== 0) {
+                                        list_delete_kemasan.map(obj => {
+                                            update_list_kemasan.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                kemasan_id: obj.kode ? Number(obj.kode) : 0,
+                                                jumlah: obj.jumlah ? Number(obj.jumlah) : 0,
+                                                uraian: obj.uraian,
+                                                merk: obj.merk,
+                                                isDeleted: true
+                                            })
+                                        })
+                                    }
+
+                                    list_kemasan.map(obj => {
+                                        if (obj.id) {
+                                            update_list_kemasan.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                kemasan_id: obj.kode ? Number(obj.kode) : 0,
+                                                jumlah: obj.jumlah ? Number(obj.jumlah) : 0,
+                                                uraian: obj.uraian,
+                                                merk: obj.merk,
+                                                isDeleted: false
+                                            })
+                                        } else {
+                                            update_list_kemasan.push({
+                                                id: "",
+                                                kemasan_id: obj.kode ? Number(obj.kode) : 0,
+                                                jumlah: obj.jumlah ? Number(obj.jumlah) : 0,
+                                                uraian: obj.uraian,
+                                                merk: obj.merk,
+                                                isDeleted: false
+                                            })
+                                        }
+                                    })
+
+                                    data.append("data_kemasan", JSON.stringify(update_list_kemasan));
 
                                     let update_list_items = [];
 
@@ -3161,6 +3199,7 @@
 
                                 new_list_items.push({
                                     "row": row_kemasan,
+                                    "id": item.id,
                                     "jumlah": jumlah,
                                     "kode": kode,
                                     "uraian": uraian,
@@ -3210,6 +3249,7 @@
                         list_kemasan.push({
                             "row": row_kemasan,
                             "jumlah": jumlah,
+                            "id": "",
                             "kode": kode,
                             "uraian": uraian,
                             "merk": merk,
@@ -3483,6 +3523,7 @@
 
                         new_list_items.push({
                             "row": row_kemasan,
+                            "id": item.id,
                             "jumlah": item.jumlah,
                             "kode": item.kode,
                             "uraian": item.uraian,
@@ -3491,6 +3532,15 @@
                             "jenis_kemasan": item.jenis_kemasan,
                             "kemasan_number": item.kemasan_number
                         })
+                    }
+                    else
+                    {
+                        if(item.id)
+                        {
+                            list_delete_kemasan.push({...item,
+                                isDeleted: true
+                            });
+                        }
                     }
                 })
 
@@ -3758,6 +3808,7 @@
 
                         new_list_items.push({
                             "row": row_kemasan,
+                            "id": item.id,
                             "jumlah": item.jumlah,
                             "kode": item.kode,
                             "uraian": item.uraian,
@@ -3766,6 +3817,15 @@
                             "jenis_kemasan": item.jenis_kemasan,
                             "kemasan_number": item.kemasan_number
                         })
+                    }
+                    else
+                    {
+                        if(item.id)
+                        {
+                            list_delete_kemasan.push({...item,
+                                isDeleted: true
+                            });
+                        }
                     }
                 })
 

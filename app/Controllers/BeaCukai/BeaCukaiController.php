@@ -5,6 +5,7 @@ namespace App\Controllers\BeaCukai;
 use App\Controllers\BaseController;
 use App\Models\BeaCukaiModel;
 use App\Models\BeaCukaiBarangModel;
+use App\Models\BeaCukaiKemasanModel;
 use App\Models\CountryModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\SupplierModel;
@@ -18,7 +19,7 @@ use App\Models\AMPurchaseOrderModel;
 class BeaCukaiController extends BaseController
 {
 
-    private $modelRMPurchaseOrder, $modelRMImportPO, $modelAMPurchaseOrder, $modelBeaCukai, $modelBeaCukaiBarang, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
+    private $modelRMPurchaseOrder, $modelRMImportPO, $modelAMPurchaseOrder, $modelBeaCukai, $modelBeaCukaiBarang, $modelBeaCukaiKemasan, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
 
     public function __construct()
     {
@@ -27,6 +28,7 @@ class BeaCukaiController extends BaseController
         $this->modelAMPurchaseOrder = new AMPurchaseOrderModel();
         $this->modelBeaCukai = new BeaCukaiModel();
         $this->modelBeaCukaiBarang = new BeaCukaiBarangModel();
+        $this->modelBeaCukaiKemasan = new BeaCukaiKemasanModel();
         $this->modelKantorBeaCukai = new KantorBeaCukaiModel();
         $this->modelSupplier = new SupplierModel();
         $this->modelCountry = new CountryModel();
@@ -253,6 +255,13 @@ class BeaCukaiController extends BaseController
             if($dataBCBarangDetail)
             {
                 $data["dataBCBarangDetail"] = $dataBCBarangDetail;
+            }
+
+            $dataBCKemasanDetail = $this->modelBeaCukaiKemasan->getByBeaCukaiId($id);
+
+            if($dataBCKemasanDetail)
+            {
+                $data["dataBCKemasanDetail"] = $dataBCKemasanDetail;
             }
 
             // var_dump($dataBCBarangDetail);
@@ -527,39 +536,15 @@ class BeaCukaiController extends BaseController
 
                 "data_dokumen"          => $this->request->getPost("data_dokumen"),
                 "data_kontainer"        => $this->request->getPost("data_kontainer"),
-                "data_kemasan"          => $this->request->getPost("data_kemasan")
+                // "data_kemasan"          => $this->request->getPost("data_kemasan")
             ];
             
             $insert =  $this->modelBeaCukai->insert($payload);
             
             $data_barang = json_decode($this->request->getPost("data_barang"));
+            $data_kemasan = json_decode($this->request->getPost("data_kemasan"));
 
             if (!$insert) {
-                foreach($data_barang as $data)
-                {
-                    $detailPayload = [];
-
-                    $detailPayload = [
-                        'bea_cukai_id' => $insert,
-                        'barang_id' => $data->barang_id,
-                        'kategori_id' => $data->kategori_id
-                    ];
-
-                    $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
-
-                    if(!$responseDetail) {
-                        $message =  'Data Gagal Disimpan';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            "payload"   => $payload,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                        return;
-                    }
-                }
-
                 $data = [
                     "status"    => false,
                     "message"   => 'Data Gagal Disimpan!',
@@ -568,6 +553,58 @@ class BeaCukaiController extends BaseController
                 ];
                 echo json_encode($data);
                 return;
+            }
+
+            foreach($data_barang as $data)
+            {
+                $detailPayload = [];
+
+                $detailPayload = [
+                    'bea_cukai_id' => $insert,
+                    'barang_id' => $data->barang_id,
+                    'kategori_id' => $data->kategori_id
+                ];
+
+                $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
+
+                if(!$responseDetail) {
+                    $message =  'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+            }
+
+            foreach($data_kemasan as $data)
+            {
+                $detailPayload = [];
+
+                $detailPayload = [
+                    'bea_cukai_id' => $insert,
+                    'jumlah' => $data->jumlah,
+                    'kemasan_id' => $data->kemasan_id,
+                    'uraian' => $data->uraian,
+                    'merk' => $data->merk
+                ];
+
+                $responseDetail = $this->modelBeaCukaiKemasan->insert($detailPayload);
+
+                if(!$responseDetail) {
+                    $message =  'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
             }
 
             $data = [
@@ -791,12 +828,13 @@ class BeaCukaiController extends BaseController
 
                 "data_dokumen"          => $this->request->getPost("data_dokumen"),
                 "data_kontainer"        => $this->request->getPost("data_kontainer"),
-                "data_kemasan"          => $this->request->getPost("data_kemasan")
+                // "data_kemasan"          => $this->request->getPost("data_kemasan")
             ];
             
             $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();
 
             $data_barang = json_decode($this->request->getPost("data_barang"));
+            $data_kemasan = json_decode($this->request->getPost("data_kemasan"));
 
             if ($insert) {
                 foreach($data_barang as $data)
@@ -857,6 +895,82 @@ class BeaCukaiController extends BaseController
                         else
                         {
                             $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Diubah';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                foreach($data_kemasan as $data)
+                {
+                    $detailPayload = [];
+
+                    $detailPayload = [
+                        'bea_cukai_id' => $id,
+                        'jumlah' => $data->jumlah,
+                        'kemasan_id' => $data->kemasan_id,
+                        'uraian' => $data->uraian,
+                        'merk' => $data->merk
+                    ];
+
+                    // kalau hapus dan ada id
+                    if($data->isDeleted === true)
+                    {
+                        if($data->id)
+                        {
+                            $responseDetail = $this->modelBeaCukaiKemasan->delete($data->id);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Dihapus';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                         // kalau update
+                        if($data->id)
+                        {
+                            $conditionDetail = [
+                                'id' => $data->id
+                            ];
+
+                            $responseDetail = $this->modelBeaCukaiKemasan->where($conditionDetail)->set($detailPayload)->update();
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Disimpan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+
+                        // kalau create
+                        else
+                        {
+                            $responseDetail = $this->modelBeaCukaiKemasan->insert($detailPayload);
 
                             if(!$responseDetail) {
                                 $message =  'Data Gagal Diubah';

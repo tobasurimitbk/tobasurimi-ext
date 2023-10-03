@@ -94,7 +94,7 @@ class BeaCukaiModel extends Model
         'jabatan',
         'data_dokumen',
         'data_kontainer',
-        'data_kemasan',
+        // 'data_kemasan',
         'status_posting',
 
         // bc 2.5
