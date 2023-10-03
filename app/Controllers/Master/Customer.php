@@ -266,7 +266,7 @@ class Customer extends BaseController
                     ]
                 ],
                 "email" => [
-                    "rules" => "valid_email",
+                    "rules" => "permit_empty|valid_email",
                     'errors' => [
                         'valid_email' => 'Email harus valid'
                     ]
@@ -379,6 +379,13 @@ class Customer extends BaseController
                         "deletedAt" => date("Y-m-d H:i:s")
                     ];
                     $this->ListAddressesModel->update($res_list[$i]["id"], $values);
+                }
+                // handle if null
+                if (count($res_list) == 0) {
+                    $values = [
+                        "deletedAt" => date("Y-m-d H:i:s")
+                    ];
+                    $this->ListAddressesModel->update($id, $values);
                 }
                 if ($this->CustomerModel->update($id, $values)) {
                     $data = [
