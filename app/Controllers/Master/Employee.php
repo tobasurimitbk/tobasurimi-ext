@@ -67,7 +67,7 @@ class Employee extends BaseController
 
         foreach ($dataEmployee as $item) {
             // check employee with user when user not deleted
-            $check = $this->TunjanganModel->countUserByEmployeeId($item["id"]);
+            $check = $this->UserModel->countUserByEmployeeId($item["id"]);
 
             if ($check < 1) {
                 array_push($finalDataEmployee, $item);

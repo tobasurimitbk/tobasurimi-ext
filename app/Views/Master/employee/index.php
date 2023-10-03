@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="number" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
+                                <input autocomplete="one-time-code" type="number" minlength="18" maxlength="18" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
                                 <label for="floatingInput">NIP (Wajib)</label>
                             </div>
                         </div>
@@ -435,7 +435,15 @@
                     pattern: /[0-9]/,
                 }
             }
-        })
+        });
+
+        $(".nip").mask("AAAAAAAAAAAAAAAAAA", {
+            translation: {
+                "A": {
+                    pattern: /[0-9]/,
+                }
+            }
+        });
 
         //CSS SELECT2 FLOATING LABEL
         $('.province_id')
@@ -585,7 +593,9 @@
         var validator = $(".create-form").validate({
             rules: {
                 nip: {
-                    required: true
+                    required: true,
+                    minlength: 18,
+                    maxlength: 18
                 },
                 nik: {
                     minlength: 16,
@@ -613,7 +623,9 @@
             },
             messages: {
                 nip: {
-                    required: "NIP wajib diisi"
+                    required: "NIP wajib diisi",
+                    minlength: "NIK Minimal 18 Digit",
+                    maxlength: "NIK Maksimal 18 Digit"
                 },
                 nik: {
                     minlength: "NIK Minimal 16 Digit",
