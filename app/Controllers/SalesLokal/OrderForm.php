@@ -306,7 +306,7 @@ class OrderForm extends BaseController
                 "sales_id"              => $customerData->sales_id,
                 "order_date"            => $orderDate,
                 "shipping_date"         => $shippingDate,
-                "payment_terms"         => $postData['payment_terms'],
+                "payment_terms"         => $postData['termin'],
                 "keterangan"            => $postData['parent_keterangan'],
                 // "discount_rupiah"       => $postData('discount_rupiah'),
                 // "discount_percentage"   => $postData('discount_percentage'),
@@ -566,7 +566,7 @@ class OrderForm extends BaseController
             "destination" => $this->request->getPost('destination'),
             "order_date" => $orderDate ? date("Y/m/d", strtotime(str_replace("/", "-", $orderDate))) : "",
             "shipping_date" => $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-            "payment_terms" => $this->request->getPost('payment_terms'),
+            "payment_terms" => $this->request->getPost('termin'),
             "keterangan" => $this->request->getPost('parent_keterangan'),
             "discount_rupiah" => $this->request->getPost('discount_rupiah'),
             "discount_percentage" => $this->request->getPost('discount_percentage'),
@@ -754,7 +754,7 @@ class OrderForm extends BaseController
             ->select('barangs.*')
             ->select('warehouses.warehouse_name')
             ->select('satuans.nama_satuan')
-            ->where('kategori_id', 29)
+            ->where('kategori_barang', 'Jadi')
             ->findAll();
 
         $data = [
