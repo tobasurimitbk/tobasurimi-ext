@@ -10,7 +10,7 @@
                 Batal
             </a>
             <?php if (!empty($dataPembayaranPOLokal)) : ?>
-                <a class="btn btn-warning btn-print float-right text-white" target="_blank" onclick="alert('Fitur Print Belum Tersedia')">
+                <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal/print/' . $dataPembayaranPOLokal->id ?? '') ?>">
                     <i class="fa-solid fa-print"></i> Print
                 </a>
             <?php else : ?>

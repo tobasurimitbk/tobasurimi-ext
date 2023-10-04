@@ -9,6 +9,7 @@ use App\Models\LocalPOPaymentModel;
 use App\Models\LocalPOPaymentDetailModel;
 use App\Models\LocalPOInvSummaryModel;
 use App\Models\LocalPOInvSumDetailModel;
+use Dompdf\Dompdf;
 
 class PembayaranPOLokal extends BaseController
 {
@@ -423,6 +424,75 @@ class PembayaranPOLokal extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function print($id)
+    {
+        $dompdf = new Dompdf();
+
+        $localPOPaymentModel = new LocalPOPaymentModel();
+        $localPOPaymentDetModel = new LocalPOPaymentDetailModel();
+        $supplierModel = new SupplierModel();
+        $localPOInvSummaryModel = new LocalPOInvSummaryModel();
+
+        $selectQry = "local_po_payments.*,
+                      DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y') AS payment_date,
+                      DATE_FORMAT(local_po_payments.due_date, '%d/%m/%Y') AS due_date
+                      ";
+        $paymentData = $localPOPaymentModel->asObject()
+            ->select($selectQry)
+            ->find($id);
+
+        if ($paymentData == null) {
+            return redirect()->to('pembayaran-po-lokal');
+        }
+
+        $paymentDetData = $localPOPaymentDetModel->where('local_po_payment_id', $id)
+            ->findAll();
+        $paidSumDetId = array_column($paymentDetData, 'local_po_inv_sum_detail_id');
+
+        $supplier = $supplierModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->where('id', $paymentData->supplier_id)
+            ->first();
+
+        $summary = $localPOInvSummaryModel->asObject()
+            ->select("id, summary_no, total, DATE_FORMAT(due_date, '%d/%m/%Y') AS due_date")
+            ->where('id', $paymentData->local_po_inv_summary_id)
+            ->where('is_posted', 1)
+            ->first();
+
+        $selectQry = "penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
+                      penerimaan_barang_detail.nama_barang_dok AS item_name,
+                      penerimaan_barang_detail.qty AS qty,
+                      local_po_inv_sum_details.id AS local_po_inv_sum_detail_id,
+                      local_po_inv_sum_details.inv_amt AS total,
+                      satuans.kode_satuan AS unit";
+
+        $itemList = $localPOInvSummaryModel->asObject()
+            ->select($selectQry)
+            ->join('local_po_inv_sum_details', 'local_po_inv_sum_details.local_po_inv_summary_id = local_po_inv_summaries.id')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = local_po_inv_sum_details.penerimaan_barang_id')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
+            ->where('local_po_inv_summaries.id', $paymentData->local_po_inv_summary_id)
+            ->whereIn('local_po_inv_sum_details.id', $paidSumDetId)
+            ->findAll();
+
+        $data = [
+            'dataPembayaranPOLokal' => $paymentData,
+            'supplier'             => $supplier,
+            'summary'           => $summary,
+            "itemList"              => $itemList
+        ];
+
+        $dompdf->loadHtml(view('Pembayaran/pembayaranPOLokal/print', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Pembayaran PO Lokal ", array("Attachment" => false));
+
+        exit(0);
     }
 
     private function generatePaymentNo()
