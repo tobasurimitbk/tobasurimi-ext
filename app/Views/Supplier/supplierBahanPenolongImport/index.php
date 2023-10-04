@@ -341,53 +341,53 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        }, {
-            data: "kode",
-            className: "text-center"
-        }, {
-            data: "name",
-            className: "text-center"
-        }, {
-            data: "address",
-            className: "text-center"
-        }, {
-            data: "province_name",
-            className: "text-center"
-        }, {
-            data: "city_name",
-            className: "text-center"
-        }, {
-            data: "postal_code",
-            className: "text-center"
-        }, {
-            data: "no_npwp",
-            className: "text-center"
-        }, {
-            data: "phone",
-            className: "text-center"
-        }, {
-            data: "contact_person",
-            className: "text-center"
-        }, {
-            data: "email",
-            className: "text-center"
-        }
-        // , {
-        //     data: "no_rekening",
-        //     className: "text-center"
-        // }, {
-        //     data: "supplier_buyer",
-        //     className: "text-center"
-        // }, {
-        //     data: "ap_name",
-        //     className: "text-center"
-        // }, {
-        //     data: "ar_name",
-        //     className: "text-center"
-        // }
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "kode",
+                className: "text-center"
+            }, {
+                data: "name",
+                className: "text-center"
+            }, {
+                data: "address",
+                className: "text-center"
+            }, {
+                data: "province_name",
+                className: "text-center"
+            }, {
+                data: "city_name",
+                className: "text-center"
+            }, {
+                data: "postal_code",
+                className: "text-center"
+            }, {
+                data: "no_npwp",
+                className: "text-center"
+            }, {
+                data: "phone",
+                className: "text-center"
+            }, {
+                data: "contact_person",
+                className: "text-center"
+            }, {
+                data: "email",
+                className: "text-center"
+            }
+            // , {
+            //     data: "no_rekening",
+            //     className: "text-center"
+            // }, {
+            //     data: "supplier_buyer",
+            //     className: "text-center"
+            // }, {
+            //     data: "ap_name",
+            //     className: "text-center"
+            // }, {
+            //     data: "ar_name",
+            //     className: "text-center"
+            // }
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -775,7 +775,7 @@
         })
 
         $(".btn-show-form").click(function() {
-            $('.input-generate').hide();
+            // $('.input-generate').hide();
 
             $(".id").val("");
             $(".title-name").text("Tambah");
@@ -860,7 +860,7 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
 
-            $('.input-generate').show();
+            $('.input-generate').hide();
             $(".create-form")[0].reset()
             $(".delete-form").css('display', '');
             let id = data.id;

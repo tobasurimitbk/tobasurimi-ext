@@ -112,33 +112,33 @@ class SupplierBahanPenolongImport extends BaseController
                 "name" => [
                     "rules" => "required"
                 ],
-                "address" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "no_npwp" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "phone" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "contact_person" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "email" => [
-                    "rules" => "permit_empty|valid_email"
-                ],
+                // "address" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "no_npwp" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "phone" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "contact_person" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "email" => [
+                //     "rules" => "permit_empty|valid_email"
+                // ],
                 // "no_rekening" => [
                 //     "rules" => "permit_empty|string"
                 // ],
                 // "supplier_buyer" => [
                 //     "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
                 // ],
-                "country_code" => [
-                    "rules" => "required"
-                ],
-                "postal_code" => [
-                    "rules" => "permit_empty|numeric"
-                ],
+                // "country_code" => [
+                //     "rules" => "required"
+                // ],
+                // "postal_code" => [
+                //     "rules" => "permit_empty|numeric"
+                // ],
                 // "ap_id" => [
                 //     "rules" => "permit_empty|is_natural"
                 // ],
@@ -244,33 +244,33 @@ class SupplierBahanPenolongImport extends BaseController
                 "name" => [
                     "rules" => "required"
                 ],
-                "address" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "no_npwp" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "phone" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "contact_person" => [
-                    "rules" => "permit_empty|string"
-                ],
-                "email" => [
-                    "rules" => "permit_empty|valid_email"
-                ],
+                // "address" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "no_npwp" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "phone" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "contact_person" => [
+                //     "rules" => "permit_empty|string"
+                // ],
+                // "email" => [
+                //     "rules" => "permit_empty|valid_email"
+                // ],
                 // "no_rekening" => [
                 //     "rules" => "permit_empty|string"
                 // ],
                 // "supplier_buyer" => [
                 //     "rules" => "permit_empty|in_list[SUPPLIER,BUYER,SUPPLIER + BUYER]"
                 // ],
-                "country_code" => [
-                    "rules" => "required"
-                ],
-                "postal_code" => [
-                    "rules" => "permit_empty|numeric"
-                ],
+                // "country_code" => [
+                //     "rules" => "required"
+                // ],
+                // "postal_code" => [
+                //     "rules" => "permit_empty|numeric"
+                // ],
                 // "ap_id" => [
                 //     "rules" => "permit_empty|is_natural"
                 // ],
