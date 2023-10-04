@@ -73,7 +73,7 @@ class AttendancesUnitModel extends Model
         if ($addCondition['search']) {
             $DataQry->groupStart()
                 ->like('name', $addCondition['search'])
-                ->orLike('date', $addCondition['search'])
+                ->orLike('ip', $addCondition['search'])
                 ->groupEnd();
         }
 
