@@ -25,7 +25,7 @@
             font-size: 16px;
             text-align: left;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         hr {
@@ -118,7 +118,7 @@
         Item Pembayaran
     </h6>
 
-    <table width="100%" border="1" class="border-table">
+    <table width="100%" border="1" class="border-table" style="margin-top:-20px">
         <thead>
             <tr align="center">
                 <td>NO</td>

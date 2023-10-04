@@ -74,8 +74,7 @@ class User extends BaseController
                             "url"   => $res_child_access[$j]["url"],
                             "access"    => $access
                         ];
-                        if(sizeof($access) !== 0)
-                        {
+                        if (sizeof($access) !== 0) {
                             array_push($arr_child, (object) $values);
                         }
                     }
@@ -88,8 +87,7 @@ class User extends BaseController
                     "isParent"      => $res_access_list[$i]["parent_id"],
                     "child"         => $arr_child
                 ];
-                if(sizeof($arr_child) !== 0)
-                {
+                if (sizeof($arr_child) !== 0) {
                     array_push($arr, (object) $values);
                 }
             }
@@ -210,7 +208,7 @@ class User extends BaseController
                     "company_id" => $this->this_company_id,
                     "name" => $this->request->getPost("name"),
                     "username" => $this->request->getPost("username"),
-                    "user_pass" => password_hash($this->request->getPost("password"), PASSWORD_BCRYPT),
+                    "user_pass" => password_hash($this->request->getVar("password"), PASSWORD_BCRYPT),
                     "employee_id" => formatter($this->request->getPost("employee_id"), "STR_TO_INT"),
                     "company_role" => $this->request->getPost("company_role"),
                     "status" => $this->request->getPost("status"),
@@ -268,7 +266,7 @@ class User extends BaseController
                 ]
             ];
 
-             if (!$this->validate($rules)) {
+            if (!$this->validate($rules)) {
                 $errorList = $this->validator->getErrors();
                 $data = [
                     "status"    => false,
@@ -287,21 +285,17 @@ class User extends BaseController
                 // check username exist except id
                 $check_current_username = $this->UserModel->check_current_username($id, $this->request->getPost("username"));
 
-                if($check_current_username == 0)
-                {
-                    if($password)
-                    {
+                if ($check_current_username == 0) {
+                    if ($password) {
                         $payload = [
                             "company_id" => $this->this_company_id,
                             "username" => $this->request->getPost("username"),
-                            "user_pass" => password_hash($this->request->getPost("password"), PASSWORD_BCRYPT),
+                            "user_pass" => password_hash($this->request->getVar("password"), PASSWORD_BCRYPT),
                             "company_role" => $this->request->getPost("company_role"),
                             "status" => $this->request->getPost("status"),
                             "current_company_id" => $this->request->getPost("current_company_id")
                         ];
-                    }
-                    else
-                    {
+                    } else {
                         $payload = [
                             "company_id" => $this->this_company_id,
                             "username" => $this->request->getPost("username"),
@@ -335,9 +329,7 @@ class User extends BaseController
                         ];
                         echo json_encode($data);
                     }
-                }
-                else
-                {
+                } else {
                     $data = [
                         "status"            => false,
                         "message"    => "Username sudah ada!",
@@ -368,8 +360,7 @@ class User extends BaseController
                 $company_role = $response ? json_decode($response->company_role) : [];
                 $new_company_role = [];
 
-                foreach($company_role as $item)
-                {
+                foreach ($company_role as $item) {
                     $company_name = $this->CompaniesModel->find($item->company_id);
                     $role_name = $this->RolesModel->find($item->role_id);
 

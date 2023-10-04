@@ -52,8 +52,8 @@ class Auth extends BaseController
             if ($this->validate($rules)) {
                 $token = "";
 
-                $username = $this->request->getPost('username');
-                $password = $this->request->getPost('password');
+                $username = $this->request->getVar('username');
+                $password = $this->request->getVar('password');
 
                 $res_user = $this->userModel->get_by_username($username);
                 if (count($res_user) > 0) {
@@ -105,9 +105,8 @@ class Auth extends BaseController
                                         "url"   => $res_child_access[$j]["url"],
                                         "access"    => $access
                                     ];
-                                    
-                                    if(sizeof($access) !== 0)
-                                    {
+
+                                    if (sizeof($access) !== 0) {
                                         array_push($arr_child, (object) $values);
                                     }
                                 }
@@ -120,9 +119,8 @@ class Auth extends BaseController
                                 "isParent"      => $res_access_list[$i]["parent_id"],
                                 "child"         => $arr_child
                             ];
-                            
-                            if(sizeof($arr_child) !== 0)
-                            {
+
+                            if (sizeof($arr_child) !== 0) {
                                 array_push($arr, (object) $values);
                             }
                         }
@@ -137,7 +135,7 @@ class Auth extends BaseController
                         $session = (object) [
                             "isLogin" => true,
                             "token" => $token,
-                            "name" => $res_user[0]["employee_name"],
+                            "name" => $res_user[0]["name"],
                             "username" => $res_user[0]["username"],
                             "this_role_id" => $this_role_id,
                             "this_role_name" => $this_role_name,
