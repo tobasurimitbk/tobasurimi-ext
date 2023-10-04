@@ -288,12 +288,13 @@ class PembayaranPOImport extends BaseController
             }
 
             $paymentAmtNatural = preg_replace("/[^0-9,]/", "", $this->request->getPost('payment_amt'));
-            $paymentAmtNatural = str_replace(",", ".", $paymentAmtNatural);
-            $paymentAmt = number_format((float) $paymentAmtNatural, 3, '.', '');
+            $paymentAmtNaturals = str_replace(",", ".", $paymentAmtNatural);
+            $paymentAmt = number_format((float) $paymentAmtNaturals, 3, '.', '');
 
             $currentExchangeRateNatural = preg_replace("/[^0-9,]/", "", $this->request->getPost('current_exchange_rate'));
-            $currentExchangeRateNatural = str_replace(",", ".", $currentExchangeRateNatural);
-            $currentExchangeRate = number_format((float) $paymentAmtNatural, 3, '.', '');
+            $currentExchangeRateNaturals = str_replace(",", ".", $currentExchangeRateNatural);
+            $currentExchangeRate = number_format((float) $currentExchangeRateNaturals, 3, '.', '');
+
 
             $payload = [
                 'company_id'            => $this->this_company_id,

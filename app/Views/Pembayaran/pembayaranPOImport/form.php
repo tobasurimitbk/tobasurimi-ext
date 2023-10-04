@@ -31,7 +31,7 @@
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" value="<?= $paymentData->payment_no ?? '' ?>" placeholder="No. Pembayaran" disabled>
-                                    <label for="floatingInput">No. Pembayaran</label>
+                                    <label for="floatingInput">No. Pembayaran (Auto Generate)</label>
                                 </div>
                             </div>
                         </div>
@@ -479,19 +479,10 @@
 </script>
 <script>
     function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
-
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return "Rp. " + ribuanFormatted + ',' + desimal;
+        var reverse = angka.toString().split('').reverse().join('');
+        var ribuan = reverse.match(/\d{1,3}/g);
+        var formatted = ribuan.join('.').split('').reverse().join('');
+        return 'Rp. ' + formatted;
     }
 </script>
 
