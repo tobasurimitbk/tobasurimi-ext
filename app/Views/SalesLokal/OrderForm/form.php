@@ -105,7 +105,7 @@
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
-                    <div class="col-md-1">
+                    <!-- <div class="col-md-1">
                         <div class="mb-3" style="height: 50px;">
                             <label for="floatingInput">Pajak</label>
                             <div class="switch-form-pinjaman-karyawan">
@@ -115,7 +115,7 @@
                                 </label>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                     <div class="col-md-2">
                         <div class="mb-3" style="height: 50px;">
                             <label for="floatingInput">Include Pajak</label>
@@ -126,7 +126,7 @@
                                 </label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
             </form>
@@ -179,10 +179,10 @@
                             <td style="height: 40px;">Discount</td>
                             <td class="text-right" style="height: 40px;">Rp. <span id="discTotal">0</span></td>
                         </tr>
-                        <tr>
+                        <!-- <tr>
                             <td style="height: 40px;">PPn (11%)</td>
                             <td class="text-right" style="height: 40px;">Rp. <span id="taxTotal">0</span></td>
-                        </tr>
+                        </tr> -->
                         <tr>
                             <td style="height: 40px;">Biaya Kirim</td>
                             <td class="text-right" style="height: 40px;">Rp. <span id="freightCost"><?= number_format($data->estimated_freight ?? 0); ?></span></td>
@@ -251,7 +251,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
+                                <input autocomplete="one-time-code" type="number" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
                                 <label for="floatingInput">disc%</label>
                             </div>
                         </div>
@@ -289,10 +289,75 @@
     var totalPriceEdit = 0;
     let no = 0;
 
-
+    const table = $('.dataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        info: false,
+        paging: false,
+        fixedHeader: true,
+        display: "stripe",
+        searching: false,
+        ordering: false,
+        columns: [{
+                data: "no",
+                className: "text-center",
+            },
+            {
+                data: "kode_barang",
+                className: "text-center"
+            },
+            {
+                data: "nama_barang",
+                className: "text-center"
+            },
+            {
+                data: "qty",
+                className: "text-center"
+            },
+            {
+                data: "satuan",
+                className: "text-center"
+            },
+            {
+                data: "harga_barang",
+                className: "text-center"
+            },
+            {
+                data: "disc",
+                className: "text-center"
+            },
+            {
+                data: "amount",
+                className: "text-center"
+            },
+            {
+                data: "status",
+                className: "text-center actions",
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `
+                <div class="mt-2">
+                    <button data-no="${row?.no}">X</button>
+                </div>
+                `
+                }
+            }
+        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     $(document).ready(function() {
-
         <?php if (!empty($data)) {
             foreach ($data->detail as $payload) {
         ?>
@@ -306,89 +371,85 @@
                     qty: "<?= $payload['qty'] ?>",
                     amount: "<?= $payload['amount'] ?>",
                     keterangan: "<?= $payload['keterangan'] ?>",
-                    tax: <?= $payload['tax'] ?>,
+                    tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?>,
                     dept: <?= $payload['dept'] ?? 0 ?>,
                     warehouse_id: <?= $payload['id_warehouse'] ?>,
-                    warehouse_name: "<?= $payload['warehouse_name'] ?>"
+                    warehouse_name: "<?= $payload['warehouse_name'] ?>",
+                    isDeleted: false
                 });
+
+                table.row.add({
+                    no: no,
+                    id: <?= $payload['id'] ?>, 
+                    id_barang: <?= $payload['id_barang'] ?>,
+                    kode_barang: '<?= $payload['kode_barang'] ?>',
+                    nama_barang: '<?= $payload['nama_barang'] ?>',
+                    qty: '<?= $payload['qty'] ?>',
+                    satuan: '<?= $payload['satuan'] ?>',
+                    harga_barang: Number('<?= $payload['harga_barang'] ?>').toLocaleString(),
+                    barangTotal: Number("<?= $payload['amount'] ?>"),
+                    disc: "<?= $payload['discount_percentage'] ?>",
+                    tax:  null,
+                    taxAmt: null,
+                    keterangan: "<?= $payload['keterangan'] ?>",
+                    discAmt: Number("<?= $payload['amount'] ?>") * (Number("<?= $payload['discount_percentage'] ?>") / 100),
+                    amount: Number("<?= $payload['amount'] ?>").toLocaleString(),
+                    dept: <?= $payload['dept'] ?? 0 ?>,
+                    warehouse_id: <?= $payload['id_warehouse'] ?>,
+                    warehouse_name: "<?= $payload['warehouse_name'] ?>",
+                    isDeleted: false
+                }).draw(false);
             <?php
             }
             ?>
         <?php
         } ?>
 
-        const table = $('.dataTable').DataTable({
-            dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-            processing: true,
-            info: false,
-            paging: false,
-            fixedHeader: true,
-            display: "stripe",
-            searching: false,
-            ordering: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                },
+        $('.dataTable tbody').on('click', 'button', function() { // delete datatable row
+            console.log($(this).data('no'))
+            table.clear().draw();
+            // table.row($(this).parents('tr')).remove().draw();
+            let new_list = [];
+            no = 0;
+            row = 0;
+            list_items.map((obj) => {
+                if(obj.no !== $(this).data('no'))
                 {
-                    data: "kode_barang",
-                    className: "text-center"
-                },
+                    no = no + 1;
+                    new_list.push(obj);
+
+                    table.row.add({
+                        id: obj.id,
+                        no: no,
+                        id_barang: obj.id_barang,
+                        kode_barang: obj.kode_barang,
+                        nama_barang: obj.nama_barang,
+                        qty: obj.qty,
+                        satuan: obj.satuan,
+                        harga_barang: obj.harga,
+                        barangTotal: obj.amount,
+                        disc: obj.disc,
+                        tax: obj.tax,
+                        taxAmt: obj.taxAmt,
+                        keterangan: obj.keterangan,
+                        discAmt: obj.discAmt,
+                        amount: Number(obj.amount).toLocaleString(),
+                        dept: obj.dept,
+                        warehouse_id: obj.warehouse_id,
+                        warehouse_name: obj.warehouse_name,
+                        isDeleted: false
+                    }).draw(false);
+                }
+                else
                 {
-                    data: "nama_barang",
-                    className: "text-center"
-                },
-                {
-                    data: "qty",
-                    className: "text-center"
-                },
-                {
-                    data: "satuan",
-                    className: "text-center"
-                },
-                {
-                    data: "harga_barang",
-                    className: "text-center"
-                },
-                {
-                    data: "disc",
-                    className: "text-center"
-                },
-                {
-                    data: "amount",
-                    className: "text-center"
-                },
-                {
-                    data: "status",
-                    className: "text-center actions",
-                    render: function(data, type, row) {
-                        let id = row?.id;
-                        return `
-                    <div class="mt-2">
-                        <button>X</button>
-                    </div>
-                    `
+                    if(obj.id)
+                    {
+                        list_delete.push(obj);
                     }
                 }
-            ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        $('.dataTable tbody').on('click', 'button', function() { // delete datatable row
-            table.row($(this).parents('tr')).remove().draw();
-
+            })
+            list_items = new_list;
             reCountTotal();
         });
 
@@ -633,6 +694,7 @@
 
                 $(".nama_barang").val(nama);
                 $(".harga").val(harga ? Number(harga).toLocaleString('en-EN') : "");
+                $(".amount").val(Number((harga ? Number(harga) : 0) * ($(".qty").val() ? Number($(".qty").val()) : 0)).toLocaleString())
                 // $(".id_warehouse").val(warehouseId);
                 // $(".warehouse").val(warehouseName);
             } else {
@@ -739,6 +801,8 @@
 
                         let update_list_items = [];
 
+                        update_list_items = tableData;
+
                         if (list_delete.length !== 0) {
                             list_delete.map(obj => {
                                 update_list_items.push({
@@ -764,7 +828,7 @@
                         tableData.map(obj => {
                             console.log(obj)
                             // total = total + (obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0) * (obj.qty ? Number(obj.qty) : 0);
-                            total += obj.amount || 0;
+                            total += Number(obj.amount.replaceAll(",", "")) || 0;
 
                             if (taxStatus && !includeTaxStatus) {
                                 taxAmt += obj.taxAmt ?? 0;
@@ -810,7 +874,7 @@
                         data.append('taxAmt', taxAmt)
                         data.append("tax_status", taxStatus)
                         data.append("include_tax", includeTaxStatus)
-                        data.append("items", JSON.stringify(tableData))
+                        data.append("items", JSON.stringify(update_list_items))
                         // data.append("items", update_list_items)
 
                         // var object = {};
@@ -967,6 +1031,19 @@
             let amount = (harga * qty).toLocaleString();
             $(".amount").val(amount);
         });
+
+        $(".discount_percentage").keyup(function() {
+            if ($(".discount_percentage").val()) {
+                if ($(".discount_percentage").val() > 100) {
+                    $(".discount_percentage").val(100)
+                }
+                if ($(".discount_percentage").val() < 0) {
+                    $(".discount_percentage").val();
+                }
+            } else {
+                $(".discount_percentage").val();
+            }
+        })
 
         $(".btn-submit-detail").click(function() {
             let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
@@ -1202,10 +1279,17 @@
                                     discount_percentage: discountPercentage,
                                     dept: dept,
                                     warehouse_id: warehouseId,
-                                    warhouse_name: warhouseName
+                                    warhouse_name: warhouseName,
+
+                                    kode_barang: selectedData.code,
+                                    satuan: selectedData.satuan,
+                                    disc: discountPercentage,
+                                    discAmt: discAmt,
+                                    isDeleted: false
                                 });
 
                                 table.row.add({
+                                    id: "",
                                     no: no,
                                     id_barang: id_barang,
                                     kode_barang: selectedData.code,
@@ -1222,7 +1306,8 @@
                                     amount: Number(discountedAmt).toLocaleString(),
                                     dept: dept,
                                     warehouse_id: warehouseId,
-                                    warehouse_name: warhouseName
+                                    warehouse_name: warhouseName,
+                                    isDeleted: false
                                 }).draw(false);
 
                                 reCountTotal();
@@ -1329,7 +1414,7 @@
 
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#discTotal').html(discTotal.toLocaleString());
-            $('#taxTotal').html(taxTotalHtml.toLocaleString());
+            // $('#taxTotal').html(taxTotalHtml.toLocaleString());
 
             // if (includeTax) taxTotal = 0;
 
@@ -1357,8 +1442,8 @@
         });
 
         <?php if (!empty($data)) : ?>
-            const dataHaciu = <?= json_encode($data->detail) ?>;
-            table.rows.add(dataHaciu).draw(false);
+            // const dataHaciu = <?= json_encode($data->detail) ?>;
+            // table.rows.add(dataHaciu).draw(false);
             reCountTotal();
         <?php endif; ?>
 

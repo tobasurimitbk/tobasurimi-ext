@@ -207,12 +207,12 @@ class OrderForm extends BaseController
                     'required' => 'id barang tidak boleh kosong',
                 ],
             ],
-            "items.*.harga_barang" => [
-                "rules" => "required|numeric|greater_than_equal_to[0]",
-                'errors' => [
-                    'required' => 'Harga barang tidak boleh kosong',
-                ],
-            ],
+            // "items.*.harga_barang" => [
+            //     "rules" => "required|numeric|greater_than_equal_to[0]",
+            //     'errors' => [
+            //         'required' => 'Harga barang tidak boleh kosong',
+            //     ],
+            // ],
             "items.*.qty" => [
                 "rules" => "required|numeric|greater_than[0]",
                 'errors' => [
@@ -310,10 +310,10 @@ class OrderForm extends BaseController
                 "keterangan"            => $postData['parent_keterangan'],
                 // "discount_rupiah"       => $postData('discount_rupiah'),
                 // "discount_percentage"   => $postData('discount_percentage'),
-                "ppn"                   => $postData['taxAmt'],
+                // "ppn"                   => $postData['taxAmt'],
                 "estimated_freight"     => $estimatedFreight,
-                "tax_status"            => $postData['tax_status'],
-                "include_pa"            => $postData['include_tax'],
+                // "tax_status"            => $postData['tax_status'],
+                // "include_pa"            => $postData['include_tax'],
                 "total_harga"           => $postData['total'],
                 "tipe_sales_order"      => 'LOKAL'
             ];
@@ -332,9 +332,9 @@ class OrderForm extends BaseController
                     "id_sales_order"        => $dataSalesOrder,
                     "id_barang"             => $row->id_barang,
                     "qty"                   => $row->qty,
-                    "amount"                => $row->amount,
+                    "amount"                => formatter($row->amount, "CURR_TO_INT"),
                     "keterangan"            => $row->keterangan,
-                    "tax"                   => $row->tax,
+                    // "tax"                   => $row->tax,
                     "discount_percentage"   => $row->disc,
                     // "dept"                  => $row->dept,
                     "id_warehouse"          => $row->warehouse_id,
@@ -373,6 +373,9 @@ class OrderForm extends BaseController
     {
         //Get data sales order
         $dataSalesOrder = $this->SalesOrderModel->getSalesOrderLokalById(($id));
+
+        // var_dump($dataSalesOrder);
+        // die;
 
         // validation
         if ($dataSalesOrder == null) {
@@ -436,9 +439,10 @@ class OrderForm extends BaseController
 
     public function update()
     {
-        $payload = $this->request->getVar();
-        $items = json_decode($this->request->getVar("items"));
+        $items = json_decode($this->request->getPost("items"));
 
+        $payload = $this->request->getPost();
+        $postData["items"] = json_decode($payload["items"], true);
 
         $data = [
             "payload" => $payload,
@@ -447,57 +451,39 @@ class OrderForm extends BaseController
         ];
         //echo json_encode($data);
 
-        $validate = $this->validate([
-            "id" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'id tidak boleh kosong',
-                ]
-            ],
-            "id_user" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'User tidak boleh kosong',
-                ]
-            ],
+        $validate = [
             "id_customer" => [
-                "rules" => "required",
-                'errors' =>
-                [
+                "rules" => "required|is_natural_no_zero",
+                'errors' => [
                     'required' => 'Customer tidak boleh kosong',
                 ]
             ],
-            "destination" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'tujuan pengiriman tidak boleh kosong',
-                ]
-            ],
             "order_date" => [
-                "rules" => "required",
-                'errors' =>
-                [
-                    'required' => 'tanggal pemesanan ID tidak boleh kosong',
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
+                    'required' => 'tanggal pemesananan tidak boleh kosong',
                 ]
             ],
             "shipping_date" => [
-                "rules" => "required",
-                'errors' =>
-                [
+                "rules" => "required|valid_date[d/m/Y]",
+                'errors' => [
                     'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
             ],
+            "estimated_freight" => [
+                "rules" => "permit_empty|is_natural",
+                'errors' => [
+                    // 'required' => 'tanggal pengiriman tidak boleh kosong',
+                ]
+            ],
             "tax_status" => [
-                "rules" => "required",
+                "rules" => "permit_empty|in_list[true,false]",
                 'errors' => [
                     'required' => 'tax status tidak boleh kosong',
                 ]
             ],
-            "include_pa" => [
-                "rules" => "required",
+            "include_tax" => [
+                "rules" => "permit_empty|in_list[true,false]",
                 'errors' => [
                     'required' => 'include pa tidak boleh kosong',
                 ]
@@ -510,54 +496,69 @@ class OrderForm extends BaseController
             ],
             "tipe_sales_order" => [
                 "rules" => "required",
-                'errors' =>
-                [
+                'errors' => [
                     'required' => 'tipe sales order tidak boleh kosong',
                 ],
             ],
             "items" => [
                 "rules" => "required",
-                'errors' =>
-                [
+                'errors' => [
                     'required' => 'barang tidak boleh kosong',
                 ],
             ],
-            /*
-            "items" => 'is_array',
-            "items.id_barang" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'Barang tidak boleh kosong',
-                ]
-            ],
-            "items.qty" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'qty tidak boleh kosong',
-                ]
-            ],
-            "items.amount" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'total harga tidak boleh kosong',
-                ]
-            ],
-            "items.warehouse_id" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'warehouse tidak boleh kosong',
-                ]
-            ],*/
+            // "items.*.id_barang" => [
+            //     "rules" => "required",
+            //     'errors' => [
+            //         'required' => 'id barang tidak boleh kosong',
+            //     ],
+            // ],
+            // "items.*.harga_barang" => [
+            //     "rules" => "required|numeric|greater_than_equal_to[0]",
+            //     'errors' => [
+            //         'required' => 'Harga barang tidak boleh kosong',
+            //     ],
+            // ],
+            // "items.*.qty" => [
+            //     "rules" => "required|numeric|greater_than[0]",
+            //     'errors' => [
+            //         'required' => 'Qty barang tidak boleh kosong',
+            //     ],
+            // ],
+            // "items.*.discount_percentage" => [
+            //     "rules" => "permit_empty|numeric|greater_than_equal_to[0]",
+            //     'errors' => [
+            //         // 'required' => 'barang tidak boleh kosong',
+            //     ],
+            // ],
+            // "items.*.warehouse_id" => [
+            //     "rules" => "required|numeric|greater_than_equal_to[0]",
+            //     'errors' => [
+            //         'required' => 'Gudang barang tidak boleh kosong',
+            //     ],
+            // ],
+        ];
 
-        ]);
-        if (!$validate) {
-            //echo json_encode($payload);
-            //return;
-            return redirect()->to('/order-form-lokal/id/' . $payload['id'])->back()->withInput();
+        // $data = [
+        //     "status"    => false,
+        //     "message"   => json_encode($payload),
+        //     'token'     => csrf_hash(),
+        // ];
+        // echo json_encode($data);
+        // return;
+
+        if (!$this->validateData($payload, $validate)) {
+            $errorList = $this->validator->getErrors();
+            $data = [
+                "status"    => false,
+                "message"   => $errorList[array_keys($errorList)[0]],
+                'token'     => csrf_hash(),
+            ];
+            echo json_encode($data);
+            return;
         }
 
-        $orderDate = $this->request->getVar('order_date');
-        $shippingDate = $this->request->getVar('shipping_date');
+        $orderDate = $this->request->getPost('order_date');
+        $shippingDate = $this->request->getPost('shipping_date');
 
         $values = [
             "id_user" => $this->request->getPost('id_user'),
@@ -570,10 +571,10 @@ class OrderForm extends BaseController
             "keterangan" => $this->request->getPost('parent_keterangan'),
             "discount_rupiah" => $this->request->getPost('discount_rupiah'),
             "discount_percentage" => $this->request->getPost('discount_percentage'),
-            "ppn" => $this->request->getPost('ppn'),
+            // "ppn" => $this->request->getPost('ppn'),
             "estimated_freight" => $this->request->getPost('estimated_freight'),
-            "tax_status" => $this->request->getPost('tax_status'),
-            "include_pa" => $this->request->getPost('include_pa'),
+            // "tax_status" => $this->request->getPost('tax_status'),
+            // "include_pa" => $this->request->getPost('include_pa'),
             "total_harga" => $this->request->getPost('total'),
             "tipe_sales_order" => $this->request->getPost('tipe_sales_order'),
         ];
@@ -584,79 +585,189 @@ class OrderForm extends BaseController
             $dataSalesOrder =  $this->SalesOrderModel->update($payload['id'], $values);
 
             $totalQty = 0;
+
+            // codingan baru
             foreach ($items as $row) {
-                $item = $this->DetailStockBarang
-                    ->where('barang_id', $row->id_barang)
-                    ->where('warehouse_id', $row->warehouse_id)
-                    ->first();
+                if($row->id === "")
+                {
+                    $barangData = $this->BarangModel->asObject()
+                        ->where('id', $row->id_barang)
+                        ->where('company_id', $this->this_company_id)
+                        ->first();
 
-
-
-                if ($row->id && $row->isDeleted === false) {
-                    $dataBefore = $this->SalesOrderDetailModel->asObject()->find($row->id);
-                    if ($dataBefore->qty > $row->qty) {
-                        $dataItems = $dataBefore->qty - $row->qty;
-                        $stok = [
-                            "stok" => ($item['stok'] + $dataItems),
+                    if (empty($barangData)) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => 'Barang tidak ditemukan',
+                            'token'     => csrf_hash(),
                         ];
-                    } else {
-                        $dataItems =  $row->qty - $dataBefore->qty;
-                        $checkItems = $item['stok'] - $dataItems;
+                        echo json_encode($data);
+                        return;
+                    }
 
-
-                        if ($checkItems < 0) {
-                            throw new ErrorException('barang tidak boleh kurang dari stock');
-                        }
-                        $stok = [
-                            "stok" => ($item['stok'] - $dataItems),
+                    if ($barangData->stok < $row->qty) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => 'Stock tidak cukup',
+                            'token'     => csrf_hash(),
                         ];
+                        echo json_encode($data);
+                        return;
                     }
+
+                    $this->BarangModel->builder()->decrement('stok', $row->qty);
+                    $this->stockDetailModel->reduceStock($row->id_barang, $row->warehouse_id, $row->qty);
+
                     $totalQty = $totalQty + $row->qty;
-
                     $valueBarang = [
-                        "id_barang" => $row->id_barang,
-                        "qty" => $row->qty,
-                        "amount" => $row->amount,
-                        "keterangan" => $row->keterangan,
-                        "tax" => $row->tax,
-                        "discount_percentage" => $row->discount_percentage,
-                        "dept" => $row->dept,
-                        "id_warehouse" => $row->warehouse_id,
-                    ];
-
-                    $this->DetailStockBarang->update($item['id'], $stok);
-
-                    $this->SalesOrderDetailModel->update($row->id, $valueBarang);
-                } else if ($row->id && $row->isDeleted === true) {
-                    $this->SalesOrderDetailModel->delete($row->id);
-                    $stok = [
-                        "stok" => ($item['stok'] + $row->qty),
-                    ];
-                    $this->DetailStockBarang->update($item['id'], $stok);
-                } else {
-                    if ($item['stok'] > $row->qty) {
-                        throw new ErrorException('barang tidak boleh kurang dari stock');
-                    }
-                    $totalQty = $totalQty + $row->qty;
-
-                    $valueBarang = [
-                        "id_sales_order" => $payload['id'],
-                        "id_barang" => $row->id_barang,
-                        "qty" => $row->qty,
-                        "amount" => $row->amount,
-                        "keterangan" => $row->keterangan,
-                        "tax" => $row->tax,
-                        "discount_percentage" => $row->discount_percentage,
-                        "dept" => $row->dept,
-                        "id_warehouse" => $row->warehouse_id,
+                        "id_sales_order"        => $payload['id'],
+                        "id_barang"             => $row->id_barang,
+                        "qty"                   => $row->qty,
+                        "amount"                => formatter($row->amount, "CURR_TO_INT"),
+                        "keterangan"            => $row->keterangan,
+                        // "tax"                   => $row->tax,
+                        "discount_percentage"   => $row->disc,
+                        // "dept"                  => $row->dept,
+                        "id_warehouse"          => $row->warehouse_id,
                     ];
                     $this->SalesOrderDetailModel->save($valueBarang);
-                    $stok = [
-                        "stok" => ($item['stok'] - $row->qty),
-                    ];
-                    $this->DetailStockBarang->update($item['id'], $stok);
+                }
+                else
+                {
+                    // $data = [
+                    //     "status"            => false,
+                    //     "message"    => json_encode($row),
+                    //     'token' => csrf_hash(),
+                    // ];
+                    // return json_encode($data);
+
+                    if($row->isDeleted === true)
+                    {
+                        $this->SalesOrderDetailModel->delete($row->id);
+                        $this->stockDetailModel->addStock($row->id_barang, $row->warehouse_id, $row->qty);
+                    }
+                    else
+                    {
+                        $item = $this->stockDetailModel
+                        ->where('barang_id', $row->id_barang)
+                        ->where('warehouse_id', $row->warehouse_id)
+                        ->first();
+
+                        $dataBefore = $this->SalesOrderDetailModel->asObject()->find($row->id);
+                        if ($dataBefore->qty > $row->qty) {
+                            $dataItems = $dataBefore->qty - $row->qty;
+                            $stok = [
+                                "stok" => ($item['qty'] + $dataItems),
+                            ];
+
+                            $this->stockDetailModel->update($item['id'], $stok);
+                        }
+
+                        if ($dataBefore->qty < $row->qty) {
+                        
+                            $dataItems =  $row->qty - $dataBefore->qty;
+                            $checkItems = $item['stok'] - $dataItems;
+
+
+                            if ($checkItems < 0) {
+                                throw new ErrorException('barang tidak boleh kurang dari stock');
+                            }
+                            $stok = [
+                                "stok" => ($item['qty'] - $dataItems)
+                            ];
+
+                            // $totalQty = $totalQty + $row->qty;
+                            $this->stockDetailModel->update($item['id'], $stok);
+                        }
+
+                        $valueBarang = [
+                            "id_barang" => $row->id_barang,
+                            "qty" => $row->qty,
+                            "amount" => formatter($row->amount, "CURR_TO_INT"),
+                            "keterangan" => $row->keterangan,
+                            // "tax" => $row->tax,
+                            "discount_percentage" => $row->disc,
+                            "dept" => $row->dept,
+                            "id_warehouse" => $row->warehouse_id,
+                        ];
+    
+                        $this->SalesOrderDetailModel->update($row->id, $valueBarang);    
+                    }
                 }
             }
+
+            // codingan lama
+            // foreach ($items as $row) {
+            //     $item = $this->DetailStockBarang
+            //         ->where('barang_id', $row->id_barang)
+            //         ->where('warehouse_id', $row->warehouse_id)
+            //         ->first();
+
+            //     if ($row->id && $row->isDeleted === false) {
+            //         $dataBefore = $this->SalesOrderDetailModel->asObject()->find($row->id);
+            //         if ($dataBefore->qty > $row->qty) {
+            //             $dataItems = $dataBefore->qty - $row->qty;
+            //             $stok = [
+            //                 "stok" => ($item['stok'] + $dataItems),
+            //             ];
+            //         } else {
+            //             $dataItems =  $row->qty - $dataBefore->qty;
+            //             $checkItems = $item['stok'] - $dataItems;
+
+
+            //             if ($checkItems < 0) {
+            //                 throw new ErrorException('barang tidak boleh kurang dari stock');
+            //             }
+            //             $stok = [
+            //                 "stok" => ($item['stok'] - $dataItems),
+            //             ];
+            //         }
+            //         $totalQty = $totalQty + $row->qty;
+
+            //         $valueBarang = [
+            //             "id_barang" => $row->id_barang,
+            //             "qty" => $row->qty,
+            //             "amount" => formatter($row->amount, "CURR_TO_INT"),
+            //             "keterangan" => $row->keterangan,
+            //             // "tax" => $row->tax,
+            //             "discount_percentage" => $row->discount_percentage,
+            //             "dept" => $row->dept,
+            //             "id_warehouse" => $row->warehouse_id,
+            //         ];
+
+            //         $this->DetailStockBarang->update($item['id'], $stok);
+
+            //         $this->SalesOrderDetailModel->update($row->id, $valueBarang);
+            //     } else if ($row->id && $row->isDeleted === true) {
+            //         $this->SalesOrderDetailModel->delete($row->id);
+            //         $stok = [
+            //             "stok" => ($item['stok'] + $row->qty),
+            //         ];
+            //         $this->DetailStockBarang->update($item['id'], $stok);
+            //     } else {
+            //         if ($item['stok'] > $row->qty) {
+            //             throw new ErrorException('barang tidak boleh kurang dari stock');
+            //         }
+            //         $totalQty = $totalQty + $row->qty;
+
+            //         $valueBarang = [
+            //             "id_sales_order" => $payload['id'],
+            //             "id_barang" => $row->id_barang,
+            //             "qty" => $row->qty,
+            //             "amount" => $row->amount,
+            //             "keterangan" => $row->keterangan,
+            //             "tax" => $row->tax,
+            //             "discount_percentage" => $row->discount_percentage,
+            //             "dept" => $row->dept,
+            //             "id_warehouse" => $row->warehouse_id,
+            //         ];
+            //         $this->SalesOrderDetailModel->save($valueBarang);
+            //         $stok = [
+            //             "stok" => ($item['stok'] - $row->qty),
+            //         ];
+            //         $this->DetailStockBarang->update($item['id'], $stok);
+            //     }
+            // }
 
             $this->SalesOrderModel->update($payload['id'], ['qty_barang' => $totalQty]);
 
