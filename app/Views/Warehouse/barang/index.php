@@ -840,26 +840,27 @@
                         
                         validator.resetForm();
                         validator.reset();
+                        // $.ajax({
+                        //     url: `<?= base_url("barang/dropdown/parent"); ?>`,
+                        //     method: "GET",
+                        //     dataType: "json",
+                        //     success: function(result) {
+                        //         $(".parent_id").empty()
+                        //         $(".parent_id").append(`<option value=""></option>`)
+                        //         result.data.forEach(function(item) {
+                        //             if(item.id == Number(res?.data?.parent_id))
+                        //             {
+                        //                 $(".parent_id").append(`<option selected value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                        //             }
+                        //             else
+                        //             {
+                        //                 $(".parent_id").append(`<option value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
+                        //             }
+                        //         })
+                        //     }
+                        // })
 
-                        $.ajax({
-                            url: `<?= base_url("barang/dropdown/parent"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".parent_id").empty()
-                                $(".parent_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    if(item.id == Number(res?.data?.parent_id))
-                                    {
-                                        $(".parent_id").append(`<option selected value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
-                                    }
-                                    else
-                                    {
-                                        $(".parent_id").append(`<option value="${item.id}">${item.kode_barang} - ${item.nama_barang}</option>`)
-                                    }
-                                })
-                            }
-                        })
+                        $('.parent_id').val(res?.data?.parent_id).change();
 
                         $(".ap_id").val(res?.data?.ap_id).change();
                         $(".ar_id").val(res?.data?.ar_id).change();
