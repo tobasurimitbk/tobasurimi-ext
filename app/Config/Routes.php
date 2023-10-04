@@ -295,6 +295,7 @@ $routes->get('/pembayaran-po-lokal/create', 'Pembayaran\PembayaranPOLokal::creat
 $routes->post('/pembayaran-po-lokal/create', 'Pembayaran\PembayaranPOLokal::savePembayaranPOLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal/delete', 'Pembayaran\PembayaranPOLokal::deletePembayaranPOLokal', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal/print/(:num)', 'Pembayaran\PembayaranPOLokal::print/$1', ['filter' => 'Auth']);
 
 // PEMBAYARAN PO IMPORT
 $routes->get('/pembayaran-po-import', 'Pembayaran\PembayaranPOImport::pembayaranPOImport', ['filter' => 'Auth']);

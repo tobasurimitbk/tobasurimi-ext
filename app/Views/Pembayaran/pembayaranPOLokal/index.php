@@ -44,6 +44,7 @@
                                 <th>Tanggal Pembayaran</th>
                                 <th>Metode Pembayaran</th>
                                 <th>Jumlah</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -124,6 +125,22 @@
             {
                 data: "amount",
                 className: "text-center"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `
+                        <div class="mt-0">
+                            <button class="btn btn-warning btn-print" onclick="printPoLokal('<?= base_url("pembayaran-po-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    `
+                }
             }
         ],
         columnDefs: [{
@@ -176,7 +193,10 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             location.replace(`<?= base_url("pembayaran-po-lokal/"); ?>${data.id}`);
-        })
-    })
+        });
+    });
+    const printPoLokal = function(url) {
+        window.open(url, "_blank");
+    }
 </script>
 <?= $this->endSection(); ?>
