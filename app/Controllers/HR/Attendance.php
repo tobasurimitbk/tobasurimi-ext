@@ -448,7 +448,7 @@ class Attendance extends BaseController
                     $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->checkout));
 
                     $result['keterangan'] = $keterangan[0];
-                    $result['jamTerlambat'] = $keterangan[0];
+                    $result['jamTerlambat'] = $keterangan[1];
                 } else {
                     // ada attandance only(in)
                     $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->checkin));
