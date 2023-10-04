@@ -79,7 +79,7 @@
             <tr>
                 <td>Supplier</td>
                 <td>:</td>
-                <td><?= $supplier->name; ?></td>
+                <td><?= $supplier != null ? $supplier->name : "-"; ?></td>
             </tr>
             <tr>
                 <td>Tanggal Bayar</td>
