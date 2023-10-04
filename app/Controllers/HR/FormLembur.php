@@ -174,25 +174,28 @@ class FormLembur extends BaseController
         $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $tanggal)));
 
         // Check data di fingerprint
+        $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+        DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+
         $logAttendance = $modelLogAttendance
+            ->select($selectQry)
             ->where('company_id', $this->this_company_id)
             ->where('employees_id', $employeeID)
             ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
+            ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
             ->limit(2)
-            ->orderBy('id', "ASC") // urutkan (masuk, pulang)
             ->get()
             ->getResult();
 
-        // insert data log to variable
-        foreach ($logAttendance as $i => $v) {
-            if ($i == 1) {
-                // ambil jam pulang
-                $checkOutLog = \date('H:i', \strtotime($v->date_create));
-            } elseif ($i == 0) {
-                // jika ga ada (jam masuk)
-                $checkOutLog = \date('H:i', \strtotime($v->date_create));
-            }
+        // asign to max date create
+        if ($logAttendance[0]->checkout != $logAttendance[0]->checkin) {
+            // ada in and out
+            $checkOutLog = \date('H:i', \strtotime($logAttendance[0]->checkout));
+        } else {
+            // in
+            $checkOutLog = \date('H:i', \strtotime($logAttendance[0]->checkin));
         }
+
 
         // cek hari besar
         $hariBesar = $modelBigDays->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
@@ -206,7 +209,7 @@ class FormLembur extends BaseController
         }
 
         // check apakah sudah presensi pulang di log
-        if ($checkOutLog == "") {
+        if ($logAttendance[0]->checkout == $logAttendance[0]->checkin) {
             // belum ada presensi pulang di log
             return \response()->setJSON([
                 'message' => "Karyawan belum melakukan presensi pulang pada tanggal $tanggal",

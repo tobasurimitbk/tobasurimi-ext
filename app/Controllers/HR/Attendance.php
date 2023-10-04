@@ -198,10 +198,15 @@ class Attendance extends BaseController
                     ->first();
                 // check adakah data 
                 $hariLibur = $hariLiburModel->where('date', $dates)->first();
-                $logAttandance = $AttendancesLogModel->where('employees_id', $e['id'])
+                $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+                DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+
+                $logAttandance = $AttendancesLogModel
+                    ->select($selectQry)
+                    ->where('employees_id', $e['id'])
                     ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
-                    ->orderBy('id', "DESC") // ambil terbaru
-                    ->limit(2) // get 2 date in log attandance 
+                    ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
+                    ->limit(2)
                     ->get()
                     ->getResult();
 
@@ -239,15 +244,15 @@ class Attendance extends BaseController
                         ]);
                     } else {
                         // data absen ada di log
-                        if (\count($logAttandance) == 2) {
+                        if ($logAttandance[0]->checkout != $logAttandance[0]->checkin) {
                             // ada attandance (in dan out)
                             // create in
                             $AttendanceModel->insert([
                                 'company_id' => $this->this_company_id,
                                 'employee_id' => $e['id'],
                                 'periode' => $dates,
-                                'checkin' => \date('H:i:s', \strtotime($logAttandance[1]->date_create)), // in
-                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // out
+                                'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
+                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
                                 'status' => 'HADIR_H'
                             ]);
                         } else {
@@ -256,8 +261,8 @@ class Attendance extends BaseController
                                 'company_id' => $this->this_company_id,
                                 'employee_id' => $e['id'],
                                 'periode' => $dates,
-                                'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // in
-                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->date_create)), // out
+                                'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
+                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
                                 'status' => 'HADIR_H',
                             ]);
                         }
@@ -407,9 +412,15 @@ class Attendance extends BaseController
             ->first();
         $hariLibur = $hariLiburModel->where('date', $tanggal)
             ->first();
-        $logAttandance = $AttendancesLogModel->where('employees_id', $employeeID)
+
+        $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+        DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+
+        $logAttandance = $AttendancesLogModel
+            ->select($selectQry)
+            ->where('employees_id', $employeeID)
             ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
-            ->orderBy('id', "DESC")
+            ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
             ->limit(2)
             ->get()
             ->getResult();
@@ -427,20 +438,21 @@ class Attendance extends BaseController
             } else {
                 // ada absen di log
                 $result['status'] = "Hadir";
-                if (\count($logAttandance) == 2) {
+                if ($logAttandance[0]->checkout != $logAttandance[0]->checkin) {
                     // ada attandance (in dan out)
                     $keterangan = static::ketelambatanCheck(
                         $this->this_company_id,
                         $result['checkIn']
                     );
-                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[1]->date_create));
-                    $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->date_create));
+                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->checkin));
+                    $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->checkout));
 
                     $result['keterangan'] = $keterangan[0];
-                    $result['jamTerlambat'] = $keterangan[1];
+                    $result['jamTerlambat'] = $keterangan[0];
                 } else {
                     // ada attandance only(in)
-                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->date_create));
+                    $result['checkIn'] = \date('H:i:s', \strtotime($logAttandance[0]->checkin));
+                    // $result['checkOut'] = \date('H:i:s', \strtotime($logAttandance[0]->checkout));
                     $keterangan = static::ketelambatanCheck(
                         $this->this_company_id,
                         $result['checkIn']
