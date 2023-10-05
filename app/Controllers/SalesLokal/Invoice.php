@@ -61,7 +61,9 @@ class Invoice extends BaseController
         //Get Customers
         $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
         $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
+        $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
         $data = [
+            "noFaktur" => $noFaktur,
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
@@ -340,8 +342,12 @@ class Invoice extends BaseController
             ->findAll();
         
         $documentData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->document_id);
+
+        $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
+
         // dd($documentList);
         $data = [
+            "noFaktur"      => $noFaktur,
             "data"          => $dataSalesInvoiceOrder,
             "documentList"  => $documentList,
             "documentData"  => $documentData,

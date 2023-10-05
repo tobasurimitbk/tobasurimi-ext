@@ -136,4 +136,29 @@ class SalesOrderInvoiceModel extends Model
 
         return $dataSalesOrderInvoice;
     }
+
+    public function generateNoFaktur(): string
+    {
+        $format = "LKL/INV";
+        $month = idate('m');
+        $year = date('Y');
+        $formatMonth = str_pad($month, 2, 0, STR_PAD_LEFT);
+        $numberTemplate = "/$year/$formatMonth";
+
+        $lastData = $this->asObject()
+            ->like('no_faktur', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $invNumber = $format . '1' . $numberTemplate;
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->kode);
+            $lastIncrement = intval($asd[0]) + 1;
+
+            $invNumber = $format . $lastIncrement . $numberTemplate;
+        }
+
+        return $invNumber;
+    }
 }

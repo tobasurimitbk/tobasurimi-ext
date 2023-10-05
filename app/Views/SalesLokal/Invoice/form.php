@@ -30,7 +30,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : ""; ?>" placeholder="Auto Generate">
+                            <input autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : $noFaktur; ?>" placeholder="Auto Generate">
                             <label for="floatingInput">No Faktur</label>
                         </div>
                     </div>
