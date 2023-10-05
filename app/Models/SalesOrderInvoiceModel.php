@@ -153,7 +153,7 @@ class SalesOrderInvoiceModel extends Model
         $invNumber = $format . '1' . $numberTemplate;
 
         if (!empty($lastData)) {
-            $asd = explode('/', $lastData->kode);
+            $asd = explode('/', $lastData->no_faktur);
             $lastIncrement = intval($asd[0]) + 1;
 
             $invNumber = $format . $lastIncrement . $numberTemplate;
