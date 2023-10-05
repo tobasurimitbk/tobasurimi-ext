@@ -226,7 +226,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
-                <button type="button" onclick="addBarang('<?= base_url("barang"); ?>')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button>
+                <!-- <button type="button" onclick="alert('Menu master barang masih diperbarui')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button> -->
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -1004,17 +1004,12 @@
             let validate_same = false;
 
             list_items.map(item => {
-                if(barang_id !== '')
-                {
-                    if(item.barang_id == barang_id)
-                    {
+                if (barang_id !== '') {
+                    if (item.barang_id == barang_id) {
                         // kalau edit barang, barang tidak ganti tidak kena validasi
-                        if(row_detail === item.row)
-                        {
+                        if (row_detail === item.row) {
                             validate_same = false;
-                        }
-                        else
-                        {
+                        } else {
                             validate_same = true;
                         }
                     }
@@ -1616,7 +1611,7 @@
                     $(".detail-modal").modal("show");
                 }
             })
-        }      
+        }
     })
 
     const changeTipeSPP = function() {
@@ -1673,7 +1668,7 @@
                     $(".spp_no").val(res?.data);
                 }
             })
-        } 
+        }
     }
 
     const changeStatus = function() {
