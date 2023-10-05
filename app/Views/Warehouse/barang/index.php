@@ -22,7 +22,7 @@
                                     <label class="form-check-label" for="inlineRadio1">Single Spec</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input autocomplete="one-time-code" class="form-check-input" type="radio" name="productSpec" id="inlineRadio2" value="multi" checked>
+                                    <input autocomplete="one-time-code" class="form-check-input inlineRadio2" type="radio" name="productSpec" id="inlineRadio2" value="multi" checked>
                                     <label class="form-check-label" for="inlineRadio2">Multi Spec</label>
                                 </div>
                             </div>
@@ -636,7 +636,9 @@
         });
 
         $(".btn-show-form").click(function() {
+            $(".parent").val();
             $(".parent_id").removeAttr('disabled');
+            $(".inlineRadio2").removeAttr('disabled');
             validator.resetForm();
             validator.reset();
             // $(".body-detail-spek").empty()
@@ -802,6 +804,10 @@
                         $(".id").val(id);
                         $('.parent').val(res?.data?.parent_id);
                         $('.kode_barang').rules('remove', 'required');
+                        if(res?.data?.spec_type == 'single')
+                        {
+                            $(".inlineRadio2").attr("disabled", true);
+                        }
                         if(res?.data?.parent_id !== "0" || res?.data?.spec_type == 'single')
                         {
                             $(".is_parent").css("display", "");
