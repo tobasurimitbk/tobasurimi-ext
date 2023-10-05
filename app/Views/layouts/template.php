@@ -107,6 +107,14 @@
             return true
         }
 
+        var invalidChars = ["-", "e", "+", "E"];
+
+        $("input[type='number']").on("keydown", function(e){ 
+            if(invalidChars.includes(e.key)){
+                e.preventDefault();
+            }
+        });
+
         const lettersOnly = function(event)
         {
             if (String.fromCharCode(event.keyCode).match(/[^0-9A-Za-z ]/g)) return false;

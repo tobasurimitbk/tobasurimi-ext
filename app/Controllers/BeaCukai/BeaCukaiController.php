@@ -5,6 +5,7 @@ namespace App\Controllers\BeaCukai;
 use App\Controllers\BaseController;
 use App\Models\BeaCukaiModel;
 use App\Models\BeaCukaiBarangModel;
+use App\Models\BeaCukaiDokumenModel;
 use App\Models\BeaCukaiKemasanModel;
 use App\Models\BeaCukaiKontainerModel;
 use App\Models\CountryModel;
@@ -20,7 +21,7 @@ use App\Models\AMPurchaseOrderModel;
 class BeaCukaiController extends BaseController
 {
 
-    private $modelRMPurchaseOrder, $modelRMImportPO, $modelAMPurchaseOrder, $modelBeaCukai, $modelBeaCukaiBarang, $modelBeaCukaiKemasan, $modelBeaCukaiKontainer, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
+    private $modelRMPurchaseOrder, $modelRMImportPO, $modelAMPurchaseOrder, $modelBeaCukai, $modelBeaCukaiBarang, $modelBeaCukaiDokumen, $modelBeaCukaiKemasan, $modelBeaCukaiKontainer, $modelKantorBeaCukai, $modelSupplier, $modelCountry, $modelMetadata, $modelSalesOrderInvoice, $this_company_id;
 
     public function __construct()
     {
@@ -29,6 +30,7 @@ class BeaCukaiController extends BaseController
         $this->modelAMPurchaseOrder = new AMPurchaseOrderModel();
         $this->modelBeaCukai = new BeaCukaiModel();
         $this->modelBeaCukaiBarang = new BeaCukaiBarangModel();
+        $this->modelBeaCukaiDokumen = new BeaCukaiDokumenModel();
         $this->modelBeaCukaiKemasan = new BeaCukaiKemasanModel();
         $this->modelBeaCukaiKontainer = new BeaCukaiKontainerModel();
         $this->modelKantorBeaCukai = new KantorBeaCukaiModel();
@@ -257,6 +259,13 @@ class BeaCukaiController extends BaseController
             if($dataBCBarangDetail)
             {
                 $data["dataBCBarangDetail"] = $dataBCBarangDetail;
+            }
+
+            $dataBCDokumenDetail = $this->modelBeaCukaiDokumen->getByBeaCukaiId($id);
+
+            if($dataBCDokumenDetail)
+            {
+                $data["dataBCDokumenDetail"] = $dataBCDokumenDetail;
             }
 
             $dataBCKemasanDetail = $this->modelBeaCukaiKemasan->getByBeaCukaiId($id);
@@ -541,9 +550,7 @@ class BeaCukaiController extends BaseController
                 "tempat"                => $this->request->getPost("tempat"),
                 "tanggal"               => $this->request->getPost("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggal")))) : "",
                 "pemberitahu"           => $this->request->getPost("pemberitahu"),
-                "jabatan"               => $this->request->getPost("jabatan"),
-
-                "data_dokumen"          => $this->request->getPost("data_dokumen")
+                "jabatan"               => $this->request->getPost("jabatan")
             ];
             
             $insert =  $this->modelBeaCukai->insert($payload);
@@ -551,6 +558,7 @@ class BeaCukaiController extends BaseController
             $data_barang = json_decode($this->request->getPost("data_barang"));
             $data_kemasan = json_decode($this->request->getPost("data_kemasan"));
             $data_kontainer = json_decode($this->request->getPost("data_kontainer"));
+            $data_dokumen = json_decode($this->request->getPost("data_dokumen"));
 
             if (!$insert) {
                 $data = [
@@ -628,6 +636,33 @@ class BeaCukaiController extends BaseController
                 ];
 
                 $responseDetail = $this->modelBeaCukaiKontainer->insert($detailPayload);
+
+                if(!$responseDetail) {
+                    $message =  'Data Gagal Disimpan';
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => $payload,
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+            }
+
+            foreach($data_dokumen as $data)
+            {
+                $detailPayload = [];
+
+                $detailPayload = [
+                    'bea_cukai_id' => $insert,
+                    'dokumen_id' => $data->dokumen_id,
+                    'no_dokumen' => $data->no_dokumen,
+                    'date' => $data->date ? date("Y/m/d", strtotime(str_replace("/", "-", $data->date))) : "",
+                    'keterangan' => $data->keterangan
+                ];
+
+                $responseDetail = $this->modelBeaCukaiDokumen->insert($detailPayload);
 
                 if(!$responseDetail) {
                     $message =  'Data Gagal Disimpan';
@@ -859,9 +894,7 @@ class BeaCukaiController extends BaseController
                 "tempat"                => $this->request->getPost("tempat"),
                 "tanggal"               => $this->request->getPost("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("tanggal")))) : "",
                 "pemberitahu"           => $this->request->getPost("pemberitahu"),
-                "jabatan"               => $this->request->getPost("jabatan"),
-
-                "data_dokumen"          => $this->request->getPost("data_dokumen")
+                "jabatan"               => $this->request->getPost("jabatan")
             ];
             
             $insert =  $this->modelBeaCukai->where(['id' => $id])->set($payload)->update();
@@ -869,6 +902,7 @@ class BeaCukaiController extends BaseController
             $data_barang = json_decode($this->request->getPost("data_barang"));
             $data_kemasan = json_decode($this->request->getPost("data_kemasan"));
             $data_kontainer = json_decode($this->request->getPost("data_kontainer"));
+            $data_dokumen = json_decode($this->request->getPost("data_dokumen"));
 
             if ($insert) {
                 foreach($data_barang as $data)
@@ -1081,6 +1115,82 @@ class BeaCukaiController extends BaseController
                         else
                         {
                             $responseDetail = $this->modelBeaCukaiKontainer->insert($detailPayload);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Diubah';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                foreach($data_dokumen as $data)
+                {
+                    $detailPayload = [];
+
+                    $detailPayload = [
+                        'bea_cukai_id' => $id,
+                        'dokumen_id' => $data->dokumen_id,
+                        'no_dokumen' => $data->no_dokumen,
+                        'date' => $data->date ? date("Y/m/d", strtotime(str_replace("/", "-", $data->date))) : "",
+                        'keterangan' => $data->keterangan
+                    ];
+
+                    // kalau hapus dan ada id
+                    if($data->isDeleted === true)
+                    {
+                        if($data->id)
+                        {
+                            $responseDetail = $this->modelBeaCukaiDokumen->delete($data->id);
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Dihapus';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                         // kalau update
+                        if($data->id)
+                        {
+                            $conditionDetail = [
+                                'id' => $data->id
+                            ];
+
+                            $responseDetail = $this->modelBeaCukaiDokumen->where($conditionDetail)->set($detailPayload)->update();
+
+                            if(!$responseDetail) {
+                                $message =  'Data Gagal Disimpan';
+                                $data = [
+                                    "status"            => false,
+                                    "message"    => $message,
+                                    "payload"   => $payload,
+                                    'token' => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
+                            }
+                        }
+
+                        // kalau create
+                        else
+                        {
+                            $responseDetail = $this->modelBeaCukaiDokumen->insert($detailPayload);
 
                             if(!$responseDetail) {
                                 $message =  'Data Gagal Diubah';

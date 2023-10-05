@@ -601,28 +601,27 @@
                             </tr>
                         </thead>
                         <tbody class="body-dokumen-table" id="body-dokumen-table" style="cursor: pointer;">
-                            <?php if(!empty($dataBC)){ 
-                                $list = json_decode($dataBC->data_dokumen);
+                            <?php if(!empty($dataBCDokumenDetail)){ 
                                 $row_dokumen = 0; 
-                                foreach($list as $item){    
+                                foreach($dataBCDokumenDetail as $item){    
                                     $row_dokumen = $row_dokumen + 1;
                                     if($dataBC->status_posting === "Belum Posting"){
                                 ?>
                                         <tr>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
                                             <?= $row_dokumen; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item->kode_number; ?>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item["description"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item->jenis; ?>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item["value"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item->no; ?>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item["no_dokumen"]; ?>
                                         </td>
-                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item->kode; ?>" data-jenis="<?= $item->jenis; ?>" data-no="<?= $item->no; ?>" data-tanggal="<?= $item->tanggal; ?>" data-keterangan="<?= $item->keterangan; ?>"  data-row="<?= $row_dokumen; ?>">
-                                            <?= $item->tanggal; ?>
+                                        <td style="text-align: center;" class="edit-table-dokumen" data-kode="<?= $item["dokumen_id"]; ?>" data-jenis="<?= $item["value"]; ?>" data-no="<?= $item["no_dokumen"]; ?>" data-tanggal="<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>" data-keterangan="<?= $item["note"]; ?>"  data-row="<?= $row_dokumen; ?>">
+                                            <?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?>
                                         </td>
                                         <td style="text-align: center;">
                                             <button onclick='deleteRowDokumen(<?= $row_dokumen; ?>)'>X</button>
@@ -631,10 +630,10 @@
                                 <?php } else {?>
                                         <tr>
                                             <td style="text-align: center;"><?= $row_dokumen; ?></td>
-                                            <td style="text-align: center;"><?= $item->kode; ?></td>
-                                            <td style="text-align: center;"><?= $item->jenis; ?></td>
-                                            <td style="text-align: center;"><?= $item->no; ?></td>
-                                            <td style="text-align: center;"><?= $item->tanggal; ?></td>
+                                            <td style="text-align: center;"><?= $item["description"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["value"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["no_dokumen"]; ?></td>
+                                            <td style="text-align: center;"><?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : ""; ?></td>
                                             <td></td>
                                         </tr>
                                 <?php }
@@ -1204,25 +1203,25 @@
     let list_delete_kontainer = [];
     let list_delete_kemasan = [];
     let list_delete_barang = [];
+    let list_delete_dokumen = [];
 
     let row_dokumen = 0;
     let row_kontainer = 0;
     let row_kemasan = 0;
     let row_barang = 0;
 
-    <?php if(!empty($dataBC)){
-        $list_dokumen = json_decode($dataBC->data_dokumen);
-        foreach($list_dokumen as $item){
+    <?php if(!empty($dataBCDokumenDetail)){
+        foreach($dataBCDokumenDetail as $item){
     ?> 
             row_dokumen = row_dokumen + 1;
             list_dokumen.push({
                 "row": row_dokumen,
-                "kode_number": '<?= $item->kode_number ?>',
-                "kode": '<?= $item->kode ?>',
-                "jenis": '<?= $item->jenis ?>',
-                "no": '<?= $item->no ?>',
-                "tanggal": '<?= $item->tanggal ?>',
-                "keterangan": '<?= $item->keterangan ?>',
+                "kode_number": '<?= $item["description"] ?>',
+                "kode": '<?= $item["dokumen_id"] ?>',
+                "jenis": '<?= $item["value"] ?>',
+                "no": '<?= $item["no_dokumen"] ?>',
+                "tanggal": '<?= $item["date"] ? date("d/m/Y", strtotime($item["date"])) : "" ?>',
+                "keterangan": '<?= $item["note"] ?>',
             });
     <?php } 
     } ?>
@@ -2672,7 +2671,45 @@
                                     data.append("tanggal", $(".tanggal").val());
                                     data.append("pemberitahu", $(".pemberitahu").val());
                                     data.append("jabatan", $(".jabatan").val());
-                                    data.append("data_dokumen", JSON.stringify(list_dokumen));
+
+                                    let update_list_dokumen = [];
+
+                                    if (list_delete_dokumen.length !== 0) {
+                                        list_delete_dokumen.map(obj => {
+                                            update_list_dokumen.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                dokumen_id: obj.kode ? Number(obj.dokumen_id) : 0,
+                                                no_dokumen: obj.no ? Number(obj.no) : 0,
+                                                date: obj.tanggal,
+                                                keterangan: obj.keterangan,
+                                                isDeleted: true
+                                            })
+                                        })
+                                    }
+
+                                    list_dokumen.map(obj => {
+                                        if (obj.id) {
+                                            update_list_dokumen.push({
+                                                id: obj.id ? Number(obj.id) : 0,
+                                                dokumen_id: obj.kode ? Number(obj.dokumen_id) : 0,
+                                                no_dokumen: obj.no ? Number(obj.no) : 0,
+                                                date: obj.tanggal,
+                                                keterangan: obj.keterangan,
+                                                isDeleted: false
+                                            })
+                                        } else {
+                                            update_list_dokumen.push({
+                                                id: "",
+                                                dokumen_id: obj.kode ? Number(obj.dokumen_id) : 0,
+                                                no_dokumen: obj.no ? Number(obj.no) : 0,
+                                                date: obj.tanggal,
+                                                keterangan: obj.keterangan,
+                                                isDeleted: false
+                                            })
+                                        }
+                                    })
+
+                                    data.append("data_dokumen", JSON.stringify(update_list_dokumen));
 
                                     let update_list_kontainer = [];
 
@@ -3429,15 +3466,18 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push({
-                            "row": row_dokumen,
-                            "kode_number": item.kode_number,
-                            "kode": item.kode,
-                            "jenis": item.jenis,
-                            "no": item.no,
-                            "tanggal": item.tanggal,
-                            "keterangan": item.keterangan
-                        })
+                        new_list_items.push({...item,
+                            row: row_dokumen
+                        });
+                    }
+                    else
+                    {
+                        if(item.id)
+                        {
+                            list_delete_dokumen.push({...item,
+                                isDeleted: true
+                            });
+                        }
                     }
                 })
 
@@ -3493,7 +3533,7 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push.push({...item,
+                        new_list_items.push({...item,
                             row: row_kontainer
                         });
                     }
@@ -3628,15 +3668,8 @@
                         tag_html += "</tr>";
 
                         new_list_items.push({
-                            "row": row_barang,
-                            "id": item.id,
-                            "kode_barang": item.kode_barang,
-                            "nama_barang": item.nama_barang,
-                            "hs": item.hs,
-                            "kategori": item.kategori,
-                            "kode_dokumen": item.kode_dokumen,
-                            "kode_kategori": item.kode_kategori,
-                            "nama_kategori": item.nama_kategori 
+                            ...item,
+                            "row": row_barang
                         })
                     }
                     else
@@ -3704,14 +3737,18 @@
                         tag_html += "</tr>";
 
                         new_list_items.push({
-                            "row": row_dokumen,
-                            "kode": item.kode,
-                            "kode_number": item.kode_number,
-                            "jenis": item.jenis,
-                            "no": item.no,
-                            "tanggal": item.tanggal,
-                            "keterangan": item.keterangan
+                            ...item,
+                            "row": row_dokumen
                         })
+                    }
+                    else
+                    {
+                        if(item.id)
+                        {
+                            list_delete_dokumen.push({...item,
+                                isDeleted: true
+                            });
+                        }
                     }
                 })
 
@@ -3768,7 +3805,7 @@
                         tag_html += "</td>";
                         tag_html += "</tr>";
 
-                        new_list_items.push.push({...item,
+                        new_list_items.push({...item,
                             row: row_kontainer
                         });
                     }

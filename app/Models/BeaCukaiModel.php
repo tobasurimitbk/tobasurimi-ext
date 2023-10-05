@@ -92,8 +92,8 @@ class BeaCukaiModel extends Model
         'tanggal',
         'pemberitahu',
         'jabatan',
-        'data_dokumen',
-        'data_kontainer',
+        // 'data_dokumen',
+        // 'data_kontainer',
         // 'data_kemasan',
         'status_posting',
 
