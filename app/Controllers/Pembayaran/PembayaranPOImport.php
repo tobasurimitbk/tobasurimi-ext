@@ -3,11 +3,12 @@
 namespace App\Controllers\Pembayaran;
 
 use App\Controllers\BaseController;
-
+use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\ImportPOPaymentModel;
 use App\Models\SupplierModel;
 use App\Models\RMImportPOModel;
 use App\Models\AMPurchaseOrderModel;
+use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 
 class PembayaranPOImport extends BaseController
@@ -532,5 +533,49 @@ class PembayaranPOImport extends BaseController
         }
 
         return null;
+    }
+
+    public function getDetailBarangByPO()
+    {
+        $id = $this->request->getVar('id');
+        $kategori = $this->request->getVar('kategori');
+        $type = $this->request->getVar('type');
+
+        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $importPOPaymentModel = new ImportPOPaymentModel();
+        $supplierModel = new SupplierModel();
+
+        $dataPOImport = $amPurchaseOrderModel->getPOById($id);
+
+        if ($dataPOImport == null) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Data barang tidak ditemukkan"
+            ]);
+        }
+
+        $dataPOImportDetail = $amPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseOrderId($id);
+        $listImportPOPayment = $importPOPaymentModel->where('po_id', $id)->findAll();
+
+        $totalHarga = 0;
+        foreach ($dataPOImportDetail as $d) {
+            $totalHarga += formatter($d['totalPriceWithoutAdditional'], "CURR_TO_INT");
+        }
+
+        $totalPay = 0;
+        foreach ($listImportPOPayment as $l) {
+            $totalPay += formatter($l['payment_amt'], "CURR_TO_INT");
+        }
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'importPoPaymentRiwayat' => $listImportPOPayment,
+            'dataPOImportDetail' => $dataPOImportDetail,
+            'dataPOImportHargaFinal' => $totalHarga,
+            'totalPay' => $totalPay,
+        ]);
     }
 }

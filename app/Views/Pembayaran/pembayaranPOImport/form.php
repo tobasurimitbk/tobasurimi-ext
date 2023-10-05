@@ -22,6 +22,9 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <label class="form-label font-weight-bold lable-title mt-2 mb-3">
+                Detail Pembayaran
+            </label>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
@@ -39,7 +42,7 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? "disabled" : "" ?> class="form-select" name="payment_type" id="payment_type">
-                                <option value="" disabled selected></option>
+                                <option value="" selected> Pilih Payment Type </option>
                                 <option value="DP" <?= (!empty($paymentData) && $paymentData->payment_type == 'DP') ? 'selected' : '' ?>>DP</option>
                                 <option value="Pelunasan" <?= (!empty($paymentData) && $paymentData->payment_type == 'Pelunasan') ? 'selected' : '' ?>>Pelunasan</option>
                             </select>
@@ -73,8 +76,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select " name="import_po" id="import_po" disabled>
-                                <option disabled selected value=""></option>
+                            <select class="form-select " name="import_po" id="import_po">
+                                <option selected value="">Pilih No PO Import</option>
                                 <?php foreach ($poList ?? [] as $po) : ?>
                                     <option value="<?= $po->id ?>" <?= (!empty($paymentData) && $paymentData->po_id == $po->id) ? 'selected' : '' ?>><?= $po->po_no ?></option>
                                 <?php endforeach ?>
@@ -107,8 +110,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="po_amt" name="po_amt" value="Rp. <?= number_format($poData->total ?? 0, 2, ',', '.')  ?>" disabled>
-                            <label for="floatingInput">PO Amount</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control" id="po_amt" name="po_amt" value="Rp. <?= number_format($mustPay ?? 0, 2, ',', '.')  ?>" disabled>
+                            <label for="floatingInput">PO Amount (Sisa Pembayaran)</label>
                         </div>
                     </div>
                 </div>
@@ -156,7 +159,7 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select " <?= !empty($paymentData) ? "disabled" : "" ?> name="payment_method" id="payment_method">
-                                <option disabled selected value=""></option>
+                                <option selected value="">Pilih Payment Method</option>
                                 <option value="CASH" <?= (!empty($paymentData) && $paymentData->payment_method == 'CASH') ? 'selected' : '' ?>>Cash</option>
                                 <option value="TRANSFER" <?= (!empty($paymentData) && $paymentData->payment_method == 'TRANSFER') ? 'selected' : '' ?>>Transfer</option>
                                 <option value="LC" <?= (!empty($paymentData) && $paymentData->payment_method == 'LC') ? 'selected' : '' ?>>LC</option>
@@ -190,6 +193,47 @@
                     </div>
                 </div>
             </form>
+            <div class="detail-pembayaran">
+                <label class="form-label font-weight-bold lable-title mt-2 mb-3">
+                    Detail Barang
+                </label><br>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi" id="detailBarang" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr style="text-align: center;">
+                                <th>No.</th>
+                                <th>Kode Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Harga Barang</th>
+                                <th>Jumlah Diterima</th>
+                                <th>Total Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table">
+                        </tbody>
+                    </table>
+                </div>
+                <label class="form-label font-weight-bold lable-title mt-2 mb-3">
+                    Riwayat Pembayaran
+                </label>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi" id="riwayatBayar" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr style="text-align: center;">
+                                <th>No.</th>
+                                <th>No Pembayaran</th>
+                                <th>Tanggal Bayar</th>
+                                <th>Termin</th>
+                                <th>Payment Method</th>
+                                <th>Payment Type</th>
+                                <th>Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -198,6 +242,8 @@
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
+
+        $('.detail-pembayaran').hide();
 
         var validator = $(".create-form").validate({
             rules: {
@@ -261,20 +307,20 @@
             autoclose: true
         });
 
-        $("#payment_type").change(function() {
+        // $("#payment_type").change(function() {
 
-            if ($(this).val() == 'DP') {
-                $('#import_lpb').prop('disabled', true);
-                $('#import_po').prop('disabled', false);
-            } else {
-                $('#import_lpb').prop('disabled', false);
-                $('#import_po').prop('disabled', true);
-            }
+        //     if ($(this).val() == 'DP') {
+        //         $('#import_lpb').prop('disabled', true);
+        //         $('#import_po').prop('disabled', false);
+        //     } else {
+        //         $('#import_lpb').prop('disabled', false);
+        //         $('#import_po').prop('disabled', true);
+        //     }
 
-        });
+        // });
 
         $('#po_type').select2({
-            placeholder: "",
+            placeholder: "Pilih PO Type",
             theme: "bootstrap-5"
         }).change(function(e) {
             const url = ($(this).val() == 'BAKU') ? '<?= base_url('supplier-bahan-baku-import/dropdown') ?>' : '<?= base_url('supplier-bahan-penolong-import/dropdown') ?>';
@@ -307,7 +353,7 @@
         });
 
         $('#supplier').select2({
-            placeholder: "",
+            placeholder: "Pilih Nama Supplier",
             theme: "bootstrap-5"
         }).change(function(e) {
             const supplierId = $(this).val();
@@ -326,7 +372,7 @@
 
             $("#import_po").empty();
             $("#import_po").select2({
-                // placeholder: "Pilih Bro",
+                placeholder: "Pilih Nomor PO",
                 theme: "bootstrap-5",
                 ajax: {
                     url: `${url}${supplierId}`,
@@ -384,7 +430,7 @@
         }
 
         $('#import_po, #import_lpb').select2({
-            placeholder: "",
+            placeholder: "Pilih Nomor PO Import",
             theme: "bootstrap-5"
         }).change(function() {
             const attr = $(this).select2('data');
@@ -475,6 +521,101 @@
             $(".no_bukti_pembayaran").attr("readonly", false);
             $(".no_bukti_pembayaran").val("");
         }
+    }
+
+    $('#import_po').on('change', function() {
+        var idPO = $(this).val();
+        generateBarangByPo(idPO);
+    });
+
+    function generateBarangByPo(id) {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        console.log(id);
+        var formData = new FormData();
+        formData.append("id", id);
+        $.ajax({
+            url: "<?= base_url("pembayaran-po-import/get-po"); ?>",
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    console.log(response);
+                    $('.detail-pembayaran').show();
+                    $('#detailBarang').find('tbody').empty();
+                    var no = 1;
+                    var totalHarga = 0;
+                    if (response.dataPOImportDetail.length == 0) {
+                        var newRow = $('<tr>');
+                        newRow.append($('<td colspan="8" align="center" style="font-weight:normal;">').text("Detail barang tidak ditemukan"));
+                        $('#detailBarang').append(newRow);
+                    } else {
+                        $.each(response.dataPOImportDetail, function(i, v) {
+                            var newRow = $('<tr align="center">');
+                            newRow.append($('<td>').text(no++));
+                            newRow.append($('<td>').text(v.kode_barang));
+                            newRow.append($('<td>').text(v.nama_barang));
+                            newRow.append($('<td>').text(formatRupiah(v.price)));
+                            newRow.append($('<td>').text(v.qty_diterima));
+                            newRow.append($('<td>').text(formatRupiah(v.totalPriceWithoutAdditional)));
+                            $('#detailBarang').append(newRow);
+                        });
+                        var newRow = $('<tr>');
+                        newRow.append($('<td colspan="5" align="right" style="font-weight:bold;">').text("Total Harga Perlu Dibayar"));
+                        newRow.append($('<td colspan="1" align="center" style="font-weight:bold;">').text(formatRupiah(response.dataPOImportHargaFinal)));
+                        $('#detailBarang').append(newRow);
+                    }
+
+                    var no = 1;
+                    var totalbayar = 0;
+                    if (response.importPoPaymentRiwayat.length == 0) {
+                        var newRow = $('<tr>');
+                        newRow.append($('<td colspan="8" align="center" style="font-weight:normal;">').text("Riwayat Pembayaran Tidak Ada"));
+                        $('#riwayatBayar').append(newRow);
+                    } else {
+                        $.each(response.importPoPaymentRiwayat, function(i, v) {
+                            var newRow = $('<tr align="center">');
+                            var splitDate = v.payment_date.split('-');
+                            var dateFormated = splitDate[2] + '/' + splitDate[1] + '/' + splitDate[0];
+
+                            newRow.append($('<td>').text(no++));
+                            newRow.append($('<td>').text(v.payment_no));
+                            newRow.append($('<td>').text(dateFormated));
+                            newRow.append($('<td>').text(v.termin));
+                            newRow.append($('<td>').text(v.payment_method));
+                            newRow.append($('<td>').text(v.payment_type));
+                            newRow.append($('<td>').text(formatRupiah(v.payment_amt)));
+
+                            $('#riwayatBayar').append(newRow);
+                        });
+                        var newRow = $('<tr>');
+                        newRow.append($('<td colspan="6" align="right" style="font-weight:bold;">').text("Total Sudah Dibayar"));
+                        newRow.append($('<td colspan="1" align="center" style="font-weight:bold;">').text(formatRupiah(response.totalPay)));
+                        $('#riwayatBayar').append(newRow);
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Terjadi kesalahan pada sistem',
+                        confirmButtonColor: '#4e73df',
+                    });
+                }
+            },
+            onError: function(response) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi kesalahan pada sistem',
+                    confirmButtonColor: '#4e73df',
+                });
+            }
+        });
     }
 </script>
 <script>

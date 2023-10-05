@@ -305,6 +305,7 @@ $routes->get('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::cre
 $routes->post('/pembayaran-po-import/create', 'Pembayaran\PembayaranPOImport::savePembayaranPOImport', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/update', 'Pembayaran\PembayaranPOImport::updatePembayaranPOImport', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-import/delete', 'Pembayaran\PembayaranPOImport::deletePembayaranPOImport', ['filter' => 'Auth']);
+$routes->post('/pembayaran-po-import/get-po', 'Pembayaran\PembayaranPOImport::getDetailBarangByPO', ['filter' => 'Auth']);
 
 // penerimaan pembayaran SO
 $routes->get('/penerimaan-penjualan-lokal', 'Penerimaan\SalesOrderPayment::index', ['filter' => 'Auth']);

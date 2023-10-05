@@ -99,8 +99,8 @@
                     <i class="fa-solid fa-print"></i> Export
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><button class="dropdown-item" onclick="printPerDivisi('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Per Divisi</button></li>
-                    <li><button class="dropdown-item" onclick="detailPerDivisi('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Detail Per Divisi</button></li>
+                    <li><button class="dropdown-item" onclick="printPerDivisi('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Daftar Upah</button></li>
+                    <li><button class="dropdown-item" onclick="detailPerDivisi('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Slip Gaji</button></li>
                 </ul>
             <?php endif; ?>
         </div>

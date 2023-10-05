@@ -87,7 +87,7 @@ class ImportPOPaymentModel extends Model
                 ->like('suppliers.name', $addCondition['search'])
                 ->orLike('import_po_payments.payment_no', $addCondition['search'])
                 ->orLike('metadata.value', $addCondition['search'])
-            ->groupEnd();
+                ->groupEnd();
         }
 
         // date filter start
@@ -99,7 +99,7 @@ class ImportPOPaymentModel extends Model
             $paymentDataQry->where('import_po_payments.payment_date <=', $addCondition['lastDate']);
         }
         // date filter end
-        
+
         $totalFilteredData = $paymentDataQry->countAllResults(false);
         $data = $paymentDataQry->findAll($limit, $offset);
 

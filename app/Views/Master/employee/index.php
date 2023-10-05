@@ -25,31 +25,55 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Full Name" maxlength="30">
-                                <label for="floatingInput">Nama Lengkap (Wajib)</label>
+                                <label for="floatingInput">Nama Lengkap </label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK">
-                                <label for="floatingInput">NIK (Optional)</label>
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
+                                        <label for="floatingInput">Tanggal Bergabung </label>
+                                    </div>
+                                    <div class="input-group-prepend group-prepend-password align-items-center">
+                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
+                                            <i class="fa fa-calendar icon-join-date icon-form"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" minlength="18" maxlength="18" class="form-control nip" id="nip" name="nip" placeholder="NIP" maxlength="30">
-                                <label for="floatingInput">NIP (Wajib)</label>
+                                <label for="floatingInput">NIP </label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
-                                <label for="floatingInput">Alamat (Optional)</label>
+                                <select class="form-select gender" name="gender" id="gender" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="Pria">Pria</option>
+                                    <option value="Wanita">Wanita</option>
+                                </select>
+                                <label for="floatingInput">Jenis Kelamin </label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select jabatan_id" name="jabatan_id" id="floatingSelect" aria-label="Floating label select example">
+                                    <option value=""></option>
+
+                                </select>
+                                <label for="floatingInput">Jabatan </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
@@ -63,6 +87,14 @@
                                         </span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example" onchange="generateKomponenGaji()">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Divisi </label>
                             </div>
                         </div>
                     </div>
@@ -97,6 +129,14 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                                <label for="floatingInput">Alamat (Optional)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control phone_no" id="phone_no" name="phone_no" placeholder="Phone (Optional)" maxlength="30">
@@ -111,17 +151,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select gender" name="gender" id="gender" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <option value="Pria">Pria</option>
-                                    <option value="Wanita">Wanita</option>
-                                </select>
-                                <label for="floatingInput">Jenis Kelamin (Wajib)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select religion_id" name="religion_id" id="religion_id" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -129,7 +159,7 @@
                                 <label for="floatingInput">Agama (Optional)</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select pendidikan" name="pendidikan" id="pendidikan" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -157,36 +187,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example" onchange="generateKomponenGaji()">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Divisi (Wajib)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select jabatan_id" name="jabatan_id" id="floatingSelect" aria-label="Floating label select example">
-                                    <option value=""></option>
-
-                                </select>
-                                <label for="floatingInput">Jabatan (Wajib)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <div class="input-group input-group-password">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" class="form-control input-picker join_date" id="join_date" name="join_date" placeholder="Tanggal Bergabung">
-                                        <label for="floatingInput">Tanggal Bergabung (Wajib)</label>
-                                    </div>
-                                    <div class="input-group-prepend group-prepend-password align-items-center">
-                                        <span style="border: 0px" class="input-group-text bg-white" id="basic-addon2">
-                                            <i class="fa fa-calendar icon-join-date icon-form"></i>
-                                        </span>
-                                    </div>
-                                </div>
+                                <input autocomplete="one-time-code" type="text" minlength="16" maxlength="16" class="form-control nik" id="nik" name="nik" placeholder="NIK">
+                                <label for="floatingInput">NIK (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -231,7 +233,7 @@
                                     <option value="Resign">Resign</option>
                                     <option value="Pensiun">Pensiun</option>
                                 </select>
-                                <label for="floatingInput">Status (Wajib)</label>
+                                <label for="floatingInput">Status </label>
                             </div>
                         </div>
                     </div>

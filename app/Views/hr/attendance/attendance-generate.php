@@ -444,7 +444,7 @@
                 <div class="modal-body">
                     <div class="alert bg-info text-white" style="margin-top: -10px;">
                         <div class="card-text">
-                            Status perizinan yang status Approvalnya adalah UnApproval akan dimasukkan kedalam komponen potongan pada menu payroll.
+                            Status Perizinan yang tidak disetujui akan dimasukkan kedalam perhitungan potongan pada Payroll
                         </div>
                     </div>
                     <input type="hidden" name="attendanceID" id="attendenceID" />
