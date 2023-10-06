@@ -180,7 +180,6 @@
             errorClass: 'text-danger',
             errorPlacement: function(error, element) {
                 var elem = $(element);
-                console.log(elem);
                 if (elem.hasClass("multiple_po_id")) {
                     element = $(".select2-selection--multiple").parent();
                     error.insertAfter(element);
@@ -243,8 +242,8 @@
                     data: "total",
                     className: "text-center",
                     render: function(data, type, row) {
-                        var total = row?.total;
-                        return formatRupiah(total);
+                        var total = parseFloat(row?.total);
+                        return formatRupiah(total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
                     }
                 }
             ],
@@ -291,7 +290,6 @@
                     url: '<?= base_url() . 'rekap-faktur/supplier/' ?>' + $(this).val(),
                     dataType: 'json',
                     processResults: function(res) {
-                        console.log(res);
                         return {
                             results: $.map(res.data, function(item) {
                                 return {
@@ -370,7 +368,6 @@
                         const ids = rowsSelected.map((obj) => {
                             return obj.local_po_inv_sum_detail_id
                         });
-                        console.log(rowsSelected);
                         data.append("local_po_inv_sum_detail_id", JSON.stringify(ids));
 
                         $.ajax({
@@ -462,7 +459,6 @@
 
                 $('.nominal_pembayaran').val(totalAnj).trigger('keyup')
                 e.preventDefault();
-                console.log(rowsSelected);
             })
         }
 

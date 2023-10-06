@@ -288,10 +288,10 @@ class RekapFaktur extends BaseController
 
         $selectQry = "local_po_inv_sum_details.id AS local_po_inv_sum_detail_id,
                       penerimaan_barang.no_penerimaan_barang AS no_lpb,
-                      DATE_FORMAT(validation_date, '%d/%m/%Y') AS lpb_date,
+                      DATE_FORMAT(penerimaan_barang.createdAt, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       penerimaan_barang_detail.qty AS qty,
-                      local_po_inv_sum_details.inv_amt AS total,
+                      penerimaan_barang_detail.sub_total as total,
                       satuans.kode_satuan AS unit";
         $fakturList = $localPOInvSumModel->asObject()
             ->select($selectQry)
