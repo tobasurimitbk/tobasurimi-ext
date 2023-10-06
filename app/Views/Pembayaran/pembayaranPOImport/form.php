@@ -9,15 +9,9 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-po-import"); ?>">
                 Batal
             </a>
-            <?php if (!empty($paymentData)) : ?>
-                <a class="btn btn-warning btn-print float-right text-white" target="_blank" onclick="alert('Fitur Print Belum Tersedia')">
-                    <i class="fa-solid fa-print"></i> Print
-                </a>
-            <?php else : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-form">
-                    Simpan
-                </button>
-            <?php endif; ?>
+            <button class="btn btn-show-form btn-save float-right btn-submit-form">
+                Simpan
+            </button>
         </div>
     </div>
     <div class="card">
@@ -76,7 +70,10 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select " name="import_po" id="import_po">
+                            <?php if (!empty($poList)) : ?>
+                                <input type="hidden" name="import_po" id="import_po" value="<?= $paymentData->po_id ?>">
+                            <?php endif; ?>
+                            <select class="form-select " name="import_po" id="import_po" <?= empty($poList) ?: "disabled" ?>>
                                 <option selected value="">Pilih No PO Import</option>
                                 <?php foreach ($poList ?? [] as $po) : ?>
                                     <option value="<?= $po->id ?>" <?= (!empty($paymentData) && $paymentData->po_id == $po->id) ? 'selected' : '' ?>><?= $po->po_no ?></option>
@@ -307,18 +304,6 @@
             autoclose: true
         });
 
-        // $("#payment_type").change(function() {
-
-        //     if ($(this).val() == 'DP') {
-        //         $('#import_lpb').prop('disabled', true);
-        //         $('#import_po').prop('disabled', false);
-        //     } else {
-        //         $('#import_lpb').prop('disabled', false);
-        //         $('#import_po').prop('disabled', true);
-        //     }
-
-        // });
-
         $('#po_type').select2({
             placeholder: "Pilih PO Type",
             theme: "bootstrap-5"
@@ -528,6 +513,10 @@
         generateBarangByPo(idPO);
     });
 
+    generateBarangByPo($('#import_po').val());
+
+
+
     function generateBarangByPo(id) {
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
@@ -600,12 +589,6 @@
                         newRow.append($('<td colspan="1" align="center" style="font-weight:bold;">').text(formatRupiah(response.totalPay)));
                         $('#riwayatBayar').append(newRow);
                     }
-                } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Terjadi kesalahan pada sistem',
-                        confirmButtonColor: '#4e73df',
-                    });
                 }
             },
             onError: function(response) {

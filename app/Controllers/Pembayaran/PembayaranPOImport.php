@@ -538,13 +538,10 @@ class PembayaranPOImport extends BaseController
     public function getDetailBarangByPO()
     {
         $id = $this->request->getVar('id');
-        $kategori = $this->request->getVar('kategori');
-        $type = $this->request->getVar('type');
 
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
         $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $importPOPaymentModel = new ImportPOPaymentModel();
-        $supplierModel = new SupplierModel();
 
         $dataPOImport = $amPurchaseOrderModel->getPOById($id);
 
