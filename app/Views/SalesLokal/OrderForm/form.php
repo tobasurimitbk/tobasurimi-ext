@@ -906,7 +906,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("order-form-lokal"); ?>" + "/id/" + id;
+                                                window.location.href = "<?= base_url("order-form-lokal"); ?>";
                                             })
                                     } else {
                                         Swal.fire({
@@ -959,7 +959,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("order-form-lokal"); ?>" + "/id/" + +response.id;
+                                                window.location.href = "<?= base_url("order-form-lokal"); ?>";
                                             })
                                     } else {
                                         Swal.fire({

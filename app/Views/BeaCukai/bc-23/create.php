@@ -2678,8 +2678,8 @@
                                         list_delete_dokumen.map(obj => {
                                             update_list_dokumen.push({
                                                 id: obj.id ? Number(obj.id) : 0,
-                                                dokumen_id: obj.kode ? Number(obj.dokumen_id) : 0,
-                                                no_dokumen: obj.no ? Number(obj.no) : 0,
+                                                dokumen_id: obj.kode ? Number(obj.kode) : 0,
+                                                no_dokumen: obj.no,
                                                 date: obj.tanggal,
                                                 keterangan: obj.keterangan,
                                                 isDeleted: true
@@ -2691,8 +2691,8 @@
                                         if (obj.id) {
                                             update_list_dokumen.push({
                                                 id: obj.id ? Number(obj.id) : 0,
-                                                dokumen_id: obj.kode ? Number(obj.dokumen_id) : 0,
-                                                no_dokumen: obj.no ? Number(obj.no) : 0,
+                                                dokumen_id: obj.kode ? Number(obj.kode) : 0,
+                                                no_dokumen: obj.no,
                                                 date: obj.tanggal,
                                                 keterangan: obj.keterangan,
                                                 isDeleted: false
@@ -2700,8 +2700,8 @@
                                         } else {
                                             update_list_dokumen.push({
                                                 id: "",
-                                                dokumen_id: obj.kode ? Number(obj.dokumen_id) : 0,
-                                                no_dokumen: obj.no ? Number(obj.no) : 0,
+                                                dokumen_id: obj.kode ? Number(obj.kode) : 0,
+                                                no_dokumen: obj.no,
                                                 date: obj.tanggal,
                                                 keterangan: obj.keterangan,
                                                 isDeleted: false
