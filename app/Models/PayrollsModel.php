@@ -429,18 +429,18 @@ class PayrollsModel extends Model
     static function convertionIDRMoneyTotal($nilai)
     {
         $pecahan = array(
-            '100000' => 'Lembar 100000',
-            '50000' => 'Lembar 50000',
-            '20000' => 'Lembar 20000',
-            '10000' => 'Lembar 10000',
-            '5000' => 'Lembar 5000',
-            '2000' => 'Lembar 2000',
-            '1000' => 'Lembar 1000',
-            '500' => 'Pecahan 500',
-            '200' => 'Pecahan 200',
-            '100' => 'Pecahan 100',
-            '50' => 'Pecahan 50',
-            '25' => 'Pecahan 25'
+            '100000' => 'Lembar Rp.100.000',
+            '50000' => 'Lembar Rp.50.000',
+            '20000' => 'Lembar Rp.20.000',
+            '10000' => 'Lembar Rp.10.000',
+            '5000' => 'Lembar Rp.5000',
+            '2000' => 'Lembar Rp.2000',
+            '1000' => 'Lembar Rp.1000',
+            '500' => 'Pecahan Rp.500',
+            '200' => 'Pecahan Rp.200',
+            '100' => 'Pecahan Rp.100',
+            '50' => 'Pecahan Rp.50',
+            '25' => 'Pecahan Rp.25'
         );
 
         $result = [];
