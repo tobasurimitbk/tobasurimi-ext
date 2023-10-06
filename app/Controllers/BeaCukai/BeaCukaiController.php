@@ -578,7 +578,9 @@ class BeaCukaiController extends BaseController
                 $detailPayload = [
                     'bea_cukai_id' => $insert,
                     'barang_id' => $data->barang_id,
-                    'kategori_id' => $data->kategori_id
+                    'kategori_id' => $data->kategori_id,
+                    'merk' => $data->merk,
+                    'tipe' => $data->tipe
                 ];
 
                 $responseDetail = $this->modelBeaCukaiBarang->insert($detailPayload);
@@ -912,7 +914,9 @@ class BeaCukaiController extends BaseController
                     $detailPayload = [
                         'bea_cukai_id' => $id,
                         'barang_id' => $data->barang_id,
-                        'kategori_id' => $data->kategori_id
+                        'kategori_id' => $data->kategori_id,
+                        'merk' => $data->merk,
+                        'tipe' => $data->tipe
                     ];
 
                     // kalau hapus dan ada id

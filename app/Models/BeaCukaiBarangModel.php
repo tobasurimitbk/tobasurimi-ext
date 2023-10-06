@@ -18,7 +18,9 @@ class BeaCukaiBarangModel extends Model
         'id',
         'bea_cukai_id',
         'barang_id',
-        'kategori_id'
+        'kategori_id',
+        'merk',
+        'tipe'
     ];
 
     // Dates

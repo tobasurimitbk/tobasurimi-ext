@@ -58,6 +58,40 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input readonly autocomplete="one-time-code" type="text" placeholder="Nama Barang" class="itemNamaBarang form-control target input-picker">
+                            <label for="floatingInput">Nama Barang</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" placeholder="Merk (Opsional)" class="itemMerk form-control target input-picker">
+                            <label for="floatingInput">Merk (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" placeholder="Tipe (Opsional)" class="itemTipe form-control target input-picker">
+                            <label for="floatingInput">Tipe (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" placeholder="Ukuran (Opsional)" class="itemUkuran form-control target input-picker">
+                            <label for="floatingInput">Ukuran (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" placeholder="Spesifikasi (Opsional)" class="itemSpesifikasi form-control target input-picker">
+                            <label for="floatingInput">Spesifikasi Lain (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -895,19 +929,19 @@
                                 if($dataBC->status_posting === "Belum Posting"){
                             ?>
                                     <tr>
-                                    <td style="text-align: center;" class="edit-table-barang" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
                                         <?= $row_barang; ?>
                                     </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
                                         <?= $item['kode_barang']; ?>
                                     </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
                                         <?= $item['nama_barang']; ?>
                                     </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
                                         <?= $item['kode_hs']; ?>
                                     </td>
-                                    <td style="text-align: center;" class="edit-table-barang" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
+                                    <td style="text-align: center;" class="edit-table-barang" data-merk="<?= $item['merk']; ?>" data-tipe="<?= $item['tipe']; ?>" data-nama="<?= $item['nama_barang']; ?>" data-kode="<?= $item['kode_barang']; ?>" data-hs="<?= $item['kode_hs']; ?>" data-kategori="<?= $item['kategori_id']; ?>" data-row="<?= $row_barang; ?>">
                                         <?= $kode_kategori[1] . " - " . $item['nama_kategori_barang']; ?>
                                     </td>
                                     <td style="text-align: center;">
@@ -1280,6 +1314,8 @@
                 "kode_dokumen": '<?= $separate_kode[0] ?>',
                 "kode_kategori": '<?= $separate_kode[1] ?>',
                 "nama_kategori": '<?= $item['nama_kategori_barang'] ?>',
+                "merk": '<?= $item['merk'] ?>',
+                "tipe": '<?= $item['tipe'] ?>',
             });
     <?php } 
     } ?>
@@ -2154,22 +2190,22 @@
                             {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += row_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.kode_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.nama_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.hs_code;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += "";
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                                 tag_html += `</td>`;
                                 tag_html += "</tr>";
@@ -2184,7 +2220,9 @@
                                     "kategori": "",
                                     "kode_dokumen": "",
                                     "kode_kategori": "",
-                                    "nama_kategori": ""
+                                    "nama_kategori": "",
+                                    "merk": "",
+                                    "tipe": ""
                                 });
                             }
                         })
@@ -2210,22 +2248,22 @@
                             {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += row_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.kode_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.nama_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.hs_code;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += "";
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                                 tag_html += `</td>`;
                                 tag_html += "</tr>";
@@ -2240,7 +2278,9 @@
                                     "kategori": "",
                                     "kode_dokumen": "",
                                     "kode_kategori": "",
-                                    "nama_kategori": ""
+                                    "nama_kategori": "",
+                                    "merk": "",
+                                    "tipe": ""
                                 });
                             }
                         })
@@ -2266,22 +2306,22 @@
                             {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += row_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.kode_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.nama_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.hs_code;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += "";
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                                 tag_html += `</td>`;
                                 tag_html += "</tr>";
@@ -2296,7 +2336,9 @@
                                     "kategori": "",
                                     "kode_dokumen": "",
                                     "kode_kategori": "",
-                                    "nama_kategori": ""
+                                    "nama_kategori": "",
+                                    "merk": "",
+                                    "tipe": ""
                                 });
                             }
                         })
@@ -2322,22 +2364,22 @@
                             {
                                 row_barang = row_barang + 1;
                                 tag_html += "<tr>";
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += row_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.kode_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.nama_barang;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += item.hs_code;
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += "";
                                 tag_html += `</td>`;
-                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
+                                tag_html += `<td class="edit-table-barang" data-kategori="" data-row="${row_barang}" data-merk="" data-tipe="" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs_code}" style="text-align: center;">`;
                                 tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                                 tag_html += `</td>`;
                                 tag_html += "</tr>";
@@ -2352,7 +2394,9 @@
                                     "kategori": "",
                                     "kode_dokumen": "",
                                     "kode_kategori": "",
-                                    "nama_kategori": ""
+                                    "nama_kategori": "",
+                                    "merk": "",
+                                    "tipe": ""
                                 });
                             }
                         })
@@ -2423,11 +2467,18 @@
         let hs = $(this).data('hs');
         let kategori = $(this).data('kategori');
         let row = $(this).data('row');
+        let nama = $(this).data('nama');
+        let merk = $(this).data('merk');
+        let tipe = $(this).data('tipe');
 
         $(".itemKodeBarang").val(kode);
         $(".itemHS").val(hs);
         $(".itemKategoriBarang").val(kategori).change();
         $(".itemIdBarang").val(row);
+
+        $(".itemNamaBarang").val(nama);
+        $(".itemMerk").val(merk);
+        $(".itemTipe").val(tipe);
 
         $(".section-form").css("display", "none");
         $(".section-barang").css("display", "");
@@ -2507,6 +2558,8 @@
         let namakategori = $(".itemKategoriBarang option:selected").attr("data-namakategori");
         let kodekategori = $(".itemKategoriBarang option:selected").attr("data-codekategori");
         let kodedokumen = $(".itemKategoriBarang option:selected").attr("data-codedokumen");
+        let merk = $(".itemMerk").val()
+        let tipe = $(".itemTipe").val()
         
         if ($(".form-barang").valid()) {
             Swal.fire({
@@ -2541,26 +2594,28 @@
                                 "kategori": kategori,
                                 "kode_dokumen": kodedokumen,
                                 "kode_kategori": kodekategori,
-                                "nama_kategori": namakategori 
+                                "nama_kategori": namakategori,
+                                "merk": merk,
+                                "tipe": tipe 
                             });
 
                             tag_html += "<tr>";
-                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-merk="${merk}" data-tipe="${tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += row_barang;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-merk="${merk}" data-tipe="${tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += item.kode_barang;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-merk="${merk}" data-tipe="${tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += item.nama_barang;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-merk="${merk}" data-tipe="${tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += item.hs;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-merk="${merk}" data-tipe="${tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += kodekategori + " - " + namakategori;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${kategori}" data-row="${row_barang}" data-merk="${merk}" data-tipe="${tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                             tag_html += `</td>`;
                             tag_html += "</tr>";
@@ -2568,22 +2623,22 @@
                         else
                         {
                             tag_html += "<tr>";
-                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += row_barang;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += item.kode_barang;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += item.nama_barang;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += item.hs;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += item.kode_kategori + " - " + item.nama_kategori;
                             tag_html += `</td>`;
-                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                            tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                             tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                             tag_html += `</td>`;
                             tag_html += "</tr>";
@@ -2797,6 +2852,8 @@
                                                 id: obj.id ? Number(obj.id) : 0,
                                                 barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                                 kategori_id: obj.kategori ? Number(obj.kategori) : 0,
+                                                merk: obj.merk,
+                                                tipe: obj.tipe,
                                                 isDeleted: true
                                             })
                                         })
@@ -2808,6 +2865,8 @@
                                                 id: obj.id ? Number(obj.id) : 0,
                                                 barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                                 kategori_id: obj.kategori ? Number(obj.kategori) : 0,
+                                                merk: obj.merk,
+                                                tipe: obj.tipe,
                                                 isDeleted: false
                                             })
                                         } else {
@@ -2815,6 +2874,8 @@
                                                 id: "",
                                                 barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
                                                 kategori_id: obj.kategori ? Number(obj.kategori) : 0,
+                                                merk: obj.merk,
+                                                tipe: obj.tipe,
                                                 isDeleted: false
                                             })
                                         }
@@ -3647,22 +3708,22 @@
                         row_barang = row_barang + 1;
 
                         tag_html += "<tr>";
-                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                         tag_html += row_barang;
                         tag_html += `</td>`;
-                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                         tag_html += item.kode_barang;
                         tag_html += `</td>`;
-                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                         tag_html += item.nama_barang;
                         tag_html += `</td>`;
-                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                         tag_html += item.hs;
                         tag_html += `</td>`;
-                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                         tag_html += item.kode_kategori + " - " + item.nama_kategori;
                         tag_html += `</td>`;
-                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
+                        tag_html += `<td class="edit-table-barang" data-kategori="${item.kategori}" data-row="${row_barang}" data-merk="${item.merk}" data-tipe="${item.tipe}" data-nama="${item.nama_barang}" data-kode="${item.kode_barang}" data-hs="${item.hs}" style="text-align: center;">`;
                         tag_html += `<button onclick="deleteRowBarang(${row_barang})">X</button>`;
                         tag_html += `</td>`;
                         tag_html += "</tr>";

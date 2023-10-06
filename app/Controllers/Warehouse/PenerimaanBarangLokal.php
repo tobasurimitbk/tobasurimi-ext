@@ -1204,13 +1204,13 @@ class PenerimaanBarangLokal extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
             "idCompany"     => $this->this_company_id,
             "kategori"      => "LOKAL",
-            "type"          => "BAHAN BAKU"
+            // "type"          => "BAHAN BAKU"
         ];
 
         $condition = [
             // "suppliers.company_id"  => $this->this_company_id,
             "penerimaan_barang.status_penerimaan"       => "LOKAL",
-            "penerimaan_barang.tipe_bahan"              => "BAKU",
+            // "penerimaan_barang.tipe_bahan"              => "BAKU",
             // "penerimaan_barang_detail.summarized_qty <" => 'penerimaan_barang_detail.qty'
 
             // "search"                                => $this->request->getGet("search"),
