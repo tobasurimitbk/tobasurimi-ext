@@ -365,6 +365,12 @@ class RekapFaktur extends BaseController
             $filteredData = array_filter($arrData, fn ($value) => !empty($value));
             $detailData = $this->request->getPost('invoices') ?? [];
 
+            // update is posted
+            if ($isPosted) {
+                // set is_posted = 1
+                $localPOInvSum->update($id, $arrData);
+            }
+
             foreach ($detailData as $invoice) {
                 $penerimaanData = $penerimaanBarangModel->asObject()
                     ->where('status_post', 'FINISH')
@@ -409,6 +415,7 @@ class RekapFaktur extends BaseController
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil diubah",
+                "isPosted" => $isPosted,
                 // "payload"   => $payload,
                 'token'     => csrf_hash(),
                 'id'        => $id

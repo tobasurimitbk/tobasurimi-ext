@@ -58,7 +58,6 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
-
                     <div class="col-md-6">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= (!empty($dataPembayaranPOLokal)) ? "disabled" : "" ?> class="form-select" name="summary_id" id="supplier-faktur">
@@ -74,7 +73,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" onkeyup="this.value = formatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" value="Rp. <?= number_format($dataPembayaranPOLokal->amount ?? 0, 2, ',', '.')  ?>" readonly disabled>
+                            <input autocomplete="one-time-code" onkeyup="this.value = formatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" value="Rp. <?= number_format($dataPembayaranPOLokal->amount ?? 0)  ?>" readonly disabled>
                             <label for="floatingInput">Nominal Pembayaran</label>
                         </div>
                     </div>
