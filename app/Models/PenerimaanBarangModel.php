@@ -192,6 +192,7 @@ class PenerimaanBarangModel extends Model
         $selectQry = "penerimaan_barang_detail.id AS id,
                       DATE_FORMAT(penerimaan_barang.createdAt, '%d/%m/%Y') AS lpb_date,
                       penerimaan_barang.no_penerimaan_barang AS no_lpb,
+                      penerimaan_barang.multiple_po_no,
                       penerimaan_barang_detail.nama_barang_dok AS item_name,
                       (`penerimaan_barang_detail`.`qty` - `penerimaan_barang_detail`.`summarized_qty`) AS lpb_qty,
                       penerimaan_barang_detail.harga AS price,

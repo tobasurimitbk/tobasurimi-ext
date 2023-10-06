@@ -1228,7 +1228,7 @@ class PenerimaanBarangLokal extends BaseController
         foreach ($itemData['data'] as $data) {
             array_push($receivedData, [
                 "id"                    => $data->id,
-                "no_po"                 => "jugijagiju",
+                "no_po"                 => json_decode($data->multiple_po_no),
                 "lpb_date"              => $data->lpb_date,
                 "no_lpb"                => $data->no_lpb,
                 "item_name"             => $data->item_name,
