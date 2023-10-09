@@ -145,20 +145,16 @@ class Barang extends BaseController
                     "rules" => "permit_empty",
                 ],
                 "satuan_id" => [
-                    "rules" => "required|is_natural",
-                    'errors' => [
-                        'required' => 'Satuan tidak boleh kosong'
-                    ]
+                    "rules" => "permit_empty|is_natural"
                 ],
                 "harga_barang" => [
-                    "rules" => "required|regex_match[/[0-9]|\,/]",
-                    'errors' => [
-                        'required' => 'Harga Barang tidak boleh kosong',
-                        "regex_match" => "Harga Barang harus numerik!"
-                    ]
+                    "rules" => "permit_empty|is_natural"
                 ],
                 "type" => [
-                    "rules" => "permit_empty",
+                    "rules" => "required|is_natural",
+                    'errors' => [
+                        'required' => 'Tipe Supplier tidak boleh kosong'
+                    ]
                 ],
                 "hs_id" => [
                     "rules" => "permit_empty|is_natural",
@@ -277,13 +273,13 @@ class Barang extends BaseController
                     "rules" => "permit_empty|is_natural",
                 ],
                 "harga_barang" => [
-                    "rules" => "permit_empty|regex_match[/[0-9]|\,/]",
-                    "errors" => [
-                        "regex_match" => "Harga Barang harus numerik!"
-                    ]
+                    "rules" => "permit_empty|is_natural"
                 ],
                 "type" => [
-                    "rules" => "permit_empty",
+                    "rules" => "required|is_natural",
+                    'errors' => [
+                        'required' => 'Tipe Supplier tidak boleh kosong'
+                    ]
                 ],
                 "hs_id" => [
                     "rules" => "permit_empty|is_natural",
