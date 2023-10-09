@@ -18,7 +18,7 @@
                             <div class="mb-3" style="height: 50px;">
                                 <div for="floatingInput" class="label-modal-master-barang">Product Spec</div>
                                 <div class="form-check form-check-inline">
-                                    <input autocomplete="one-time-code" class="form-check-input" type="radio" name="productSpec" id="inlineRadio1" value="single">
+                                    <input autocomplete="one-time-code" class="form-check-input inlineRadio1" type="radio" name="productSpec" id="inlineRadio1" value="single">
                                     <label class="form-check-label" for="inlineRadio1">Single Spec</label>
                                 </div>
                                 <div class="form-check form-check-inline">
