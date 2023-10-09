@@ -170,7 +170,9 @@ class RekapFaktur extends BaseController
         $addCondition = [
             "search"    => $this->request->getGet("search"),
             "sort"      => $this->request->getGet("sort"),
-            "sortType"  => $this->request->getGet("sortType")
+            "sortType"  => $this->request->getGet("sortType"),
+            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"   => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : ""
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");

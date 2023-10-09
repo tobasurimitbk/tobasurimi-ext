@@ -73,11 +73,22 @@ class LocalPOInvSummaryModel extends Model
 
         $totalData = $summaryDataQry->countAllResults(false);
 
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $summaryDataQry->groupStart();
+        }
         if ($addCondition['search']) {
-            $summaryDataQry->groupStart()
-                ->like('suppliers.name', $addCondition['search'])
-                ->orLike('summary_no', $addCondition['search'])
-            ->groupEnd();
+            $summaryDataQry
+            ->like('suppliers.name', $addCondition['search'])
+            ->orLike('summary_no', $addCondition['search']);
+        }
+        if ($addCondition['dateStart']) {
+            $summaryDataQry->where('local_po_inv_summaries.due_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $summaryDataQry->where('local_po_inv_summaries.due_date <=', $addCondition['dateEnd']);
+        }
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $summaryDataQry->groupEnd();
         }
         
         $totalFilteredData = $summaryDataQry->countAllResults(false);
