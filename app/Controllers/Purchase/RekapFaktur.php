@@ -217,6 +217,7 @@ class RekapFaktur extends BaseController
             ->where('company_id', $this->this_company_id)
             ->where('supplier_id', $supplierId)
             ->where('local_po_inv_sum_details.is_paid', 0)
+            ->where('is_posted', 1)
             ->groupBy('local_po_inv_summaries.id')
             ->findAll();
 
