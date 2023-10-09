@@ -91,7 +91,7 @@ class EmployeesModel extends Model
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND UPPER(employees.name) like '%" . strtoupper($values["name"]) . "%' ");
         if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(employees.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nik) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nip) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.jabatan) like '%" . strtoupper($values["search"]) . "%') ");
+            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(employees.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nik) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nip) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.jabatan_id) like '%" . strtoupper($values["search"]) . "%') ");
 
         if ($sortby != '')
             $requete .= "ORDER BY $sortby ";
@@ -109,7 +109,7 @@ class EmployeesModel extends Model
         if (isset($values["name"]))
             $requete .= ($values["name"] == "") ? "" : ("AND UPPER(employees.name) like '%" . strtoupper($values["name"]) . "%' ");
         if (isset($values["search"]))
-            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(employees.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nik) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nip) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.jabatan) like '%" . strtoupper($values["search"]) . "%') ");
+            $requete .= ($values["search"] == "") ? "" : ("AND (UPPER(employees.name) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nik) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.nip) like '%" . strtoupper($values["search"]) . "%' OR UPPER(employees.jabatan_id) like '%" . strtoupper($values["search"]) . "%') ");
 
         $result = $this->db->query($requete)->getResultArray();
         return ($result[0]["total"]) ? $result[0]["total"] : 0;

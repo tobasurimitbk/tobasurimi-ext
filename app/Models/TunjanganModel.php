@@ -73,7 +73,6 @@ class TunjanganModel extends Model
         if ($addCondition['search']) {
             $DataQry->groupStart()
                 ->like('name', $addCondition['search'])
-                ->orLike('date', $addCondition['search'])
                 ->groupEnd();
         }
 
