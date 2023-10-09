@@ -142,8 +142,8 @@
                                     $no = (strlen($i) == 1) ? ("0" . $i) : $i;
 
                                     if (date("N", $temp) == 7) :
-                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>IN " . $i . "</font></td>";
-                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>OUT " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>IN<br> " . $i . "</font></td>";
+                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>OUT<br> " . $i . "</font></td>";
                                     else :
                                         echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\">IN<br> " . $i . "</td>";
                                         echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\">OUT<br> " . $i . "</td>";
