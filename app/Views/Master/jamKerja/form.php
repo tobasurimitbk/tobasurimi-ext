@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($jamKerja) ? "Update" : "Tambah"; ?></h1>
+        <h1 class="title-name"><?= !empty($jamKerja) ? "Update" : "Tambah"; ?> Jam Kerja</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jam-kerja"); ?>">
                 Batal

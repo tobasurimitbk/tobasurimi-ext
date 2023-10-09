@@ -168,7 +168,7 @@
                                 <th onclick="changeSort('name')" class="sort">Nama Pelanggan</th>
                                 <th onclick="changeSort('phone')" class="sort">Telepon</th>
                                 <th onclick="changeSort('contact_person')" class="sort">Kontak</th>
-                                <th onclick="changeSort('saldo')" class="sort">Saldo</th>
+                                <!-- <th onclick="changeSort('saldo')" class="sort">Saldo</th> -->
                                 <th onclick="changeSort('currencyName')" class="sort">Mata Uang</th>
                             </tr>
                         </thead>
@@ -220,29 +220,32 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "kode",
-            className: "text-center"
-        }, {
-            data: "name",
-            className: "text-center"
-        }, {
-            data: "phone",
-            className: "text-center"
-        }, {
-            data: "contact_person",
-            className: "text-center"
-        }, {
-            data: "saldo",
-            className: "text-center"
-        }, {
-            data: "currencyName",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "kode",
+                className: "text-center"
+            }, {
+                data: "name",
+                className: "text-center"
+            }, {
+                data: "phone",
+                className: "text-center"
+            }, {
+                data: "contact_person",
+                className: "text-center"
+            },
+            // {
+            //     data: "saldo",
+            //     className: "text-center"
+            // }, 
+            {
+                data: "currencyName",
+                className: "text-center"
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -303,7 +306,7 @@
             .find('label')
             .css('z-index', '1');
 
-         // TERMIN
+        // TERMIN
         $('.termin').select2({
             placeholder: "",
             theme: "bootstrap-5",
