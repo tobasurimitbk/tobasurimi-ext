@@ -165,13 +165,13 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="tambahan" id="tambahan" value="<?= number_format($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->tambahan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
-                            <label for="floatingInput">Tambahan</label>
+                            <label for="floatingInput">Potongan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" <?= !empty($dataTerimaFaktur) ? ($statusUpdate ? "disabled=true" : "") : ""; ?> class="form-control information" name="potongan" id="potongan" value="<?= number_format($dataTerimaFaktur == null ? 0 : $dataTerimaFaktur->potongan) ?? ""; ?>" onkeyup="formatNumber(this)" placeholder="Keterangan">
-                            <label for="floatingInput">Potongan</label>
+                            <label for="floatingInput">Penambahan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
