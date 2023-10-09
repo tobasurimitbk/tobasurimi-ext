@@ -98,7 +98,7 @@
                                         <option value="BAHAN BAKU LOKAL">Bahan Baku Lokal</option>
                                     </select>
 
-                                    <label for="floatingInput">Tipe Supplier (Opsional)</label>
+                                    <label for="floatingInput">Tipe Supplier</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -594,7 +594,10 @@
                 },
                 harga_barang: {
                     required: true
-                }
+                },
+                type: {
+                    required: true
+                },
             },
             messages: {
                 kode_barang: {
@@ -611,6 +614,9 @@
                 },
                 stok: {
                     required: "Stok wajib diisi"
+                },
+                type: {
+                    required: "Tipe Supplier wajib diisi"
                 }
             },
             errorElement: 'span',
