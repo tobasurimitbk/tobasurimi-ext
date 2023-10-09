@@ -99,12 +99,19 @@
         }
 
         const formatNumber = function(el) {
-            if (isNaN(el.value.replaceAll(",", ""))) {
-                el.value = ""
+            // Remove non-numeric characters
+            let value = el.value.replace(/\D/g, '');
+
+            // Format the value as a currency with commas
+            if (value.length > 0) {
+            const formatter = new Intl.NumberFormat('en-US', {
+                currency: 'IDR',
+                minimumFractionDigits: 2,
+            });
+            value = formatter.format(value / 100);
             }
-            el.value = Number(el.value.replaceAll(",", "")).toLocaleString()
-            console.log(el.value)
-            return true
+
+            el.value = value;
         }
 
         var invalidChars = ["-", "e", "+", "E"];
