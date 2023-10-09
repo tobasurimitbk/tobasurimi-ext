@@ -148,13 +148,10 @@ class Barang extends BaseController
                     "rules" => "permit_empty|is_natural"
                 ],
                 "harga_barang" => [
-                    "rules" => "permit_empty|is_natural"
+                    "rules" => "permit_empty"
                 ],
                 "type" => [
-                    "rules" => "required|is_natural",
-                    'errors' => [
-                        'required' => 'Tipe Supplier tidak boleh kosong'
-                    ]
+                    "rules" => "permit_empty"
                 ],
                 "hs_id" => [
                     "rules" => "permit_empty|is_natural",
@@ -223,6 +220,14 @@ class Barang extends BaseController
             $payload_supplier = [];
 
             $this->barangModel->db->transException(true)->transStart();
+            // $data = [
+            //     "status"    => false,
+            //     "message"   => json_encode($payload),
+            //     "payload"   => $payload,
+            //     'token'     => csrf_hash()
+            // ];
+            // return json_encode($data);
+
             $insertedId =  $this->barangModel->insert($payload);
 
             foreach ($supplier_id as $item) {
@@ -273,13 +278,10 @@ class Barang extends BaseController
                     "rules" => "permit_empty|is_natural",
                 ],
                 "harga_barang" => [
-                    "rules" => "permit_empty|is_natural"
+                    "rules" => "permit_empty"
                 ],
                 "type" => [
-                    "rules" => "required|is_natural",
-                    'errors' => [
-                        'required' => 'Tipe Supplier tidak boleh kosong'
-                    ]
+                    "rules" => "permit_empty"
                 ],
                 "hs_id" => [
                     "rules" => "permit_empty|is_natural",

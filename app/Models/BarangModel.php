@@ -26,6 +26,7 @@ class BarangModel extends Model
         'harga_barang',
         'satuan_id',
         'kategori_barang',
+        'spec_type',
         'hs_id',
         'ap_id',
         'ar_id',

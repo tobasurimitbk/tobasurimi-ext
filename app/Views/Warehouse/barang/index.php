@@ -644,6 +644,7 @@
         $(".btn-show-form").click(function() {
             $(".parent").val();
             $(".parent_id").removeAttr('disabled');
+            $(".inlineRadio1").removeAttr('disabled');
             $(".inlineRadio2").removeAttr('disabled');
             validator.resetForm();
             validator.reset();
@@ -810,9 +811,16 @@
                         $(".id").val(id);
                         $('.parent').val(res?.data?.parent_id);
                         $('.kode_barang').rules('remove', 'required');
+                        if(res?.data?.spec_type == 'multi')
+                        {
+                            $(".inlineRadio1").attr("disabled", true);
+                            $(".inlineRadio2").removeAttr('disabled');
+                        }
+
                         if(res?.data?.spec_type == 'single')
                         {
                             $(".inlineRadio2").attr("disabled", true);
+                            $(".inlineRadio1").removeAttr('disabled');
                         }
                         if(res?.data?.parent_id !== "0" || res?.data?.spec_type == 'single')
                         {
