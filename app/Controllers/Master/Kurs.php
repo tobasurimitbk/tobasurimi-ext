@@ -39,9 +39,7 @@ class Kurs extends BaseController
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $condition = [
-            
-        ];
+        $condition = [];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -122,10 +120,21 @@ class Kurs extends BaseController
             if ($this->validate($rules)) {
                 $valas =  $this->request->getPost("valas");
 
+                // VALIDATION DATE STRAT AND END
+                $startDate = $this->request->getPost("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("start_date")))) : "";
+                $endDate = $this->request->getPost("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("end_date")))) : "";
+                if (strtotime($startDate) > strtotime($endDate)) {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Tanggal Mulai dan Tanggal Selesai Tidak Sesuai",
+                        'token' => csrf_hash()
+                    ];
+                    return response()->setJSON($data);
+                }
+
                 // CREATE CURRENCY
                 $id_metadata = $this->request->getPost("metadata_id");
-                if($valas)
-                {
+                if ($valas) {
                     $payload = [
                         "name" => "Valuta",
                         "description" => NULL,
@@ -145,19 +154,16 @@ class Kurs extends BaseController
                 // CHECK CURRENT KURS
                 $check = $this->KursModel->check_current("", $id_metadata, $this->request->getPost("end_date"));
 
-                if($check > 0)
-                {
+                if ($check > 0) {
                     $message = 'Kurs Sedang Berjalan';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            "payload"   => "",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                }
-                else
-                {
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => "",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
                     if ($this->KursModel->insert($values)) {
                         $data = [
                             "status"            => true,
@@ -235,10 +241,21 @@ class Kurs extends BaseController
 
                 $valas =  $this->request->getPost("valas");
 
+                // VALIDATION DATE STRAT AND END
+                $startDate = $this->request->getPost("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("start_date")))) : "";
+                $endDate = $this->request->getPost("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("end_date")))) : "";
+                if (strtotime($startDate) > strtotime($endDate)) {
+                    $data = [
+                        "status"            => false,
+                        "message"    => "Tanggal Mulai dan Tanggal Selesai Tidak Sesuai",
+                        'token' => csrf_hash()
+                    ];
+                    return response()->setJSON($data);
+                }
+
                 // CREATE CURRENCY
                 $id_metadata = $this->request->getPost("metadata_id");
-                if($valas)
-                {
+                if ($valas) {
                     $payload = [
                         "name" => "Valuta",
                         "description" => NULL,
@@ -258,19 +275,16 @@ class Kurs extends BaseController
                 // CHECK CURRENT KURS
                 $check = $this->KursModel->check_current($id, $id_metadata, $this->request->getPost("end_date"));
 
-                if($check > 0)
-                {
+                if ($check > 0) {
                     $message = 'Kurs Sedang Berjalan';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            "payload"   => "",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                }
-                else
-                {
+                    $data = [
+                        "status"            => false,
+                        "message"    => $message,
+                        "payload"   => "",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                } else {
                     if ($this->KursModel->where(['id' => $id])->set($values)->update()) {
                         $data = [
                             "status"            => true,
