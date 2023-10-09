@@ -19,6 +19,7 @@ class TandaTerimaFakturDetailModel extends Model
         'penerimaan_barang_detail_id',
         'lpb_date',
         'lpb_no',
+        'po_no',
         'item_name',
         'unit',
         'qty',
