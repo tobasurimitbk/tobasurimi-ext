@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Barang</h5>
+                <h5 class="modal-title"><label class="title-name"></label><?= $kategoriBarang === "Jadi" ? "Barang Jadi" : ($kategoriBarang === "Scrap" ? "Barang Scrap" : $kategoriBarang) ?></h5>
             </div>
             <div class="modal-body">
                 <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
@@ -201,7 +201,7 @@
 <!-- Begin Page Content -->
 <section class="section">
 <div class="section-header">
-    <h1>Barang <?= $kategoriBarang; ?></h1>
+    <h1><?= $kategoriBarang === "Jadi" ? "Barang Jadi" : ($kategoriBarang === "Scrap" ? "Barang Scrap" : $kategoriBarang); ?></h1>
     <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
     </button>
