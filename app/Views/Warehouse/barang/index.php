@@ -33,8 +33,8 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select parent_id" name="parent_id" id="parent_id">
                                     <option value=""></option>
-                                    <?php foreach ($dataBarangParent as $parent): ?>
-                                    <option value="<?= $parent->id ?>"><?= "$parent->kode_barang - $parent->nama_barang" ?></option>
+                                    <?php foreach ($dataBarangParent as $parent) : ?>
+                                        <option value="<?= $parent->id ?>"><?= "$parent->kode_barang - $parent->nama_barang" ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Parent Barang</label>
@@ -73,8 +73,8 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                         <option value=""></option>
-                                        <?php foreach ($satuanData as $satuan): ?>
-                                        <option value="<?= $satuan->id ?>"><?= $satuan->nama_satuan ?></option>
+                                        <?php foreach ($satuanData as $satuan) : ?>
+                                            <option value="<?= $satuan->id ?>"><?= $satuan->nama_satuan ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput">Satuan Barang</label>
@@ -115,8 +115,8 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select hs_id" name="hs_id" id="hs_id">
                                         <option value=""></option>
-                                        <?php foreach ($dataKodeHS as $dataAccount): ?>
-                                        <option value="<?= $dataAccount->id ?>"><?= $dataAccount->code ?></option>
+                                        <?php foreach ($dataKodeHS as $dataAccount) : ?>
+                                            <option value="<?= $dataAccount->id ?>"><?= $dataAccount->code ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput">Kode HS (Opsional)</label>
@@ -128,7 +128,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select ap_id" name="ap_id" id="ap_id">
                                         <option value=""></option>
-                                        <?php foreach ($aparData as $accountData): ?>
+                                        <?php foreach ($aparData as $accountData) : ?>
                                         <option value="<?= $accountData->id ?>"><?= "[$accountData->no_sub]$accountData->nama_sub" ?></option>
                                         <?php endforeach; ?>
                                     </select>
@@ -139,7 +139,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select ar_id" name="ar_id" id="ar_id">
                                         <option value=""></option>
-                                        <?php foreach ($aparData as $accountData): ?>
+                                        <?php foreach ($aparData as $accountData) : ?>
                                         <option value="<?= $accountData->id ?>"><?= "[$accountData->no_sub]$accountData->nama_sub" ?></option>
                                         <?php endforeach; ?>
                                     </select>
@@ -200,19 +200,19 @@
 
 <!-- Begin Page Content -->
 <section class="section">
-<div class="section-header">
-    <h1><?= $kategoriBarang === "Jadi" ? "Barang Jadi" : ($kategoriBarang === "Scrap" ? "Barang Scrap" : $kategoriBarang); ?></h1>
-    <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-    </button>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
-            <div class="col-md-3 col mb-3">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
-            </div>
-            <!-- <div class="col mb-3">
+    <div class="section-header">
+        <h1><?= $kategoriBarang === "Jadi" ? "Barang Jadi" : ($kategoriBarang === "Scrap" ? "Barang Scrap" : $kategoriBarang); ?></h1>
+        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end row-col-spp row-form-select-master-barang-index">
+                <div class="col-md-3 col mb-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" />
+                </div>
+                <!-- <div class="col mb-3">
                 <select class="form-select kategori form-out-search" name="kategori" id="kategori" aria-label="Floating label select example">
                     <option value="">Kategori: All</option>
                     <?php
@@ -226,34 +226,31 @@
                     ?>
                 </select>
             </div>  -->
-        </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No.</th>
-                            <th onclick="changeSort('parent_barang')" class="sort">Parent Barang</th>
-                            <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                            <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                            <th onclick="changeSort('type')" class="sort">Tipe Supplier</th>
-                            <th onclick="changeSort('harga_barang')" class="sort">Harga Barang</th>
-                            <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
-                            <!-- <th onclick="changeSort('kategori')" class="sort">Kategori</th> -->
-                            <th onclick="changeSort('code_hs')" class="sort">Kode HS</th>
-                            <th onclick="changeSort('sub_akun_ap')" class="sort">Akun Pembelian</th>
-                            <th onclick="changeSort('sub_akun_ar')" class="sort">Akun Penjualan</th>
-                            <th onclick="changeSort('stok')" class="sort">Stok</th>
-                        </tr>
-                    </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No.</th>
+                                <th onclick="changeSort('parent_barang')" class="sort">Parent Barang</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
+                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('type')" class="sort">Tipe Supplier</th>
+                                <th onclick="changeSort('harga_barang')" class="sort">Harga Terakhir</th>
+                                <th onclick="changeSort('kode_satuan')" class="sort">Satuan</th>
+                                <th onclick="changeSort('stok')" class="sort">Stok</th>
+                                <th class="sort">Histori</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 <script>
@@ -269,7 +266,9 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -288,70 +287,70 @@
             }
         },
         // scrollX: true,
-        "initComplete": function (settings, json) {    
-            $('.dataTables_length').empty();    
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"); 
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        }, 
-        {
-            data: "parent_barang",
-            className: "text-center"
-        },
-        {
-            data: "kode_barang",
-            className: "text-center"
-        },
-        {
-            data: "nama_barang",
-            className: "text-center"
-        },
-        {
-            data: "type",
-            className: "text-center"
-        },
-        {
-            data: "harga_barang",
-            className: "text-center"
-        },
-        {
-            data: "kode_satuan",
-            className: "text-center"
-        },
-        // {
-        //     data: "kategori",
-        //     className: "text-center"
-        // },
-        {
-            data: "code_hs",
-            className: "text-center"
-        },
-        {
-            data: "sub_akun_ap",
-            className: "text-center"
-        },
-        {
-            data: "sub_akun_ar",
-            className: "text-center"
-        },
-        {
-            data: "stok",
-            className: "text-center",
-            render: function(data, type, row) {
-                return `
+                data: "no",
+                className: "text-center",
+                sortable: false
+            },
+            {
+                data: "parent_barang",
+                className: "text-center"
+            },
+            {
+                data: "kode_barang",
+                className: "text-center"
+            },
+            {
+                data: "nama_barang",
+                className: "text-center"
+            },
+            {
+                data: "type",
+                className: "text-center"
+            },
+            {
+                data: "harga_barang",
+                className: "text-center"
+            },
+            {
+                data: "sub_akun_ar",
+                className: "text-center"
+            },
+            {
+                data: "stok",
+                className: "text-center",
+                render: function(data, type, row) {
+                    return `
                 <div class="text-danger">
                 ${data}
                 </div>
                 `
+                }
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    return `
+                        <div class="mt-0">
+                            <button onclick="alert('Belum Tersedia')" class="btn btn-success posting-spp">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            </button>
+                        </div>
+                    `
+                }
             }
-        }],
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -409,8 +408,8 @@
             .find('label')
             .css('z-index', '1');
 
-         // PARENT BARANG
-         $('.parent_id').select2({
+        // PARENT BARANG
+        $('.parent_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             allowClear: true,
@@ -811,19 +810,16 @@
                         $(".id").val(id);
                         $('.parent').val(res?.data?.parent_id);
                         $('.kode_barang').rules('remove', 'required');
-                        if(res?.data?.spec_type == 'multi')
-                        {
+                        if (res?.data?.spec_type == 'multi') {
                             $(".inlineRadio1").attr("disabled", true);
                             $(".inlineRadio2").removeAttr('disabled');
                         }
 
-                        if(res?.data?.spec_type == 'single')
-                        {
+                        if (res?.data?.spec_type == 'single') {
                             $(".inlineRadio2").attr("disabled", true);
                             $(".inlineRadio1").removeAttr('disabled');
                         }
-                        if(res?.data?.parent_id !== "0" || res?.data?.spec_type == 'single')
-                        {
+                        if (res?.data?.parent_id !== "0" || res?.data?.spec_type == 'single') {
                             $(".is_parent").css("display", "");
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('add', {
@@ -838,9 +834,7 @@
                             // $('.pph').rules('add', {
                             //     required: true
                             // });
-                        }
-                        else
-                        {
+                        } else {
                             $(".is_parent").css("display", "none");
                             $('.stok').rules('remove', 'required');
                             $('.harga_barang').rules('remove', 'required');
@@ -857,7 +851,7 @@
                         $(".harga_barang").val(res?.data?.harga_barang ? Number(res.data.harga_barang).toLocaleString() : 0);
                         $('#ppn').val(res.data.ppn);
                         $('#pph').val(res.data.pph);
-                        
+
                         validator.resetForm();
                         validator.reset();
                         // $.ajax({
@@ -913,8 +907,7 @@
                             arr_supplier_id.push(Number(item.supplier_id));
                         })
 
-                        if(res?.data?.type === "BAHAN BAKU LOKAL")
-                        {
+                        if (res?.data?.type === "BAHAN BAKU LOKAL") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
                                 method: "GET",
@@ -930,8 +923,7 @@
                                 }
                             })
                         }
-                        if(res?.data?.type === "BAHAN BAKU IMPORT")
-                        {
+                        if (res?.data?.type === "BAHAN BAKU IMPORT") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
                                 method: "GET",
@@ -947,8 +939,7 @@
                                 }
                             })
                         }
-                        if(res?.data?.type === "BAHAN PENOLONG LOKAL")
-                        {
+                        if (res?.data?.type === "BAHAN PENOLONG LOKAL") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
                                 method: "GET",
@@ -964,8 +955,7 @@
                                 }
                             })
                         }
-                        if(res?.data?.type === "BAHAN PENOLONG IMPORT")
-                        {
+                        if (res?.data?.type === "BAHAN PENOLONG IMPORT") {
                             $.ajax({
                                 url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
                                 method: "GET",
@@ -1058,7 +1048,7 @@
             }
         })
 
-        $(".search").keyup(function () {
+        $(".search").keyup(function() {
             table.ajax.reload();
         })
 
@@ -1066,58 +1056,55 @@
         //     table.ajax.reload();
         // })
 
-        $(".parent_id").change(function () {
-            if(changeParent){
-            // $(".kode_barang").val("");
-            // $(".nama_barang").val("");
-            $(".satuan_id").val("").change();
-            $(".harga_barang").val("");
-            $(".supplier_id").val([]).change();
-            $(".hs_id").val("").change();
-            $(".ap_id").val("").change();
-            $(".ar_id").val("").change();
-            $(".type").val("");
-            $(".spek").val("");
-            $(".stok").val("");
+        $(".parent_id").change(function() {
+            if (changeParent) {
+                // $(".kode_barang").val("");
+                // $(".nama_barang").val("");
+                $(".satuan_id").val("").change();
+                $(".harga_barang").val("");
+                $(".supplier_id").val([]).change();
+                $(".hs_id").val("").change();
+                $(".ap_id").val("").change();
+                $(".ar_id").val("").change();
+                $(".type").val("");
+                $(".spek").val("");
+                $(".stok").val("");
 
-            if($(".parent_id").val())
-            {
-                haciu2()
-                // $(".is_parent").css("display", "");
-                // $('.stok').rules('add', {
-                //     required: true
-                // });
-                // $('.harga_barang').rules('add', {
-                //     required: true
-                // });
-                // $('.type').rules('add', {
-                //     required: true
-                // });
-                // $('.satuan_id').rules('add', {
-                //     required: true
-                // });
-                // $('.hs_id').rules('add', {
-                //     required: true
-                // });
-                // $('.ap_id').rules('add', {
-                //     required: true
-                // });
-                // $('.ar_id').rules('add', {
-                //     required: true
-                // });
-            }
-            else
-            {
-                haciu1()
-                // $(".is_parent").css("display", "none");
-                // $('.stok').rules('remove', 'required');
-                // $('.harga_barang').rules('remove', 'required');
-                // $('.type').rules('remove', 'required');
-                // $('.satuan_id').rules('remove', 'required');
-                // $('.hs_id').rules('remove', 'required');
-                // $('.ap_id').rules('remove', 'required');
-                // $('.ar_id').rules('remove', 'required');
-            }
+                if ($(".parent_id").val()) {
+                    haciu2()
+                    // $(".is_parent").css("display", "");
+                    // $('.stok').rules('add', {
+                    //     required: true
+                    // });
+                    // $('.harga_barang').rules('add', {
+                    //     required: true
+                    // });
+                    // $('.type').rules('add', {
+                    //     required: true
+                    // });
+                    // $('.satuan_id').rules('add', {
+                    //     required: true
+                    // });
+                    // $('.hs_id').rules('add', {
+                    //     required: true
+                    // });
+                    // $('.ap_id').rules('add', {
+                    //     required: true
+                    // });
+                    // $('.ar_id').rules('add', {
+                    //     required: true
+                    // });
+                } else {
+                    haciu1()
+                    // $(".is_parent").css("display", "none");
+                    // $('.stok').rules('remove', 'required');
+                    // $('.harga_barang').rules('remove', 'required');
+                    // $('.type').rules('remove', 'required');
+                    // $('.satuan_id').rules('remove', 'required');
+                    // $('.hs_id').rules('remove', 'required');
+                    // $('.ap_id').rules('remove', 'required');
+                    // $('.ar_id').rules('remove', 'required');
+                }
             }
         })
 
@@ -1154,8 +1141,7 @@
                         // data.append("spek", JSON.stringify(update_list_spek));
 
                         // UPDATE
-                        if(id)
-                        {
+                        if (id) {
                             $.ajax({
                                 url: "<?= base_url("barang/update"); ?>",
                                 data: data,
@@ -1171,14 +1157,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1200,8 +1186,7 @@
                             });
                         }
                         // CREATE
-                        else
-                        {
+                        else {
                             $.ajax({
                                 url: "<?= base_url("barang/save"); ?>",
                                 data: data,
@@ -1217,14 +1202,14 @@
                                     if (response.status) {
                                         stopLoading()
                                         Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                table.ajax.reload()
+                                                $(".add-modal").modal("hide")
+                                            })
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -1280,14 +1265,14 @@
                             if (response.status) {
                                 stopLoading()
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                    $(".add-modal").modal("hide")
-                                })
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload()
+                                        $(".add-modal").modal("hide")
+                                    })
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -1314,12 +1299,11 @@
 
     $(".btn-add-row").click(function() {
         row_detail++;
-        list_spek.push(
-        {
+        list_spek.push({
             row: row_detail,
             display: "",
         })
-        
+
         let tag_html = "";
         tag_html += `<tr class="table_${row_detail}">`;
         tag_html += `<td>`;
@@ -1337,13 +1321,13 @@
         $(".table_" + id).css("display", "none")
         let new_list_spek = []
         list_spek.forEach((item) => {
-            if(item.row !== id)
-            {
+            if (item.row !== id) {
                 new_list_spek.push(item)
-            }
-            else
-            {
-                new_list_spek.push({row: id, display: "none"})
+            } else {
+                new_list_spek.push({
+                    row: id,
+                    display: "none"
+                })
             }
         })
 
@@ -1356,8 +1340,7 @@
         $(".supplier_id").empty()
         $(".supplier_id").val([]).change()
 
-        if(value === "BAHAN BAKU LOKAL")
-        {
+        if (value === "BAHAN BAKU LOKAL") {
             $.ajax({
                 url: `<?= base_url("supplier-bahan-baku/dropdown"); ?>`,
                 method: "GET",
@@ -1373,8 +1356,7 @@
                 }
             })
         }
-        if(value === "BAHAN BAKU IMPORT")
-        {
+        if (value === "BAHAN BAKU IMPORT") {
             $.ajax({
                 url: `<?= base_url("supplier-bahan-baku-import/dropdown"); ?>`,
                 method: "GET",
@@ -1390,8 +1372,7 @@
                 }
             })
         }
-        if(value === "BAHAN PENOLONG LOKAL")
-        {
+        if (value === "BAHAN PENOLONG LOKAL") {
             $.ajax({
                 url: `<?= base_url("supplier-bahan-penolong/dropdown"); ?>`,
                 method: "GET",
@@ -1407,8 +1388,7 @@
                 }
             })
         }
-        if(value === "BAHAN PENOLONG IMPORT")
-        {
+        if (value === "BAHAN PENOLONG IMPORT") {
             $.ajax({
                 url: `<?= base_url("supplier-bahan-penolong-import/dropdown"); ?>`,
                 method: "GET",
@@ -1427,13 +1407,10 @@
     }
 
     const changeSort = function(val) {
-        if(sort !== val)
-        {
+        if (sort !== val) {
             sortType = "ASC";
             sort = val;
-        }
-        else
-        {
+        } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
