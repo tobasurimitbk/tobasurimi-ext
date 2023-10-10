@@ -189,7 +189,7 @@
     });
 
     $("select[name='divisionID']").select2({
-        placeholder: "Pilih Divisi Dahulu",
+        placeholder: "Pilih Divisi",
         theme: "bootstrap-5",
         allowClear: true
     });
@@ -397,7 +397,30 @@
             }
         },
         messages: {
-
+            employeeID: {
+                required: "Pilih pegawai terlebih dahulu"
+            },
+            tanggalLembur: {
+                required: " Tanggal Lembur wajib diisi"
+            },
+            jamKerjaMasuk: {
+                required: " Jam Kerja Masuk wajib diisi"
+            },
+            jamKerjaKeluar: {
+                required: " Jam Kerja Keluar wajib diisi"
+            },
+            jamMulaiLembur: {
+                required: " Jam Mulai Lembur wajib diisi"
+            },
+            jamSelesaiLembur: {
+                required: " Jam Selesai Lembur wajib diisi"
+            },
+            jumlahJamIstirahat: {
+                required: " Jumlah Jam Istirahat wajib diisi"
+            },
+            jumlahJamKerjaBersih: {
+                required: " Jumlah Jam Kerja Bersih wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
