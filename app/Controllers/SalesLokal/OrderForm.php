@@ -166,7 +166,7 @@ class OrderForm extends BaseController
                 ]
             ],
             "estimated_freight" => [
-                "rules" => "permit_empty|is_natural",
+                "rules" => "permit_empty",
                 'errors' => [
                     // 'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
@@ -308,6 +308,7 @@ class OrderForm extends BaseController
                 "shipping_date"         => $shippingDate,
                 "payment_terms"         => $postData['termin'],
                 "keterangan"            => $postData['parent_keterangan'],
+                "destination"           => $customerData->address,
                 // "discount_rupiah"       => $postData('discount_rupiah'),
                 // "discount_percentage"   => $postData('discount_percentage'),
                 // "ppn"                   => $postData['taxAmt'],
@@ -588,8 +589,7 @@ class OrderForm extends BaseController
 
             // codingan baru
             foreach ($items as $row) {
-                if($row->id === "")
-                {
+                if ($row->id === "") {
                     $barangData = $this->BarangModel->asObject()
                         ->where('id', $row->id_barang)
                         ->where('company_id', $this->this_company_id)
@@ -631,9 +631,7 @@ class OrderForm extends BaseController
                         "id_warehouse"          => $row->warehouse_id,
                     ];
                     $this->SalesOrderDetailModel->save($valueBarang);
-                }
-                else
-                {
+                } else {
                     // $data = [
                     //     "status"            => false,
                     //     "message"    => json_encode($row),
@@ -641,17 +639,14 @@ class OrderForm extends BaseController
                     // ];
                     // return json_encode($data);
 
-                    if($row->isDeleted === true)
-                    {
+                    if ($row->isDeleted === true) {
                         $this->SalesOrderDetailModel->delete($row->id);
                         $this->stockDetailModel->addStock($row->id_barang, $row->warehouse_id, $row->qty);
-                    }
-                    else
-                    {
+                    } else {
                         $item = $this->stockDetailModel
-                        ->where('barang_id', $row->id_barang)
-                        ->where('warehouse_id', $row->warehouse_id)
-                        ->first();
+                            ->where('barang_id', $row->id_barang)
+                            ->where('warehouse_id', $row->warehouse_id)
+                            ->first();
 
                         $dataBefore = $this->SalesOrderDetailModel->asObject()->find($row->id);
                         if ($dataBefore->qty > $row->qty) {
@@ -664,7 +659,7 @@ class OrderForm extends BaseController
                         }
 
                         if ($dataBefore->qty < $row->qty) {
-                        
+
                             $dataItems =  $row->qty - $dataBefore->qty;
                             $checkItems = $item['stok'] - $dataItems;
 
@@ -690,8 +685,8 @@ class OrderForm extends BaseController
                             "dept" => $row->dept,
                             "id_warehouse" => $row->warehouse_id,
                         ];
-    
-                        $this->SalesOrderDetailModel->update($row->id, $valueBarang);    
+
+                        $this->SalesOrderDetailModel->update($row->id, $valueBarang);
                     }
                 }
             }
@@ -824,7 +819,7 @@ class OrderForm extends BaseController
 
                 $data = [
                     "status"            => true,
-                    "message"    => "Data Success Dihapus",
+                    "message"    => $dataDetail,
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
@@ -890,7 +885,7 @@ class OrderForm extends BaseController
         $dataWarehouse = $this->stockDetailModel
             // ->select()
             ->join('warehouses', 'warehouses.id = stock_details.warehouse_id')
-            ->where('stock_details.barang_id', $id_barang)
+            ->where('barang_id', $id_barang)
             ->where('stock_details.qty >', 0)
             ->groupBy(['stock_details.barang_id', 'stock_details.warehouse_id'])
             ->findAll();

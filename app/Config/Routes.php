@@ -487,7 +487,15 @@ $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount'
 $routes->get('/sub-account/dropdown', 'Master\Account::dropdownSubAccount', ['filter' => 'Auth']);
 $routes->get('/ap-ar/dropdown', 'Master\Account::dropdownAPAR', ['filter' => 'Auth']);
 
-// MASTER BARANG
+// Master Barang
+// Parent Barang
+$routes->get('parent-barang', 'Warehouse\ParentBarang::index', ['filter' => 'Auth']);
+$routes->post('parent-barang/save', 'Warehouse\ParentBarang::create', ['filter' => 'Auth']);
+$routes->post('parent-barang/update', 'Warehouse\ParentBarang::update', ['filter' => 'Auth']);
+$routes->post('parent-barang/delete', 'Warehouse\ParentBarang::delete', ['filter' => 'Auth']);
+$routes->post('parent-barang/get', 'Warehouse\ParentBarang::get', ['filter' => 'Auth']);
+$routes->get('parent-barang/all', 'Warehouse\ParentBarang::all', ['filter' => 'Auth']);
+
 $routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');
 });
