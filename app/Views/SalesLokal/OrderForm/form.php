@@ -683,7 +683,8 @@
                     dataType: "json",
                     success: function(res) {
                         $(".warehouse").empty();
-                        $(".warehouse").append(`<option value=""></option>`);
+                        //bug di penjualan lokal
+                        // $(".warehouse").append(`<option value=""></option>`);
 
                         // console.log(res.dataWarehouse)
                         res.dataWarehouse.forEach(function(item) {

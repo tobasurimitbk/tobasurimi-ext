@@ -862,10 +862,12 @@ class OrderForm extends BaseController
         $dataBarang = $this->BarangModel
             ->join('warehouses', 'warehouses.id = barangs.warehouse_id', 'left')
             ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
+            ->join('stock_details', 'stock_details.barang_id = barangs.id', 'left')
             ->select('barangs.*')
             ->select('warehouses.warehouse_name')
             ->select('satuans.nama_satuan')
             ->where('kategori_barang', 'Jadi')
+            ->where('stock_details.qty >', 0)
             ->findAll();
 
         $data = [
@@ -888,7 +890,7 @@ class OrderForm extends BaseController
         $dataWarehouse = $this->stockDetailModel
             // ->select()
             ->join('warehouses', 'warehouses.id = stock_details.warehouse_id')
-            ->where('barang_id', $id_barang)
+            ->where('stock_details.barang_id', $id_barang)
             ->where('stock_details.qty >', 0)
             ->groupBy(['stock_details.barang_id', 'stock_details.warehouse_id'])
             ->findAll();
