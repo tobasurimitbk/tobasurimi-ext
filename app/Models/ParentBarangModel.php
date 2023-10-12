@@ -58,7 +58,7 @@ class ParentBarangModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "parent_barang.*";
-        $DataQry = $this->asObject()
+        $DataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
             ->orderBy($sort, $sortType);
