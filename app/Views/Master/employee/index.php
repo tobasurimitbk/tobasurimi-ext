@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
@@ -89,12 +89,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example" onchange="generateKomponenGaji()">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Divisi </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select tipe" name="tipe" id="tipe" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($tipeEmployee as $t) : ?>
+                                        <option value="<?= $t['value'] ?>">
+                                            <?= $t['value'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Tipe / Golongan </label>
                             </div>
                         </div>
                     </div>
@@ -286,6 +299,7 @@
                                 <th onclick="changeSort('nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
                                 <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
+                                <th onclick="changeSort('tipe')" class="sort">Tipe/Gol</th>
                                 <th onclick="changeSort('email')" class="sort">Email</th>
                                 <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
                                 <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
@@ -357,6 +371,9 @@
             className: "text-center"
         }, {
             data: "divisionName",
+            className: "text-center"
+        }, {
+            data: "tipe",
             className: "text-center"
         }, {
             data: "email",
@@ -612,6 +629,9 @@
                 division_id: {
                     required: true,
                 },
+                tipe: {
+                    required: true,
+                },
                 pin: {
                     minlength: 6,
                     maxlength: 6
@@ -641,6 +661,9 @@
                 },
                 division_id: {
                     required: "Divisi wajib diisi"
+                },
+                tipe: {
+                    required: "Tipe/Golongan wajib diisi"
                 },
                 pin: {
                     minlength: "Minimal dan Maksimal 6 Karakter",
@@ -1074,6 +1097,7 @@
                         $(".province_id").val(res?.data?.province_id).change();
                         $(".child").val(res?.data?.child).change();
                         $(".division_id").val(res?.data?.division_id);
+                        $(".tipe").val(res?.data?.tipe);
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
 
                         // AJAX GET CITY

@@ -41,6 +41,7 @@ class EmployeesModel extends Model
         'child',
         'employee_img',
         'status',
+        'tipe',
         'createdAt',
         'updatedAt',
         'deletedAt'

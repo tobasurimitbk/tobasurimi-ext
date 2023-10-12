@@ -8,6 +8,7 @@ use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
 use App\Models\GajiConjunctionModel;
 use App\Models\GajiDivisiModel;
+use App\Models\MetadataModel;
 use App\Models\UserModel;
 use App\Models\TunjanganModel;
 use Exception;
@@ -23,6 +24,7 @@ class Employee extends BaseController
     protected $TunjanganModel;
     protected $GajiDivisiModel;
     protected $DivisionModel;
+    protected $MetaDataModel;
 
     public function __construct()
     {
@@ -35,6 +37,7 @@ class Employee extends BaseController
         $this->TunjanganModel = new TunjanganModel();
         $this->GajiDivisiModel = new GajiDivisiModel();
         $this->DivisionModel = new DivisisModel();
+        $this->MetaDataModel = new MetadataModel();
     }
 
     public function employee()
@@ -43,6 +46,7 @@ class Employee extends BaseController
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $data = [
             "dataProvinces" => $dataProvinces,
+            "tipeEmployee" => $this->MetaDataModel->where('name', "Tipe Karyawan")->findAll()
         ];
 
         return view('Master/employee/index', $data);
@@ -148,12 +152,13 @@ class Employee extends BaseController
                 "nip" => $res[$i]["nip"],
                 "name" => $res[$i]["name"],
                 "divisionName" => $res[$i]["divisionName"],
-                "email" => $res[$i]["email"],
-                "phone_no" => $res[$i]["phone_no"],
+                "email" => $res[$i]["email"] == null ? "-" : $res[$i]["email"],
+                "phone_no" => $res[$i]["phone_no"] == null ? "-" :  $res[$i]["phone_no"],
                 "dob" => $res[$i]["dob"] == "0000-00-00" ? "-" : date("d/m/Y", strtotime($res[$i]["dob"])),
                 "gender" => $res[$i]["gender"],
                 "acc_no" => $res[$i]["acc_no"],
                 "status" => $res[$i]["status"],
+                "tipe" => $res[$i]['tipe'] ==  null ? "-" : $res[$i]['tipe']
             );
         }
 
@@ -197,7 +202,8 @@ class Employee extends BaseController
                 "bank_name" => $this->request->getPost("bank_name") ?? "",
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
                 "pin"  => $this->request->getPost("pin") ?? "",
-                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0
+                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0,
+                "tipe" => $this->request->getPost('tipe')
             ];
             if (!empty($file->getName())) {
                 $mime = $file->getMimeType();
@@ -300,7 +306,8 @@ class Employee extends BaseController
                 "bank_name" => $this->request->getPost("bank_name") ?? "",
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
                 "pin"  => $this->request->getPost("pin") ?? "",
-                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0
+                "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0,
+                "tipe" => $this->request->getPost('tipe')
             ];
             $file = $this->request->getFile("employeeImg");
             if (!empty($file->getName())) {
@@ -342,7 +349,7 @@ class Employee extends BaseController
 
                     return \response()->setJSON([
                         "status"    => true,
-                        "message"   => "Data Employee Berhasil diubah",
+                        "message"   => "Data Employee Berhasil Diupdate",
                         'token' => csrf_hash()
                     ]);
                 } else {
