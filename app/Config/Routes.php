@@ -495,30 +495,43 @@ $routes->post('parent-barang/update', 'Warehouse\ParentBarang::update', ['filter
 $routes->post('parent-barang/delete', 'Warehouse\ParentBarang::delete', ['filter' => 'Auth']);
 $routes->post('parent-barang/get', 'Warehouse\ParentBarang::get', ['filter' => 'Auth']);
 $routes->get('parent-barang/all', 'Warehouse\ParentBarang::all', ['filter' => 'Auth']);
-
-$routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');
+// Master Barang
+$routes->get('barang-bahan-baku', 'Warehouse\Barang::bahanBakuView', ['filter' => 'Auth']);
+$routes->get('barang-bahan-penolong', 'Warehouse\Barang::bahanPenolongView', ['filter' => 'Auth']);
+$routes->get('barang-bahan-jadi', 'Warehouse\Barang::bahanJadiView', ['filter' => 'Auth']);
+$routes->get('barang-scrap', 'Warehouse\Barang::bahanScrapView', ['filter' => 'Auth']);
+$routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
+    $routes->get('all', 'Warehouse\Barang::all');
+    $routes->post('get', 'Warehouse\Barang::get');
+    $routes->post('save', 'Warehouse\Barang::create');
+    $routes->post('update', 'Warehouse\Barang::update');
+    $routes->post('delete', 'Warehouse\Barang::delete');
+    $routes->post('generate-new-code', 'Warehouse\Barang::generateNewCode');
 });
 
-$routes->group('barang-bahan-baku', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'Warehouse\Barang::barang/Bahan Baku');
-});
+// $routes->group('barang-bahan-penolong', ['filter' => 'Auth'], function ($routes) {
+//     $routes->get('/', 'Warehouse\Barang::barang/Bahan Penolong');
+// });
 
-$routes->group('barang-bahan-jadi', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'Warehouse\Barang::barang/Jadi');
-});
+// $routes->group('barang-bahan-baku', ['filter' => 'Auth'], function ($routes) {
+//     $routes->get('/', 'Warehouse\Barang::barang/Bahan Baku');
+// });
 
-$routes->group('barang-scrap', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('/', 'Warehouse\Barang::barang/Scrap');
-});
+// $routes->group('barang-bahan-jadi', ['filter' => 'Auth'], function ($routes) {
+//     $routes->get('/', 'Warehouse\Barang::barang/Jadi');
+// });
 
-$routes->group('barang', ['filter' => 'Auth'], function ($routes) {
-    $routes->get('all', 'Warehouse\Barang::allBarang');
-    $routes->get('id/(:segment)', 'Warehouse\Barang::getByIdBarang/$1');
-    $routes->post('save', 'Warehouse\Barang::saveBarang');
-    $routes->post('update', 'Warehouse\Barang::updateBarang');
-    $routes->post('delete', 'Warehouse\Barang::deleteBarang');
-});
+// $routes->group('barang-scrap', ['filter' => 'Auth'], function ($routes) {
+//     $routes->get('/', 'Warehouse\Barang::barang/Scrap');
+// });
+
+// $routes->group('barang', ['filter' => 'Auth'], function ($routes) {
+//     $routes->get('all', 'Warehouse\Barang::allBarang');
+//     $routes->get('id/(:segment)', 'Warehouse\Barang::getByIdBarang/$1');
+//     $routes->post('save', 'Warehouse\Barang::saveBarang');
+//     $routes->post('update', 'Warehouse\Barang::updateBarang');
+//     $routes->post('delete', 'Warehouse\Barang::deleteBarang');
+// });
 
 // WAREHOUSE
 // MASTER STOCK

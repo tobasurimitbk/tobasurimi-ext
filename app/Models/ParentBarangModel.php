@@ -18,7 +18,8 @@ class ParentBarangModel extends Model
         'company_id',
         'parent_type',
         'parent_name',
-        'kategori'
+        'kategori',
+        'deletedAt'
     ];
 
     // Dates

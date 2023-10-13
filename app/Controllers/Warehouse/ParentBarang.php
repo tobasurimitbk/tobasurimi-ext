@@ -87,7 +87,9 @@ class ParentBarang extends BaseController
         $id = $this->request->getVar('id');
 
         $rememberName = $parentBarangModel->where('id', $id)->first()['parent_name'];
-        $parentBarangModel->where('id', $id)->delete();
+        $parentBarangModel->update($id, [
+            'deletedAt' => date('Y-m-d H:i:s')
+        ]);
 
         return response()->setJSON([
             'token' => csrf_hash(),
@@ -121,6 +123,7 @@ class ParentBarang extends BaseController
         $condition = [
             "company_id"  => $this->this_company_id,
             "parent_type" => $this->request->getGet('parent_type'),
+            "deletedAt" => NULL
         ];
 
         $addCondition = [

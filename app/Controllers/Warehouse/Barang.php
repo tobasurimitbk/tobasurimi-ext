@@ -3,570 +3,252 @@
 namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
-
-use App\Models\BarangModel;
-use App\Models\BarangSupplierModel;
-use App\Models\HsCodesModel;
-use App\Models\MetadataModel;
+use App\Models\BarangMasterModel;
+use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
-use App\Models\Sub_AkunsModel;
+use Exception;
 
 class Barang extends BaseController
 {
-    protected $token;
     protected $this_company_id;
-    protected $barangModel;
-    protected $barangSupplierModel;
-    protected $HsCodesModel;
-    protected $metadataModel;
-    protected $SatuansModel;
-    protected $Sub_AkunsModel;
+    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap;
 
     public function __construct()
     {
-        $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->barangModel = new BarangModel();
-        $this->barangSupplierModel = new BarangSupplierModel();
-        $this->HsCodesModel = new HsCodesModel();
-        $this->metadataModel = new MetadataModel();
-        $this->SatuansModel = new SatuansModel();
-        $this->Sub_AkunsModel = new Sub_AkunsModel();
+        $this->kodeBahanBaku = "BB";
+        $this->kodeBahanPenolong = "BP";
+        $this->kodeBahanJadi = "BJ";
+        $this->kodeBahanScrap = "BS";
     }
 
-    public function barang($kategori)
+    public function bahanBakuView()
     {
-        // Get Kategori
-        $dataKategori = $this->metadataModel->get_by_name('Kategori Barang');
-
-        // get parent barang
-        $dataBarangParent = $this->barangModel->getParentBarang($this->this_company_id, $kategori);
-
-        // get ap ar account
-        $dataAPAR = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
-
-        // get satuan data
-        $satuanData = $this->SatuansModel->asObject()->findAll();
-
-        // get data HS
-        $dataKodeHS = $this->HsCodesModel->asObject()->findAll();
-
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
         $data = [
-            "kategoriBarang"    => $kategori,
-            "dataKategori"      => $dataKategori,
-            "dataBarangParent"  => $dataBarangParent,
-            "aparData"          => $dataAPAR,
-            "satuanData"        => $satuanData,
-            "dataKodeHS"        => $dataKodeHS
+            'type' => "bahan_baku",
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_baku")->findAll(),
+            'satuanBarang' => $satuanModel->findAll()
         ];
 
-        return view('Warehouse/barang/index', $data);
+        return view('Warehouse/barangMaster/bahanBaku', $data);
     }
 
-    public function allBarang()
+    public function bahanPenolongView()
+    {
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
+        $data = [
+            'type' => "bahan_penolong",
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_penolong")->findAll(),
+            'satuanBarang' => $satuanModel->findAll()
+        ];
+
+        return view('Warehouse/barangMaster/bahanPenolong', $data);
+    }
+
+    public function bahanJadiView()
+    {
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
+        $data = [
+            'type' => "bahan_jadi",
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_jadi")->findAll(),
+            'satuanBarang' => $satuanModel->findAll()
+        ];
+
+        return view('Warehouse/barangMaster/bahanJadi', $data);
+    }
+
+    public function bahanScrapView()
+    {
+        $parentBarangModel = new ParentBarangModel();
+        $satuanModel = new SatuansModel();
+        $data = [
+            'type' => "bahan_scrap",
+            'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_scrap")->findAll(),
+            'satuanBarang' => $satuanModel->findAll()
+        ];
+
+        return view('Warehouse/barangMaster/bahanScrap', $data);
+    }
+
+    public function create()
+    {
+        $barangModel = new BarangMasterModel();
+        $type = $this->request->getVar('type');
+
+        $barangModel->insert([
+            'company_id' => $this->this_company_id,
+            'satuan_id' => $this->request->getVar('satuan_id'),
+            'parent_type_id' => $this->request->getVar('parent_type_id'),
+            'kode_barang' => $this->request->getVar('kode_barang'),
+            'barang_name' => $this->request->getVar('barang_name'),
+            'type_barang' => $type,
+            'stok' => 0
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => \csrf_hash(),
+            'message' => "Barang baru berhasil ditambahkan"
+        ]);
+    }
+
+    public function update()
+    {
+        $id = $this->request->getVar('id');
+        $barangModel = new BarangMasterModel();
+        $type = $this->request->getVar('type');
+
+        $barangModel->update($id, [
+            'company_id' => $this->this_company_id,
+            'satuan_id' => $this->request->getVar('satuan_id'),
+            'parent_type' => $this->request->getVar('parent_type'),
+            'barang_name' => $this->request->getVar('barang_name'),
+            'type_barang' => $type,
+        ]);
+
+        return response()->setJSON([
+            'status' => \true,
+            'token' => \csrf_hash(),
+            'message' => "Barang baru berhasil diupdate"
+        ]);
+    }
+
+    public function delete()
+    {
+        $id = $this->request->getVar('id');
+        $barangModel = new BarangMasterModel();
+
+        $barangModel->update($id, [
+            'deletedAt' => date('Y-m-d H:i:s')
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Barang berhasil dihapus",
+            'token' => \csrf_hash()
+        ]);
+    }
+
+    public function get()
+    {
+        $barangModel = new BarangMasterModel();
+        $id = $this->request->getVar('id');
+
+        return \response()->setJSON([
+            'token' => \csrf_hash(),
+            'data' => $barangModel->where('id', $id)->where('deletedAt', null)->first()
+        ]);
+    }
+
+    public function all()
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            // "idCategory"    => formatter($this->request->getGet("kategori"), "STR_TO_INT"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "idCompany"     => $this->this_company_id
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
         ];
 
         $condition = [
-            "barangs.company_id"    => $this->this_company_id
+            "barang_master.company_id"  => $this->this_company_id,
+            "barang_master.type_barang" => $this->request->getGet('parent_type'),
+            "barang_master.deletedAt" => NULL
         ];
+
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            // "kategori"      => $this->request->getGet("kategori"),
-            "kategori_barang" => $this->request->getGet("kategori_barang")
+            'search' => $this->request->getGet('search'),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType")
         ];
+
+        $barangMasterModel = new BarangMasterModel();
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $barangData = $this->barangModel->getBarangList($condition, $addCondition, $limit, $offset);
 
-        $dataBarang = [];
+        $res = $barangMasterModel->getList($condition, $addCondition, $limit, $offset);
+
+        $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        foreach ($barangData['data'] as $data) {
-            array_push($dataBarang, [
-                "no"            => $no++,
-                "id"            => $data->id,
-                "parent_barang"   => $data->parent_barang,
-                "kode_barang"   => $data->kode_barang,
-                // "kategori"      => $data->kategori,
-                "nama_barang"   => $data->nama_barang,
-                "type"          => $data->type,
-                "harga_barang"  => number_format($data->harga_barang),
-                "kode_satuan"   => $data->kode_satuan,
-                "code_hs"       => $data->code_hs,
-                "sub_akun_ap"   => $data->sub_akun_ap,
-                "sub_akun_ar"   => $data->sub_akun_ar,
-                "stok"          => $data->stok
+        foreach ($res['data'] as $data) {
+            array_push($rdata, [
+                "no"                    => $no++,
+                "id"                    => $data['id'],
+                "kelompok_barang"       => $data['kelompok_barang'],
+                "kode_barang"           => $data['kode_barang'],
+                "barang_name"           => $data['barang_name'],
+                "satuan"                => $data['satuan'],
+                "stok"                  => $data['stok'],
+                "harga_terakhir"        => "Rp. 0.00", // belum selesai (khusus master data bahan penolong)
+                "supplier_terakhir"     => "-" // belum selesai (khusus master data bahan penolong)
             ]);
         }
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $barangData['totalData'],
-            "recordsFiltered"   => $barangData['totalFilteredData'],
-            "data"              => $dataBarang,
-            // "response" => $response,
-            "payload"           => $payload
+            "recordsTotal"      => $res['totalData'],
+            "recordsFiltered"   => $res['totalFilteredData'],
+            "data"              => $rdata,
+            "payload"           => $payload,
         ];
 
-        echo json_encode($data);
-        return;
+        return response()->setJSON($data);
     }
 
-    public function saveBarang()
+    public function generateNewCode()
     {
-        try {
-            $rules = [
-                "productSpec" => [
-                    "rules" => "required|in_list[single,multi]",
-                    'errors' => [
-                        'required' => 'Product Spec tidak boleh kosong'
-                    ]
-                ],
-                "nama_barang" => [
-                    "rules" => "required",
-                    'errors' => [
-                        'required' => 'Nama Barang tidak boleh kosong'
-                    ]
-                ],
-                "spek" => [
-                    "rules" => "permit_empty",
-                ],
-                "satuan_id" => [
-                    "rules" => "permit_empty|is_natural"
-                ],
-                "harga_barang" => [
-                    "rules" => "permit_empty"
-                ],
-                "type" => [
-                    "rules" => "permit_empty"
-                ],
-                "hs_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
-                "ap_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
-                "ar_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
-                "ppn" => [
-                    "rules" => "permit_empty|numeric",
-                ],
-                "pph" => [
-                    "rules" => "permit_empty|numeric",
-                ]
-            ];
+        $barangModel = new BarangMasterModel();
+        $type = $this->request->getVar('type');
+        $codeName = "";
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            $parent_id = formatter($this->request->getPost("parent_id"), "STR_TO_INT");
-            $kodeBarang = $this->generateNewCode();
-            $productSpec = $this->request->getPost('productSpec');
-            if ($parent_id || $productSpec == 'single') {
-                $payload = [
-                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
-                    "spec_type"         => $productSpec,
-                    "company_id"        => $this->this_company_id,
-                    "parent_id"         => formatter($this->request->getPost("parent_id"), "STR_TO_INT"),
-                    "kode_barang"       => $kodeBarang,
-                    "nama_barang"       => $this->request->getPost("nama_barang"),
-                    "type"              => $this->request->getPost("type"),
-                    "supplier_id"       => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                    "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                    "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    // "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                    "stok"              => 0,
-                    "ppn"               => $this->request->getPost('ppn') ?? 0,
-                    "pph"               => $this->request->getPost('pph') ?? 0,
-                    "spek"              => $this->request->getPost("spek")
-                ];
-            } else {
-                $payload = [
-                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
-                    "spec_type"     => $productSpec,
-                    "company_id"    => $this->this_company_id,
-                    "parent_id"     => 0,
-                    "kode_barang"   => $kodeBarang,
-                    "nama_barang"   => $this->request->getPost("nama_barang"),
-                ];
-            }
-
-            $supplier_id = json_decode($this->request->getPost("supplier_id"));
-            $payload_supplier = [];
-
-            $this->barangModel->db->transException(true)->transStart();
-            // $data = [
-            //     "status"    => false,
-            //     "message"   => json_encode($payload),
-            //     "payload"   => $payload,
-            //     'token'     => csrf_hash()
-            // ];
-            // return json_encode($data);
-
-            $insertedId =  $this->barangModel->insert($payload);
-
-            foreach ($supplier_id as $item) {
-                $payload_supplier[] = [
-                    "barang_id"     => $insertedId,
-                    "supplier_id"   => $item
-                ];
-            }
-
-            if (count($payload_supplier)) {
-                $this->barangSupplierModel->insertBatch($payload_supplier);
-            }
-
-            $this->barangModel->db->transComplete();
-
-            $data = [
-                "status"    => true,
-                "message"   => "Data Berhasil disimpan",
-                "payload"   => $payload,
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-        } catch (\Exception $e) {
-            $data = [
-                "status"    => false,
-                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function updateBarang()
-    {
-        try {
-            $rules = [
-                "productSpec" => [
-                    "rules" => "permit_empty|in_list[single,multi]",
-                ],
-                "nama_barang" => [
-                    "rules" => "permit_empty",
-                ],
-                "spek" => [
-                    "rules" => "permit_empty",
-                ],
-                "satuan_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
-                "harga_barang" => [
-                    "rules" => "permit_empty"
-                ],
-                "type" => [
-                    "rules" => "permit_empty"
-                ],
-                "hs_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
-                "ap_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
-                "ar_id" => [
-                    "rules" => "permit_empty|is_natural",
-                ],
-                "ppn" => [
-                    "rules" => "permit_empty|numeric",
-                ],
-                "pph" => [
-                    "rules" => "permit_empty|numeric",
-                ]
-            ];
-
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            $id = $this->request->getPost("id");
-            $productSpec = $this->request->getPost('productSpec');
-            $parent = formatter($this->request->getPost("parent"), "STR_TO_INT");
-
-            $barangData = $this->barangModel->asObject()
-                ->find($id);
-
-            if (empty($barangData)) {
-                $data = [
-                    "status"    => false,
-                    "message"   => 'Barang Tidak ditemukan',
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($barangData->spec_type == 'single' && $productSpec == 'multi' && empty($parent)) {
-                $data = [
-                    "status"    => false,
-                    "message"   => 'Not Allowed',
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            if ($parent || $productSpec == 'single') {
-                $payload = [
-                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
-                    "spec_type"         => $productSpec,
-                    "parent_id"         => $parent,
-                    "type"              => $this->request->getPost("type"),
-                    "supplier_id"       => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    "company_id"        => $this->this_company_id,
-                    "nama_barang"       => $this->request->getPost("nama_barang"),
-                    "harga_barang"      => formatter($this->request->getPost("harga_barang"), "CURR_TO_INT"),
-                    "satuan_id"         => formatter($this->request->getPost("satuan_id"), "STR_TO_INT"),
-                    "hs_id"             => formatter($this->request->getPost("hs_id"), "STR_TO_INT"),
-                    "ap_id"             => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    "ar_id"             => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "stok"              => $this->request->getPost("stok") ? formatter($this->request->getPost("stok"), "STR_TO_INT") : 0,
-                    "ppn"               => $this->request->getPost('ppn') ?? 0,
-                    "pph"               => $this->request->getPost('pph') ?? 0,
-                    "spek"              => $this->request->getPost("spek")
-                ];
-            } else {
-                $payload = [
-                    "kategori_barang"   => $this->request->getPost("kategori_barang"),
-                    "spec_type"     => $productSpec,
-                    "parent_id"     => 0,
-                    "company_id"    => $this->this_company_id,
-                    "nama_barang"   => $this->request->getPost("nama_barang"),
-                ];
-            }
-
-            $condition = [
-                'id' => $id
-            ];
-
-            $this->barangModel->db->transException(true)->transStart();
-
-            $this->barangModel->where($condition)->set($payload)
-                ->update();
-
-            $supplier_id = json_decode($this->request->getPost("supplier_id"));
-
-            $this->barangSupplierModel->deleteByBarangId($id);
-
-            foreach ($supplier_id as $item) {
-                $payload_supplier = [
-                    "barang_id" => $id,
-                    "supplier_id" => $item
-                ];
-                $this->barangSupplierModel->insert($payload_supplier);
-            }
-
-            $this->barangModel->db->transComplete();
-
-            $data = [
-                "status"    => true,
-                "message"   => "Data Berhasil diubah",
-                "payload"   => $payload,
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-        } catch (\Exception $e) {
-            $data = [
-                "status"    => false,
-                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function getByIdBarang($id = null)
-    {
-        if (!empty($id)) {
-            $response =  $this->barangModel->find($id);
-
-            if ($response) {
-                $responseSupplier =  $this->barangSupplierModel->getByBarangId($id);
-                if ($responseSupplier) {
-                    $data = [
-                        "status"  => true,
-                        "data"  => $response,
-                        "dataSupplier"  => $responseSupplier
-                    ];
-                    echo json_encode($data);
-                } else {
-                    $data = [
-                        "status"  => true,
-                        "data"  => $response,
-                        "dataSupplier"  => []
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $message = 'Data Gagal Ditemukan';
-                $data = [
-                    "status" => false,
-                    "message"  => $message
-                ];
-                echo json_encode($data);
-            }
+        if ($type == "bahan_baku") {
+            $codeName = $this->kodeBahanBaku;
+        } elseif ($type == "bahan_penolong") {
+            $codeName = $this->kodeBahanPenolong;
+        } elseif ($type == "bahan_jadi") {
+            $codeName = $this->kodeBahanJadi;
         } else {
-            $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
-            ];
-            echo json_encode($data);
+            $codeName = $this->kodeBahanScrap;
         }
-        return;
-    }
 
-    public function deleteBarang()
-    {
-        try {
-            $id = $this->request->getPost("id");
-
-            if (!empty($id)) {
-                $findBarang = $this->barangModel->find($id);
-                if ($findBarang) {
-                    $response =  $this->barangModel->delete($id);
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil dihapus",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Dihapus';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Tidak Ditemukan",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-        }
-        return;
-    }
-
-    public function dropdownBarang()
-    {
-        $dataBarang = $this->barangModel->getBarangByCompanyId($this->this_company_id);
-
-        $data = [
-            "data" => $dataBarang
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
-    public function dropdownParentBarang()
-    {
-        $dataBarang = $this->barangModel->getParentBarang($this->this_company_id);
-
-        $data = [
-            "data" => $dataBarang
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
-    public function dropdownBarangKategori()
-    {
-        $kategori = $this->request->getGet("kategori");
-        $dataBarang = $this->barangModel->getBarangByKategori($kategori);
-
-        $data = [
-            "data" => $dataBarang
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
-    public function dropdownBarangType()
-    {
-        $type = $this->request->getGet("type");
-        $dataBarang = $this->barangModel->getBarangByType($type);
-
-        $data = [
-            "data" => $dataBarang
-        ];
-
-        echo json_encode($data);
-        return;
-    }
-
-    private function generateNewCode()
-    {
-        // PR-0001
-        $lastBarang = $this->barangModel->asObject()
+        $lastBarang = $barangModel->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('type_barang', $type)
+            ->where('deletedAt', null)
+            ->like('kode_barang', $codeName . '-____')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
         if (empty($lastBarang)) {
-            return "PR-0001";
+            return response()->setJSON([
+                'codeNew' => "$codeName-0001",
+                'token' => csrf_hash(),
+            ]);
         }
 
-        $lastCode = $lastBarang->kode_barang;
-        $lastCodeExp = explode('-', $lastCode);
-        $lastIncrement = (int)$lastCodeExp[1];
-        $newIncrement = str_pad(($lastIncrement + 1), 4, '0', STR_PAD_LEFT);
+        try {
 
-        return "PR-$newIncrement";
+            $lastCode = $lastBarang->kode_barang;
+            $lastCodeExp = explode('-', $lastCode);
+            $lastIncrement = (int)$lastCodeExp[1];
+            $newIncrement = str_pad(($lastIncrement + 1), 4, '0', STR_PAD_LEFT);
+
+            return response()->setJSON([
+                'codeNew' => $codeName . "-" . $newIncrement,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'codeNew' => $codeName . "-????",
+                'token' => csrf_hash()
+            ]);
+        }
     }
 }
