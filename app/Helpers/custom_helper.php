@@ -98,6 +98,9 @@ if (!function_exists('formatter')) {
          case "CURR_TO_INT":
             return intval(str_replace(",", "", $value));
             break;
+         case "CURR_TO_FLOAT":
+               return floatval(str_replace(",", "", $value));
+               break;
          case "NUM_TO_CURR":
             return str_replace(",", ".", number_format($value));
             break;

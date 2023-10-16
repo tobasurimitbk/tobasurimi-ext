@@ -107,4 +107,19 @@ class BarangMasterModel extends Model
             'sortType'          => $sortType
         ];
     }
+
+    public function getBarangByType($type)
+    {
+        $arrCondition = [
+            'barang_master.deletedAt' => null,
+            'barang_master.type_barang' => $type
+        ];
+
+        $selectQry = "barang_master.*";
+        $data = $this->select($selectQry)
+            ->where($arrCondition)
+            ->findAll();
+
+        return $data;
+    }
 }

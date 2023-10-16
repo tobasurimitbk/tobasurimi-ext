@@ -251,4 +251,19 @@ class Barang extends BaseController
             ]);
         }
     }
+
+    public function dropdownBarangType()
+    {
+        $barangModel = new BarangMasterModel();
+
+        $type = $this->request->getGet("type");
+        $dataBarang = $barangModel->getBarangByType($type);
+
+        $data = [
+            "data" => $dataBarang
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }

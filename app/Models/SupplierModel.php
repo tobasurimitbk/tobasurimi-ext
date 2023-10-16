@@ -16,23 +16,23 @@ class SupplierModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'company_id',
-        'kode',
         'name',
         'address',
-        'province_id',
-        'city_id',
-        'postal_code',
         'no_npwp',
         'phone',
-        'contact_person',
-        'email',
+        'type',
+        //'contact_person',
+        //'kode',
+        //'province_id',
+        //'city_id',
+        //'postal_code',
+        //'email',
         // 'no_rekening',
         // 'supplier_buyer',
-        'type',
-        'kategori',
+        //'kategori',
         // 'ap_id',
         // 'ar_id',
-        'country_code'
+        // 'country_code'
     ];
 
     // Dates
@@ -62,17 +62,17 @@ class SupplierModel extends Model
     public function getSupplierList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'kode'              => 'suppliers.kode',
+            // 'kode'              => 'suppliers.kode',
             'name'              => 'suppliers.name',
             'address'           => 'suppliers.address',
             'no_npwp'           => 'suppliers.no_npwp',
             'phone'             => 'suppliers.phone',
-            'contact_person'    => 'suppliers.contact_person',
+            // 'contact_person'    => 'suppliers.contact_person',
             // 'no_rekening'       => 'suppliers.no_rekening',
             // 'supplier_buyer'    => 'suppliers.supplier_buyer',
-            'province'          => 'provinces.province_name',
-            'city'              => 'cities.city_name',
-            'postal_code'       => 'suppliers.postal_code',
+            // 'province'          => 'provinces.province_name',
+            // 'city'              => 'cities.city_name',
+            // 'postal_code'       => 'suppliers.postal_code',
             'createdAt'         => 'suppliers.createdAt',
             'updatedAt'         => 'suppliers.updatedAt',
         ];
@@ -81,14 +81,14 @@ class SupplierModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "suppliers.*, 
-                      cities.city_name AS city_name, 
-                      provinces.province_name AS province_name";
+        $selectQry = "suppliers.*";
+                    //   cities.city_name AS city_name, 
+                    //   provinces.province_name AS province_name";
         $supplierDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('cities', 'suppliers.city_id = cities.id', 'left')
-            ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
+            // ->join('cities', 'suppliers.city_id = cities.id', 'left')
+            // ->join('provinces', 'suppliers.province_id = provinces.id', 'left')
             ->orderBy($sort, $sortType);
 
         // $selectQry = "suppliers.*, 
@@ -110,7 +110,7 @@ class SupplierModel extends Model
         if ($addCondition['search']) {
             $supplierDataQry->groupStart()
                 ->like('name', $addCondition['search'])
-                ->orLike('kode', $addCondition['search'])
+                // ->orLike('kode', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -127,9 +127,10 @@ class SupplierModel extends Model
     public function getSupplierById($id)
     {
         $supplierData = $this->asObject()
-            ->select('suppliers.*, country.country_name')
+            ->select('suppliers.*')
+            // ->select('suppliers.*, country.country_name')
             // ->select('suppliers.*, ap.nama_sub AS ap_name, ar.nama_sub AS ar_name, country.country_name')
-            ->join('country', 'country.code = suppliers.country_code', 'left')
+            // ->join('country', 'country.code = suppliers.country_code', 'left')
             // ->join('sub_akuns AS ap', 'ap.id = suppliers.ap_id', 'left')
             // ->join('sub_akuns AS ar', 'ar.id = suppliers.ar_id', 'left')
             ->find($id);
@@ -141,7 +142,7 @@ class SupplierModel extends Model
     {
         $arrCondition = [
             'deletedAt' => null,
-            'kategori' => $kategori,
+            // 'kategori' => $kategori,
             'type' => $type,
             'company_id' => $company_id
         ];
@@ -153,28 +154,28 @@ class SupplierModel extends Model
         return $query->getResultArray();
     }
 
-    public function generateSupplierCode(): string
-    {
-        $month = idate('m');
-        $year = date('y');
-        $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "/SUP/$romanMonth/$year";
+    // public function generateSupplierCode(): string
+    // {
+    //     $month = idate('m');
+    //     $year = date('y');
+    //     $romanMonth = romanMonthNumber($month);
+    //     $numberTemplate = "/SUP/$romanMonth/$year";
 
-        $lastData = $this->asObject()
-            ->like('kode', $numberTemplate, 'before')
-            ->orderBy('createdAt', 'DESC')
-            ->first();
+    //     $lastData = $this->asObject()
+    //         ->like('kode', $numberTemplate, 'before')
+    //         ->orderBy('createdAt', 'DESC')
+    //         ->first();
 
-        $invNumber = '001' . $numberTemplate;
+    //     $invNumber = '001' . $numberTemplate;
 
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->kode);
-            $lastIncrement = intval($asd[0]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+    //     if (!empty($lastData)) {
+    //         $asd = explode('/', $lastData->kode);
+    //         $lastIncrement = intval($asd[0]) + 1;
+    //         $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
 
-            $invNumber = $paddedNumber . $numberTemplate;
-        }
+    //         $invNumber = $paddedNumber . $numberTemplate;
+    //     }
 
-        return $invNumber;
-    }
+    //     return $invNumber;
+    // }
 }

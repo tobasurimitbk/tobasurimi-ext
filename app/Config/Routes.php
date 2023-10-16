@@ -154,40 +154,29 @@ $routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
 $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
+// SUPPLIER HARGA
+$routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
+$routes->post('/supplier-harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
+$routes->get('/supplier-harga/id/(:num)', 'Supplier\SupplierHarga::getByIdSupplierHarga/$1', ['filter' => 'Auth']);
+$routes->post('/supplier-harga/update', 'Supplier\SupplierHarga::updateSupplierHarga', ['filter' => 'Auth']);
+$routes->post('/supplier-harga/delete', 'Supplier\SupplierHarga::deleteSupplierHarga', ['filter' => 'Auth']);
+
 // SUPPLIER
-$routes->get('/supplier/ajax', 'Supplier\SupplierBahanBaku::supplierAjax', ['filter' => 'Auth']);
+$routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => 'Auth']);
+$routes->get('/supplier/id/(:num)', 'Supplier\Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
+$routes->post('/supplier/delete', 'Supplier\Supplier::deleteSupplier', ['filter' => 'Auth']);
+
 // BAHAN BAKU LOKAL
-$routes->get('/supplier-bahan-baku', 'Supplier\SupplierBahanBaku::supplierBahanBaku', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-baku/all', 'Supplier\SupplierBahanBaku::allSupplierBahanBaku', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-baku/id/(:num)', 'Supplier\SupplierBahanBaku::getByIdSupplierBahanBaku/$1', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-baku/save', 'Supplier\SupplierBahanBaku::saveSupplierBahanBaku', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-baku/update', 'Supplier\SupplierBahanBaku::updateSupplierBahanBaku', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-baku/delete', 'Supplier\SupplierBahanBaku::deleteSupplierBahanBaku', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku', 'Supplier\Supplier::supplierBahanBaku', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku/all', 'Supplier\Supplier::allSupplierBahanBaku', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-baku/save', 'Supplier\Supplier::saveSupplierBahanBaku', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-baku/update', 'Supplier\Supplier::updateSupplierBahanBaku', ['filter' => 'Auth']);
 
-// BAHAN PENOLONG LOKAL
-$routes->get('/supplier-bahan-penolong', 'Supplier\SupplierBahanPenolong::supplierBahanPenolong', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-penolong/all', 'Supplier\SupplierBahanPenolong::allSupplierBahanPenolong', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-penolong/id/(:num)', 'Supplier\SupplierBahanPenolong::getByIdSupplierBahanPenolong/$1', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-penolong/save', 'Supplier\SupplierBahanPenolong::saveSupplierBahanPenolong', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-penolong/update', 'Supplier\SupplierBahanPenolong::updateSupplierBahanPenolong', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-penolong/delete', 'Supplier\SupplierBahanPenolong::deleteSupplierBahanPenolong', ['filter' => 'Auth']);
-
-// BAHAN BAKU IMPORT
-$routes->get('/supplier-bahan-baku-import', 'Supplier\SupplierBahanBakuImport::supplierBahanBakuImport', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-baku-import/all', 'Supplier\SupplierBahanBakuImport::allSupplierBahanBakuImport', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-baku-import/id/(:num)', 'Supplier\SupplierBahanBakuImport::getByIdSupplierBahanBakuImport/$1', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-baku-import/save', 'Supplier\SupplierBahanBakuImport::saveSupplierBahanBakuImport', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-baku-import/update', 'Supplier\SupplierBahanBakuImport::updateSupplierBahanBakuImport', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-baku-import/delete', 'Supplier\SupplierBahanBakuImport::deleteSupplierBahanBakuImport', ['filter' => 'Auth']);
-
-// BAHAN PENOLONG IMPORT
-$routes->get('/supplier-bahan-penolong-import', 'Supplier\SupplierBahanPenolongImport::supplierBahanPenolongImport', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-penolong-import/all', 'Supplier\SupplierBahanPenolongImport::allSupplierBahanPenolongImport', ['filter' => 'Auth']);
-$routes->get('/supplier-bahan-penolong-import/id/(:segment)', 'Supplier\SupplierBahanPenolongImport::getByIdSupplierBahanPenolongImport/$1', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-penolong-import/save', 'Supplier\SupplierBahanPenolongImport::saveSupplierBahanPenolongImport', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-penolong-import/update', 'Supplier\SupplierBahanPenolongImport::updateSupplierBahanPenolongImport', ['filter' => 'Auth']);
-$routes->post('/supplier-bahan-penolong-import/delete', 'Supplier\SupplierBahanPenolongImport::deleteSupplierBahanPenolongImport', ['filter' => 'Auth']);
-
+// BAHAN PENOLONG
+$routes->get('/supplier-bahan-penolong', 'Supplier\Supplier::supplierBahanPenolong', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-penolong/all', 'Supplier\Supplier::allSupplierBahanPenolong', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-penolong/save', 'Supplier\Supplier::saveSupplierBahanPenolong', ['filter' => 'Auth']);
+$routes->post('/supplier-bahan-penolong/update', 'Supplier\Supplier::updateSupplierBahanPenolong', ['filter' => 'Auth']);
 // PURCHASE
 // SPP
 $routes->get('/spp', 'Purchase\SPP::spp', ['filter' => 'Auth']);

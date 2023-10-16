@@ -13,180 +13,30 @@
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
-                            <!-- <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" placeholder="Kode">
-                                <label for="floatingInput">Kode</label>
-                            </div> -->
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control kode" id="kode" name="kode" value="<?= !empty($dataSPP) ? $dataSPP->spp_no : ""; ?>">
-                                    <label for="floatingInput">Kode Supplier</label>
-                                </div>
-                                <div style="<?= !empty($dataSPP) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
                                 <label for="floatingInput">Nama</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP (Opsional)">
+                                <label for="floatingInput">Nomor NPWP (Opsional)</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control address" id="address" name="address" placeholder="Address">
+                            <div class="form-floating mb-3">
+                                <textarea autocomplete="one-time-code" class="form-control address text-area-all" name="address" id="address" placeholder="Alamat (Opsional)"></textarea>
                                 <label for="floatingInput">Alamat (Opsional)</label>
                             </div>
                         </div>
                     </div>
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <select class="form-select country_code" name="country_code" id="country_code">
-                            <option value=""></option>
-                            <?php foreach ($country as $c) : ?>
-                                <option value="<?= $c->code; ?>">
-                                    <?= $c->country_name; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Pilih Negara (Opsional)</label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select province_parent_id" name="province_parent_id" id="province_parent_id" onchange="getCityParent()">
-                                            <option value=""></option>
-                                            <?php
-                                            if (!empty($dataProvinces)) {
-                                                foreach ($dataProvinces as $province) {
-                                            ?>
-                                                    <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
-                                            <?php
-                                                }
-                                            }
-                                            ?>
-                                        </select>
-                                        <label for="floatingInput">Provinsi (Opsional)</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
-                                            <option value="" data-code=""></option>
-                                        </select>
-                                        <label for="floatingInput">Kota (Opsional)</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="postal_code" placeholder="Postal Code">
-                                        <label for="floatingInput">Kode Pos (Opsional)</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="Nomor NPWP">
-                                <label for="floatingInput">Nomor NPWP (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
-                                <label for="floatingInput">No. Telepon (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person">
-                                <label for="floatingInput">Contact Person (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_rekening" id="no_rekening" name="no_rekening" placeholder="No. Rekening">
-                                <label for="floatingInput">No. Rekening (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select supplier_buyer" name="supplier_buyer" id="supplier_buyer">
-                                    <option value="SUPPLIER + BUYER">SUPPLIER + BUYER</option>
-                                    <option value="SUPPLIER">SUPPLIER</option>
-                                    <option value="BUYER">BUYER</option>
-                                </select>
-                                <label for="floatingInput">Supplier / Buyer (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select ap_id" name="ap_id" id="ap_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Akun AP (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select ar_id" name="ar_id" id="ar_id">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Akun AR (Opsional)</label>
-                            </div>
-                        </div>
-                    </div> -->
                 </form>
-                <!-- <div class="col-subtitle-modal">
-                    <div class="row mt-5">
-                        <div class="col-md-6">
-                            <h5 class="modal-sub-title">List Alamat Pengiriman</h5>
-                        </div>
-                        <div class="col-md-6">
-                            <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal" style="width: 106px;">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                            </button>
-                        </div>
-                    </div>
-                </div> -->
-                <!-- <div class="table-responsive mt-2">
-                        <table class="table-inside table-bordered nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Alamat</th>
-                                    <th>Kota</th>
-                                    <th>Provinsi</th>
-                                    <th>Kode Pos</th>
-                                    <th>Main Address</th>
-                                </tr>
-                            </thead>
-                            <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
-
-                            </tbody>
-                        </table>
-                    </div> -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-hide-parent btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
@@ -194,66 +44,107 @@
     </div>
 </div>
 
-<!-- <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog">
+<div class="modal harga-modal" id="harga_modal">
+    <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Alamat Pengiriman</h5>
+                <h5 class="modal-title">Harga Bahan Baku</h5>
             </div>
-            <div class="modal-body">
-                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+            <div class="modal-body">        
+                <input autocomplete="one-time-code" type="hidden" class="id_supplier" name="id_supplier" id="id_supplier" />
+                <input autocomplete="one-time-code" type="hidden" class="id_supplier_harga" name="id_supplier_harga" id="id_supplier_harga" />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input disabled autocomplete="one-time-code" type="text" class="form-control name_supplier" id="name_supplier" name="name_supplier" placeholder="Nama Supplier">
+                            <label for="floatingInput">Nama Supplier</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                            <textarea disabled autocomplete="one-time-code" class="form-control address_supplier text-area-all" name="address_supplier" id="address_supplier" placeholder="Alamat (Opsional)"></textarea>
+                            <label for="floatingInput">Alamat (Opsional)</label>
+                        </div>
+                    </div>
+                </div>
+                <form class="harga-form" role="form" method="POST" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control detail_address" id="detail_address" name="detail_address" placeholder="Address">
-                                <label for="floatingInput">Address</label>
+                                <select class="form-select bahan_baku" name="bahan_baku" id="bahan_baku" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Bahan Baku</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_id" name="province_id" id="province_id">
+                                <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
                                     <option value=""></option>
-                                    <?php
-                                    if (!empty($dataProvinces)) {
-                                        foreach ($dataProvinces as $province) {
-                                    ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
                                 </select>
-                                <label for="floatingInput">Provinsi</label>
+                                <label for="floatingInput">Bagian</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_id" name="city_id" id="city_id" onchange="getPostalCode()">
-                                    <option value="" data-code=""></option>
-                                </select>
-                                <label for="floatingInput">Kota</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesfikasi" name="spesifikasi" placeholder="Spesifikasi">
+                                <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly="true" type="text" class="form-control postal_code" id="postal_code" name="postal_code" placeholder="Postal Code">
-                                <label for="floatingInput">Kode Pos</label>
+                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
+                                <label for="floatingInput">Harga Umum</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
+                                <label for="floatingInput">Harga Harian</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
+                                <label for="floatingInput">Harga Bulanan</label>
                             </div>
                         </div>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                    <button type="button" class="btn btn-discard delete-detail delete-btn">Hapus</button>
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-2">Batal</button>
-                    <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-hide-harga btn-discard mr-2">Batal</button>
+                    <button type="submit" class="btn btn-submit-form btn-submit-harga">Simpan</button>
+                </div>
+                <div class="table-responsive mt-3 mb-3">
+                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0" id="tabelKomponenGaji">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th width="10">No</th>
+                                <th>Bahan Baku</th>
+                                <th>Bagian</th>
+                                <th>Spesifikasi</th>
+                                <th>Harga Umum</th>
+                                <th>Harga Harian</th>
+                                <th>Harga Bulanan</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div> -->
+</div>
+
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -267,7 +158,7 @@
         <div class="card-body">
             <div class="row justify-content-end mb-3">
                 <div class="col-md-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Nama" value="" />
                 </div>
             </div>
             <div class="row">
@@ -276,20 +167,10 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th onclick="changeSort('province_name')" class="sort">Provinsi</th>
-                                <th onclick="changeSort('city_name')" class="sort">Kota</th>
-                                <th onclick="changeSort('postal_code')" class="sort">Kode Pos</th>
                                 <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
-                                <th onclick="changeSort('phone')" class="sort">No. Telepon</th>
-                                <th onclick="changeSort('contact_person')" class="sort">Contact Person</th>
-                                <th onclick="changeSort('email')" class="sort">Email</th>
-                                <!-- <th onclick="changeSort('no_rekening')" class="sort">No. Rekening</th>
-                                <th onclick="changeSort('supplier_buyer')" class="sort">Supplier / Buyer</th>
-                                <th onclick="changeSort('ap_name')" class="sort">AP</th>
-                                <th onclick="changeSort('ar_name')" class="sort">AR</th> -->
+                                <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th>Set Harga</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -304,13 +185,43 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "kode";
+    let sort = "name";
     let sortType = "asc";
     let trigger = true;
+    let list_harga = [];
 
-    let list_address = [];
-    let list_delete = [];
-    var row = 0;
+    $('.bahan_baku').select2({
+        placeholder: "Pilih Bahan Baku",
+        theme: "bootstrap-5",
+        dropdownParent: $(".harga-modal .modal-content")
+    })
+
+    $('.bagian').select2({
+        placeholder: "Pilih Bagian",
+        theme: "bootstrap-5",
+        dropdownParent: $(".harga-modal .modal-content")
+    })
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.form-select')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -349,50 +260,28 @@
             className: "text-center",
             sortable: false
         }, {
-            data: "kode",
-            className: "text-center"
-        }, {
             data: "name",
-            className: "text-center"
-        }, {
-            data: "address",
-            className: "text-center"
-        }, {
-            data: "province_name",
-            className: "text-center"
-        }, {
-            data: "city_name",
-            className: "text-center"
-        }, {
-            data: "postal_code",
             className: "text-center"
         }, {
             data: "no_npwp",
             className: "text-center"
         }, {
-            data: "phone",
+            data: "address",
             className: "text-center"
         }, {
-            data: "contact_person",
-            className: "text-center"
-        }, {
-            data: "email",
-            className: "text-center"
-        }
-        // , {
-        //     data: "no_rekening",
-        //     className: "text-center"
-        // }, {
-        //     data: "supplier_buyer",
-        //     className: "text-center"
-        // }, {
-        //     data: "ap_name",
-        //     className: "text-center"
-        // }, {
-        //     data: "ar_name",
-        //     className: "text-center"
-        // }
-        ],
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row?.id;
+                    return `
+                        <button class="btn btn-success" onclick="setHarga(${id})" style="box-shadow: none !important;">
+                            Set Harga
+                        </button>
+                    `
+            }
+        }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -407,28 +296,46 @@
         }
     });
 
-    var validator_detail = $(".detail-form").validate({
+    var validator_detail = $(".harga-form").validate({
         rules: {
-            detail_address: {
+            bahan_baku: {
                 required: true
             },
-            province_id: {
+            bagian: {
                 required: true
             },
-            city_id: {
+            spesifikasi: {
+                required: true
+            },
+            harga_umum: {
+                required: true
+            },
+            harga_harian: {
+                required: true
+            },
+            harga_bulanan: {
                 required: true
             }
         },
         messages: {
-            detail_address: {
-                required: "Address wajib diisi"
+            bahan_baku: {
+                required: "Bahan Baku wajib diisi"
             },
-            province_id: {
-                required: "Province wajib diisi"
+            bagian: {
+                required: "Bagian wajib diisi"
             },
-            city_id: {
-                required: "City wajib diisi"
+            spesifikasi: {
+                required: "Spesifikasi wajib diisi"
             },
+            harga_umum: {
+                required: "Harga Umum wajib diisi"
+            },
+            harga_harian: {
+                required: "Harga Harian wajib diisi"
+            },
+            harga_bulanan: {
+                required: "Harga Bulanan wajib diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -453,275 +360,24 @@
     });
 
     $(document).ready(function() {
-        const select2Prop = {
-            dropdownParent: $("#add_modal"),
-            ajax: {
-                delay: 300,
-                url: `<?= base_url("sub-account/dropdown"); ?>`,
-                dataType: 'json',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-                }
-            }
-        };
-
-        // PROVINCE
-        $('.province_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        });
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".province_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".province_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".province_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // PROVINCE PARENT
-        $('.province_parent_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".province_parent_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".province_parent_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".province_parent_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // CITY
-        $('.city_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".detail-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $(".city_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $(".city_id")
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $(".city_id")
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // CITY PARENT
-        $('.city_parent_id').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal .modal-content")
-        })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.city_parent_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.city_parent_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.city_parent_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        // // AP
-        // $('.ap_id').select2({
-        //     placeholder: "",
-        //     theme: "bootstrap-5",
-        //     dropdownParent: $(".add-modal .modal-content")
-        // })
-
-        // //CSS SELECT2 FLOATING LABEL
-        // $('.ap_id')
-        //     .parent('div')
-        //     .children('span')
-        //     .children('span')
-        //     .children('span')
-        //     .css('height', ' calc(3.5rem + 2px)');
-
-        // $('.ap_id')
-        //     .parent('div')
-        //     .children('span')
-        //     .children('span')
-        //     .children('span')
-        //     .children('span')
-        //     .css('margin-top', '22px').css('margin-left', '-7px');
-
-        // $('.ap_id')
-        //     .parent('div')
-        //     .find('label')
-        //     .css('z-index', '1');
-
-        // // AR
-        // $('.ar_id').select2({
-        //     placeholder: "",
-        //     theme: "bootstrap-5",
-        //     dropdownParent: $(".add-modal .modal-content")
-        // })
-
-        // //CSS SELECT2 FLOATING LABEL
-        // $('.ar_id')
-        //     .parent('div')
-        //     .children('span')
-        //     .children('span')
-        //     .children('span')
-        //     .css('height', ' calc(3.5rem + 2px)');
-
-        // $('.ar_id')
-        //     .parent('div')
-        //     .children('span')
-        //     .children('span')
-        //     .children('span')
-        //     .children('span')
-        //     .css('margin-top', '22px').css('margin-left', '-7px');
-
-        // $('.ar_id')
-        //     .parent('div')
-        //     .find('label')
-        //     .css('z-index', '1');
-
         var validator = $(".create-form").validate({
             rules: {
-                kode: {
-                    required: true
-                },
                 name: {
                     required: true
                 },
-                address: {
-                    // required: true
-                },
                 no_npwp: {
-                    // required: true,
                     minlength: 15,
                     maxlength: 15,
-                },
-                phone: {
-                    // required: true
-                },
-                contact_person: {
-                    // required: true
-                },
-                email: {
-                    // required: true
-                },
-                // no_rekening: {
-                //     // required: true
-                // },
-                // supplier_buyer: {
-                //     // required: true
-                // },
-                province_parent_id: {
-                    // required: true
-                },
-                city_parent_id: {
-                    // required: true
-                },
-                // ap_id: {
-                //     // required: true
-                // },
-                // ar_id: {
-                //     // required: true
-                // }
+                }
             },
             messages: {
-                kode: {
-                    required: "Kode wajib diisi"
-                },
                 name: {
                     required: "Nama wajib diisi"
                 },
-                address: {
-                    required: "Alamat wajib diisi"
-                },
                 no_npwp: {
-                    required: "Nomor NPWP wajib diisi",
                     minlength: "Nomor NPWP minimal 15 angka",
                     maxlength: "Nomor NPWP maksimal 15 angka",
-                },
-                phone: {
-                    required: "No. Telepon wajib diisi"
-                },
-                contact_person: {
-                    required: "Contact Person wajib diisi"
-                },
-                email: {
-                    required: "Email wajib diisi"
-                },
-                // no_rekening: {
-                //     required: "No. Rekening wajib diisi"
-                // },
-                // supplier_buyer: {
-                //     required: "Supplier / Buyer wajib diisi"
-                // },
-                province_parent_id: {
-                    required: "Provinsi wajib diisi"
-                },
-                city_parent_id: {
-                    required: "Kota wajib diisi"
-                },
-                // ap_id: {
-                //     required: "Akun AP wajib diisi"
-                // },
-                // ar_id: {
-                //     required: "Akun AR wajib diisi"
-                // }
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -745,13 +401,7 @@
             },
         });
 
-        $(".phone").mask("0000000000000")
-
-        $(".postal_code").mask("00000")
-
         $(".no_npwp").mask("000000000000000")
-
-        // $(".no_rekening").mask("000000000000000")
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -759,83 +409,25 @@
 
         $(".dataTable_info").addClass("pt-0");
 
-        $(".btn-show-detail").click(function() {
-            $(".delete-detail").css('display', 'none');
-            $(".province_id").val('').change()
-            $(".city_id").val('').change()
-            $(".city_id").empty()
-            $(".city_id").append(`<option value=""></option>`)
-
-            $(".title-detail-name").text("Tambah")
-            $(".id_detail").val('')
-            $(".detail_address").val('')
-
-            $(".postal_code").val('')
-
-            validator_detail.resetForm();
-            validator_detail.reset();
-
-            $(".detail-modal").modal("show")
-        })
-
         $(".btn-show-form").click(function() {
-            $('.input-generate').show();
-
             $(".id").val("");
             $(".title-name").text("Tambah");
-
-            $(".province_parent_id").val('').change()
-            $(".city_parent_id").val('').change()
-            $(".city_parent_id").empty()
-            $(".city_parent_id").append(`<option value=""></option>`)
-
-            $(".kode").attr("readonly", false);
-
-            $(".body-detail-table").empty()
-
-            row = 0;
-
-            list_address = [];
 
             validator.resetForm();
             validator.reset();
 
             $(".create-form")[0].reset()
             $(".delete-form").css('display', 'none');
-            $(".body-detail-table").empty()
-
-            // $('.ap_id').select2(select2Prop);
-            // $('.ar_id').select2(select2Prop);
 
             $(".add-modal").modal("show");
         })
 
-        $(".btn-hide-detail").click(function() {
-            $(".detail-modal").modal("hide")
-        })
-
-        $(".btn-hide-form").click(function() {
+        $(".btn-hide-parent").click(function() {
             $(".add-modal").modal("hide")
         })
 
-        $(".province_id").change(function() {
-            const id = $(".province_id option:selected").val()
-
-            if (id && trigger) {
-                $.ajax({
-                    url: `<?= base_url("city"); ?>/${id}`,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        $(".city_id").empty()
-                        $(".city_id").val("").change()
-                        $(".city_id").append(`<option value=""></option>`)
-                        res.data.forEach(function(item) {
-                            $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                        })
-                    }
-                })
-            }
+        $(".btn-hide-harga").click(function() {
+            $(".harga-modal").modal("hide")
         })
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
@@ -845,129 +437,19 @@
             let id = data.id;
             $(".title-name").text("Update");
 
-            $(".kode").attr("readonly", true);
-
             $.ajax({
-                url: "<?= base_url("supplier-bahan-baku/id"); ?>" + "/" + id,
+                url: "<?= base_url("supplier/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $('.input-generate').hide()
-
                         $(".id").val(id);
-                        $(".kode").val(res?.data?.kode);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
                         $(".no_npwp").val(res?.data?.no_npwp);
-                        $(".phone").val(res?.data?.phone);
-                        $(".contact_person").val(res?.data?.contact_person);
-                        $(".email").val(res?.data?.email);
-                        // $(".no_rekening").val(res?.data?.no_rekening);
-                        // $(".supplier_buyer").val(res?.data?.supplier_buyer).change();
-                        $(".province_parent_id").val(res?.data?.province_id).change();
-                        $(".country_code").val(res?.data?.country_code).change();
-
-                        row = res?.data?.list_address.length;
-
-                        list_address = [];
-
-                        let tag_html = "";
-
-                        $(".body-detail-table").empty()
-
-                        res?.data?.list_address.map((item, index) => {
-                            list_address.push({
-                                id: item.id,
-                                supplier_id: item.supplier_id,
-                                row: index + 1,
-                                address: item.address,
-                                province_id: item.province_id,
-                                province_name: item.province_name,
-                                city_id: item.city_id,
-                                city_name: item.city_name,
-                                postal_code: item.postal_code,
-                                main_address: item.main_address
-                            })
-
-                            tag_html += `<tr>`;
-                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += index + 1;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.address;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.city_name;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.province_name;
-                            tag_html += "</td>";
-                            tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${index + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-                            tag_html += item.postal_code;
-                            tag_html += "</td>";
-                            tag_html += "<td class='actions'>";
-                            if (item.main_address == 1) {
-                                tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${index + 1}">`;
-                            } else {
-                                tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${index + 1}">`;
-                            }
-                            tag_html += "</td>";
-                            tag_html += "</tr>";
-                        })
-
-                        $(".body-detail-table").append(tag_html)
 
                         validator.resetForm();
                         validator.reset();
-                        list_delete = [];
-
-                        // AJAX GET CITY
-                        $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_parent_id").empty()
-                                $(".city_parent_id").val("").change()
-                                $(".city_parent_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                                })
-
-                                $(".city_parent_id").val(res?.data?.city_id).change();
-                                $(".parent_postal_code").val(res?.data?.postal_code);
-                            }
-                        })
-
-                        /* $.ajax({
-                            url: `<?= base_url("sub-account/dropdown"); ?>`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".ap_id").empty()
-                                $(".ar_id").empty()
-
-                                $(".ap_id").append(`<option value=""></option>`)
-                                $(".ar_id").append(`<option value=""></option>`)
-
-                                result.data.forEach(function(item) {
-                                    $(".ap_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                                    $(".ar_id").append(`<option value="${item.id}">${item.nama_sub}</option>`)
-                                })
-
-                                $(".ap_id").val(res?.data?.ap_id).change();
-                                $(".ar_id").val(res?.data?.ar_id).change();
-                                $(".add-modal").modal("show")
-                            }
-                        }) */
-                        // $('.ap_id').select2(select2Prop);
-                        // $('.ar_id').select2(select2Prop);
-
-                        // const $apOption = $("<option selected='selected'></option>").val(res?.data?.ap_id).text(res?.data?.ap_name);
-                        // $(".ap_id").append($apOption).trigger('change');
-                        // const $arOption = $("<option selected='selected'></option>").val(res?.data?.ar_id).text(res?.data?.ar_name);
-                        // $(".ar_id").append($arOption).trigger('change');
 
                         $(".add-modal").modal("show");
 
@@ -982,7 +464,6 @@
             })
         })
 
-        // delete
         $(".delete-form").click(function() {
             Swal.fire({
                 icon: 'question',
@@ -999,7 +480,7 @@
                     let id = $(".id").val();
                     setLoading()
                     $.ajax({
-                        url: "<?= base_url("supplier-bahan-baku/delete"); ?>",
+                        url: "<?= base_url("supplier/delete"); ?>",
                         data: {
                             id: id
                         },
@@ -1044,209 +525,7 @@
             })
         })
 
-        // $(".btn-submit-detail").click(function() {
-        //     let row_detail = $(".id_detail").val();
-        //     let address = $(".detail_address").val()
-        //     let province_id = $(".province_id option:selected").val()
-        //     let province_name = $(".province_id option:selected").text()
-        //     let city_id = $(".city_id option:selected").val()
-        //     let city_name = $(".city_id option:selected").text()
-        //     let postal_code = $(".postal_code").val();
-
-        //     // update detail
-        //     if(row_detail)
-        //     {
-        //         let main_address = document.querySelector('input[name="main"]:checked').value;
-
-        //         if ($(".detail-form").valid()) {
-        //             Swal.fire({
-        //                 icon: 'question',
-        //                 title: 'Simpan Data?',
-        //                 confirmButtonColor: '#4e73df',
-        //                 cancelButtonColor: '#d33',
-        //                 showCancelButton: true,
-        //                 reverseButtons: true,
-        //                 confirmButtonText: 'Simpan',
-        //                 cancelButtonText: 'Batal',
-        //             }).then((result) => {
-        //                 if (result.isConfirmed) {
-        //                     console.log(id)
-        //                     let new_list_address = []
-        //                     let tag_html = "";
-
-        //                     row = 0;
-
-        //                     $(".body-detail-table").empty()
-
-        //                     list_address.map(item => {
-        //                         if(item.row == row_detail)
-        //                         {
-        //                             tag_html += `<tr>`;
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                             tag_html += row + 1;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                             tag_html += address;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                             tag_html += province_name;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                             tag_html += city_name;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                             tag_html += postal_code;
-        //                             tag_html += "</td>";
-        //                             tag_html += "<td class='actions'>";
-        //                             if(item.row == main_address)
-        //                             {
-        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
-        //                             }
-        //                             else
-        //                             {
-        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
-        //                             }
-        //                             tag_html += "</td>";
-        //                             tag_html += "</tr>";
-
-        //                             new_list_address.push({
-        //                                 id: item.id,
-        //                                 supplier_id: item.supplier_id,
-        //                                 row: row + 1,
-        //                                 address: address,
-        //                                 province_id: province_id,
-        //                                 province_name: province_name,
-        //                                 city_id: city_id,
-        //                                 city_name: city_name,
-        //                                 postal_code: postal_code,
-        //                                 main_address: item.main_address
-        //                             });
-
-        //                             row = row + 1;
-        //                         }
-        //                         else
-        //                         {
-        //                             tag_html += `<tr>`;
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-        //                             tag_html += row + 1;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-        //                             tag_html += item.address;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-        //                             tag_html += item.province_name;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-        //                             tag_html += item.city_name;
-        //                             tag_html += "</td>";
-        //                             tag_html += `<td class="edit-table-detail" data-id="${item.id}" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-        //                             tag_html += item.postal_code;
-        //                             tag_html += "</td>";
-        //                             tag_html += "<td class='actions'>";
-        //                             if(item.row == main_address)
-        //                             {
-        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
-        //                             }
-        //                             else
-        //                             {
-        //                                 tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
-        //                             }
-        //                             tag_html += "</td>";
-        //                             tag_html += "</tr>";
-
-        //                             new_list_address.push(item);
-
-        //                             row = row + 1;
-        //                         }
-        //                     })
-
-        //                     list_address = [];
-
-        //                     list_address = new_list_address;
-
-        //                     $(".body-detail-table").append(tag_html)
-
-        //                     $(".detail-modal").modal("hide")
-        //                 }
-        //             })
-        //         }
-        //     }
-        //     // create detail
-        //     else
-        //     {
-        //         if ($(".detail-form").valid()) {
-        //             Swal.fire({
-        //                 icon: 'question',
-        //                 title: 'Simpan Data?',
-        //                 confirmButtonColor: '#4e73df',
-        //                 cancelButtonColor: '#d33',
-        //                 showCancelButton: true,
-        //                 reverseButtons: true,
-        //                 confirmButtonText: 'Simpan',
-        //                 cancelButtonText: 'Batal',
-        //             }).then((result) => {
-        //                 if (result.isConfirmed) {
-        //                     list_address.push({
-        //                         id: '',
-        //                         supplier_id: '',
-        //                         row: row + 1,
-        //                         address: address,
-        //                         province_id: province_id,
-        //                         province_name: province_name,
-        //                         city_id: city_id,
-        //                         city_name: city_name,
-        //                         postal_code: postal_code,
-        //                         main_address: 0
-        //                     })
-        //                 let tag_html = "";
-        //                     tag_html += `<tr>`;
-        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                     tag_html += row + 1;
-        //                     tag_html += "</td>";
-        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                     tag_html += address;
-        //                     tag_html += "</td>";
-        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                     tag_html += province_name;
-        //                     tag_html += "</td>";
-        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                     tag_html += city_name;
-        //                     tag_html += "</td>";
-        //                     tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${address}" data-province="${province_id}" data-city="${city_id}" data-postalcode="${postal_code}">`;
-        //                     tag_html += postal_code;
-        //                     tag_html += "</td>";
-        //                     tag_html += "<td class='actions'>";
-        //                     if(row === 0)
-        //                     {
-        //                         tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
-        //                     }   
-        //                     else
-        //                     {
-        //                         tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
-        //                     } 
-        //                     tag_html += "</td>";
-        //                     tag_html += "</tr>";
-        //                     $(".body-detail-table").append(tag_html)
-        //                     $(".detail-modal").modal("hide")
-        //                     row = row + 1;
-        //                 }
-        //             })
-        //         }
-        //     }
-        // })
-
         $(".btn-submit-parent").click(function() {
-            $(".detail-modal").modal("hide")
-            // if(list_address.length == 0)
-            // {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         title: 'List Alamat Pengiriman Tidak Boleh Kosong',
-            //         confirmButtonColor: '#4e73df',
-            //     })
-            // }
-            // else
-            // {
             if ($(".create-form").valid()) {
                 Swal.fire({
                     icon: 'question',
@@ -1261,83 +540,6 @@
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData(document.querySelector(".create-form"));
-
-                        let update_list_address = [];
-                        // let main_address = document.querySelector('input[name="main"]:checked').value;
-
-                        // if(list_delete.length !== 0)
-                        // {
-                        //     list_delete.map(obj => {
-                        //         update_list_address.push(
-                        //             {
-                        //                 id: obj.id,
-                        //                 supplier_id: obj.supplier_id,
-                        //                 address: obj.address,
-                        //                 province_id: obj.province_id,
-                        //                 city_id: obj.city_id,
-                        //                 main_address: 0,
-                        //                 isDelete: true
-                        //             }
-                        //         )
-                        //     })
-                        // }
-
-                        // list_address.map(obj => {
-                        //     if (main_address == obj.row) {
-                        //         if (obj.id) {
-                        //             update_list_address.push(
-                        //                 {
-                        //                     id: obj.id,
-                        //                     supplier_id: obj.supplier_id,
-                        //                     address: obj.address,
-                        //                     province_id: obj.province_id,
-                        //                     city_id: obj.city_id,
-                        //                     main_address: 1
-                        //                 }
-                        //             )
-                        //         }
-                        //         else
-                        //         {
-                        //             update_list_address.push(
-                        //                 {
-                        //                     address: obj.address,
-                        //                     province_id: obj.province_id,
-                        //                     city_id: obj.city_id,
-                        //                     main_address: 1
-                        //                 }
-                        //             )
-                        //         }
-                        //     }
-                        //     else
-                        //     {
-                        //         if (obj.id) {
-                        //             update_list_address.push(
-                        //                 {
-                        //                     id: obj.id,
-                        //                     supplier_id: obj.supplier_id,
-                        //                     address: obj.address,
-                        //                     province_id: obj.province_id,
-                        //                     city_id: obj.city_id,
-                        //                     main_address: 0
-                        //                 }
-                        //             )
-                        //         }
-                        //         else
-                        //         {
-                        //             update_list_address.push(
-                        //                 {
-                        //                     address: obj.address,
-                        //                     province_id: obj.province_id,
-                        //                     city_id: obj.city_id,
-                        //                     main_address: 0
-                        //                 }
-                        //             )
-                        //         }
-                        //     }
-                        // })
-
-                        // data.append("list_address", JSON.stringify(update_list_address))
-
                         let id = $(".id").val();
 
                         $.ajax({
@@ -1385,181 +587,297 @@
                     }
                 })
             }
-            // }
+        })
+
+        $(".btn-submit-harga").click(function() {
+            if ($(".harga-form").valid()) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        let data = new FormData(document.querySelector(".harga-form"));
+                        let id = $(".id_supplier_harga").val();
+                        data.append("id_supplier", $(".id_supplier").val());
+                        data.append("id_supplier_harga", $(".id_supplier_harga").val());
+
+                        $.ajax({
+                            url: id ? "<?= base_url("supplier-harga/update"); ?>" : "<?= base_url("supplier-harga/save"); ?>",
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                $(".harga-form")[0].reset()
+                                $(".bahan_baku").val('').change()
+                                $(".bagian").val('').change()
+                                $(".harga_umum").val(0)
+                                $(".harga_harian").val(0)
+                                $(".harga_bulanan").val(0)
+                                $(".id_supplier_harga").val('')
+
+                                //reset table
+                                functionHarga()
+
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+                })
+            }
         })
     })
 
-    // $(document).on('click', '.delete-detail', function() {
-    //     let id = $(".id_detail").val()
-    //     let main_address = document.querySelector('input[name="main"]:checked').value;
+    const setHarga = function(id) {
+        validator_detail.resetForm();
+        validator_detail.reset();
+        $(".harga-form")[0].reset()
 
-    //     console.log(id)
-    //     console.log(main_address)
+        $.ajax({
+            url: `<?= base_url("barang/dropdown/type"); ?>`,
+            method: "GET",
+            data: {
+                type: "bahan_baku"
+            },
+            dataType: "json",
+            success: function(res) {
+                $(".bahan_baku").empty()
 
-    //     if(id === main_address)
-    //     {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Main Address Tidak Dapat Dihapus',
-    //             confirmButtonColor: '#4e73df',
-    //         })
-    //     }
-    //     else
-    //     {
-    //         Swal.fire({
-    //             icon: 'question',
-    //             title: 'Hapus Data?',
-    //             confirmButtonColor: '#4e73df',
-    //             cancelButtonColor: '#d33',
-    //             showCancelButton: true,
-    //             reverseButtons: true,
-    //             confirmButtonText: 'Hapus',
-    //             cancelButtonText: 'Batal',
-    //         }).then((result) => {
-    //             if (result.isConfirmed) {
-    //                 console.log(id)
-    //                 let new_list_address = []
-    //                 let tag_html = "";
+                $(".bahan_baku").append(`<option value=""></option>`)
 
-    //                 $(".body-detail-table").empty()
+                res.data.forEach(function(item) {
+                    $(".bahan_baku").append(`<option value="${item.id}">${item.barang_name}</option>`)
+                })
 
-    //                 row = 0;
+                $(".bahan_baku").val("").change();
+            }
+        }) 
+            
+        $.ajax({
+            url: `<?= base_url("warehouse/dropdown"); ?>`,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                $(".bagian").empty()
 
-    //                 console.log(list_address)
+                $(".bagian").append(`<option value=""></option>`)
 
-    //                 list_address.map(item => {
-    //                     if(item.row != id)
-    //                     {
-    //                         tag_html += `<tr>`;
-    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-    //                         tag_html += row + 1;
-    //                         tag_html += "</td>";
-    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-    //                         tag_html += item.address;
-    //                         tag_html += "</td>";
-    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-    //                         tag_html += item.province_name;
-    //                         tag_html += "</td>";
-    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-    //                         tag_html += item.city_name;
-    //                         tag_html += "</td>";
-    //                         tag_html += `<td class="edit-table-detail" data-id="" data-row="${row + 1}" data-address="${item.address}" data-province="${item.province_id}" data-city="${item.city_id}" data-postalcode="${item.postal_code}">`;
-    //                         tag_html += item.postal_code;
-    //                         tag_html += "</td>";
-    //                         tag_html += "<td class='actions'>";
-    //                         if(main_address == item.row)
-    //                         {
-    //                             tag_html += `<input autocomplete="one-time-code" type="radio" checked id="main" name="main" value="${row + 1}">`;
-    //                         }   
-    //                         else
-    //                         {
-    //                             tag_html += `<input autocomplete="one-time-code" type="radio" id="main" name="main" value="${row + 1}">`;
-    //                         } 
-    //                         tag_html += "</td>";
-    //                         tag_html += "</tr>";
+                res.data.forEach(function(item) {
+                    $(".bagian").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                })
 
-    //                         new_list_address.push({...item, row: row + 1});
+                $(".bagian").val("").change();
+            }
+        }) 
+            
+        $.ajax({
+            url: "<?= base_url("supplier/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    $(".id_supplier").val(id);
+                    $(".name_supplier").val(res?.data?.name);
+                    $(".address_supplier").val(res?.data?.address);
 
-    //                         row = row + 1;
-    //                     }
-    //                     else
-    //                     {
-    //                         // sent parameter isDelete if have supplier id and id
-    //                         if(item.id)
-    //                         {
-    //                             list_delete.push(item)
-    //                         }
-    //                     }
-    //                 })
+                    $(".bahan_baku").val('').change()
+                    $(".bagian").val('').change()
+                    $(".harga_umum").val(0)
+                    $(".harga_harian").val(0)
+                    $(".harga_bulanan").val(0)
 
-    //                 list_address = [];
+                    $.ajax({
+                        url: `<?= base_url("supplier-harga/ajax"); ?>`,
+                        method: "GET",
+                        data: {
+                            id: id
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            console.log(res)
+                            let no = 0;
+                            $(".body-detail-table").empty()
+                            let tag_html = "";
 
-    //                 list_address = new_list_address;
+                            result?.data?.map((item) => {
+                                no = no + 1;
+                                tag_html += "<tr>";
+                                tag_html += "<td>";
+                                tag_html += no;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += item?.barang_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += item?.bagian_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += item?.spesifikasi;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += Number(item.harga_umum).toLocaleString();
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += Number(item.harga_harian).toLocaleString();
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += Number(item.harga_bulanan).toLocaleString();
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += `<button onclick="editHarga(${item?.id})" class="btn btn-warning posting-spp">
+                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                </button>`;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += `<button class="btn btn-danger" onclick="deleteHarga(${item?.id})">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>`;
+                                tag_html += "</td>";
+                                tag_html += "</tr>";
+                            })
+                            $(".body-detail-table").append(tag_html)
+                            $(".harga-modal").modal("show");
+                        }
+                    }) 
 
-    //                 $(".body-detail-table").append(tag_html)
-
-    //                 $(".detail-modal").modal("hide")
-    //             }
-    //         })
-    //     }
-    // })
-
-    // $(document).on('show.bs.modal','.detail-modal', function () {
-    //    document.getElementById("add_modal").style = "display: block; z-index: 999 !important";
-    // })
-
-    // $(document).on('hide.bs.modal','.detail-modal', function () {
-    //     document.getElementById("add_modal").style = "display: block;";
-    //     $(".add-modal").css("overflow-y", "auto");
-    // })
-
-    // $(document).on('click', '.edit-table-detail', function(evt) {
-    //     // if(!$(evt.target).is('.actions')) {
-    //         $(".title-detail-name").text("Update")
-    //         $(".delete-detail").css('display', '');
-    //         let address = $(this).data('address')
-    //         let province_id = $(this).data('province')
-    //         let city_id = $(this).data('city')
-    //         let postal_code = $(this).data('postalcode')
-    //         let rowid = $(this).data('row')
-    //         let id = $(this).data('id')
-
-    //         validator_detail.resetForm();
-    //         validator_detail.reset();
-    //         trigger = false;
-    //         $(".province_id").val(province_id).change()
-
-    //         $(".id_detail").val(rowid)
-    //         $(".detail_address").val(address)
-
-    //         // AJAX GET CITY
-    //         $.ajax({
-    //             url: `<?= base_url("city"); ?>/${province_id}`,
-    //             method: "GET",
-    //             dataType: "json",
-    //             success: function(result) {
-    //                 $(".city_id").empty()
-    //                 $(".city_id").val("").change()
-    //                 $(".city_id").append(`<option value=""></option>`)
-    //                 result.data.forEach(function(item) {
-    //                     $(".city_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-    //                 })
-
-    //                 $(".city_id").val(city_id).change()
-    //                 $(".postal_code").val(postal_code)
-    //                 trigger = true;
-    //                 $(".detail-modal").modal("show")
-    //             }
-    //         })
-    //     // }
-    // })
-
-    const getCityParent = function() {
-        const id = $(".province_parent_id option:selected").val()
-
-        if (id) {
-            $.ajax({
-                url: `<?= base_url("city"); ?>/${id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".city_parent_id").empty()
-                    $(".city_parent_id").val("").change()
-                    $(".city_parent_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
                     })
                 }
-            })
-        }
+            }
+        })
     }
 
-    // const getPostalCode = function() {
-    //     $(".postal_code").val($(".city_id option:selected").attr("data-code"))
-    // }
+    const editHarga = function(id) {
+         $.ajax({
+            url: `<?= base_url("supplier-harga/id/"); ?>` + id,
+            method: "GET",
+            dataType: "json",
+            success: function(result) {
+                console.log(result)
+                if(result.status === true)
+                {
+                    $(".id_supplier_harga").val(result?.data?.id);
+                    $(".harga_harian").val(Number(result.data.harga_harian).toLocaleString());
+                    $(".harga_umum").val(Number(result.data.harga_umum).toLocaleString());
+                    $(".harga_bulanan").val(Number(result.data.harga_bulanan).toLocaleString());
+                    $(".bahan_baku").val(Number(result.data.bahan_baku_id)).change();
+                    $(".bagian").val(Number(result.data.bagian_id)).change();
+                    $(".spesifikasi").val(result?.data?.spesifikasi);
+                }
+                else
+                {
+                    $(".id_supplier_harga").val('');
+                    $(".harga_harian").val(0);
+                    $(".harga_umum").val(0);
+                    $(".harga_bulanan").val(0);
+                    $(".bahan_baku").val('').change();
+                    $(".bagian").val('').change();
+                    $(".spesifikasi").val('');
+                }
+            }
+        })
+    }
 
-    const getPostalCodeParent = function() {
-        $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
+    const deleteHarga = function(id) {
+        Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("supplier-harga/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+
+                            if (response.status) {
+                                $(".id_supplier_harga").val('');
+                                $(".harga_harian").val(0);
+                                $(".harga_umum").val(0);
+                                $(".harga_bulanan").val(0);
+                                $(".bahan_baku").val('').change();
+                                $(".bagian").val('').change();
+                                $(".spesifikasi").val('');
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+
+                            // reset table
+                            functionHarga()
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                            stopLoading()
+                        }
+                    });
+                }
+            })
     }
 
     const changeSort = function(val) {
@@ -1571,70 +889,59 @@
         }
     }
 
-    const changeStatus = function() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
+    let functionHarga = function() {
+        $.ajax({
+            url: `<?= base_url("supplier-harga/ajax"); ?>`,
+            method: "GET",
+            data: {
+                id: $(".id_supplier").val()
+            },
+            dataType: "json",
+            success: function(result) {
+                let no = 0;
+                $(".body-detail-table").empty()
+                let tag_html = "";
 
-        if (value) {
-            $(".kode").attr("readonly", true);
-            $(".kode").val("AUTO GENERATE");
-        } else {
-            $(".kode").attr("readonly", false);
-            $(".kode").val("");
-        }
+                result?.data?.map((item) => {
+                    no = no + 1;
+                    tag_html += "<tr>";
+                    tag_html += "<td>";
+                    tag_html += no;
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += item?.barang_name;
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += item?.bagian_name;
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += item?.spesifikasi;
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += Number(item.harga_umum).toLocaleString();
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += Number(item.harga_harian).toLocaleString();
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += Number(item.harga_bulanan).toLocaleString();
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += `<button onclick="editHarga(${item?.id})" class="btn btn-warning posting-spp">
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button>`;
+                    tag_html += "</td>";
+                    tag_html += "<td>";
+                    tag_html += `<button class="btn btn-danger" onclick="deleteHarga(${item?.id})">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>`;
+                    tag_html += "</td>";
+                    tag_html += "</tr>";
+                })
+                $(".body-detail-table").append(tag_html)
+            }
+        }) 
     }
-
-    // COUNTRY
-    $('.country_code').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    });
-
-    $(".country_code")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $(".country_code")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $(".country_code")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
-    // DISABLED PROVINSI DAN KABUPATEN JIKA YANG DIPILIH BUKAN INDONESIA
-    $('.country_code').on('change', function() {
-        var codeCountry = $(this).val();
-        if (codeCountry != "ID") {
-            // DISABLED PROVINSI
-            $('.province_parent_id').val("").change();
-            $('.province_parent_id').attr('disabled', true);
-            // DISABLED KABUPATEN
-            $('.city_parent_id').val("").change();
-            $('.city_parent_id').attr('disabled', true);
-        } else {
-            // ENABLED
-            $('.province_parent_id').attr('disabled', false);
-            $('.city_parent_id').attr('disabled', false);
-        }
-    });
-
-    // RESTART SELECT2 KETIKA KLIK TAMBAH BUTTON
-    $('.btn-add').click(function() {
-        $('.country_code').val("").change();
-        $('.ap_id').val(null).trigger("change");
-        $('.ar_id').val(null).trigger("change");
-        $('.province_parent_id').attr('disabled', false);
-        $('.city_parent_id').attr('disabled', false);
-    });
 </script>
 
 
