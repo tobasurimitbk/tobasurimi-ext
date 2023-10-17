@@ -671,12 +671,13 @@ $routes->post('/formula-payroll/update', 'HR\FormulaPayroll::update', ['filter' 
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::pinjamanKaryawan', ['filter' => 'Auth']);
-$routes->get('/pinjaman-karyawan/id/(:segment)', 'HR\PinjamanKaryawan::getById/$1', ['filter' => 'Auth']);
-$routes->get('/pinjaman-karyawan/create', 'HR\PinjamanKaryawan::createView', ['filter' => 'Auth']);
-$routes->get('/pinjaman-karyawan/all', 'HR\PinjamanKaryawan::allPinjamanKaryawan', ['filter' => 'Auth']);
-$routes->post('/pinjaman-karyawan/save', 'HR\PinjamanKaryawan::create', ['filter' => 'Auth']);
-$routes->post('/pinjaman-karyawan/update', 'HR\PinjamanKaryawan::update', ['filter' => 'Auth']);
-$routes->post('/pinjaman-karyawan/delete', 'HR\PinjamanKaryawan::delete', ['filter' => 'Auth']);
+$routes->get('/pinjaman-karyawan/all', 'HR\PinjamanKaryawan::all', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/generate-all', 'HR\PinjamanKaryawan::generateAllPinjaman', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/generate-single', 'HR\PinjamanKaryawan::generateSinglePinjaman', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/update-nominal', 'HR\PinjamanKaryawan::updateNominalPinjaman', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/change-status', 'HR\PinjamanKaryawan::changeStatusPinjaman', ['filter' => 'Auth']);
+$routes->get('/pinjaman-karyawan/print/(:segment)/(:segment)', 'HR\PinjamanKaryawan::exportPDF/$1/$2', ['filter' => 'Auth']);
 
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);
