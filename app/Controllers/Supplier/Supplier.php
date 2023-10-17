@@ -3,23 +3,34 @@
 namespace App\Controllers\Supplier;
 
 use App\Controllers\BaseController;
+use App\Models\CountryModel;
+use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
 
 class Supplier extends BaseController
 {
-    protected $token;
-    protected $this_company_id;
+    protected $this_company_id, $provinceModel, $countryModel, $supplierModel;
 
     public function __construct()
     {
-        $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->provinceModel = new ProvinceModel();
+        $this->countryModel = new CountryModel();
+        $this->supplierModel = new SupplierModel();
     }
 
     // bahan baku
     public function supplierBahanBaku()
     {
-        return view('Supplier/supplierBahanBaku/index');
+        $provinceData = $this->provinceModel->asObject()->findAll();
+        $countryData = $this->countryModel->asObject()->findAll();
+
+        $data = [
+            "dataProvinces" => $provinceData,
+            "country" => $countryData
+        ];
+
+        return view('Supplier/supplierBahanBaku/index', $data);
     }
 
     public function allSupplierBahanBaku()
@@ -34,7 +45,6 @@ class Supplier extends BaseController
             "type"          => "BAHAN BAKU"
         ];
 
-        $supplierModel = new SupplierModel();
         $condition = [
             "suppliers.company_id"  => $this->this_company_id,
             "suppliers.type"        => "BAHAN BAKU"
@@ -46,7 +56,7 @@ class Supplier extends BaseController
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $supplierData = $supplierModel->getSupplierList($condition, $addCondition, $limit, $offset);
+        $supplierData = $this->supplierModel->getSupplierList($condition, $addCondition, $limit, $offset);
 
         $dataSupplier = [];
 
@@ -55,6 +65,7 @@ class Supplier extends BaseController
         foreach ($supplierData['data'] as $data) {
             array_push($dataSupplier, [
                 "no"            => $no++,
+                "kode"          => $data->kode,
                 "id"            => $data->id,
                 "name"          => $data->name,
                 "address"       => $data->address,
@@ -77,9 +88,10 @@ class Supplier extends BaseController
     public function saveSupplierBahanBaku()
     {
         try {
-            $supplierModel = new SupplierModel();
-
             $rules = [
+                "kode" => [
+                    "rules" => "required"
+                ],
                 "name" => [
                     "rules" => "required"
                 ],
@@ -87,6 +99,33 @@ class Supplier extends BaseController
                     "rules" => "permit_empty|string"
                 ],
                 "no_npwp" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "phone" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "contact_person" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "email" => [
+                    "rules" => "permit_empty|valid_email"
+                ],
+                "country_code" => [
+                    "rules" => "permit_empty"
+                ],
+                "postal_code" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "province_parent_id" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "city_parent_id" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "account_receivable" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "account_payable" => [
                     "rules" => "permit_empty|string"
                 ]
             ];
@@ -102,28 +141,30 @@ class Supplier extends BaseController
                 return;
             }
 
-            $payload = json_encode([
-                "company_id"        => $this->this_company_id,
-                "name"              => $this->request->getPost("name"),
-                "address"           => $this->request->getPost("address"),
-                "no_npwp"           => $this->request->getPost("no_npwp"),
-                "type"              => "BAHAN BAKU"
-            ]);
-
             $insertData = [
-                "company_id"        => $this->this_company_id,
-                "name"              => $this->request->getPost("name"),
-                "address"           => $this->request->getPost("address"),
-                "no_npwp"           => $this->request->getPost("no_npwp"),
+                "company_id" => $this->this_company_id,
+                "kode" => $this->request->getPost("kode"),
+                "name" => $this->request->getPost("name"),
+                "address" => $this->request->getPost("address"),
+                "no_npwp" => $this->request->getPost("no_npwp"),
+                "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
+                "email" => $this->request->getPost("email"),
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
+                "postal_code" => $this->request->getPost("postal_code"),
+                "country_code"      => $this->request->getPost("country_code"),
+                "account_receivable" => $this->request->getPost("account_receivable"),
+                "account_payable" => $this->request->getPost("account_payable"),
                 "type"              => "BAHAN BAKU"
             ];
-            $insert = $supplierModel->insert($insertData);
+            $insert = $this->supplierModel->insert($insertData);
 
             if (!$insert) {
                 $data = [
                     "status"    => false,
                     "message"   => 'Data Gagal Disimpan!',
-                    "payload"   => $payload,
+                    "payload"   => json_encode($insertData),
                     'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
@@ -133,7 +174,7 @@ class Supplier extends BaseController
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
-                "payload"   => $payload,
+                "payload"   => json_encode($insertData),
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);
@@ -152,8 +193,6 @@ class Supplier extends BaseController
     public function updateSupplierBahanBaku()
     {
         try {
-            $supplierModel = new SupplierModel();
-
             $rules = [
                 "name" => [
                     "rules" => "required"
@@ -162,6 +201,33 @@ class Supplier extends BaseController
                     "rules" => "permit_empty|string"
                 ],
                 "no_npwp" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "phone" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "contact_person" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "email" => [
+                    "rules" => "permit_empty|valid_email"
+                ],
+                "country_code" => [
+                    "rules" => "permit_empty"
+                ],
+                "postal_code" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "province_parent_id" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "city_parent_id" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "account_receivable" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "account_payable" => [
                     "rules" => "permit_empty|string"
                 ]
             ];
@@ -181,16 +247,23 @@ class Supplier extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
-                    "company_id"        => $this->this_company_id,
-                    "name"              => $this->request->getPost("name"),
-                    "address"           => $this->request->getPost("address"),
-                    "no_npwp"           => $this->request->getPost("no_npwp"),
-                    "type"              => "BAHAN BAKU"
+                    "name" => $this->request->getPost("name"),
+                    "address" => $this->request->getPost("address"),
+                    "no_npwp" => $this->request->getPost("no_npwp"),
+                    "phone" => $this->request->getPost("phone"),
+                    "contact_person" => $this->request->getPost("contact_person"),
+                    "email" => $this->request->getPost("email"),
+                    "province_id" => $this->request->getPost("province_parent_id"),
+                    "city_id" => $this->request->getPost("city_parent_id"),
+                    "postal_code" => $this->request->getPost("postal_code"),
+                    "country_code"      => $this->request->getPost("country_code"),
+                    "account_receivable" => $this->request->getPost("account_receivable"),
+                    "account_payable" => $this->request->getPost("account_payable"),
                 ];
             }
 
             if ($payload) {
-                $supplierModel->update($id, $payload);
+                $this->supplierModel->update($id, $payload);
 
                 $data = [
                     "status"            => true,
@@ -229,7 +302,6 @@ class Supplier extends BaseController
             "type"          => "BAHAN PENOLONG"
         ];
 
-        $supplierModel = new SupplierModel();
         $condition = [
             "suppliers.company_id"  => $this->this_company_id,
             "suppliers.type"        => "BAHAN PENOLONG"
@@ -241,7 +313,7 @@ class Supplier extends BaseController
         ];
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $supplierData = $supplierModel->getSupplierList($condition, $addCondition, $limit, $offset);
+        $supplierData = $this->supplierModel->getSupplierList($condition, $addCondition, $limit, $offset);
 
         $dataSupplier = [];
 
@@ -273,8 +345,6 @@ class Supplier extends BaseController
     public function saveSupplierBahanPenolong()
     {
         try {
-            $supplierModel = new SupplierModel();
-
             $rules = [
                 "name" => [
                     "rules" => "required"
@@ -318,7 +388,7 @@ class Supplier extends BaseController
                 "phone"             => $this->request->getPost("phone"),
                 "type"              => "BAHAN PENOLONG"
             ];
-            $insert = $supplierModel->insert($insertData);
+            $insert = $this->supplierModel->insert($insertData);
 
             if (!$insert) {
                 $data = [
@@ -353,8 +423,6 @@ class Supplier extends BaseController
     public function updateSupplierBahanPenolong()
     {
         try {
-            $supplierModel = new SupplierModel();
-
             $rules = [
                 "name" => [
                     "rules" => "required"
@@ -394,7 +462,7 @@ class Supplier extends BaseController
             }
 
             if ($payload) {
-                $supplierModel->update($id, $payload);
+                $this->supplierModel->update($id, $payload);
 
                 $data = [
                     "status"            => true,
@@ -418,8 +486,7 @@ class Supplier extends BaseController
 
     public function getByIdSupplier($id)
     {
-        $supplierModel = new SupplierModel();
-        $supplierData = $supplierModel->getSupplierById($id);
+        $supplierData = $this->supplierModel->getSupplierById($id);
 
         if (!$supplierData) {
             $data = [
@@ -443,7 +510,6 @@ class Supplier extends BaseController
     public function deleteSupplier()
     {
         try {
-            $supplierModel = new SupplierModel();
             $id = $this->request->getPost("id");
 
             if (empty($id)) {
@@ -456,7 +522,7 @@ class Supplier extends BaseController
                 return;
             }
 
-            $supplierModel->delete($id);
+            $this->supplierModel->delete($id);
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil dihapus",
@@ -477,8 +543,7 @@ class Supplier extends BaseController
 
     public function dropdownSupplier()
     {
-        $supplierModel = new SupplierModel();
-        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('', 'BAHAN BAKU', $this->this_company_id);
 
         $data = [
             "data" => $dataSupplier
@@ -490,11 +555,10 @@ class Supplier extends BaseController
 
     public function supplierAjax()
     {
-        $supplierModel = new SupplierModel();
         $id = $this->request->getGet("id");
 
         if (!empty($id)) {
-            $response = $supplierModel->getSupplierById($id);
+            $response = $this->supplierModel->getSupplierById($id);
             if ($response) {
                 $data = [
                     "status"  => true,
@@ -516,7 +580,27 @@ class Supplier extends BaseController
             ];
             echo json_encode($data);
         }
+        return;
+    }
 
+    public function supplierGenerate()
+    {
+        $response = $this->supplierModel->generateSupplierCode();
+
+        if ($response) {
+            $data = [
+                "status"  => true,
+                "data"  => $response
+            ];
+            echo json_encode($data);
+        } else {
+            $message = 'Kode Gagal di Generate!!!';
+            $data = [
+                "status" => false,
+                "message"  => $message
+            ];
+            echo json_encode($data);
+        }
         return;
     }
 }

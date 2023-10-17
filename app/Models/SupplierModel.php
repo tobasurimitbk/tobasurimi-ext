@@ -16,23 +16,25 @@ class SupplierModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'company_id',
+        'kode',
         'name',
         'address',
         'no_npwp',
         'phone',
         'type',
-        //'contact_person',
-        //'kode',
-        //'province_id',
-        //'city_id',
-        //'postal_code',
-        //'email',
+        'contact_person',
+        'province_id',
+        'city_id',
+        'postal_code',
+        'email',
+        'country_code',
+        'account_receivable',
+        'account_payable'
         // 'no_rekening',
         // 'supplier_buyer',
         //'kategori',
         // 'ap_id',
         // 'ar_id',
-        // 'country_code'
     ];
 
     // Dates
@@ -62,7 +64,7 @@ class SupplierModel extends Model
     public function getSupplierList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            // 'kode'              => 'suppliers.kode',
+            'kode'              => 'suppliers.kode',
             'name'              => 'suppliers.name',
             'address'           => 'suppliers.address',
             'no_npwp'           => 'suppliers.no_npwp',
@@ -110,7 +112,7 @@ class SupplierModel extends Model
         if ($addCondition['search']) {
             $supplierDataQry->groupStart()
                 ->like('name', $addCondition['search'])
-                // ->orLike('kode', $addCondition['search'])
+                ->orLike('kode', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -154,28 +156,28 @@ class SupplierModel extends Model
         return $query->getResultArray();
     }
 
-    // public function generateSupplierCode(): string
-    // {
-    //     $month = idate('m');
-    //     $year = date('y');
-    //     $romanMonth = romanMonthNumber($month);
-    //     $numberTemplate = "/SUP/$romanMonth/$year";
+    public function generateSupplierCode(): string
+    {
+        $month = idate('m');
+        $year = date('y');
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "/SUP/$romanMonth/$year";
 
-    //     $lastData = $this->asObject()
-    //         ->like('kode', $numberTemplate, 'before')
-    //         ->orderBy('createdAt', 'DESC')
-    //         ->first();
+        $lastData = $this->asObject()
+            ->like('kode', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
 
-    //     $invNumber = '001' . $numberTemplate;
+        $invNumber = '001' . $numberTemplate;
 
-    //     if (!empty($lastData)) {
-    //         $asd = explode('/', $lastData->kode);
-    //         $lastIncrement = intval($asd[0]) + 1;
-    //         $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->kode);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
 
-    //         $invNumber = $paddedNumber . $numberTemplate;
-    //     }
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
 
-    //     return $invNumber;
-    // }
+        return $invNumber;
+    }
 }

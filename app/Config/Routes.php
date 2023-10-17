@@ -164,6 +164,7 @@ $routes->post('/supplier-harga/delete', 'Supplier\SupplierHarga::deleteSupplierH
 // SUPPLIER
 $routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => 'Auth']);
 $routes->get('/supplier/id/(:num)', 'Supplier\Supplier::getByIdSupplier/$1', ['filter' => 'Auth']);
+$routes->get('/supplier/generate', 'Supplier\Supplier::supplierGenerate', ['filter' => 'Auth']);
 $routes->post('/supplier/delete', 'Supplier\Supplier::deleteSupplier', ['filter' => 'Auth']);
 
 // BAHAN BAKU LOKAL
