@@ -76,7 +76,8 @@ class SupplierHargaModel extends Model
             'deletedAt' => null,
             'bahan_baku_id' => $data["bahan_baku_id"],
             'bagian_id' => $data["bagian_id"],
-            'spesifikasi' => $data["spesifikasi"]
+            'spesifikasi' => $data["spesifikasi"],
+            'supplier_id' => $data["supplier_id"]
         ];
 
         $builder = $this->db->table('supplier_harga')
