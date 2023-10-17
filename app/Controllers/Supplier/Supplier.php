@@ -6,10 +6,13 @@ use App\Controllers\BaseController;
 use App\Models\CountryModel;
 use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
+use App\Models\SupplierHargaModel;
+use App\Models\BarangMasterModel;
+use App\Models\DivisisModel;
 
 class Supplier extends BaseController
 {
-    protected $this_company_id, $provinceModel, $countryModel, $supplierModel;
+    protected $this_company_id, $provinceModel, $countryModel, $supplierModel, $supplierHargaModel, $barangMasterModel, $divisiModel;
 
     public function __construct()
     {
@@ -17,6 +20,9 @@ class Supplier extends BaseController
         $this->provinceModel = new ProvinceModel();
         $this->countryModel = new CountryModel();
         $this->supplierModel = new SupplierModel();
+        $this->supplierHargaModel = new SupplierHargaModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->divisiModel = new DivisisModel();
     }
 
     // bahan baku
@@ -31,6 +37,34 @@ class Supplier extends BaseController
         ];
 
         return view('Supplier/supplierBahanBaku/index', $data);
+    }
+
+    public function getSupplierBahanBakuHarga($id)
+    {
+        $supplierData = $this->supplierModel->getSupplierById($id);
+        $barangData = $this->barangMasterModel->getBarangByType('bahan_baku');
+        $divisiData = $this->divisiModel->get_by_company_id($this->this_company_id);
+
+        $dataSupplier = [];
+        $dataSupplierHarga = [];
+
+        if($supplierData)
+        {
+            if($supplierData->type === "BAHAN BAKU")
+            {
+                $dataSupplier = $supplierData;
+                $dataSupplierHarga = $this->supplierHargaModel->getBySupplierId($id);
+            }
+        }
+
+        $data = [
+            "dataSupplier" => $dataSupplier,
+            "dataSupplierHarga" => $dataSupplierHarga,
+            "dataBarang" => $barangData,
+            "dataDivisi" => $divisiData
+        ];
+
+        return view('Supplier/supplierBahanBaku/harga', $data);
     }
 
     public function allSupplierBahanBaku()
@@ -497,7 +531,6 @@ class Supplier extends BaseController
             return;
         }
 
-        $supplierData->list_address = []; // cek nanti
         $data = [
             "status"    => true,
             "data"      => $supplierData,

@@ -169,6 +169,7 @@ $routes->post('/supplier/delete', 'Supplier\Supplier::deleteSupplier', ['filter'
 
 // BAHAN BAKU LOKAL
 $routes->get('/supplier-bahan-baku', 'Supplier\Supplier::supplierBahanBaku', ['filter' => 'Auth']);
+$routes->get('/supplier-bahan-baku/harga/(:segment)', 'Supplier\Supplier::getSupplierBahanBakuHarga/$1', ['filter' => 'Auth']);
 $routes->get('/supplier-bahan-baku/all', 'Supplier\Supplier::allSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/save', 'Supplier\Supplier::saveSupplierBahanBaku', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-baku/update', 'Supplier\Supplier::updateSupplierBahanBaku', ['filter' => 'Auth']);

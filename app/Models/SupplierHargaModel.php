@@ -56,13 +56,32 @@ class SupplierHargaModel extends Model
     {
         $arrCondition = [
             'supplier_harga.deletedAt' => null,
+            'divisis.deletedAt' => null,
             'supplier_harga.supplier_id' => $id
         ];
 
-        $builder = $this->db->table('supplier_harga')->select('supplier_harga.*, warehouses.warehouse_name as bagian_name, barang_master.barang_name');
-        $builder->join('warehouses', 'supplier_harga.bagian_id = warehouses.id', 'left')
+        $builder = $this->db->table('supplier_harga')->select('supplier_harga.*, divisis.divisi as bagian_name, barang_master.barang_name');
+        $builder->join('divisis', 'supplier_harga.bagian_id = divisis.id', 'left')
         ->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
-        ->where($arrCondition);
+        ->where($arrCondition)
+        ->orderBy('supplier_harga.updatedAt', 'desc');
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
+
+    public function checkAlreadyExist($data)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'bahan_baku_id' => $data["bahan_baku_id"],
+            'bagian_id' => $data["bagian_id"],
+            'spesifikasi' => $data["spesifikasi"]
+        ];
+
+        $builder = $this->db->table('supplier_harga')
+        ->where($arrCondition)
+        ->orderBy('supplier_harga.updatedAt', 'desc');
         $query = $builder->get();
 
         return $query->getResultArray();

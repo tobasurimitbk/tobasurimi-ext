@@ -58,17 +58,40 @@ class SupplierHarga extends BaseController
                 "harga_harian"     => formatter($this->request->getPost("harga_harian"), "CURR_TO_FLOAT"),
                 "harga_bulanan"    => formatter($this->request->getPost("harga_bulanan"), "CURR_TO_FLOAT")
             ];
-            $insert = $this->SupplierHargaModel->insert($insertData);
 
-            if (!$insert) {
-                $data = [
-                    "status"    => false,
-                    "message"   => 'Data Gagal Disimpan!',
-                    "payload"   => json_encode($insertData),
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
+            // check if supplier harga with wupplier, bahan baku, spesifikasi already exist
+            $find = $this->SupplierHargaModel->checkAlreadyExist($insertData);
+
+            if($find)
+            {
+                // update
+                $insert = $this->SupplierHargaModel->update($find[0]["id"], $insertData);
+
+                if (!$insert) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => 'Data Gagal Disimpan!',
+                        "payload"   => json_encode($insertData),
+                        'token'     => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+            }
+            else
+            {
+                //create new
+                $insert = $this->SupplierHargaModel->insert($insertData);
+                if (!$insert) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => 'Data Gagal Disimpan!',
+                        "payload"   => json_encode($insertData),
+                        'token'     => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
             }
 
             $data = [
@@ -136,6 +159,7 @@ class SupplierHarga extends BaseController
                 "harga_harian"     => formatter($this->request->getPost("harga_harian"), "CURR_TO_FLOAT"),
                 "harga_bulanan"    => formatter($this->request->getPost("harga_bulanan"), "CURR_TO_FLOAT")
             ];
+
             $insert = $this->SupplierHargaModel->update($id, $insertData);
 
             if (!$insert) {
