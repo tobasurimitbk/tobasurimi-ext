@@ -186,11 +186,11 @@
         row = row + 1;
 
         list_item.push({
-            row: row,
-            id: '<?= $item["id"]?>',
-            bahan_baku_id: '<?= $item["bahan_baku_id"]?>',
+            row: Number(row),
+            id: Number('<?= $item["id"]?>'),
+            bahan_baku_id: Number('<?= $item["bahan_baku_id"]?>'),
             barang_name: '<?= $item["barang_name"]?>',
-            bagian_id: '<?= $item["bagian_id"]?>',
+            bagian_id: Number('<?= $item["bagian_id"]?>'),
             bagian_name: '<?= $item["bagian_name"]?>',
             spesifikasi: '<?= $item["spesifikasi"]?>',
             harga_umum: Number('<?= $item["harga_umum"] ? $item["harga_umum"] : 0; ?>').toLocaleString(),
@@ -601,7 +601,7 @@
         $(".spesifikasi").attr("disabled", true)
 
         let current_row = list_item.find(item => (
-            item.row === nilai_row
+            item.row === Number(nilai_row)
         ));
 
         $(".row").val(current_row?.row);
