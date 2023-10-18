@@ -214,4 +214,10 @@ class AttendancesModel extends Model
             ];
         }
     }
+
+    public function detectIfGenerate($yearMonth, $employeeID)
+    {
+        $res = $this->asArray()->where('employee_id', $employeeID)->where('year_month', $yearMonth)->findAll();
+        return (count($res) == 0) ? false : true;
+    }
 }

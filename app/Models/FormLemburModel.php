@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class FormLemburModel extends Model
 {
-    protected $DBGroup          = 'default';
+    protected $DBGroup           = 'default';
     protected $table            = 'form_lembur';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
