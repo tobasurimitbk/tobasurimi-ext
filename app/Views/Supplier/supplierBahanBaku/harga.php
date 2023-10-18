@@ -104,10 +104,10 @@
                     </div>
                     <div class="col-md-6">
                         <button class="btn btn-add btn-block float-right" onclick="createHarga()">
-                            Simpan
-                        </button>
-                        <button class="btn btn-add btn-block float-right" onclick="setHarga()">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                        </button>
+                        <button style="border-color: #e7323a !important; background-color: #e7323a !important;" class="btn btn-add btn-block float-right" onclick="setHarga()">
+                            Reset
                         </button>
                     </div>
                 </div>
