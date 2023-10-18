@@ -26,7 +26,10 @@ class FormLembur extends BaseController
 
     public function index()
     {
-        return \view('hr/lembur/index');
+        return view('hr/lembur/index', [
+            'year' => date("Y"),
+            'month' => date("m")
+        ]);
     }
 
     public function createView()
@@ -90,13 +93,16 @@ class FormLembur extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
+        $monthYear = explode('-', $this->request->getVar('yearMonth'));
         $condition = [
             "form_lembur.company_id" => $this->this_company_id,
             "employees.deletedAt" => null,
+            'MONTH(form_lembur.periode)' => $monthYear[1],
+            'YEAR(form_lembur.periode)' => $monthYear[0]
         ];
 
         $addCondition = [
-            "nip"           => $this->request->getGet("nip"),
+            "search"           => $this->request->getGet("search"),
         ];
 
         $limit = $this->request->getGet("length");

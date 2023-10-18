@@ -50,8 +50,6 @@
             <div class="row justify-content-end row-col-page-list-attendance">
                 <div class="col-6 mb-2">
                     <form id="search_form" name="search_form" class="kt-form kt-form--fit kt-margin-b-20" method="POST">
-
-                        <!-- <?php echo "Attendance " . date("F Y", strtotime($year . "-" . $month . "-01")); ?> -->
                         <select name="month" id="month">
                             <?php
                             for ($i = 1; $i <= 12; $i++) {

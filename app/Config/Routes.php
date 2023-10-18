@@ -617,7 +617,8 @@ $routes->get('/log-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelL
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
-$routes->post('/generate-attendance', 'HR\Attendance::generateAttendanceAction', ['filter' => 'Auth']);
+$routes->post('/generate-attendance/global', 'HR\Attendance::generateAttendanceGlobalAction', ['filter' => 'Auth']);
+$routes->post('/generate-attendance/personal', 'HR\Attendance::generateAttendancePersonalAction', ['filter' => 'Auth']);
 $routes->post('/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter' => 'Auth']);
 $routes->post('/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
 $routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttendance', ['filter' => 'Auth']);

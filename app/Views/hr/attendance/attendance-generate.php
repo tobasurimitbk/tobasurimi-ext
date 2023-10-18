@@ -32,50 +32,28 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Attendance</h1>
+        <h1>Data Absensi</h1>
         <div class="col-button-tambah-spp">
-            <?php if ($totalAttendances == 0) : ?>
-                <a class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
-                    Generate
-                </a>
-            <?php endif; ?>
+            <a class="btn btn-hide-form btn-discard float-right mr-2" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
+                Generate
+            </a>
             <?php if ($totalAttendances != 0) : ?>
-                <form id="formPosting" method="post">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="year" id="year" value="<?= $year ?>">
-                    <input type="hidden" name="month" id="month" value="<?= $month ?>">
-                    <?php if ($isPostingPayroll != 0) : ?>
-                        <input type="hidden" name="statusPosting" id="statusPosting" value="0">
-                        <button disabled class="btn btn-show-form btn-save float-right btn-submit">
-                            <i class="fa-solid fa-check mr-1 fa-lg"></i> Sudah Posting
-                        </button>
-                    <?php else : ?>
-                        <?php if ($isPosting == 0 && $totalAttendances != 0) : ?>
-                            <a class="btn btn-show-form btn-discard float-right btn-generate-ulang" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
-                                Generate Ulang
-                            </a>
-                            <input type="hidden" name="statusPosting" id="statusPosting" value="1">
-                            <button type="submit" class="btn btn-show-form btn-save float-right btn-submit">
-                                Posting
-                            </button>
-                        <?php else : ?>
-                            <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-print"></i> Export
-                            </button>
-                            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                                <li><a target="_blank" class="dropdown-item" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">PDF</a></li>
-                                <li><a class="dropdown-item" href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Excel</a></li>
-                            </ul>
-                            <input type="hidden" id="statusPosting" name="statusPosting" value="0">
-                            <button class="btn btn-show-form btn-save float-right btn-submit">
-                                Batalkan Posting
-                            </button>
-                        <?php endif ?>
-                    <?php endif; ?>
-                </form>
+                <input type="hidden" name="year" id="year" value="<?= $year ?>">
+                <input type="hidden" name="month" id="month" value="<?= $month ?>">
+
+                <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-print"></i> Export
+                </button>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                    <li><a target="_blank" class="dropdown-item" href="<?= base_url('list-attendance/print/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">PDF</a></li>
+                    <li><a class="dropdown-item" href="<?= base_url('list-attendance/excel/id/' . $year . '-' . $month . "?divisiID=" . @$_GET['divisiID']) ?>">Excel</a></li>
+                </ul>
             <?php endif ?>
+            </form>
         </div>
     </div>
+    <?= csrf_field() ?>
+
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-page-list-attendance">
@@ -108,7 +86,12 @@
                         </button>
                     </form>
                 </div>
-                <div class="col-6 mb-2">
+                <div class="col-6 mb-0">
+                    <div class="clearfix" id="loadingSpinner">
+                        <div class="spinner-border text-primary float-right" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -158,129 +141,126 @@
                     <table class="table table-bordered table-striped- table-bordered table-hover table-checkable" id="attendanceTable">
                         <thead>
                             <tr>
-                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
-                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
+                                <td height="25" rowspan="2" style="vertical-align:middle;z-index:1; text-align:center;">&nbsp;Karyawan</td>
+                                <td height="25" rowspan="2" style="vertical-align:middle;z-index:1; text-align:center;">&nbsp;Divisi</td>
+                                <td colspan="<?= $startMonth['totalDay'] * 2 ?>" style="text-align: center;"><?= $startMonth['firstMonthName'] ?></td>
+                                <td colspan="<?= $endMonth['totalDay'] * 2 ?>" style="text-align: center;"><?= $endMonth['secondMonthName'] ?></td>
+                            <tr>
                                 <?php
-                                $lastDate = date("t", strtotime($year . "-" . $month . "-01"));
-                                for ($i = 1; $i <= $lastDate; $i++) :
-                                    $temp = mktime(0, 0, 0, $month, $i, $year);
-
-                                    if (date("N", $temp) == 7) :
-                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\"height=\"25\" ><font color='red'>IN <br>" . $i . "</font></td>";
-                                        echo "<td align=center  style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>OUT <br>" . $i . "</font></td>";
+                                foreach ($allDates as $a) :
+                                    if (date("N", strtotime($a)) == 7) :
+                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\"height=\"25\" ><font color='red'>IN <br>" . date('d', strtotime($a)) . "</font></td>";
+                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\"><font color='red'>OUT <br>" . date('d', strtotime($a)) . "</font></td>";
                                     else :
-                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\">IN <br>" . $i . "</td>";
-                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\"height=\"25\">OUT<br> " . $i . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\" height=\"25\">IN <br>" . date('d', strtotime($a)) . "</td>";
+                                        echo "<td align=center style=\"vertical-align:middle; min-width: 44px;\"height=\"25\">OUT<br> " . date('d', strtotime($a)) . "</td>";
                                     endif;
-                                endfor;
+                                endforeach;
                                 ?>
+                            </tr>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $attandanceModel = new \App\Models\AttendancesModel(); ?>
                             <!-- Cek apakah sudah digenerate apa belum -->
                             <?php if ($totalAttendances == 0) : ?>
-                                <td colspan="<?= $temp ?>" align="left">
-                                    Presensi Belum digenerate
+                                <td colspan="<?= ($startMonth['totalDay'] * 2) + ($endMonth['totalDay'] * 2) + 2 ?>" align="left">
+                                    Presensi Belum digenerate dari log absensi
                                 </td>
                             <?php else : ?>
                                 <?php foreach ($employeesData as $i => $e) : ?>
                                     <?php $libur = 0; ?>
                                     <tr>
-                                        <td style="vertical-align:middle;z-index:1" nowrap>
+                                        <td style="vertical-align:middle;z-index:1; text-align:center;" nowrap>
                                             &nbsp; <?= $e['name']; ?>
                                         </td>
-                                        <td style="vertical-align:middle;z-index:1" nowrap>
+                                        <td style="vertical-align:middle;z-index:1; text-align:center;" nowrap>
                                             &nbsp;<?= $e["divisi"]; ?></td>
                                         </td>
-                                        <?php for ($j = 1; $j <= $lastDate; $j++) : ?>
-                                            <?php
-                                            // create format date yyyy-mm-dd
-                                            $no = (strlen($j) == 1) ? ("0" . $j) : $j;
-                                            $dateFormat = ($year . "-" . $month . "-" . $no);
-                                            // get attendance by employee and date
-                                            $attandance = $attandanceModel->getAttendances($dateFormat, $e['id']);
-                                            ?>
-                                            <?php $temp = mktime(0, 0, 0, $month, $j, $year); ?>
+                                        <?php $j = 1; ?>
+                                        <?php foreach ($allDates as $a) : ?>
+                                            <?php $no = (strlen($j) == 1) ? ("0" . $j) : $j; ?>
+                                            <?php $attandance = $attandanceModel->getAttendances($a, $e['id']); ?>
                                             <?php if ($attandance == null) : ?>
                                                 <!-- Null -->
-                                                <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                                <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                             <?php else : ?>
                                                 <?php $statusKode = explode("_", $attandance->status)[1]; ?>
                                                 <?php if ($statusKode == "A") : ?>
                                                     <!-- Employe Tidak Hadir -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#e7323a; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#e7323a; color:white;'>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#e7323a; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#e7323a; color:white;'>
                                                     </td>
                                                 <?php elseif ($statusKode == "H") : ?>
                                                     <!-- Employe Hadir -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;'>
                                                         <font color="white"><b><?= $attandance->checkin; ?></b></font>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#304de2;" style='vertical-align: middle;'>
                                                         <font color="white"><b><?= $attandance->checkout; ?></b></font>
                                                     </td>
                                                 <?php elseif ($statusKode == "I") : ?>
                                                     <!-- Employe Ijin -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
                                                 <?php elseif ($statusKode == "CT") : ?>
                                                     <!-- Employe Cuti Tahunan -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ffc107; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ffc107; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ffc107; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#ffc107; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
                                                 <?php elseif ($statusKode == "CHD") : ?>
                                                     <!-- Employe Cuti Haid -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#242120; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#242120; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#242120; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#242120; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
                                                 <?php elseif ($statusKode == "CHL") : ?>
                                                     <!-- Employe Cuti Hamil -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
                                                 <?php elseif ($statusKode == "CM") : ?>
                                                     <!-- Employe Cuti Melahirkan -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#C34A36; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
                                                 <?php elseif ($statusKode == "S") : ?>
                                                     <!-- Employe Sakit -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#28a745; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#28a745; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#28a745; color:white;'>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style='background-color:#28a745; color:white;'>
                                                         <b><?= $statusKode ?></b>
                                                     </td>
                                                 <?php elseif ($statusKode == "L") : ?>
                                                     <!-- LIBUR -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
                                                 <?php elseif ($statusKode == "RL") : ?>
                                                     <!-- RL -->
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#ff7b00; vertical-align:middle; color:white;"><b>RL</b></td>
-                                                    <td class="update-attendance" data-tanggal="<?= $dateFormat ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#ff7b00; vertical-align:middle; color:white;"><b>RL</b></td>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#ff7b00; vertical-align:middle; color:white;"><b>RL</b></td>
+                                                    <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="background-color:#ff7b00; vertical-align:middle; color:white;"><b>RL</b></td>
                                                 <?php endif; ?>
                                             <?php endif; ?>
-                                        <?php endfor; ?>
+                                            <?php $j++; ?>
+                                        <?php endforeach; ?>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif ?>
@@ -330,11 +310,10 @@
                     </div>
                 <?php endif; ?>
 
-                <?php if ($totalAttendances != 0) : ?>
-                    <?php if ($pager->hasMore() || ($pager->getCurrentPage() < $pager->getPageCount()) || (count($employeesData) > $pager->getPerPage())) : ?>
-                        <?= $pager->links('default', 'bootstrap4_pagination') ?>
-                    <?php endif ?>
+                <?php if ($totalAttendances > 0 && count($employeesData) > 10) : ?>
+                    <?= $pager->links('default', 'bootstrap4_pagination') ?>
                 <?php endif ?>
+
 
                 <div class="card-text mt-4">
                     <b class="text-black">Keterangan</b>
@@ -376,6 +355,7 @@
             </div>
         </div>
     </div>
+
 </section>
 
 <div class="modal fade" id="generateModal" tabindex="-1">
@@ -384,52 +364,101 @@
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Generate Attendance</h5>
             </div>
-            <form id="formGenerateAttendance" role="form" method="POST">
-                <div class="modal-body">
-                    <?= csrf_field() ?>
-                    <div class="row mb-2" id="formCheckInOut">
-                        <div class="col-md-6">
-                            <div class="form-floating mt-1">
-                                <select name="month" class="form-select" id="labelMonthFilter" aria-label="Pilih Filter Bulan">
-                                    <option selected>Pilih Bulan</option>
-                                    <?php for ($i = 1; $i <= 12; $i++) : ?>
-                                        <?php
-                                        $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
-                                        $checked = ($month == $temp) ? "selected" : "";
-                                        ?>
-                                        <option value="<?= $temp; ?>" <?= $checked; ?>>
-                                            <?= $temp; ?>
-                                        </option>
-                                    <?php endfor ?>
-                                </select>
-                                <label for="labelMonthFilter">Month</label>
+            <div class="modal-body">
+                <?= csrf_field() ?>
+                <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-top: -20px;">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#global" type="button" role="tab" aria-controls="home" aria-selected="true">Global (Seluruh Karyawan)</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#single" type="button" role="tab" aria-controls="profile" aria-selected="false">Personal (Per Karyawan)</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="global" role="tabpanel" aria-labelledby="home-tab">
+                        <form id="formGenerateGlobalAttendance" role="form" method="POST">
+                            <div class="row mb-2">
+                                <div class="col-md-12">
+                                    <div class="form-floating mt-1">
+                                        <input value="<?= $year . '-' . $month ?>" autocomplete="one-time-code" name="monthYearGlobal" type="month" required class="form-control target">
+                                        <label>Periode Absensi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input readonly value="<?= $startDate ?>" autocomplete="one-time-code" name="startDateGlobal" type="text" required class="form-control target input-picker startDate">
+                                        <label for="floatingInput">Tanggal Mulai Log Absen</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input readonly value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDateGlobal" type="text" required class="form-control target input-picker endDate">
+                                        <label for="floatingInput">Tanggal Selesai Log Absen</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mt-1">
-                                <select name="year" class="form-select" id="labelYearFilter" aria-label="Pilih Filter Tahun">
-                                    <option selected>Pilih Tahun</option>
-                                    <?php
-                                    for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) :
-                                        $checked = ($year == $i) ? "selected" : "";
-                                    ?>
-                                        <option value="<?= $i; ?>" <?= $checked; ?>><?= $i; ?></option>
-                                    <?php endfor ?>
-                                </select>
-                                <label for="labelYearFilter">Year</label>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-submit-form" id="globalGenerateBtn">Generate</button>
                             </div>
-                        </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="single" role="tabpanel" aria-labelledby="profile-tab">
+                        <form id="formGeneratePersonalAttendance">
+                            <div class="row mb-2">
+                                <div class="col-md-12 mt-3">
+                                    <div class="form-floating mt-1">
+                                        <input value="<?= $year . '-' . $month ?>" autocomplete="one-time-code" name="monthYearPersonal" type="month" required class="form-control target">
+                                        <label>Periode Absensi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="divisionID" name="filterDivisi" aria-label="Floating label select example">
+                                            <option value="">
+                                                Cari Berdasarkan Divisi
+                                            </option>
+                                            <?php foreach ($divisi as $d) : ?>
+                                                <option value="<?= $d['id'] ?>">
+                                                    <?= $d['divisi']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="employeeID" name="filterEmployee" aria-label="Floating label select example">
+                                            <option value="">
+                                                Cari Berdasarkan Nama Karyawan
+                                            </option>
+                                        </select>
+                                        <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input value="<?= $startDate ?>" readonly autocomplete="one-time-code" name="startDatePersonal" type="text" required class="form-control target input-picker startDate">
+                                        <label for="floatingInput">Tanggal Mulai Log Absen</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input value="<?= $endDate ?>" readonly autocomplete="one-time-code" name="finishDatePersonal" type="text" required class="form-control target input-picker endDate">
+                                        <label for="floatingInput">Tanggal Selesai Log Absen</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-submit-form" id="singleGenerateBtn">Generate</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
-                    <?php if ($isPosting == 0) : ?>
-                        <button type="submit" class="btn btn-submit-form">Generate</button>
-                    <?php else : ?>
-                        <button type="button" disabled class="btn btn-submit-form">Sudah Posting</button>
-                    <?php endif ?>
-                </div>
-            </form>
+            </div>
+
         </div>
     </div>
 </div>
@@ -519,6 +548,8 @@
 
 <script>
     $(document).ready(function() {
+        // hide loading
+        $('#loadingSpinner').hide();
         // csrf
         const csrfToken = '<?= csrf_token() ?>';
         // hide modal
@@ -531,141 +562,261 @@
             theme: "bootstrap-5",
             allowClear: true,
         });
-        // post generate attendance
-        $('#formGenerateAttendance').submit(function(e) {
+        // post generate global attendance
+        $('#globalGenerateBtn').click(function(e) {
             e.preventDefault();
-            setLoading()
             // set variable
             const csrf = $(`[name="${csrfToken}"]`);
-            var month = $("select[name='month']").val();
-            var year = $("select[name='year']").val();
+            var monthYearGlobal = $("input[name='monthYearGlobal']").val();
+            var startDateGlobal = $("input[name='startDateGlobal']").val();
+            var finishDateGlobal = $("input[name='finishDateGlobal']").val();
+
+            if (monthYearGlobal == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Pilih periode absensi",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else if (startDateGlobal == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Tanggal mulai log absensi tidak boleh kosong",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else if (finishDateGlobal == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Tanggal selesai log absensi tidak boleh kosong",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Generate Global Presensi ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    // append to form
+                    var formData = new FormData();
+                    formData.append('monthYear', monthYearGlobal);
+                    formData.append('startDate', startDateGlobal);
+                    formData.append('finishDate', finishDateGlobal);
+
+                    $.ajax({
+                        url: "<?= base_url("generate-attendance/global"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            // show loading
+                            $('#loadingSpinner').show();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then((result) => {
+                                    // update table
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                            $('#loadingSpinner').hide();
+                        },
+                        onError: function(response) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi kesalahan pada sistem',
+                                confirmButtonColor: '#4e73df',
+                            });
+                            $('#loadingSpinner').hide();
+                        }
+                    });
+                });
+            }
+        });
+        // post generate personal attendance
+        $('#singleGenerateBtn').click(function(e) {
+            e.preventDefault();
+            // set variable
+            const csrf = $(`[name="${csrfToken}"]`);
+            var monthYearPersonal = $("input[name='monthYearPersonal']").val();
+            var startDatePersonal = $("input[name='startDatePersonal']").val();
+            var finishDatePersonal = $("input[name='finishDatePersonal']").val();
+            var employeeID = $('#employeeID').val();
+            var divisionID = $('#divisionID').val();
+
+            if (monthYearPersonal == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Pilih periode absensi",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else if (divisionID == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Pilih divisi",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else if (employeeID == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Pilih karyawan",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else if (startDatePersonal == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Tanggal mulai log absensi tidak boleh kosong",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else if (finishDatePersonal == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Tanggal selesai log absensi tidak boleh kosong",
+                    confirmButtonColor: '#4e73df',
+                }).then(() => {});
+            } else {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Generate Personal Presensi ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    // append to form
+                    var formData = new FormData();
+                    formData.append('monthYear', monthYearPersonal);
+                    formData.append('startDate', startDatePersonal);
+                    formData.append('finishDate', finishDatePersonal);
+                    formData.append('employeeID', employeeID);
+
+                    $.ajax({
+                        url: "<?= base_url("generate-attendance/personal"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            // show loading
+                            $('#loadingSpinner').show();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then((result) => {
+                                    // update table
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                            $('#loadingSpinner').hide();
+                        },
+                        onError: function(response) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi kesalahan pada sistem',
+                                confirmButtonColor: '#4e73df',
+                            });
+                            $('#loadingSpinner').hide();
+                        }
+                    });
+                });
+            }
+        });
+        // Display Modal Change Status Attendence 
+        $('.update-attendance').click(function(e) {
+            e.preventDefault();
+
+            // get var
+            var employeeID = $(this).data('employee_id');
+            var tanggal = $(this).data('tanggal');
+            const csrf = $(`[name="${csrfToken}"]`);
             // append to form
             var formData = new FormData();
-            formData.append('month', month);
-            formData.append('year', year);
-
+            formData.append('employeeID', employeeID);
+            formData.append('tanggal', tanggal);
+            // Ajax Get Detail Status By Tanggal and EmployeeID
             $.ajax({
-                url: "<?= base_url("generate-attendance"); ?>",
+                url: "<?= base_url("get-attendance"); ?>",
                 data: formData,
-                method: "POST",
-                dataType: "json",
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                 },
+                method: "POST",
+                dataType: "json",
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    if (response.code == 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        }).then((result) => {
-                            // update table
-                            location.reload();
-                        });
-                    } else if (response.code == 422) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        });
+                    var attendance = response.data.attendance;
+                    var employee = response.data.employee;
+
+                    $('#reason').val(null);
+                    $('#attendenceID').val(attendance.id);
+                    $('#employeeName').val(employee.name);
+                    $('#tanggal').val(response.data.tanggal);
+                    $('#statusKehadiran').val(attendance.status);
+                    $('#keterangan').val(response.data.keterangan);
+                    $('#jamTerlambat').val(response.data.jamTerlambat);
+                    $('#isApproved').val(attendance.isApproved);
+
+                    if (attendance.status == 'HADIR_H') {
+                        // hadir
+                        $('#reasonForm').hide();
+                        $('#formInOut').show();
+                        $('#approvalForm').hide();
+                        // set form
+                        $('#checkout').val(attendance.checkout);
+                        $('#checkin').val(attendance.checkin);
+                    } else if (attendance.status == "ALPHA_A" || attendance.status == "LIBUR_L" || attendance.status == "RL_RL") {
+                        $('#approvalForm').hide();
+                    } else {
+                        // ada perizinan
+                        $('#reasonForm').show();
+                        $('#formInOut').hide();
+                        $('#approvalForm').show();
+                        $('#reason').val(attendance.reason);
                     }
-                    stopLoading()
+
+                    $('#updateModal').show();
                 },
                 onError: function(response) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Terjadi kesalahan pada sistem',
                         confirmButtonColor: '#4e73df',
-                    });
-                    stopLoading()
+                    })
                 }
             });
-        });
-        // Display Modal Change Status Attendence 
-        $('.update-attendance').click(function(e) {
-            e.preventDefault();
-            if ($('#statusPosting').val() == 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: "Ups, Presensi sudah diposting",
-                    confirmButtonColor: '#4e73df',
-                });
-            } else {
-                setLoading();
-                // get var
-                var employeeID = $(this).data('employee_id');
-                var tanggal = $(this).data('tanggal');
-                const csrf = $(`[name="${csrfToken}"]`);
-                // append to form
-                var formData = new FormData();
-                formData.append('employeeID', employeeID);
-                formData.append('tanggal', tanggal);
-                // Ajax Get Detail Status By Tanggal and EmployeeID
-                $.ajax({
-                    url: "<?= base_url("get-attendance"); ?>",
-                    data: formData,
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        var attendance = response.data.attendance;
-                        var employee = response.data.employee;
 
-                        $('#attendenceID').val(attendance.id);
-                        $('#employeeName').val(employee.name);
-                        $('#tanggal').val(response.data.tanggal);
-                        $('#statusKehadiran').val(attendance.status);
-                        $('#keterangan').val(response.data.keterangan);
-                        $('#jamTerlambat').val(response.data.jamTerlambat);
-                        $('#isApproved').val(attendance.isApproved);
 
-                        if (attendance.status == 'HADIR_H') {
-                            // hadir
-                            $('#reasonForm').hide();
-                            $('#formInOut').show();
-                            $('#approvalForm').hide();
-                            // set form
-                            $('#checkout').val(attendance.checkout);
-                            $('#checkin').val(attendance.checkin);
-                        } else if (attendance.status == "ALPHA_A" || attendance.status == "LIBUR_L" || attendance.status == "RL_RL") {
-                            $('#approvalForm').hide();
-                        } else {
-                            // ada perizinan
-                            $('#reasonForm').show();
-                            $('#formInOut').hide();
-                            $('#approvalForm').show();
-                            $('#reason').val(attendance.reason);
-                        }
-
-                        $('#updateModal').show();
-                        stopLoading()
-                    },
-                    onError: function(response) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Terjadi kesalahan pada sistem',
-                            confirmButtonColor: '#4e73df',
-                        })
-                        stopLoading()
-                    }
-                });
-            }
-
-        });
-        // Hari Libur
-        $('.hari-libur').click(function(e) {
-            e.preventDefault();
-            Swal.fire({
-                icon: 'error',
-                title: 'Tanggal ' + $(this).data('tanggal') + ' adalah hari libur',
-                confirmButtonColor: '#4e73df',
-            });
         });
         // on change status kehadiran
         $('#statusKehadiran').change(function(e) {
@@ -757,66 +908,6 @@
                 }
             });
         });
-        // update status posting
-        $('#formPosting').submit(function(e) {
-            e.preventDefault();
-            // set variable
-            const csrf = $(`[name="${csrfToken}"]`);
-            var statusPosting = $('#statusPosting').val();
-            var year = $('#year').val();
-            var month = $('#month').val();
-            // alert
-            Swal.fire({
-                icon: 'question',
-                title: statusPosting == 1 ? "Posting Presensi ?" : "Batalkan Posting Presensi ?",
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    setLoading();
-
-                    // append to form
-                    var formData = new FormData();
-                    formData.append('statusPosting', statusPosting);
-                    formData.append('year', year);
-                    formData.append("month", month);
-
-                    $.ajax({
-                        url: "<?= base_url("posting-unposting-attendance"); ?>",
-                        data: formData,
-                        method: "POST",
-                        dataType: "json",
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                location.reload();
-                            });
-                            stopLoading()
-                        },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi kesalahan pada sistem',
-                                confirmButtonColor: '#4e73df',
-                            });
-                            stopLoading()
-                        }
-                    });
-                }
-            });
-        });
         // Search employee
         $("select[name='select2EmployeesName']").select2({
             placeholder: "Cari Nama Karyawan",
@@ -848,14 +939,71 @@
                 cache: true
             }
         });
+        // otomatis generate start dan end 
+        $('input[name="monthYearGlobal"], input[name="monthYearPersonal"]').on('change', function() {
+            var inputValue = $(this).val();
+            var dateParts = inputValue.split('-');
+            var year = parseInt(dateParts[0]);
+            var month = parseInt(dateParts[1]);
+
+            var startDate = new Date(year, month - 2, 23);
+            var endDate = new Date(year, month - 1, 21);
+
+            var formattedStartDate = startDate.getDate() + '/' + (startDate.getMonth() + 1) + '/' + startDate.getFullYear();
+            var formattedEndDate = endDate.getDate() + '/' + (endDate.getMonth() + 1) + '/' + endDate.getFullYear();
+
+            $('.startDate').val(formattedStartDate).attr('readonly', true);
+            $('.endDate').val(formattedEndDate).attr('readonly', true);
+        });
+        // filter table by employee
         $("select[name='select2EmployeesName']").on("change", function() {
             var selectedValue = $(this).val();
             window.location.href = "<?= base_url("list-attendance?month=$month&year=$year") ?>&employeesID=" + selectedValue;
         });
+        // filter htable by division
         $("select[name='divisiID']").on("change", function() {
             var selectedValue = $(this).val();
             window.location.href = "<?= base_url("list-attendance?month=$month&year=$year") ?>&divisiID=" + selectedValue;
         });
+        // filter select2 init
+        $("select[name='filterDivisi']").select2({
+            placeholder: "Cari Berdasarkan Divisi",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+        // select2 filter employee ajax
+        $("select[name='filterEmployee']").select2({
+            placeholder: "Cari Nama Karyawan",
+            theme: "bootstrap-5",
+            allowClear: true,
+            minimumInputLength: 2,
+            dropdownParent: $('#generateModal'),
+            ajax: {
+                url: "<?= base_url('attendance/like-employees') ?>",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        employeesName: params.term,
+                        divisiID: $("select[name='filterDivisi']").val(),
+                    };
+                },
+                processResults: function(data) {
+                    var options = [];
+                    $.each(data.data, function(index, employee) {
+                        options.push({
+                            id: employee.id,
+                            text: employee.name
+                        });
+                    });
+                    return {
+                        results: options
+                    };
+                },
+                cache: true
+            }
+        });
+        // style helper
         $('.form-select')
             .parent('div')
             .children('span')

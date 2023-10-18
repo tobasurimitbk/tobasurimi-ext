@@ -10,12 +10,52 @@
         </a>
     </div>
     <?= csrf_field() ?>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end row-col-page-list-attendance">
+                <div class="col-6 mb-2">
+                    <form id="search_form" name="search_form" class="kt-form kt-form--fit kt-margin-b-20">
+                        <select name="month" id="month">
+                            <?php
+                            for ($i = 1; $i <= 12; $i++) {
+                                $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
+                                $checked = ($month == $temp) ? "selected" : "";
+                            ?>
+                                <option value="<?php echo $temp; ?>" <?php echo $checked; ?>><?php echo $temp; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                        <select name="year" id="year">
+                            <?php
+                            for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) {
+                                $checked = ($year == $i) ? "selected" : "";
+                            ?>
+                                <option value="<?php echo $i; ?>" <?php echo $checked; ?>><?php echo $i; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                        <button type="button" class="btn btn-primary btn-brand--icon" id="filterYearMonth">
+                            <span>
+                                <i class="la la-print"></i>
+                                <span>Cari</span>
+                            </span>
+                        </button>
 
+                    </form>
+                </div>
+                <div class="col-6 mb-2">
+                    <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search fos-jk mb-3" placeholder="Cari Data Berdasarkan NIP" id="filterSearch" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search fos-jk mb-3" placeholder="Cari NIP / Nama Karyawan" id="filterSearch" value="" />
                 </div>
             </div>
             <div class="row">
@@ -24,12 +64,12 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;" class="sort">No</th>
-                                <th onclick="changeSort('nip')" class="sort">NIP</th>
-                                <th onclick="" class="sort">Nama Karyawan</th>
-                                <th onclick="" class="sort">Divisi</th>
-                                <th onclick="" class="sort">Tgl Lembur</th>
-                                <th onclick="" class="sort">Jam Lembur</th>
-                                <th onclick="" class="sort">Uang Lembur</th>
+                                <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
+                                <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
+                                <th onclick="changeSort('divisis.divisi')" class="sort">Divisi</th>
+                                <th onclick="changeSort('form_lembur.periode')" class="sort">Tgl Lembur</th>
+                                <th onclick="changeSort('form_lembur.total_jam_lembur')" class="sort">Jam Lembur</th>
+                                <th onclick="changeSort('form_lembur.total_uang_lembur')" class="sort">Uang Lembur</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -64,7 +104,8 @@
             url: "<?= base_url("lembur/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.nip = $('#filterSearch').val();
+                data.search = $('#filterSearch').val();
+                data.yearMonth = $('#year').val() + "-" + $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -138,6 +179,10 @@
     }
 
     $("#filterSearch").keyup(function() {
+        table.ajax.reload();
+    });
+
+    $('#filterYearMonth').click(function() {
         table.ajax.reload();
     });
 </script>

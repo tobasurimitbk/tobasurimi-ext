@@ -309,9 +309,15 @@
                     let id = row?.id;
                     let is_boleh_minjam = row?.isBolehMinjam;
                     let employeeName = row?.name;
-                    return `
+                    let status_pinjaman = row?.statusPinjaman;
+                    if (status_pinjaman == 1) {
+                        return '-';
+                    } else {
+                        return `
                         <input name="id_pinjaman[]" data-employee_name="${employeeName}" class="child id_pinjaman" type="checkbox" value="${id}" ${is_boleh_minjam == 0 ? 'disabled' : ''}>
                         `
+                    }
+
                 }
             },
 
