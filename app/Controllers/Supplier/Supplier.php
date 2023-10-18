@@ -321,7 +321,15 @@ class Supplier extends BaseController
 
     public function supplierBahanPenolong()
     {
-        return view('Supplier/supplierBahanPenolong/index');
+        $provinceData = $this->provinceModel->asObject()->findAll();
+        $countryData = $this->countryModel->asObject()->findAll();
+
+        $data = [
+            "dataProvinces" => $provinceData,
+            "country" => $countryData
+        ];
+
+        return view('Supplier/supplierBahanPenolong/index', $data);
     }
 
     public function allSupplierBahanPenolong()
@@ -356,6 +364,7 @@ class Supplier extends BaseController
         foreach ($supplierData['data'] as $data) {
             array_push($dataSupplier, [
                 "no"            => $no++,
+                "kode"          => $data->kode,
                 "id"            => $data->id,
                 "name"          => $data->name,
                 "address"       => $data->address,
@@ -380,6 +389,9 @@ class Supplier extends BaseController
     {
         try {
             $rules = [
+                "kode" => [
+                    "rules" => "required"
+                ],
                 "name" => [
                     "rules" => "required"
                 ],
@@ -391,6 +403,24 @@ class Supplier extends BaseController
                 ],
                 "phone" => [
                     "rules" => "permit_empty|string"
+                ],
+                "contact_person" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "email" => [
+                    "rules" => "permit_empty|valid_email"
+                ],
+                "country_code" => [
+                    "rules" => "permit_empty"
+                ],
+                "postal_code" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "province_parent_id" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "city_parent_id" => [
+                    "rules" => "permit_empty|numeric"
                 ]
             ];
 
@@ -405,30 +435,29 @@ class Supplier extends BaseController
                 return;
             }
 
-            $payload = json_encode([
+            $insertData = [
                 "company_id" => $this->this_company_id,
+                "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
                 "no_npwp" => $this->request->getPost("no_npwp"),
                 "phone" => $this->request->getPost("phone"),
-                "type" => "BAHAN PENOLONG"
-            ]);
-
-            $insertData = [
-                "company_id"        => $this->this_company_id,
-                "name"              => $this->request->getPost("name"),
-                "address"           => $this->request->getPost("address"),
-                "no_npwp"           => $this->request->getPost("no_npwp"),
-                "phone"             => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
+                "email" => $this->request->getPost("email"),
+                "province_id" => $this->request->getPost("province_parent_id"),
+                "city_id" => $this->request->getPost("city_parent_id"),
+                "postal_code" => $this->request->getPost("postal_code"),
+                "country_code"      => $this->request->getPost("country_code"),
                 "type"              => "BAHAN PENOLONG"
             ];
+
             $insert = $this->supplierModel->insert($insertData);
 
             if (!$insert) {
                 $data = [
                     "status"    => false,
                     "message"   => 'Data Gagal Disimpan!',
-                    "payload"   => $payload,
+                    "payload"   => json_encode($insertData),
                     'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
@@ -438,7 +467,7 @@ class Supplier extends BaseController
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
-                "payload"   => $payload,
+                "payload"   => json_encode($insertData),
                 'token'     => csrf_hash()
             ];
             echo json_encode($data);
@@ -469,6 +498,24 @@ class Supplier extends BaseController
                 ],
                 "phone" => [
                     "rules" => "permit_empty|string"
+                ],
+                "contact_person" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "email" => [
+                    "rules" => "permit_empty|valid_email"
+                ],
+                "country_code" => [
+                    "rules" => "permit_empty"
+                ],
+                "postal_code" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "province_parent_id" => [
+                    "rules" => "permit_empty|numeric"
+                ],
+                "city_parent_id" => [
+                    "rules" => "permit_empty|numeric"
                 ]
             ];
 
@@ -487,11 +534,16 @@ class Supplier extends BaseController
                 $id = $this->request->getPost("id");
 
                 $payload = [
-                    "company_id"        => $this->this_company_id,
-                    "name"              => $this->request->getPost("name"),
-                    "address"           => $this->request->getPost("address"),
-                    "no_npwp"           => $this->request->getPost("no_npwp"),
-                    "phone"             => $this->request->getPost("phone")
+                    "name" => $this->request->getPost("name"),
+                    "address" => $this->request->getPost("address"),
+                    "no_npwp" => $this->request->getPost("no_npwp"),
+                    "phone" => $this->request->getPost("phone"),
+                    "contact_person" => $this->request->getPost("contact_person"),
+                    "email" => $this->request->getPost("email"),
+                    "province_id" => $this->request->getPost("province_parent_id"),
+                    "city_id" => $this->request->getPost("city_parent_id"),
+                    "postal_code" => $this->request->getPost("postal_code"),
+                    "country_code"      => $this->request->getPost("country_code")
                 ];
             }
 

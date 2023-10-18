@@ -169,6 +169,9 @@
                     </table>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-hide-harga btn-discard mr-2">Batal</button>
+            </div>
         </div>
     </div>
 </div>
@@ -457,6 +460,8 @@
         });
 
         $(".no_npwp").mask("000000000000000")
+
+        $(".phone").mask("0000000000000")
 
         $(".search").keyup(function() {
             table.ajax.reload();
