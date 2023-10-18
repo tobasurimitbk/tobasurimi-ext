@@ -201,6 +201,25 @@
         }
     ?>
 
+    $('.dataTable').DataTable({
+        ordering: false,
+        //responsive: true,
+        display: 'stripe',
+        searching: false,
+        lengthChange: false,
+        pageLength: 25,
+        columnDefs: [{
+            defaultContent: '-',
+            targets: '_all'
+        }],
+        "initComplete": function (settings, json) {  
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");            
+        },
+        language: {
+            emptyTable: "Belum Ada Data Harga"
+        }
+    })
+
     $('.bahan_baku').select2({
         placeholder: "Pilih Bahan Baku",
         theme: "bootstrap-5"
