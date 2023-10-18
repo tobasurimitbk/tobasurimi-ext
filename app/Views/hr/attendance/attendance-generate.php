@@ -294,18 +294,21 @@
                                 <?php else : ?>
                                     <?php foreach ($employeesData as $i => $e) : ?>
                                         <?php $status = $attandanceModel->getStatusAttendances($year, $month, $e['id']); ?>
-                                        <tr>
-                                            <td width="150">
-                                                &nbsp;<?= $e['name'] ?></td>
-                                            <td width="110">
-                                                &nbsp;<?= $e['divisi'] ?></td>
-                                            </td>
-                                            <?php foreach ($statusPerizinan as $s) : ?>
-                                                <td width="20" align="center">
-                                                    <?= $status[$s['value']] ?>
+                                        <?php $isGenerate = $attandanceModel->detectIfGenerate($year . "-" . $month, $e['id']); ?>
+                                        <?php if ($isGenerate) : ?>
+                                            <tr>
+                                                <td width="150">
+                                                    &nbsp;<?= $e['name'] ?></td>
+                                                <td width="110">
+                                                    &nbsp;<?= $e['divisi'] ?></td>
                                                 </td>
-                                            <?php endforeach; ?>
-                                        </tr>
+                                                <?php foreach ($statusPerizinan as $s) : ?>
+                                                    <td width="20" align="center">
+                                                        <?= $status[$s['value']] ?>
+                                                    </td>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </tbody>
