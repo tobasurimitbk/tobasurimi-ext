@@ -47,9 +47,9 @@ class SupplierHarga extends BaseController
                 "bahan_baku_name"   => $data->bahan_baku_name,
                 "createdAt"         => $data->createdAt ? date("d/m/Y", strtotime($data->createdAt)) : "",
                 "spesifikasi"       => $data->spesifikasi,
-                "harga_umum"        => "Rp" . number_format($data->harga_umum, 2, '.', ','),
-                "harga_harian"      => "Rp" . number_format($data->harga_harian, 2, '.', ','),
-                "harga_bulanan"     => "Rp" . number_format($data->harga_bulanan, 2, '.', ',')
+                "harga_umum"        => "Rp " . number_format($data->harga_umum, 2, '.', ','),
+                "harga_harian"      => "Rp " . number_format($data->harga_harian, 2, '.', ','),
+                "harga_bulanan"     => "Rp " . number_format($data->harga_bulanan, 2, '.', ',')
             ]);
         }
 
@@ -68,160 +68,69 @@ class SupplierHarga extends BaseController
     public function saveSupplierHarga()
     {
         try {
-            $rules = [
-                "bahan_baku" => [
-                    "rules" => "required"
-                ],
-                "bagian" => [
-                    "rules" => "required"
-                ],
-                "spesifikasi" => [
-                    "rules" => "required"
-                ],
-                "harga_umum" => [
-                    "rules" => "required"
-                ],
-                "harga_harian" => [
-                    "rules" => "required"
-                ],
-                "harga_bulanan" => [
-                    "rules" => "required"
-                ],
-            ];
+            $list_item = json_decode($this->request->getPost("list_item"));
+            $list_delete = json_decode($this->request->getPost("list_delete"));
 
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            $insertData = [
-                "supplier_id"      => $this->request->getPost("id_supplier"),
-                "bahan_baku_id"       => $this->request->getPost("bahan_baku"),
-                "bagian_id"           => $this->request->getPost("bagian"),
-                "spesifikasi"      => $this->request->getPost("spesifikasi"),
-                "harga_umum"       => formatter($this->request->getPost("harga_umum"), "CURR_TO_FLOAT"),
-                "harga_harian"     => formatter($this->request->getPost("harga_harian"), "CURR_TO_FLOAT"),
-                "harga_bulanan"    => formatter($this->request->getPost("harga_bulanan"), "CURR_TO_FLOAT")
-            ];
-
-            // check if supplier harga with wupplier, bahan baku, spesifikasi already exist
-            $find = $this->SupplierHargaModel->checkAlreadyExist($insertData);
-
-            if($find)
+            // for create and update
+            foreach($list_item as $item)
             {
+                $insertData = [
+                    "supplier_id"      => $this->request->getPost("supplier_id"),
+                    "bahan_baku_id"    => $item->bahan_baku_id,
+                    "bagian_id"        => $item->bagian_id,
+                    "spesifikasi"      => $item->spesifikasi,
+                    "harga_umum"       => formatter($item->harga_umum, "CURR_TO_FLOAT"),
+                    "harga_harian"     => formatter($item->harga_harian, "CURR_TO_FLOAT"),
+                    "harga_bulanan"    => formatter($item->harga_bulanan, "CURR_TO_FLOAT")
+                ];
+
                 // update
-                $insert = $this->SupplierHargaModel->update($find[0]["id"], $insertData);
+                if($item->id) {
+                    $insert = $this->SupplierHargaModel->update($item->id, $insertData);
 
-                if (!$insert) {
-                    $data = [
-                        "status"    => false,
-                        "message"   => 'Data Gagal Disimpan!',
-                        "payload"   => json_encode($insertData),
-                        'token'     => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                    return;
+                    if (!$insert) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => 'Data Gagal Disimpan!',
+                            "payload"   => json_encode($insertData),
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
+                // create
+                else {
+                    $insert = $this->SupplierHargaModel->insert($insertData);
+                    if (!$insert) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => 'Data Gagal Disimpan!',
+                            "payload"   => json_encode($insertData),
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
                 }
             }
-            else
+
+            // for delete
+            foreach($list_delete as $item)
             {
-                //create new
-                $insert = $this->SupplierHargaModel->insert($insertData);
-                if (!$insert) {
+                $id = $item->id;
+
+                if (empty($id)) {
                     $data = [
                         "status"    => false,
-                        "message"   => 'Data Gagal Disimpan!',
-                        "payload"   => json_encode($insertData),
+                        "message"   => "Data Gagal Dihapus",
                         'token'     => csrf_hash()
                     ];
                     echo json_encode($data);
                     return;
                 }
-            }
 
-            $data = [
-                "status"    => true,
-                "message"   => "Data Berhasil disimpan",
-                "payload"   => json_encode($insertData),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
-        } catch (\Exception $e) {
-            $data = [
-                "status"    => false,
-                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
-        }
-    }
-
-    public function updateSupplierHarga()
-    {
-        try {
-            $rules = [
-                "bahan_baku" => [
-                    "rules" => "required"
-                ],
-                "bagian" => [
-                    "rules" => "required"
-                ],
-                "spesifikasi" => [
-                    "rules" => "required"
-                ],
-                "harga_umum" => [
-                    "rules" => "required"
-                ],
-                "harga_harian" => [
-                    "rules" => "required"
-                ],
-                "harga_bulanan" => [
-                    "rules" => "required"
-                ],
-            ];
-
-            if (!$this->validate($rules)) {
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            $id = $this->request->getPost("id_supplier_harga");
-
-            $insertData = [
-                "supplier_id"      => $this->request->getPost("id_supplier"),
-                "bahan_baku_id"       => $this->request->getPost("bahan_baku"),
-                "bagian_id"           => $this->request->getPost("bagian"),
-                "spesifikasi"      => $this->request->getPost("spesifikasi"),
-                "harga_umum"       => formatter($this->request->getPost("harga_umum"), "CURR_TO_FLOAT"),
-                "harga_harian"     => formatter($this->request->getPost("harga_harian"), "CURR_TO_FLOAT"),
-                "harga_bulanan"    => formatter($this->request->getPost("harga_bulanan"), "CURR_TO_FLOAT")
-            ];
-
-            $insert = $this->SupplierHargaModel->update($id, $insertData);
-
-            if (!$insert) {
-                $data = [
-                    "status"    => false,
-                    "message"   => 'Data Gagal Disimpan!',
-                    "payload"   => json_encode($insertData),
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
+                $this->SupplierHargaModel->delete($id);
             }
 
             $data = [
@@ -283,39 +192,5 @@ class SupplierHarga extends BaseController
         echo json_encode($data);
 
         return;
-    }
-
-    public function deleteSupplierHarga()
-    {
-        try {
-            $id = $this->request->getPost("id");
-
-            if (empty($id)) {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Data Gagal Dihapus",
-                    'token'     => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            $this->SupplierHargaModel->delete($id);
-            $data = [
-                "status"    => true,
-                "message"   => "Data Berhasil dihapus",
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
-        } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
-        }
     }
 }

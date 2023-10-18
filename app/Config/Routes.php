@@ -159,8 +159,6 @@ $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax'
 $routes->get('/supplier-harga/all', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
 $routes->post('/supplier-harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/id/(:num)', 'Supplier\SupplierHarga::getByIdSupplierHarga/$1', ['filter' => 'Auth']);
-$routes->post('/supplier-harga/update', 'Supplier\SupplierHarga::updateSupplierHarga', ['filter' => 'Auth']);
-$routes->post('/supplier-harga/delete', 'Supplier\SupplierHarga::deleteSupplierHarga', ['filter' => 'Auth']);
 
 // SUPPLIER
 $routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => 'Auth']);
