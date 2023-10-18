@@ -147,20 +147,20 @@
             <div class="modal-body">
                 <div class="row justify-content-end mb-3">
                     <div class="col-md-3">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No PO" value="" />
+                        <input autocomplete="one-time-code" class="form-control search-harga form-out-search" placeholder="Cari Nama Barang" value="" />
                     </div>
                 </div>
                 <div class="table-responsive mt-3 mb-3">
-                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0" id="tabelKomponenGaji">
+                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi secondDataTable" width="100%" cellspacing="0" id="secondDataTable">
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10">No</th>
-                                <th>No PO</th>
-                                <th>Tgl</th>
-                                <th>Barang</th>
-                                <th>Umum</th>
-                                <th>Harian</th>
-                                <th>Bulanan</th>
+                                <th onclick="changeSortHarga('bahan_baku_name')" class="sort">Barang</th>
+                                <th onclick="changeSortHarga('createdAt')" class="sort">Tgl</th>
+                                <th onclick="changeSortHarga('spesifikasi')" class="sort">Spesifikasi</th>
+                                <th onclick="changeSortHarga('harga_umum')" class="sort">Umum</th>
+                                <th onclick="changeSortHarga('harga_harian')" class="sort">Harian</th>
+                                <th onclick="changeSortHarga('harga_bulanan')" class="sort">Bulanan</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
@@ -190,7 +190,7 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable firstDataTable" id="firstDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
@@ -215,7 +215,10 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
     let sortType = "asc";
+    let sortHarga = "bahan_baku_name";
+    let sortTypeHarga = "asc";
     let trigger = true;
+    let id_supplier = "";
     
     $('.province_parent_id').select2({
         placeholder: "",
@@ -256,7 +259,7 @@
         .find('label')
         .css('z-index', '1');
 
-    const table = $('.dataTable').DataTable({
+    let table = $('#firstDataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
@@ -335,6 +338,76 @@
         }
     });
 
+    let secondTable = $('#secondDataTable').DataTable({
+        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("supplier-harga/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.id = id_supplier;
+                data.search = $(".search-harga").val();
+                data.sort = sortHarga;
+                data.sortType = sortTypeHarga;
+            }
+        },
+        // scrollX: true,
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.secondDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        //responsive: true,
+        display: "stripe",
+        searching: false,
+        columns: [{
+            data: "no",
+            className: "text-center",
+            sortable: false
+        }, {
+            data: "bahan_baku_name",
+            className: "text-center"
+        }, {
+            data: "createdAt",
+            className: "text-center"
+        }, {
+            data: "spesifikasi",
+            className: "text-center"
+        }, {
+            data: "harga_umum",
+            className: "text-center"
+        }, {
+            data: "harga_harian",
+            className: "text-center"
+        }, {
+            data: "harga_bulanan",
+            className: "text-center"
+        }],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
     $(document).ready(function() {
         var validator = $(".create-form").validate({
             rules: {
@@ -387,6 +460,10 @@
 
         $(".search").keyup(function() {
             table.ajax.reload();
+        })
+
+        $(".search-harga").keyup(function() {
+            secondTable.ajax.reload();
         })
 
         $(".dataTable_info").addClass("pt-0");
@@ -657,60 +734,24 @@
         }
     }
 
-    let History = function() {
-        $.ajax({
-            url: `<?= base_url("supplier-harga/ajax"); ?>`,
-            method: "GET",
-            data: {
-                id: $(".id_supplier").val()
-            },
-            dataType: "json",
-            success: function(result) {
-                let no = 0;
-                $(".body-detail-table").empty()
-                let tag_html = "";
-
-                result?.data?.map((item) => {
-                    no = no + 1;
-                    tag_html += `<tr>`;
-                    tag_html += "<td>";
-                    tag_html += no;
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += item?.barang_name;
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += item?.bagian_name;
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += item?.spesifikasi;
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += Number(item.harga_umum).toLocaleString();
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += Number(item.harga_harian).toLocaleString();
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += Number(item.harga_bulanan).toLocaleString();
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += `<button onclick="editHarga(${item?.id})" class="btn btn-warning posting-spp">
-                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button>`;
-                    tag_html += "</td>";
-                    tag_html += "<td>";
-                    tag_html += `<button class="btn btn-danger" onclick="deleteHarga(${item?.id})">
-                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                    </button>`;
-                    tag_html += "</td>";
-                    tag_html += "</tr>";
-                })
-                $(".body-detail-table").append(tag_html)
-                $(".harga-modal").modal("show")
-            }
-        }) 
+    const changeSortHarga = function(val) {
+        if (sortHarga !== val) {
+            sortTypeHarga = "asc";
+            sortHarga = val;
+        } else {
+            sortTypeHarga = sortTypeHarga === "asc" ? "desc" : "asc";
+        }
     }
+
+    let History = function(id) {
+        id_supplier = id;
+        $(".search-harga").val('')
+        sortHarga = "bahan_baku_name";
+        sortTypeHarga = "asc";
+        secondTable.ajax.reload()
+        $(".harga-modal").modal("show")
+    }
+    
 </script>
 
 <?= $this->endSection(); ?>

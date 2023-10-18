@@ -156,6 +156,7 @@ $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
 
 // SUPPLIER HARGA
 $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax', ['filter' => 'Auth']);
+$routes->get('/supplier-harga/all', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
 $routes->post('/supplier-harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/id/(:num)', 'Supplier\SupplierHarga::getByIdSupplierHarga/$1', ['filter' => 'Auth']);
 $routes->post('/supplier-harga/update', 'Supplier\SupplierHarga::updateSupplierHarga', ['filter' => 'Auth']);

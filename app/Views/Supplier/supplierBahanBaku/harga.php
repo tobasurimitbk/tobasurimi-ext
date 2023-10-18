@@ -349,7 +349,10 @@
     }
 
     const editHarga = function(id) {
-         $.ajax({
+        validator.resetForm();
+        validator.reset();
+        
+        $.ajax({
             url: `<?= base_url("supplier-harga/id/"); ?>` + id,
             method: "GET",
             dataType: "json",

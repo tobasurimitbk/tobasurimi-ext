@@ -52,6 +52,47 @@ class SupplierHargaModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'bahan_baku_name'   => 'barang_master.barang_name',
+            'spesifikasi'       => 'supplier_harga.spesifikasi',
+            'harga_umum'        => 'supplier_harga.harga_umum',
+            'harga_harian'      => 'supplier_harga.harga_harian',
+            'harga_bulanan'     => 'supplier_harga.harga_bulanan',
+            'createdAt'         => 'supplier_harga.createdAt',
+            'updatedAt'         => 'supplier_harga.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'supplier_harga.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "supplier_harga.*, barang_master.barang_name AS bahan_baku_name";
+        $supplierDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('barang_master', 'supplier_harga.bahan_baku_id = barang_master.id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $supplierDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $supplierDataQry->groupStart()
+                ->like('barang_master.barang_name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $totalFilteredData = $supplierDataQry->countAllResults(false);
+        $data = $supplierDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     public function getBySupplierId($id)
     {
         $arrCondition = [
