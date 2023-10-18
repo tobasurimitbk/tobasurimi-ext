@@ -6279,3 +6279,24 @@ table.dataTable .body-table tr td .btn.btn-danger {
     padding-left: 0px;
   }
 }
+
+.table.table-hover-tobasurimi tr td .btn {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+#harga_modal .modal-dialog .modal-content .modal-body .form-control.search-harga {
+  padding: 12px;
+}
+
+table.dataTable tbody tr td .btn {
+  font-size: 13px;
+  box-shadow: none !important;
+}
+
+.card .card-body table tbody tr td {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #2f4858;
+}
