@@ -364,6 +364,7 @@
                 render: function(data, type, row) {
                     let nominalPinjaman = row?.nominalPinjaman;
                     let is_boleh_minjam = row?.isBolehMinjam;
+                    let status_pinjaman = row?.statusPinjaman;
                     let id = row?.id;
 
                     return `
@@ -371,7 +372,7 @@
                 <input value="${nominalPinjaman}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" 
                 onchange="this.value = formatRupiah(this.value); changeNominalPinjaman(this)" 
                 autocomplete="one-time-code" data-id="${id}" name="nominalPinjaman" type="text" 
-                class="form-control target input-picker" ${is_boleh_minjam == 0 ? 'disabled' : ''}>
+                class="form-control target input-picker" ${is_boleh_minjam == 0 || status_pinjaman == 1 ? 'disabled' : ''}>
                 <label>Nominal Pinjaman</label>
             </div>
         `
