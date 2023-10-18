@@ -183,8 +183,8 @@
                                             <?php $attandance = $attandanceModel->getAttendances($a, $e['id']); ?>
                                             <?php if ($attandance == null) : ?>
                                                 <!-- Null -->
-                                                <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
-                                                <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle;"><img src='assets/img/stop.png' width='25' height='25'></td>
+                                                <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle; background-color:#a41fa6;"></td>
+                                                <td class="update-attendance" data-tanggal="<?= $a ?>" data-employee_id="<?= $e['id'] ?>" width=25 align=center style="vertical-align:middle; background-color:#a41fa6;"></td>
                                             <?php else : ?>
                                                 <?php $statusKode = explode("_", $attandance->status)[1]; ?>
                                                 <?php if ($statusKode == "A") : ?>
@@ -351,6 +351,18 @@
                             </div>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <div class="col-sm-2 col-4 mt-2">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="p-3" style="width: 5px; height:5px; background-color:#a41fa6;"></div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="card-text mt-1 text-black">
+                                    BELUM GENERATE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
