@@ -33,7 +33,6 @@ class PembayaranPOLokal extends BaseController
 
         $supplierList = $supplierModel->asObject()
             ->where('company_id', $this->this_company_id)
-            ->where('kategori', 'LOKAL')
             ->findAll();
 
         $data = [
@@ -64,7 +63,6 @@ class PembayaranPOLokal extends BaseController
 
         $supplierList = $supplierModel->asObject()
             ->where('company_id', $this->this_company_id)
-            ->where('kategori', 'LOKAL')
             ->findAll();
 
         $summaryList = $localPOInvSummaryModel->asObject()

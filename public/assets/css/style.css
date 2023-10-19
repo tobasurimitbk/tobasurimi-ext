@@ -6025,8 +6025,7 @@ table.dataTable .body-table tr td .btn.btn-danger {
 
   .section .section-header .btn.btn-add {
     position: relative;
-    float: none !important;
-    min-width: 100%;
+    margin-left: auto!important;
     margin: 0;
     margin-top: 0px;
     margin-top: 0.75rem;
