@@ -7,6 +7,7 @@ use App\Models\SppModel;
 use App\Models\SppDetailModel;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
+use App\Models\CompaniesModel;
 
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
@@ -26,6 +27,7 @@ class SPP extends BaseController
 
     protected $MetadataModel;
     protected $DivisisModel;
+    protected $CompaniesModel;
 
     protected $RmImportPOModel;
     protected $RmImportPODetailModel;
@@ -47,6 +49,7 @@ class SPP extends BaseController
 
         $this->MetadataModel = new MetadataModel();
         $this->DivisisModel = new DivisisModel();
+        $this->CompaniesModel = new CompaniesModel();
 
         $this->RmImportPOModel = new RMImportPOModel();
         $this->RmImportPODetailModel = new RMImportPODetailModel();
@@ -67,6 +70,9 @@ class SPP extends BaseController
 
     public function createSPP()
     {
+        //Get Company
+        $dataCompany =  $this->CompaniesModel->getCompanies();
+
         //Get Order Type By Metadata
         $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
@@ -74,6 +80,7 @@ class SPP extends BaseController
         $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
+            "dataCompany"   => $dataCompany,
             "dataOrderType" => $dataOrderType,
             "dataDivisi" => $dataDivisi
         ];
@@ -83,6 +90,9 @@ class SPP extends BaseController
 
     public function getByIdSPP($id = null)
     {
+        //Get Company
+        $dataCompany =  $this->CompaniesModel->getCompanies();
+
         //Get Order Type By Metadata
         $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
@@ -90,6 +100,7 @@ class SPP extends BaseController
         $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
+            "dataCompany"   => $dataCompany,
             "dataOrderType" => $dataOrderType,
             "dataDivisi" => $dataDivisi
         ];
@@ -150,9 +161,7 @@ class SPP extends BaseController
             "dateEnd"          => $this->request->getGet("dateEnd") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        $condition = [
-            "purchase_requests.company_id"        => $this->this_company_id
-        ];
+        $condition = [];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
@@ -177,6 +186,7 @@ class SPP extends BaseController
                 "id"            => $data->id,
                 "spp_type"      => $data->spp_type,
                 "spp_no"        => $data->spp_no,
+                "companyName"  => $data->companyName,
                 "divisiName" => $data->divisiName,
                 "spp_type"      => $data->spp_type,
                 "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
@@ -230,11 +240,11 @@ class SPP extends BaseController
 
             if ($this->validate($rules)) {
                 $insertData = [
-                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
+                    "company_id" => $this->request->getPost("company_id"),
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
-                    "divisi_id" => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
+                    "divisi_id" => $this->request->getPost("divisi_id"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
                     "createdBy" => session()->get("login")->user_id,
@@ -330,10 +340,11 @@ class SPP extends BaseController
                 $id = $this->request->getPost("id");
 
                 $insertData = [
+                    "company_id" => $this->request->getPost("company_id"),
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
-                    "divisi_id" => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
+                    "divisi_id" => $this->request->getPost("divisi_id"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
                     "items" =>  json_decode($this->request->getPost("items")),
@@ -374,7 +385,6 @@ class SPP extends BaseController
                                 "id" => $id_detail,
                                 "purchase_request_id" => $this->request->getPost("id"),
                                 "barang_id" => $value->item_id,
-                                "spec" => $value->spec,
                                 "qty" => $value->qty,
                                 "unit" => $value->unit,
                                 "price" => $value->price,
@@ -388,7 +398,6 @@ class SPP extends BaseController
                             $dataDetail = [
                                 "purchase_request_id" => $this->request->getPost("id"),
                                 "barang_id" => $value->item_id,
-                                "spec" => $value->spec,
                                 "qty" => $value->qty,
                                 "unit" => $value->unit,
                                 "price" => $value->price,
@@ -468,7 +477,6 @@ class SPP extends BaseController
                                     $dataDetail = [
                                         "id" => $responseDetailPO->id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -486,7 +494,6 @@ class SPP extends BaseController
                                         "am_purchase_order_id" =>  $responsePO->id,
                                         "purchase_request_detail_id" => $purchase_request_detail_id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -570,7 +577,6 @@ class SPP extends BaseController
                                     $dataDetail = [
                                         "id" => $responseDetailPO->id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -588,7 +594,6 @@ class SPP extends BaseController
                                         "am_purchase_order_id" =>  $responsePO->id,
                                         "purchase_request_detail_id" => $purchase_request_detail_id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -893,6 +898,7 @@ class SPP extends BaseController
                 "id"            => $data->id,
                 "spp_type"      => $data->spp_type,
                 "spp_no"        => $data->spp_no,
+                "companyName"   => $data->companyName,
                 "divisiName"    => $data->divisiName,
                 "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "request_date"  => date('d/m/Y', strtotime($data->request_date)),

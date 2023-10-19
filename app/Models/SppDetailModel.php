@@ -17,7 +17,6 @@ class SppDetailModel extends Model
     protected $allowedFields    = [
         "purchase_request_id",
         "barang_id",
-        "spec",
         "qty",
         "unit",
         "price",

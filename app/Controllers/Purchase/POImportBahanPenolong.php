@@ -49,7 +49,7 @@ class POImportBahanPenolong extends BaseController
     public function createPOImportBahanPenolong()
     {
         //Get SPP Number
-        $dataSPP = $this->sppModel->getNoSPP("Bahan Penolong Import");
+        $dataSPP = $this->sppModel->getNoSPP("Import");
 
         //Get Supplier
         $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN PENOLONG', $this->this_company_id);

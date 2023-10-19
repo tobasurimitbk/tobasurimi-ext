@@ -47,7 +47,24 @@
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSPP) ? $dataSPP->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select company_id" id="company_id" name="company_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataCompany)) {
+                                    foreach ($dataCompany as $company) {
+                                ?>
+                                        <option value="<?= $company["id"]; ?>" <?= !empty($dataSPP) ? ($dataSPP->company_id === $company["id"] ? "selected" : "") : ""; ?>><?= $company["company"]; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput">Company</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select onchange="changeDepartment()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -64,7 +81,7 @@
                             <label for="floatingInput">Departemen</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -77,7 +94,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -90,7 +109,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                                 <option value="Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "selected" : "") : ""; ?>>Lokal</option>
@@ -100,9 +119,7 @@
                             <label for="floatingInput">Tipe SPP</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSPP) ? $dataSPP->note : ""; ?>" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'readonly=true' : '') : ''; ?> type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
@@ -146,7 +163,6 @@
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
                                 <th>Satuan</th>
-                                <th>Spesifikasi</th>
                                 <th>Harga Barang</th>
                                 <th>Qty</th>
                                 <th>Total Harga</th>
@@ -174,13 +190,12 @@
                                             <td><?= $details->kodeBarang; ?></td>
                                             <td><?= $details->barangName; ?></td>
                                             <td><?= $details->satuanName; ?></td>
-                                            <td><?= $details->spec; ?></td>
                                             <td><?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
                                             <td><?= number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= $details->note; ?></td>
                                             <td>
-                                                <button data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-spesifikasi="<?= $details->spec; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
+                                                <button data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                                 </button>
                                                 <button onclick="deleteRow('<?= $no; ?>')" class="btn btn-danger">
@@ -194,7 +209,6 @@
                                             <td><?= $details->kodeBarang; ?></td>
                                             <td><?= $details->barangName; ?></td>
                                             <td><?= $details->satuanName; ?></td>
-                                            <td><?= $details->spec; ?></td>
                                             <td><?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
                                             <td><?= number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
@@ -211,7 +225,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="4"></td>
+                                <td colspan="3"></td>
                                 <td><b>TOTAL</b></td>
                                 <td><b><?= number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
@@ -270,33 +284,27 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
-                                <label for="floatingInput">Spesifikasi</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
                                 <label for="floatingInput">Qty</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total Harga">
                                 <label for="floatingInput">Total Harga</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-floating mb-3">
                                 <textarea autocomplete="one-time-code" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
                                 <label for="floatingInput">Keterangan</label>
@@ -345,7 +353,6 @@
                 nama_barang: '<?= $details->barangName; ?>',
                 nama_satuan: '<?= $details->satuanName; ?>',
                 satuan: <?= $details->unit; ?>,
-                spesifikasi: '<?= $details->spec; ?>',
                 harga: '<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
                 qty: Number('<?= $details->qty; ?>'),
                 total: '<?= number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?>',
@@ -425,15 +432,21 @@
         //     dropdownParent: $(".detail-modal .modal-content")
         // })
 
+        // COMPANY
+        $('.company_id').select2({
+            placeholder: "",
+            theme: "bootstrap-5"
+        })
+
         //CSS SELECT2 FLOATING LABEL
-        $('.spesifikasi')
+        $('.company_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.spesifikasi')
+        $('.company_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -441,7 +454,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.spesifikasi')
+        $('.company_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -545,6 +558,9 @@
                 },
                 divisi_id: {
                     required: true,
+                },
+                company_id: {
+                    required: true,
                 }
             },
             messages: {
@@ -556,6 +572,9 @@
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
+                },
+                company_id: {
+                    required: "Company wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -678,7 +697,6 @@
                                         unit: obj.satuan ? Number(obj.satuan) : 0,
                                         price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
                                         note: obj.keterangan,
-                                        spec: obj.spesifikasi,
                                         isDeleted: true
                                     })
                                 })
@@ -694,8 +712,7 @@
                                         qty: obj.qty ? Number(obj.qty) : 0,
                                         unit: obj.satuan ? Number(obj.satuan) : 0,
                                         price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan,
-                                        spec: obj.spesifikasi
+                                        note: obj.keterangan
                                     })
                                 } else {
                                     update_list_items.push({
@@ -705,8 +722,7 @@
                                         qty: obj.qty ? Number(obj.qty) : 0,
                                         unit: obj.satuan ? Number(obj.satuan) : 0,
                                         price: obj.harga ? Number(obj.harga.replaceAll(",", "")) : 0,
-                                        note: obj.keterangan,
-                                        spec: obj.spesifikasi
+                                        note: obj.keterangan
                                     })
                                 }
                             })
@@ -819,7 +835,6 @@
             $(".qty").val('')
             $(".satuan").val('')
             $(".satuan_id").val('')
-            $(".spesifikasi").val('')
             $(".harga").val('')
             $(".total").val('')
             $(".keterangan").val('')
@@ -859,16 +874,6 @@
                 let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
                 let satuan_id = $(".kode_barang option:selected").data("satuan_id") ? $(".kode_barang option:selected").data("satuan_id") : "";
                 let barang_id = $(".kode_barang option:selected").data("barang_id") ? $(".kode_barang option:selected").data("barang_id") : "";
-
-                $.ajax({
-                    url: "<?= base_url("barang/id"); ?>" + "/" + barang_id,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        let spek = res?.data?.spek;
-                        $(".spesifikasi").val(spek);
-                    }
-                })
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
 
@@ -965,7 +970,6 @@
             let nama_barang = $(".nama_barang").val()
             let nama_satuan = $(".satuan").val()
             let satuan = $(".satuan_id").val()
-            let spesifikasi = $(".spesifikasi").val()
             let harga = $(".harga").val()
             let qty = $(".qty").val()
             let total = $(".total").val()
@@ -1036,9 +1040,6 @@
                                         tag_html += nama_satuan;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += spesifikasi;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
                                         tag_html += harga;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
@@ -1052,7 +1053,7 @@
                                         tag_html += "</td>";
                                         tag_html += "<td>";
                                         tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
                                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -1068,7 +1069,6 @@
                                             nama_barang: nama_barang,
                                             nama_satuan: nama_satuan,
                                             satuan: satuan,
-                                            spesifikasi: spesifikasi,
                                             harga: harga,
                                             qty: qty,
                                             total: total,
@@ -1093,9 +1093,6 @@
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += item.nama_satuan;
-                                        tag_html += "</td>";
-                                        tag_html += `<td>`;
-                                        tag_html += item.spesifikasi;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += item.harga;
@@ -1138,7 +1135,7 @@
                                 $(".foot-detail-table").empty()
 
                                 tag_total += `<tr>`;
-                                tag_total += "<td colspan='4'>";
+                                tag_total += "<td colspan='3'>";
                                 tag_total += "</td>";
                                 tag_total += "<td>";
                                 tag_total += "<b>TOTAL</b>";
@@ -1185,7 +1182,6 @@
                                     nama_barang: nama_barang,
                                     nama_satuan: nama_satuan,
                                     satuan: satuan,
-                                    spesifikasi: spesifikasi,
                                     harga: harga,
                                     qty: qty,
                                     total: total,
@@ -1213,9 +1209,6 @@
                                 tag_html += nama_satuan;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += spesifikasi;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
                                 tag_html += harga;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
@@ -1241,7 +1234,7 @@
                                 $(".foot-detail-table").empty()
 
                                 tag_total += `<tr>`;
-                                tag_total += "<td colspan='4'>";
+                                tag_total += "<td colspan='3'>";
                                 tag_total += "</td>";
                                 tag_total += "<td>";
                                 tag_total += "<b>TOTAL</b>";
@@ -1314,9 +1307,6 @@
                         tag_html += item.nama_satuan;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += item.spesifikasi;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
                         tag_html += item.harga;
                         tag_html += "</td>";
                         tag_html += `<td>`;
@@ -1364,7 +1354,7 @@
                 $(".foot-detail-table").empty()
 
                 tag_total += `<tr>`;
-                tag_total += "<td colspan='4'>";
+                tag_total += "<td colspan='3'>";
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
@@ -1432,9 +1422,6 @@
                         tag_html += item.nama_satuan;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += item.spesifikasi;
-                        tag_html += "</td>";
-                        tag_html += `<td>`;
                         tag_html += item.harga;
                         tag_html += "</td>";
                         tag_html += `<td>`;
@@ -1482,7 +1469,7 @@
                 $(".foot-detail-table").empty()
 
                 tag_total += `<tr>`;
-                tag_total += "<td colspan='4'>";
+                tag_total += "<td colspan='3'>";
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
@@ -1514,7 +1501,6 @@
         let kode_barang = $(this).data('kode_barang')
         let nama_barang = $(this).data('nama_barang')
         let satuan = $(this).data('satuan')
-        let spesifikasi = $(this).data('spesifikasi')
         let harga = $(this).data('harga')
         let qty = $(this).data('qty')
         let keterangan = $(this).data('keterangan')
@@ -1527,8 +1513,6 @@
         $(".id_detail").val(rowid)
         $(".kode").val(kode_barang)
         $(".keterangan").val(keterangan)
-
-        $(".spesifikasi").val(spesifikasi);
 
         $(".barang_id").val(barang_id)
         $(".nama_barang").val(nama_barang)
@@ -1578,7 +1562,7 @@
         $(".foot-detail-table").empty()
 
         tag_total += `<tr>`;
-        tag_total += "<td colspan='4'>";
+        tag_total += "<td colspan='3'>";
         tag_total += "</td>";
         tag_total += "<td>";
         tag_total += "<b>TOTAL</b>";

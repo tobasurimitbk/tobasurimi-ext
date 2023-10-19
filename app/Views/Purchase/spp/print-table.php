@@ -123,6 +123,7 @@
                 <td><b>No.</b></td>
                 <td><b>Tipe SPP</b></td>
                 <td><b>NO. SPP</b></td>
+                <td><b>Company</b></td>
                 <td><b>Departemen</b></td>
                 <td><b>Total Harga</b></td>
                 <td><b>Tanggal Order</b></td>
@@ -138,6 +139,7 @@
                         <td><?= $detail['no'] ?></td>
                         <td><?= $detail['spp_type'] ?></td>
                         <td><?= $detail['spp_no'] ?></td>
+                        <td><?= $detail['companyName'] ?></td>
                         <td><?= $detail['divisiName'] ?></td>
                         <td><?= $detail['total'] ?></td>
                         <td><?= $detail['request_date'] ?></td>

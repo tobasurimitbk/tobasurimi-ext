@@ -59,6 +59,7 @@ class SppModel extends Model
             'sppType'          => 'purchase_requests.spp_type',
             'sppNo'            => 'purchase_requests.spp_no',
             'divisi'            => 'divisis.divisi',
+            'company'            => 'companies.company',
             'total'             => 'purchase_requests.total',
             'requestDate'      => 'purchase_requests.request_date',
             'createdAt'         => 'purchase_requests.createdAt',
@@ -70,12 +71,14 @@ class SppModel extends Model
 
         $selectQry = "purchase_requests.*,
                     divisis.divisi AS divisiName, 
+                    companies.company AS companyName, 
                     COUNT(purchase_request_details.id) AS itemCount";
 
         $purchaseRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('divisis', 'purchase_requests.divisi_id = divisis.id', 'left')
+            ->join('companies', 'purchase_requests.company_id = companies.id', 'left')
             ->join('purchase_request_details', 'purchase_requests.id = purchase_request_details.purchase_request_id', 'left')
             ->groupBy(('purchase_requests.id'))
             ->orderBy($sort, $sortType);

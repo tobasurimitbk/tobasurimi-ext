@@ -59,6 +59,7 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
                                 <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
+                                <th onclick="changeSort('company')" class="sort">Company</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th>Jumlah Order</th>
@@ -137,6 +138,10 @@
             },
             {
                 data: "spp_no",
+                className: "text-center"
+            },
+            {
+                data: "companyName",
                 className: "text-center"
             },
             {
