@@ -85,7 +85,7 @@
                 <td>Jenis Order: <?= $dataSPP->spp_type ?></td>
             </tr>
             <tr>
-                <td>Departmen: <?= $dataSPP->divisiName ?></td>
+                <td>Departemen: <?= $dataSPP->divisiName ?></td>
                 <td>No Spp: <?= $dataSPP->spp_no ?></td>
             </tr>
         </table>
@@ -111,7 +111,7 @@
                         <td class="table-border"><b><?= $detail->barangName . " " . $detail->spec ?></b></td>
                         <td class="table-border"><b><?= $detail->qty . " " . $detail->satuanName ?></b></td>
                         <td class="table-border"><b><?= $detail->note ?></b></td>
-                        <td class="table-border"><b><?= $detail->price ?></b></td>
+                        <td class="table-border"><b><?= number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                         <td class="table-border"><b></b></td>
                     </tr>
                 <?php } ?>

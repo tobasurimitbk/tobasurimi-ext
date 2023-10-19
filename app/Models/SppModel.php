@@ -17,6 +17,7 @@ class SppModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
+        'company_id',
         'request_date',
         'spp_no',
         'spp_type',

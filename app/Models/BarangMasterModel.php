@@ -115,8 +115,9 @@ class BarangMasterModel extends Model
             'barang_master.type_barang' => $type
         ];
 
-        $selectQry = "barang_master.*";
+        $selectQry = "barang_master.*, satuans.nama_satuan";
         $data = $this->select($selectQry)
+            ->join('satuans', 'barang_master.satuan_id = satuans.id', 'left')
             ->where($arrCondition)
             ->findAll();
 
