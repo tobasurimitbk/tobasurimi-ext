@@ -1108,7 +1108,7 @@
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += `
-                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
                                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
                                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -1222,7 +1222,7 @@
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
-                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-spesifikasi="${spesifikasi}" data-harga="${harga}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">
+                                <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${barang_id}" data-kode_barang="${kode_barang}" data-nama_barang="${nama_barang}" data-satuan="${satuan}" data-harga="${harga}" data-qty="${qty}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">
                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                 </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -1319,7 +1319,7 @@
                         tag_html += item.keterangan;
                         tag_html += "</td>";
                         tag_html += "<td>";
-                        tag_html += `<button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
+                        tag_html += `<button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -1434,7 +1434,7 @@
                         tag_html += item.keterangan;
                         tag_html += "</td>";
                         tag_html += "<td>";
-                        tag_html += `<button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-spesifikasi="${item.spesifikasi}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
+                        tag_html += `<button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${item.qty}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button><button class="btn btn-danger" onclick="deleteRow(${row + 1})">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
