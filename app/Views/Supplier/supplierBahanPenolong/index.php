@@ -302,7 +302,7 @@
                 let id = row?.id;
                 return `
                     <button class="btn btn-success" onclick="History(${id})" style="box-shadow: none !important;">
-                        <i class="fas fa-clock"></i>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
                     </a>
                 `
             }

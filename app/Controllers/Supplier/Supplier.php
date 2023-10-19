@@ -8,11 +8,10 @@ use App\Models\ProvinceModel;
 use App\Models\SupplierModel;
 use App\Models\SupplierHargaModel;
 use App\Models\BarangMasterModel;
-use App\Models\DivisisModel;
 
 class Supplier extends BaseController
 {
-    protected $this_company_id, $provinceModel, $countryModel, $supplierModel, $supplierHargaModel, $barangMasterModel, $divisiModel;
+    protected $this_company_id, $provinceModel, $countryModel, $supplierModel, $supplierHargaModel, $barangMasterModel;
 
     public function __construct()
     {
@@ -22,7 +21,6 @@ class Supplier extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->supplierHargaModel = new SupplierHargaModel();
         $this->barangMasterModel = new BarangMasterModel();
-        $this->divisiModel = new DivisisModel();
     }
 
     // bahan baku
@@ -43,7 +41,6 @@ class Supplier extends BaseController
     {
         $supplierData = $this->supplierModel->getSupplierById($id);
         $barangData = $this->barangMasterModel->getBarangByType('bahan_baku');
-        $divisiData = $this->divisiModel->get_by_company_id($this->this_company_id);
 
         $dataSupplier = [];
         $dataSupplierHarga = [];
@@ -60,8 +57,7 @@ class Supplier extends BaseController
         $data = [
             "dataSupplier" => $dataSupplier,
             "dataSupplierHarga" => $dataSupplierHarga,
-            "dataBarang" => $barangData,
-            "dataDivisi" => $divisiData
+            "dataBarang" => $barangData
         ];
 
         return view('Supplier/supplierBahanBaku/harga', $data);
