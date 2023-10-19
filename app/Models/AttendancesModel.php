@@ -92,6 +92,37 @@ class AttendancesModel extends Model
         return $resultTotal;
     }
 
+    public function getStatusAttendancesInRange($startDate, $endDate, $employeeID)
+    {
+        $modelMetaData = new MetadataModel();
+        $statusArr = [];
+        foreach ($modelMetaData->where('name', "Status Perizinan")->findAll() as $s) {
+            array_push($statusArr, $s['value']);
+        }
+
+        $resultTotal = [];
+        // cek form perizinan
+        foreach ($statusArr as $sa) {
+            $query = $this->asObject()
+                ->select("COUNT(DISTINCT DATE(periode)) as count")
+                ->where('employee_id', $employeeID)
+                ->where('status', $sa)
+                ->where('deletedAt', null)
+                ->groupStart()
+                ->where('periode >=', $startDate)
+                ->where('periode <=', $endDate)
+                ->groupEnd()
+                ->groupBy('status')
+                ->get();
+
+            $row = $query->getRow();
+
+            $resultTotal[$sa] = $row ? $row->count : 0;
+        }
+
+        return $resultTotal;
+    }
+
     public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
     {
         $AttendanceModel = new AttendancesModel();

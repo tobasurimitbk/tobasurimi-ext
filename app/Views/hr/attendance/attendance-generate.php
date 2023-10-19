@@ -292,10 +292,12 @@
                                         Presensi Belum digenerate
                                     </td>
                                 <?php else : ?>
+                                    <?php $isGenerateTotal = 0; ?>
                                     <?php foreach ($employeesData as $i => $e) : ?>
                                         <?php $status = $attandanceModel->getStatusAttendances($year, $month, $e['id']); ?>
                                         <?php $isGenerate = $attandanceModel->detectIfGenerate($year . "-" . $month, $e['id']); ?>
                                         <?php if ($isGenerate) : ?>
+                                            <?php $isGenerateTotal++; ?>
                                             <tr>
                                                 <td width="150">
                                                     &nbsp;<?= $e['name'] ?></td>
@@ -316,7 +318,7 @@
                     </div>
                 <?php endif; ?>
 
-                <?php if ($totalAttendances > 0 && count($employeesData) > 10) : ?>
+                <?php if ($totalAttendances > 0 && count($employeesData) > 10 && $isGenerateTotal > 10) : ?>
                     <?= $pager->links('default', 'bootstrap4_pagination') ?>
                 <?php endif ?>
 

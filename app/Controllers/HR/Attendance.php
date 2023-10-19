@@ -227,6 +227,15 @@ class Attendance extends BaseController
         $AttendanceModel = new AttendancesModel();
 
         $employeeData = $EmployeesModel->where('id', $employeeID)->findAll();
+        $employeeStatus = $EmployeesModel->where('id', $employeeID)->first();
+
+        if ($employeeStatus != "Aktif") {
+            return $this->response->setJSON([
+                'message' => "Status karyawan " . $employeeStatus['name'] . " adalah " . $employeeStatus['status'],
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
 
         $AttendanceModel->where([
             'MONTH(periode)' => $month,

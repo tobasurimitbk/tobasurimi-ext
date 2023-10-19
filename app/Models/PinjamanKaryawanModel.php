@@ -111,4 +111,9 @@ class PinjamanKaryawanModel extends Model
             'sortType'          => $sortType
         ];
     }
+
+    public function getPinjamanKaryawanDiambil($employeeID, $monthYear)
+    {
+        return $this->asArray()->where('month_year', $monthYear)->where('status_pinjaman', '1')->where('employee_id', $employeeID)->first();
+    }
 }

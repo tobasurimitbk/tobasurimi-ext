@@ -1,88 +1,110 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-<div class="modal" id="detailPayroll" tabindex="1">
-    <div class="modal-dialog modal-lg">
+<div class="modal fade" id="generateModal" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Komponen Gaji</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Generate Payroll</h5>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input type="text" value="<?= date('M-Y', strtotime($year . "-" . $month)) ?>" readonly class="form-control" disabled>
-                            <label for="bulan">Bulan</label>
-                        </div>
+                <?= csrf_field() ?>
+                <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-top: -20px;">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#global" type="button" role="tab" aria-controls="home" aria-selected="true">Global (Seluruh Karyawan)</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#single" type="button" role="tab" aria-controls="profile" aria-selected="false">Personal (Per Karyawan)</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="global" role="tabpanel" aria-labelledby="home-tab">
+                        <form id="formGenerateGlobal" role="form" method="POST">
+                            <div class="row mb-2">
+                                <div class="col-md-12">
+                                    <div class="form-floating mt-1">
+                                        <input value="<?= $year . '-' . $month ?>" readonly autocomplete="one-time-code" name="monthYearGlobal" type="month" required class="form-control target">
+                                        <label>Periode Absensi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDateGlobal" type="text" required class="form-control target input-picker startDate">
+                                        <label for="floatingInput">Mulai Absensi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDateGlobal" type="text" required class="form-control target input-picker endDate">
+                                        <label for="floatingInput">Selesai Absensi</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-submit-form" id="globalGenerateBtn">Generate</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input type="text" id="divisiName" readonly class="form-control" disabled>
-                            <label>Divisi</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input id="employeesName" type="text" class="form-control" disabled>
-                            <label>Employee Name</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input id="totalHadir" type="text" class="form-control" disabled>
-                            <label>Total Hadir</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input id="totalIjin" type="text" class="form-control" disabled>
-                            <label>Total Ijin</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input id="totalAlpha" type="text" class="form-control" disabled>
-                            <label>Total Alpha</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input id="totalCuti" type="text" class="form-control" disabled>
-                            <label>Total Cuti</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input id="totalSakit" type="text" class="form-control" disabled>
-                            <label>Total Sakit</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-2" style="height: 50px;">
-                            <input id="totalLibur" type="text" class="form-control" disabled>
-                            <label>Total Libur</label>
-                        </div>
+                    <div class="tab-pane fade" id="single" role="tabpanel" aria-labelledby="profile-tab">
+                        <form id="formGeneratePersonal">
+                            <div class="row mb-2">
+                                <div class="col-md-12 mt-3">
+                                    <div class="form-floating mt-1">
+                                        <input value="<?= $year . '-' . $month ?>" readonly autocomplete="one-time-code" name="monthYearPersonal" type="month" required class="form-control target">
+                                        <label>Periode Absensi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="divisionID" name="filterDivisiID" aria-label="Floating label select example">
+                                            <option value="">
+                                                Cari Berdasarkan Divisi
+                                            </option>
+                                            <?php foreach ($divisi as $d) : ?>
+                                                <option value="<?= $d['id'] ?>">
+                                                    <?= $d['divisi']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="employeeID" name="filterEmployeeID" aria-label="Floating label select example">
+                                            <option value="">
+                                                Cari Berdasarkan Nama Karyawan
+                                            </option>
+                                        </select>
+                                        <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDatePersonal" type="text" required class="form-control target input-picker startDate">
+                                        <label for="floatingInput">Mulai Absen</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-3">
+                                        <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDatePersonal" type="text" required class="form-control target input-picker endDate">
+                                        <label for="floatingInput">Selesai Absen</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-submit-form" id="singleGenerateBtn">Generate</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="table-responsive mt-2 mb-3">
-                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0" id="tabelGaji">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Komponen Gaji</th>
-                                <th>Nominal</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-gaji" style="cursor: pointer;">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-2">Close</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -90,11 +112,10 @@
         <h1>Payroll</h1>
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
-            <?php if (!$isGenerate) : ?>
-                <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
-                    Generate
-                </a>
-            <?php else : ?>
+            <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" style="margin-right: 10px;">
+                Generate
+            </a>
+            <?php if ($isGenerate) : ?>
                 <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-print"></i> Export
                 </button>
@@ -156,7 +177,7 @@
             <div class="row justify-content-start mb-3">
                 <div class="col-md-4">
                     <div class="form-floating">
-                        <select class="form-select" name="filterDivisiID" aria-label="Floating label select example">
+                        <select class="form-select" name="filterDivisiID" id="filterDivisiID" aria-label="Floating label select example">
                             <option value="">
                                 Cari Berdasarkan Divisi
                             </option>
@@ -171,7 +192,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating">
-                        <select class="form-select" name="filterEmployeeID" aria-label="Floating label select example">
+                        <select class="form-select" name="filterEmployeeID" id="filterEmployeeID" aria-label="Floating label select example">
                             <option value="">
                                 Cari Berdasarkan Nama Karyawan
                             </option>
@@ -186,10 +207,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('nip')" class="sort">NIP</th>
-                                <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
-                                <th onclick="changeSort('divisi')" class="sort">Divisi</th>
+                                <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
+                                <th onclick="changeSort('employees.name')" class="sort">Nama Lengkap</th>
+                                <th onclick="changeSort('divisis.divisi')" class="sort">Divisi</th>
+                                <th>Mulai</th>
+                                <th>Selesai</th>
                                 <th>Hari Kerja</th>
+                                <th>Gaji Bersih</th>
                                 <th>Total Gaji & Lembur</th>
                                 <th>Total Pengurangan Gaji</th>
                                 <th>Gaji Diterima</th>
@@ -211,7 +235,6 @@
     let sortType = "asc";
     $('#loadingSpinner').hide();
 
-
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
@@ -230,8 +253,8 @@
             url: "<?= base_url("payroll/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.divisi_id = $("select[name='filterDivisiID']").val();
-                data.employee_id = $("select[name='filterEmployeeID']").val();
+                data.divisi_id = $("#filterDivisiID").val();
+                data.employee_id = $("#filterEmployeeID").val();
                 data.year = "<?= $year ?>";
                 data.month = "<?= $month; ?>";
                 data.sort = sort;
@@ -266,7 +289,19 @@
                 className: "text-center"
             },
             {
+                data: "startDate",
+                className: "text-center"
+            },
+            {
+                data: "endDate",
+                className: "text-center"
+            },
+            {
                 data: "hariKerja",
+                className: "text-center"
+            },
+            {
+                data: "upahBersih",
                 className: "text-center"
             },
             {
@@ -293,9 +328,6 @@
                         <div class="mt-0">
                             <button class="btn btn-warning btn-print" onclick="print('<?= base_url("payroll/print/single/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button onclick="generateUlang(${employee_id})" class="btn btn-success posting-spp">
-                                <i class="fa-solid fa-sm fa-repeat"></i>
                             </button>
                         </div>
                     `
@@ -324,34 +356,164 @@
         }
     }
 
-    $("select[name='filterDivisiID']").change(function() {
+    $("#filterDivisiID").change(function() {
         table.ajax.reload();
     });
-    $("select[name='filterEmployeeID']").change(function() {
+    $("#filterEmployeeID").change(function() {
         table.ajax.reload();
     });
 
-    // generate ulang per employee
-    const generateUlang = function(employeeID) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Generate Ulang Payroll ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#loadingSpinner').show();
-                const csrf = $(`[name="${csrfToken}"]`);
+    // Generate Modal Show
+    $('#generate').click(function(e) {
+        e.preventDefault();
+        $('#generateModal').modal('show');
+    });
+
+    // Generate Global
+    $('#globalGenerateBtn').click(function(e) {
+        e.preventDefault();
+        // set variable
+        const csrf = $(`[name="${csrfToken}"]`);
+        var monthYearGlobal = $("input[name='monthYearGlobal']").val();
+        var startDateGlobal = $("input[name='startDateGlobal']").val();
+        var finishDateGlobal = $("input[name='finishDateGlobal']").val();
+
+        if (monthYearGlobal == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Pilih periode payroll",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else if (startDateGlobal == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Tanggal mulai absensi tidak boleh kosong",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else if (finishDateGlobal == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Tanggal selesai absensi tidak boleh kosong",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else {
+            Swal.fire({
+                icon: 'question',
+                title: 'Generate Global Payroll ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
                 var formData = new FormData();
-                var month = "<?= $month ?>";
-                var year = "<?= $year; ?>";
+                formData.append('yearMonth', monthYearGlobal);
+                formData.append('startDate', startDateGlobal);
+                formData.append('finishDate', finishDateGlobal);
 
-                formData.append('month', month);
-                formData.append('year', year);
+                $.ajax({
+                    url: "<?= base_url("payroll/generate-global"); ?>",
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        // show loading
+                        $('#loadingSpinner').show();
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                // update table
+                                table.ajax.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                        }
+                        $('#loadingSpinner').hide();
+                        $('#generateModal').modal('hide');
+                    },
+                    onError: function(response) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi kesalahan pada sistem',
+                            confirmButtonColor: '#4e73df',
+                        });
+                        $('#loadingSpinner').hide();
+                    }
+                });
+            });
+        }
+    });
+
+    // Generate Single
+    $('#singleGenerateBtn').click(function(e) {
+        e.preventDefault();
+        // set variable
+        const csrf = $(`[name="${csrfToken}"]`);
+        var monthYearPersonal = $("input[name='monthYearPersonal']").val();
+        var startDatePersonal = $("input[name='startDatePersonal']").val();
+        var finishDatePersonal = $("input[name='finishDatePersonal']").val();
+        var employeeID = $('#employeeID').val();
+        var divisionID = $('#divisionID').val();
+
+        if (monthYearPersonal == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Pilih periode absensi",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else if (divisionID == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Pilih divisi",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else if (employeeID == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Pilih karyawan",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else if (startDatePersonal == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Tanggal mulai absensi tidak boleh kosong",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else if (finishDatePersonal == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Tanggal selesai absensi tidak boleh kosong",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else {
+            Swal.fire({
+                icon: 'question',
+                title: 'Generate Personal Presensi ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                // append to form
+                var formData = new FormData();
+                formData.append('yearMonth', monthYearPersonal);
+                formData.append('startDate', startDatePersonal);
+                formData.append('finishDate', finishDatePersonal);
                 formData.append('employeeID', employeeID);
 
                 $.ajax({
@@ -361,68 +523,8 @@
                     dataType: "json",
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            });
-
-                        }
-                        table.ajax.reload();
-                        $('#loadingSpinner').hide();
-                    },
-                    onError: function(response) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Terjadi kesalahan pada sistem',
-                            confirmButtonColor: '#4e73df',
-                        });
-                        $('#loadingSpinner').hide();
-
-                    }
-                });
-            }
-        });
-    }
-
-    // Generate
-    $('#generate').click(function(e) {
-        e.preventDefault();
-        Swal.fire({
-            icon: 'question',
-            title: 'Generate Payroll Bulan <?= $year . " - " . $month ?> ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-
-            if (result.isConfirmed) {
-                $('#loadingSpinner').show();
-                // set variable
-                const csrf = $(`[name="${csrfToken}"]`);
-                var month = "<?= $month ?>";
-                var year = "<?= $year; ?>";
-                // append to form
-                var formData = new FormData();
-                formData.append('month', month);
-                formData.append('year', year);
-                // generate action
-                $.ajax({
-                    url: "<?= base_url("payroll/generate"); ?>",
-                    data: formData,
-                    method: "POST",
-                    dataType: "json",
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        // show loading
+                        $('#loadingSpinner').show();
                     },
                     processData: false,
                     contentType: false,
@@ -432,17 +534,19 @@
                                 icon: 'success',
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                // update table
+                                table.ajax.reload();
                             });
-                            // update table
-                            location.reload();
                         } else {
                             Swal.fire({
-                                icon: 'warning',
+                                icon: 'error',
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             });
                         }
                         $('#loadingSpinner').hide();
+                        $('#generateModal').modal('hide');
                     },
                     onError: function(response) {
                         Swal.fire({
@@ -453,20 +557,14 @@
                         $('#loadingSpinner').hide();
                     }
                 });
-            }
-        });
-
+            });
+        }
     });
 
     // Get and Show
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
         location.replace(`<?= base_url("payroll/id"); ?>/${data.id}`);
-    });
-    // hide modal
-    $('.btn-hide-detail').click(function() {
-        $('#detailPayroll').modal('hide');
-
     });
     // function helper
     function formatRupiah(angka) {
@@ -550,12 +648,24 @@
         .find('label')
         .css('z-index', '1');
 
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
+    $("input[name='startDatePersonal'], input[name='startDateGlobal']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+
+    $("input[name='finishDatePersonal'], input[name='finishDateGlobal']").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
 
     const printPerDivisi = function(url) {
-        var divisionID = $("select[name='filterDivisiID']").val();
+        var divisionID = $("#filterDivisiID").val();
         if (divisionID == "") {
             Swal.fire({
                 icon: 'warning',
@@ -568,7 +678,7 @@
     }
 
     const detailPerDivisi = function(url) {
-        var divisionID = $("select[name='filterDivisiID']").val();
+        var divisionID = $("#filterDivisiID").val();
         if (divisionID == "") {
             Swal.fire({
                 icon: 'warning',

@@ -46,7 +46,7 @@ class FormPerizinanNotApprovedModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function generate($payrollID, $employeeID, $companyID, $yearMonth)
+    public function generate($payrollID, $employeeID, $companyID, $yearMonth, $startDate, $endDate)
     {
         // declare model
         $AttendancesModel = new AttendancesModel();
@@ -54,11 +54,15 @@ class FormPerizinanNotApprovedModel extends Model
         // delete first
         $this->db->table('form_perizinan_not_approved')
             ->where('employee_id', $employeeID)
-            ->where('LEFT(periode, 7)', $yearMonth)
+            ->where('year_month', $yearMonth)
             ->delete();
 
         $attendancesInMonth = $AttendancesModel->where('employee_id', $employeeID)
-            ->where('LEFT(periode, 7)', $yearMonth)
+            ->where('year_month', $yearMonth)
+            ->groupStart()
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupEnd()
             ->findAll();
 
         foreach ($attendancesInMonth as $p) {
