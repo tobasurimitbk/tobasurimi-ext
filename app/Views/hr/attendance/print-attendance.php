@@ -60,28 +60,39 @@
                 <td width="10px">:</td>
                 <td><?= date('F - Y', strtotime($yearMonth)) ?></td>
             </tr>
+            <tr>
+                <td width="100px"><b>Periode</b></td>
+                <td width="10px">:</td>
+                <td><?= $startDate ?> s.d <?= $endDate ?></td>
+            </tr>
         </tbody>
     </table>
 
     <table class="table table-bordered" style="font-size:12px; margin-top:10px;" border="1">
         <thead>
-            <tr align="center" style="font-weight: bold;">
-                <td width="10">&nbsp;No</td>
-                <td height="25">&nbsp;Karyawan</td>
-                <td height="25">&nbsp;Divisi</td>
+            <tr>
+                <td width="10" rowspan="2">&nbsp;No</td>
+                <td height="25" rowspan="2">&nbsp;Karyawan</td>
+                <td height="25" rowspan="2">&nbsp;Divisi</td>
+                <td colspan="<?= $startMonth['totalDay']  ?>" style="text-align: center;"><?= $startMonth['firstMonthName'] ?></td>
+                <td colspan="<?= $endMonth['totalDay']  ?>" style="text-align: center;"><?= $endMonth['secondMonthName'] ?></td>
+            <tr>
                 <?php
-                $lastDate = date("t", strtotime($year . "-" . $month . "-01"));
-                for ($i = 1; $i <= $lastDate; $i++) :
-                    $temp = mktime(0, 0, 0, $month, $i, $year);
-                    echo "<td align=center style=\"vertical-align:middle;\">" . $i . "</td>";
-                endfor;
+                foreach ($allDates as $a) :
+                    if (date("N", strtotime($a)) == 7) :
+                        echo "<td align=center style=\"vertical-align:middle;\" ><font color='red'>" . date('d', strtotime($a)) . "</font></td>";
+                    else :
+                        echo "<td align=center style=\"vertical-align:middle;\">" . date('d', strtotime($a)) . "</td>";
+                    endif;
+                endforeach;
                 ?>
+            </tr>
             </tr>
         </thead>
         <tbody>
             <?php $nomor = 1; ?>
+            <?php $attandanceModel = new \App\Models\AttendancesModel(); ?>
             <?php foreach ($employeesData as $i => $e) : ?>
-                <?php $attandanceModel = new \App\Models\AttendancesModel(); ?>
                 <?php $libur = 0; ?>
                 <tr align="center; font-weight:bold; color:white;">
                     <td style="color: black; font-weight:normal;"><?= $nomor++; ?></td>
@@ -91,15 +102,10 @@
                     <td style="color: black; font-weight:normal;">
                         &nbsp;<?= $e["divisi"]; ?></td>
                     </td>
-                    <?php for ($j = 1; $j <= $lastDate; $j++) : ?>
-                        <?php
-                        // create format date yyyy-mm-dd
-                        $no = (strlen($j) == 1) ? ("0" . $j) : $j;
-                        $dateFormat = ($year . "-" . $month . "-" . $no);
-                        // get attendance by employee and date
-                        $attandance = $attandanceModel->getAttendances($dateFormat, $e['id']);
-                        ?>
-                        <?php $temp = mktime(0, 0, 0, $month, $j, $year); ?>
+                    <?php $j = 1; ?>
+                    <?php foreach ($allDates as $a) : ?>
+                        <?php $no = (strlen($j) == 1) ? ("0" . $j) : $j; ?>
+                        <?php $attandance = $attandanceModel->getAttendances($a, $e['id']); ?>
                         <?php if ($attandance == null) : ?>
                             <!-- Null -->
                             <td align=center style='background-color:#e7323a; color:white;'>
@@ -159,7 +165,7 @@
                                 </td>
                             <?php endif; ?>
                         <?php endif; ?>
-                    <?php endfor; ?>
+                    <?php endforeach; ?>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -191,6 +197,11 @@
                     <td width="100px"><b>Bulan</b></td>
                     <td width="10px">:</td>
                     <td><?= date('F - Y', strtotime($yearMonth)) ?></td>
+                </tr>
+                <tr>
+                    <td width="100px"><b>Periode</b></td>
+                    <td width="10px">:</td>
+                    <td><?= $startDate ?> s.d <?= $endDate ?></td>
                 </tr>
             </tbody>
         </table>

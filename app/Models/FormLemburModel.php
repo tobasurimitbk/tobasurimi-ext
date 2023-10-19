@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class FormLemburModel extends Model
 {
-    protected $DBGroup          = 'default';
+    protected $DBGroup           = 'default';
     protected $table            = 'form_lembur';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
@@ -24,7 +24,8 @@ class FormLemburModel extends Model
         'kurangi_jam_istirahat',
         'jam_mulai_lembur',
         'jam_selesai_lembur',
-        'gaji_pokok_per_hari'
+        'gaji_pokok_per_hari',
+        'is_payroll'
     ];
 
     // Dates
@@ -54,12 +55,12 @@ class FormLemburModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'nip'    => 'employees.nip',
-            'name'   => 'employees.name',
-            'divisi' => 'divisis.divisi',
-            'periode' => 'form_lembur.periode',
-            'total_jam_lembur' => 'form_lembur.total_jam_lembur',
-            'total_uang_lembur' => 'form_lembur.total_uang_lembur',
+            'employees.nip' => 'employees.nip',
+            'employees.name' => 'employees.name',
+            'divisis.divisi' => 'divisis.divisi',
+            'form_lembur.periode' => 'form_lembur.periode',
+            'form_lembur.total_jam_lembur' => 'form_lembur.total_jam_lembur',
+            'form_lembur.total_uang_lembur' => 'form_lembur.total_uang_lembur',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -84,15 +85,16 @@ class FormLemburModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['nip']) {
+        if ($addCondition['search']) {
             $dataQry->groupStart();
         }
 
-        if ($addCondition['nip']) {
-            $dataQry->like('employees.nip', $addCondition['nip']);
+        if ($addCondition['search']) {
+            $dataQry->like('employees.nip', $addCondition['search'])
+                ->orLike('employees.name', $addCondition['search']);
         }
 
-        if ($addCondition['nip']) {
+        if ($addCondition['search']) {
             $dataQry->groupEnd();
         }
 

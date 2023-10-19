@@ -169,6 +169,9 @@
                     </table>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-hide-harga btn-discard mr-2">Batal</button>
+            </div>
         </div>
     </div>
 </div>
@@ -215,8 +218,8 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
     let sortType = "asc";
-    let sortHarga = "bahan_baku_name";
-    let sortTypeHarga = "asc";
+    let sortHarga = "createdAt";
+    let sortTypeHarga = "desc";
     let trigger = true;
     let id_supplier = "";
     
@@ -344,7 +347,7 @@
         serverSide: true,
         ordering: true,
         order: [
-            [1, 'asc']
+            [2, 'desc']
         ],
         fixedHeader: true,
         lengthMenu: [
@@ -457,6 +460,8 @@
         });
 
         $(".no_npwp").mask("000000000000000")
+
+        $(".phone").mask("0000000000000")
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -746,8 +751,8 @@
     let History = function(id) {
         id_supplier = id;
         $(".search-harga").val('')
-        sortHarga = "bahan_baku_name";
-        sortTypeHarga = "asc";
+        sortHarga = "createdAt";
+        sortTypeHarga = "desc";
         secondTable.ajax.reload()
         $(".harga-modal").modal("show")
     }

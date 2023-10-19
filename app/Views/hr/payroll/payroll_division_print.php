@@ -49,25 +49,28 @@
                 </table>
             </td>
             <td>
-                <table border="0">
-                    <tr>
-                        <td colspan="3" style="text-align: center; font-size:14px;">PT TOBA SURIMI</td>
-                    </tr>
-                </table>
+
             </td>
         </tr>
     </table>
-
+    <table width="100%">
+        <tr align="center">
+            <td colspan="3" style="text-align: center; font-size:14px;">PT TOBA SURIMI</td>
+        </tr>
+    </table>
     <table width="100%">
         <tr align="center" style="font-weight: bold; font-size:15px">
             <td>DAFTAR UPAH KARYAWAN</td>
         </tr>
         <tr align="center" style=" font-size:12px">
-            <td> Bulan <?= $month ?> Tahun <?= $year ?> Periode 1</td>
+            <td> Bulan <?= date('M', strtotime("{$year}-{$month}-01")) ?> Tahun <?= $year ?> Periode 1</td>
+        </tr>
+        <tr align="center" style=" font-size:12px">
+            <td>Pembayaran dari tanggal <?= $startDate ?> s/d tanggal <?= $endDate ?> </td>
         </tr>
     </table>
 
-    <table border="0">
+    <table border="0" style="margin-top: 30px;">
         <tr>
             <td>Divisi</td>
             <td>:</td>
@@ -79,42 +82,62 @@
         <thead>
             <tr align="center">
                 <td>NO</td>
+                <td>Kode</td>
                 <td>Karyawan</td>
                 <td>J.Hr</td>
-                <td>Upah Pokok <br> (Rp)</td>
-                <td>Upah Lembur <br> (Rp)</td>
                 <td>Total Upah <br> (Rp)</td>
+                <td>Uang Makan <br> (Rp)</td>
+                <td>Upah Pokok <br> (Rp)</td>
+                <td>Lembur Kerja <br> (Rp)</td>
+                <td>Tunj.Ksjh <br> (Rp)</td>
+                <td>Lembur Libur <br> (Rp)</td>
                 <td>Potongan <br> (Rp)</td>
                 <td>Jumlah Upah <br> (Rp)</td>
             </tr>
         </thead>
         <tbody>
+            <?php $uangMakanTotal = 0; ?>
             <?php foreach ($payrollData['dataPayroll'] as $p) : ?>
+                <?php
+                $gajiConjunctionModel = new \App\Models\GajiConjunctionModel();
+                $uangMakan = $gajiConjunctionModel->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
+                    ->where('employee_id', $p['employee_id'])
+                    ->where('tunjangan.name', "Uang Makan")
+                    ->first();
+                $uangMakanTotal += ($uangMakan == null) ? 0 : $uangMakan['nominal'];
+                ?>
                 <tr align="center">
                     <td><?= $p['no'] ?></td>
+                    <td><?= $p['id'] ?></td>
                     <td><?= $p['name'] ?></td>
                     <td><?= $p['hariKerja'] ?></td>
+                    <td><?= $p['jumlahUpah'] ?></td>
+                    <td><?= ($uangMakan == null) ? 0 : number_format($uangMakan['nominal'], 2, ',', '.')   ?></td>
                     <td><?= $p['upahPokok'] ?></td>
                     <td><?= $p['upahLembur'] ?></td>
-                    <td><?= $p['totalUpah'] ?></td>
+                    <td>0</td>
+                    <td>0</td>
                     <td><?= $p['potongan'] ?></td>
                     <td><?= $p['jumlahUpah'] ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td colspan="3" style="text-align: right;">
+                <td colspan="4" style="text-align: right;">
                     Total
                 </td>
+                <td><?= number_format($payrollData['total']['totalUpah'], 2, ',', '.')  ?></td>
+                <td><?= number_format($uangMakanTotal, 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['upahPokok'], 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['upahLembur'], 2, ',', '.')  ?></td>
-                <td><?= number_format($payrollData['total']['totalUpah'], 2, ',', '.')  ?></td>
+                <td><?= number_format(0, 2, ',', '.')  ?></td>
+                <td><?= number_format(0, 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['potongan'], 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['jumlahUpah'], 2, ',', '.')  ?></td>
             </tr>
         </tbody>
     </table>
 
-    <table width="100%" style="margin-top: 30px;">
+    <table width="100%" style="margin-top: 10px;">
         <tr align="left" style="font-size:12px;">
             <td>PERINCIAN KOMPONEN GAJI</td>
         </tr>
@@ -126,12 +149,13 @@
             <?php foreach ($komponenGaji as  $k) : ?>
                 <tr>
                     <td><?= $k['name'] ?> <?= $k['tipe'] == "PLUS" ? "(+)" : "(-)"  ?></td>
+                    <td>Rp <?= number_format($k['nominal'], 2, ',', '.')  ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 
-    <table width="100%" style="margin-top: 30px;">
+    <table width="100%" style="margin-top: 10px;">
         <tr align="left" style="font-size:12px;">
             <td>KETERANGAN</td>
         </tr>

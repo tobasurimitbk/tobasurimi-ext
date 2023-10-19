@@ -159,8 +159,6 @@ $routes->get('/supplier-harga/ajax', 'Supplier\SupplierHarga::supplierHargaAjax'
 $routes->get('/supplier-harga/all', 'Supplier\SupplierHarga::supplierHargaAll', ['filter' => 'Auth']);
 $routes->post('/supplier-harga/save', 'Supplier\SupplierHarga::saveSupplierHarga', ['filter' => 'Auth']);
 $routes->get('/supplier-harga/id/(:num)', 'Supplier\SupplierHarga::getByIdSupplierHarga/$1', ['filter' => 'Auth']);
-$routes->post('/supplier-harga/update', 'Supplier\SupplierHarga::updateSupplierHarga', ['filter' => 'Auth']);
-$routes->post('/supplier-harga/delete', 'Supplier\SupplierHarga::deleteSupplierHarga', ['filter' => 'Auth']);
 
 // SUPPLIER
 $routes->get('/supplier/ajax', 'Supplier\Supplier::supplierAjax', ['filter' => 'Auth']);
@@ -619,7 +617,8 @@ $routes->get('/log-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelL
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
-$routes->post('/generate-attendance', 'HR\Attendance::generateAttendanceAction', ['filter' => 'Auth']);
+$routes->post('/generate-attendance/global', 'HR\Attendance::generateAttendanceGlobalAction', ['filter' => 'Auth']);
+$routes->post('/generate-attendance/personal', 'HR\Attendance::generateAttendancePersonalAction', ['filter' => 'Auth']);
 $routes->post('/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter' => 'Auth']);
 $routes->post('/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
 $routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttendance', ['filter' => 'Auth']);
@@ -654,8 +653,8 @@ $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter
 // payroll
 $routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
 $routes->get('/payroll/all', 'HR\Payroll::getAllPayRoll', ['filter' => 'Auth']);
-$routes->post('/payroll/generate', 'HR\Payroll::generatePayroll', ['filter' => 'Auth']);
-$routes->post('/payroll/generate-single', 'HR\Payroll::repeatGeneratePayroll', ['filter' => 'Auth']);
+$routes->post('/payroll/generate-global', 'HR\Payroll::generateGlobalPayroll', ['filter' => 'Auth']);
+$routes->post('/payroll/generate-single', 'HR\Payroll::generateSinglePayroll', ['filter' => 'Auth']);
 $routes->get('/payroll/id/(:segment)', 'HR\Payroll::detailPayrollView/$1', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-komponen-gaji', 'HR\Payroll::updateNominalKomponenGaji', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::updateNominalKeterlambatanPresensi', ['filter' => 'Auth']);

@@ -9,13 +9,53 @@
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
     </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-end row-col-page-list-attendance">
+                <div class="col-6 mb-2">
+                    <form id="search_form" name="search_form" class="kt-form kt-form--fit kt-margin-b-20">
+                        <select name="month" id="month">
+                            <?php
+                            for ($i = 1; $i <= 12; $i++) {
+                                $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
+                                $checked = ($month == $temp) ? "selected" : "";
+                            ?>
+                                <option value="<?php echo $temp; ?>" <?php echo $checked; ?>><?php echo $temp; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                        <select name="year" id="year">
+                            <?php
+                            for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) {
+                                $checked = ($year == $i) ? "selected" : "";
+                            ?>
+                                <option value="<?php echo $i; ?>" <?php echo $checked; ?>><?php echo $i; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                        <button type="button" class="btn btn-primary btn-brand--icon" id="filterYearMonth">
+                            <span>
+                                <i class="la la-print"></i>
+                                <span>Cari</span>
+                            </span>
+                        </button>
 
+                    </form>
+                </div>
+                <div class="col-6 mb-2">
+                    <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <?= csrf_field() ?>
-                <div class="col-sm-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Berdasarkan NIP" value="" />
+                <div class="col-md-3 mb-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari NIP / Nama Karyawan" value="" />
                 </div>
             </div>
             <div class="row">
@@ -24,13 +64,13 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('employeeNip')" class="sort">NIP</th>
-                                <th onclick="changeSort('employeeName')" class="sort">Nama Karyawan</th>
-                                <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
-                                <th onclick="changeSort('mulai')" class="sort">Mulai</th>
-                                <th onclick="changeSort('selesai')" class="sort">Selesai</th>
-                                <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
-                                <th onclick="changeSort('approval')" class="sort">Status Approval</th>
+                                <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
+                                <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
+                                <th onclick="changeSort('employees.division_id')" class="sort">Divisi</th>
+                                <th>Mulai</th>
+                                <th>Selesai</th>
+                                <th onclick="changeSort('form_perijinan.status')" class="sort">Keterangan</th>
+                                <th onclick="changeSort('form_perijinan.is_approval')" class="sort">Status Approval</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -51,23 +91,6 @@
 
     var row = 0;
 
-    $(document).ready(function() {
-
-        $(".dataTable_info").addClass("pt-0");
-
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
-
-        $(".dateStart, .dateEnd").change(function() {
-            table.ajax.reload();
-        })
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("form-perijinan/id"); ?>/${data.kode}`);
-        })
-    });
 
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -87,7 +110,8 @@
             url: "<?= base_url("form-perijinan/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.nip = $(".search").val();
+                data.search = $(".search").val();
+                data.yearMonth = $('#year').val() + "-" + $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -133,7 +157,7 @@
             targets: "_all"
         }],
         language: {
-            emptyTable: "Tidak Ada Data",
+            emptyTable: "Tidak Ada Data Perijinan",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
@@ -142,6 +166,24 @@
         }
     });
 
+
+    $(document).ready(function() {
+
+        $(".dataTable_info").addClass("pt-0");
+
+        $(".search").keyup(function() {
+            table.ajax.reload();
+        })
+
+        $('#filterYearMonth').click(function() {
+            table.ajax.reload();
+        })
+
+        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            const data = table.row(this).data();
+            location.replace(`<?= base_url("form-perijinan/id"); ?>/${data.kode}`);
+        })
+    });
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

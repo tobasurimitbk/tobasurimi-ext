@@ -130,9 +130,14 @@
                         <td><?= $payroll['hadir'] ?> Hari</td>
                     </tr>
                     <tr>
-                        <td>Tambahan Hari Libur </td>
+                        <td>Tambahan Hari Libur Kerja</td>
                         <td>:</td>
                         <td><?= $payroll['libur'] ?> Hari</td>
+                    </tr>
+                    <tr>
+                        <td>Tambahan Hari Libur Resmi</td>
+                        <td>:</td>
+                        <td>0 Hari</td>
                     </tr>
                     <tr>
                         <td>Gaji</td>
@@ -178,9 +183,14 @@
                         <td><?= $payroll['hadir'] ?> Hari</td>
                     </tr>
                     <tr>
-                        <td>Tambahan Hari Libur </td>
+                        <td>Tambahan Hari Libur Kerja </td>
                         <td>:</td>
                         <td><?= $payroll['libur'] ?> Hari</td>
+                    </tr>
+                    <tr>
+                        <td>Tambahan Hari Libur Resmi</td>
+                        <td>:</td>
+                        <td>0 Hari</td>
                     </tr>
                     <tr>
                         <td>Gaji</td>
@@ -233,14 +243,18 @@
                         <td><?= "Rp " . number_format($payroll['nominal_uang_gaji'] + $payroll['nominal_uang_lembur'], 2, ',', '.') ?></td>
                     </tr>
                     <tr>
-                        <td colspan="3" style="font-weight: bold;">Komponen tunjangan & potongan</td>
+                        <td>Potongan Pinjaman</td>
+                        <td>:</td>
+                        <td>(-) <?= "Rp " . number_format($payroll['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
                     </tr>
                     <?php foreach ($perhitunganGaji as  $p) : ?>
-                        <tr>
-                            <td><?= $p['name'] ?></td>
-                            <td>:</td>
-                            <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
-                        </tr>
+                        <?php if ($p['tipe'] == "MINUS") : ?>
+                            <tr>
+                                <td><?= $p['name'] ?></td>
+                                <td>:</td>
+                                <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
+                            </tr>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                     <tr>
                         <td>Potongan Lain-Lain</td>
@@ -257,20 +271,57 @@
                         <td><?= "Rp " . number_format($payroll['nominal_uang_gaji'] + $payroll['nominal_uang_lembur'], 2, ',', '.') ?></td>
                     </tr>
                     <tr>
-                        <td colspan="3" style="font-weight: bold;">Komponen tunjangan & potongan</td>
+                        <td>Potongan Pinjaman</td>
+                        <td>:</td>
+                        <td>(-) <?= "Rp " . number_format($payroll['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
                     </tr>
                     <?php foreach ($perhitunganGaji as  $p) : ?>
-                        <tr>
-                            <td><?= $p['name'] ?></td>
-                            <td>:</td>
-                            <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
-                        </tr>
+                        <?php if ($p['tipe'] == "MINUS") : ?>
+                            <tr>
+                                <td><?= $p['name'] ?></td>
+                                <td>:</td>
+                                <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
+                            </tr>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                     <tr>
                         <td>Potongan Lain-Lain</td>
                         <td>:</td>
                         <td>(-) <?= "Rp " . number_format($totalNominalKeterlambatanPresensi + $totalNominalRekapPerizinanNotApproved, 2, ',', '.') ?></td>
                     </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table>
+                    <?php foreach ($perhitunganGaji as  $p) : ?>
+                        <?php if ($p['tipe'] == "PLUS") : ?>
+                            <tr>
+                                <td><?= $p['name'] ?></td>
+                                <td>:</td>
+                                <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
+                            </tr>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </table>
+            </td>
+            <td>
+                <table>
+                    <?php foreach ($perhitunganGaji as  $p) : ?>
+                        <?php if ($p['tipe'] == "PLUS") : ?>
+                            <tr>
+                                <td><?= $p['name'] ?></td>
+                                <td>:</td>
+                                <td><?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
+                            </tr>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </table>
             </td>
         </tr>

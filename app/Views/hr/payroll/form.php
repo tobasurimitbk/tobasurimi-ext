@@ -22,10 +22,22 @@
                 Detail Karyawan
             </label>
             <div class="row mt-2">
-                <div class="col-sm-12">
+                <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" class="form-control target input-picker" value="<?= date('M-Y', strtotime($payrollDetail['year_month']))  ?>">
-                        <label for="floatingInput">Bulan</label>
+                        <label for="floatingInput">Bulan / Periode</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" class="form-control target input-picker" value="<?= date('d/m/Y', strtotime($payrollDetail['start_date']))  ?>">
+                        <label for="floatingInput">Mulai Absen</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" class="form-control target input-picker" value="<?= date('d/m/Y', strtotime($payrollDetail['end_date']))  ?>">
+                        <label for="floatingInput">Selesai Absen</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
@@ -173,6 +185,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link <?= (@$_GET['location'] == "rekapPerizinanTidakDisetujui") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#perizinanNotApproved" type="button" role="tab" aria-selected="false">Rekap Perizinan Tidak Disetujui</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link <?= (@$_GET['location'] == "pinjamanKaryawan") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#pinjamanKaryawan" type="button" role="tab" aria-selected="false">Pinjaman Karyawan</button>
+                    </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade <?= (@$_GET['location'] == "nilaiKomponenGaji" || empty(@$_GET['location'])) ? 'show active' : '' ?> " id="perhitunganGaji" role="tabpanel">
@@ -296,6 +311,35 @@
                                     <tr class="bg-secondary">
                                         <td colspan="3" align="right"><b>Total Denda Perizinan Tidak Disetujui Atasan</b></td>
                                         <td><b class="text-danger">(-) <?= "Rp " . number_format($totalNominalRekapPerizinanNotApproved,  2, ',', '.') ?></b></td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade <?= (@$_GET['location'] == "pinjamanKaryawan") ? 'show active' : '' ?>" id="pinjamanKaryawan" role="tabpanel">
+                        <table class="table nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 10px; text-align:center;" class="sort">No</th>
+                                    <th style="text-align: center;" class="sort">Tanggal Ambil Pinjaman</th>
+                                    <th class="sort">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-table" id="body-table">
+                                <?php $no = 1;
+                                $totalPinjaman = 0; ?>
+                                <?php if ($rekapPinjaman == null) : ?>
+                                    <td colspan="4" class="text-center">Karyawan tidak pernah mengambil pinjaman bulanan</td>
+                                <?php else : ?>
+                                    <?php $totalPinjaman = $rekapPinjaman['nominal']; ?>
+                                    <tr>
+                                        <td><?= $no++; ?></td>
+                                        <td style="text-align: center;"><?= date('d/m/Y', strtotime($rekapPinjaman['updatedAt'])) ?></td>
+                                        <td style="font-weight:bold;" class="text-danger"><b>(-) <?= "Rp " . number_format($rekapPinjaman['nominal'],  2, ',', '.') ?></b></td>
+                                    </tr>
+                                    <tr class="bg-secondary">
+                                        <td colspan="2" align="right"><b>Total Pinjaman Karyawan</b></td>
+                                        <td><b class="text-danger">(-) <?= "Rp " . number_format($totalPinjaman,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

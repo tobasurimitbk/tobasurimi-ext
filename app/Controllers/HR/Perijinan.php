@@ -26,7 +26,10 @@ class Perijinan extends BaseController
 
     public function perijinan()
     {
-        return view('hr/perijinan/index');
+        return view('hr/perijinan/index', [
+            'year' => date("Y"),
+            'month' => date("m")
+        ]);
     }
 
     public function createView()
@@ -97,13 +100,17 @@ class Perijinan extends BaseController
         $FormPerijinanModel = new FormPerijinanModel();
         $metaDataModel = new MetadataModel();
 
+        $monthYear = explode('-', $this->request->getVar('yearMonth'));
+
         $condition = [
             'employees.deletedAt' => null,
-            'employees.company_id' => $this->this_company_id
+            'employees.company_id' => $this->this_company_id,
+            'MONTH(form_perijinan.periode)' => $monthYear[1],
+            'YEAR(form_perijinan.periode)' => $monthYear[0]
         ];
 
         $addCondition = [
-            "nip"        => $this->request->getGet("nip"),
+            "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
         ];

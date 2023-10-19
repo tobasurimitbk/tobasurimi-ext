@@ -309,9 +309,15 @@
                     let id = row?.id;
                     let is_boleh_minjam = row?.isBolehMinjam;
                     let employeeName = row?.name;
-                    return `
+                    let status_pinjaman = row?.statusPinjaman;
+                    if (status_pinjaman == 1) {
+                        return '-';
+                    } else {
+                        return `
                         <input name="id_pinjaman[]" data-employee_name="${employeeName}" class="child id_pinjaman" type="checkbox" value="${id}" ${is_boleh_minjam == 0 ? 'disabled' : ''}>
                         `
+                    }
+
                 }
             },
 
@@ -358,6 +364,7 @@
                 render: function(data, type, row) {
                     let nominalPinjaman = row?.nominalPinjaman;
                     let is_boleh_minjam = row?.isBolehMinjam;
+                    let status_pinjaman = row?.statusPinjaman;
                     let id = row?.id;
 
                     return `
@@ -365,7 +372,7 @@
                 <input value="${nominalPinjaman}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" 
                 onchange="this.value = formatRupiah(this.value); changeNominalPinjaman(this)" 
                 autocomplete="one-time-code" data-id="${id}" name="nominalPinjaman" type="text" 
-                class="form-control target input-picker" ${is_boleh_minjam == 0 ? 'disabled' : ''}>
+                class="form-control target input-picker" ${is_boleh_minjam == 0 || status_pinjaman == 1 ? 'disabled' : ''}>
                 <label>Nominal Pinjaman</label>
             </div>
         `
@@ -417,15 +424,21 @@
                     let startDate = row?.mulaiAbsen;
                     let finishDate = row?.selesaiAbsen;
                     let tipeGol = row?.tipeGol;
+                    let status_pinjaman = row?.statusPinjaman;
                     let id = row?.id;
 
-                    return `
+                    if (status_pinjaman == 1) {
+                        return '-';
+                    } else {
+                        return `
             <div class="mt-0">
                 <button onclick="generateSingle(${employeeID}, '${employeeName}', '${yearMonth}', '${startDate}', '${finishDate}', '${tipeGol}', ${id})" class="btn btn-success posting-spp">
                     <i class="fa-solid fa-sm fa-repeat"></i>
                 </button>
             </div>
         `
+                    }
+
                 }
             }
 

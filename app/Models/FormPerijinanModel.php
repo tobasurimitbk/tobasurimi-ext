@@ -51,9 +51,11 @@ class FormPerijinanModel extends Model
     public function getPerijinanList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'employeeName' => 'employees.name',
-            'employeeNip' => 'employees.nip',
-            'divisi' => 'employees.divisision_id'
+            'employees.name' => 'employees.name',
+            'employees.nip' => 'employees.nip',
+            'employees.division_id' => 'employees.division_id',
+            'form_perijinan.status' => 'form_perijinan.status',
+            'form_perijinan.is_approval' => 'form_perijinan.is_approval'
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -70,16 +72,17 @@ class FormPerijinanModel extends Model
 
         $totalData = $formPerijinanQry->countAllResults(false);
 
-        if ($addCondition['nip']) {
+        if ($addCondition['search']) {
             $formPerijinanQry->groupStart();
         }
 
-        if ($addCondition['nip']) {
+        if ($addCondition['search']) {
             $formPerijinanQry
-                ->like('employees.nip', $addCondition['nip']);
+                ->like('employees.nip', $addCondition['search'])
+                ->orLike('employees.name', $addCondition['search']);
         }
 
-        if ($addCondition['nip']) {
+        if ($addCondition['search']) {
             $formPerijinanQry->groupEnd();
         }
 

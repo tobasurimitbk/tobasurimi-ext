@@ -5,7 +5,8 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
 <b>
     Company Name: <?= $company['company'] ?><br>
     Divisi: <?= $divisi != null ? $divisi['divisi'] : "Semua Divisi" ?><br>
-    Bulan: <?= date('F - Y', strtotime($yearMonth)) ?>
+    Bulan: <?= date('F - Y', strtotime($yearMonth)) ?> <br>
+    Periode: <?= $startDate ?> s.d <?= $endDate ?>
 </b>
 <br>
 <b>
@@ -15,22 +16,28 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
 <table border="1">
     <thead>
         <tr align="center" style="font-weight: bold;">
-            <td>No</td>
-            <td>Karyawan</td>
-            <td>Divisi</td>
+            <td rowspan="2">No</td>
+            <td rowspan="2">Karyawan</td>
+            <td rowspan="2">Divisi</td>
+            <td colspan="<?= $startMonth['totalDay']  ?>" style="text-align: center;"><?= $startMonth['firstMonthName'] ?></td>
+            <td colspan="<?= $endMonth['totalDay']  ?>" style="text-align: center;"><?= $endMonth['secondMonthName'] ?></td>
+        <tr>
             <?php
-            $lastDate = date("t", strtotime($year . "-" . $month . "-01"));
-            for ($i = 1; $i <= $lastDate; $i++) :
-                $temp = mktime(0, 0, 0, $month, $i, $year);
-                echo "<td align=center>" . $i . "</td>";
-            endfor;
+            foreach ($allDates as $a) :
+                if (date("N", strtotime($a)) == 7) :
+                    echo "<td align=center style=\"vertical-align:middle;\" ><font color='red'>" . date('d', strtotime($a)) . "</font></td>";
+                else :
+                    echo "<td align=center style=\"vertical-align:middle;\">" . date('d', strtotime($a)) . "</td>";
+                endif;
+            endforeach;
             ?>
+        </tr>
         </tr>
     </thead>
     <tbody>
         <?php $nomor = 1; ?>
+        <?php $attandanceModel = new \App\Models\AttendancesModel(); ?>
         <?php foreach ($employeesData as $i => $e) : ?>
-            <?php $attandanceModel = new \App\Models\AttendancesModel(); ?>
             <?php $libur = 0; ?>
             <tr align="center; font-weight:bold; color:white;">
                 <td style="color: black; font-weight:normal;"><?= $nomor++; ?></td>
@@ -40,15 +47,10 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
                 <td style="color: black; font-weight:normal;">
                     &nbsp;<?= $e["divisi"]; ?></td>
                 </td>
-                <?php for ($j = 1; $j <= $lastDate; $j++) : ?>
-                    <?php
-                    // create format date yyyy-mm-dd
-                    $no = (strlen($j) == 1) ? ("0" . $j) : $j;
-                    $dateFormat = ($year . "-" . $month . "-" . $no);
-                    // get attendance by employee and date
-                    $attandance = $attandanceModel->getAttendances($dateFormat, $e['id']);
-                    ?>
-                    <?php $temp = mktime(0, 0, 0, $month, $j, $year); ?>
+                <?php $j = 1; ?>
+                <?php foreach ($allDates as $a) : ?>
+                    <?php $no = (strlen($j) == 1) ? ("0" . $j) : $j; ?>
+                    <?php $attandance = $attandanceModel->getAttendances($a, $e['id']); ?>
                     <?php if ($attandance == null) : ?>
                         <!-- Null -->
                         <td align=center style='background-color:#e7323a; color:white;'>
@@ -108,7 +110,7 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
                             </td>
                         <?php endif; ?>
                     <?php endif; ?>
-                <?php endfor; ?>
+                <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
     </tbody>

@@ -121,7 +121,8 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'users.id' => null
+            'users.id' => null,
+            'employees.status' => "Aktif"
         ];
 
         $builder = $this->db->table('employees')
@@ -174,7 +175,8 @@ class EmployeesModel extends Model
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
             'divisis.id' => $divisionID,
-            'divisis.deletedAt' => null
+            'divisis.deletedAt' => null,
+            'employees.status' => "Aktif"
         ];
 
         $builder = $this->db->table('employees')
@@ -210,6 +212,7 @@ class EmployeesModel extends Model
             'employees.deletedAt' => null,
             'employees.company_id' => $companyID,
             'users.id' => null,
+            'employees.status' => "Aktif"
         ];
 
         if ($employeesID !== null) {
@@ -240,6 +243,7 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
+            'employees.status' => "Aktif"
         ];
 
         $builder = $this->db->table('employees')

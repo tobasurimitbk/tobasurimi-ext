@@ -12,7 +12,6 @@ use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
 use App\Models\JamKerjaModel;
 use App\Models\MetadataModel;
-use App\Models\PayrollsModel;
 use CodeIgniter\I18n\Time;
 use Dompdf\Dompdf;
 use Locale;
@@ -105,23 +104,31 @@ class Attendance extends BaseController
         // declare model
         $AttendanceModel = new AttendancesModel();
         $EmployeesModel = new EmployeesModel();
-        $payrollModel = new PayrollsModel();
         $DivisiModel = new DivisisModel();
         $metaDataModel = new MetadataModel();
 
-        // get attendance Total (ngecek apakah sudah digenerate belum)
-        $totalAttendances = $AttendanceModel->where('LEFT(periode, 7)', $year . "-" . $month)
-            ->where('company_id', $this->this_company_id)
-            ->countAllResults();
-        // check is posting
-        $isPosting = $AttendanceModel->where('LEFT(periode, 7)', $year . "-" . $month)
-            ->where('company_id', $this->this_company_id)
-            ->where('isPosting', 1)
-            ->countAllResults();
+        $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
+        $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
 
-        $isPostingPayroll = $payrollModel->where('company_id', $this->this_company_id)
-            ->where('year_month', $year . "-" . $month)
-            ->where('isPosted', 1)
+        $startDates = date('Y-m-d', strtotime(str_replace('/', '-', $startDate)));
+        $endDates = date('Y-m-d', strtotime(str_replace('/', '-', $endDate)));
+
+        $startDateTimestamp = strtotime($startDates);
+        $endDateTimestamp = strtotime($endDates);
+
+        $allDates = array();
+        while ($startDateTimestamp <= $endDateTimestamp) {
+            $currentDate = date('Y-m-d', $startDateTimestamp);
+            $allDates[] = $currentDate;
+            $startDateTimestamp += 86400;
+        }
+
+        // Menghitung $startMonth dan $endMonth
+        $resStartEndMonth = static::getTotalDatesAndGroubMonth($allDates);
+
+        // get attendance Total (ngecek apakah sudah digenerate belum)
+        $totalAttendances = $AttendanceModel->where('year_month', $year . "-" . $month)
+            ->where('company_id', $this->this_company_id)
             ->countAllResults();
 
         $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination($this->this_company_id, $this->request->getGet('employeesID'), $this->request->getGet('divisiID'));
@@ -136,37 +143,42 @@ class Attendance extends BaseController
             'employeesData' => $dataEmployeePager['data'],
             'pager' => $dataEmployeePager['pager'],
             'employeeDetailFilter' => $employeeDetailFilter,
-            'isPosting' =>  $isPosting,
-            'isPostingPayroll' => $isPostingPayroll,
             'divisi' => $DivisiModel->get_by_company_id($this->this_company_id),
             'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
                 ->orderBy('name', "ASC")
                 ->findAll(),
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'allDates' => $allDates,
+            'startMonth' => $resStartEndMonth[0],
+            'endMonth' => $resStartEndMonth[1]
         ];
 
         $data['pager'] = $pager;
 
-        return \view('hr/attendance/attendance-generate', $data);
+        return view('hr/attendance/attendance-generate', $data);
     }
 
-    public function generateAttendanceAction()
+    public function generateAttendanceGlobalAction()
     {
         // declare variable
-        $month = $this->request->getVar('month');
-        $year = $this->request->getVar('year');
+        $monthYear = explode('-', $this->request->getVar('monthYear'));
+        $month = $monthYear[1];
+        $year = $monthYear[0];
+        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
+        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+
         // declare model
-        $AttendancesLogModel = new AttendancesLogModel();
         $EmployeesModel = new EmployeesModel();
         $AttendanceModel = new AttendancesModel();
-        $FormPerijinanModel = new FormPerijinanModel();
-        $hariLiburModel = new BigDaysModel();
 
         $employeeData = $EmployeesModel->getEmployees($this->this_company_id);
-        // check employee
+
         if (count($employeeData) == 0) {
             return $this->response->setJSON([
                 'message' => "Employee tidak ditemukan di company ini",
-                'code' => 422
+                'status' => false,
+                'token' => csrf_hash()
             ]);
         }
 
@@ -177,104 +189,91 @@ class Attendance extends BaseController
             'company_id' => $this->this_company_id
         ])->delete();
 
-        // generate yyyy-mm-dd per tahun-bulan
-        // Menghitung jumlah hari dalam bulan yang diberikan
-        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-        // Membuat array untuk menyimpan semua tanggal
-        $allDates = array();
-        // Menghasilkan semua tanggal dalam bulan dan tahun yang diberikan
-        for ($day = 1; $day <= $daysInMonth; $day++) {
-            $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
-            $allDates[] = $date;
+        $res = $AttendanceModel->generate(
+            $employeeData,
+            $startDate,
+            $endDate,
+            $year,
+            $month,
+            $this->this_company_id
+        );
+
+        if ($res['status']) {
+            return $this->response->setJSON([
+                'message' => "Attendance seluruh karyawan berhasil digenerate",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'message' => $res['message'],
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function generateAttendancePersonalAction()
+    {
+        $monthYear = explode('-', $this->request->getVar('monthYear'));
+        $month = $monthYear[1];
+        $year = $monthYear[0];
+        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
+        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+        $employeeID = $this->request->getVar('employeeID');
+
+        // declare model
+        $EmployeesModel = new EmployeesModel();
+        $AttendanceModel = new AttendancesModel();
+
+        $employeeData = $EmployeesModel->where('id', $employeeID)->findAll();
+        $employeeStatus = $EmployeesModel->where('id', $employeeID)->first();
+
+        if ($employeeStatus != "Aktif") {
+            return $this->response->setJSON([
+                'message' => "Status karyawan " . $employeeStatus['name'] . " adalah " . $employeeStatus['status'],
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
         }
 
-        // loop employee
-        foreach ($employeeData as $e) {
-            // loop date
-            foreach ($allDates as $dates) {
-                // chek apakah data izin
-                $formPerizinan = $FormPerijinanModel->where('periode', $dates)
-                    ->where('employee_id', $e['id'])
-                    ->first();
-                // check adakah data 
-                $hariLibur = $hariLiburModel->where('date', $dates)->first();
-                $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-                DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+        $AttendanceModel->where([
+            'MONTH(periode)' => $month,
+            'YEAR(periode)' => $year,
+            'company_id' => $this->this_company_id,
+            'employee_id' => $employeeID
+        ])->delete();
 
-                $logAttandance = $AttendancesLogModel
-                    ->select($selectQry)
-                    ->where('employees_id', $e['id'])
-                    ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
-                    ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
-                    ->limit(2)
-                    ->get()
-                    ->getResult();
-
-                if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
-                    // ada hari libur
-                    $AttendanceModel->insert([
-                        'company_id' => $this->this_company_id,
-                        'employee_id' => $e['id'],
-                        'periode' => $dates,
-                        'status' => "LIBUR_L",
-                        'reason' => ''
-                    ]);
-                } elseif ($formPerizinan != null) {
-                    // ada perizinan 
-                    $AttendanceModel->insert([
-                        'company_id' => $this->this_company_id,
-                        'employee_id' => $e['id'],
-                        'periode' => $dates,
-                        'status' => $formPerizinan['status'],
-                        'reason' => $formPerizinan['reason'],
-                        'isApproved' => $formPerizinan['is_approval']
-                    ]);
-                } elseif ($formPerizinan == null) {
-                    // tidak ada data perizinan jadi
-                    // get attendance by date and employee by log
-
-                    if (\count($logAttandance) == 0) {
-                        // rekap absen tidak ditemukan
-                        // set jadi ALPHA
-                        $AttendanceModel->insert([
-                            'company_id' => $this->this_company_id,
-                            'employee_id' => $e['id'],
-                            'periode' => $dates,
-                            'status' => 'ALPHA_A',
-                        ]);
-                    } else {
-                        // data absen ada di log
-                        if ($logAttandance[0]->checkout != $logAttandance[0]->checkin) {
-                            // ada attandance (in dan out)
-                            // create in
-                            $AttendanceModel->insert([
-                                'company_id' => $this->this_company_id,
-                                'employee_id' => $e['id'],
-                                'periode' => $dates,
-                                'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
-                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
-                                'status' => 'HADIR_H'
-                            ]);
-                        } else {
-                            // ada attandance only(in)
-                            $AttendanceModel->insert([
-                                'company_id' => $this->this_company_id,
-                                'employee_id' => $e['id'],
-                                'periode' => $dates,
-                                'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
-                                'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
-                                'status' => 'HADIR_H',
-                            ]);
-                        }
-                    }
-                }
-            }
+        if (count($employeeData) == 0) {
+            return $this->response->setJSON([
+                'message' => "Employee tidak ditemukan di company ini",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
         }
 
-        return $this->response->setJSON([
-            'message' => "Attendance berhasil digenerate",
-            'code' => 200
-        ]);
+        $res = $AttendanceModel->generate(
+            $employeeData,
+            $startDate,
+            $endDate,
+            $year,
+            $month,
+            $this->this_company_id
+        );
+
+        if ($res['status']) {
+            return $this->response->setJSON([
+                'message' => "Attendance personal karyawan berhasil digenerate",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'message' => $res['message'],
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
     }
 
     public function getDetailAttendance()
@@ -285,6 +284,7 @@ class Attendance extends BaseController
 
         $AttendanceModel = new AttendancesModel();
         $EmployeesModel = new EmployeesModel();
+        $bigDaysModel = new BigDaysModel();
 
         Locale::setDefault('id_ID');
         $attendanceDetail = $AttendanceModel->where('periode', $tanggal)
@@ -306,6 +306,18 @@ class Attendance extends BaseController
 
         $resultData['keterangan'] = $keterangan[0];
         $resultData['jamTerlambat'] = $keterangan[1];
+
+        if ($attendanceDetail != null) {
+            if ($attendanceDetail['status'] == "LIBUR_L") {
+                // cek apakah big days
+                $bigDays = $bigDaysModel->where('date', $attendanceDetail['periode'])
+                    ->where('company_id', $this->this_company_id)
+                    ->first();
+                if ($bigDays != null) {
+                    $resultData['keterangan'] = $bigDays['name'];
+                }
+            }
+        }
 
         return $this->response->setJSON([
             'data' => $resultData,
@@ -333,23 +345,6 @@ class Attendance extends BaseController
 
         return $this->response->setJSON([
             'message' => "Attendence diperbaruhi"
-        ]);
-    }
-
-    public function updatePostAttendance()
-    {
-        $year = $this->request->getVar('year');
-        $month = $this->request->getVar('month');
-        $status = $this->request->getVar('statusPosting');
-
-        $query = "UPDATE attendances SET isPosting = ? WHERE DATE_FORMAT(periode, '%Y-%m') = ? AND company_id = ?";
-        $params = [$status, "$year-$month", "$this->this_company_id"];
-
-        $db = \Config\Database::connect();
-        $db->query($query, $params);
-
-        return $this->response->setJSON([
-            'message' => "Status posting presensi diperbaruhi"
         ]);
     }
 
@@ -625,15 +620,42 @@ class Attendance extends BaseController
             $employeeData = $employeesModel->getEmployeesAndDivisi($this->this_company_id);
         }
 
-        $splitYearMonth = \explode("-", $yearMonth);
+        $splitYearMonth = explode("-", $yearMonth);
+
+        $year = $splitYearMonth[0];
+        $month = $splitYearMonth[1];
+
+        $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
+        $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
+
+        $startDates = date('Y-m-d', strtotime(str_replace('/', '-', $startDate)));
+        $endDates = date('Y-m-d', strtotime(str_replace('/', '-', $endDate)));
+
+        $startDateTimestamp = strtotime($startDates);
+        $endDateTimestamp = strtotime($endDates);
+
+        $allDates = array();
+        while ($startDateTimestamp <= $endDateTimestamp) {
+            $currentDate = date('Y-m-d', $startDateTimestamp);
+            $allDates[] = $currentDate;
+            $startDateTimestamp += 86400;
+        }
+
+        // Menghitung $startMonth dan $endMonth
+        $resStartEndMonth = static::getTotalDatesAndGroubMonth($allDates);
 
         $data = [
             'yearMonth' => $yearMonth,
             'company' => $companyModel->where('id', $this->this_company_id)->first(),
             'divisi' => $divisiModel->where('id', $divisiID)->first(),
+            'year' => $year,
+            'month' => $month,
             'employeesData' => $employeeData,
-            'month' => $splitYearMonth[1],
-            'year' => $splitYearMonth[0],
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'allDates' => $allDates,
+            'startMonth' => $resStartEndMonth[0],
+            'endMonth' => $resStartEndMonth[1],
             'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
                 ->orderBy('name', "ASC")
                 ->findAll(),
@@ -662,15 +684,42 @@ class Attendance extends BaseController
             $employeeData = $employeesModel->getEmployeesAndDivisi($this->this_company_id);
         }
 
-        $splitYearMonth = \explode("-", $yearMonth);
+        $splitYearMonth = explode("-", $yearMonth);
+
+        $year = $splitYearMonth[0];
+        $month = $splitYearMonth[1];
+
+        $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
+        $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
+
+        $startDates = date('Y-m-d', strtotime(str_replace('/', '-', $startDate)));
+        $endDates = date('Y-m-d', strtotime(str_replace('/', '-', $endDate)));
+
+        $startDateTimestamp = strtotime($startDates);
+        $endDateTimestamp = strtotime($endDates);
+
+        $allDates = array();
+        while ($startDateTimestamp <= $endDateTimestamp) {
+            $currentDate = date('Y-m-d', $startDateTimestamp);
+            $allDates[] = $currentDate;
+            $startDateTimestamp += 86400;
+        }
+
+        // Menghitung $startMonth dan $endMonth
+        $resStartEndMonth = static::getTotalDatesAndGroubMonth($allDates);
 
         $data = [
             'yearMonth' => $yearMonth,
             'company' => $companyModel->where('id', $this->this_company_id)->first(),
             'divisi' => $divisiModel->where('id', $divisiID)->first(),
             'employeesData' => $employeeData,
-            'month' => $splitYearMonth[1],
-            'year' => $splitYearMonth[0],
+            'month' => $month,
+            'year' => $year,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'allDates' => $allDates,
+            'startMonth' => $resStartEndMonth[0],
+            'endMonth' => $resStartEndMonth[1],
             'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
                 ->orderBy('name', "ASC")
                 ->findAll(),
@@ -714,5 +763,32 @@ class Attendance extends BaseController
         ];
 
         return isset($translations[$day]) ? $translations[$day] : $day;
+    }
+
+    static function getTotalDatesAndGroubMonth($allDates)
+    {
+        $startMonth = [
+            'firstMonthName' => date('F', strtotime($allDates[0])),
+            'totalDay' => 0
+        ];
+
+        $endMonth = [
+            'secondMonthName' => date('F', strtotime(end($allDates))),
+            'totalDay' => 0
+        ];
+
+        foreach ($allDates as $date) {
+            $month = date('F', strtotime($date));
+            if ($month === $startMonth['firstMonthName']) {
+                $startMonth['totalDay']++;
+            }
+            if ($month === $endMonth['secondMonthName']) {
+                $endMonth['totalDay']++;
+            }
+        }
+
+        return [
+            $startMonth, $endMonth
+        ];
     }
 }

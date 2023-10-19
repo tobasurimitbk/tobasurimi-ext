@@ -20,7 +20,8 @@ class AttendanceKeterlambatanModel extends Model
         'attendances_id',
         'periode',
         'total_jam_keterlambatan',
-        'nominal_pengurangan'
+        'nominal_pengurangan',
+        'year_month'
     ];
 
     // Dates
@@ -47,7 +48,7 @@ class AttendanceKeterlambatanModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function generate($payrollID, $employeeID, $companyID, $yearMonth)
+    public function generate($payrollID, $employeeID, $companyID, $yearMonth, $startDate, $endDate)
     {
         // declare model
         $AttendancesModel = new AttendancesModel();
@@ -55,11 +56,15 @@ class AttendanceKeterlambatanModel extends Model
         // delete first
         $this->db->table('attendances_keterlambatan')
             ->where('employee_id', $employeeID)
-            ->where('LEFT(periode, 7)', $yearMonth)
+            ->where('year_month', $yearMonth)
             ->delete();
 
         $attendancesInMonth = $AttendancesModel->where('employee_id', $employeeID)
-            ->where('LEFT(periode, 7)', $yearMonth)
+            ->where('year_month', $yearMonth)
+            ->groupStart()
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupEnd()
             ->findAll();
 
         foreach ($attendancesInMonth as $p) {
