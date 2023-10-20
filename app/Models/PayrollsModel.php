@@ -460,53 +460,104 @@ class PayrollsModel extends Model
     public function getSummaryPayroll($yearMonth, $companyID)
     {
         $divisiModel = new DivisisModel();
-        $employeeModel = new EmployeesModel();
         $divisiData = $divisiModel->where('company_id', $companyID)->where('deletedAt', null)->findAll();
 
         $res = [];
+        $upahPokok = 0;
+        $tunjanganPlusCadangan = 0;
+        $lemburTotal = 0;
+        $totalUpah = 0;
+        $potongan = 0;
+        $upahBersih = 0;
+        $orangTotal = 0;
+        $lembur = 0;
+        $jamKerja = 0;
 
         foreach ($divisiData as $d) {
-            $employeePayroll = $this->asArray()->select('payrolls.*, employees.division_id')
+            $selectQry = "
+                COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
+                SUM(nominal_uang_gaji) AS upahBersih, 
+                SUM(nominal_penambahan_gaji) AS tunjangan,
+                SUM(nominal_cadangan) AS cadangan,
+                SUM(nominal_uang_lembur) AS lembur,
+                SUM(nominal_gaji_diterima) AS total_upah,
+                SUM(nominal_pengurangan_gaji + nominal_pinjaman_karyawan) AS potongan
+            ";
+            $employeePayrollTotal = $this->asArray()->select($selectQry)
                 ->join('employees', 'employees.id = payrolls.employee_id')
                 ->where('payrolls.year_month', $yearMonth)
                 ->where('employees.company_id', $companyID)
                 ->where('employees.division_id', $d['id'])
                 ->findAll();
 
+            // set total
+            $upahPokok += $employeePayrollTotal[0]['upahBersih'];
+            $tunjanganPlusCadangan += ($employeePayrollTotal[0]['cadangan'] + $employeePayrollTotal[0]['tunjangan']);
+            $lemburTotal += $employeePayrollTotal[0]['lembur'];
+            $totalUpah += ($employeePayrollTotal[0]['upahBersih'] + $employeePayrollTotal[0]['cadangan'] + $employeePayrollTotal[0]['tunjangan']);
+            $potongan += $employeePayrollTotal[0]['potongan'];
+            $upahBersih += ($employeePayrollTotal[0]['upahBersih'] + $employeePayrollTotal[0]['tunjangan'] + $employeePayrollTotal[0]['cadangan'] - $employeePayrollTotal[0]['potongan']);
+            $orangTotal += $employeePayrollTotal[0]['totalEmployee'];
+            $lembur +=  static::getTotalJamLemburInOnePeriode($d['id'], $yearMonth);
+            $jamKerja += static::getTotalJamKerjaInOnePeriode($d['id'], $yearMonth);
+
             $res[] = [
                 'divisi' => $d['divisi'],
-                'orang' => count($employeePayroll),
-                'upahPokok' =>  ''
+                'payrollTotal' => $employeePayrollTotal,
+                'totalJamKerja' => static::getTotalJamKerjaInOnePeriode($d['id'], $yearMonth),
+                'totalJamLembur' => static::getTotalJamLemburInOnePeriode($d['id'], $yearMonth),
             ];
         }
 
-        return $res;
-    }
-
-    static function summaryByDivisionNominal($divisionID, $yearMonth)
-    {
-        $res = [
-            'upah_pokok' => 0,
-            'tunjangan_cadangan' => 0
+        return [
+            'res' => $res,
+            'upahPokokTotal' => $upahPokok,
+            'orangTotal' => $orangTotal,
+            'tunjanganPlusCadangan' => $tunjanganPlusCadangan,
+            'lemburTotal' => $lemburTotal,
+            'totalUpah' => $totalUpah,
+            'potongan' => $potongan,
+            'upahBersih' => $upahBersih,
+            'lembur' => $lembur,
+            'jamKerja' => $jamKerja,
         ];
-
-        $payrollGajiModel = new PayrollGajiConjunctionModel();
-
-        // $gajiHarian = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
-        //     ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
-        //     ->join('gaji_divisi', 'gaji_divisi.
-        //     ')
-        //     ->where('tunjangan.is_gaji_harian', '1')
-        //     ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-        //     ->first();
-
-        // $gajiCadangan = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
-        //     ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
-        //     ->where('tunjangan.is_cadangan', '1')
-        //     ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-        //     ->first();
     }
 
+    static function getTotalJamKerjaInOnePeriode($divisionID, $yearMonth)
+    {
+        $db = db_connect();
+        $qry = "
+        SELECT 
+            FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(attendances.checkout, attendances.checkin)) / 3600)) AS totalJamKerja
+        FROM 
+            attendances
+        WHERE 
+            DATE_FORMAT(periode, '%Y-%m') = '$yearMonth'
+            AND division_id = '$divisionID'
+            AND attendances.checkin IS NOT NULL
+            AND attendances.checkout IS NOT NULL;
+        ";
+
+        $query = $db->query($qry);
+        if ($query) {
+            $result = $query->getRow();
+            return $result->totalJamKerja;
+        } else {
+            return 0;
+        }
+    }
+
+    static function getTotalJamLemburInOnePeriode($divisionID, $yearMonth)
+    {
+        $formLemburModel = new FormLemburModel();
+        $selectQry = "SUM(form_lembur.total_jam_lembur) AS totalJamLembur";
+        $result =  $formLemburModel->select($selectQry)->where('division_id', $divisionID)->where('DATE_FORMAT(periode, "%Y-%m")', $yearMonth)->findAll();
+        if (!empty($result)) {
+            return $result[0]['totalJamLembur'];
+        } else {
+            return 0;
+        }
+    }
 
     static function convertionIDRMoneyTotal($nilai)
     {
@@ -528,13 +579,11 @@ class PayrollsModel extends Model
 
         foreach ($pecahan as $nilaiPecahan => $namaPecahan) {
             $jumlahPecahan = floor($nilai / $nilaiPecahan);
-            if ($jumlahPecahan > 0) {
-                $result[] = [
-                    'lembar' => $namaPecahan,
-                    'totalLembar' => $jumlahPecahan
-                ];
-                $nilai %= $nilaiPecahan;
-            }
+            $result[] = [
+                'lembar' => $namaPecahan,
+                'totalLembar' => $jumlahPecahan
+            ];
+            $nilai %= $nilaiPecahan;
         }
 
         return $result;

@@ -72,7 +72,7 @@
 
     <table border="0" style="margin-top: 30px;">
         <tr>
-            <td>Divisi</td>
+            <td>Bagian</td>
             <td>:</td>
             <td><?= $divisi['divisi'] ?></td>
         </tr>
@@ -189,6 +189,8 @@
                 </td>
             </tr>
         <?php endforeach; ?>
+    </table>
+
     </table>
 </body>
 
