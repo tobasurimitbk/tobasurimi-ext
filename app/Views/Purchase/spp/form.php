@@ -190,9 +190,9 @@
                                             <td><?= $details->kodeBarang; ?></td>
                                             <td><?= $details->barangName; ?></td>
                                             <td><?= $details->satuanName; ?></td>
-                                            <td><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "") . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
-                                            <td><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "") . number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= $details->note; ?></td>
                                             <td>
                                                 <button data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kodeBarang; ?>" data-nama_barang="<?= $details->barangName; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
@@ -209,9 +209,9 @@
                                             <td><?= $details->kodeBarang; ?></td>
                                             <td><?= $details->barangName; ?></td>
                                             <td><?= $details->satuanName; ?></td>
-                                            <td><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "") . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
-                                            <td><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "") . number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->totalPrice, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= $details->note; ?></td>
                                             <td></td>
 
@@ -227,9 +227,9 @@
                             <tr>
                                 <td colspan="3"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "Rp ") . number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
+                                <td><b><?= "Rp " . number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
-                                <td><b><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "Rp ") . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
+                                <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td colspan="2"></td>
                             </tr>
                         </tfoot>
@@ -1037,13 +1037,13 @@
                                         tag_html += nama_satuan;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + harga;
+                                        tag_html += "Rp " + harga;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += qty;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + total;
+                                        tag_html += "Rp " + total;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += keterangan;
@@ -1092,13 +1092,13 @@
                                         tag_html += item.nama_satuan;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + item.harga;
+                                        tag_html += "Rp " + item.harga;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += item.qty;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
-                                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + item.total;
+                                        tag_html += "Rp " + item.total;
                                         tag_html += "</td>";
                                         tag_html += `<td>`;
                                         tag_html += item.keterangan;
@@ -1138,13 +1138,13 @@
                                 tag_total += "<b>TOTAL</b>";
                                 tag_total += "</td>";
                                 tag_total += "<td>";
-                                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td>";
                                 tag_total += `<b>${total_qty}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td>";
-                                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td colspan='2'>";
                                 tag_total += "</td>";
@@ -1206,13 +1206,13 @@
                                 tag_html += nama_satuan;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + harga;
+                                tag_html += "Rp " + harga;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += qty;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
-                                tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + total;
+                                tag_html += "Rp " + total;
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += keterangan;
@@ -1237,13 +1237,13 @@
                                 tag_total += "<b>TOTAL</b>";
                                 tag_total += "</td>";
                                 tag_total += "<td>";
-                                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td>";
                                 tag_total += `<b>${total_qty}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td>";
-                                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                                 tag_total += "</td>";
                                 tag_total += "<td colspan='2'>";
                                 tag_total += "</td>";
@@ -1304,13 +1304,13 @@
                         tag_html += item.nama_satuan;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + item.harga;
+                        tag_html += "Rp " + item.harga;
                         tag_html += "</td>";
                         tag_html += `<td>`;
                         tag_html += item.qty;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + item.total;
+                        tag_html += "Rp " + item.total;
                         tag_html += "</td>";
                         tag_html += `<td>`;
                         tag_html += item.keterangan;
@@ -1357,13 +1357,13 @@
                 tag_total += "<b>TOTAL</b>";
                 tag_total += "</td>";
                 tag_total += "<td>";
-                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_qty}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
-                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td colspan='2'>";
                 tag_total += "</td>";
@@ -1419,13 +1419,13 @@
                         tag_html += item.nama_satuan;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + item.harga;
+                        tag_html += "Rp " + item.harga;
                         tag_html += "</td>";
                         tag_html += `<td>`;
                         tag_html += item.qty;
                         tag_html += "</td>";
                         tag_html += `<td>`;
-                        tag_html += ($(".spp_type").val() === "Lokal" ? "Rp " : "") + item.total;
+                        tag_html += "Rp " + item.total;
                         tag_html += "</td>";
                         tag_html += `<td>`;
                         tag_html += item.keterangan;
@@ -1472,13 +1472,13 @@
                 tag_total += "<b>TOTAL</b>";
                 tag_total += "</td>";
                 tag_total += "<td>";
-                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                tag_total += `<b>${"Rp " + total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${total_qty}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td>";
-                tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                 tag_total += "</td>";
                 tag_total += "<td colspan='2'>";
                 tag_total += "</td>";
@@ -1560,13 +1560,13 @@
         tag_total += "<b>TOTAL</b>";
         tag_total += "</td>";
         tag_total += "<td>";
-        tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") }0.00</b>`;
+        tag_total += `<b>Rp 0.00</b>`;
         tag_total += "</td>";
         tag_total += "<td>";
         tag_total += `<b>${total_qty}</b>`;
         tag_total += "</td>";
         tag_total += "<td>";
-        tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") }0.00</b>`;
+        tag_total += `<b>Rp 0.00</b>`;
         tag_total += "</td>";
         tag_total += "<td colspan='2'>";
         tag_total += "</td>";
