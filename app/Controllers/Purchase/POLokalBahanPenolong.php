@@ -48,7 +48,7 @@ class POLokalBahanPenolong extends BaseController
     public function createPOLokalBahanPenolong()
     {
         //Get SPP Number
-        $dataSPP = $this->SppModel->getNoSPP('Bahan Penolong Lokal');
+        $dataSPP = $this->SppModel->getNoSPP('Lokal');
 
         foreach (array_keys($dataSPP) as $key) {
             $dataSPP[$key] = (object)$dataSPP[$key];

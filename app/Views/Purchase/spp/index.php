@@ -41,10 +41,8 @@
                     <div class="form-floating spp-ptspp mb-3" style="height: 50px;">
                         <select class="form-select kategori spp_type form-out-search" name="spp_type" id="spp_type" aria-label="Floating label select example">
                             <option value="">Pilih Tipe SPP</option>
-                            <option value="Bahan Penolong Lokal">Bahan Penolong Lokal</option>
-                            <option value="Bahan Penolong Import">Bahan Penolong Import</option>
-                            <option value="Bahan Baku Lokal">Bahan Baku Lokal</option>
-                            <option value="Bahan Baku Import">Bahan Baku Import</option>
+                            <option value="Lokal">Lokal</option>
+                            <option value="Import">Import</option>
                         </select>
                         <label for="floatingInput" class="l-spp-ptspp">Tipe SPP</label>
                     </div>
@@ -61,6 +59,7 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
                                 <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
+                                <th onclick="changeSort('company')" class="sort">Company</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('total')" class="sort">Total Harga</th>
                                 <th>Jumlah Order</th>
@@ -139,6 +138,10 @@
             },
             {
                 data: "spp_no",
+                className: "text-center"
+            },
+            {
+                data: "companyName",
                 className: "text-center"
             },
             {

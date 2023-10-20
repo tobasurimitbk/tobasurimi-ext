@@ -17,7 +17,6 @@ class SppDetailModel extends Model
     protected $allowedFields    = [
         "purchase_request_id",
         "barang_id",
-        "spec",
         "qty",
         "unit",
         "price",
@@ -51,8 +50,8 @@ class SppDetailModel extends Model
     public function getSppDetailById($id)
     {
         $selectQry = "purchase_request_details.*,
-                        FORMAT(CEILING(purchase_request_details.qty) * CEILING(purchase_request_details.price), 'N', 'en-us') AS totalPrice,
-                        FORMAT(CEILING(purchase_request_details.price), 'N', 'en-us') AS price,
+                        (purchase_request_details.qty * purchase_request_details.price) AS totalPrice,
+                        purchase_request_details.price AS price,
                         barangs.kode_barang AS kodeBarang,
                         barangs.nama_barang AS barangName,
                         satuans.nama_satuan AS satuanName

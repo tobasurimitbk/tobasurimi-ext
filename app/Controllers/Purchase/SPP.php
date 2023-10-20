@@ -7,6 +7,7 @@ use App\Models\SppModel;
 use App\Models\SppDetailModel;
 use App\Models\MetadataModel;
 use App\Models\DivisisModel;
+use App\Models\CompaniesModel;
 
 use App\Models\RMImportPOModel;
 use App\Models\RMImportPODetailModel;
@@ -26,6 +27,7 @@ class SPP extends BaseController
 
     protected $MetadataModel;
     protected $DivisisModel;
+    protected $CompaniesModel;
 
     protected $RmImportPOModel;
     protected $RmImportPODetailModel;
@@ -33,6 +35,8 @@ class SPP extends BaseController
     protected $AmPurchaseOrderDetailModel;
     protected $RmPurchaseOrderModel;
     protected $RmPurchaseOrderDetailModel;
+
+    protected $this_company_id;
 
     protected $dompdf;
 
@@ -45,6 +49,7 @@ class SPP extends BaseController
 
         $this->MetadataModel = new MetadataModel();
         $this->DivisisModel = new DivisisModel();
+        $this->CompaniesModel = new CompaniesModel();
 
         $this->RmImportPOModel = new RMImportPOModel();
         $this->RmImportPODetailModel = new RMImportPODetailModel();
@@ -52,6 +57,8 @@ class SPP extends BaseController
         $this->AmPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->RmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
+        $this->this_company_id = session()->get("login")->this_company_id;
 
         $this->dompdf = new Dompdf();
     }
@@ -63,6 +70,9 @@ class SPP extends BaseController
 
     public function createSPP()
     {
+        //Get Company
+        $dataCompany =  $this->CompaniesModel->getCompanies();
+
         //Get Order Type By Metadata
         $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
@@ -70,6 +80,7 @@ class SPP extends BaseController
         $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
+            "dataCompany"   => $dataCompany,
             "dataOrderType" => $dataOrderType,
             "dataDivisi" => $dataDivisi
         ];
@@ -79,6 +90,9 @@ class SPP extends BaseController
 
     public function getByIdSPP($id = null)
     {
+        //Get Company
+        $dataCompany =  $this->CompaniesModel->getCompanies();
+
         //Get Order Type By Metadata
         $dataOrderType =  $this->MetadataModel->get_by_name("Tipe PO");
 
@@ -86,6 +100,7 @@ class SPP extends BaseController
         $dataDivisi = $this->DivisisModel->asObject()->findAll();
 
         $data = [
+            "dataCompany"   => $dataCompany,
             "dataOrderType" => $dataOrderType,
             "dataDivisi" => $dataDivisi
         ];
@@ -171,9 +186,10 @@ class SPP extends BaseController
                 "id"            => $data->id,
                 "spp_type"      => $data->spp_type,
                 "spp_no"        => $data->spp_no,
+                "companyName"  => $data->companyName,
                 "divisiName" => $data->divisiName,
                 "spp_type"      => $data->spp_type,
-                "total"         => number_format($data->total),
+                "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "request_date"  => date('d/m/Y', strtotime($data->request_date)),
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
@@ -224,10 +240,11 @@ class SPP extends BaseController
 
             if ($this->validate($rules)) {
                 $insertData = [
+                    "company_id" => $this->request->getPost("company_id"),
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
-                    "divisi_id" => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
+                    "divisi_id" => $this->request->getPost("divisi_id"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
                     "createdBy" => session()->get("login")->user_id,
@@ -323,13 +340,13 @@ class SPP extends BaseController
                 $id = $this->request->getPost("id");
 
                 $insertData = [
+                    "company_id" => $this->request->getPost("company_id"),
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => $this->request->getPost("spp_no"),
                     "spp_type" => $this->request->getPost("spp_type"),
-                    "divisi_id" => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
+                    "divisi_id" => $this->request->getPost("divisi_id"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
-                    "createdBy" => session()->get("login")->user_id,
                     "items" =>  json_decode($this->request->getPost("items")),
                 ];
 
@@ -368,7 +385,6 @@ class SPP extends BaseController
                                 "id" => $id_detail,
                                 "purchase_request_id" => $this->request->getPost("id"),
                                 "barang_id" => $value->item_id,
-                                "spec" => $value->spec,
                                 "qty" => $value->qty,
                                 "unit" => $value->unit,
                                 "price" => $value->price,
@@ -382,7 +398,6 @@ class SPP extends BaseController
                             $dataDetail = [
                                 "purchase_request_id" => $this->request->getPost("id"),
                                 "barang_id" => $value->item_id,
-                                "spec" => $value->spec,
                                 "qty" => $value->qty,
                                 "unit" => $value->unit,
                                 "price" => $value->price,
@@ -393,56 +408,56 @@ class SPP extends BaseController
                         }
 
                         // update item po bb lokal
-                        if($this->request->getPost("spp_type") === "Bahan Baku Lokal")
-                        {
-                            $responsePO = $this->RmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
+                        // if($this->request->getPost("spp_type") === "Bahan Baku Lokal")
+                        // {
+                        //     $responsePO = $this->RmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
 
-                            if($responsePO)
-                            {
-                                $responseDetailPO = $this->RmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
+                        //     if($responsePO)
+                        //     {
+                        //         $responseDetailPO = $this->RmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
                                 
-                                // edit and delete po items
-                                if($responseDetailPO)
-                                {
-                                    // delete po
-                                    if (!empty($value->isDeleted)) {
-                                        $this->RmPurchaseOrderDetailModel->where('id', $responseDetailPO->id)->delete();
-                                    }
+                        //         // edit and delete po items
+                        //         if($responseDetailPO)
+                        //         {
+                        //             // delete po
+                        //             if (!empty($value->isDeleted)) {
+                        //                 $this->RmPurchaseOrderDetailModel->where('id', $responseDetailPO->id)->delete();
+                        //             }
 
-                                    // edit po
-                                    $dataDetail = [
-                                        "id" => $responseDetailPO->id,
-                                        "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
-                                        "note" => $value->note,
-                                        "qty" => $value->qty,
-                                        "remaining_qty" => $value->qty,
-                                        "general_price" => $value->price,
-                                    ];
+                        //             // edit po
+                        //             $dataDetail = [
+                        //                 "id" => $responseDetailPO->id,
+                        //                 "barang_id" => $value->item_id,
+                        //                 "spec" => $value->spec,
+                        //                 "note" => $value->note,
+                        //                 "qty" => $value->qty,
+                        //                 "remaining_qty" => $value->qty,
+                        //                 "general_price" => $value->price,
+                        //             ];
             
-                                    $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
-                                }
-                                // create po items
-                                else
-                                {
-                                    $dataDetail = [
-                                        "id" => null,
-                                        "rm_purchase_order_id" =>  $responsePO->id,
-                                        "purchase_request_detail_id" => $purchase_request_detail_id,
-                                        "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
-                                        "note" => $value->note,
-                                        "qty" => $value->qty,
-                                        "remaining_qty" => $value->qty,
-                                        "general_price" => $value->price,
-                                    ];
+                        //             $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
+                        //         }
+                        //         // create po items
+                        //         else
+                        //         {
+                        //             $dataDetail = [
+                        //                 "id" => null,
+                        //                 "rm_purchase_order_id" =>  $responsePO->id,
+                        //                 "purchase_request_detail_id" => $purchase_request_detail_id,
+                        //                 "barang_id" => $value->item_id,
+                        //                 "spec" => $value->spec,
+                        //                 "note" => $value->note,
+                        //                 "qty" => $value->qty,
+                        //                 "remaining_qty" => $value->qty,
+                        //                 "general_price" => $value->price,
+                        //             ];
             
-                                    $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
-                                }
-                            }
-                        }
+                        //             $this->RmPurchaseOrderDetailModel->upsert($dataDetail);
+                        //         }
+                        //     }
+                        // }
                         // update item po bp lokal
-                        if($this->request->getPost("spp_type") === "Bahan Penolong Lokal")
+                        if($this->request->getPost("spp_type") === "Lokal")
                         {
                             $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
 
@@ -462,7 +477,6 @@ class SPP extends BaseController
                                     $dataDetail = [
                                         "id" => $responseDetailPO->id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -480,7 +494,6 @@ class SPP extends BaseController
                                         "am_purchase_order_id" =>  $responsePO->id,
                                         "purchase_request_detail_id" => $purchase_request_detail_id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -493,58 +506,58 @@ class SPP extends BaseController
                             }
                         }
                         // update item po bb import
-                        if($this->request->getPost("spp_type") === "Bahan Baku Import")
-                        {
-                            $responsePO = $this->RmImportPOModel->getByPurchaseRequestId($this->request->getPost("id"));
+                        // if($this->request->getPost("spp_type") === "Bahan Baku Import")
+                        // {
+                        //     $responsePO = $this->RmImportPOModel->getByPurchaseRequestId($this->request->getPost("id"));
 
-                            if($responsePO)
-                            {
-                                $responseDetailPO = $this->RmImportPODetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
+                        //     if($responsePO)
+                        //     {
+                        //         $responseDetailPO = $this->RmImportPODetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
-                                // edit and delete po items
-                                if($responseDetailPO)
-                                {
-                                    // delete po
-                                    if (!empty($value->isDeleted)) {
-                                        $this->RmImportPODetailModel->where('id', $responseDetailPO->id)->delete();
-                                    }
+                        //         // edit and delete po items
+                        //         if($responseDetailPO)
+                        //         {
+                        //             // delete po
+                        //             if (!empty($value->isDeleted)) {
+                        //                 $this->RmImportPODetailModel->where('id', $responseDetailPO->id)->delete();
+                        //             }
 
-                                    // edit po
-                                    $dataDetail = [
-                                        "id" => $responseDetailPO->id,
-                                        "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
-                                        "note" => $value->note,
-                                        "qty" => $value->qty,
-                                        "remaining_qty" => $value->qty,
-                                        "price" => $value->price,
-                                        "unit" => $value->unit,
-                                    ];
+                        //             // edit po
+                        //             $dataDetail = [
+                        //                 "id" => $responseDetailPO->id,
+                        //                 "barang_id" => $value->item_id,
+                        //                 "spec" => $value->spec,
+                        //                 "note" => $value->note,
+                        //                 "qty" => $value->qty,
+                        //                 "remaining_qty" => $value->qty,
+                        //                 "price" => $value->price,
+                        //                 "unit" => $value->unit,
+                        //             ];
             
-                                    $this->RmImportPODetailModel->upsert($dataDetail);
-                                }
-                                // create po items
-                                else
-                                {
-                                    $dataDetail = [
-                                        "id" => null,
-                                        "rm_import_po_id" =>  $responsePO->id,
-                                        "purchase_request_detail_id" => $purchase_request_detail_id,
-                                        "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
-                                        "note" => $value->note,
-                                        "qty" => $value->qty,
-                                        "remaining_qty" => $value->qty,
-                                        "price" => $value->price,
-                                        "unit" => $value->unit,
-                                    ];
+                        //             $this->RmImportPODetailModel->upsert($dataDetail);
+                        //         }
+                        //         // create po items
+                        //         else
+                        //         {
+                        //             $dataDetail = [
+                        //                 "id" => null,
+                        //                 "rm_import_po_id" =>  $responsePO->id,
+                        //                 "purchase_request_detail_id" => $purchase_request_detail_id,
+                        //                 "barang_id" => $value->item_id,
+                        //                 "spec" => $value->spec,
+                        //                 "note" => $value->note,
+                        //                 "qty" => $value->qty,
+                        //                 "remaining_qty" => $value->qty,
+                        //                 "price" => $value->price,
+                        //                 "unit" => $value->unit,
+                        //             ];
             
-                                    $this->RmImportPODetailModel->upsert($dataDetail);
-                                }
-                            }
-                        }
+                        //             $this->RmImportPODetailModel->upsert($dataDetail);
+                        //         }
+                        //     }
+                        // }
                         // update item po bp import
-                        if($this->request->getPost("spp_type") === "Bahan Penolong Import")
+                        if($this->request->getPost("spp_type") === "Import")
                         {
                             $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
 
@@ -564,7 +577,6 @@ class SPP extends BaseController
                                     $dataDetail = [
                                         "id" => $responseDetailPO->id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -582,7 +594,6 @@ class SPP extends BaseController
                                         "am_purchase_order_id" =>  $responsePO->id,
                                         "purchase_request_detail_id" => $purchase_request_detail_id,
                                         "barang_id" => $value->item_id,
-                                        "spec" => $value->spec,
                                         "note" => $value->note,
                                         "qty" => $value->qty,
                                         "remaining_qty" => $value->qty,
@@ -752,27 +763,27 @@ class SPP extends BaseController
                 return;
             }
 
-            if($tipe === "Bahan Baku Lokal")
-            {
-                $responsePO = $this->RmPurchaseOrderModel->getByPurchaseRequestId($id);
+            // if($tipe === "Bahan Baku Lokal")
+            // {
+            //     $responsePO = $this->RmPurchaseOrderModel->getByPurchaseRequestId($id);
 
-                if($responsePO)
-                {
-                    $deletePO = $this->RmPurchaseOrderModel->where('id', $responsePO->id)->delete();
+            //     if($responsePO)
+            //     {
+            //         $deletePO = $this->RmPurchaseOrderModel->where('id', $responsePO->id)->delete();
 
-                    if(!$deletePO)
-                    {
-                        $data = [
-                            "status"     => false,
-                            "message"    => "Data PO Gagal Dihapus",
-                            'token'      => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                        return;
-                    }
-                }
-            }
-            if($tipe === "Bahan Penolong Lokal")
+            //         if(!$deletePO)
+            //         {
+            //             $data = [
+            //                 "status"     => false,
+            //                 "message"    => "Data PO Gagal Dihapus",
+            //                 'token'      => csrf_hash()
+            //             ];
+            //             echo json_encode($data);
+            //             return;
+            //         }
+            //     }
+            // }
+            if($tipe === "Lokal")
             {
                 $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($id);
 
@@ -792,27 +803,27 @@ class SPP extends BaseController
                     }    
                 }
             }
-            if($tipe === "Bahan Baku Import")
-            {
-                $responsePO = $this->RmImportPOModel->getByPurchaseRequestId($id);
+            // if($tipe === "Bahan Baku Import")
+            // {
+            //     $responsePO = $this->RmImportPOModel->getByPurchaseRequestId($id);
 
-                if($responsePO)
-                {
-                    $deletePO = $this->RmImportPOModel->where('id', $responsePO->id)->delete();
+            //     if($responsePO)
+            //     {
+            //         $deletePO = $this->RmImportPOModel->where('id', $responsePO->id)->delete();
 
-                    if(!$deletePO)
-                    {
-                        $data = [
-                            "status"     => false,
-                            "message"    => "Data PO Gagal Dihapus",
-                            'token'      => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                        return;
-                    }
-                }
-            }
-            if($tipe === "Bahan Penolong Import")
+            //         if(!$deletePO)
+            //         {
+            //             $data = [
+            //                 "status"     => false,
+            //                 "message"    => "Data PO Gagal Dihapus",
+            //                 'token'      => csrf_hash()
+            //             ];
+            //             echo json_encode($data);
+            //             return;
+            //         }
+            //     }
+            // }
+            if($tipe === "Import")
             {
                 $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($id);
 
@@ -887,11 +898,12 @@ class SPP extends BaseController
                 "id"            => $data->id,
                 "spp_type"      => $data->spp_type,
                 "spp_no"        => $data->spp_no,
+                "companyName"   => $data->companyName,
                 "divisiName"    => $data->divisiName,
-                "total"         => number_format($data->total),
-                "request_date"  => date('Y-m-d', strtotime($data->request_date)),
+                "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
+                "request_date"  => date('d/m/Y', strtotime($data->request_date)),
                 "is_posted"     => $data->is_posted,
-                "createdAt"     => date('Y-m-d', strtotime($data->createdAt)),
+                "createdAt"     => date('d/m/Y', strtotime($data->createdAt)),
             ]);
         }
 

@@ -51,44 +51,31 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Bahan Baku</label>
+                            <label for="floatingInput">Nama Barang</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select bagian" name="bagian" id="bagian" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataDivisi as $d) : ?>
-                                    <option value="<?= $d["id"]; ?>">
-                                        <?= $d["divisi"]; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">Bagian</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesfikasi" name="spesifikasi" placeholder="Spesifikasi">
                             <label for="floatingInput">Spesifikasi</label>
                         </div>
                     </div>
+                </div>
+                <div class="row"> 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="0" autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
@@ -104,7 +91,7 @@
                     </div>
                     <div class="col-md-6">
                         <button class="btn btn-add btn-block float-right" onclick="createHarga()">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                         </button>
                         <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="setHarga()">
                             Reset
@@ -118,8 +105,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10">No</th>
-                                <th>Bahan Baku</th>
-                                <th>Bagian</th>
+                                <th>Nama Barang</th>
                                 <th>Spesifikasi</th>
                                 <th>Harga Umum</th>
                                 <th>Harga Harian</th>
@@ -139,9 +125,6 @@
                                 </td>
                                 <td>
                                     <?= $item["barang_name"]; ?>
-                                </td>
-                                <td>
-                                    <?= $item["bagian_name"]; ?>
                                 </td>
                                 <td>
                                     <?= $item["spesifikasi"]; ?>
@@ -190,8 +173,6 @@
             id: Number('<?= $item["id"]?>'),
             bahan_baku_id: Number('<?= $item["bahan_baku_id"]?>'),
             barang_name: '<?= $item["barang_name"]?>',
-            bagian_id: Number('<?= $item["bagian_id"]?>'),
-            bagian_name: '<?= $item["bagian_name"]?>',
             spesifikasi: '<?= $item["spesifikasi"]?>',
             harga_umum: Number('<?= $item["harga_umum"] ? $item["harga_umum"] : 0; ?>').toLocaleString(),
             harga_harian: Number('<?= $item["harga_harian"] ? $item["harga_harian"] : 0; ?>').toLocaleString(),
@@ -221,12 +202,7 @@
     })
 
     $('.bahan_baku').select2({
-        placeholder: "Pilih Bahan Baku",
-        theme: "bootstrap-5"
-    })
-
-    $('.bagian').select2({
-        placeholder: "Pilih Bagian",
+        placeholder: "Pilih Nama Barang",
         theme: "bootstrap-5"
     })
 
@@ -256,9 +232,6 @@
             bahan_baku: {
                 required: true
             },
-            bagian: {
-                required: true
-            },
             spesifikasi: {
                 required: true
             },
@@ -275,9 +248,6 @@
         messages: {
             bahan_baku: {
                 required: "Bahan Baku wajib diisi"
-            },
-            bagian: {
-                required: "Bagian wajib diisi"
             },
             spesifikasi: {
                 required: "Spesifikasi wajib diisi"
@@ -384,12 +354,10 @@
         $(".row").val('');
         $(".id_supplier_harga").val('')
         $(".bahan_baku").val('').change()
-        $(".bagian").val('').change()
         $(".harga_umum").val(0)
         $(".harga_harian").val(0)
         $(".harga_bulanan").val(0)
 
-        $(".bagian").removeAttr("disabled")
         $(".bahan_baku").removeAttr("disabled")
         $(".spesifikasi").removeAttr("disabled")
     }
@@ -403,8 +371,6 @@
         let id_supplier_harga = $(".id_supplier_harga").val()
         let bahan_baku_id = $(".bahan_baku option:selected").val()
         let barang_name = $(".bahan_baku option:selected").text()
-        let bagian_id = $(".bagian option:selected").val()
-        let bagian_name = $(".bagian option:selected").text()
         let spesifikasi = $(".spesifikasi").val()
         let harga_umum = $(".harga_umum").val()
         let harga_harian = $(".harga_harian").val()
@@ -443,9 +409,6 @@
                                 tag_html += barang_name;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += bagian_name;
-                                tag_html += "</td>";
-                                tag_html += "<td>";
                                 tag_html += spesifikasi;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
@@ -459,7 +422,7 @@
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
-                                <button class="btn btn-warning posting-spp" onclick="editHarga(${row})">
+                                <button class="btn btn-warning posting-spp mr-1" onclick="editHarga(${row})">
                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                 </button><button class="btn btn-danger" onclick="deleteHarga(${row})">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -486,9 +449,6 @@
                                 tag_html += item.barang_name;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += item.bagian_name;
-                                tag_html += "</td>";
-                                tag_html += "<td>";
                                 tag_html += item.spesifikasi;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
@@ -502,7 +462,7 @@
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
-                                <button class="btn btn-warning posting-spp" onclick="editHarga(${row})">
+                                <button class="btn btn-warning posting-spp mr-1" onclick="editHarga(${row})">
                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                 </button><button class="btn btn-danger" onclick="deleteHarga(${row})">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -526,19 +486,16 @@
             // create
             else
             {
-                // check if bahan baku, bagian, spesifikasi already exist
+                // check if bahan baku, spesifikasi already exist
                 let view_exist = list_item.find(item => (
-                    item.spesifikasi === spesifikasi && (
-                        item.bahan_baku_id === bahan_baku_id &&
-                        item.bagian_id === bagian_id
-                    )
+                    item.spesifikasi === spesifikasi && item.bahan_baku_id === bahan_baku_id
                 ))
 
                 if(view_exist)
                 {
                     Swal.fire({
                         icon: 'error',
-                        title: "Bahan Baku, bagian, dan spesifikasi tidak boleh sama",
+                        title: "Bahan Baku, spesifikasi tidak boleh sama",
                         confirmButtonColor: '#4e73df',
                     })
                 }
@@ -565,9 +522,6 @@
                             tag_html += barang_name;
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += bagian_name;
-                            tag_html += "</td>";
-                            tag_html += "<td>";
                             tag_html += spesifikasi;
                             tag_html += "</td>";
                             tag_html += "<td>";
@@ -581,7 +535,7 @@
                             tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
-                            <button class="btn btn-warning posting-spp" onclick="editHarga(${row})">
+                            <button class="btn btn-warning posting-spp mr-1" onclick="editHarga(${row})">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button><button class="btn btn-danger" onclick="deleteHarga(${row})">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -596,8 +550,6 @@
                                 id: id_supplier_harga,
                                 bahan_baku_id: bahan_baku_id,
                                 barang_name: barang_name,
-                                bagian_id: bagian_id,
-                                bagian_name: bagian_name,
                                 spesifikasi: spesifikasi,
                                 harga_umum: harga_umum,
                                 harga_harian: harga_harian,
@@ -615,7 +567,6 @@
     const editHarga = function(nilai_row) {
         validator.resetForm();
         validator.reset();
-        $(".bagian").attr("disabled", true)
         $(".bahan_baku").attr("disabled", true)
         $(".spesifikasi").attr("disabled", true)
 
@@ -629,7 +580,6 @@
         $(".harga_umum").val(current_row?.harga_umum);
         $(".harga_bulanan").val(current_row?.harga_bulanan);
         $(".bahan_baku").val(current_row?.bahan_baku_id).change();
-        $(".bagian").val(current_row?.bagian_id).change();
         $(".spesifikasi").val(current_row?.spesifikasi);
     }
 
@@ -671,9 +621,6 @@
                         tag_html += item.barang_name;
                         tag_html += "</td>";
                         tag_html += "<td>";
-                        tag_html += item.bagian_name;
-                        tag_html += "</td>";
-                        tag_html += "<td>";
                         tag_html += item.spesifikasi;
                         tag_html += "</td>";
                         tag_html += "<td>";
@@ -687,7 +634,7 @@
                         tag_html += "</td>";
                         tag_html += "<td>";
                         tag_html += `
-                        <button class="btn btn-warning posting-spp" onclick="editHarga(${row})">
+                        <button class="btn btn-warning posting-spp mr-1" onclick="editHarga(${row})">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button><button class="btn btn-danger" onclick="deleteHarga(${row})">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
