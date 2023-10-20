@@ -227,9 +227,9 @@
                             <tr>
                                 <td colspan="3"></td>
                                 <td><b>TOTAL</b></td>
-                                <td><b><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "") . number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
+                                <td><b><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "Rp ") . number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
-                                <td><b><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "") . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
+                                <td><b><?= (!empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "Rp " : "") : "Rp ") . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td colspan="2"></td>
                             </tr>
                         </tfoot>
@@ -1513,7 +1513,7 @@
 
         $(".barang_id").val(barang_id)
         $(".nama_barang").val(nama_barang)
-        
+
         $(".harga").val(harga)
         $(".qty").val(qty)
         $(".total").val((harga.replaceAll(",", "") * Number(qty)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
@@ -1560,13 +1560,13 @@
         tag_total += "<b>TOTAL</b>";
         tag_total += "</td>";
         tag_total += "<td>";
-        tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") }0</b>`;
+        tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") }0.00</b>`;
         tag_total += "</td>";
         tag_total += "<td>";
         tag_total += `<b>${total_qty}</b>`;
         tag_total += "</td>";
         tag_total += "<td>";
-        tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") }0</b>`;
+        tag_total += `<b>${($(".spp_type").val() === "Lokal" ? "Rp " : "") }0.00</b>`;
         tag_total += "</td>";
         tag_total += "<td colspan='2'>";
         tag_total += "</td>";
