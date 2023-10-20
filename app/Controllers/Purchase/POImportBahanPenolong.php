@@ -52,7 +52,7 @@ class POImportBahanPenolong extends BaseController
         $dataSPP = $this->sppModel->getNoSPP("Import");
 
         //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN PENOLONG', $this->this_company_id);
+        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('BAHAN PENOLONG', $this->this_company_id);
 
         //Get Valuta By Metadata
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
@@ -73,7 +73,7 @@ class POImportBahanPenolong extends BaseController
         $dataSPP = $this->sppModel->getNoSPP("Bahan Penolong Import");
 
         //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('IMPORT', 'BAHAN PENOLONG', $this->this_company_id);
+        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('BAHAN PENOLONG', $this->this_company_id);
 
         //Get Valuta By Metadata
         $dataValuta = $this->metadataModel->get_by_name('Valuta');

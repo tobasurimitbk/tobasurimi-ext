@@ -55,7 +55,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('BAHAN PENOLONG', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -88,7 +88,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('BAHAN PENOLONG', $this->this_company_id);
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -162,7 +162,7 @@ class POLokalBahanPenolong extends BaseController
                 "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
-                "total"         => number_format($data->total),
+                "total"         => "Rp " . number_format($data->total),
                 "currencyName"      => $data->currencyName,
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
@@ -203,9 +203,6 @@ class POLokalBahanPenolong extends BaseController
                 // "payment_term" => [
                 //     "rules" => "required"
                 // ],
-                "currency" => [
-                    "rules" => "required"
-                ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
@@ -237,7 +234,6 @@ class POLokalBahanPenolong extends BaseController
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                    "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note"                  => $this->request->getPost("note"),
@@ -333,9 +329,6 @@ class POLokalBahanPenolong extends BaseController
                 // "payment_term" => [
                 //     "rules" => "required"
                 // ],
-                "currency" => [
-                    "rules" => "required"
-                ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
@@ -365,7 +358,6 @@ class POLokalBahanPenolong extends BaseController
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                    "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note"                  => $this->request->getPost("note"),

@@ -140,11 +140,10 @@ class SupplierModel extends Model
         return $supplierData;
     }
 
-    public function getSupplierByKategoriAndType($kategori, $type, $company_id)
+    public function getSupplierByKategoriAndType($type, $company_id)
     {
         $arrCondition = [
             'deletedAt' => null,
-            // 'kategori' => $kategori,
             'type' => $type,
             'company_id' => $company_id
         ];
