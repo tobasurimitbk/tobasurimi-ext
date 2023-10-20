@@ -30,13 +30,13 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDateGlobal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai Absensi</label>
+                                        <label for="floatingInput">Mulai</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDateGlobal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">selesai </label>
+                                        <label for="floatingInput">Selesai </label>
                                     </div>
                                 </div>
                             </div>
@@ -83,13 +83,13 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDatePersonal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai Absen</label>
+                                        <label for="floatingInput">Mulai</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDatePersonal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">Selesai Absen</label>
+                                        <label for="floatingInput">Selesai</label>
                                     </div>
                                 </div>
                             </div>
