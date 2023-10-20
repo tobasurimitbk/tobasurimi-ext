@@ -107,22 +107,4 @@ class PayrollGajiConjunctionModel extends Model
 
         return $nominal;
     }
-
-    public function getNominalGajiPerHariPayroll($payrollID)
-    {
-        return $this->asArray()->select('payroll_gaji_conjunction.*')
-            ->join('tunjangan', 'payroll_gaji_conjunction.tunjangan_id = tunjangan.id')
-            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-            ->where('tunjangan.is_gaji_harian', 1)
-            ->first();
-    }
-
-    public function getNominalUangCadanganPayroll($payrollID)
-    {
-        return $this->asArray()->select('payroll_gaji_conjunction.*')
-            ->join('tunjangan', 'payroll_gaji_conjunction.tunjangan_id = tunjangan.id')
-            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-            ->where('tunjangan.is_cadangan', '1')
-            ->first();
-    }
 }
