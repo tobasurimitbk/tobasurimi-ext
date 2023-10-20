@@ -161,6 +161,7 @@ class POLokalBahanPenolong extends BaseController
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
                 "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
+                "companyName"  => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "total"         => "Rp " . number_format($data->total),
                 "is_posted"     => $data->is_posted,
@@ -225,11 +226,9 @@ class POLokalBahanPenolong extends BaseController
                 $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
 
                 $insertData = [
-                    "company_id"            => $this->this_company_id,
                     "purchase_request_id"   => $purchase_request_id,
                     "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "divisi_id"             => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
@@ -250,9 +249,9 @@ class POLokalBahanPenolong extends BaseController
                 $insertData["total"] = $totalPrice;
 
                 if ($insertData["po_no"] === "") {
-                    $dataDivisi = $this->DivisisModel->find($insertData["divisi_id"]);
+                    $dataDivisi = $this->DivisisModel->find($this->request->getPost("divisi_id"));
                     $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $insertData["divisi_id"], $last_day);
+                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $this->request->getPost("divisi_id"), $last_day);
                 };
 
                 $insert = $this->AMPurchaseOrderModel->insert($insertData);
@@ -350,20 +349,41 @@ class POLokalBahanPenolong extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $insertData = [
-                    "company_id"            => $this->this_company_id,
-                    "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
-                    "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "po_type"               => 'Lokal',
-                    "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                    "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                    "note"                  => $this->request->getPost("note"),
-                    "isPosted"              => false,
-                    "createdBy"             => session()->get("login")->user_id,
-                    "items"                 => json_decode($this->request->getPost("items"))
-                ];
+                if(!empty($this->request->getPost("auto_generate")))
+                {
+                    $dataDivisi = $this->DivisisModel->find($this->request->getPost("divisi_id"));
+                    $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+
+                    $insertData = [
+                        "po_no"                 => $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $this->request->getPost("divisi_id"), $last_day),
+                        "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                        "po_type"               => 'Lokal',
+                        "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                        //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                        "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
+                        //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                        "note"                  => $this->request->getPost("note"),
+                        "isPosted"              => false,
+                        "createdBy"             => session()->get("login")->user_id,
+                        "items"                 => json_decode($this->request->getPost("items"))
+                    ];
+                }
+                else
+                {
+                    $insertData = [
+                        "po_no"                 => $this->request->getPost("po_no"),
+                        "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                        "po_type"               => 'Lokal',
+                        "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                        //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                        "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
+                        //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                        "note"                  => $this->request->getPost("note"),
+                        "isPosted"              => false,
+                        "createdBy"             => session()->get("login")->user_id,
+                        "items"                 => json_decode($this->request->getPost("items"))
+                    ];
+                }
 
                 if ($insertData) {
                     $this->AMPurchaseOrderModel->update($id, $insertData);

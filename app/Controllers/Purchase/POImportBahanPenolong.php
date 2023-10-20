@@ -117,7 +117,6 @@ class POImportBahanPenolong extends BaseController
         ];
 
         $condition = [
-            "am_purchase_orders.company_id"     => $this->this_company_id,
             "am_purchase_orders.po_type"        => "Import"
         ];
 
@@ -145,7 +144,8 @@ class POImportBahanPenolong extends BaseController
                 "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
-                "total"         => number_format($data->total),
+                "companyName"  => $data->companyName,
+                "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "currencyName"  => $data->currencyName,
                 "itemCount"     => $data->itemCount,
                 "is_posted"     => $data->is_posted,
@@ -227,11 +227,9 @@ class POImportBahanPenolong extends BaseController
                 $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
                 
                 $payload = [
-                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
                     "purchase_request_id" => $purchase_request_id,
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "divisi_id" => $divisi_id,
                     "po_type" => "Import",
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
@@ -305,7 +303,6 @@ class POImportBahanPenolong extends BaseController
                             'am_purchase_order_id' => $response,
                             'purchase_request_detail_id' => $data->purchase_request_detail_id,
                             'barang_id' =>$barang_id,
-                            'spec' => $data->spec,
                             'note' => $data->note,
                             'unit' => $data->unit,
                             'qty' => $data->qty,
@@ -427,10 +424,8 @@ class POImportBahanPenolong extends BaseController
                 $no = $this->amPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $divisi, date('y'), $divisi_id, $last_day);
 
                 $payload = [
-                    "company_id" => formatter($this->this_company_id, "STR_TO_INT"),
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "divisi_id" => $divisi_id,
                     "po_type" => "Import",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "payment_term" => $this->request->getPost("payment_term"),

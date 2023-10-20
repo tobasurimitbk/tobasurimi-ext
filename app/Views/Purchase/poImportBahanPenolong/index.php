@@ -40,6 +40,7 @@
                         <tr>
                             <th>No.</th>
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
+                            <th onclick="changeSort('companyName')" class="sort">Company</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
@@ -104,6 +105,10 @@
         },
         {
             data: "po_date",
+            className: "text-center"
+        },
+        {
+            data: "companyName",
             className: "text-center"
         },
         {

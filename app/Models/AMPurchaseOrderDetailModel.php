@@ -70,8 +70,8 @@ class AMPurchaseOrderDetailModel extends Model
             (am_purchase_order_details.qty * am_purchase_order_details.price + am_purchase_order_details.additional_cost) AS totalPrice,
             am_purchase_order_details.price AS price,
             am_purchase_order_details.additional_cost AS additional_cost,
-            barangs.nama_barang, 
-            barangs.kode_barang,
+            barang_master.barang_name as nama_barang, 
+            barang_master.kode_barang,
             taxppn.tax_value as ppnValue, 
             taxpph.tax_value as pphValue, 
             satuans.id as id_satuan, 
@@ -80,7 +80,7 @@ class AMPurchaseOrderDetailModel extends Model
         $builder = $this->db->table('am_purchase_order_details')
             ->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
-            ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
             ->join('taxes AS taxpph', 'taxpph.id = am_purchase_order_details.pph', 'left');
@@ -105,8 +105,8 @@ class AMPurchaseOrderDetailModel extends Model
             (am_purchase_order_details.qty * am_purchase_order_details.price + am_purchase_order_details.additional_cost) AS totalPrice,
             (am_purchase_order_details.price) AS price,
             (am_purchase_order_details.additional_cost) AS additional_cost,
-            barangs.nama_barang, 
-            barangs.kode_barang,
+            barang_master.barang_name as nama_barang, 
+            barang_master.kode_barang,
             taxppn.tax_value as ppnValue, 
             taxpph.tax_value as pphValue, 
             satuans.id as id_satuan, 
@@ -116,7 +116,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
-            ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
             ->join('taxes AS taxpph', 'taxpph.id = am_purchase_order_details.pph', 'left');
@@ -140,8 +140,8 @@ class AMPurchaseOrderDetailModel extends Model
             FORMAT(CEILING(am_purchase_order_details.qty) * CEILING(am_purchase_order_details.price) + CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS totalPrice,
             FORMAT(CEILING(am_purchase_order_details.price), 'N', 'en-us') AS price,
             FORMAT(CEILING(am_purchase_order_details.additional_cost), 'N', 'en-us') AS additional_cost,
-            barangs.nama_barang, 
-            barangs.kode_barang,
+            barang_master.barang_name as nama_barang, 
+            barang_master.kode_barang,
             taxppn.tax_value as ppnValue, 
             taxpph.tax_value as pphValue, 
             satuans.id as id_satuan, 
@@ -150,7 +150,7 @@ class AMPurchaseOrderDetailModel extends Model
         $builder = $this->db->table('am_purchase_order_details')
             ->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
-            ->join('barangs', 'barangs.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
             ->join('taxes AS taxppn', 'taxppn.id = am_purchase_order_details.ppn', 'left')
             ->join('taxes AS taxpph', 'taxpph.id = am_purchase_order_details.pph', 'left');

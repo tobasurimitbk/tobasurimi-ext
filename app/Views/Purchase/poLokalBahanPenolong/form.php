@@ -62,7 +62,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="spp" name="spp" id="spp" value="<?= !empty($dataPOLokal) ? $dataPOLokal->purchase_request_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <?php if (!empty($dataPOLokal)) { ?>
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
@@ -99,7 +99,7 @@
                             </div>
                         <?php } ?>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -112,10 +112,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" readonly type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->companyName : ""; ?>" class="form-control company" placeholder="Company">
+                            <label for="floatingInput">Company</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataPOLokal) ? $dataPOLokal->divisi_id : ""; ?>" class="form-control divisi_id" id="divisi_id" name="divisi_id">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->divisiName : ""; ?>" readonly="true" class="form-control divisi" id="divisi" name="divisi" placeholder="Divisi">
+                            <input autocomplete="one-time-code" readonly type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->divisiName : ""; ?>" class="form-control divisi" id="divisi" name="divisi" placeholder="Divisi">
                             <label for="floatingInput">Departemen</label>
                         </div>
                     </div>
@@ -712,6 +720,7 @@
                         if (res.status) {
                             $(".divisi_id").val(res?.data?.divisi_id)
                             $(".divisi").val(res?.data?.divisiName)
+                            $(".company").val(res?.data?.companyName)
 
                             let new_list_items = []
                             let tag_html = "";
@@ -835,8 +844,9 @@
 
                             $(".foot-detail-table").append(tag_total);
                         } else {
-                            $(".divisi_id").val()
-                            $(".divisi").val()
+                            $(".divisi_id").val('')
+                            $(".divisi").val('')
+                            $(".company").val('')
 
                             list_items = []
 
