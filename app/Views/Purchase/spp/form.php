@@ -111,7 +111,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
+                        <input autocomplete="one-time-code" type="hidden" class="form-control type" id="type" name="type" value="<?= !empty($dataSPP) ? $dataSPP->spp_type : ""; ?>">
+                            <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? 'disabled="true"' : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                                 <option value="Lokal" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Lokal" ? "selected" : "") : ""; ?>>Lokal</option>
                                 <option value="Import" <?= !empty($dataSPP) ? ($dataSPP->spp_type === "Import" ? "selected" : "") : ""; ?>>Import</option>
                             </select>
