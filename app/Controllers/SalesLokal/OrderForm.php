@@ -15,6 +15,7 @@ use App\Models\DetailStockBarang;
 use App\Models\StockDetailModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\AllNoModel;
+use App\Models\MetadataModel;
 
 use Error;
 use ErrorException;
@@ -53,6 +54,7 @@ class OrderForm extends BaseController
         $this->stockDetailModel = new StockDetailModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->AllNoModel = new AllNoModel();
+        $this->MetaDataModel = new MetadataModel();
         $this->db = \Config\Database::connect();
 
         $this->userId = session()->get("login")->user_id;
@@ -72,6 +74,7 @@ class OrderForm extends BaseController
             ->join('metadata', 'metadata.id = customers.termin')
             ->where('customers.company_id', $this->this_company_id)
             ->findAll();
+        
 
         $data = [
             "dataCustomers" => $customers,
@@ -399,12 +402,16 @@ class OrderForm extends BaseController
             ->join('employees', 'employees.id = customers.sales_id')
             ->where('customers.company_id', $this->this_company_id)
             ->findAll();
+        
+        $metadatas = $this->MetaDataModel->findAll();
+        
         // dd($dataSalesOrder->detail);
         $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
         $dataSalesOrder->shipping_date = $dataSalesOrder->shipping_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->shipping_date)) : "";
         $data = [
             "data" => $dataSalesOrder,
             "dataCustomers" => $customers,
+            "dataMetaData"  => $metadatas,
             "id_user" => $dataSalesOrder->id_user,
             // "seller_name" => $dataSalesOrder->seller_name,
 
@@ -981,5 +988,19 @@ class OrderForm extends BaseController
         $domPdf->stream($fileName, array("Attachment" => false));
 
         exit();
+    }
+
+    public function getMetaData($id){
+
+        $metadatas = $this->MetaDataModel
+        ->where('metadata.id', $id)
+        ->findAll();
+
+        $data = [
+            "dataMetaData" => $metadatas,
+        ];
+
+        echo json_encode($data);
+        return;
     }
 }

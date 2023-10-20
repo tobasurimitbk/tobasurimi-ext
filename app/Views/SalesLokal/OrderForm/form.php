@@ -35,7 +35,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control sales_name" disabled=true value="<?= $data->no_sales_order ?? '' ?>">
-                            <label for="floatingInput">No. SO</label>
+                            <label for="floatingInput">No. Order</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -58,7 +58,7 @@
                             <select class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->id_customer === true ? 'disabled=true' : '') : ''; ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer) : ?>
-                                    <option value="<?= $customer['id']; ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                    <option value="<?= $customer['id']; ?>" data-tipepelanggan="<?= rawurlencode($customer['tipe_pelanggan']); ?>" data-address="<?= rawurlencode($customer['address']) ?>" data-termin="<?= rawurlencode($customer['termin']) ?>" data-salesname="<?= rawurlencode($customer['salesName']); ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Konsumen</label>
@@ -79,6 +79,12 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" disabled class="form-control input-picker tipe_pelanggan" id="tipe_pelanggan" name="tipe_pelanggan" placeholder="Tipe Pelanggan">
+                            <label for="floatingInput">Tipe Pelanggan</label>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" class="form-control input-picker shipping_date" id="shipping_date" name="shipping_date" <?= !empty($data) ? ($data->shipping_date === true ? 'disabled=true' : '') : ''; ?> value="<?= !empty($data) ? $data->shipping_date : ""; ?>" placeholder="End of time">
@@ -213,12 +219,20 @@
                     <!-- <input autocomplete="one-time-code" type="hidden" class="id_barang" name="id_barang" id="id_barang" /> -->
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="number" readonly="true" class="form-control stok" name="stok" id="stok" placeholder="Stok">
+                                    <label for="floatingInput">Stok</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -469,14 +483,35 @@
         $('.id_customer').select2({
             placeholder: "",
             theme: "bootstrap-5"
-        }).change(function() {
-            const customerAddress = $(this).find(':selected').data('address');
-            const termin = $(this).find(':selected').data('termin');
-            const salesName = $(this).find(':selected').data('salesname');
+        });
+        
+        $(".id_customer").change(function() {
+            // if ($(".id_customer").val()) {
+                const customerAddress = $(this).find(':selected').data('address');
+                const termin = $(this).find(':selected').data('termin');
+                const salesName = $(this).find(':selected').data('salesname');
+                // const tipePelanggan = $(this).find(':selected').data('tipepelanggan');
+        
+                $('#tagihan_ke').val(decodeURIComponent(customerAddress));
+                $('#termin').val(decodeURIComponent(termin));
+                $('#sales_name').val(decodeURIComponent(salesName));
+                
+                let idCustomer = $(".id_customer").val();
+                console.log(idCustomer);
+                $.ajax({
+                    url: "<?= base_url('/order-form-lokal/getmetaData'); ?>" + "/" + idCustomer,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(res) {
+                        $(".tipe_pelanggan").empty();
 
-            $('#tagihan_ke').val(decodeURIComponent(customerAddress));
-            $('#termin').val(decodeURIComponent(termin));
-            $('#sales_name').val(decodeURIComponent(salesName));
+                        // console.log(res.dataWarehouse)
+                        res.dataMetaData.forEach(function(item) {
+                            $(".tipe_pelanggan").val(item.value);
+                        })
+                    }
+                })
+            // }
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -673,6 +708,7 @@
                 let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
                 let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
                 let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : "";
+                let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
                 $.ajax({
@@ -687,6 +723,7 @@
                         // console.log(res.dataWarehouse)
                         res.dataWarehouse.forEach(function(item) {
                             $(".warehouse").append(`<option  value="${item.warehouse_id}" ${warehouseId==item.id?"selected":""}>${item.warehouse_name}</option>`);
+                            $(".stok").val(item.qty);
                         })
                     }
                 })
@@ -717,6 +754,7 @@
 
             let id_barang = $(this).data('id_barang')
             let nama_barang = $(this).data('nama_barang')
+            let tipe_pelanggan = $(this).data('tipe_pelanggan')
             let harga = $(this).data('harga')
             let qty = $(this).data('qty')
             let amount = $(this).data('amount')
@@ -732,10 +770,14 @@
 
             validator_detail.resetForm();
             validator_detail.reset();
+            
+            console.log(nama_barang);
+            console.log(tipe_pelanggan);
 
             $(".id_detail").val(id)
-            $(".qty").val(qty)
             // $(".harga").val(parseInt(harga))
+            $(".qty").val(qty)
+            $(".tipe_pelanggan").val(tipe_pelanggan)
             $(".amount").val(amount)
             $(".keterangan").val(keterangan)
             $(".tax").val(tax)
