@@ -20,6 +20,7 @@ class SupplierModel extends Model
         'address',
         'no_npwp',
         'phone',
+        'fax',
         'type',
         'contact_person',
         'province_id',
