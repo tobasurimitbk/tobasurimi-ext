@@ -611,10 +611,10 @@ class POLokalBahanPenolong extends BaseController
                     $totalPpn += $totalan * (float)$value->ppnValue / 100;
                 }
 
-                $dataBPLokal->totalPrice = number_format($totalPrice);
-                $dataBPLokal->totalDisc = number_format($totalDisc);
-                $dataBPLokal->totalPpn = number_format($totalPpn);
-                $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn);
+                $dataBPLokal->totalPrice = number_format(formatter($totalPrice, "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalDisc = number_format(formatter($totalDisc, "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPpn = number_format(formatter($totalPpn, "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPo = number_format(formatter(($totalPrice - $totalDisc + $totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
                 // $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
 
                 $data["dataPOLokal"] = $dataBPLokal;
