@@ -71,12 +71,10 @@ class Supplier extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "idCompany"     => $this->this_company_id,
             "type"          => "BAHAN BAKU"
         ];
 
         $condition = [
-            "suppliers.company_id"  => $this->this_company_id,
             "suppliers.type"        => "BAHAN BAKU"
         ];
         $addCondition = [
@@ -172,7 +170,6 @@ class Supplier extends BaseController
             }
 
             $insertData = [
-                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -336,12 +333,10 @@ class Supplier extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "idCompany"     => $this->this_company_id,
             "type"          => "BAHAN PENOLONG"
         ];
 
         $condition = [
-            "suppliers.company_id"  => $this->this_company_id,
             "suppliers.type"        => "BAHAN PENOLONG"
         ];
         $addCondition = [
@@ -432,7 +427,6 @@ class Supplier extends BaseController
             }
 
             $insertData = [
-                "company_id" => $this->this_company_id,
                 "kode" => $this->request->getPost("kode"),
                 "name" => $this->request->getPost("name"),
                 "address" => $this->request->getPost("address"),
@@ -624,7 +618,7 @@ class Supplier extends BaseController
 
     public function dropdownSupplier()
     {
-        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
 
         $data = [
             "data" => $dataSupplier

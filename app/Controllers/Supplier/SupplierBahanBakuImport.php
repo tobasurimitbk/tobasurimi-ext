@@ -403,7 +403,7 @@ class SupplierBahanBakuImport extends BaseController
     public function dropdownSupplier()
     {
         $supplierModel = new SupplierModel();
-        $dataSupplier = $supplierModel->getSupplierByKategoriAndType('BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $supplierModel->getSupplierByType('BAHAN BAKU');
 
         $data = [
             "data" => $dataSupplier
