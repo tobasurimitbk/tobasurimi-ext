@@ -147,9 +147,9 @@
 
     <table class="signature-table">
         <tr style="vertical-align: top;">
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Sales</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Gudang</td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Produksi</td>
+            <td style="height: 120px;border-bottom: 1px solid;width: 90px">Sales</td>
+            <td style="height: 120px;border-bottom: 1px solid;width: 90px">Gudang</td>
+            <td style="height: 120px;border-bottom: 1px solid;width: 90px">Produksi</td>
         </tr>
         <tr>
             <td>Date: </td>
