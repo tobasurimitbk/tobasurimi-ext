@@ -108,7 +108,7 @@
                     <tr>
                         <td class="table-border"><b><?= $detail->no ?></b></td>
                         <td class="table-border"><b><?= $detail->kodeBarang ?></b></td>
-                        <td class="table-border"><b><?= $detail->barangName . " " . $detail->spec ?></b></td>
+                        <td class="table-border"><b><?= $detail->barangName ?></b></td>
                         <td class="table-border"><b><?= $detail->qty . " " . $detail->satuanName ?></b></td>
                         <td class="table-border"><b><?= $detail->note ?></b></td>
                         <td class="table-border"><b><?= ($dataSPP->spp_type === "Lokal" ? "Rp " : "") . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>

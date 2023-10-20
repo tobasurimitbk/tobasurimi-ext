@@ -163,7 +163,6 @@ class POLokalBahanPenolong extends BaseController
                 "po_no"         => $data->po_no,
                 "supplierName"  => $data->supplierName,
                 "total"         => "Rp " . number_format($data->total),
-                "currencyName"      => $data->currencyName,
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED"

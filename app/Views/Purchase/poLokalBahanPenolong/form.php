@@ -22,7 +22,7 @@
                 </button>
 
                 <?php if ($dataPOLokal->is_posted === "0") { ?>
-                    <button class="btn btn-success posting-spp float-right">
+                    <button class="btn btn-success posting-spp float-right posting-po">
                         Posting
                     </button>
                 <?php } ?>
@@ -239,17 +239,17 @@
                                             <td><?= $details->kode_barang; ?></td>
                                             <td><?= $details->nama_barang; ?></td>
                                             <td><?= $details->nama_satuan; ?></td>
-                                            <td><?= "Rp " . $details->price; ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
                                             <td><?= formatter($details->remaining_qty, "STR_TO_FLOAT"); ?></td>
                                             <td><?= formatter($details->qty_diterima, "STR_TO_FLOAT"); ?></td>
-                                            <td><?= "Rp " . $details->totalPriceWithoutAdditional; ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->disc, "STR_TO_INT"); ?></td>
-                                            <td><?= "Rp " . $details->additional_cost; ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= $details->ppn; ?></td>
                                             <td><?= $details->pph; ?></td>
                                             <td>
-                                                <button data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= $details->totalPriceWithoutAdditional; ?>" data-additional_cost="<?= $details->additional_cost; ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= $details->price; ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
+                                                <button data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-additional_cost="<?= number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                                 </button>
                                             </td>
@@ -259,13 +259,13 @@
                                             <td><?= $details->kode_barang; ?></td>
                                             <td><?= $details->nama_barang; ?></td>
                                             <td><?= $details->nama_satuan; ?></td>
-                                            <td><?= "Rp " . $details->price; ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->qty, "STR_TO_FLOAT"); ?></td>
                                             <td><?= formatter($details->remaining_qty, "STR_TO_FLOAT"); ?></td>
                                             <td><?= formatter($details->qty_diterima, "STR_TO_FLOAT"); ?></td>
-                                            <td><?= "Rp " . $details->totalPriceWithoutAdditional; ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->disc, "STR_TO_INT"); ?></td>
-                                            <td><?= "Rp " . $details->additional_cost; ?></td>
+                                            <td><?= "Rp " . number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= $details->ppn; ?></td>
                                             <td><?= $details->pph; ?></td>
                                             <td></td>
@@ -440,11 +440,11 @@
                 nama_barang: '<?= $details->nama_barang; ?>',
                 nama_satuan: '<?= $details->nama_satuan; ?>',
                 satuan: <?= $details->unit; ?>,
-                harga: '<?= $details->price; ?>',
+                harga: '<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>',
                 qty: Number('<?= $details->qty; ?>'),
-                total: '<?= $details->totalPriceWithoutAdditional; ?>',
+                total: '<?= number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?>',
                 keterangan: '<?= $details->note; ?>',
-                additional_cost: '<?= $details->additional_cost; ?>',
+                additional_cost: '<?= number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?>',
                 disc: Number('<?= $details->disc; ?>'),
                 ppn: '<?= $details->ppn; ?>',
                 pph: '<?= $details->pph; ?>',
@@ -739,8 +739,8 @@
                                 tag_html += `<td>`;
                                 tag_html += item.satuanName;
                                 tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += "Rp " + Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += `<td>Rp `;
+                                tag_html += Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += Number(item.qty);
@@ -751,8 +751,8 @@
                                 tag_html += `<td>`;
                                 tag_html += 0;
                                 tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += "Rp " + Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                tag_html += `<td>Rp `;
+                                tag_html += Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += 0;
@@ -815,7 +815,7 @@
                             tag_total += "<b>TOTAL</b>";
                             tag_total += "</td>";
                             tag_total += "<td>";
-                            tag_total += `<b>"Rp " + ${total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                            tag_total += `<b>Rp ${total_harga_barang.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_qty}</b>`;
@@ -827,7 +827,7 @@
                             tag_total += `<b>${total_qty_diterima}</b>`;
                             tag_total += "</td>";
                             tag_total += "<td>";
-                            tag_total += `<b>"Rp " + ${total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+                            tag_total += `<b>Rp ${total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                             tag_total += "</td>";
                             tag_total += "<td colspan='5'>";
                             tag_total += "</td>";
@@ -1066,8 +1066,8 @@
                             tag_html += `<td>`;
                             tag_html += item.qty_diterima;
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += "Rp " + item.total;
+                            tag_html += `<td>Rp `;
+                            tag_html += item.total;
                             tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += disc ? disc : 0;
@@ -1166,7 +1166,7 @@
             })
         })
 
-        $(".posting-spp").click(function() {
+        $(".posting-po").click(function() {
             Swal.fire({
                 icon: 'question',
                 title: 'Yakin akan di Posting?',

@@ -83,7 +83,7 @@ class AMPurchaseOrderModel extends Model
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
-            ->join('metadata', 'metadata.id = am_purchase_orders.currency')
+            ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->groupBy(('am_purchase_orders.id'))
             ->orderBy($sort, $sortType);
