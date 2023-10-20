@@ -30,13 +30,13 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDateGlobal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai Absensi</label>
+                                        <label for="floatingInput">Mulai</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDateGlobal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">Selesai Absensi</label>
+                                        <label for="floatingInput">Selesai </label>
                                     </div>
                                 </div>
                             </div>
@@ -83,13 +83,13 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDatePersonal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai Absen</label>
+                                        <label for="floatingInput">Mulai</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDatePersonal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">Selesai Absen</label>
+                                        <label for="floatingInput">Selesai</label>
                                     </div>
                                 </div>
                             </div>
@@ -120,8 +120,10 @@
                     <i class="fa-solid fa-print"></i> Export
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><button class="dropdown-item" onclick="printPerDivisi('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Daftar Upah</button></li>
-                    <li><button class="dropdown-item" onclick="detailPerDivisi('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Slip Gaji</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Daftar Upah</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Slip Gaji</button></li>
+                    <li><button class="dropdown-item" onclick="print('<?= base_url('payroll/print/summary/' . $year . '-' . $month) ?>')">Summary</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan/' . $year . '-' . $month) ?>')">Daftar Potongan</button></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -176,7 +178,7 @@
         <div class="card-body">
             <div class="row justify-content-start mb-3">
                 <div class="col-md-4">
-                    <div class="form-floating">
+                    <div class="form-floating mt-1">
                         <select class="form-select" name="filterDivisiID" id="filterDivisiID" aria-label="Floating label select example">
                             <option value="">
                                 Cari Berdasarkan Divisi
@@ -191,7 +193,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-floating">
+                    <div class="form-floating mt-1">
                         <select class="form-select" name="filterEmployeeID" id="filterEmployeeID" aria-label="Floating label select example">
                             <option value="">
                                 Cari Berdasarkan Nama Karyawan
@@ -387,19 +389,19 @@
         } else if (startDateGlobal == '') {
             Swal.fire({
                 icon: 'warning',
-                title: "Tanggal mulai absensi tidak boleh kosong",
+                title: "Tanggal mulai tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (finishDateGlobal == '') {
             Swal.fire({
                 icon: 'warning',
-                title: "Tanggal selesai absensi tidak boleh kosong",
+                title: "Tanggal selesai  tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else {
             Swal.fire({
                 icon: 'question',
-                title: 'Generate Global Payroll ?',
+                title: 'Generate Global Payroll (Data payroll pegawai periode ini akan di reset) ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -489,19 +491,19 @@
         } else if (startDatePersonal == '') {
             Swal.fire({
                 icon: 'warning',
-                title: "Tanggal mulai absensi tidak boleh kosong",
+                title: "Tanggal mulai tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (finishDatePersonal == '') {
             Swal.fire({
                 icon: 'warning',
-                title: "Tanggal selesai absensi tidak boleh kosong",
+                title: "Tanggal selesai  tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else {
             Swal.fire({
                 icon: 'question',
-                title: 'Generate Personal Presensi ?',
+                title: 'Generate Personal Payroll (Data payroll pegawai ini akan direset) ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -664,7 +666,7 @@
     });
 
 
-    const printPerDivisi = function(url) {
+    const printWithDivision = function(url) {
         var divisionID = $("#filterDivisiID").val();
         if (divisionID == "") {
             Swal.fire({
@@ -677,17 +679,8 @@
         }
     }
 
-    const detailPerDivisi = function(url) {
-        var divisionID = $("#filterDivisiID").val();
-        if (divisionID == "") {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Pilih Divisi Dahulu',
-                confirmButtonColor: '#4e73df',
-            });
-        } else {
-            window.open(url + '/' + divisionID, "_blank");
-        }
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 </script>
 

@@ -62,9 +62,9 @@
                                     <td><?= $p['employee']['id'] ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Tahun / Bulan </td>
+                                    <td>Tahun / Bulan / Periode </td>
                                     <td>:</td>
-                                    <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?></td>
+                                    <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                 </tr>
                                 <tr>
                                     <td>No Induk / Divisi</td>
@@ -102,9 +102,9 @@
                                     <td><?= $p['employee']['id'] ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Tahun / Bulan </td>
+                                    <td>Tahun / Bulan / Periode </td>
                                     <td>:</td>
-                                    <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?></td>
+                                    <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                 </tr>
                                 <tr>
                                     <td>No Induk / Divisi</td>
@@ -132,7 +132,7 @@
                             <tr>
                                 <td>Hari Kerja</td>
                                 <td>:</td>
-                                <td><?= $p['payroll']['hadir'] ?> Hari</td>
+                                <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                             </tr>
                             <tr>
                                 <td>Tambahan Hari Libur Kerja</td>
@@ -147,17 +147,17 @@
                             <tr>
                                 <td>Gaji</td>
                                 <td>:</td>
-                                <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari</td>
                             </tr>
                             <tr>
                                 <td>Cadangan</td>
                                 <td>:</td>
-                                <td><?= "Rp " . number_format($p['nominalUangCadangan'] == null ? 0 : $p['nominalUangCadangan']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                <td><?= "Rp " . number_format($p['payroll']['nominal_cadangan'], 2, ',', '.') ?>/Hari</td>
                             </tr>
                             <tr>
                                 <td>Total Gaji</td>
                                 <td>:</td>
-                                <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                <td><?= "Rp " . number_format(($p['payroll']['nominal_gaji_harian'] + $p['payroll']['nominal_cadangan']), 2, ',', '.') ?>/Hari</td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
@@ -185,7 +185,7 @@
                             <tr>
                                 <td>Hari Kerja</td>
                                 <td>:</td>
-                                <td><?= $p['payroll']['hadir'] ?> Hari</td>
+                                <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                             </tr>
                             <tr>
                                 <td>Tambahan Hari Libur Kerja</td>
@@ -200,17 +200,17 @@
                             <tr>
                                 <td>Gaji</td>
                                 <td>:</td>
-                                <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari</td>
                             </tr>
                             <tr>
                                 <td>Cadangan</td>
                                 <td>:</td>
-                                <td><?= "Rp " . number_format($p['nominalUangCadangan'] == null ? 0 : $p['nominalUangCadangan']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                <td><?= "Rp " . number_format($p['payroll']['nominal_cadangan'], 2, ',', '.') ?>/Hari</td>
                             </tr>
                             <tr>
                                 <td>Total Gaji</td>
                                 <td>:</td>
-                                <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                <td><?= "Rp " . number_format(($p['payroll']['nominal_gaji_harian'] + $p['payroll']['nominal_cadangan']), 2, ',', '.') ?>/Hari</td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
@@ -252,14 +252,14 @@
                                     <tr>
                                         <td><?= $pg['name'] ?></td>
                                         <td>:</td>
-                                        <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                             <tr>
                                 <td>Potongan Lain-Lain</td>
                                 <td>:</td>
-                                <td>(-) <?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
+                                <td><?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
                             </tr>
                         </table>
                     </td>
@@ -275,19 +275,19 @@
                                     <tr>
                                         <td><?= $pg['name'] ?></td>
                                         <td>:</td>
-                                        <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                             <tr>
                                 <td>Potongan Lain-Lain</td>
                                 <td>:</td>
-                                <td>(-) <?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
+                                <td><?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
-                <tr>
+                <!-- <tr>
                     <td colspan="2">
                         <hr>
                     </td>
@@ -300,7 +300,7 @@
                                     <tr>
                                         <td><?= $pg['name'] ?></td>
                                         <td>:</td>
-                                        <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -313,13 +313,13 @@
                                     <tr>
                                         <td><?= $pg['name'] ?></td>
                                         <td>:</td>
-                                        <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </table>
                     </td>
-                </tr>
+                </tr> -->
                 <tr>
                     <td colspan="2">
                         <hr>
@@ -405,9 +405,9 @@
                                         <td><?= $p['employee']['id'] ?></td>
                                     </tr>
                                     <tr>
-                                        <td>Tahun / Bulan </td>
+                                        <td>Tahun / Bulan / Periode </td>
                                         <td>:</td>
-                                        <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?></td>
+                                        <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                     </tr>
                                     <tr>
                                         <td>No Induk / Divisi</td>
@@ -445,9 +445,9 @@
                                         <td><?= $p['employee']['id'] ?></td>
                                     </tr>
                                     <tr>
-                                        <td>Tahun / Bulan </td>
+                                        <td>Tahun / Bulan / Periode </td>
                                         <td>:</td>
-                                        <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?></td>
+                                        <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                     </tr>
                                     <tr>
                                         <td>No Induk / Divisi</td>
@@ -475,7 +475,7 @@
                                 <tr>
                                     <td>Hari Kerja</td>
                                     <td>:</td>
-                                    <td><?= $p['payroll']['hadir'] ?> Hari</td>
+                                    <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                                 </tr>
                                 <tr>
                                     <td>Tambahan Hari Libur Kerja</td>
@@ -490,17 +490,17 @@
                                 <tr>
                                     <td>Gaji</td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                    <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari</td>
                                 </tr>
                                 <tr>
                                     <td>Cadangan</td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($p['nominalUangCadangan'] == null ? 0 : $p['nominalUangCadangan']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                    <td><?= "Rp " . number_format($p['payroll']['nominal_cadangan'], 2, ',', '.') ?>/Hari</td>
                                 </tr>
                                 <tr>
                                     <td>Total Gaji</td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                    <td><?= "Rp " . number_format(($p['payroll']['nominal_gaji_harian'] + $p['payroll']['nominal_cadangan']), 2, ',', '.') ?>/Hari</td>
                                 </tr>
                                 <tr>
                                     <td colspan="2"></td>
@@ -528,7 +528,7 @@
                                 <tr>
                                     <td>Hari Kerja</td>
                                     <td>:</td>
-                                    <td><?= $p['payroll']['hadir'] ?> Hari</td>
+                                    <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                                 </tr>
                                 <tr>
                                     <td>Tambahan Hari Libur Kerja</td>
@@ -543,17 +543,17 @@
                                 <tr>
                                     <td>Gaji</td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                    <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari</td>
                                 </tr>
                                 <tr>
                                     <td>Cadangan</td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($p['nominalUangCadangan'] == null ? 0 : $p['nominalUangCadangan']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                    <td><?= "Rp " . number_format($p['payroll']['nominal_cadangan'], 2, ',', '.') ?>/Hari</td>
                                 </tr>
                                 <tr>
                                     <td>Total Gaji</td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($p['gajiPerHari'] == null ? 0 : $p['gajiPerHari']['nominal'], 2, ',', '.') ?>/Hari</td>
+                                    <td><?= "Rp " . number_format(($p['payroll']['nominal_gaji_harian'] + $p['payroll']['nominal_cadangan']), 2, ',', '.') ?>/Hari</td>
                                 </tr>
                                 <tr>
                                     <td colspan="2"></td>
@@ -595,14 +595,14 @@
                                         <tr>
                                             <td><?= $pg['name'] ?></td>
                                             <td>:</td>
-                                            <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                                 <tr>
                                     <td>Potongan Lain-Lain</td>
                                     <td>:</td>
-                                    <td>(-) <?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
+                                    <td><?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
                                 </tr>
                             </table>
                         </td>
@@ -618,19 +618,19 @@
                                         <tr>
                                             <td><?= $pg['name'] ?></td>
                                             <td>:</td>
-                                            <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                                 <tr>
                                     <td>Potongan Lain-Lain</td>
                                     <td>:</td>
-                                    <td>(-) <?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
+                                    <td><?= "Rp " . number_format($p['totalNominalKeterlambatanPresensi'] + $p['totalNominalRekapPerizinanNotApproved'], 2, ',', '.') ?></td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <td colspan="2">
                             <hr>
                         </td>
@@ -643,7 +643,7 @@
                                         <tr>
                                             <td><?= $pg['name'] ?></td>
                                             <td>:</td>
-                                            <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
@@ -656,13 +656,13 @@
                                         <tr>
                                             <td><?= $pg['name'] ?></td>
                                             <td>:</td>
-                                            <td><?= $pg['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </table>
                         </td>
-                    </tr>
+                    </tr> -->
                     <tr>
                         <td colspan="2">
                             <hr>

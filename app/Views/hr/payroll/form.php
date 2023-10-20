@@ -91,7 +91,7 @@
                 </div>
                 <div class="col-sm-2 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" required name="totalIzin" id="totalIzin" class="form-control target input-picker" value="<?= $payrollDetail['ijin'] ?? 0 ?> Kali">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalIzin" id="totalIzin" class="form-control target input-picker" value="<?= $payrollDetail['izin'] ?? 0 ?> Kali">
                         <label for="floatingInput">Izin</label>
                     </div>
                 </div>
@@ -154,20 +154,20 @@
             <div class="row">
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($gajiPerHari == null ? 0 : $gajiPerHari['nominal'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_gaji_harian'], 2, ',', '.') ?>">
                         <label for="floatingInput">Gaji (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($nominalUangCadangan == null ? 0 : $nominalUangCadangan['nominal'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_cadangan'], 2, ',', '.') ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" id="hariKerja" class="form-control target input-picker" value="<?= $payrollDetail['hadir'] ?> Hari">
-                        <label for="floatingInput">Hari Kerja (Total Masuk)</label>
+                        <input readonly autocomplete="one-time-code" type="text" id="hariKerja" class="form-control target input-picker" value="<?= $payrollDetail['hadir_final'] ?> Hari">
+                        <label for="floatingInput">Hari Kerja (Total Masuk + Perizinan Approved)</label>
                     </div>
                 </div>
             </div>
@@ -295,10 +295,10 @@
                                     <th class="sort">Nominal</th>
                                 </tr>
                             </thead>
-                            <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                            <tbody class="body-table" id="body-table">
                                 <?php $no = 1; ?>
                                 <?php if (count($rekapPerizinanNotApproved) == 0) : ?>
-                                    <td colspan="4" class="text-center">Tidak ada perizinan yang tidak disetujui</td>
+                                    <td colspan=" 4" class="text-center">Tidak ada perizinan yang tidak disetujui</td>
                                 <?php else : ?>
                                     <?php foreach ($rekapPerizinanNotApproved as  $r) : ?>
                                         <tr class="rekapPerizinanTidakDisetujuiTabel" data-id="<?= $r['id'] ?>" data-tanggal="<?= date('d/m/Y', strtotime($r['periode'])) ?>" data-jenis="<?= $r['status'] ?>" data-nominal="<?= $r['nominal_pengurangan'] ?>">
@@ -309,7 +309,7 @@
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
-                                        <td colspan="3" align="right"><b>Total Denda Perizinan Tidak Disetujui Atasan</b></td>
+                                        <td colspan="3" align="right"><b>Pengurangan Gaji Harian</b></td>
                                         <td><b class="text-danger">(-) <?= "Rp " . number_format($totalNominalRekapPerizinanNotApproved,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
@@ -460,48 +460,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-submit-form" id="submitFormKeterlambatanPresensi">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="rekapPerizinanTidakDisetujuiModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name">Update Nominal Denda Perizinan tidak disetujui</label></h5>
-            </div>
-            <form id="formUpdatePerizinanNotApproved" role="form" method="POST">
-                <input type="hidden" name="perizinanID">
-                <input type="hidden" value="<?= $payrollDetail['id'] ?>" name="payrollID">
-                <div class="modal-body">
-                    <?= csrf_field() ?>
-                    <div class="row mb-2">
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly autocomplete="one-time-code" type="text" id="tanggalPerizinan" class="form-control target input-picker" value="">
-                                <label for="floatingInput">Tanggal Perizinan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly autocomplete="one-time-code" type="text" id="jenisPerizinan" class="form-control target input-picker" value="">
-                                <label for="floatingInput">Jenis Perizinan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input name="nominal" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalPerizinanNotApproved" class="form-control target input-picker" value="">
-                                <label for="nominalPerizinanNotApproved" id="nominalPerizinanNotApproved">Nominal</label>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-submit-form" id="submitFormPerizinanNotApproved">Simpan</button>
                 </div>
             </form>
         </div>
@@ -704,102 +662,6 @@
 </script>
 
 <script>
-    $('.rekapPerizinanTidakDisetujuiTabel').click(function() {
-        var id = $(this).data('id');
-        var tanggal = $(this).data('tanggal');
-        var jenis = $(this).data('jenis');
-        var nominal = $(this).data('nominal');
-
-        $("input[name='perizinanID']").val(id);
-        $('#tanggalPerizinan').val(tanggal);
-        $('#jenisPerizinan').val(jenis.split("_")[0]);
-        $('#nominalPerizinanNotApproved').val(formatRupiah(nominal));
-
-        $('#rekapPerizinanTidakDisetujuiModal').modal('show');
-    });
-    var validatorformUpdatePerizinanNotApproved = $("#formUpdatePerizinanNotApproved").validate({
-        rules: {
-            nominal: {
-                required: true
-            }
-        },
-        messages: {
-            nominal: {
-                required: "Nominal wajib diisi"
-            },
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            } else {
-                error.insertAfter(element);
-            }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
-
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
-    $('#submitFormPerizinanNotApproved').click(function(e) {
-        e.preventDefault();
-        if ($("#submitFormPerizinanNotApproved").valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let data = new FormData(document.querySelector("#formUpdatePerizinanNotApproved"));
-                    $.ajax({
-                        url: "<?= base_url("payroll/update/nominal-perizinan-not-approved"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                location.replace(`<?= base_url("payroll/id"); ?>/${response.id}?location=${response.location}`);
-                            });
-                        },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            });
-                        }
-                    });
-
-                }
-            })
-        }
-    });
-</script>
-
-<script>
     $("#gajiPerHari, #cadanganPerHari").change(function() {
         const csrf = $(`[name="${csrfToken}"]`);
 
@@ -810,8 +672,8 @@
         formData.append('nominalGajiPerHari', gajiPerHari);
         formData.append('nominalCadangan', cadanganPerHari);
         formData.append("payrollID", "<?= $payrollDetail['id'] ?>");
-        formData.append("gajiPerHariID", "<?= $gajiPerHari == null ? 0 : $gajiPerHari['id'] ?>");
-        formData.append("cadanganID", "<?= $nominalUangCadangan == null ? 0 : $nominalUangCadangan['id'] ?>");
+        formData.append("gajiPerHariID", "<?= $payrollDetail['nominal_gaji_harian'] ?>");
+        formData.append("cadanganID", "<?= $payrollDetail['nominal_cadangan'] ?>");
 
         $.ajax({
             url: "<?= base_url("payroll/update/nominal-gaji-cadangan"); ?>",

@@ -60,4 +60,14 @@ class GajiConjunctionModel extends Model
 
         return $query->getResultArray();
     }
+
+    public function getNominalByKomponenName($komponenName, $employeeID)
+    {
+        $res =  $this->asArray()->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
+            ->where('employee_id', $employeeID)
+            ->like('tunjangan.name', $komponenName)
+            ->first();
+
+        return ($res == null) ? 0 : $res['nominal'];
+    }
 }

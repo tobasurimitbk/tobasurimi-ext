@@ -306,7 +306,6 @@ $routes->get('/penerimaan-penjualan-lokal/create', 'Penerimaan\SalesOrderPayment
 $routes->get('/order-form-lokal', 'SalesLokal\OrderForm::index', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/warehouseAll/(:segment)', 'SalesLokal\OrderForm::getAllWarehouse/$1', ['filter' => 'Auth']);
-$routes->get('/order-form-lokal/getmetaData/(:segment)', 'SalesLokal\OrderForm::getMetaData/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/id/(:segment)', 'SalesLokal\OrderForm::getById/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/getByCustomer/(:num)', 'SalesLokal\OrderForm::getByCustomerId/$1', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/create', 'SalesLokal\OrderForm::createView', ['filter' => 'Auth']);
@@ -659,12 +658,13 @@ $routes->post('/payroll/generate-single', 'HR\Payroll::generateSinglePayroll', [
 $routes->get('/payroll/id/(:segment)', 'HR\Payroll::detailPayrollView/$1', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-komponen-gaji', 'HR\Payroll::updateNominalKomponenGaji', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::updateNominalKeterlambatanPresensi', ['filter' => 'Auth']);
-$routes->post('/payroll/update/nominal-perizinan-not-approved', 'HR\Payroll::updateNominalPerizinanNotApproved', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-gaji-cadangan', 'HR\Payroll::updateNominalGajiPerHariAndCadangan', ['filter' => 'Auth']);
 $routes->post('/payroll/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->get('/payroll/print/single/(:segment)', 'HR\Payroll::exportPdfPayrollSingle/$1', ['filter' => 'Auth']);
 $routes->get('/payroll/print/division/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivision/$1/$2', ['filter' => 'Auth']);
 $routes->get('/payroll/print/detail/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivisionDetail/$1/$2', ['filter' => 'Auth']);
+$routes->get('/payroll/print/summary/(:segment)', 'HR\Payroll::exportPdfSummary/$1', ['filter' => 'Auth']);
+$routes->get('/payroll/print/potongan/(:segment)/(:segment)', 'HR\Payroll::exportPdfPotongan/$1/$2', ['filter' => 'Auth']);
 
 // formula payroll
 $routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);
@@ -755,27 +755,6 @@ $routes->cli('/api/employees-sync-attendances', 'API\Employees::sync_employee_to
 $routes->cli('/api/sync-attendances', 'API\Attendances::sync_attendance');
 $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance', ['filter' => 'Auth']);
 //$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
-
-//Laporan Accounting
-$routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/pembelian/all', 'Laporan\Accounting\Pembelian::allTransaksi', ['filter' => 'Auth']);
-
-//Tipe Barang
-$routes->get('/tipe-barang', 'Accounting\Barang\TipeBarang::index', ['filter' => 'Auth']);
-$routes->get('/tipe-barang/all', 'Accounting\Barang\TipeBarang::all', ['filter' => 'Auth']);
-$routes->post('/tipe-barang/save', 'Accounting\Barang\TipeBarang::create', ['filter' => 'Auth']);
-$routes->post('/tipe-barang/get', 'Accounting\Barang\TipeBarang::get', ['filter' => 'Auth']);
-$routes->post('/tipe-barang/update', 'Accounting\Barang\TipeBarang::update', ['filter' => 'Auth']);
-$routes->post('/tipe-barang/delete', 'Accounting\Barang\TipeBarang::delete', ['filter' => 'Auth']);
-
-//Tipe AccountModule
-$routes->get('/account-module', 'Accounting\AccountModule\AccountModule::index', ['filter' => 'Auth']);
-$routes->get('/account-module/all', 'Accounting\AccountModule\AccountModule::allAccountModule', ['filter' => 'Auth']);
-$routes->post('/account-module/save', 'Accounting\AccountModule\AccountModule::saveAccountModule', ['filter' => 'Auth']);
-$routes->get('/account-module/id/(:num)', 'Accounting\AccountModule\AccountModule::getByIdAccountModule/$1', ['filter' => 'Auth']);
-$routes->post('/account-module/update', 'Accounting\AccountModule\AccountModule::updateAccountModule', ['filter' => 'Auth']);
-$routes->post('/account-module/delete', 'Accounting\AccountModule\AccountModule::deleteAccountModule', ['filter' => 'Auth']);
 
 //api
 /*

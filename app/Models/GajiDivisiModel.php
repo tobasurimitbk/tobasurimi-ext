@@ -101,4 +101,10 @@ class GajiDivisiModel extends Model
 
         return $res;
     }
+
+    public function getNominalByKomponenName($divisionID, $nominalName)
+    {
+        $res = $this->asArray()->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id')->where('gaji_divisi.division_id', $divisionID)->like('tunjangan.name', $nominalName)->first();
+        return ($res == null) ? 0 : $res['nominal'];
+    }
 }

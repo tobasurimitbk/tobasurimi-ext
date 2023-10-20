@@ -101,7 +101,7 @@ class Payroll extends BaseController
                 "nip" => $p->employeesNIP,
                 "name"  => $p->employeesName,
                 "divisi" => $p->divisiName,
-                "hariKerja" => $p->hadir . " Hari",
+                "hariKerja" => $p->hadir_final . " Hari",
                 "startDate" => date('d/m/Y', strtotime($p->start_date)),
                 "endDate" => date('d/m/Y', strtotime($p->end_date)),
                 "upahBersih" => "Rp " . number_format($p->nominal_uang_gaji, 2, ',', '.'),
@@ -151,10 +151,11 @@ class Payroll extends BaseController
 
             // get employees
             $employeesData = $employeesModel->getEmployees($this->this_company_id);
-
+            $test = [];
             // Insert Again
             foreach ($employeesData as $e) {
                 $status = $attendanceModel->getStatusAttendancesInRange($startDate, $endDate, $e['id']);
+
                 // payroll insert
                 $payrollID = $payrollModel->insert([
                     "company_id" => $e['company_id'],
@@ -170,6 +171,12 @@ class Payroll extends BaseController
                     "hadir" => $status['HADIR_H'],
                     "libur" => $status['LIBUR_L'],
                     "alpha" => $status['ALPHA_A'],
+                    "hadir_final" => 0,
+                    "total_perizinan_not_approved" => 0,
+                    "total_perizinan_approved" => 0,
+                    "nominal_cadangan" => 0,
+                    "nominal_gaji_harian" => 0,
+                    "nominal_pinjaman_karyawan" => 0,
                     "nominal_uang_gaji" => 0,
                     "nominal_uang_lembur" => 0,
                     "nominal_pengurangan_gaji" => 0,
@@ -188,16 +195,6 @@ class Payroll extends BaseController
                     $endDate
                 );
 
-                // generate form perijinan not approved
-                $FormPerizinanNotApprovedModel->generate(
-                    $payrollID,
-                    $e['id'],
-                    $this->this_company_id,
-                    $yearMonth,
-                    $startDate,
-                    $endDate
-                );
-
                 // generate payroll gaji 
                 $PayrollGajiModel->generate(
                     $payrollID,
@@ -206,17 +203,34 @@ class Payroll extends BaseController
                     $yearMonth
                 );
 
+                // generate form perijinan not approved
+                $res = $FormPerizinanNotApprovedModel->generate(
+                    $payrollID,
+                    $e['id'],
+                    $this->this_company_id,
+                    $yearMonth,
+                    $startDate,
+                    $endDate
+                );
+
                 // update payroll
                 $payrollFinal = $payrollModel->generate(
                     $e['id'],
                     $yearMonth,
                     $payrollID,
-                    $status['HADIR_H'],
+                    ($status['HADIR_H'] + $res['total_perizinan_approved']),
                     $startDate,
                     $endDate
                 );
 
-                $payrollModel->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
+                $payrollModel
+                    ->set('hadir_final', ($status['HADIR_H'] + $res['total_perizinan_approved']))
+                    ->set('total_perizinan_not_approved', $res['total_perizinan_not_approved'])
+                    ->set('total_perizinan_approved', $res['total_perizinan_approved'])
+                    ->set('nominal_cadangan', $payrollFinal['nominal_cadangan'])
+                    ->set('nominal_gaji_harian', $payrollFinal['nominal_gaji_harian'])
+                    ->set('nominal_pinjaman_karyawan', $payrollFinal['nominal_pinjaman_karyawan'])
+                    ->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
                     ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
                     ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
                     ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
@@ -225,8 +239,9 @@ class Payroll extends BaseController
             }
 
             return \response()->setJSON([
-                'message' => "Data Payroll global berhasil digenerate",
-                'status' => true
+                'message' => "Data Payroll global berhasil digenerate ",
+                'status' => true,
+                'test' => $test
             ]);
         } else {
             return \response()->setJSON([
@@ -282,6 +297,12 @@ class Payroll extends BaseController
             "hadir" => $status['HADIR_H'],
             "libur" => $status['LIBUR_L'],
             "alpha" => $status['ALPHA_A'],
+            "hadir_final" => 0,
+            "total_perizinan_not_approved" => 0,
+            "total_perizinan_approved" => 0,
+            "nominal_cadangan" => 0,
+            "nominal_gaji_harian" => 0,
+            "nominal_pinjaman_karyawan" => 0,
             "nominal_uang_gaji" => 0,
             "nominal_uang_lembur" => 0,
             "nominal_pengurangan_gaji" => 0,
@@ -300,16 +321,6 @@ class Payroll extends BaseController
             $endDate
         );
 
-        // generate form perijinan not approved
-        $FormPerizinanNotApprovedModel->generate(
-            $payrollID,
-            $employeesData['id'],
-            $this->this_company_id,
-            $yearMonth,
-            $startDate,
-            $endDate
-        );
-
         // generate payroll gaji 
         $PayrollGajiModel->generate(
             $payrollID,
@@ -318,21 +329,37 @@ class Payroll extends BaseController
             $yearMonth
         );
 
+        // generate form perijinan not approved
+        $res = $FormPerizinanNotApprovedModel->generate(
+            $payrollID,
+            $employeesData['id'],
+            $this->this_company_id,
+            $yearMonth,
+            $startDate,
+            $endDate
+        );
+
         // update payroll
         $payrollFinal = $payrollModel->generate(
             $employeesData['id'],
             $yearMonth,
             $payrollID,
-            $status['HADIR_H'],
+            ($status['HADIR_H'] + $res['total_perizinan_approved']),
             $startDate,
             $endDate
         );
 
-        $payrollModel->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
+        $payrollModel
+            ->set('hadir_final', ($status['HADIR_H'] + $res['total_perizinan_approved']))
+            ->set('total_perizinan_not_approved', $res['total_perizinan_not_approved'])
+            ->set('total_perizinan_approved', $res['total_perizinan_approved'])
+            ->set('nominal_cadangan', $payrollFinal['nominal_cadangan'])
+            ->set('nominal_gaji_harian', $payrollFinal['nominal_gaji_harian'])
+            ->set('nominal_pinjaman_karyawan', $payrollFinal['nominal_pinjaman_karyawan'])
+            ->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
             ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
             ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
             ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
-            ->set('nominal_penambahan_gaji', $payrollFinal['nominal_penambahan_gaji'])
             ->where('id', $payrollID)
             ->update();
 
@@ -362,8 +389,6 @@ class Payroll extends BaseController
 
         $data = [
             'payrollDetail' => $payrollModel->detailPayroll($id),
-            'gajiPerHari' => $payrollGajiModel->getNominalGajiPerHariPayroll($id),
-            'nominalUangCadangan' => $payrollGajiModel->getNominalUangCadanganPayroll($id),
             'perhitunganGaji' => $payrollGajiModel->getPerhitunganKomponenGajiPayroll($id),
             'totalPerhitunganGaji' => $payrollGajiModel->getTotalKomponenGajiPayroll($id),
             'rekapKeterlambatanPresensi' => $attendanceTerlambatModel->rekap($id),
@@ -423,31 +448,6 @@ class Payroll extends BaseController
         return \response()->setJSON([
             'message' => "Nominal pengurangan keterlambatan presensi berhasil diperbaruhi",
             'location' => "rekapKeterlambatanPresensi",
-            'id' => $payrollID
-        ]);
-    }
-
-    public function updateNominalPerizinanNotApproved()
-    {
-        $id = $this->request->getVar('perizinanID');
-        $payrollID = $this->request->getVar('payrollID');
-
-        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
-        $angka = str_replace(",", ".", $angka);
-        $angkaDesimal = number_format((float) $angka, 3, '.', '');
-
-        $payrollModel = new PayrollsModel();
-        $formPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
-
-        $formPerizinanNotApprovedModel->update($id, [
-            'nominal_pengurangan' => $angkaDesimal,
-        ]);
-
-        $payrollModel->generateIfPayrollChanged($payrollID);
-
-        return \response()->setJSON([
-            'message' => "Nominal pengurangan dari perizinan tidak disetujui berhasil diperbaruhi",
-            'location' => "rekapPerizinanTidakDisetujui",
             'id' => $payrollID
         ]);
     }
@@ -528,8 +528,6 @@ class Payroll extends BaseController
             'employee' => $employee,
             'year' => explode("-", $payrollDetail['year_month'])[0],
             'month' => explode("-", $payrollDetail['year_month'])[1],
-            'gajiPerHari' => $payrollGajiModel->getNominalGajiPerHariPayroll($payrollID),
-            'nominalUangCadangan' => $payrollGajiModel->getNominalUangCadanganPayroll($payrollID),
             'rekapLembur' => $formLemburModel->rekap($payrollDetail['employee_id'], $payrollDetail['year_month']),
             'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
             'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
@@ -601,6 +599,50 @@ class Payroll extends BaseController
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Detail Payroll Berdasarkan Divisi ", array("Attachment" => false));
+
+        exit(0);
+    }
+
+    public function exportPdfSummary($yearMonth)
+    {
+        $dompdf = new Dompdf();
+
+        $divisiModel = new DivisisModel();
+
+        $year = explode("-", $yearMonth)[0];
+        $month = explode("-", $yearMonth)[1];
+
+        $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
+        $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
+
+        $data = [
+            'year' => $year,
+            'month' => $month,
+            'startDate' => $startDate,
+            'endDate' => $endDate
+        ];
+
+        $dompdf->loadHtml(view('hr/payroll/payroll_summary_print', $data));
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream("Sumarry Jumlah Upah dan Jam Kerja ", array("Attachment" => false));
+
+        exit(0);
+    }
+
+    public function exportPdfPotongan($yearMonth, $divisionID)
+    {
+        $dompdf = new Dompdf();
+        $payrollModel = new PayrollsModel();
+
+        $data = [
+            'payrollData' => $payrollModel->getPayrollDetail($yearMonth, $divisionID, $this->this_company_id)
+        ];
+
+        $dompdf->loadHtml(view('hr/payroll/payroll_potongan_print', $data));
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Daftar Potongan ", array("Attachment" => false));
 
         exit(0);
     }
