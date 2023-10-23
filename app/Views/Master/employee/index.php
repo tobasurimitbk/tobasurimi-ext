@@ -1111,6 +1111,7 @@
                         $(".child").val(res?.data?.child).change();
                         $(".division_id").val(res?.data?.division_id);
                         $(".tipe").val(res?.data?.tipe);
+                        $(".bagian_id").val(res?.data?.bagian_id);
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
 
                         // AJAX GET CITY
