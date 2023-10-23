@@ -193,4 +193,26 @@ class SupplierHarga extends BaseController
 
         return;
     }
+
+    public function getByIdSupplier($id)
+    {
+        $supplierData = $this->SupplierHargaModel->getBySupplierId($id);
+
+        if (!$supplierData) {
+            $data = [
+                "status"    => false,
+                "message"   => 'Not Found!'
+            ];
+            echo json_encode($data);
+            return;
+        }
+
+        $data = [
+            "status"    => true,
+            "data"      => $supplierData,
+        ];
+        echo json_encode($data);
+
+        return;
+    }
 }

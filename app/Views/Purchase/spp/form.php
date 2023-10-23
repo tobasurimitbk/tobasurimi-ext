@@ -151,7 +151,6 @@
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         <?php } ?>
-
                     </div>
                 </div>
             </div>
@@ -307,8 +306,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating mb-3">
-                                <textarea autocomplete="one-time-code" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan"></textarea>
-                                <label for="floatingInput">Keterangan</label>
+                                <textarea autocomplete="one-time-code" class="form-control keterangan text-area-all" name="keterangan" id="keterangan" placeholder="Keterangan (Opsional)"></textarea>
+                                <label for="floatingInput">Keterangan (Opsional)</label>
                             </div>
                         </div>
                     </div>

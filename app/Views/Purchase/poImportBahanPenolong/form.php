@@ -220,8 +220,8 @@
                                 <th>Satuan</th>
                                 <th>Harga Barang</th>
                                 <th>Qty</th>
-                                <th>Sisa Penerimaan</th>
-                                <th>Jumlah Diterima</th>
+                                <!-- <th>Sisa Penerimaan</th>
+                                <th>Jumlah Diterima</th> -->
                                 <th>Total Harga</th>
                                 <th>Disc %</th>
                                 <th>Biaya Tambahan</th>
@@ -254,8 +254,8 @@
                                             <td><?= $details["nama_satuan"]; ?></td>
                                             <td><?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details["qty"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td>
+                                            <!-- <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
+                                            <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td> -->
                                             <td><?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details["disc"], "STR_TO_INT"); ?></td>
                                             <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
@@ -272,8 +272,8 @@
                                             <td><?= $details["nama_satuan"]; ?></td>
                                             <td><?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details["qty"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
-                                            <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td>
+                                            <!-- <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
+                                            <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td> -->
                                             <td><?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details["disc"], "STR_TO_INT"); ?></td>
                                             <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
@@ -291,8 +291,8 @@
                                 <td><b>TOTAL</b></td>
                                 <td><b><?= number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
-                                <td><b><?= $total_remaining_qty; ?></b></td>
-                                <td><b><?= $total_qty_diterima; ?></b></td>
+                                <!-- <td><b><?= $total_remaining_qty; ?></b></td>
+                                <td><b><?= $total_qty_diterima; ?></b></td> -->
                                 <td><b><?= number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td colspan="3"></td>
                             </tr>
@@ -666,12 +666,12 @@
                                 tag_html += `<td>`;
                                 tag_html += item.qty ? Number(item.qty) : 0;
                                 tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += 0;
-                                tag_html += "</td>";
+                                // tag_html += `<td>`;
+                                // tag_html += 0;
+                                // tag_html += "</td>";
+                                // tag_html += `<td>`;
+                                // tag_html += 0;
+                                // tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
@@ -731,12 +731,12 @@
                             tag_total += "<td>";
                             tag_total += `<b>${total_qty}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_remaining_qty}</b>`;
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>${total_qty_diterima}</b>`;
-                            tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>${total_remaining_qty}</b>`;
+                            // tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>${total_qty_diterima}</b>`;
+                            // tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>${total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                             tag_total += "</td>";
@@ -768,12 +768,12 @@
                             tag_total += "<td>";
                             tag_total += `<b>0</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>0</b>`;
-                            tag_total += "</td>";
-                            tag_total += "<td>";
-                            tag_total += `<b>0</b>`;
-                            tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>0</b>`;
+                            // tag_total += "</td>";
+                            // tag_total += "<td>";
+                            // tag_total += `<b>0</b>`;
+                            // tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += `<b>0</b>`;
                             tag_total += "</td>";
@@ -968,12 +968,12 @@
                             tag_html += `<td>`;
                             tag_html += item.qty;
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.remaining_qty;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.qty_diterima;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.remaining_qty;
+                            // tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.qty_diterima;
+                            // tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.total;
                             tag_html += "</td>";
@@ -1018,12 +1018,12 @@
                             tag_html += `<td>`;
                             tag_html += item.harga;
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.remaining_qty;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.qty_diterima;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.remaining_qty;
+                            // tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.qty_diterima;
+                            // tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.qty;
                             tag_html += "</td>";

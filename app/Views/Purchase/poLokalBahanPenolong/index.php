@@ -44,9 +44,9 @@
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                             <th onclick="changeSort('total')" class="sort">Total Harga</th>
-                            <th>Jumlah Order</th>
+                            <th>Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
-                            <th>Actions</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">

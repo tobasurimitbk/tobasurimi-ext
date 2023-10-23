@@ -18,7 +18,6 @@ class RMPurchaseOrderModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'purchase_request_id',
         'company_id',
         'po_no',
         'po_date',
@@ -93,10 +92,12 @@ class RMPurchaseOrderModel extends Model
     public function getPoBBList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'po_date'          => 'rm_purchase_orders.po_date',
-            'po_no'            => 'rm_purchase_orders.po_no',
-            'supplier_name'    => 'suppliers.supplier_name',
+            'poDate'            => 'rm_purchase_orders.po_date',
+            'poNo'              => 'rm_purchase_orders.po_no',
+            'companyName'       => 'companies.company',
+            'supplier'          => 'suppliers.supplier_name',
             'createdAt'         => 'rm_purchase_orders.createdAt',
+            'statusPenerimaan'  => 'rm_purchase_orders.status_penerimaan'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -104,13 +105,15 @@ class RMPurchaseOrderModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "rm_purchase_orders.*, 
-            suppliers.name AS supplierName, 
+            suppliers.name AS supplierName,
+            companies.company AS companyName,
             COUNT(rm_purchase_order_details.id) AS itemCount";
 
         $bbLokalDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id')
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->join('companies', 'rm_purchase_orders.company_id = companies.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
             ->groupBy(('rm_purchase_orders.id'))
             ->orderBy($sort, $sortType);
@@ -148,39 +151,23 @@ class RMPurchaseOrderModel extends Model
     public function getPoBBLokalById($id)
     {
         $selectQry = "rm_purchase_orders.*,
-                            companies.holding_company AS companyName,
+                            companies.company AS companyName,
                             companies.address AS companyAddress,
                             suppliers.name AS supplierName,
                             suppliers.address AS supplierAddress,
                             suppliers.phone AS supplierPhone,
                             suppliers.no_npwp AS supplierNPWP,
-                            purchase_requests.spp_no AS spp_no,
                             users.name AS createdBy
                             ";
 
         $poBBLokalData = $this->asObject()
             ->select($selectQry)
-            ->join('purchase_requests', 'purchase_requests.id = rm_purchase_orders.purchase_request_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
             ->find($id);
 
         return $poBBLokalData;
-    }
-
-    public function getByPurchaseRequestId($id)
-    {
-        $arrCondition = [
-            'deletedAt' => null,
-            'purchase_request_id' => $id,
-        ];
-
-        $builder = $this->db->table('rm_purchase_orders');
-        $builder->where($arrCondition);
-        $query = $builder->get();
-
-        return $query->getRow();
     }
 
     public function generateNoPo()
