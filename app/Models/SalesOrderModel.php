@@ -160,15 +160,15 @@ class SalesOrderModel extends Model
         $selectQueryDetail = "sales_order_detail.*,
                               sales_order_detail.discount_percentage AS disc, 
                               warehouses.warehouse_name, 
-                              barangs.kode_barang AS kode_barang,
-                              barangs.nama_barang AS nama_barang,
-                              barangs.harga_barang AS harga_barang,
-                              barangs.satuan_id,
+                              barang_master.kode_barang AS kode_barang,
+                              barang_master.barang_name AS nama_barang,
+                              sales_order_detail.harga_barang AS harga_barang,
+                              barang_master.satuan_id,
                               satuans.kode_satuan AS satuan";
         $detail = $this->SalesOrderDetailModel
             ->where('id_sales_order', $id)
-            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
+            ->join('barang_master', 'barang_master.id = sales_order_detail.id_barang')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id')
             ->join('warehouses', 'warehouses.id = sales_order_detail.id_warehouse')
             ->select($selectQueryDetail)
             ->findAll();

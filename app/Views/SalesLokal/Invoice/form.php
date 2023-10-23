@@ -179,7 +179,7 @@
                                 <td class="text-right" style="height: 40px;">Rp. <span id="taxTotal">0</span></td>
                             </tr>
                             <tr>
-                                <td class="font-weight-bold" style="border-top: 1px solid #929292; height: 40px;">Total Invoice <span id="includeTaxText">(Termasuk Pajak)</span></td>
+                                <td class="font-weight-bold" style="border-top: 1px solid #929292; height: 40px;">Total Invoice <span id="includeTaxText"></span></td>
                                 <td style="border-top: 1px solid #929292; height: 40px;" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
                             </tr>
                         </table>
@@ -465,32 +465,46 @@
             let discTotal = 0;
             let taxTotal = 0;
             let taxTotalHtml = 0;
+            let dummyTax = 0;
 
             itemList.map((obj) => {
                 // console.log(obj)
                 const itemAmt = +(obj.amount.replace(/\D/g, ''));
                 itemSubTotal += itemAmt;
-                discTotal += ((100 - +obj.disc) / 100) * itemAmt;
-                const taxAmt = itemAmt * (+obj.tax / 100);
-
+                discTotal += ((+obj.disc) / 100) * itemAmt;
+                if (taxStatus) {
+                    dummyTax += (+obj.taxChecked);
+                } else {
+                    dummyTax += (+obj.tax);
+                }
+                const taxAmt = itemAmt * (dummyTax / 100);
+                
                 if (taxStatus && !includeTax) {
                     taxTotal += taxAmt;
-                    taxTotalHtml += taxAmt;
+                    // taxTotalHtml += taxAmt;
                 } else if (taxStatus && includeTax) {
-                    taxTotalHtml += taxAmt;
+                    taxTotal += taxAmt;
                 }
+                taxTotalHtml += taxAmt;
             });
-
-            if (taxStatus && includeTax) {
-                $('#includeTaxText').html('(Termasuk Pajak)');
-            } else {
-                $('#includeTaxText').html('');
-            }
-
+            
             $('#itemSubTotal').html(itemSubTotal.toLocaleString());
             $('#taxTotal').html(taxTotalHtml.toLocaleString());
 
-            const grandTotal = itemSubTotal + taxTotal - discTotal; 
+            let grandTotal = 0; 
+
+            console.log(itemSubTotal);
+            console.log(taxTotalHtml);
+            console.log(discTotal);
+            
+            if (taxStatus && includeTax) {
+                $('#includeTaxText').html('(Termasuk Pajak)');
+                grandTotal = itemSubTotal + taxTotalHtml - discTotal;
+            } else {
+                $('#includeTaxText').html('');
+                grandTotal = itemSubTotal - discTotal;
+            }
+            
             $('#grandTotal').html(grandTotal.toLocaleString());
         };
 

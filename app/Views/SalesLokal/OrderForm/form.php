@@ -214,7 +214,7 @@
                             <td class="text-right" style="height: 40px;">Rp. <span id="freightCost"><?= number_format($data->estimated_freight ?? 0); ?></span></td>
                         </tr>
                         <tr>
-                            <td class="font-weight-bold" style="border-top: 1px solid #929292; height:40px;">Total Order <span id="includeTaxText">(Termasuk Pajak)</span></td>
+                            <td class="font-weight-bold" style="border-top: 1px solid #929292; height:40px;">Total Order </td>
                             <td style="border-top: 1px solid #929292; height: 40px;" class="text-right font-weight-bold">Rp. <span id="grandTotal">0</span></td>
                         </tr>
                     </table>
@@ -626,7 +626,7 @@
                 },
                 shipping_date: {
                     required: true
-                },
+                }
             },
             messages: {
                 id_customer: {
@@ -637,7 +637,7 @@
                 },
                 shipping_date: {
                     required: "tanggal pengiriman wajib diisi"
-                },
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -673,12 +673,6 @@
                 qty: {
                     required: true
                 },
-                // amount: {
-                //     required: true
-                // },
-                harga: {
-                    required: true
-                },
                 warehouse: {
                     required: true
                 }
@@ -693,11 +687,8 @@
                 qty: {
                     required: "Qty wajib diisi"
                 },
-                // amount: {
-                //     required: "Satuan wajib diisi"
-                // },
                 warehouse: {
-                    required: "warehouse wajib diisi"
+                    required: "Warehouse wajib diisi"
                 },
             },
             errorElement: 'span',
@@ -757,7 +748,7 @@
                 // $(".warehouse").val(warehouseName);
             } else {
                 $(".nama_barang").attr("readonly", false)
-                $(".harga").val("0");
+                // $(".harga").val("0");
                 $(".qty").val("");
                 $(".amount").val("0");
                 $(".keterangan").val("").change();
