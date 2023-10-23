@@ -83,6 +83,15 @@ $routes->post('/divisi/save', 'Master\Divisi::saveDivisi', ['filter' => 'Auth'])
 $routes->post('/divisi/update', 'Master\Divisi::updateDivisi', ['filter' => 'Auth']);
 $routes->post('/divisi/delete', 'Master\Divisi::deleteDivisi', ['filter' => 'Auth']);
 
+// BAGIAN
+$routes->get('/divisi/bagian/(:segment)', 'Master\Bagian::index/$1', ['filter' => 'Auth']);
+$routes->get('/divisi/bagian/data/all', 'Master\Bagian::all', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/save', 'Master\Bagian::create', ['filter' => 'Auth']);
+$routes->get('/divisi/bagian/id/(:segment)', 'Master\Bagian::get/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/update/(:segment)', 'Master\Bagian::update/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/delete/(:segment)', 'Master\Bagian::delete/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/generate-new-kode', 'Master\Bagian::generateKode', ['filter' => 'Auth']);
+
 // COMPANY
 $routes->get('/company', 'Master\Company::company', ['filter' => 'Auth']);
 $routes->get('/company/all', 'Master\Company::allCompany', ['filter' => 'Auth']);

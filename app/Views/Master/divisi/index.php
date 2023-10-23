@@ -101,6 +101,8 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Divisi</th>
                                 <th onclick="changeSort('jamKerja')" class="sort">Jam Kerja</th>
+                                <th class="sort">Total Bagian</th>
+                                <th class="sort" style="width: 100px;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -151,17 +153,35 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "divisi",
-            className: "text-center"
-        }, {
-            data: "jamKerja",
-            className: "text-center"
-        }],
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "divisi",
+                className: "text-center"
+            }, {
+                data: "jamKerja",
+                className: "text-center"
+            },
+            {
+                data: "totalBagian",
+                className: "text-center"
+            }, {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row?.id;
+                    return `
+                        <a class="btn btn-warning" href="<?= base_url(); ?>divisi/bagian/${id}" style="box-shadow: none !important;">
+                            Set Bagian
+                        </a>
+                    `
+                }
+            }
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
