@@ -607,7 +607,7 @@ class Payroll extends BaseController
     {
         $dompdf = new Dompdf();
 
-        $divisiModel = new DivisisModel();
+        $payrollModel = new PayrollsModel();
 
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
@@ -619,7 +619,8 @@ class Payroll extends BaseController
             'year' => $year,
             'month' => $month,
             'startDate' => $startDate,
-            'endDate' => $endDate
+            'endDate' => $endDate,
+            'data' => $payrollModel->getSummaryPayroll($yearMonth, $this->this_company_id)
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_summary_print', $data));

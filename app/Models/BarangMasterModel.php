@@ -25,7 +25,9 @@ class BarangMasterModel extends Model
         'stok',
         'createdAt',
         'updatedAt',
-        'deletedAt'
+        'deletedAt',
+        //data sementara
+        'warehouse_id'
     ];
 
     // Dates

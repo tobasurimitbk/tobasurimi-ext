@@ -79,7 +79,7 @@
     <table width="100%" style="margin-top: 20px;" border="1" id="dashed-border-table">
         <thead>
             <tr align="center">
-                <td>Divisi</td>
+                <td>Bagian</td>
                 <td>Orang</td>
                 <td>Upah Pokok<br>(Rp)</td>
                 <td>Tunj+Cad<br>(Rp)</td>
@@ -92,6 +92,36 @@
                 <td>Jam Lembur <br>(Jam)</td>
             </tr>
         </thead>
+        <tbody>
+            <?php foreach ($data['res'] as $d) : ?>
+                <tr>
+                    <td><?= $d['divisi'] ?></td>
+                    <td><?= $d['payrollTotal'][0]['totalEmployee'] ?></td>
+                    <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
+                    <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
+                    <td><?= number_format(($d['payrollTotal'][0]['lembur']), 2, ',', '.')  ?></td>
+                    <td><?= number_format(0, 2, ',', '.')  ?></td>
+                    <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
+                    <td><?= number_format($d['payrollTotal'][0]['potongan'], 2, ',', '.')  ?></td>
+                    <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan'] - $d['payrollTotal'][0]['potongan']), 2, ',', '.')  ?></td>
+                    <td><?= number_format($d['totalJamKerja'], 2, ',', '.') ?></td>
+                    <td><?= number_format($d['totalJamLembur'], 2, ',', '.') ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <tr>
+                <td>Total</td>
+                <td><?= $data['orangTotal'] ?></td>
+                <td><?= number_format($data['upahPokokTotal'], 2, ',', '.')  ?></td>
+                <td><?= number_format($data['tunjanganPlusCadangan'], 2, ',', '.')  ?></td>
+                <td><?= number_format($data['lemburTotal'], 2, ',', '.')  ?></td>
+                <td><?= number_format(0, 2, ',', '.') ?></td>
+                <td><?= number_format($data['totalUpah'], 2, ',', '.') ?></td>
+                <td><?= number_format($data['potongan'], 2, ',', '.')  ?></td>
+                <td><?= number_format($data['upahBersih'], 2, ',', '.') ?></td>
+                <td><?= number_format($data['jamKerja'], 2, ',', '.')  ?></td>
+                <td><?= number_format($data['lembur'], 2, ',', '.') ?></td>
+            </tr>
+        </tbody>
 
     </table>
 </body>
