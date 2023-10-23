@@ -331,6 +331,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nip";
     let sortType = "asc";
+    let bagianID = 0;
 
     let list_delete = [];
 
@@ -1111,7 +1112,8 @@
                         $(".child").val(res?.data?.child).change();
                         $(".division_id").val(res?.data?.division_id);
                         $(".tipe").val(res?.data?.tipe);
-                        $(".bagian_id").val(res?.data?.bagian_id);
+                        bagianID = res?.data?.bagian_id;
+
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
 
                         // AJAX GET CITY
@@ -1293,7 +1295,13 @@
                 result.data.forEach(function(item) {
                     $("select[name='bagian_id']").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
                 });
-                $("select[name='bagian_id']").val('').change();
+                if (bagianID == 0) {
+                    $("select[name='bagian_id']").val('').change();
+
+                } else {
+                    $("select[name='bagian_id']").val(bagianID).change();
+
+                }
             }
         })
     });
