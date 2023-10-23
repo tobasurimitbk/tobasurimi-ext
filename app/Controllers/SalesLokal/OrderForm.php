@@ -9,7 +9,7 @@ use Dompdf\Dompdf;
 use App\Models\CompaniesModel;
 use App\Models\SalesOrderModel;
 use App\Models\CustomerModel;
-use App\Models\BarangModel;
+use App\Models\BarangMasterModel;
 use App\Models\WarehousesModel;
 use App\Models\DetailStockBarang;
 use App\Models\StockDetailModel;
@@ -48,7 +48,7 @@ class OrderForm extends BaseController
         $this->companyModel = new CompaniesModel();
         $this->SalesOrderModel = new SalesOrderModel();
         $this->CustomerModel = new CustomerModel();
-        $this->BarangModel = new BarangModel();
+        $this->BarangModel = new BarangMasterModel();
         $this->WarehousesModel = new WarehousesModel();
         $this->DetailStockBarang = new DetailStockBarang();
         $this->stockDetailModel = new StockDetailModel();
@@ -74,10 +74,13 @@ class OrderForm extends BaseController
             ->join('metadata', 'metadata.id = customers.termin')
             ->where('customers.company_id', $this->this_company_id)
             ->findAll();
+
+        $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
         
 
         $data = [
             "dataCustomers" => $customers,
+            "companies" => $dataCompany,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
 
@@ -264,8 +267,10 @@ class OrderForm extends BaseController
         // check stock
         foreach ($items as $row) {
             $barangData = $this->BarangModel->asObject()
-                ->where('id', $row->id_barang)
-                ->where('company_id', $this->this_company_id)
+                ->select('barang_master.*')
+                ->select('stock_details.qty as stok_detail')
+                ->join('stock_details', 'stock_details.barang_id = barang_master.id', 'left')
+                ->where('barang_master.id', $row->id_barang)
                 ->first();
 
             if (empty($barangData)) {
@@ -278,7 +283,7 @@ class OrderForm extends BaseController
                 return;
             }
 
-            if ($barangData->stok < $row->qty) {
+            if ($barangData->stok_detail < $row->qty) {
                 $data = [
                     "status"    => false,
                     "message"   => 'Stock tidak cukup',
@@ -319,6 +324,7 @@ class OrderForm extends BaseController
                 // "tax_status"            => $postData['tax_status'],
                 // "include_pa"            => $postData['include_tax'],
                 "total_harga"           => $postData['total'],
+                "id_company"            => $postData['company'],
                 "tipe_sales_order"      => 'LOKAL'
             ];
 
@@ -398,12 +404,15 @@ class OrderForm extends BaseController
         }
 
         $customers = $this->CustomerModel
-            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->select('customers.*, CONCAT(employees.nip , " - ", employees.name) AS salesName, metadata.value AS termin')
             ->join('employees', 'employees.id = customers.sales_id')
+            ->join('metadata', 'metadata.id = customers.termin')
             ->where('customers.company_id', $this->this_company_id)
             ->findAll();
         
         $metadatas = $this->MetaDataModel->findAll();
+
+        $dataCompany = $this->companyModel->where('deletedAt', NULL)->asObject()->findAll();
         
         // dd($dataSalesOrder->detail);
         $dataSalesOrder->order_date = $dataSalesOrder->order_date !== "0000-00-00" ? date("d/m/Y", strtotime($dataSalesOrder->order_date)) : "";
@@ -411,6 +420,7 @@ class OrderForm extends BaseController
         $data = [
             "data" => $dataSalesOrder,
             "dataCustomers" => $customers,
+            "companies" => $dataCompany,
             "dataMetaData"  => $metadatas,
             "id_user" => $dataSalesOrder->id_user,
             // "seller_name" => $dataSalesOrder->seller_name,
@@ -479,7 +489,7 @@ class OrderForm extends BaseController
                 ]
             ],
             "estimated_freight" => [
-                "rules" => "permit_empty|is_natural",
+                "rules" => "permit_empty",
                 'errors' => [
                     // 'required' => 'tanggal pengiriman tidak boleh kosong',
                 ]
@@ -514,45 +524,7 @@ class OrderForm extends BaseController
                     'required' => 'barang tidak boleh kosong',
                 ],
             ],
-            // "items.*.id_barang" => [
-            //     "rules" => "required",
-            //     'errors' => [
-            //         'required' => 'id barang tidak boleh kosong',
-            //     ],
-            // ],
-            // "items.*.harga_barang" => [
-            //     "rules" => "required|numeric|greater_than_equal_to[0]",
-            //     'errors' => [
-            //         'required' => 'Harga barang tidak boleh kosong',
-            //     ],
-            // ],
-            // "items.*.qty" => [
-            //     "rules" => "required|numeric|greater_than[0]",
-            //     'errors' => [
-            //         'required' => 'Qty barang tidak boleh kosong',
-            //     ],
-            // ],
-            // "items.*.discount_percentage" => [
-            //     "rules" => "permit_empty|numeric|greater_than_equal_to[0]",
-            //     'errors' => [
-            //         // 'required' => 'barang tidak boleh kosong',
-            //     ],
-            // ],
-            // "items.*.warehouse_id" => [
-            //     "rules" => "required|numeric|greater_than_equal_to[0]",
-            //     'errors' => [
-            //         'required' => 'Gudang barang tidak boleh kosong',
-            //     ],
-            // ],
         ];
-
-        // $data = [
-        //     "status"    => false,
-        //     "message"   => json_encode($payload),
-        //     'token'     => csrf_hash(),
-        // ];
-        // echo json_encode($data);
-        // return;
 
         if (!$this->validateData($payload, $validate)) {
             $errorList = $this->validator->getErrors();
@@ -572,7 +544,7 @@ class OrderForm extends BaseController
             "id_user" => $this->request->getPost('id_user'),
             "id_po" => $this->request->getPost('id_po'),
             "id_customer" => $this->request->getPost('id_customer'),
-            "destination" => $this->request->getPost('destination'),
+            "destination" => $this->request->getPost('tagihan_ke'),
             "order_date" => $orderDate ? date("Y/m/d", strtotime(str_replace("/", "-", $orderDate))) : "",
             "shipping_date" => $shippingDate ? date("Y/m/d", strtotime(str_replace("/", "-", $shippingDate))) : "",
             "payment_terms" => $this->request->getPost('termin'),
@@ -599,7 +571,6 @@ class OrderForm extends BaseController
                 if ($row->id === "") {
                     $barangData = $this->BarangModel->asObject()
                         ->where('id', $row->id_barang)
-                        ->where('company_id', $this->this_company_id)
                         ->first();
 
                     if (empty($barangData)) {
@@ -862,13 +833,17 @@ class OrderForm extends BaseController
             $dataBarang = json_decode($responseBarang["body"])->data;
         }*/
         $dataBarang = $this->BarangModel
-            ->join('warehouses', 'warehouses.id = barangs.warehouse_id', 'left')
-            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
-            ->join('stock_details', 'stock_details.barang_id = barangs.id', 'left')
-            ->select('barangs.*')
-            ->select('warehouses.warehouse_name')
-            ->select('satuans.nama_satuan')
-            ->where('kategori_barang', 'Jadi')
+            ->join('warehouses', 'warehouses.id = barang_master.warehouse_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id', 'left')
+            ->join('stock_details', 'stock_details.barang_id = barang_master.id', 'left')
+            ->select('barang_master.*')
+            ->select('barang_master.id as id_barang')
+            ->select('barang_master.kode_barang as kode_barang')
+            ->select('barang_master.id as id_barang')
+            ->select('barang_master.barang_name as nama_barang')
+            ->select('warehouses.warehouse_name as warehouse_name')
+            ->select('satuans.nama_satuan as nama_satuan')
+            ->where('type_barang', 'bahan_jadi')
             ->where('stock_details.qty >', 0)
             ->findAll();
 

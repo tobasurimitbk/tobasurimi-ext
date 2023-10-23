@@ -81,7 +81,8 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" disabled class="form-control input-picker tipe_pelanggan" id="tipe_pelanggan" name="tipe_pelanggan" placeholder="Tipe Pelanggan">
+                            <input type="hidden" class="hidden_tipe_pelanggan" id="hidden_tipe_pelanggan" name="hidden_tipe_pelanggan" value="<?= $data->tipe_pelanggan ?? '' ?>">
+                            <input autocomplete="one-time-code" disabled class="form-control input-picker tipe_pelanggan" id="tipe_pelanggan" name="tipe_pelanggan" placeholder="Tipe Pelanggan" value="<?= $data->tipe_pelanggan_value ?? '' ?>">
                             <label for="floatingInput">Tipe Pelanggan</label>
                         </div>
                     </div>
@@ -93,8 +94,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" onkeyup="formatNumber(this)" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="End of time">
-                            <label for="floatingInput">Biaya Kirim</label>
+                            <select class="form-select company" name="company" id="company" >
+                                <option value=""></option>
+                                    <?php
+                                        if (!empty($companies)) {
+                                            foreach ($companies as $c) {
+                                    ?>
+                                        <option value="<?= $c->id; ?>" <?= !empty($data) ? ($data->id_company === $c->id ? "selected" : "") : ""; ?> ><?= $c->company; ?></option>
+                                    <?php
+                                            }
+                                        }
+                                    ?>
+                            </select>
+                            <label for="floatingInput">Company</label>
                         </div>
                     </div>
                     <!-- <div class="col-md-4">
@@ -107,6 +119,12 @@
                     </div> -->
                 </div>
                 <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" class="form-control input-picker" id="estimated_freight" name="estimated_freight" onkeyup="formatNumber(this)" value="<?= number_format($data->estimated_freight ?? 0); ?>" placeholder="End of time">
+                            <label for="floatingInput">Biaya Kirim</label>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 80px;">
                             <textarea autocomplete="one-time-code" <?= !empty($data) ? ($data->keterangan === true ? 'disabled=true' : '') : ''; ?> class="form-control parent_keterangan text-area-all" style="height: 100%" id="parent_keterangan" name="parent_keterangan" placeholder="keterangan"><?= !empty($data) ? $data->keterangan : ""; ?></textarea>
@@ -437,6 +455,7 @@
                     table.row.add({
                         id: obj.id,
                         no: no,
+                        tipe_pelanggan: obj.tipe_pelanggan,
                         id_barang: obj.id_barang,
                         kode_barang: obj.kode_barang,
                         nama_barang: obj.nama_barang,
@@ -483,27 +502,30 @@
         $('.id_customer').select2({
             placeholder: "",
             theme: "bootstrap-5"
+        }).change(function() {
+            const customerAddress = $(this).find(':selected').data('address');
+            const termin = $(this).find(':selected').data('termin');
+            const salesName = $(this).find(':selected').data('salesname');
+            const tipePelanggan = $(this).find(':selected').data('tipepelanggan');
+    
+            $('#tagihan_ke').val(decodeURIComponent(customerAddress));
+            $('#termin').val(decodeURIComponent(termin));
+            $('#sales_name').val(decodeURIComponent(salesName));
+            $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
         });
         
-        $(".id_customer").change(function() {
-            // if ($(".id_customer").val()) {
-                const customerAddress = $(this).find(':selected').data('address');
-                const termin = $(this).find(':selected').data('termin');
-                const salesName = $(this).find(':selected').data('salesname');
-                // const tipePelanggan = $(this).find(':selected').data('tipepelanggan');
-        
-                $('#tagihan_ke').val(decodeURIComponent(customerAddress));
-                $('#termin').val(decodeURIComponent(termin));
-                $('#sales_name').val(decodeURIComponent(salesName));
+        $("#hidden_tipe_pelanggan").on('input change keyup paste', function() {
+            // if ($(".hidden_tipe_pelanggan").val()) {
+
                 
-                let idCustomer = $(".id_customer").val();
-                console.log(idCustomer);
+                let tipePelanggan = $("#hidden_tipe_pelanggan").val();
+                console.log(tipePelanggan);
+                // console.log(idCustomer);
                 $.ajax({
-                    url: "<?= base_url('/order-form-lokal/getmetaData'); ?>" + "/" + idCustomer,
+                    url: "<?= base_url('/order-form-lokal/getmetaData'); ?>" + "/" + tipePelanggan,
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        $(".tipe_pelanggan").empty();
 
                         // console.log(res.dataWarehouse)
                         res.dataMetaData.forEach(function(item) {
@@ -729,8 +751,8 @@
                 })
 
                 $(".nama_barang").val(nama);
-                $(".harga").val(harga ? Number(harga).toLocaleString('en-EN') : "");
-                $(".amount").val(Number((harga ? Number(harga) : 0) * ($(".qty").val() ? Number($(".qty").val()) : 0)).toLocaleString())
+                // $(".harga").val(harga ? Number(harga).toLocaleString('en-EN') : "");
+                // $(".amount").val(Number((harga ? Number(harga) : 0) * ($(".qty").val() ? Number($(".qty").val()) : 0)).toLocaleString())
                 // $(".id_warehouse").val(warehouseId);
                 // $(".warehouse").val(warehouseName);
             } else {
@@ -794,15 +816,15 @@
                 dataType: "json",
                 success: function(res) {
 
-                    $(".id_barang").empty();
+                    // $(".id_barang").empty();
 
                     $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-warehouse_name="" data-id_item="" value=""></option>`);
 
                     res.dataBarang.forEach(function(item) {
                         if (item.id == id_barang) {
-                            valData = item.id
+                            valData = item.id_barang
                         }
-                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${idWarehouse}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}" ${item.id==id_barang?'selected':''}>${item.nama_barang}</option>`);
+                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-satuan="${item?.nama_satuan}" data-warehouse_id="${idWarehouse}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id_barang}" value="${item.id_barang}" ${item.id_barang==id_barang?'selected':''}>${item.nama_barang}</option>`);
                     })
 
                     $(".id_barang").val(valData).change();
@@ -1501,6 +1523,33 @@
             $(".no_order").val("");
         }
     }
+
+    // Company
+    $('.company').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+        })
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.company')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.company')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.company')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
     // change data model jika sudah ada datanya di pilih
 </script>

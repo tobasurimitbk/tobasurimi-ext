@@ -48,7 +48,8 @@ class SalesOrderModel extends Model
         'estimated_freight',
         'tax_status',
         'include_pa',
-        'paid_amt'
+        'paid_amt',
+        'id_company',
     ];
 
     // Dates
@@ -143,12 +144,15 @@ class SalesOrderModel extends Model
                       CONCAT(employees.nip , ' - ', employees.name) AS salesName,
                       customers.name as customer_name ,
                       customers.address,customers.phone,
-                      metadata.value AS termin";
+                      customers.tipe_pelanggan as tipe_pelanggan,
+                      termin.value AS termin,
+                      tipe_pelanggan.value AS tipe_pelanggan_value";
 
         $dataSalesOrder = $this->asObject()
             ->join('users', 'users.id = sales_order.id_user')
             ->join('customers', 'customers.id = sales_order.id_customer ')
-            ->join('metadata', 'metadata.id = customers.termin', 'left')
+            ->join('metadata as termin', 'termin.id = customers.termin', 'left')
+            ->join('metadata as tipe_pelanggan', 'tipe_pelanggan.id = customers.tipe_pelanggan', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id ')
             ->select($selectQry)
             ->find($id);

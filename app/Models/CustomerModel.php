@@ -169,6 +169,29 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
+    public function getCustomerWithMetaData($idCustomer)
+    {
+        $selectQry = "customers.*,
+                      metadata.value AS tipe_pelanggan";
+
+        $arrCondition = [
+            'id'    => $idCustomer,
+            'deletedAt' => null
+        ];
+
+        // $builder = $this->db->table('customers');
+        // $builder->join('metadata', 'metadata.id = customers.tipe_pelanggan');
+        // $builder->where($arrCondition);
+        // $query = $builder->get();
+
+        $customerMeta = $this->asObject()
+        ->join('metadata', 'metadata.id = customers.tipe_pelanggan')
+        ->select($selectQry)
+        ->where($arrCondition);
+
+        return $customerMeta;
+    }
+
     public function get_kode($bln, $thn, $thn2, $last_year)
     {
         $lastStr =  $thn2;
