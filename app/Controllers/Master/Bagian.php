@@ -87,7 +87,7 @@ class Bagian extends BaseController
     {
         $bagianModel = new BagianModel();
 
-        $check = $bagianModel->where('nama_bagian', $this->request->getVar('namaBagian'))->first();
+        $check = $bagianModel->where('nama_bagian', $this->request->getVar('namaBagian'))->where('division_id', $this->request->getVar('divisionID'))->where('deletedAt', null)->first();
         if ($check != null) {
             return response()->setJSON([
                 'status' => false,
@@ -154,8 +154,11 @@ class Bagian extends BaseController
     public function generateKode()
     {
         $bagianModel = new BagianModel();
+        $divisiModel = new DivisisModel();
 
-        $codeName = $this->kode;
+        $divisi = $divisiModel->where('id', $this->request->getVar('divisionID'))->first();
+
+        $codeName = substr(\strtoupper($divisi['divisi']), 0, 3);
 
         $last = $bagianModel->asObject()
             ->where('company_id', $this->this_company_id)
@@ -189,5 +192,16 @@ class Bagian extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+    }
+
+    public function getBagianByDivision()
+    {
+        $bagianModel = new BagianModel();
+        $res = $bagianModel->where('division_id', $this->request->getVar('divisionID'))->where('deletedAt', null)->findAll();
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $res,
+        ]);
     }
 }

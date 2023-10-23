@@ -49,6 +49,7 @@ $routes->post('/employee/save', 'Master\Employee::saveEmployee', ['filter' => 'A
 $routes->post('/employee/update', 'Master\Employee::updateEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/delete', 'Master\Employee::deleteEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/getKomponenGaji', 'Master\Employee::getKomponenGaji', ['filter' => 'Auth']);
+$routes->post('/employee/get-bagian', 'Master\Bagian::getBagianByDivision', ['filter' => 'Auth']);
 
 // CUSTOMER
 $routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
