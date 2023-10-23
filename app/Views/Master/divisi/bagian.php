@@ -360,7 +360,8 @@
     function resetForm() {
         let form = document.querySelector(".form-data");
         $("input[name='kode_bagian']").attr("readonly", false);
-        $("#generate_new_code").attr('checked', false);
+        $("#generate_new_code").attr('checked', false).show();
+        $("input[name='id']").val(null);
         form.reset();
     }
 
@@ -384,7 +385,7 @@
                     $('input[name="kode_bagian"]').val(response.data.kode_bagian);
                     $("input[name='kode_bagian']").attr("readonly", true);
                     $('input[name="id"]').val(response.data.id);
-                    $("#generate_new_code").attr('checked', true);
+                    $("#generate_new_code").attr('checked', true).hide();
 
                 } else {
                     Swal.fire({
