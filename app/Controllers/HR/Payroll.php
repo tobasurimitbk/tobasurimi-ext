@@ -181,6 +181,7 @@ class Payroll extends BaseController
                     "nominal_uang_lembur" => 0,
                     "nominal_pengurangan_gaji" => 0,
                     "nominal_gaji_diterima" => 0,
+                    "nominal_penambahan_gaji" => 0,
                     "start_date" => $startDate,
                     "end_date" => $endDate
                 ]);
@@ -234,6 +235,7 @@ class Payroll extends BaseController
                     ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
                     ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
                     ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
+                    ->set('nominal_penambahan_gaji', $res['nominal_penambahan_gaji'])
                     ->where('id', $payrollID)
                     ->update();
             }
@@ -307,6 +309,7 @@ class Payroll extends BaseController
             "nominal_uang_lembur" => 0,
             "nominal_pengurangan_gaji" => 0,
             "nominal_gaji_diterima" => 0,
+            "nominal_penambahan_gaji" => 0,
             "start_date" => $startDate,
             "end_date" => $endDate
         ]);
@@ -360,6 +363,7 @@ class Payroll extends BaseController
             ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
             ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
             ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
+            ->set('nominal_penambahan_gaji', $res['nominal_penambahan_gaji'])
             ->where('id', $payrollID)
             ->update();
 
