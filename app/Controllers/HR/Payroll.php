@@ -631,17 +631,22 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPotongan($yearMonth, $divisionID)
+    public function exportPdfPotongan($yearMonth)
     {
         $dompdf = new Dompdf();
         $payrollModel = new PayrollsModel();
 
+        $year = explode("-", $yearMonth)[0];
+        $month = explode("-", $yearMonth)[1];
+
         $data = [
-            'payrollData' => $payrollModel->getPayrollDetail($yearMonth, $divisionID, $this->this_company_id)
+            'year' => $year,
+            'month' => $month,
+            'payrollData' => $payrollModel->getPotonganPayroll($yearMonth, $this->this_company_id)
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_potongan_print', $data));
-        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
         $dompdf->stream("Daftar Potongan ", array("Attachment" => false));
 
