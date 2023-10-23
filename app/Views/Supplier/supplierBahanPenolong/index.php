@@ -451,7 +451,6 @@
                         $(".email").val(res?.data?.email);
                         $(".province_parent_id").val(res?.data?.province_id).change();
                         $(".country_code").val(res?.data?.country_code).change();
-                        $(".contact_person").val(res?.data?.contact_person);
 
                          // AJAX GET CITY
                          $.ajax({

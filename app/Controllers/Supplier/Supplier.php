@@ -560,6 +560,207 @@ class Supplier extends BaseController
         }
     }
 
+    public function supplierInternasional()
+    {
+        return view('Supplier/supplierInternasional/index');
+    }
+
+    public function allSupplierInternasional()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "type"          => "INTERNASIONAL"
+        ];
+
+        $condition = [
+            "suppliers.type"        => "INTERNASIONAL"
+        ];
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType")
+        ];
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $supplierData = $this->supplierModel->getSupplierList($condition, $addCondition, $limit, $offset);
+
+        $dataSupplier = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($supplierData['data'] as $data) {
+            array_push($dataSupplier, [
+                "no"                => $no++,
+                "kode"              => $data->kode,
+                "id"                => $data->id,
+                "name"              => $data->name,
+                "address"           => $data->address,
+                "phone"             => $data->phone,
+                "contact_person"    => $data->contact_person,
+                "fax"               => $data->fax
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $supplierData['totalData'],
+            "recordsFiltered"   => $supplierData['totalFilteredData'],
+            "data"              => $dataSupplier,
+            "payload"           => $payload
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function saveSupplierInternasional()
+    {
+        try {
+            $rules = [
+                "kode" => [
+                    "rules" => "required"
+                ],
+                "name" => [
+                    "rules" => "required"
+                ],
+                "address" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "fax" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "phone" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "contact_person" => [
+                    "rules" => "permit_empty|string"
+                ]
+            ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $insertData = [
+                "kode" => $this->request->getPost("kode"),
+                "name" => $this->request->getPost("name"),
+                "address" => $this->request->getPost("address"),
+                "fax" => $this->request->getPost("fax"),
+                "phone" => $this->request->getPost("phone"),
+                "contact_person" => $this->request->getPost("contact_person"),
+                "type"              => "INTERNASIONAL"
+            ];
+
+            $insert = $this->supplierModel->insert($insertData);
+
+            if (!$insert) {
+                $data = [
+                    "status"    => false,
+                    "message"   => 'Data Gagal Disimpan!',
+                    "payload"   => json_encode($insertData),
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $data = [
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                "payload"   => json_encode($insertData),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        } catch (\Exception $e) {
+            $data = [
+                "status"    => false,
+                "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token'     => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        }
+    }
+
+    public function updateSupplierInternasional()
+    {
+        try {
+            $rules = [
+                "name" => [
+                    "rules" => "required"
+                ],
+                "address" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "fax" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "phone" => [
+                    "rules" => "permit_empty|string"
+                ],
+                "contact_person" => [
+                    "rules" => "permit_empty|string"
+                ]
+            ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                $data = [
+                    "status"    => false,
+                    "message"   => $errorList[array_keys($errorList)[0]],
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            if ($this->validate($rules)) {
+                $id = $this->request->getPost("id");
+
+                $payload = [
+                    "name" => $this->request->getPost("name"),
+                    "address" => $this->request->getPost("address"),
+                    "fax" => $this->request->getPost("fax"),
+                    "phone" => $this->request->getPost("phone"),
+                    "contact_person" => $this->request->getPost("contact_person"),
+                ];
+            }
+
+            if ($payload) {
+                $this->supplierModel->update($id, $payload);
+
+                $data = [
+                    "status"            => true,
+                    "message"   => "Data Berhasil diubah",
+                    "payload"   => $payload,
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        }
+    }
+
     public function getByIdSupplier($id)
     {
         $supplierData = $this->supplierModel->getSupplierById($id);

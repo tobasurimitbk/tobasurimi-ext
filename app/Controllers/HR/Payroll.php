@@ -181,6 +181,7 @@ class Payroll extends BaseController
                     "nominal_uang_lembur" => 0,
                     "nominal_pengurangan_gaji" => 0,
                     "nominal_gaji_diterima" => 0,
+                    "nominal_penambahan_gaji" => 0,
                     "start_date" => $startDate,
                     "end_date" => $endDate
                 ]);
@@ -234,6 +235,7 @@ class Payroll extends BaseController
                     ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
                     ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
                     ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
+                    ->set('nominal_penambahan_gaji', $payrollFinal['nominal_penambahan_gaji'])
                     ->where('id', $payrollID)
                     ->update();
             }
@@ -307,6 +309,7 @@ class Payroll extends BaseController
             "nominal_uang_lembur" => 0,
             "nominal_pengurangan_gaji" => 0,
             "nominal_gaji_diterima" => 0,
+            "nominal_penambahan_gaji" => 0,
             "start_date" => $startDate,
             "end_date" => $endDate
         ]);
@@ -360,6 +363,7 @@ class Payroll extends BaseController
             ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
             ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
             ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
+            ->set('nominal_penambahan_gaji', $payrollFinal['nominal_penambahan_gaji'])
             ->where('id', $payrollID)
             ->update();
 
@@ -631,17 +635,22 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPotongan($yearMonth, $divisionID)
+    public function exportPdfPotongan($yearMonth)
     {
         $dompdf = new Dompdf();
         $payrollModel = new PayrollsModel();
 
+        $year = explode("-", $yearMonth)[0];
+        $month = explode("-", $yearMonth)[1];
+
         $data = [
-            'payrollData' => $payrollModel->getPayrollDetail($yearMonth, $divisionID, $this->this_company_id)
+            'year' => $year,
+            'month' => $month,
+            'payrollData' => $payrollModel->getPotonganPayroll($yearMonth, $this->this_company_id)
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_potongan_print', $data));
-        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
         $dompdf->stream("Daftar Potongan ", array("Attachment" => false));
 

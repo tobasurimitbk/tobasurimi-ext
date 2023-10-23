@@ -49,6 +49,7 @@ $routes->post('/employee/save', 'Master\Employee::saveEmployee', ['filter' => 'A
 $routes->post('/employee/update', 'Master\Employee::updateEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/delete', 'Master\Employee::deleteEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/getKomponenGaji', 'Master\Employee::getKomponenGaji', ['filter' => 'Auth']);
+$routes->post('/employee/get-bagian', 'Master\Bagian::getBagianByDivision', ['filter' => 'Auth']);
 
 // CUSTOMER
 $routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
@@ -82,6 +83,15 @@ $routes->get('/divisi/id/(:segment)', 'Master\Divisi::getByIdDivisi/$1', ['filte
 $routes->post('/divisi/save', 'Master\Divisi::saveDivisi', ['filter' => 'Auth']);
 $routes->post('/divisi/update', 'Master\Divisi::updateDivisi', ['filter' => 'Auth']);
 $routes->post('/divisi/delete', 'Master\Divisi::deleteDivisi', ['filter' => 'Auth']);
+
+// BAGIAN
+$routes->get('/divisi/bagian/(:segment)', 'Master\Bagian::index/$1', ['filter' => 'Auth']);
+$routes->get('/divisi/bagian/data/all', 'Master\Bagian::all', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/save', 'Master\Bagian::create', ['filter' => 'Auth']);
+$routes->get('/divisi/bagian/id/(:segment)', 'Master\Bagian::get/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/update/(:segment)', 'Master\Bagian::update/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/delete/(:segment)', 'Master\Bagian::delete/$1', ['filter' => 'Auth']);
+$routes->post('/divisi/bagian/generate-new-kode', 'Master\Bagian::generateKode', ['filter' => 'Auth']);
 
 // COMPANY
 $routes->get('/company', 'Master\Company::company', ['filter' => 'Auth']);
@@ -178,6 +188,12 @@ $routes->get('/supplier-bahan-penolong', 'Supplier\Supplier::supplierBahanPenolo
 $routes->get('/supplier-bahan-penolong/all', 'Supplier\Supplier::allSupplierBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-penolong/save', 'Supplier\Supplier::saveSupplierBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-penolong/update', 'Supplier\Supplier::updateSupplierBahanPenolong', ['filter' => 'Auth']);
+
+$routes->get('/supplier-internasional', 'Supplier\Supplier::supplierInternasional', ['filter' => 'Auth']);
+$routes->get('/supplier-internasional/all', 'Supplier\Supplier::allSupplierInternasional', ['filter' => 'Auth']);
+$routes->post('/supplier-internasional/save', 'Supplier\Supplier::saveSupplierInternasional', ['filter' => 'Auth']);
+$routes->post('/supplier-internasional/update', 'Supplier\Supplier::updateSupplierInternasional', ['filter' => 'Auth']);
+
 // PURCHASE
 // SPP
 $routes->get('/spp', 'Purchase\SPP::spp', ['filter' => 'Auth']);
@@ -665,7 +681,7 @@ $routes->get('/payroll/print/single/(:segment)', 'HR\Payroll::exportPdfPayrollSi
 $routes->get('/payroll/print/division/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivision/$1/$2', ['filter' => 'Auth']);
 $routes->get('/payroll/print/detail/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivisionDetail/$1/$2', ['filter' => 'Auth']);
 $routes->get('/payroll/print/summary/(:segment)', 'HR\Payroll::exportPdfSummary/$1', ['filter' => 'Auth']);
-$routes->get('/payroll/print/potongan/(:segment)/(:segment)', 'HR\Payroll::exportPdfPotongan/$1/$2', ['filter' => 'Auth']);
+$routes->get('/payroll/print/potongan/(:segment)', 'HR\Payroll::exportPdfPotongan/$1', ['filter' => 'Auth']);
 
 // formula payroll
 $routes->get('/formula-payroll', 'HR\FormulaPayroll::formulaPayroll', ['filter' => 'Auth']);

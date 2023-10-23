@@ -123,7 +123,7 @@
                     <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Daftar Upah</button></li>
                     <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Slip Gaji</button></li>
                     <li><button class="dropdown-item" onclick="print('<?= base_url('payroll/print/summary/' . $year . '-' . $month) ?>')">Summary</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan/' . $year . '-' . $month) ?>')">Daftar Potongan</button></li>
+                    <li><button class="dropdown-item" onclick="print('<?= base_url('payroll/print/potongan/' . $year . '-' . $month) ?>')">Daftar Potongan</button></li>
                 </ul>
             <?php endif; ?>
         </div>
