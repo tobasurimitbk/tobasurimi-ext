@@ -5,7 +5,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Supplier Bahan Baku</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Supplier Internasional</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
@@ -36,68 +36,20 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select country_code" name="country_code" id="country_code">
-                                    <option value=""></option>
-                                    <?php foreach ($country as $c) : ?>
-                                        <option value="<?= $c->code; ?>">
-                                            <?= $c->country_name; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Negara (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select province_parent_id" name="province_parent_id" id="province_parent_id" onchange="getCityParent()">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataProvinces)) {
-                                        foreach ($dataProvinces as $province) {
-                                    ?>
-                                            <option value="<?= $province->id; ?>"><?= $province->province_name; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">Provinsi (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control fax" id="fax" name="fax" placeholder="Fax (Opsional)">
+                                <label for="floatingInput">Fax (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select city_parent_id" name="city_parent_id" id="city_parent_id" onchange="getPostalCodeParent()">
-                                    <option value="" data-code=""></option>
-                                </select>
-                                <label for="floatingInput">Kota (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control parent_postal_code" id="parent_postal_code" name="postal_code" placeholder="Kode Pos (Opsional)">
-                                <label for="floatingInput">Kode Pos (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_npwp" id="no_npwp" name="no_npwp" placeholder="NPWP (Opsional)">
-                                <label for="floatingInput">NPWP (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="No. Telepon (Opsional)">
                                 <label for="floatingInput">No. Telepon (Opsional)</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control contact_person" id="contact_person" name="contact_person" placeholder="Contact Person (Opsional)">
@@ -105,72 +57,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control account_receivable" id="account_receivable" name="account_receivable" placeholder="Akun Receivable (Opsional)">
-                                <label for="floatingInput">Akun Receivable (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control account_payable" id="account_payable" name="account_payable" placeholder="Akun Payable (Opsional)">
-                                <label for="floatingInput">Akun Payable (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="email" class="form-control email" id="email" name="email" placeholder="Email">
-                                <label for="floatingInput">Email (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-hide-parent btn-discard mr-2">Batal</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Batal</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal harga-modal" id="harga_modal">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">History Bahan Baku</h5>
-            </div>
-            <div class="modal-body">
-                <div class="row justify-content-end mb-3">
-                    <div class="col-md-3">
-                        <input autocomplete="one-time-code" class="form-control search-harga form-out-search" placeholder="Cari Nama Barang" value="" />
-                    </div>
-                </div>
-                <div class="table-responsive mt-3 mb-3">
-                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi secondDataTable" width="100%" cellspacing="0" id="secondDataTable">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th width="10">No</th>
-                                <th onclick="changeSortHarga('bahan_baku_name')" class="sort">Barang</th>
-                                <th onclick="changeSortHarga('createdAt')" class="sort">Tgl</th>
-                                <th onclick="changeSortHarga('spesifikasi')" class="sort">Spesifikasi</th>
-                                <th onclick="changeSortHarga('harga_umum')" class="sort">Umum</th>
-                                <th onclick="changeSortHarga('harga_harian')" class="sort">Harian</th>
-                                <th onclick="changeSortHarga('harga_bulanan')" class="sort">Bulanan</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-hide-harga btn-discard mr-2">Batal</button>
             </div>
         </div>
     </div>
@@ -179,7 +71,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Supplier Bahan Baku</h1>
+        <h1>Supplier Internasional</h1>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -193,15 +85,14 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable firstDataTable" id="firstDataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
-                                <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
+                                <th onclick="changeSort('fax')" class="sort">Fax</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -218,51 +109,9 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
     let sortType = "asc";
-    let sortHarga = "createdAt";
-    let sortTypeHarga = "desc";
     let trigger = true;
-    let id_supplier = "";
-    
-    $('.province_parent_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    })
 
-    $('.city_parent_id').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    })
-
-    $('.country_code').select2({
-        placeholder: "",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    });
-
-    //CSS SELECT2 FLOATING LABEL
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
-
-    $('.form-select')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $('.form-select')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
-    let table = $('#firstDataTable').DataTable({
+    const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
         serverSide: true,
@@ -277,7 +126,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("supplier-bahan-baku/all"); ?>",
+            url: "<?= base_url("supplier-internasional/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -305,96 +154,10 @@
             data: "name",
             className: "text-center"
         }, {
-            data: "no_npwp",
+            data: "fax",
             className: "text-center"
         }, {
             data: "address",
-            className: "text-center"
-        }, {
-            data: "id",
-            className: "text-center actions",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row?.id;
-                    return `
-                        <a class="btn btn-warning" href="<?= base_url(); ?>supplier-bahan-baku/harga/${id}" style="box-shadow: none !important;">
-                            Set Harga
-                        </a>
-                        <button class="btn btn-success" onclick="History(${id})" style="box-shadow: none !important;">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                        </a>
-                    `
-            }
-        }],
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
-
-    let secondTable = $('#secondDataTable').DataTable({
-        dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
-        processing: true,
-        serverSide: true,
-        ordering: true,
-        order: [
-            [2, 'desc']
-        ],
-        fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("supplier-harga/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.id = id_supplier;
-                data.search = $(".search-harga").val();
-                data.sort = sortHarga;
-                data.sortType = sortTypeHarga;
-            }
-        },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.secondDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        //responsive: true,
-        display: "stripe",
-        searching: false,
-        columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        }, {
-            data: "bahan_baku_name",
-            className: "text-center"
-        }, {
-            data: "createdAt",
-            className: "text-center"
-        }, {
-            data: "spesifikasi",
-            className: "text-center"
-        }, {
-            data: "harga_umum",
-            className: "text-center"
-        }, {
-            data: "harga_harian",
-            className: "text-center"
-        }, {
-            data: "harga_bulanan",
             className: "text-center"
         }],
         columnDefs: [{
@@ -419,10 +182,6 @@
                 },
                 name: {
                     required: true
-                },
-                no_npwp: {
-                    minlength: 15,
-                    maxlength: 15,
                 }
             },
             messages: {
@@ -431,10 +190,6 @@
                 },
                 name: {
                     required: "Nama wajib diisi"
-                },
-                no_npwp: {
-                    minlength: "Nomor NPWP minimal 15 angka",
-                    maxlength: "Nomor NPWP maksimal 15 angka",
                 }
             },
             errorElement: 'span',
@@ -459,16 +214,12 @@
             },
         });
 
-        $(".no_npwp").mask("000000000000000")
+        $(".fax").mask("0000000000")
 
         $(".phone").mask("0000000000000")
 
         $(".search").keyup(function() {
             table.ajax.reload();
-        })
-
-        $(".search-harga").keyup(function() {
-            secondTable.ajax.reload();
         })
 
         $(".dataTable_info").addClass("pt-0");
@@ -482,12 +233,6 @@
 
             $(".create-form")[0].reset()
             $(".delete-form").css('display', 'none');
-
-            $(".province_parent_id").val('').change()
-            $(".city_parent_id").val('').change()
-            $(".city_parent_id").empty()
-            $(".city_parent_id").append(`<option value=""></option>`)
-            $(".country_code").val('').change()
             
             $.ajax({
                 url: "<?= base_url("supplier/generate"); ?>",
@@ -511,12 +256,8 @@
             })
         })
 
-        $(".btn-hide-parent").click(function() {
+        $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
-        })
-
-        $(".btn-hide-harga").click(function() {
-            $(".harga-modal").modal("hide")
         })
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
@@ -539,32 +280,9 @@
                         $(".kode").val(res?.data?.kode);
                         $(".name").val(res?.data?.name);
                         $(".address").val(res?.data?.address);
-                        $(".no_npwp").val(res?.data?.no_npwp);
+                        $(".fax").val(res?.data?.fax);
                         $(".phone").val(res?.data?.phone);
                         $(".contact_person").val(res?.data?.contact_person);
-                        $(".email").val(res?.data?.email);
-                        $(".province_parent_id").val(res?.data?.province_id).change();
-                        $(".country_code").val(res?.data?.country_code).change();
-                        $(".account_receivable").val(res?.data?.account_receivable);
-                        $(".account_payable").val(res?.data?.account_payable);
-
-                         // AJAX GET CITY
-                         $.ajax({
-                            url: `<?= base_url("city"); ?>/${res?.data?.province_id}`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_parent_id").empty()
-                                $(".city_parent_id").val("").change()
-                                $(".city_parent_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                                })
-
-                                $(".city_parent_id").val(res?.data?.city_id).change();
-                                $(".parent_postal_code").val(res?.data?.postal_code);
-                            }
-                        })
 
                         $(".add-modal").modal("show");
 
@@ -579,6 +297,7 @@
             })
         })
 
+        // delete
         $(".delete-form").click(function() {
             Swal.fire({
                 icon: 'question',
@@ -658,7 +377,7 @@
                         let id = $(".id").val();
 
                         $.ajax({
-                            url: id ? "<?= base_url("supplier-bahan-baku/update"); ?>" : "<?= base_url("supplier-bahan-baku/save"); ?>",
+                            url: id ? "<?= base_url("supplier-internasional/update"); ?>" : "<?= base_url("supplier-internasional/save"); ?>",
                             data: data,
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -705,30 +424,6 @@
         })
     })
 
-    const getCityParent = function() {
-        const id = $(".province_parent_id option:selected").val()
-
-        if (id) {
-            $.ajax({
-                url: `<?= base_url("city"); ?>/${id}`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".city_parent_id").empty()
-                    $(".city_parent_id").val("").change()
-                    $(".city_parent_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                    })
-                }
-            })
-        }
-    }
-
-    const getPostalCodeParent = function() {
-        $(".parent_postal_code").val($(".city_parent_id option:selected").attr("data-code"))
-    }
-
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";
@@ -737,25 +432,7 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
-
-    const changeSortHarga = function(val) {
-        if (sortHarga !== val) {
-            sortTypeHarga = "asc";
-            sortHarga = val;
-        } else {
-            sortTypeHarga = sortTypeHarga === "asc" ? "desc" : "asc";
-        }
-    }
-
-    let History = function(id) {
-        id_supplier = id;
-        $(".search-harga").val('')
-        sortHarga = "createdAt";
-        sortTypeHarga = "desc";
-        secondTable.ajax.reload()
-        $(".harga-modal").modal("show")
-    }
-    
 </script>
+
 
 <?= $this->endSection(); ?>

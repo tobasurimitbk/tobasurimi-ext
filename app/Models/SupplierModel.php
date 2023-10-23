@@ -69,6 +69,8 @@ class SupplierModel extends Model
             'address'           => 'suppliers.address',
             'no_npwp'           => 'suppliers.no_npwp',
             'phone'             => 'suppliers.phone',
+            'contact_person'    => 'suppliers.contact_person',
+            'fax'               => 'suppliers.fax',
             // 'contact_person'    => 'suppliers.contact_person',
             // 'no_rekening'       => 'suppliers.no_rekening',
             // 'supplier_buyer'    => 'suppliers.supplier_buyer',

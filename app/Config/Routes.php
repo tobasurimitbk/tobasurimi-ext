@@ -178,6 +178,12 @@ $routes->get('/supplier-bahan-penolong', 'Supplier\Supplier::supplierBahanPenolo
 $routes->get('/supplier-bahan-penolong/all', 'Supplier\Supplier::allSupplierBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-penolong/save', 'Supplier\Supplier::saveSupplierBahanPenolong', ['filter' => 'Auth']);
 $routes->post('/supplier-bahan-penolong/update', 'Supplier\Supplier::updateSupplierBahanPenolong', ['filter' => 'Auth']);
+
+$routes->get('/supplier-internasional', 'Supplier\Supplier::supplierInternasional', ['filter' => 'Auth']);
+$routes->get('/supplier-internasional/all', 'Supplier\Supplier::allSupplierInternasional', ['filter' => 'Auth']);
+$routes->post('/supplier-internasional/save', 'Supplier\Supplier::saveSupplierInternasional', ['filter' => 'Auth']);
+$routes->post('/supplier-internasional/update', 'Supplier\Supplier::updateSupplierInternasional', ['filter' => 'Auth']);
+
 // PURCHASE
 // SPP
 $routes->get('/spp', 'Purchase\SPP::spp', ['filter' => 'Auth']);
