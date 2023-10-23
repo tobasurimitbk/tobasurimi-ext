@@ -235,7 +235,7 @@ class Payroll extends BaseController
                     ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
                     ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
                     ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
-                    ->set('nominal_penambahan_gaji', $res['nominal_penambahan_gaji'])
+                    ->set('nominal_penambahan_gaji', $payrollFinal['nominal_penambahan_gaji'])
                     ->where('id', $payrollID)
                     ->update();
             }
@@ -363,7 +363,7 @@ class Payroll extends BaseController
             ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
             ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
             ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
-            ->set('nominal_penambahan_gaji', $res['nominal_penambahan_gaji'])
+            ->set('nominal_penambahan_gaji', $payrollFinal['nominal_penambahan_gaji'])
             ->where('id', $payrollID)
             ->update();
 
