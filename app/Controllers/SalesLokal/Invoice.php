@@ -11,6 +11,7 @@ use App\Models\SalesOrderInvoiceModel;
 use App\Models\SalesOrderModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
+use App\Models\TaxModel;
 use App\Models\AllNoModel;
 
 use Config\Services;
@@ -49,6 +50,7 @@ class Invoice extends BaseController
         $this->SalesOrderModel = new SalesOrderModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->SuratJalanModel = new SuratJalanModel();
+        $this->TaxModel = new TaxModel();
     }
 
     public function index()
@@ -674,6 +676,7 @@ class Invoice extends BaseController
         $taxStatus = false;
         $includeTax = false;
         $itemList = [];
+        $itemTax = [];
 
         if ($docType == 'pesanan') {
             $soId = $docId;
@@ -711,11 +714,19 @@ class Invoice extends BaseController
         }
 
         $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
+        $itemTax = $this->TaxModel->where('id','4')->asObject()->findAll();
 
         $dpp = 0;
         $taxAmt = 0;
+        $taxChecked = 0;
 
         foreach ($itemList as $item) {
+        }
+
+        foreach ($itemList as &$item) {
+            foreach ($itemTax as $itemT) {
+                $item->taxChecked = str_replace(',', '', $itemT->tax_value);
+            }
             $hargaBarang = str_replace(',', '', $item->harga_barang);
             $qty = str_replace(',', '', $item->qty);
 
@@ -735,6 +746,7 @@ class Invoice extends BaseController
             'itemList'          => $itemList,
             'dpp'               => number_format($dpp),
             'tax'               => number_format($taxAmt),
+            'taxChecked'               => number_format($taxChecked),
             'total'             => number_format($dpp + $taxAmt)
         ];
         return $data;

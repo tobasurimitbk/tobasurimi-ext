@@ -74,7 +74,25 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example" onchange="generateKomponenGaji()">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Departemen </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select bagian_id" name="bagian_id" id="bagian_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Bagian </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
@@ -89,15 +107,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select division_id" name="division_id" id="division_id" aria-label="Floating label select example" onchange="generateKomponenGaji()">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Divisi </label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
+
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe" name="tipe" id="tipe" aria-label="Floating label select example">
                                     <option value=""></option>
@@ -298,10 +309,9 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('name')" class="sort">Nama Lengkap</th>
-                                <th onclick="changeSort('divisionName')" class="sort">Divisi</th>
+                                <th onclick="changeSort('divisionName')" class="sort">Departemen</th>
+                                <th onclick="changeSort('bagian_id')" class="sort">Bagian</th>
                                 <th onclick="changeSort('tipe')" class="sort">Tipe/Gol</th>
-                                <th onclick="changeSort('email')" class="sort">Email</th>
-                                <th onclick="changeSort('phone_no')" class="sort">No. Telepon</th>
                                 <th onclick="changeSort('dob')" class="sort">Tanggal Lahir</th>
                                 <th onclick="changeSort('gender')" class="sort">Jenis Kelamin</th>
                                 <th onclick="changeSort('status')" class="sort">Status</th>
@@ -321,6 +331,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nip";
     let sortType = "asc";
+    let bagianID = 0;
 
     let list_delete = [];
 
@@ -373,13 +384,10 @@
             data: "divisionName",
             className: "text-center"
         }, {
+            data: "bagianName",
+            className: "text-center"
+        }, {
             data: "tipe",
-            className: "text-center"
-        }, {
-            data: "email",
-            className: "text-center"
-        }, {
-            data: "phone_no",
             className: "text-center"
         }, {
             data: "dob",
@@ -629,6 +637,9 @@
                 division_id: {
                     required: true,
                 },
+                bagian_id: {
+                    required: true,
+                },
                 tipe: {
                     required: true,
                 },
@@ -661,6 +672,9 @@
                 },
                 division_id: {
                     required: "Divisi wajib diisi"
+                },
+                bagian_id: {
+                    required: "Bagian wajib diisi"
                 },
                 tipe: {
                     required: "Tipe/Golongan wajib diisi"
@@ -1098,6 +1112,8 @@
                         $(".child").val(res?.data?.child).change();
                         $(".division_id").val(res?.data?.division_id);
                         $(".tipe").val(res?.data?.tipe);
+                        bagianID = res?.data?.bagian_id;
+
                         document.getElementById("preview_photo").src = res?.data?.employee_img;
 
                         // AJAX GET CITY
@@ -1257,7 +1273,38 @@
         $(".zip_code").val($(".city_id option:selected").attr("data-code"))
     }
 
+    $('select[name="division_id"]').on('change', function(e) {
+        e.preventDefault();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', $(this).val());
+        $.ajax({
+            url: `<?= base_url("employee/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
 
+            success: function(result) {
+                $("select[name='bagian_id']").empty()
+                $("select[name='bagian_id']").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("select[name='bagian_id']").append(`<option value="${item.id}">${item.nama_bagian}</option>`)
+                });
+                if (bagianID == 0) {
+                    $("select[name='bagian_id']").val('').change();
+
+                } else {
+                    $("select[name='bagian_id']").val(bagianID).change();
+
+                }
+            }
+        })
+    });
 
     function generateKomponenGaji() {
         const csrf = $(`[name="${csrfToken}"]`);

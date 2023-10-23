@@ -3,6 +3,7 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\BagianModel;
 use App\Models\DivisisModel;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
@@ -144,7 +145,11 @@ class Employee extends BaseController
 
         $data = [];
 
+        $bagianModel = new BagianModel();
+
         for ($i = 0; $i < count($res); $i++) {
+
+            $bagian = $bagianModel->where('id', $res[$i]['bagian_id'])->first();
 
             $data[] = array(
                 "no" => ($row + $i + 1),
@@ -152,13 +157,14 @@ class Employee extends BaseController
                 "nip" => $res[$i]["nip"],
                 "name" => $res[$i]["name"],
                 "divisionName" => $res[$i]["divisionName"],
-                "email" => $res[$i]["email"] == null ? "-" : $res[$i]["email"],
-                "phone_no" => $res[$i]["phone_no"] == null ? "-" :  $res[$i]["phone_no"],
+                // "email" => $res[$i]["email"] == null ? "-" : $res[$i]["email"],
+                // "phone_no" => $res[$i]["phone_no"] == null ? "-" :  $res[$i]["phone_no"],
                 "dob" => $res[$i]["dob"] == "0000-00-00" ? "-" : date("d/m/Y", strtotime($res[$i]["dob"])),
                 "gender" => $res[$i]["gender"],
                 "acc_no" => $res[$i]["acc_no"],
                 "status" => $res[$i]["status"],
-                "tipe" => $res[$i]['tipe'] ==  null ? "-" : $res[$i]['tipe']
+                "tipe" => $res[$i]['tipe'] ==  null ? "-" : $res[$i]['tipe'],
+                "bagianName" => ($bagian == null) ? "-" : $bagian['nama_bagian']
             );
         }
 
@@ -203,7 +209,8 @@ class Employee extends BaseController
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
                 "pin"  => $this->request->getPost("pin") ?? "",
                 "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0,
-                "tipe" => $this->request->getPost('tipe')
+                "tipe" => $this->request->getPost('tipe'),
+                "bagian_id" => $this->request->getPost('bagian_id')
             ];
             if (!empty($file->getName())) {
                 $mime = $file->getMimeType();
@@ -307,7 +314,8 @@ class Employee extends BaseController
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
                 "pin"  => $this->request->getPost("pin") ?? "",
                 "pendidikan" => formatter($this->request->getPost("pendidikan"), "STR_TO_INT") ?? 0,
-                "tipe" => $this->request->getPost('tipe')
+                "tipe" => $this->request->getPost('tipe'),
+                "bagian_id" => $this->request->getPost('bagian_id')
             ];
             $file = $this->request->getFile("employeeImg");
             if (!empty($file->getName())) {

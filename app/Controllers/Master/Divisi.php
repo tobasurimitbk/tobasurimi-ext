@@ -3,6 +3,7 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\BagianModel;
 use App\Models\DivisisModel;
 use App\Models\GajiDivisiModel;
 use App\Models\JamKerjaModel;
@@ -70,13 +71,16 @@ class Divisi extends BaseController
 
         $data = [];
 
-        for ($i = 0; $i < count($res); $i++) {
+        $bagianModel = new BagianModel();
 
+        for ($i = 0; $i < count($res); $i++) {
+            $totalBagian = $bagianModel->where('division_id', $res[$i]['id'])->where('deletedAt', null)->findAll();
             $data[] = array(
                 "no" => ($row + $i + 1),
                 "id" => $res[$i]["id"],
                 "divisi" => $res[$i]["divisi"],
-                "jamKerja" => $res[$i]["jenis"]
+                "jamKerja" => $res[$i]["jenis"],
+                "totalBagian" => count($totalBagian) == 0 ? '-' : count($totalBagian) . " Bagian",
             );
         }
 
