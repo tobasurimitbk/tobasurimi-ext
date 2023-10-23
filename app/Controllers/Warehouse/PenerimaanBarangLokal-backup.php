@@ -57,7 +57,7 @@ class PenerimaanBarangLokal extends BaseController
         $dataAJU = $this->metadataModel->get_by_name('jenis_dok_aju');
 
         //Get Supplier
-        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
 
         //Get Warehouse
         $dataWarehouse = $this->warehousesModel->get_by_company_id($this->this_company_id);
@@ -120,7 +120,7 @@ class PenerimaanBarangLokal extends BaseController
                         $dataNo = $this->rmPurchaseOrderModel->getNoPenerimaanBarang($supplier_id, $this->this_company_id);
 
                         //Get Supplier
-                        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+                        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN BAKU');
 
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;
@@ -132,7 +132,7 @@ class PenerimaanBarangLokal extends BaseController
                         $dataNo = $this->amPurchaseOrderModel->getNoPenerimaanBarang("Lokal", $supplier_id, $this->this_company_id);
 
                         //Get Supplier
-                        $dataSupplier = $this->supplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
+                        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN PENOLONG');
 
                         $data["dataNo"] = $dataNo;
                         $data["dataSupplier"] = $dataSupplier;

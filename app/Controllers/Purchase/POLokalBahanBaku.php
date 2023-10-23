@@ -52,7 +52,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
 
         // get Barang list
         $barangData = $this->barangModel->asObject()
@@ -75,7 +75,7 @@ class POLokalBahanBaku extends BaseController
     public function getByIdPOLokalBahanBaku($id = null)
     {
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN BAKU', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];

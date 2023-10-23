@@ -189,7 +189,7 @@ class SPP extends BaseController
                 "companyName"  => $data->companyName,
                 "divisiName" => $data->divisiName,
                 "spp_type"      => $data->spp_type,
-                "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
+                "total"         => "Rp " . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "request_date"  => date('d/m/Y', strtotime($data->request_date)),
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
@@ -314,9 +314,6 @@ class SPP extends BaseController
                 "request_date" => [
                     "rules" => "required"
                 ],
-                "spp_type" => [
-                    "rules" => "required"
-                ],
                 "spp_no" => [
                     "rules" => "required"
                 ],
@@ -343,7 +340,6 @@ class SPP extends BaseController
                     "company_id" => $this->request->getPost("company_id"),
                     "request_date" => $this->request->getPost("request_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("request_date")))) : "",
                     "spp_no" => $this->request->getPost("spp_no"),
-                    "spp_type" => $this->request->getPost("spp_type"),
                     "divisi_id" => $this->request->getPost("divisi_id"),
                     "note" => $this->request->getPost("note"),
                     "is_posted" => false,
@@ -363,6 +359,14 @@ class SPP extends BaseController
                 // if ($insertData["spp_no"] === "") {
                 //     $insertData["spp_no"] = $SppModel->genereteNoSpp($dataWarehouse["warehouse_name"]);
                 // }
+
+                // $data = [
+                //     "status"    => false,
+                //     "message"   => json_encode($this->request->getPost("type")),
+                //     "payload"   =>  json_encode($this->request->getPost("type")),
+                //     'token'     => csrf_hash()
+                // ];
+                // return json_encode($data);
 
                 if ($insertData) {
                     $this->SppModel->update($id, $insertData);
@@ -457,12 +461,14 @@ class SPP extends BaseController
                         //     }
                         // }
                         // update item po bp lokal
-                        if($this->request->getPost("spp_type") === "Lokal")
+                        if($this->request->getPost("type") === "Lokal")
                         {
                             $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
 
                             if($responsePO)
                             {
+                                $this->AmPurchaseOrderModel->where(['id' => $responsePO->id])->set(['total' => $totalPrice])->update();
+
                                 $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
                                 // edit and delete po items
@@ -557,12 +563,14 @@ class SPP extends BaseController
                         //     }
                         // }
                         // update item po bp import
-                        if($this->request->getPost("spp_type") === "Import")
+                        if($this->request->getPost("type") === "Import")
                         {
                             $responsePO = $this->AmPurchaseOrderModel->getByPurchaseRequestId($this->request->getPost("id"));
 
                             if($responsePO)
                             {
+                                $this->AmPurchaseOrderModel->where(['id' => $responsePO->id])->set(['total' => $totalPrice])->update();
+
                                 $responseDetailPO = $this->AmPurchaseOrderDetailModel->getPurchaseOrderDetailByPurchaseRequestDetailId($value->id ?? null);
 
                                 // edit and delete po items
@@ -900,7 +908,7 @@ class SPP extends BaseController
                 "spp_no"        => $data->spp_no,
                 "companyName"   => $data->companyName,
                 "divisiName"    => $data->divisiName,
-                "total"         => number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
+                "total"         => "Rp " . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "request_date"  => date('d/m/Y', strtotime($data->request_date)),
                 "is_posted"     => $data->is_posted,
                 "createdAt"     => date('d/m/Y', strtotime($data->createdAt)),

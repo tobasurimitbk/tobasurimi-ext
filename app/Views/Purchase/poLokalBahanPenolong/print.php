@@ -183,16 +183,15 @@
                 <tr>
                     <!-- <td><b><?= $detail->no ?></b></td> -->
                     <!-- <td><?= $detail->nama_satuan ?></b></td> -->
-                    <!-- <td><?= $detail->spec ?></b></td> -->
                     <!-- <td><?= $detail->additional_cost ?></b></td> -->
                     <!-- <td><?= $detail->nilaiPpn ?></b></td> -->
                     <!-- <td><?= $detail->nilaiPph ?></b></td> -->
                     <td style="padding-left: 5px;"><?= $detail->qty . " " . $detail->nama_satuan ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail->kode_barang ?></b></td>
-                    <td style="padding-left: 5px;"><?= $detail->nama_barang . " " . $detail->spec ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= $detail->price ?></b></td>
+                    <td style="padding-left: 5px;"><?= $detail->nama_barang ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= "Rp " . number_format(formatter($detail->price, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail->disc ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= $detail->totalPrice ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= "Rp " . number_format(formatter($detail->totalPrice, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                 </tr>
             <?php } ?>
         </table>
@@ -204,9 +203,6 @@
                 <div class="mt-025">
                     Diskon: <span class="txt-bold">Rp. <?= $dataPOLokal->totalDisc ?></span>
                 </div>
-                <!-- <div class="mt-025">
-                    DPP: <span class="txt-bold">Rp. <?= $dataPOLokal->dpp ?></span>
-                </div> -->
                 <div class="mt-025">
                     PPN (dikreditkan): <span class="txt-bold">Rp. <?= $dataPOLokal->totalPpn ?></span>
                 </div>

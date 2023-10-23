@@ -72,7 +72,7 @@
 
     <table border="0" style="margin-top: 30px;">
         <tr>
-            <td>Divisi</td>
+            <td>Bagian</td>
             <td>:</td>
             <td><?= $divisi['divisi'] ?></td>
         </tr>
@@ -90,21 +90,27 @@
                 <td>Upah Pokok <br> (Rp)</td>
                 <td>Lembur Kerja <br> (Rp)</td>
                 <td>Tunj.Ksjh <br> (Rp)</td>
-                <td>Lembur Libur <br> (Rp)</td>
                 <td>Potongan <br> (Rp)</td>
                 <td>Jumlah Upah <br> (Rp)</td>
             </tr>
         </thead>
         <tbody>
-            <?php $uangMakanTotal = 0; ?>
+            <?php
+            $uangMakanTotal = 0;
+            $tunjanganKesejahteraanTotal = 0; ?>
             <?php foreach ($payrollData['dataPayroll'] as $p) : ?>
                 <?php
                 $gajiConjunctionModel = new \App\Models\GajiConjunctionModel();
-                $uangMakan = $gajiConjunctionModel->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
-                    ->where('employee_id', $p['employee_id'])
-                    ->where('tunjangan.name', "Uang Makan")
-                    ->first();
-                $uangMakanTotal += ($uangMakan == null) ? 0 : $uangMakan['nominal'];
+                $uangMakanNominal = $gajiConjunctionModel->getNominalByKomponenName(
+                    "Uang Makan",
+                    $p['employee_id']
+                );
+                $tunjanganKesejahteraanNominal = $gajiConjunctionModel->getNominalByKomponenName(
+                    "Tunjangan Kesejahteraan",
+                    $p['employee_id']
+                );
+                $uangMakanTotal += $uangMakanNominal;
+                $tunjanganKesejahteraanTotal += $tunjanganKesejahteraanNominal;
                 ?>
                 <tr align="center">
                     <td><?= $p['no'] ?></td>
@@ -112,11 +118,10 @@
                     <td><?= $p['name'] ?></td>
                     <td><?= $p['hariKerja'] ?></td>
                     <td><?= $p['jumlahUpah'] ?></td>
-                    <td><?= ($uangMakan == null) ? 0 : number_format($uangMakan['nominal'], 2, ',', '.')   ?></td>
+                    <td><?= number_format($uangMakanNominal, 2, ',', '.') ?></td>
                     <td><?= $p['upahPokok'] ?></td>
                     <td><?= $p['upahLembur'] ?></td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td><?= number_format($tunjanganKesejahteraanNominal, 2, ',', '.')   ?></td>
                     <td><?= $p['potongan'] ?></td>
                     <td><?= $p['jumlahUpah'] ?></td>
                 </tr>
@@ -125,33 +130,43 @@
                 <td colspan="4" style="text-align: right;">
                     Total
                 </td>
-                <td><?= number_format($payrollData['total']['totalUpah'], 2, ',', '.')  ?></td>
+                <td><?= number_format($payrollData['total']['jumlahUpah'], 2, ',', '.')  ?></td>
                 <td><?= number_format($uangMakanTotal, 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['upahPokok'], 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['upahLembur'], 2, ',', '.')  ?></td>
-                <td><?= number_format(0, 2, ',', '.')  ?></td>
-                <td><?= number_format(0, 2, ',', '.')  ?></td>
+                <td><?= number_format($tunjanganKesejahteraanTotal, 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['potongan'], 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['jumlahUpah'], 2, ',', '.')  ?></td>
             </tr>
         </tbody>
     </table>
 
-    <table width="100%" style="margin-top: 10px;">
+    <table width="100%" style="margin-top: 20px;">
         <tr align="left" style="font-size:12px;">
-            <td>PERINCIAN KOMPONEN GAJI</td>
+            <td>PERINCIAN</td>
         </tr>
     </table>
     <br>
 
     <table>
         <tbody>
-            <?php foreach ($komponenGaji as  $k) : ?>
+            <?php $tunjanganDisplay = ["Tunjangan Seragam", "Tunjangan Makan Malam", "Tunjangan Transport"]; ?>
+            <?php $tunjanganTotalDisplay = 0; ?>
+            <?php $gajiDivisiModel = new \App\Models\GajiDivisiModel(); ?>
+            <?php foreach ($tunjanganDisplay as  $t) : ?>
+                <?php $nominalTunjDisplay = $gajiDivisiModel->getNominalByKomponenName($divisi['id'], $t); ?>
+                <?php $tunjanganTotalDisplay += $nominalTunjDisplay; ?>
                 <tr>
-                    <td><?= $k['name'] ?> <?= $k['tipe'] == "PLUS" ? "(+)" : "(-)"  ?></td>
-                    <td>Rp <?= number_format($k['nominal'], 2, ',', '.')  ?></td>
+                    <td><?= $t; ?></td>
+                    <td>:</td>
+                    <td>Rp <?= number_format($nominalTunjDisplay, 2, ',', '.')  ?></td>
                 </tr>
             <?php endforeach; ?>
+            <tr>
+                <td>Jumlah Tunjangan</td>
+                <td>:</td>
+                <td>Rp <?= $tunjanganTotalDisplay; ?></td>
+            </tr>
         </tbody>
     </table>
 
@@ -174,6 +189,8 @@
                 </td>
             </tr>
         <?php endforeach; ?>
+    </table>
+
     </table>
 </body>
 

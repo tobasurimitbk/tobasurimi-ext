@@ -16,11 +16,9 @@ class AMPurchaseOrderModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'company_id',
         'purchase_request_id',
         'po_no',
         'po_date',
-        'divisi_id',
         'po_type',
         'currency',
         'supplier_id',
@@ -63,6 +61,7 @@ class AMPurchaseOrderModel extends Model
         $availableSort = [
             'poDate'           => 'am_purchase_orders.po_date',
             'poNo'             => 'am_purchase_orders.po_no',
+            'companyName'      => 'companies.company',
             'supplierName'      => 'suppliers.name',
             'total'             => 'am_purchase_orders.total',
             'currencyName'      => 'metadata.value',
@@ -78,12 +77,15 @@ class AMPurchaseOrderModel extends Model
         $selectQry = "am_purchase_orders.*, 
                       suppliers.name AS supplierName, 
                       metadata.value AS currencyName,
+                      companies.company AS companyName,
                       COUNT(am_purchase_order_details.id) AS itemCount";
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
-            ->join('metadata', 'metadata.id = am_purchase_orders.currency')
+            ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+            ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
+            ->join('companies', 'companies.id = purchase_requests.company_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->groupBy(('am_purchase_orders.id'))
             ->orderBy($sort, $sortType);
@@ -126,6 +128,7 @@ class AMPurchaseOrderModel extends Model
     {
         $selectQry = "am_purchase_orders.*,
         purchase_requests.spp_no AS spp_no,
+        divisis.id AS divisi_id,
         divisis.divisi AS divisiName,
         suppliers.name AS supplierName,
         suppliers.address AS supplierAddress,
@@ -140,10 +143,10 @@ class AMPurchaseOrderModel extends Model
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
-            ->join('divisis', 'divisis.id = am_purchase_orders.divisi_id', 'left')
+            ->join('divisis', 'divisis.id = purchase_requests.divisi_id', 'left')
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
             ->join('users', 'users.id = purchase_requests.createdBy', 'left')
-            ->join('companies', 'companies.id = am_purchase_orders.company_id', 'left')
+            ->join('companies', 'companies.id = purchase_requests.company_id', 'left')
             ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
             ->find($id);
 
@@ -171,8 +174,7 @@ class AMPurchaseOrderModel extends Model
             'supplier_id' => $supplier_id,
             'is_posted' => 1,
             'status_penerimaan' => 0,
-            'po_type' => $po_type,
-            'company_id' => $company_id
+            'po_type' => $po_type
         ];
 
         $builder = $this->db->table('am_purchase_orders');
@@ -188,8 +190,7 @@ class AMPurchaseOrderModel extends Model
             'deletedAt' => null,
             'is_posted' => 1,
             'status_penerimaan' => 0,
-            'po_type' => $po_type,
-            'company_id' => $company_id
+            'po_type' => $po_type
         ];
 
         $builder = $this->db->table('am_purchase_orders');
@@ -204,11 +205,12 @@ class AMPurchaseOrderModel extends Model
         $lastStr =  $tgl . $bln . $thn;
 
         $builder = $this->db->table('am_purchase_orders');
-        $builder->select('po_no');
+        $builder->select('po_no')
+        ->join('purchase_requests', 'am_purchase_orders.purchase_request_id = purchase_requests.id', 'left');
         $builder->orderBy('po_no', 'desc')
-            ->where('divisi_id', $divisi_id)
-            ->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
+            ->where('purchase_requests.divisi_id', $divisi_id)
+            ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
+            ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59");
         $builder->like('po_no', $lastStr);
         $query = $builder->get();
 

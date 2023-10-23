@@ -123,12 +123,14 @@ class SppModel extends Model
     {
         $selectQry = "purchase_requests.*,
         divisis.divisi AS divisiName,
+        companies.company AS companyName,
         createdBy.name AS createdByName
         ";
 
         $sppData = $this->asObject()
             ->select($selectQry)
             ->join('divisis', 'purchase_requests.divisi_id = divisis.id', 'left')
+            ->join('companies', 'purchase_requests.company_id = companies.id', 'left')
             ->join('users AS createdBy', 'purchase_requests.createdBy = createdBy.id', 'left')
             ->find($id);
 

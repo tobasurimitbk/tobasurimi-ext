@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use PDO;
 
 class PayrollsModel extends Model
 {
@@ -28,6 +29,11 @@ class PayrollsModel extends Model
         'hadir',
         'libur',
         'alpha',
+        'hadir_final',
+        'total_perizinan_not_approved',
+        'total_perizinan_approved',
+        'nominal_cadangan',
+        'nominal_gaji_harian',
         'nominal_pinjaman_karyawan',
         'nominal_uang_gaji',
         'nominal_uang_lembur',
@@ -124,6 +130,8 @@ class PayrollsModel extends Model
     public function generate($employeeID, $yearMonth, $payrollID, $totalKehadiran, $startDate, $endDate)
     {
         $result = [
+            'nominal_cadangan' => 0,
+            'nominal_gaji_harian' => 0,
             'nominal_pinjaman_karyawan' => 0,
             'nominal_uang_gaji' => 0,
             'nominal_uang_lembur' => 0,
@@ -135,7 +143,6 @@ class PayrollsModel extends Model
         // declare model
         $formLemburModel = new FormLemburModel();
         $payrollGajiModel = new PayrollGajiConjunctionModel();
-        $formPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
 
@@ -171,6 +178,10 @@ class PayrollsModel extends Model
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->first();
 
+        // set nominal cadangan & gaji harian di payroll
+        $result['nominal_cadangan'] = $gajiCadangan == null ? 0 : $gajiCadangan['nominal'];
+        $result['nominal_gaji_harian'] = $gajiHarian == null ? 0 : $gajiHarian['nominal'];
+
         // nominal pinjaman karyawan set
         $pinjamanKaryawan = $pinjamanKaryawanModel->getPinjamanKaryawanDiambil($employeeID, $yearMonth);
 
@@ -183,13 +194,7 @@ class PayrollsModel extends Model
 
         $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $totalKehadiran;
 
-        // nominal pengurangan gaji (perizinan not approved + keterlambatan absen + komponen gaji minus)
-        // perizinan not approved
-        $perizinanNotApproved = $formPerizinanNotApprovedModel->select("SUM(nominal_pengurangan) AS total")
-            ->where('employee_id', $employeeID)
-            ->where('payroll_id', $payrollID)
-            ->findAll();
-
+        // nominal pengurangan gaji ( keterlambatan absen + komponen gaji minus)
         // keterlambatan kehadiran
         $attendanceTerlambat = $attendanceTerlambatModel->select("SUM(nominal_pengurangan) AS total")
             ->where('payroll_id', $payrollID)
@@ -213,7 +218,6 @@ class PayrollsModel extends Model
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->findAll();
 
-        $result['nominal_pengurangan_gaji'] += ($perizinanNotApproved[0]['total'] ?? 0);
         $result['nominal_pengurangan_gaji'] += ($attendanceTerlambat[0]['total'] ?? 0);
         $result['nominal_pengurangan_gaji'] += ($gajiMinus[0]['total'] ?? 0);
         $result['nominal_pengurangan_gaji'] += ($result['nominal_pinjaman_karyawan'] ?? 0);
@@ -239,6 +243,8 @@ class PayrollsModel extends Model
     public function generateIfPayrollChanged($payrollID)
     {
         $result = [
+            'nominal_cadangan' => 0,
+            'nominal_gaji_harian' => 0,
             'nominal_pinjaman_karyawan' => 0,
             'nominal_uang_gaji' => 0,
             'nominal_uang_lembur' => 0,
@@ -250,7 +256,6 @@ class PayrollsModel extends Model
         // declare model
         $formLemburModel = new FormLemburModel();
         $payrollGajiModel = new PayrollGajiConjunctionModel();
-        $formPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
 
@@ -273,19 +278,9 @@ class PayrollsModel extends Model
 
         $result['nominal_uang_lembur'] = $uangLemburTotal[0]['total'];
 
-        // set uang gaji (jmlh hadir x (gaji harian + uang cadangan))
-        $gajiHarian = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
-            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
-            ->where('tunjangan.is_gaji_harian', '1')
-            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-            ->first();
-
-        // get nominal uang cadangan
-        $gajiCadangan = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
-            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
-            ->where('tunjangan.is_cadangan', '1')
-            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-            ->first();
+        // set nominal cadangan & gaji harian di payroll riwayat (karena ini update)
+        $result['nominal_cadangan'] = $payroll['nominal_cadangan'];
+        $result['nominal_gaji_harian'] = $payroll['nominal_gaji_harian'];
 
         // nominal pinjaman karyawan set
         $pinjamanKaryawan = $pinjamanKaryawanModel->getPinjamanKaryawanDiambil($payroll['employee_id'], $payroll['year_month']);
@@ -294,17 +289,12 @@ class PayrollsModel extends Model
             $result['nominal_pinjaman_karyawan'] = $pinjamanKaryawan['nominal'];
         }
 
-        $nominalGajiHarian = ($gajiHarian != null) ? $gajiHarian['nominal'] : 0;
-        $nominalGajiCadangan = ($gajiCadangan != null) ? $gajiCadangan['nominal'] : 0;
+        $nominalGajiHarian = $payroll['nominal_gaji_harian'];
+        $nominalGajiCadangan = $payroll['nominal_cadangan'];
 
         $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $payroll['hadir'];
 
-        // nominal pengurangan gaji (perizinan not approved + keterlambatan absen + komponen gaji minus)
-        // perizinan not approved
-        $perizinanNotApproved = $formPerizinanNotApprovedModel->select("SUM(nominal_pengurangan) AS total")
-            ->where('employee_id', $payroll['employee_id'])
-            ->where('payroll_id', $payrollID)
-            ->findAll();
+        // nominal pengurangan gaji ( keterlambatan absen + komponen gaji minus)
 
         // keterlambatan kehadiran
         $attendanceTerlambat = $attendanceTerlambatModel->select("SUM(nominal_pengurangan) AS total")
@@ -331,7 +321,6 @@ class PayrollsModel extends Model
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->findAll();
 
-        $result['nominal_pengurangan_gaji'] += ($perizinanNotApproved[0]['total'] ?? 0);
         $result['nominal_pengurangan_gaji'] += ($attendanceTerlambat[0]['total'] ?? 0);
         $result['nominal_pengurangan_gaji'] += ($gajiMinus[0]['total'] ?? 0);
         $result['nominal_pengurangan_gaji'] += ($result['nominal_pinjaman_karyawan'] ?? 0);
@@ -341,6 +330,8 @@ class PayrollsModel extends Model
 
         // update
         $this->update($payrollID, [
+            'nominal_cadangan' => $result['nominal_cadangan'],
+            'nominal_gaji_harian' => $result['nominal_gaji_harian'],
             'nominal_uang_gaji' => $result['nominal_uang_gaji'],
             'nominal_uang_lembur' => $result['nominal_uang_lembur'],
             'nominal_pengurangan_gaji' => $result['nominal_pengurangan_gaji'],
@@ -383,8 +374,6 @@ class PayrollsModel extends Model
         $potongan = 0;
         $jumlahUpah = 0;
 
-        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-
         foreach ($dataQry as $p) {
             $upahPokok += $p->nominal_uang_gaji;
             $upahLembur += $p->nominal_uang_lembur;
@@ -399,7 +388,7 @@ class PayrollsModel extends Model
                 "nip" => $p->employeesNIP,
                 "name"  => $p->employeesName,
                 "divisi" => $p->divisiName,
-                "hariKerja" => $p->hadir . "",
+                "hariKerja" => $p->hadir_final . "",
                 "upahPokok" => number_format($p->nominal_uang_gaji, 2, ',', '.'),
                 "upahLembur" => number_format($p->nominal_uang_lembur, 2, ',', '.'),
                 "totalUpah" => number_format($p->nominal_uang_gaji + $p->nominal_uang_lembur, 2, ',', '.'),
@@ -450,8 +439,6 @@ class PayrollsModel extends Model
             $data[] = [
                 'payroll' => $payrollDetail,
                 'employee' => $employee,
-                'gajiPerHari' => $payrollGajiModel->getNominalGajiPerHariPayroll($ep['id']),
-                'nominalUangCadangan' => $payrollGajiModel->getNominalUangCadanganPayroll($ep['id']),
                 'rekapLembur' => $formLemburModel->rekap($payrollDetail['employee_id'], $payrollDetail['year_month']),
                 'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
                 'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
@@ -470,10 +457,111 @@ class PayrollsModel extends Model
         ];
     }
 
+    public function getSummaryPayroll($yearMonth, $companyID)
+    {
+        $divisiModel = new DivisisModel();
+        $divisiData = $divisiModel->where('company_id', $companyID)->where('deletedAt', null)->findAll();
+
+        $res = [];
+        $upahPokok = 0;
+        $tunjanganPlusCadangan = 0;
+        $lemburTotal = 0;
+        $totalUpah = 0;
+        $potongan = 0;
+        $upahBersih = 0;
+        $orangTotal = 0;
+        $lembur = 0;
+        $jamKerja = 0;
+
+        foreach ($divisiData as $d) {
+            $selectQry = "
+                COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
+                SUM(nominal_uang_gaji) AS upahBersih, 
+                SUM(nominal_penambahan_gaji) AS tunjangan,
+                SUM(nominal_cadangan) AS cadangan,
+                SUM(nominal_uang_lembur) AS lembur,
+                SUM(nominal_gaji_diterima) AS total_upah,
+                SUM(nominal_pengurangan_gaji + nominal_pinjaman_karyawan) AS potongan
+            ";
+            $employeePayrollTotal = $this->asArray()->select($selectQry)
+                ->join('employees', 'employees.id = payrolls.employee_id')
+                ->where('payrolls.year_month', $yearMonth)
+                ->where('employees.company_id', $companyID)
+                ->where('employees.division_id', $d['id'])
+                ->findAll();
+
+            // set total
+            $upahPokok += $employeePayrollTotal[0]['upahBersih'];
+            $tunjanganPlusCadangan += ($employeePayrollTotal[0]['cadangan'] + $employeePayrollTotal[0]['tunjangan']);
+            $lemburTotal += $employeePayrollTotal[0]['lembur'];
+            $totalUpah += ($employeePayrollTotal[0]['upahBersih'] + $employeePayrollTotal[0]['cadangan'] + $employeePayrollTotal[0]['tunjangan']);
+            $potongan += $employeePayrollTotal[0]['potongan'];
+            $upahBersih += ($employeePayrollTotal[0]['upahBersih'] + $employeePayrollTotal[0]['tunjangan'] + $employeePayrollTotal[0]['cadangan'] - $employeePayrollTotal[0]['potongan']);
+            $orangTotal += $employeePayrollTotal[0]['totalEmployee'];
+            $lembur +=  static::getTotalJamLemburInOnePeriode($d['id'], $yearMonth);
+            $jamKerja += static::getTotalJamKerjaInOnePeriode($d['id'], $yearMonth);
+
+            $res[] = [
+                'divisi' => $d['divisi'],
+                'payrollTotal' => $employeePayrollTotal,
+                'totalJamKerja' => static::getTotalJamKerjaInOnePeriode($d['id'], $yearMonth),
+                'totalJamLembur' => static::getTotalJamLemburInOnePeriode($d['id'], $yearMonth),
+            ];
+        }
+
+        return [
+            'res' => $res,
+            'upahPokokTotal' => $upahPokok,
+            'orangTotal' => $orangTotal,
+            'tunjanganPlusCadangan' => $tunjanganPlusCadangan,
+            'lemburTotal' => $lemburTotal,
+            'totalUpah' => $totalUpah,
+            'potongan' => $potongan,
+            'upahBersih' => $upahBersih,
+            'lembur' => $lembur,
+            'jamKerja' => $jamKerja,
+        ];
+    }
+
+    static function getTotalJamKerjaInOnePeriode($divisionID, $yearMonth)
+    {
+        $db = db_connect();
+        $qry = "
+        SELECT 
+            FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(attendances.checkout, attendances.checkin)) / 3600)) AS totalJamKerja
+        FROM 
+            attendances
+        WHERE 
+            DATE_FORMAT(periode, '%Y-%m') = '$yearMonth'
+            AND division_id = '$divisionID'
+            AND attendances.checkin IS NOT NULL
+            AND attendances.checkout IS NOT NULL;
+        ";
+
+        $query = $db->query($qry);
+        if ($query) {
+            $result = $query->getRow();
+            return $result->totalJamKerja;
+        } else {
+            return 0;
+        }
+    }
+
+    static function getTotalJamLemburInOnePeriode($divisionID, $yearMonth)
+    {
+        $formLemburModel = new FormLemburModel();
+        $selectQry = "SUM(form_lembur.total_jam_lembur) AS totalJamLembur";
+        $result =  $formLemburModel->select($selectQry)->where('division_id', $divisionID)->where('DATE_FORMAT(periode, "%Y-%m")', $yearMonth)->findAll();
+        if (!empty($result)) {
+            return $result[0]['totalJamLembur'];
+        } else {
+            return 0;
+        }
+    }
+
     static function convertionIDRMoneyTotal($nilai)
     {
         $pecahan = array(
-            '100000' => 'Lembar Rp 100.000',
             '50000' => 'Lembar Rp 50.000',
             '20000' => 'Lembar Rp 20.000',
             '10000' => 'Lembar Rp 10.000',
@@ -491,13 +579,11 @@ class PayrollsModel extends Model
 
         foreach ($pecahan as $nilaiPecahan => $namaPecahan) {
             $jumlahPecahan = floor($nilai / $nilaiPecahan);
-            if ($jumlahPecahan > 0) {
-                $result[] = [
-                    'lembar' => $namaPecahan,
-                    'totalLembar' => $jumlahPecahan
-                ];
-                $nilai %= $nilaiPecahan;
-            }
+            $result[] = [
+                'lembar' => $namaPecahan,
+                'totalLembar' => $jumlahPecahan
+            ];
+            $nilai %= $nilaiPecahan;
         }
 
         return $result;

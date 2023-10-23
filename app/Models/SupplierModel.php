@@ -15,12 +15,12 @@ class SupplierModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'company_id',
         'kode',
         'name',
         'address',
         'no_npwp',
         'phone',
+        'fax',
         'type',
         'contact_person',
         'province_id',
@@ -140,13 +140,11 @@ class SupplierModel extends Model
         return $supplierData;
     }
 
-    public function getSupplierByKategoriAndType($kategori, $type, $company_id)
+    public function getSupplierByType($type)
     {
         $arrCondition = [
             'deletedAt' => null,
-            // 'kategori' => $kategori,
-            'type' => $type,
-            'company_id' => $company_id
+            'type' => $type
         ];
 
         $builder = $this->db->table('suppliers');

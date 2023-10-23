@@ -184,10 +184,10 @@
                 <tr>
                     <td style="padding-left: 5px;"><?= $detail["qty"] . " " . $detail["nama_satuan"] ?></b></td>
                     <td style="padding-left: 5px;"><?= $detail["kode_barang"] ?></b></td>
-                    <td style="padding-left: 5px;"><?= $detail["nama_barang"] . " " . $detail["spec"] ?></b></td>
+                    <td style="padding-left: 5px;"><?= $detail["nama_barang"] ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail["price"] ?></b></td>
                     <td class="txt-right" style="padding-right: 5px;"><?= $detail["disc"] ?></b></td>
-                    <td class="txt-right" style="padding-right: 5px;"><?= number_format($totalWithAdditional) ?></b></td>
+                    <td class="txt-right" style="padding-right: 5px;"><?= number_format(formatter($totalWithAdditional, "STR_TO_FLOAT"), 2, '.', ',') ?></b></td>
                 </tr>
             <?php } ?>
         </table>
@@ -197,13 +197,13 @@
                     Currency: <span class="txt-bold"><?= $dataPO->currencyName ?></span>
                 </div>
                 <div class="mt-025">
-                    Sub Total: <span class="txt-bold"><?= number_format($totalPrice) ?></span>
+                    Sub Total: <span class="txt-bold"><?= number_format(formatter($totalPrice, "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
                 <div class="mt-025">
                     Discount: <span class="txt-bold"><?= $totalDisc ?></span>
                 </div>
                 <div class="mt-025">
-                    Grand Total: <span class="txt-bold"><?= number_format($totalPrice - $totalDisc) ?></span>
+                    Grand Total: <span class="txt-bold"><?= number_format(formatter(($totalPrice - $totalDisc), "STR_TO_FLOAT"), 2, '.', ',') ?></span>
                 </div>
             </div>
         </div>

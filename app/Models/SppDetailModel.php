@@ -52,8 +52,8 @@ class SppDetailModel extends Model
         $selectQry = "purchase_request_details.*,
                         (purchase_request_details.qty * purchase_request_details.price) AS totalPrice,
                         purchase_request_details.price AS price,
-                        barangs.kode_barang AS kodeBarang,
-                        barangs.nama_barang AS barangName,
+                        barang_master.kode_barang AS kodeBarang,
+                        barang_master.barang_name AS barangName,
                         satuans.nama_satuan AS satuanName
                         ";
 
@@ -64,8 +64,8 @@ class SppDetailModel extends Model
         $sppDetailData = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('barangs', 'purchase_request_details.barang_id = barangs.id')
-            ->join('satuans', 'barangs.satuan_id = satuans.id')
+            ->join('barang_master', 'purchase_request_details.barang_id = barang_master.id')
+            ->join('satuans', 'barang_master.satuan_id = satuans.id')
             ->findAll();
 
         return $sppDetailData;

@@ -111,7 +111,7 @@ class AccountModuleModel extends Model
         return $accountModuleData;
     }
 
-    // public function getSupplierByKategoriAndType($kategori, $type, $company_id)
+    // public function getSupplierByType($kategori, $type, $company_id)
     // {
     //     $arrCondition = [
     //         'deletedAt' => null,

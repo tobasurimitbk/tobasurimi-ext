@@ -55,7 +55,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN PENOLONG');
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -88,7 +88,7 @@ class POLokalBahanPenolong extends BaseController
         }
 
         //Get Supplier
-        $dataSupplier = $this->SupplierModel->getSupplierByKategoriAndType('LOKAL', 'BAHAN PENOLONG', $this->this_company_id);
+        $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN PENOLONG');
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -161,9 +161,9 @@ class POLokalBahanPenolong extends BaseController
                 "po_date"       => $data->po_date ? date("d/m/Y", strtotime($data->po_date)) : "",
                 "purchase_request_id" => $data->purchase_request_id,
                 "po_no"         => $data->po_no,
+                "companyName"  => $data->companyName,
                 "supplierName"  => $data->supplierName,
-                "total"         => number_format($data->total),
-                "currencyName"      => $data->currencyName,
+                "total"         => "Rp " . number_format($data->total),
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED"
@@ -203,9 +203,6 @@ class POLokalBahanPenolong extends BaseController
                 // "payment_term" => [
                 //     "rules" => "required"
                 // ],
-                "currency" => [
-                    "rules" => "required"
-                ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
@@ -229,15 +226,12 @@ class POLokalBahanPenolong extends BaseController
                 $purchase_request_id = formatter($this->request->getPost("purchase_request_id"), "STR_TO_INT");
 
                 $insertData = [
-                    "company_id"            => $this->this_company_id,
                     "purchase_request_id"   => $purchase_request_id,
                     "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "divisi_id"             => formatter($this->request->getPost("divisi_id"), "STR_TO_INT"),
                     "po_type"               => 'Lokal',
                     "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                    "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
                     "note"                  => $this->request->getPost("note"),
@@ -255,9 +249,9 @@ class POLokalBahanPenolong extends BaseController
                 $insertData["total"] = $totalPrice;
 
                 if ($insertData["po_no"] === "") {
-                    $dataDivisi = $this->DivisisModel->find($insertData["divisi_id"]);
+                    $dataDivisi = $this->DivisisModel->find($this->request->getPost("divisi_id"));
                     $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $insertData["divisi_id"], $last_day);
+                    $insertData["po_no"] = $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $this->request->getPost("divisi_id"), $last_day);
                 };
 
                 $insert = $this->AMPurchaseOrderModel->insert($insertData);
@@ -333,9 +327,6 @@ class POLokalBahanPenolong extends BaseController
                 // "payment_term" => [
                 //     "rules" => "required"
                 // ],
-                "currency" => [
-                    "rules" => "required"
-                ],
                 "payment_date" => [
                     "rules" => "required"
                 ],
@@ -358,21 +349,41 @@ class POLokalBahanPenolong extends BaseController
             if ($this->validate($rules)) {
                 $id = $this->request->getPost("id");
 
-                $insertData = [
-                    "company_id"            => $this->this_company_id,
-                    "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
-                    "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "po_type"               => 'Lokal',
-                    "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
-                    //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
-                    "currency"              => formatter($this->request->getPost("currency"), "STR_TO_INT"),
-                    "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
-                    //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
-                    "note"                  => $this->request->getPost("note"),
-                    "isPosted"              => false,
-                    "createdBy"             => session()->get("login")->user_id,
-                    "items"                 => json_decode($this->request->getPost("items"))
-                ];
+                if(!empty($this->request->getPost("auto_generate")))
+                {
+                    $dataDivisi = $this->DivisisModel->find($this->request->getPost("divisi_id"));
+                    $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+
+                    $insertData = [
+                        "po_no"                 => $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $this->request->getPost("divisi_id"), $last_day),
+                        "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                        "po_type"               => 'Lokal',
+                        "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                        //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                        "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
+                        //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                        "note"                  => $this->request->getPost("note"),
+                        "isPosted"              => false,
+                        "createdBy"             => session()->get("login")->user_id,
+                        "items"                 => json_decode($this->request->getPost("items"))
+                    ];
+                }
+                else
+                {
+                    $insertData = [
+                        "po_no"                 => $this->request->getPost("po_no"),
+                        "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                        "po_type"               => 'Lokal',
+                        "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                        //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
+                        "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
+                        //"dpp"                   => formatter($this->request->getPost("dpp"), "CURR_TO_INT"),
+                        "note"                  => $this->request->getPost("note"),
+                        "isPosted"              => false,
+                        "createdBy"             => session()->get("login")->user_id,
+                        "items"                 => json_decode($this->request->getPost("items"))
+                    ];
+                }
 
                 if ($insertData) {
                     $this->AMPurchaseOrderModel->update($id, $insertData);
@@ -620,10 +631,10 @@ class POLokalBahanPenolong extends BaseController
                     $totalPpn += $totalan * (float)$value->ppnValue / 100;
                 }
 
-                $dataBPLokal->totalPrice = number_format($totalPrice);
-                $dataBPLokal->totalDisc = number_format($totalDisc);
-                $dataBPLokal->totalPpn = number_format($totalPpn);
-                $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn);
+                $dataBPLokal->totalPrice = number_format(formatter($totalPrice, "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalDisc = number_format(formatter($totalDisc, "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPpn = number_format(formatter($totalPpn, "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPo = number_format(formatter(($totalPrice - $totalDisc + $totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
                 // $dataBPLokal->totalPo = number_format($totalPrice - $totalDisc + $totalPpn + formatter($dataBPLokal->dpp, "CURR_TO_INT"));
 
                 $data["dataPOLokal"] = $dataBPLokal;
