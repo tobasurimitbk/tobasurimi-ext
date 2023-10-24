@@ -168,12 +168,6 @@ class Invoice extends BaseController
                     // 'required' => 'Term tidak boleh kosong',
                 ]
             ],
-            "ship_via" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'Ship via tidak boleh kosong',
-                ]
-            ],
             "keterangan" => [
                 "rules" => "permit_empty",
                 'errors' => [
@@ -242,11 +236,11 @@ class Invoice extends BaseController
                 "terms"             => $postData['terms'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
-                // "dpp"               => $postData['dpp'],
-                // "ppn"               => $postData['ppn'],
-                // "total_invoice"     => $postData['total_invoice'],
-                // "termasuk_pa"       => $this->request->getPost('include_pa') ? 'true' : 'false',
-                // "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
+                "dpp"               => str_replace(',', '', $postData['dpp']),
+                "ppn"               => str_replace(',', '', $postData['ppn']),
+                "total_invoice"     => str_replace(',', '', $postData['total_invoice']),
+                "termasuk_pa"       => $this->request->getPost('include_tax') ? 'true' : 'false',
+                "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
                 "tipe_invoice"      => 'LOKAL',
                 "status_pelunasan"  => 'UNPAID',
             ];
@@ -400,12 +394,6 @@ class Invoice extends BaseController
                     // 'required' => 'Term tidak boleh kosong',
                 ]
             ],
-            "ship_via" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'Ship via tidak boleh kosong',
-                ]
-            ],
             "keterangan" => [
                 "rules" => "permit_empty",
                 'errors' => [
@@ -474,6 +462,8 @@ class Invoice extends BaseController
                 "terms"             => $postData['terms'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
+                "termasuk_pa"       => $this->request->getPost('include_tax') ? 'true' : 'false',
+                "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
             ];
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
 

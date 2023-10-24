@@ -116,7 +116,7 @@
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= ($documentData->taxStatus ?? false) ? 'checked' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= ($data->status_tax ?? false) ? 'checked' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -127,7 +127,7 @@
                                     <label for="floatingInput">Include Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= ($documentData->includeTax ?? false) ? 'checked' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= ($data->termasuk_pa ?? false) ? 'checked' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -205,6 +205,13 @@
     var tanggalFaktur = moment(currentDate).format("YYYY-MM-DD")
     // Display the date on the webpage
     $(document).ready(function() {
+
+        <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) :?>
+
+        $('#taxTotal').html(<?= $data->ppn; ?>.toLocaleString());
+        $('#itemSubTotal').html(<?= $data->dpp; ?>.toLocaleString());
+        $('#grandTotal').html(<?= $data->total_invoice; ?>.toLocaleString());
+        <?php endif; ?>
 
         const table = $('.dataTable').DataTable({
             dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
@@ -451,9 +458,9 @@
         <?php if (!empty($documentData)): ?>
         const itemList = <?= json_encode($documentData->itemList) ?>;
         table.rows.add(itemList).draw(false);
-        $('#itemSubTotal').html('<?= $documentData->dpp ?>');
-        $('#taxTotal').html('<?= $documentData->tax ?>');
-        $('#grandTotal').html('<?= $documentData->total ?>');
+        // $('#itemSubTotal').html('<?= $documentData->dpp ?>');
+        // $('#taxTotal').html('<?= $documentData->tax ?>');
+        // $('#grandTotal').html('<?= $documentData->total ?>');
         <?php endif; ?>
 
         const reCountTotal = () => {
@@ -508,7 +515,7 @@
             $('#grandTotal').html(grandTotal.toLocaleString());
         };
 
-        $('#tax_status').change(function() {
+        $('#tax_status').on('input change paste',function() {
 
             if (!this.checked) {
                 $('#include_tax').prop('checked', false);
@@ -516,7 +523,7 @@
 
             reCountTotal();
         });
-        $('#include_tax').change(function() {
+        $('#include_tax').on('input change paste',function() {
 
             const taxStatus = $('#tax_status').is(':checked');
 
@@ -721,11 +728,15 @@
                     setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
 
-                    const ppn = $('#ppn').val()
-                    const dpp = $('#dpp').val()
-                    const totalInvoice = $('#total_invoice').val()
+                    const ppn = $('#taxTotal').html();
+                    const dpp = $('#itemSubTotal').html()
+                    const totalInvoice = $('#grandTotal').html();
                     const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
                     let id = $(".id").val();
+
+                    console.log(ppn);
+                    console.log(dpp);
+                    console.log(totalInvoice);
 
                     data.append("total_invoice", totalInvoice)
                     data.append("ppn", ppn)
