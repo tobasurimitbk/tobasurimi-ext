@@ -63,7 +63,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="spp" name="spp" id="spp" value="<?= !empty($dataPOImport) ? $dataPOImport->purchase_request_id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -76,31 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <?php if (!empty($dataPOImport)) { ?>
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->spp_no : ""; ?>" readonly="true" class="form-control" placeholder="No. SPP">
-                                <label for="floatingInput">No. SPP</label>
-                            </div>
-                        <?php } else { ?>
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select purchase_request_id" id="purchase_request_id" name="purchase_request_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php
-                                    if (!empty($dataSPP)) {
-                                        foreach ($dataSPP as $spp) {
-                                    ?>
-                                            <option value="<?= $spp["id"]; ?>"><?= $spp["spp_no"]; ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <label for="floatingInput">No. SPP</label>
-                            </div>
-                        <?php } ?>
-                    </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -113,7 +89,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->divisi_id : ""; ?>" class="form-control divisi_id" id="divisi_id" name="divisi_id">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->divisiName : ""; ?>" readonly="true" class="form-control divisi" id="divisi" name="divisi" placeholder="Divisi">
@@ -157,7 +133,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -174,7 +150,7 @@
                             <label for="floatingInput">Valas</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
                             <label for="floatingInput">Termin Pembayaran (Opsional)</label>
@@ -186,7 +162,7 @@
                             <label for="floatingInput">Order Oleh</label>
                         </div>
                     </div> -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>

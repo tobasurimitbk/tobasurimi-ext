@@ -312,7 +312,7 @@ class POLokalBahanBaku extends BaseController
                     $this->RMPurchaseOrderModel->update($id, $insertData);
 
                     foreach ($insertData["items"] as $value) {
-                        $value->barang_id = $value->item_id;
+                        $value->barang_id = $value->barang_id;
                         $value->rm_purchase_order_id = $id;
 
                         if (!empty($value->isDeleted)) {
@@ -322,7 +322,7 @@ class POLokalBahanBaku extends BaseController
                         $dataDetail = [
                             "id" => $value->id ?? null,
                             "rm_purchase_order_id" => $this->request->getPost("id"),
-                            "barang_id" => $value->item_id,
+                            "barang_id" => $value->barang_id,
                             "supplier_harga_id" => $value->supplier_harga_id,
                             "spec" => $value->spec,
                             "bagian" => $value->bagian,

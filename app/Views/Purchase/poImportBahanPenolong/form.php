@@ -115,27 +115,20 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->companyName : ""; ?>" class="form-control company" placeholder="Company">
                             <label for="floatingInput">Company</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataPOImport) ? $dataPOImport->divisi_id : ""; ?>" class="form-control divisi_id" id="divisi_id" name="divisi_id">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->divisiName : ""; ?>" readonly="true" class="form-control divisi" id="divisi" name="divisi" placeholder="Divisi">
                             <label for="floatingInput">Departemen</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Supplier</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -143,29 +136,31 @@
                                 if (!empty($dataSupplier)) {
                                     foreach ($dataSupplier as $supplier) {
                                 ?>
-                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= $supplier["kode"]; ?> - <?= $supplier["name"]; ?></option>
+                                        <option <?= !empty($dataPOImport) ? ($dataPOImport->supplier_id === $supplier["id"] ? "selected" : "") : ""; ?> value="<?= $supplier["id"]; ?>" data-name="<?= $supplier["name"]; ?>"><?= $supplier["name"]; ?></option>
                                 <?php
                                     }
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Kode Supplier</label>
+                            <label for="floatingInput">Supplier</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->supplierName : ""; ?>" readonly="true" class="form-control supplier" id="supplier" name="supplier" placeholder="Nama Supplier">
-                            <label for="floatingInput">Nama Supplier</label>
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran" value="<?= !empty($dataPOImport) ? ($dataPOImport->payment_date ? date("d/m/Y", strtotime($dataPOImport->payment_date)) : "")  : ""; ?>">
+                                    <label for="floatingInput">Tanggal Pembayaran</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-payment-date"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Pembayaran</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -182,19 +177,90 @@
                             <label for="floatingInput">Valas</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" value="<?= !empty($dataPOImport) ? $dataPOImport->payment_term : ""; ?>" class="form-control payment_term" name="payment_term" id="payment_term" placeholder="Termin Pembayaran (Opsional)">
                             <label for="floatingInput">Termin Pembayaran (Opsional)</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-3">
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Lainnya</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOImport) ? $dataPOImport->createdByName : session()->get("login")->name; ?>">
-                            <label for="floatingInput">Order Oleh</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->shipper : ""; ?>" type="text" class="form-control shipper" id="shipper" name="shipper" placeholder="Shipper (Opsional)">
+                            <label for="floatingInput">Shipper (Opsional)</label>
                         </div>
-                    </div> -->
-                    <div class="col-md-3">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->consigne : ""; ?>" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne (Opsional)">
+                            <label for="floatingInput">Consigne (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->port_origin : ""; ?>" type="text" class="form-control port_origin" id="port_origin" name="port_origin" placeholder="Port Of Origin">
+                            <label for="floatingInput">Port Of Origin</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->port_destination : ""; ?>" type="text" class="form-control port_destination" id="port_destination" name="port_destination" placeholder="Port Of Destination">
+                            <label for="floatingInput">Port Of Destination</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->location_transaction : ""; ?>" type="text" class="form-control location_transaction" id="location_transaction" name="location_transaction" placeholder="Lokasi Transaksi (Opsional)">
+                            <label for="floatingInput">Lokasi Transaksi (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select shipment" id="shipment" name="shipment" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php
+                                if (!empty($dataShipment)) {
+                                    foreach ($dataShipment as $shipment) {
+                                ?>
+                                        <option <?= !empty($dataPOImport) ? (($dataPOImport->shipment ? formatter($dataPOImport->shipment, "STR_TO_INT") : 0) === formatter($shipment["id"], "STR_TO_INT") ? "selected" : "") : ""; ?> value="<?= $shipment["id"]; ?>"><?= $shipment["value"]; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <label for="floatingInput">Shipment</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-control input-picker latest_shipment_date" id="latest_shipment_date" name="latest_shipment_date" placeholder="Latest Shipment" value="<?= !empty($dataPOImport) ? ($dataPOImport->latest_shipment_date ? date("d/m/Y", strtotime($dataPOImport->latest_shipment_date)) : "")  : ""; ?>">
+                                    <label for="floatingInput">Latest Shipment Date</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-latest-shipment-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->attn : ""; ?>" type="text" class="form-control attn" id="attn" name="attn" placeholder="ATTN">
+                            <label for="floatingInput">ATTN</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
@@ -215,16 +281,16 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th>Kode Barang</th>
-                                <th>Nama Barang</th>
+                                <!-- <th>Kode</th> -->
+                                <th>Nama</th>
                                 <th>Satuan</th>
-                                <th>Harga Barang</th>
-                                <th>Qty</th>
+                                <th>Harga</th>
+                                <th>QTY</th>
                                 <!-- <th>Sisa Penerimaan</th>
                                 <th>Jumlah Diterima</th> -->
-                                <th>Total Harga</th>
-                                <th>Disc %</th>
-                                <th>Biaya Tambahan</th>
+                                <th>Total</th>
+                                <th>Disc (%)</th>
+                                <th>Tambahan</th>
                                 <th>Action</th>
                                 <!-- <th>Keterangan</th> -->
                             </tr>
@@ -249,7 +315,7 @@
                                     <tr>
                                         <?php if ($dataPOImport->is_posted === "0") { ?>
                                             <td><?= $no; ?></td>
-                                            <td><?= $details["kode_barang"]; ?></td>
+                                            <!-- <td><?= $details["kode_barang"]; ?></td> -->
                                             <td><?= $details["nama_barang"]; ?></td>
                                             <td><?= $details["nama_satuan"]; ?></td>
                                             <td><?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
@@ -257,17 +323,17 @@
                                             <!-- <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
                                             <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td> -->
                                             <td><?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details["disc"], "STR_TO_INT"); ?></td>
+                                            <td><?= formatter($details["disc"], "STR_TO_FLOAT"); ?></td>
                                             <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td>
-                                                <button data-nama_satuan="<?= $details["nama_satuan"]; ?>" data-total="<?= $details["totalPriceWithoutAdditional"]; ?>" data-additional_cost="<?= $details["additional_cost"]; ?>" data-disc="<?= formatter($details["disc"], "STR_TO_INT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-harga="<?= $details["price"]; ?>" data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
+                                                <button data-nama_satuan="<?= $details["nama_satuan"]; ?>" data-total="<?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-additional_cost="<?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-disc="<?= formatter($details["disc"], "STR_TO_FLOAT"); ?>" data-barang_id="<?= formatter($details["barang_id"], "STR_TO_INT"); ?>" data-kode_barang="<?= $details["kode_barang"]; ?>" data-nama_barang="<?= $details["nama_barang"]; ?>" data-satuan="<?= formatter($details["unit"], "STR_TO_INT"); ?>" data-harga="<?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details["qty"], "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details["note"]; ?>" data-id="<?= formatter($details["id"], "STR_TO_INT"); ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                                                 </button>
                                             </td>
                                         <?php } else { ?>
 
                                             <td><?= $no; ?></td>
-                                            <td><?= $details["kode_barang"]; ?></td>
+                                            <!-- <td><?= $details["kode_barang"]; ?></td> -->
                                             <td><?= $details["nama_barang"]; ?></td>
                                             <td><?= $details["nama_satuan"]; ?></td>
                                             <td><?= number_format(formatter($details["price"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
@@ -275,7 +341,7 @@
                                             <!-- <td><?= formatter($details["remaining_qty"], "STR_TO_FLOAT"); ?></td>
                                             <td><?= formatter($details["qty_diterima"], "STR_TO_FLOAT"); ?></td> -->
                                             <td><?= number_format(formatter($details["totalPriceWithoutAdditional"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= formatter($details["disc"], "STR_TO_INT"); ?></td>
+                                            <td><?= formatter($details["disc"], "STR_TO_FLOAT"); ?></td>
                                             <td><?= number_format(formatter($details["additional_cost"], "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td></td>
                                         <?php } ?>
@@ -287,7 +353,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="3"></td>
+                                <td colspan="2"></td>
                                 <td><b>TOTAL</b></td>
                                 <td><b><?= number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
@@ -362,8 +428,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control disc" name="disc" id="disc" placeholder="Diskon %">
-                                <label for="floatingInput">Diskon %</label>
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control disc" name="disc" id="disc" placeholder="Discount (%)">
+                                <label for="floatingInput">Discount (%)</label>
                             </div>
                         </div>
                     </div>
@@ -443,6 +509,20 @@
 
     $(document).ready(function() {
         $(".po_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".payment_date").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".latest_shipment_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -534,6 +614,14 @@
             $(".po_date").focus();
         });
 
+        $('.icon-payment-date').click(function() {
+            $(".payment_date").focus();
+        });
+
+        $('.icon-latest-shipment-date').click(function() {
+            $(".latest_shipment_date").focus();
+        });
+
         var validator = $(".create-form").validate({
             rules: {
                 po_no: {
@@ -545,12 +633,30 @@
                 po_date: {
                     required: true
                 },
+                payment_date: {
+                    required: true
+                },
                 supplier_id: {
                     required: true
                 },
                 currency: {
-                    required: true,
+                    required: true
                 },
+                port_origin: {
+                    required: true
+                },
+                port_destination: {
+                    required: true
+                },
+                shipment: {
+                    required: true
+                },
+                latest_shipment_date: {
+                    required: true
+                },
+                attn: {
+                    required: true
+                }
             },
             messages: {
                 po_no: {
@@ -562,11 +668,29 @@
                 po_date: {
                     required: "Tanggal Dibuat wajib diisi"
                 },
+                payment_date: {
+                    required: "Tanggal Pembayaran wajib diisi"
+                },
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },
                 currency: {
                     required: "Valas wajib diisi"
+                },
+                port_origin: {
+                    required: "Port Of Origin wajib diisi"
+                },
+                port_destination: {
+                    required: "Port Of Destination wajib diisi"
+                },
+                shipment: {
+                    required: "Shipment wajib diisi"
+                },
+                latest_shipment_date: {
+                    required: "Latest Shipment Date wajib diisi"
+                },
+                attn: {
+                    required: "ATTN wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -608,14 +732,14 @@
             }
         })
 
-        $(".supplier_id").change(function() {
-            if ($(".supplier_id option:selected").val()) {
-                let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
-                $(".supplier").val(name);
-            } else {
-                $(".supplier").val("");
-            }
-        })
+        // $(".supplier_id").change(function() {
+        //     if ($(".supplier_id option:selected").val()) {
+        //         let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
+        //         $(".supplier").val(name);
+        //     } else {
+        //         $(".supplier").val("");
+        //     }
+        // })
 
         $(".purchase_request_id").change(function() {
             if ($(".purchase_request_id option:selected").val()) {
@@ -651,9 +775,9 @@
                                 tag_html += `<td>`;
                                 tag_html += row + 1;
                                 tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += item.kodeBarang;
-                                tag_html += "</td>";
+                                // tag_html += `<td>`;
+                                // tag_html += item.kodeBarang;
+                                // tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += item.barangName;
                                 tag_html += "</td>";
@@ -720,7 +844,7 @@
                             $(".foot-detail-table").empty()
 
                             tag_total += `<tr>`;
-                            tag_total += "<td colspan='3'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
@@ -760,7 +884,7 @@
                             $(".foot-detail-table").empty()
 
                             tag_total += `<tr>`;
-                            tag_total += "<td colspan='3'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
@@ -953,9 +1077,9 @@
                             tag_html += `<td>`;
                             tag_html += row + 1;
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.kode_barang;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.kode_barang;
+                            // tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.nama_barang;
                             tag_html += "</td>";
@@ -1006,9 +1130,9 @@
                             tag_html += `<td>`;
                             tag_html += row + 1;
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.kode_barang;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.kode_barang;
+                            // tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.nama_barang;
                             tag_html += "</td>";
