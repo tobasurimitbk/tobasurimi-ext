@@ -395,7 +395,7 @@ class PinjamanKaryawan extends BaseController
                 ->join('employees', 'employees.id = pinjaman_karyawan.employee_id', 'left')
                 ->where('pinjaman_karyawan.month_year', $yearMonth)
                 ->where('pinjaman_karyawan.division_id', $divisionID)
-                ->where('pinjaman_karyawan.status_pinjaman', '1')
+                //->where('pinjaman_karyawan.status_pinjaman', '1')
                 ->where('pinjaman_karyawan.is_boleh_minjam', '1')
                 ->findAll(),
             'yearMonth' => $yearMonth
