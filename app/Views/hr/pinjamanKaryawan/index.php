@@ -13,7 +13,7 @@
             <?php endif; ?>
             <?php if (count($pinjamanCheck) != 0) : ?>
                 <button onclick="printPinjaman('<?= base_url('pinjaman-karyawan/print/' . $year . '-' . $month) ?>')" class="btn btn-warning btn-print float-right">
-                    Export
+                    Print
                 </button>
                 <button class="btn btn-show-form btn-save float-right btn-submit">
                     Simpan

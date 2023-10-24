@@ -114,35 +114,20 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->companyName : ""; ?>" class="form-control company" placeholder="Company">
                             <label for="floatingInput">Company</label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <input autocomplete="one-time-code" type="hidden" value="<?= !empty($dataPOLokal) ? $dataPOLokal->divisi_id : ""; ?>" class="form-control divisi_id" id="divisi_id" name="divisi_id">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" readonly type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->divisiName : ""; ?>" class="form-control divisi" id="divisi" name="divisi" placeholder="Divisi">
                             <label for="floatingInput">Departemen</label>
                         </div>
                     </div>
-                </div>
-                <!-- <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOLokal) ? $dataPOLokal->createdByName : session()->get("login")->name; ?>">
-                            <label for="floatingInput">Order Oleh</label>
-                        </div>
-                    </div>
-                </div> -->
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Supplier</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -156,23 +141,20 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Kode Supplier</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPOLokal) ? $dataPOLokal->supplierName : ""; ?>" readonly="true" class="form-control supplier" id="supplier" name="supplier" placeholder="Nama Supplier">
-                            <label for="floatingInput">Nama Supplier</label>
+                            <label for="floatingInput">Supplier</label>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Pembayaran</label>
-                    </div>
-                </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" readonly="true" class="form-control" placeholder="Order Oleh" value="<?= !empty($dataPOLokal) ? $dataPOLokal->createdByName : session()->get("login")->name; ?>">
+                            <label for="floatingInput">Order Oleh</label>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -185,7 +167,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOLokal) ? $dataPOLokal->note : ""; ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
                             <label for="floatingInput">Catatan (Opsional)</label>
@@ -206,18 +188,18 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th>Kode Barang</th>
-                                <th>Nama Barang</th>
+                                <!-- <th>Kode</th> -->
+                                <th>Nama</th>
                                 <th>Satuan</th>
-                                <th>Harga Barang</th>
-                                <th>Qty</th>
+                                <th>Harga</th>
+                                <th>QTY</th>
                                 <!-- <th>Sisa Penerimaan</th>
                                 <th>Jumlah Diterima</th> -->
-                                <th>Total Harga</th>
-                                <th>Disc %</th>
-                                <th>Biaya Tambahan</th>
-                                <th>PPN</th>
-                                <th>PPH</th>
+                                <th>Total</th>
+                                <th>Disc (%)</th>
+                                <th>Tambahan</th>
+                                <!-- <th>PPN</th>
+                                <th>PPH</th> -->
                                 <th>Action</th>
                                 <!-- <th>Keterangan</th> -->
                             </tr>
@@ -244,7 +226,7 @@
 
                                         <?php if ($dataPOLokal->is_posted === "0") { ?>
                                             <td><?= $no; ?></td>
-                                            <td><?= $details->kode_barang; ?></td>
+                                            <!-- <td><?= $details->kode_barang; ?></td> -->
                                             <td><?= $details->nama_barang; ?></td>
                                             <td><?= $details->nama_satuan; ?></td>
                                             <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
@@ -254,8 +236,8 @@
                                             <td><?= "Rp " . number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->disc, "STR_TO_INT"); ?></td>
                                             <td><?= "Rp " . number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= $details->ppn; ?></td>
-                                            <td><?= $details->pph; ?></td>
+                                            <!-- <td><?= $details->ppn; ?></td>
+                                            <td><?= $details->pph; ?></td> -->
                                             <td>
                                                 <button data-nama_satuan="<?= $details->nama_satuan; ?>" data-ppn="<?= $details->ppn; ?>" data-pph="<?= $details->pph; ?>" data-total="<?= number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-additional_cost="<?= number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-disc="<?= formatter($details->disc, "STR_TO_INT"); ?>" data-barang_id="<?= $details->barang_id; ?>" data-kode_barang="<?= $details->kode_barang; ?>" data-nama_barang="<?= $details->nama_barang; ?>" data-satuan="<?= $details->unit; ?>" data-harga="<?= number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?>" data-qty="<?= formatter($details->qty, "STR_TO_FLOAT"); ?>" data-keterangan="<?= $details->note; ?>" data-id="<?= $details->id; ?>" data-row="<?= $no; ?>" class="edit-table-detail btn btn-warning posting-spp">
                                                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -264,7 +246,7 @@
 
                                         <?php } else { ?>
                                             <td><?= $no; ?></td>
-                                            <td><?= $details->kode_barang; ?></td>
+                                            <!-- <td><?= $details->kode_barang; ?></td> -->
                                             <td><?= $details->nama_barang; ?></td>
                                             <td><?= $details->nama_satuan; ?></td>
                                             <td><?= "Rp " . number_format(formatter($details->price, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
@@ -274,8 +256,8 @@
                                             <td><?= "Rp " . number_format(formatter($details->totalPriceWithoutAdditional, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
                                             <td><?= formatter($details->disc, "STR_TO_INT"); ?></td>
                                             <td><?= "Rp " . number_format(formatter($details->additional_cost, "STR_TO_FLOAT"), 2, '.', ','); ?></td>
-                                            <td><?= $details->ppn; ?></td>
-                                            <td><?= $details->pph; ?></td>
+                                            <!-- <td><?= $details->ppn; ?></td>
+                                            <td><?= $details->pph; ?></td> -->
                                             <td></td>
                                         <?php } ?>
                                     </tr>
@@ -286,14 +268,14 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td colspan="3"></td>
+                                <td colspan="2"></td>
                                 <td><b>TOTAL</b></td>
                                 <td><b><?= "Rp " . number_format(formatter($total_harga_barang, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= $total_qty; ?></b></td>
                                 <!-- <td><b><?= $total_remaining_qty; ?></b></td>
                                 <td><b><?= $total_qty_diterima; ?></b></td> -->
                                 <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
-                                <td colspan="5"></td>
+                                <td colspan="3"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -308,7 +290,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
-                <button type="button" onclick="addBarang('<?= base_url("barang"); ?>')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button>
+                <!-- <button type="button" onclick="addBarang('<?= base_url("barang"); ?>')" class="btn btn-add-barang mr-3"><i class="fa fa-plus mr-3"></i>Barang</button> -->
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
@@ -348,7 +330,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" readonly="true" type="number" class="form-control qty" name="qty" id="qty" placeholder="Qty">
-                                <label for="floatingInput">Qty</label>
+                                <label for="floatingInput">QTY</label>
                             </div>
                         </div>
                     </div>
@@ -361,8 +343,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control disc" name="disc" id="disc" placeholder="Diskon %">
-                                <label for="floatingInput">Diskon %</label>
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control disc" name="disc" id="disc" placeholder="Diskon (%) (Opsional)">
+                                <label for="floatingInput">Discount (%) (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -370,7 +352,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control additional_cost" name="additional_cost" id="additional_cost" placeholder="Biaya Tambahan">
-                                <label for="floatingInput">Biaya Tambahan</label>
+                                <label for="floatingInput">Biaya Tambahan (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -391,7 +373,7 @@
                                 <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">PPN</label>
+                                <label for="floatingInput">PPN (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -399,7 +381,7 @@
                                 <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">PPH</label>
+                                <label for="floatingInput">PPH (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -698,14 +680,14 @@
             }
         })
 
-        $(".supplier_id").change(function() {
-            if ($(".supplier_id option:selected").val()) {
-                let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
-                $(".supplier").val(name);
-            } else {
-                $(".supplier").val("");
-            }
-        })
+        // $(".supplier_id").change(function() {
+        //     if ($(".supplier_id option:selected").val()) {
+        //         let name = $(".supplier_id option:selected").data("name") ? $(".supplier_id option:selected").data("name") : "";
+        //         $(".supplier").val(name);
+        //     } else {
+        //         $(".supplier").val("");
+        //     }
+        // })
 
         $(".purchase_request_id").change(function() {
             if ($(".purchase_request_id option:selected").val()) {
@@ -739,9 +721,9 @@
                                 tag_html += `<td>`;
                                 tag_html += row + 1;
                                 tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += item.kodeBarang;
-                                tag_html += "</td>";
+                                // tag_html += `<td>`;
+                                // tag_html += item.kodeBarang;
+                                // tag_html += "</td>";
                                 tag_html += `<td>`;
                                 tag_html += item.barangName;
                                 tag_html += "</td>";
@@ -769,12 +751,12 @@
                                 tag_html += `<td>`;
                                 tag_html += "Rp 0.00";
                                 tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += 0;
-                                tag_html += "</td>";
-                                tag_html += `<td>`;
-                                tag_html += 0;
-                                tag_html += "</td>";
+                                // tag_html += `<td>`;
+                                // tag_html += 0;
+                                // tag_html += "</td>";
+                                // tag_html += `<td>`;
+                                // tag_html += 0;
+                                // tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
                                 <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.satuanName}" data-ppn="" data-pph="" data-total="${Number(item.totalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-additional_cost="" data-disc=""  data-barang_id="${item.barang_id}" data-kode_barang="${item.kodeBarang}" data-nama_barang="${item.barangName}" data-satuan="${item.unit}" data-harga="${Number(item.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-qty="${Number(item.qty)}" data-keterangan="${item.note}" data-id="" data-row="${row + 1}">
@@ -818,7 +800,7 @@
                             $(".foot-detail-table").empty()
 
                             tag_total += `<tr>`;
-                            tag_total += "<td colspan='3'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
@@ -838,7 +820,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>Rp ${total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='5'>";
+                            tag_total += "<td colspan='3'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -859,7 +841,7 @@
                             $(".foot-detail-table").empty()
 
                             tag_total += `<tr>`;
-                            tag_total += "<td colspan='3'>";
+                            tag_total += "<td colspan='2'>";
                             tag_total += "</td>";
                             tag_total += "<td>";
                             tag_total += "<b>TOTAL</b>";
@@ -879,7 +861,7 @@
                             tag_total += "<td>";
                             tag_total += `<b>Rp 0.00</b>`;
                             tag_total += "</td>";
-                            tag_total += "<td colspan='5'>";
+                            tag_total += "<td colspan='3'>";
                             tag_total += "</td>";
                             tag_total += "</tr>";
 
@@ -1056,9 +1038,9 @@
                             tag_html += `<td>`;
                             tag_html += row + 1;
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.kode_barang;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.kode_barang;
+                            // tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.nama_barang;
                             tag_html += "</td>";
@@ -1086,12 +1068,12 @@
                             tag_html += `<td>`;
                             tag_html += additional_cost ? ("Rp " + additional_cost) : "Rp 0.00";
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += nilai_ppn ? nilai_ppn : 0;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += nilai_pph ? nilai_pph : 0;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += nilai_ppn ? nilai_ppn : 0;
+                            // tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += nilai_pph ? nilai_pph : 0;
+                            // tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
                             <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.nama_satuan}" data-ppn="${ppn}" data-pph="${pph}" data-total="${item.total}" data-additional_cost="${additional_cost}" data-disc="${disc}" data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">
@@ -1116,9 +1098,9 @@
                             tag_html += `<td>`;
                             tag_html += row + 1;
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.kode_barang;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.kode_barang;
+                            // tag_html += "</td>";
                             tag_html += `<td>`;
                             tag_html += item.nama_barang;
                             tag_html += "</td>";
@@ -1146,12 +1128,12 @@
                             tag_html += `<td>`;
                             tag_html += item.additional_cost ? ("Rp " + item.additional_cost) : "Rp 0.00";
                             tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.nilai_ppn ? item.nilai_ppn : 0;
-                            tag_html += "</td>";
-                            tag_html += `<td>`;
-                            tag_html += item.nilai_pph ? item.nilai_pph : 0;
-                            tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.nilai_ppn ? item.nilai_ppn : 0;
+                            // tag_html += "</td>";
+                            // tag_html += `<td>`;
+                            // tag_html += item.nilai_pph ? item.nilai_pph : 0;
+                            // tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
                             <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-nama_satuan="${item.nama_satuan} data-ppn="${item.ppn}" data-pph="${item.pph}" data-total="${item.total}" data-additional_cost="${item.additional_cost}" data-disc="${item.disc}"  data-barang_id="${item.barang_id}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.nama_barang}" data-satuan="${item.satuan}" data-harga="${item.harga}" data-qty="${Number(item.qty)}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">

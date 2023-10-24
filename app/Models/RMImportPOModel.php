@@ -14,7 +14,7 @@ class RMImportPOModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'company_id', 'purchase_request_id', 'po_no', 'po_date', 'divisi_id',
+    protected $allowedFields    = ['id', 'company_id', 'po_no', 'po_date', 'divisi_id',
     'currency', 'supplier_id', 'total', 'payment_term', 'note', 'is_posted', 'createdBy', 'status_penerimaan'];
 
     // Dates
@@ -108,7 +108,6 @@ class RMImportPOModel extends Model
     public function getPOById($id)
     {
         $selectQry = "rm_import_pos.*,
-        purchase_requests.spp_no AS spp_no,
         divisis.divisi AS divisiName,
         suppliers.name AS supplierName,
         suppliers.address AS supplierAddress,
@@ -121,29 +120,14 @@ class RMImportPOModel extends Model
 
         $sppData = $this->asObject()
             ->select($selectQry)
-            ->join('purchase_requests', 'purchase_requests.id = rm_import_pos.purchase_request_id', 'left')
             ->join('divisis', 'divisis.id = rm_import_pos.divisi_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
-            ->join('users', 'users.id = purchase_requests.createdBy', 'left')
+            ->join('users', 'users.id = rm_import_pos.createdBy', 'left')
             ->join('companies', 'companies.id = rm_import_pos.company_id', 'left')
             ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
             ->find($id);
 
         return $sppData;
-    }
-
-    public function getByPurchaseRequestId($id)
-    {
-        $arrCondition = [
-            'deletedAt' => null,
-            'purchase_request_id' => $id,
-        ];
-
-        $builder = $this->db->table('rm_import_pos');
-        $builder->where($arrCondition);
-        $query = $builder->get();
-
-        return $query->getRow();
     }
 
     public function getNoPenerimaanBarang($supplier_id, $company_id)

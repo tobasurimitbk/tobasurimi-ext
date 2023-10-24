@@ -145,11 +145,6 @@
                         <td><?= $payroll['libur'] ?> Hari</td>
                     </tr>
                     <tr>
-                        <td>Tambahan Hari Libur Resmi</td>
-                        <td>:</td>
-                        <td>0 Hari</td>
-                    </tr>
-                    <tr>
                         <td>Gaji</td>
                         <td>:</td>
                         <td><?= "Rp " . number_format($payroll['nominal_gaji_harian'], 2, ',', '.') ?>/Hari</td>
@@ -196,11 +191,6 @@
                         <td>Tambahan Hari Libur Kerja</td>
                         <td>:</td>
                         <td><?= $payroll['libur'] ?> Hari</td>
-                    </tr>
-                    <tr>
-                        <td>Tambahan Hari Libur Resmi</td>
-                        <td>:</td>
-                        <td>0 Hari</td>
                     </tr>
                     <tr>
                         <td>Gaji</td>

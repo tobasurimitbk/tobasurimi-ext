@@ -56,12 +56,16 @@ class POImportBahanPenolong extends BaseController
 
         //Get Valuta By Metadata
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
+
+        //Get Shipment By Metadata
+        $dataShipment = $this->metadataModel->get_by_name('Shipment');
         
         $data = [
             "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataValuta" => $dataValuta,
+            "dataShipment" => $dataShipment
         ];
 
         return view('Purchase/poImportBahanPenolong/form', $data);
@@ -77,12 +81,16 @@ class POImportBahanPenolong extends BaseController
 
         //Get Valuta By Metadata
         $dataValuta = $this->metadataModel->get_by_name('Valuta');
+
+        //Get Shipment By Metadata
+        $dataShipment = $this->metadataModel->get_by_name('Shipment');
         
         $data = [
             "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataValuta" => $dataValuta,
+            "dataShipment" => $dataShipment
         ];
 
         if (!empty($id)) {
@@ -188,6 +196,12 @@ class POImportBahanPenolong extends BaseController
                         'required' => 'Tanggal tidak boleh kosong'
                     ]
                 ],
+                "payment_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Pembayaran tidak boleh kosong'
+                    ]
+                ],
                 "supplier_id" => [
                     "rules" => "required",
                     'errors' => [
@@ -204,6 +218,36 @@ class POImportBahanPenolong extends BaseController
                     "rules" => "required",
                     'errors' => [
                         'required' => 'Valas tidak boleh kosong'
+                    ]
+                ],
+                "port_origin" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Port Of Origin tidak boleh kosong'
+                    ]
+                ],
+                "port_destination" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Port Of Destination tidak boleh kosong'
+                    ]
+                ],
+                "shipment" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Shipment tidak boleh kosong'
+                    ]
+                ],
+                "latest_shipment_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Latest Shipment Date tidak boleh kosong'
+                    ]
+                ],
+                "attn" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'ATTN tidak boleh kosong'
                     ]
                 ]
             ];
@@ -230,6 +274,7 @@ class POImportBahanPenolong extends BaseController
                     "purchase_request_id" => $purchase_request_id,
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     "po_type" => "Import",
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
@@ -238,6 +283,15 @@ class POImportBahanPenolong extends BaseController
                     "note" => $this->request->getPost("note"),
                     "createdBy" => $this->user_id,
                     "is_posted" => 0,
+
+                    "shipper" => $this->request->getPost("shipper"),
+                    "consigne" => $this->request->getPost("consigne"),
+                    "port_origin" => $this->request->getPost("port_origin"),
+                    "port_destination" => $this->request->getPost("port_destination"),
+                    "location_transaction" => $this->request->getPost("location_transaction"),
+                    "shipment" => $this->request->getPost("shipment"),
+                    "latest_shipment_date" => $this->request->getPost("latest_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("latest_shipment_date")))) : "",
+                    "attn" => $this->request->getPost("attn")
                 ];
 
                 $items = json_decode($this->request->getPost("items"));
@@ -385,6 +439,12 @@ class POImportBahanPenolong extends BaseController
                         'required' => 'Tanggal tidak boleh kosong'
                     ]
                 ],
+                "payment_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Tanggal Pembayaran tidak boleh kosong'
+                    ]
+                ],
                 "supplier_id" => [
                     "rules" => "required",
                     'errors' => [
@@ -401,6 +461,36 @@ class POImportBahanPenolong extends BaseController
                     "rules" => "required",
                     'errors' => [
                         'required' => 'Valas tidak boleh kosong'
+                    ]
+                ],
+                "port_origin" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Port Of Origin tidak boleh kosong'
+                    ]
+                ],
+                "port_destination" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Port Of Destination tidak boleh kosong'
+                    ]
+                ],
+                "shipment" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Shipment tidak boleh kosong'
+                    ]
+                ],
+                "latest_shipment_date" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Latest Shipment Date tidak boleh kosong'
+                    ]
+                ],
+                "attn" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'ATTN tidak boleh kosong'
                     ]
                 ]
             ];
@@ -426,13 +516,23 @@ class POImportBahanPenolong extends BaseController
                 $payload = [
                     "po_no" => !empty($this->request->getPost("auto_generate")) ? $no : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
+                    "payment_date" => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
                     "po_type" => "Import",
                     "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                     "payment_term" => $this->request->getPost("payment_term"),
                     "currency" => formatter($this->request->getPost("currency"), "STR_TO_INT"),
                     "note" => $this->request->getPost("note"),
                     "createdBy" => $this->user_id,
-                    "total" => $this->request->getPost("total")
+                    "total" => $this->request->getPost("total"),
+
+                    "shipper" => $this->request->getPost("shipper"),
+                    "consigne" => $this->request->getPost("consigne"),
+                    "port_origin" => $this->request->getPost("port_origin"),
+                    "port_destination" => $this->request->getPost("port_destination"),
+                    "location_transaction" => $this->request->getPost("location_transaction"),
+                    "shipment" => $this->request->getPost("shipment"),
+                    "latest_shipment_date" => $this->request->getPost("latest_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("latest_shipment_date")))) : "",
+                    "attn" => $this->request->getPost("attn")
                 ];
 
                 $items = json_decode($this->request->getPost("items"));

@@ -134,6 +134,7 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
+                "total"         => "Rp " . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),       
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);
@@ -206,6 +207,14 @@ class POLokalBahanBaku extends BaseController
                     "createdBy" => session()->get("login")->user_id,
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
+
+                $totalPrice = 0;
+
+                foreach ($insertData["items"] as $value) {
+                    $totalPrice += $value->qty * $value->general_price;
+                };
+
+                $insertData["total"] = $totalPrice;
 
                 $payload = json_encode($insertData);
 
@@ -307,12 +316,21 @@ class POLokalBahanBaku extends BaseController
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
 
+                $totalPrice = 0;
+
+                foreach ($insertData["items"] as $value) {
+                    if (empty($value->isDeleted)) {
+                        $totalPrice += $value->qty * $value->general_price;
+                    }
+                };
+
+                $insertData["total"] = $totalPrice;
 
                 if ($insertData) {
                     $this->RMPurchaseOrderModel->update($id, $insertData);
 
                     foreach ($insertData["items"] as $value) {
-                        $value->barang_id = $value->item_id;
+                        $value->barang_id = $value->barang_id;
                         $value->rm_purchase_order_id = $id;
 
                         if (!empty($value->isDeleted)) {
@@ -322,7 +340,7 @@ class POLokalBahanBaku extends BaseController
                         $dataDetail = [
                             "id" => $value->id ?? null,
                             "rm_purchase_order_id" => $this->request->getPost("id"),
-                            "barang_id" => $value->item_id,
+                            "barang_id" => $value->barang_id,
                             "supplier_harga_id" => $value->supplier_harga_id,
                             "spec" => $value->spec,
                             "bagian" => $value->bagian,

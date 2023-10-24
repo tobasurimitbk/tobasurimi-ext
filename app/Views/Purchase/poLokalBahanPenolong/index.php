@@ -43,7 +43,7 @@
                             <th onclick="changeSort('companyName')" class="sort">Company</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
-                            <th onclick="changeSort('total')" class="sort">Total Harga</th>
+                            <th onclick="changeSort('total')" class="sort">Total</th>
                             <th>Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
                             <th>Action</th>

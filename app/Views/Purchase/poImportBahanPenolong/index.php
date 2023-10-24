@@ -43,7 +43,7 @@
                             <th onclick="changeSort('companyName')" class="sort">Company</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
-                            <th onclick="changeSort('total')" class="sort">Total Harga</th>
+                            <!-- <th onclick="changeSort('total')" class="sort">Total</th> -->
                             <th onclick="changeSort('currencyName')" class="sort">Valas</th>
                             <th>Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
@@ -119,10 +119,10 @@
             data: "supplierName",
             className: "text-center"
         },
-        {
-            data: "total",
-            className: "text-center"
-        },
+        // {
+        //     data: "total",
+        //     className: "text-center"
+        // },
         {
             data: "currencyName",
             className: "text-center"

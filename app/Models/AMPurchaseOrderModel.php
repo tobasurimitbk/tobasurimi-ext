@@ -29,7 +29,17 @@ class AMPurchaseOrderModel extends Model
         'note',
         'is_posted',
         'createdBy',
-        'status_penerimaan'
+        'status_penerimaan',
+
+        // import field
+        'shipper',
+        'consigne',
+        'port_origin',
+        'port_destination',
+        'location_transaction',
+        'shipment',
+        'latest_shipment_date',
+        'attn'
     ];
 
     // Dates
