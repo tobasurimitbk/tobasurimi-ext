@@ -16,7 +16,6 @@ class RMPurchaseOrderDetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'rm_purchase_order_id',
-        'purchase_request_detail_id',
         'barang_id',
         'spec',
         'bagian',
@@ -87,34 +86,13 @@ class RMPurchaseOrderDetailModel extends Model
 
         $builder = $this->db->table('rm_purchase_order_details')
             ->select('rm_purchase_orders.po_no,
-            purchase_requests.spp_no,
-            rm_purchase_orders.status_penerimaan, rm_purchase_order_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
-            ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
-            ->join('purchase_requests', 'rm_purchase_orders.purchase_request_id = purchase_requests.id', 'left')
-            ->join('barangs', 'barangs.id = rm_purchase_order_details.barang_id', 'left')
-            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left');
-        $builder->where($arrCondition);
-        $query = $builder->get();
-
-        return $query->getRow();
-    }
-
-    public function getPurchaseOrderDetailByPurchaseRequestDetailId($id)
-    {
-        $arrCondition = [
-            'rm_purchase_order_details.deletedAt' => null,
-            'rm_purchase_order_details.purchase_request_detail_id' => $id
-        ];
-
-        $builder = $this->db->table('rm_purchase_order_details')
-            ->select('rm_purchase_orders.po_no,
             rm_purchase_orders.status_penerimaan, rm_purchase_order_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
             ->join('barangs', 'barangs.id = rm_purchase_order_details.barang_id', 'left')
             ->join('satuans', 'satuans.id = barangs.satuan_id', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
-        
+
         return $query->getRow();
     }
 

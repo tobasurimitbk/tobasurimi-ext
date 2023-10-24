@@ -30,7 +30,7 @@
                 </div>
             </div>
             <div class="col mb-3">
-                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik No PO" value="" />
             </div>
         </div>
         <div class="row">
@@ -40,11 +40,12 @@
                         <tr>
                             <th>No.</th>
                             <th onclick="changeSort('poDate')" class="sort">Tanggal Dibuat</th>
+                            <th onclick="changeSort('companyName')" class="sort">Company</th>
                             <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                             <th onclick="changeSort('supplier')" class="sort">Supplier</th>
-                            <th>Jumlah Order</th>
+                            <th>Order</th>
                             <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
-                            <th>Actions</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -102,6 +103,10 @@
         },
         {
             data: "po_date",
+            className: "text-center"
+        },
+        {
+            data: "companyName",
             className: "text-center"
         },
         {
