@@ -30,7 +30,7 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" name="jamTerlambat" value="<?= (!empty($jamKerja)) ? $jamKerja['jam_terlambat'] : '' ?> " placeholder="Batas Jam Keterlambatan">
+                            <input autocomplete="one-time-code" type="text" class="form-control" name="jamTerlambat" required value="<?= (!empty($jamKerja)) ? $jamKerja['jam_terlambat'] : '09:00' ?> " placeholder="Batas Jam Keterlambatan">
                             <label for="floatingInput">Batas Jam Keterlambatan Absen Masuk</label>
                         </div>
                     </div>
@@ -229,6 +229,7 @@
                 confirmButtonText: 'Simpan',
                 cancelButtonText: 'Batal',
             }).then((result) => {
+
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     setLoading()
@@ -317,6 +318,7 @@
 
 
                 }
+
             })
             stopLoading();
         } else {
