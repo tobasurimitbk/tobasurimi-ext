@@ -163,7 +163,7 @@ class POLokalBahanPenolong extends BaseController
                 "po_no"         => $data->po_no,
                 "companyName"  => $data->companyName,
                 "supplierName"  => $data->supplierName,
-                "total"         => "Rp " . number_format($data->total),
+                "total"         => "Rp " . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED"
@@ -384,6 +384,16 @@ class POLokalBahanPenolong extends BaseController
                         "items"                 => json_decode($this->request->getPost("items"))
                     ];
                 }
+
+                $totalPrice = 0;
+
+                foreach ($insertData["items"] as $value) {
+                    if (empty($value->isDeleted)) {
+                        $totalPrice += $value->qty * $value->price;
+                    }
+                };
+
+                $insertData["total"] = $totalPrice;
 
                 if ($insertData) {
                     $this->AMPurchaseOrderModel->update($id, $insertData);

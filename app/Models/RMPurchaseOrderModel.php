@@ -26,6 +26,7 @@ class RMPurchaseOrderModel extends Model
         'cong_sebenarnya',
         'cong_batasan',
         'subsidi_langsung',
+        'total',
         'is_posted',
         'createdBy',
         'status_penerimaan'
@@ -96,7 +97,8 @@ class RMPurchaseOrderModel extends Model
             'companyName'       => 'companies.company',
             'supplier'          => 'suppliers.supplier_name',
             'createdAt'         => 'rm_purchase_orders.createdAt',
-            'statusPenerimaan'  => 'rm_purchase_orders.status_penerimaan'
+            'statusPenerimaan'  => 'rm_purchase_orders.status_penerimaan',
+            'total'             => 'rm_purchase_orders.total'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

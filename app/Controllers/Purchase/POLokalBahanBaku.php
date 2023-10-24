@@ -134,6 +134,7 @@ class POLokalBahanBaku extends BaseController
                 "companyName"   => $data->companyName,
                 "supplierName"  => $data->supplierName,
                 "itemCount"     => $data->itemCount,
+                "total"         => "Rp " . number_format(formatter($data->total, "STR_TO_FLOAT"), 2, '.', ','),       
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
             ]);
@@ -206,6 +207,14 @@ class POLokalBahanBaku extends BaseController
                     "createdBy" => session()->get("login")->user_id,
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
+
+                $totalPrice = 0;
+
+                foreach ($insertData["items"] as $value) {
+                    $totalPrice += $value->qty * $value->general_price;
+                };
+
+                $insertData["total"] = $totalPrice;
 
                 $payload = json_encode($insertData);
 
@@ -307,6 +316,15 @@ class POLokalBahanBaku extends BaseController
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
 
+                $totalPrice = 0;
+
+                foreach ($insertData["items"] as $value) {
+                    if (empty($value->isDeleted)) {
+                        $totalPrice += $value->qty * $value->general_price;
+                    }
+                };
+
+                $insertData["total"] = $totalPrice;
 
                 if ($insertData) {
                     $this->RMPurchaseOrderModel->update($id, $insertData);
