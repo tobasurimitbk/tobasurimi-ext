@@ -133,4 +133,35 @@ class SuratJalanModel extends Model
 
         return $dataSuratJalan;
     }
+
+    public function getNumber($periode)
+    {
+
+        $no = 0;
+        $dummyNum = 0;
+        $data = $this->asObject()->where("no_surat_jalan LIKE '%$periode%'")->orderBy('id', 'DESC')->first();
+        if ($data) {
+            $pecah = explode("/", $data->no_surat_jalan);
+            foreach ($pecah as $key => $item) {
+                if ($key === 4) {
+                    $dummyNum += $item;
+                }
+            }
+        } 
+
+        $number = $dummyNum + 1;
+        // $check = $number % 99999;
+        // if ($check === 0) {
+        //     $this->update($data->id, ['no' => 99999]);
+        //     return 99999;
+        // } else {
+        //     if ($data) {
+        //         $this->update($data->id, ['no' => $check]);
+        //     } else {
+        //         $this->update($idNewCreate, ['no' => $check]);
+        //     }
+        //     return $check;
+        // }
+        return $number;
+    }
 }

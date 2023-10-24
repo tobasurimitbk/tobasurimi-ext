@@ -52,6 +52,8 @@ class SuratJalan extends BaseController
     {
         //Get Customers
         $customers = $this->CustomerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
+        
+
         $data = [
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
@@ -188,11 +190,17 @@ class SuratJalan extends BaseController
         }
 
 
+        // $code = "SJ";
+        // $currentYear = date('Y');
+        // $currentMonth = date('m');
+        // $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
+        // $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear);
+        // $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
         $code = "SJ";
         $currentYear = date('Y');
         $currentMonth = date('m');
         $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
-        $number = $this->AllNoModel->getNumber($code, $monthName . " " . $currentYear);
+        $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear . "/");
         $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
 
         $shippingDate = $this->request->getPost('shipping_date');

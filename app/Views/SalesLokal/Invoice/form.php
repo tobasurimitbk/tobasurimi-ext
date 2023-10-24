@@ -411,7 +411,6 @@
                     $("#doc_id").append(`<option value=""></option>`);
 
                     res.data.forEach(function(item) {
-                        console.log('hah')
                         $("#doc_id").append(`<option  value="${item.id}">${item.doc_no}</option>`);
                     })
                 }
@@ -475,7 +474,6 @@
             let dummyTax = 0;
 
             itemList.map((obj) => {
-                // console.log(obj)
                 const itemAmt = +(obj.amount.replace(/\D/g, ''));
                 itemSubTotal += itemAmt;
                 discTotal += ((+obj.disc) / 100) * itemAmt;
@@ -499,10 +497,6 @@
             $('#taxTotal').html(taxTotalHtml.toLocaleString());
 
             let grandTotal = 0; 
-
-            console.log(itemSubTotal);
-            console.log(taxTotalHtml);
-            console.log(discTotal);
             
             if (taxStatus && includeTax) {
                 $('#includeTaxText').html('(Termasuk Pajak)');
@@ -734,9 +728,6 @@
                     const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
                     let id = $(".id").val();
 
-                    console.log(ppn);
-                    console.log(dpp);
-                    console.log(totalInvoice);
 
                     data.append("total_invoice", totalInvoice)
                     data.append("ppn", ppn)

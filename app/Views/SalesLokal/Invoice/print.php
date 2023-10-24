@@ -191,7 +191,7 @@
         <tr>
             <td style="width: 40px;" valign="top">Say : </td>
             <td class="rounded-border" style="width: 65%;" valign="top">
-                <?= terbilang($invTotal) ?>
+            <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? terbilang($invData->total_invoice) : terbilang($invTotal) ?>
             </td>
             <td class="rounded-border">
                 <table class="w-100" style="border-collapse: collapse">
@@ -201,7 +201,7 @@
                     </tr>
                     <tr>
                         <td class="txt-right">PPN: </td>
-                        <td class="txt-right"><?= number_format($soData[0]->ppn) ?></td>
+                        <td class="txt-right"><?= (isset($invData->status_tax) && isset($invData->status_tax)) ? number_format($invData->ppn) : number_format($soData[0]->ppn) ?></td>
                     </tr>
                 </table>
             </td>
@@ -239,7 +239,7 @@
                 <table class="w-100 rounded-border" style="margin-bottom: 3px;">
                     <tr>
                         <td>Tot Sub Stlh Pjk</td>
-                        <td class="txt-right"><?= number_format($soData[0]->total_harga) ?></td>
+                        <td class="txt-right"><?= (isset($invData->status_tax) && isset($invData->status_tax)) ? number_format($invData->total_invoice) : number_format($soData[0]->total_harga) ?></td>
                     </tr>
                 </table>
                 <div class="rounded-border" style="margin-bottom: 3px;">&nbsp;</div>
@@ -247,7 +247,7 @@
                     <table class="w-100 txt-bold" style="border-collapse: collapse;">
                         <tr>
                             <td style="border-right: 1px solid;width: 100px">Total Invoice : </td>
-                            <td class="txt-right"><?= number_format($invTotal) ?></td>
+                            <td class="txt-right"><?= (isset($invData->status_tax) && isset($invData->status_tax)) ? number_format($invData->total_invoice) : number_format($invTotal) ?></td>
                         </tr>
                     </table>
                 </div>
