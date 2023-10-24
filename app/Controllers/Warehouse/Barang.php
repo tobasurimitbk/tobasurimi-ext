@@ -185,7 +185,7 @@ class Barang extends BaseController
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => $data['barang_name'],
                 "satuan"                => $data['satuan'],
-                "stok"                  => $data['stok'],
+                // "stok"                  => $data['stok'],
                 "harga_terakhir"        => "Rp. 0.00", // belum selesai (khusus master data bahan penolong)
                 "supplier_terakhir"     => "-" // belum selesai (khusus master data bahan penolong)
             ]);

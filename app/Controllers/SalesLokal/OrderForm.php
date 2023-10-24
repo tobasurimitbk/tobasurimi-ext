@@ -213,12 +213,6 @@ class OrderForm extends BaseController
                     'required' => 'id barang tidak boleh kosong',
                 ],
             ],
-            // "items.*.harga_barang" => [
-            //     "rules" => "required|numeric|greater_than_equal_to[0]",
-            //     'errors' => [
-            //         'required' => 'Harga barang tidak boleh kosong',
-            //     ],
-            // ],
             "items.*.qty" => [
                 "rules" => "required|numeric|greater_than[0]",
                 'errors' => [
@@ -231,7 +225,7 @@ class OrderForm extends BaseController
                     // 'required' => 'barang tidak boleh kosong',
                 ],
             ],
-            "items.*.harga" => [
+            "items.*.harga_barang" => [
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Harga Barang tidak boleh kosong',
@@ -348,7 +342,7 @@ class OrderForm extends BaseController
                     "id_sales_order"        => $dataSalesOrder,
                     "id_barang"             => $row->id_barang,
                     "qty"                   => $row->qty,
-                    "harga_barang"                   => $row->harga,
+                    "harga_barang"          => str_replace(',','',$row->harga_barang),
                     "amount"                => formatter($row->amount, "CURR_TO_INT"),
                     "keterangan"            => $row->keterangan,
                     // "tax"                   => $row->tax,

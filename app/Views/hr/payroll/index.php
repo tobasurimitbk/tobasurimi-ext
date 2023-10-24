@@ -372,6 +372,17 @@
         $('#generateModal').modal('show');
     });
 
+    // if on change divisi
+    $('#employeeID').attr('disabled', true);
+    $("#divisionID").on('change', function() {
+        $("#employeeID").empty();
+        if ($(this).val() == "") {
+            $('#employeeID').attr('disabled', true);
+        } else {
+            $('#employeeID').attr('disabled', false);
+        }
+    });
+
     // Generate Global
     $('#globalGenerateBtn').click(function(e) {
         e.preventDefault();
@@ -470,7 +481,6 @@
         var finishDatePersonal = $("input[name='finishDatePersonal']").val();
         var employeeID = $('#employeeID').val();
         var divisionID = $('#divisionID').val();
-
         if (monthYearPersonal == '') {
             Swal.fire({
                 icon: 'warning',

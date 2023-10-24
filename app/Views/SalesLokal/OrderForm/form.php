@@ -720,7 +720,7 @@
                 let satuan = $(".id_barang option:selected").data("satuan") ? $(".id_barang option:selected").data("satuan") : "";
                 let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
                 let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
-                let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : "";
+                // let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : "";
                 let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
@@ -863,7 +863,7 @@
                                     id: obj.id ? Number(obj.id) : 0,
                                     id_barang: obj.id_barang ? Number(obj.id_barang) : 0,
                                     nama_barang: obj.nama_barang,
-                                    harga: obj.harga,
+                                    harga_barang: obj.harga_barang ? Number(obj.harga_barang.replaceAll(",", "")) : 0,
                                     qty: obj.qty ? Number(obj.qty) : 0,
                                     amount: obj.amount ? Number(obj.amount.replaceAll(",", "")) : 0,
                                     keterangan: obj.keterangan,
@@ -888,40 +888,7 @@
                                 taxAmt += obj.taxAmt ?? 0;
                                 total += obj.taxAmt ?? 0;
                             }
-
-                            /* if (obj.id) {
-                                update_list_items.push({
-                                    id: obj.id ? Number(obj.id) : 0,
-                                    id_barang: obj.id_barang ? Number(obj.id_barang) : 0,
-                                    nama_barang: obj.nama_barang,
-                                    harga: obj.harga,
-                                    qty: obj.qty ? Number(obj.qty) : 0,
-                                    amount: obj.amount ? Number(obj.amount.replaceAll(",", "")) : 0,
-                                    keterangan: obj.keterangan,
-                                    tax: obj.tax ? Number(obj.tax) : 0,
-                                    discount_percentage: obj.discount_percentage ? Number(obj.discount_percentage) : 0,
-                                    dept: obj.dept ? Number(obj.dept) : 0,
-                                    warehouse_id: obj.warehouse_id ? Number(obj.warehouse_id) : 0,
-                                    warhouse_name: obj.warhouse_name,
-                                    isDeleted: false
-                                })
-                            } else {
-                                update_list_items.push({
-                                    id: "",
-                                    id_barang: obj.id_barang ? Number(obj.id_barang) : 0,
-                                    nama_barang: obj.nama_barang,
-                                    harga: obj.harga,
-                                    qty: obj.qty ? Number(obj.qty) : 0,
-                                    amount: obj.amount ? Number(obj.amount.replaceAll(",", "")) : 0,
-                                    keterangan: obj.keterangan,
-                                    tax: obj.tax ? Number(obj.tax) : 0,
-                                    discount_percentage: obj.discount_percentage ? Number(obj.discount_percentage) : 0,
-                                    dept: obj.dept ? Number(obj.dept) : 0,
-                                    warehouse_id: obj.warehouse_id ? Number(obj.warehouse_id) : 0,
-                                    warhouse_name: obj.warhouse_name,
-                                    isDeleted: false
-                                })
-                            } */
+                            console.log(obj.harga_barang);
                         })
 
                         data.append("total", total)
@@ -1128,181 +1095,10 @@
                     title: 'Barang tidak boleh sama',
                     confirmButtonColor: '#4e73df',
                 })
-                // Swal.fire({
-                //     icon: 'question',
-                //     title: 'Simpan Data?',
-                //     confirmButtonColor: '#4e73df',
-                //     cancelButtonColor: '#d33',
-                //     showCancelButton: true,
-                //     reverseButtons: true,
-                //     confirmButtonText: 'Simpan',
-                //     cancelButtonText: 'Batal',
-                // }).then(result => {
-                //     if (result.isConfirmed) {
-                //         const currentData = table.row(validate_same).data();
-                //         const newQty = +currentData.qty + +qty;
-                //         const newBarangTotal = +currentData.barangTotal + +amount;
-                //         const newTax = +currentData.tax + +tax;
-                //         no = 1;
-                //         const aasd = {
-                //             ...currentData,
-                //             no: no,
-                //             qty: newQty,
-                //             harga_barang: Math.ceil(newBarangTotal / newQty),
-                //             barangTotal: newBarangTotal,
-                //             disc: 0, // ganti nanti
-                //             tax: newTax,
-                //             taxAmt: currentData.taxAmt + (amount * (tax / 100)),
-                //             discAmt: currentData.discAmt + discAmt,
-                //             amount: currentData.amount + discountedAmt,
-                //         };
-                //         table.row(0).data(aasd).draw(false);
-
-                //         reCountTotal();
-                //         $(".detail-modal").modal("hide");
-                //     }
-                // });
 
             } else {
                 // update detail
                 if (row_detail) {
-                    //     if ($(".detail-form").valid()) {
-                    //         Swal.fire({
-                    //             icon: 'question',
-                    //             title: 'Simpan Data?',
-                    //             confirmButtonColor: '#4e73df',
-                    //             cancelButtonColor: '#d33',
-                    //             showCancelButton: true,
-                    //             reverseButtons: true,
-                    //             confirmButtonText: 'Simpan',
-                    //             cancelButtonText: 'Batal',
-                    //         }).then((result) => {
-                    //             if (result.isConfirmed) {
-                    //                 let new_list_items = []
-                    //                 let tag_html = "";
-                    //                 let tag_total = "";
-
-                    //                 row = 0;
-
-                    //                 $(".body-detail-table").empty()
-
-                    //                 total_harga_barang = 0;
-                    //                 total_qty = 0;
-                    //                 total_harga = 0;
-
-                    //                 /* list_items.map(item => {
-                    //                     if (item.row == row_detail) {
-                    //                         tag_html += `<tr>`;
-                    //                         tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += row + 1;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += nama_barang;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += harga;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += qty;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += amount;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += keterangan;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += "<td>";
-                    //                         tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += "</tr>";
-
-                    //                         new_list_items.push({
-                    //                             id: item.id,
-                    //                             row: row + 1,
-                    //                             id_barang: id_barang,
-                    //                             nama_barang: nama_barang,
-                    //                             harga: harga,
-                    //                             qty: qty,
-                    //                             amount: amount,
-                    //                             keterangan: keterangan,
-                    //                             tax: tax,
-                    //                             discount_percentage: discountPercentage,
-                    //                             dept: dept,
-                    //                             warehouse_id: warehouseId,
-                    //                             warhouse_name: warhouseName
-                    //                         });
-
-                    //                         row = row + 1;
-
-                    //                         total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
-                    //                         total_qty = total_qty + Number(qty);
-                    //                         total_harga = total_harga + Number(amount.replaceAll(",", ""));
-                    //                     } else {
-                    //                         tag_html += `<tr>`;
-                    //                         tag_html += `<td class="edit-table-detail"data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += row + 1;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail"data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += nama_barang;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail"data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += harga;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail"data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += qty;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail"data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += amount;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += `<td class="edit-table-detail"data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${item.id_barang}" data-nama_barang="${item.nama_barang}" data-harga="${item.harga}" data-qty="${item.qty}" data-amount="${item.amount}" data-keterangan="${item.keterangan}" data-id="${item.id}" data-row="${row + 1}">`;
-                    //                         tag_html += keterangan;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += "<td>";
-                    //                         tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                    //                         tag_html += "</td>";
-                    //                         tag_html += "</tr>";
-
-                    //                         new_list_items.push(item);
-                    //                         row = row + 1;
-                    //                         console.log(typeof item.harga)
-                    //                         total_harga_barang = total_harga_barang + Number(item.harga.replaceAll(",", ""));
-                    //                         total_qty = total_qty + Number(item.qty);
-                    //                         total_harga = total_harga + Number(item.amount.replaceAll(",", ""));
-                    //                     }
-                    //                 }) */
-
-
-                    //                 list_items = [];
-                    //                 list_items = new_list_items;
-
-                    //                 // $(".body-detail-table").append(tag_html)
-                    //                 $(".foot-detail-table").empty()
-
-                    //                 tag_total += `<tr>`;
-                    //                 tag_total += "<td colspan='1'>";
-                    //                 tag_total += "</td>";
-                    //                 tag_total += "<td>";
-                    //                 tag_total += "<b>TOTAL</b>";
-                    //                 tag_total += "</td>";
-                    //                 tag_total += "<td>";
-                    //                 tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
-                    //                 tag_total += "</td>";
-                    //                 tag_total += "<td>";
-                    //                 tag_total += `<b>${total_qty}</b>`;
-                    //                 tag_total += "</td>";
-                    //                 tag_total += "<td>";
-                    //                 tag_total += `<b>${total_harga.toLocaleString()}</b>`;
-                    //                 tag_total += "</td>";
-                    //                 tag_total += "<td colspan='3'>";
-                    //                 tag_total += "</td>";
-                    //                 tag_total += "</tr>";
-
-                    //                 $(".foot-detail-table").append(tag_total);
-                    //                 $(".detail-modal").modal("hide")
-                    //             }
-                    //         })
-                    //         // create
-                    //     }
                 } else {
                     if ($(".detail-form").valid()) {
                         Swal.fire({
@@ -1372,31 +1168,6 @@
 
                                 let tag_html = "";
                                 let tag_total = "";
-
-                                /* tag_html += `<tr>`;
-                                tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">`;
-                                tag_html += row + 1;
-                                tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">`;
-                                tag_html += nama_barang;
-                                tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">`;
-                                tag_html += harga;
-                                tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">`;
-                                tag_html += qty;
-                                tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">`;
-                                tag_html += amount;
-                                tag_html += "</td>";
-                                tag_html += `<td class="edit-table-detail" data-warehouse_name="${warhouseName}" data-dept="${dept}"  data-id_warehouse="${warehouseId}" data-tax="${tax}" data-discount_percentage="${discountPercentage}" data-id_barang="${id_barang}" data-nama_barang="${nama_barang}" data-harga="${harga}" data-qty="${qty}" data-amount="${amount}" data-keterangan="${keterangan}" data-id="" data-row="${row + 1}">`;
-                                tag_html += keterangan;
-                                tag_html += "</td>";
-                                tag_html += "<td>";
-                                tag_html += `<button onclick='deleteRow(${row + 1})'>X</button>`;
-                                tag_html += "</td>";
-                                tag_html += "</tr>";
-                                $(".body-detail-table").append(tag_html) */
 
                                 $(".foot-detail-table").empty()
 
