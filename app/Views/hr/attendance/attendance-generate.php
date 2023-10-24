@@ -700,7 +700,7 @@
                     title: "Pilih divisi",
                     confirmButtonColor: '#4e73df',
                 }).then(() => {});
-            } else if (employeeID == '') {
+            } else if (employeeID == null) {
                 Swal.fire({
                     icon: 'warning',
                     title: "Pilih karyawan",
@@ -844,8 +844,18 @@
                 }
             });
 
-
         });
+        // if on change divisi
+        $('#employeeID').attr('disabled', true);
+        $("#divisionID").on('change', function() {
+            $("#employeeID").empty();
+            if ($(this).val() == "") {
+                $('#employeeID').attr('disabled', true);
+            } else {
+                $('#employeeID').attr('disabled', false);
+            }
+        });
+
         // on change status kehadiran
         $('#statusKehadiran').change(function(e) {
             e.preventDefault();
