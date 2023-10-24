@@ -23,6 +23,7 @@ class SalesOrderDetailModel extends Model
         'keterangan',
         'discount_percentage',
         'tax',
+        'harga_barang',
         'amount',
         'id_warehouse',
         'dept',
