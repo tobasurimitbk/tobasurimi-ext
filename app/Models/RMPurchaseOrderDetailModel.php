@@ -16,6 +16,7 @@ class RMPurchaseOrderDetailModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'rm_purchase_order_id',
+        'supplier_harga_id',
         'barang_id',
         'spec',
         'bagian',

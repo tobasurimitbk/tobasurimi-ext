@@ -291,7 +291,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
                                 <select onchange="changeKode()" class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
-                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                    <option data-barang_id="" data-nama="" data-satuan="" data-supplier="" value=""></option>
                                 </select>
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
@@ -426,6 +426,7 @@
                 id: <?= $details->id; ?>,
                 row: row,
                 barang_id: '<?= $details->barang_id; ?>',
+                supplier_harga_id: '<?= $details->supplier_harga_id; ?>',
                 kode_barang: '<?= $details->kodeBarang; ?>',
                 nama_barang: '<?= $details->barangName; ?>',
                 nama_satuan: '<?= $details->nama_satuan; ?>',
@@ -700,10 +701,10 @@
                     success: function(res) {
                         $(".kode_barang").empty();
 
-                        $(".kode_barang").append(`<option data-spec="" data-umum="" data-harian="" data-bulanan="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+                        $(".kode_barang").append(`<option data-supplier="" data-spec="" data-umum="" data-harian="" data-bulanan="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
 
                         res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-spec="${item.spesifikasi}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                            $(".kode_barang").append(`<option data-supplier="${item.supplier_harga_id}" data-spec="${item.spesifikasi}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                         })
 
                         $(".kode_barang").val("").change();
@@ -854,6 +855,7 @@
             let barangName = $(".nama_barang").val()
             let satuanName = $(".nama_satuan").val()
             let spesifikasi = $(".spesifikasi").val()
+            let supplier_harga_id = $(".kode_barang option:selected").data("supplier")
             let kode = $(".kode").val()
             let peti = $(".peti").val()
             let quality = $(".quality").val()
@@ -960,6 +962,7 @@
                                         new_list_items.push({
                                             id: item.id,
                                             row: row + 1,
+                                            supplier_harga_id: supplier_harga_id,
                                             barang_id: barangId,
                                             kode_barang: kode,
                                             nama_barang: barangName,
@@ -1080,6 +1083,7 @@
                                         id: '',
                                         row: row + 1,
                                         barang_id: barangId,
+                                        supplier_harga_id: supplier_harga_id,
                                         kode_barang: kode,
                                         nama_barang: barangName,
                                         nama_satuan: satuanName,
@@ -1305,6 +1309,7 @@
                                         update_list_items.push({
                                             id: obj.id ? Number(obj.id) : 0,
                                             barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                            supplier_harga_id: obj.supplier_harga_id ? Number(obj.supplier_harga_id) : 0,
                                             spec: obj.spesifikasi,
                                             bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
                                             peti: obj.peti,
@@ -1324,6 +1329,7 @@
                                         update_list_items.push({
                                             id: obj.id ? Number(obj.id) : 0,
                                             barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                            supplier_harga_id: obj.supplier_harga_id ? Number(obj.supplier_harga_id) : 0,
                                             spec: obj.spesifikasi,
                                             bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
                                             peti: obj.peti,
@@ -1337,6 +1343,7 @@
                                     } else {
                                         update_list_items.push({
                                             barang_id: obj.barang_id ? Number(obj.barang_id) : 0,
+                                            supplier_harga_id: obj.supplier_harga_id ? Number(obj.supplier_harga_id) : 0,
                                             spec: obj.spesifikasi,
                                             bagian: obj.bagian_id ? Number(obj.bagian_id) : 0,
                                             peti: obj.peti,
@@ -1549,10 +1556,10 @@
             success: function(res) {
                 $(".kode_barang").empty();
 
-                $(".kode_barang").append(`<option data-spec="" data-umum="" data-harian="" data-bulanan="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+                $(".kode_barang").append(`<option data-supplier="" data-spec="" data-umum="" data-harian="" data-bulanan="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
 
                 res.data.forEach(function(item) {
-                    $(".kode_barang").append(`<option data-spec="${item.spesifikasi}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                    $(".kode_barang").append(`<option data-supplier="${item.supplier_harga_id}" data-spec="${item.spesifikasi}" data-umum="${Number(item.harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-harian="${Number(item.harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-bulanan="${Number(item.harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" data-barang_id="${item.bahan_baku_id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_id}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                 })
 
                 $(".kode_barang").val(kode_barang).change();
