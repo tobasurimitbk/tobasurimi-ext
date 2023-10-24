@@ -253,9 +253,8 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td></td>
-                                <td colspan="2"><b>TOTAL</b></td>
-                                <td></td>
+                                <td colspan="3"></td>
+                                <td><b>TOTAL</b></td>
                                 <td><b><?= "Rp " . number_format(formatter($total_harga, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= "Rp " . number_format(formatter($total_harian, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
                                 <td><b><?= "Rp " . number_format(formatter($total_bulanan, "STR_TO_FLOAT"), 2, '.', ','); ?></b></td>
@@ -1049,12 +1048,10 @@
                                 $(".foot-detail-table").empty()
 
                                 tag_total += `<tr>`;
-                                tag_total += "<td>";
+                                tag_total += "<td colspan='3'>";
                                 tag_total += "</td>";
-                                tag_total += "<td colspan='2'>";
+                                tag_total += "<td>";
                                 tag_total += "<b>TOTAL</b>";
-                                tag_total += "</td>";
-                                tag_total += "<td>";
                                 tag_total += "</td>";
                                 tag_total += "<td>";
                                 tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
@@ -1154,12 +1151,10 @@
                                     $(".foot-detail-table").empty()
 
                                     tag_total += `<tr>`;
-                                    tag_total += "<td>";
+                                    tag_total += "<td colspan='3'>";
                                     tag_total += "</td>";
-                                    tag_total += "<td colspan='2'>";
+                                    tag_total += "<td>";
                                     tag_total += "<b>TOTAL</b>";
-                                    tag_total += "</td>";
-                                    tag_total += "<td>";
                                     tag_total += "</td>";
                                     tag_total += "<td>";
                                     tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
@@ -1480,12 +1475,10 @@
         $(".foot-detail-table").empty()
 
         tag_total += `<tr>`;
-        tag_total += "<td>";
+        tag_total += "<td colspan='3'>";
         tag_total += "</td>";
-        tag_total += "<td colspan='2'>";
+        tag_total += "<td>";
         tag_total += "<b>TOTAL</b>";
-        tag_total += "</td>";
-        tag_total += "<td>";
         tag_total += "</td>";
         tag_total += "<td>";
         tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
@@ -1684,12 +1677,10 @@
                 $(".foot-detail-table").empty()
 
                 tag_total += `<tr>`;
-                tag_total += "<td>";
+                tag_total += "<td colspan='3'>";
                 tag_total += "</td>";
-                tag_total += "<td colspan='2'>";
+                tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
-                tag_total += "</td>";
-                tag_total += "<td>";
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
@@ -1829,12 +1820,10 @@
                 $(".foot-detail-table").empty()
 
                 tag_total += `<tr>`;
-                tag_total += "<td>";
+                tag_total += "<td colspan='3'>";
                 tag_total += "</td>";
-                tag_total += "<td colspan='2'>";
+                tag_total += "<td>";
                 tag_total += "<b>TOTAL</b>";
-                tag_total += "</td>";
-                tag_total += "<td>";
                 tag_total += "</td>";
                 tag_total += "<td>";
                 tag_total += `<b>${"Rp " + total_harga.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
