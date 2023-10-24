@@ -68,7 +68,7 @@
 
     <table border="0">
         <tr>
-            <td>Divisi</td>
+            <td>Departemen</td>
             <td>:</td>
             <td><?= $divisi['divisi'] ?></td>
         </tr>

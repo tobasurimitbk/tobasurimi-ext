@@ -66,7 +66,7 @@
                                 <th style="width: 10px;" class="sort">No</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
-                                <th onclick="changeSort('divisis.divisi')" class="sort">Divisi</th>
+                                <th onclick="changeSort('divisis.divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('form_lembur.periode')" class="sort">Tgl Lembur</th>
                                 <th onclick="changeSort('form_lembur.total_jam_lembur')" class="sort">Jam Lembur</th>
                                 <th onclick="changeSort('form_lembur.total_uang_lembur')" class="sort">Uang Lembur</th>

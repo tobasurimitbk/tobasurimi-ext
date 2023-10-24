@@ -72,7 +72,7 @@
 
     <table border="0" style="margin-top: 30px;">
         <tr>
-            <td>Bagian</td>
+            <td>Departemen</td>
             <td>:</td>
             <td><?= $divisi['divisi'] ?></td>
         </tr>
@@ -84,6 +84,7 @@
                 <td>NO</td>
                 <td>Kode</td>
                 <td>Karyawan</td>
+                <td>Bagian</td>
                 <td>J.Hr</td>
                 <td>Total Upah <br> (Rp)</td>
                 <td>Uang Makan <br> (Rp)</td>
@@ -92,6 +93,7 @@
                 <td>Tunj.Ksjh <br> (Rp)</td>
                 <td>Potongan <br> (Rp)</td>
                 <td>Jumlah Upah <br> (Rp)</td>
+                <td>Tanda Tangan</td>
             </tr>
         </thead>
         <tbody>
@@ -116,6 +118,7 @@
                     <td><?= $p['no'] ?></td>
                     <td><?= $p['id'] ?></td>
                     <td><?= $p['name'] ?></td>
+                    <td><?= $p['namaBagian'] ?></td>
                     <td><?= $p['hariKerja'] ?></td>
                     <td><?= $p['jumlahUpah'] ?></td>
                     <td><?= number_format($uangMakanNominal, 2, ',', '.') ?></td>
@@ -124,10 +127,13 @@
                     <td><?= number_format($tunjanganKesejahteraanNominal, 2, ',', '.')   ?></td>
                     <td><?= $p['potongan'] ?></td>
                     <td><?= $p['jumlahUpah'] ?></td>
+                    <td style="padding: 25px;">
+
+                    </td>
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td colspan="4" style="text-align: right;">
+                <td colspan="5" style="text-align: right;">
                     Total
                 </td>
                 <td><?= number_format($payrollData['total']['jumlahUpah'], 2, ',', '.')  ?></td>
@@ -137,6 +143,7 @@
                 <td><?= number_format($tunjanganKesejahteraanTotal, 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['potongan'], 2, ',', '.')  ?></td>
                 <td><?= number_format($payrollData['total']['jumlahUpah'], 2, ',', '.')  ?></td>
+                <td></td>
             </tr>
         </tbody>
     </table>
@@ -178,20 +185,25 @@
     <br>
     <?php $resultKeterangan = App\Models\PayrollsModel::convertionIDRMoneyTotal($payrollData['total']['jumlahUpah']); ?>
     <table>
-        <?php foreach ($resultKeterangan as $r) : ?>
-            <tr>
+        <?php foreach ($resultKeterangan as $i => $r) : ?>
+            <?php if ($i % 3 == 0) : ?>
+                <tr>
+                <?php endif; ?>
                 <td>
                     <?= $r['lembar'] ?>
                 </td>
                 <td>:</td>
-                <td>
+                <td style="width:50px">
                     <?= $r['totalLembar'] ?>
                 </td>
-            </tr>
+                <?php if (($i + 1) % 3 == 0) : ?>
+                </tr>
+            <?php endif; ?>
         <?php endforeach; ?>
     </table>
 
-    </table>
+
+
 </body>
 
 

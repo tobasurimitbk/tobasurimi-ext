@@ -40,22 +40,30 @@
                         <label for="floatingInput">Selesai Absen</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-1">
+            </div>
+            <div class="row mt-2">
+                <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" id="nip" class="form-control target input-picker" value="<?= $payrollDetail['nip'] ?>">
                         <label for="floatingInput">NIP</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-1">
+                <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" id="employeeName" class="form-control target" value="<?= $payrollDetail['employeeName'] ?>">
                         <label for="floatingInput">Nama Karyawan</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-1">
+                <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" id="divisi" class="form-control target input-picker" value="<?= $payrollDetail['divisi'] ?>">
-                        <label for="floatingInput">Divisi</label>
+                        <label for="floatingInput">Departemen</label>
+                    </div>
+                </div>
+                <div class="col-sm-3 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" id="bagian" class="form-control target input-picker" value="<?= $payrollDetail['nama_bagian'] ?>">
+                        <label for="floatingInput">Bagian</label>
                     </div>
                 </div>
             </div>

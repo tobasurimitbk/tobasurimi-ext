@@ -42,7 +42,7 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Pilih Divisi</label>
+                            <label for="floatingInput">Pilih Departemen</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
@@ -189,7 +189,7 @@
     });
 
     $("select[name='divisionID']").select2({
-        placeholder: "Pilih Divisi",
+        placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
     });
