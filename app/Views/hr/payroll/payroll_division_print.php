@@ -84,7 +84,6 @@
                 <td>NO</td>
                 <td>Kode</td>
                 <td>Karyawan</td>
-                <td>Bagian</td>
                 <td>J.Hr</td>
                 <td>Total Upah <br> (Rp)</td>
                 <td>Uang Makan <br> (Rp)</td>
@@ -118,7 +117,6 @@
                     <td><?= $p['no'] ?></td>
                     <td><?= $p['id'] ?></td>
                     <td><?= $p['name'] ?></td>
-                    <td><?= $p['namaBagian'] ?></td>
                     <td><?= $p['hariKerja'] ?></td>
                     <td><?= $p['jumlahUpah'] ?></td>
                     <td><?= number_format($uangMakanNominal, 2, ',', '.') ?></td>
