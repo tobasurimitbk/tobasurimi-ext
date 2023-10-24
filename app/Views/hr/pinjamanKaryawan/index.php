@@ -894,7 +894,7 @@
         if (divisionID == "") {
             Swal.fire({
                 icon: 'warning',
-                title: 'Pilih Divisi Dahulu',
+                title: 'Pilih Departemen',
                 confirmButtonColor: '#4e73df',
             });
         } else {
