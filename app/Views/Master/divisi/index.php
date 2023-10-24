@@ -99,7 +99,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('divisi')" class="sort">Divisi</th>
+                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('jamKerja')" class="sort">Jam Kerja</th>
                                 <th class="sort">Total Bagian</th>
                                 <th class="sort" style="width: 100px;">Action</th>

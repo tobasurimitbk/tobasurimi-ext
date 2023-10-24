@@ -71,7 +71,7 @@
                     <div class="form-floating">
                         <select class="form-select" name="filterDivisiID" aria-label="Floating label select example">
                             <option value="">
-                                Cari Berdasarkan Divisi
+                                Cari Departemen
                             </option>
                             <?php foreach ($divisi as $d) : ?>
                                 <option value="<?= $d['id'] ?>">
@@ -79,7 +79,7 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                        <label for="floatingInput">Cari Departemen</label>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -102,7 +102,7 @@
                                 <th>No</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
-                                <th onclick="changeSort('employees.division_id')" class="sort">Divisi</th>
+                                <th onclick="changeSort('employees.division_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('pinjaman_karyawan.start_date')">Mulai Absen</th>
                                 <th onclick="changeSort('pinjaman_karyawan.end_date')">Selesai Absen</th>
                                 <th onclick="changeSort('pinjaman_karyawan.hadir')">Hadir</th>
@@ -129,7 +129,7 @@
             <form id="formGeneratePinjaman" class="create-form" role="form" method="POST">
                 <div class="modal-body">
                     <div class="alert bg-info text-white" style="font-weight: bold; margin-top:-10px;">
-                        Anda dapat menggenerate data karyawan yang berhak melakukan pinjaman sesuai periode pinjaman.
+                        Pinjaman digenerate tanggal 12 setiap bulan
                     </div>
                     <?= csrf_field() ?>
                     <div class="row mb-2">
@@ -141,14 +141,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mt-3">
-                                <input value="" autocomplete="one-time-code" name="startDate" type="text" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Mulai Absen</label>
+                                <input value="<?= "01/$month/$year" ?>" readonly autocomplete="one-time-code" name="startDate" type="text" required class="form-control target input-picker">
+                                <label for="floatingInput">Tanggal Mulai</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mt-3">
-                                <input value="" autocomplete="one-time-code" name="finishDate" type="text" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Selesai Absen</label>
+                                <input value="<?= "12/$month/$year" ?>" readonly autocomplete="one-time-code" name="finishDate" type="text" required class="form-control target input-picker">
+                                <label for="floatingInput">Tanggal Selesai</label>
                             </div>
                         </div>
                     </div>
@@ -196,14 +196,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mt-3">
-                                <input value="" autocomplete="one-time-code" name="startDate" type="text" id="startDate" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Mulai Absen</label>
+                                <input value="" readonly autocomplete="one-time-code" name="startDate" type="text" id="startDate" required class="form-control target input-picker">
+                                <label for="floatingInput">Tanggal Mulai</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mt-3">
-                                <input value="" autocomplete="one-time-code" name="finishDate" type="text" id="finishDate" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Selesai Absen</label>
+                                <input value="" readonly autocomplete="one-time-code" name="finishDate" type="text" id="finishDate" required class="form-control target input-picker">
+                                <label for="floatingInput">Tanggal Selesai</label>
                             </div>
                         </div>
                     </div>
@@ -258,12 +258,12 @@
     let sortType = "asc";
     const csrfToken = '<?= csrf_token() ?>';
     $('#loadingSpinner').hide();
-    $("input[name='startDate'], input[name='finishDate']").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
+    // $("input[name='startDate'], input[name='finishDate']").datepicker({
+    //     todayHighlight: true,
+    //     format: "dd/mm/yyyy",
+    //     orientation: "bottom auto",
+    //     autoclose: true
+    // });
     const table = $('.dataTable').DataTable({
         dom: "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'f>>t<'row align-items-start'<'col-md-4'l><'col-md-4 text-center'i><'col-md-4'p>>",
         processing: true,
@@ -468,7 +468,7 @@
 
     // select2 divisi
     $("select[name='filterDivisiID']").select2({
-        placeholder: "Cari Berdasarkan Divisi",
+        placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
     });
@@ -569,10 +569,10 @@
                     required: "Pilih periode pinjaman"
                 },
                 startDate: {
-                    required: "Tanggal Mulai Absen Wajib Diisi"
+                    required: "Tanggal Mulai Wajib Diisi"
                 },
                 finishDate: {
-                    required: "Tanggal Selesai Absen Wajib Diisi"
+                    required: "Tanggal Selesai Wajib Diisi"
                 },
             },
             errorElement: 'span',
@@ -894,7 +894,7 @@
         if (divisionID == "") {
             Swal.fire({
                 icon: 'warning',
-                title: 'Pilih Divisi Dahulu',
+                title: 'Pilih Departemen',
                 confirmButtonColor: '#4e73df',
             });
         } else {

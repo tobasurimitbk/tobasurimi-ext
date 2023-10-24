@@ -46,7 +46,7 @@
                     </table>
                     <table>
                         <tr>
-                            <td>Company Name </td>
+                            <td>Unit </td>
                             <td>:</td>
                             <td><?= $company['company'] ?></td>
                         </tr>
@@ -61,9 +61,14 @@
                             <td><?= $year ?> / <?= $month ?> / 1</td>
                         </tr>
                         <tr>
-                            <td>No Induk / Divisi</td>
+                            <td>No Induk / Departemen</td>
                             <td>:</td>
                             <td> <?= $employee['nip'] ?> / <?= $employee['divisi'] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Bagian</td>
+                            <td>:</td>
+                            <td> <?= $employee['nama_bagian'] ?> </td>
                         </tr>
                         <tr>
                             <td>Nama</td>
@@ -86,7 +91,7 @@
                     </table>
                     <table>
                         <tr>
-                            <td>Company Name </td>
+                            <td>Unit </td>
                             <td>:</td>
                             <td><?= $company['company'] ?></td>
                         </tr>
@@ -101,9 +106,14 @@
                             <td><?= $year ?> / <?= $month ?> / 1</td>
                         </tr>
                         <tr>
-                            <td>No Induk / Divisi</td>
+                            <td>No Induk / Departemen</td>
                             <td>:</td>
                             <td> <?= $employee['nip'] ?> / <?= $employee['divisi'] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Bagian</td>
+                            <td>:</td>
+                            <td> <?= $employee['nama_bagian'] ?> </td>
                         </tr>
                         <tr>
                             <td>Nama</td>

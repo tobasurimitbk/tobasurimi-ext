@@ -47,14 +47,14 @@
     <table class="mb-3" style="font-size: 12px;">
         <tbody>
             <tr>
-                <td width="100px"><b>Company Name</b></td>
+                <td width="100px"><b>Unit</b></td>
                 <td width="10px">:</td>
                 <td><?= $company['company'] ?></td>
             </tr>
             <tr>
-                <td width="100px"><b>Divisi</b></td>
+                <td width="100px"><b>Departemen</b></td>
                 <td width="10px">:</td>
-                <td><?= $divisi != null ? $divisi['divisi'] : "Semua Divisi" ?></td>
+                <td><?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?></td>
             </tr>
             <tr>
                 <td width="100px"><b>Bulan</b></td>
@@ -69,7 +69,8 @@
             <tr align="center" style="font-weight: bold;">
                 <td style="vertical-align:middle;z-index:1" width="10">&nbsp;No</td>
                 <td style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
-                <td style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
+                <td style="vertical-align:middle;z-index:1">&nbsp;Departemen</td>
+                <td style="vertical-align:middle;z-index:1">&nbsp;Bagian</td>
                 <?php
                 $last_date = date("t", strtotime($yearMonth . "-01"));
                 for ($i = 1; $i <= $last_date; $i++) :
@@ -99,6 +100,9 @@
                     </td>
                     <td>
                         &nbsp;<?= $res_user[$i]["divisi"]; ?>
+                    </td>
+                    <td>
+                        &nbsp;<?= $res_user[$i]["namaBagian"]; ?>
                     </td>
                     <?php
                     for ($j = 1; $j <= $last_date; $j++) :
@@ -222,14 +226,14 @@
         <table class="mb-3" style="font-size: 12px;">
             <tbody>
                 <tr>
-                    <td width="100px"><b>Company Name</b></td>
+                    <td width="100px"><b>Unit</b></td>
                     <td width="10px">:</td>
                     <td><?= $company['company'] ?></td>
                 </tr>
                 <tr>
-                    <td width="100px"><b>Divisi</b></td>
+                    <td width="100px"><b>Departemen</b></td>
                     <td width="10px">:</td>
-                    <td><?= $divisi != null ? $divisi['divisi'] : "Semua Divisi" ?></td>
+                    <td><?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?></td>
                 </tr>
                 <tr>
                     <td width="100px"><b>Bulan</b></td>
@@ -243,7 +247,8 @@
                 <tr align="center" style="font-weight: bold;">
                     <td width="10">&nbsp;No</td>
                     <td>&nbsp;Karyawan</td>
-                    <td>&nbsp;Divisi</td>
+                    <td>&nbsp;Departemen</td>
+                    <td>&nbsp;Bagian</td>
                     <?php foreach ($statusPerizinan as $s) : ?>
                         <td width="30">
                             <b><?= explode("_", $s['value'])[1] ?></b>
@@ -272,6 +277,9 @@
                         </td>
                         <td>
                             &nbsp;<?= $res_user[$i]["divisi"]; ?>
+                        </td>
+                        <td>
+                            &nbsp;<?= $res_user[$i]["namaBagian"]; ?>
                         </td>
                         <?php foreach ($statusPerizinan as $s) : ?>
                             <td>

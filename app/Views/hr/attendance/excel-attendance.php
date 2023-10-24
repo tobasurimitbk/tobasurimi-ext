@@ -3,8 +3,8 @@ header("Content-type: application/vnd-ms-excel");
 header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . ".xls");
 ?>
 <b>
-    Company Name: <?= $company['company'] ?><br>
-    Divisi: <?= $divisi != null ? $divisi['divisi'] : "Semua Divisi" ?><br>
+    Unit: <?= $company['company'] ?><br>
+    Departemen: <?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?><br>
     Bulan: <?= date('F - Y', strtotime($yearMonth)) ?> <br>
     Periode: <?= $startDate ?> s.d <?= $endDate ?>
 </b>
@@ -16,9 +16,10 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
 <table border="1">
     <thead>
         <tr align="center" style="font-weight: bold;">
-            <td rowspan="2">No</td>
-            <td rowspan="2">Karyawan</td>
-            <td rowspan="2">Divisi</td>
+            <td rowspan="2" style="text-align: center;">No</td>
+            <td rowspan="2" style="text-align: center;">Karyawan</td>
+            <td rowspan="2" style="text-align: center;">Departemen</td>
+            <td rowspan="2" style="text-align: center;">Bagian</td>
             <td colspan="<?= $startMonth['totalDay']  ?>" style="text-align: center;"><?= $startMonth['firstMonthName'] ?></td>
             <td colspan="<?= $endMonth['totalDay']  ?>" style="text-align: center;"><?= $endMonth['secondMonthName'] ?></td>
         <tr>
@@ -46,6 +47,9 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
                 </td>
                 <td style="color: black; font-weight:normal;">
                     &nbsp;<?= $e["divisi"]; ?></td>
+                </td>
+                <td style="color: black; font-weight:normal;">
+                    &nbsp;<?= $e["namaBagian"]; ?></td>
                 </td>
                 <?php $j = 1; ?>
                 <?php foreach ($allDates as $a) : ?>
@@ -122,9 +126,10 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
 <table border="1">
     <thead>
         <tr align="center" style="font-weight: bold;">
-            <td width="10">No</td>
-            <td>Karyawan</td>
-            <td>Divisi</td>
+            <td width="10" style="text-align: center;">No</td>
+            <td style="text-align: center;">Karyawan</td>
+            <td style="text-align: center;">Departemen</td>
+            <td style="text-align: center;">Bagian</td>
             <?php foreach ($statusPerizinan as $s) : ?>
                 <td width="20" align="center">
                     <b><?= explode("_", $s['value'])[1] ?></b>
@@ -142,6 +147,9 @@ header("Content-Disposition: attachment; filename=AbsensiFinal_" . $yearMonth . 
                     &nbsp;<?= $e['name'] ?></td>
                 <td>
                     &nbsp;<?= $e['divisi'] ?></td>
+                </td>
+                <td>
+                    &nbsp;<?= $e["namaBagian"]; ?>
                 </td>
                 <?php foreach ($statusPerizinan as $s) : ?>
                     <td width="20" align="center">

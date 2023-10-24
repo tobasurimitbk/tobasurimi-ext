@@ -35,7 +35,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= (!empty($formPerijinan)) ? "disabled" : "" ?> class="form-select division_id" name="division_id" id="division_id">
                                 <option value="">
-                                    Pilih Divisi Terlebih Dahulu
+                                    Pilih Departemen
                                 </option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= (!empty($formPerijinan)) ?  ($formPerijinan['division_id'] == $d['id'] ? "selected" : "") : ""  ?> value="<?= $d['id'] ?>">
@@ -43,7 +43,7 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput">Pilih Divisi</label>
+                            <label for="floatingInput">Pilih Departemen</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -176,7 +176,7 @@
             .css('z-index', '1');
 
         $('.division_id').select2({
-            placeholder: "Pilih Divisi Terlebih Dahulu",
+            placeholder: "Pilih Departemen",
             theme: "bootstrap-5"
         });
 

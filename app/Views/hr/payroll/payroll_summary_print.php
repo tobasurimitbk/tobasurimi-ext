@@ -74,6 +74,9 @@
         <tr align="center" style=" font-size:12px">
             <td>Pembayaran dari tanggal <?= $startDate ?> s/d tanggal <?= $endDate ?> </td>
         </tr>
+        <tr align="center" style=" font-size:12px">
+            <td>Unit <?= $data['unit']['company'] ?> Departemen <?= $data['divisi']['divisi'] ?></td>
+        </tr>
     </table>
 
     <table width="100%" style="margin-top: 20px;" border="1" id="dashed-border-table">
@@ -95,7 +98,7 @@
         <tbody>
             <?php foreach ($data['res'] as $d) : ?>
                 <tr>
-                    <td><?= $d['divisi'] ?></td>
+                    <td><?= $d['bagian'] ?></td>
                     <td><?= $d['payrollTotal'][0]['totalEmployee'] ?></td>
                     <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
                     <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>

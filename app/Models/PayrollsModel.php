@@ -87,7 +87,9 @@ class PayrollsModel extends Model
             payrolls.*,
             employees.name AS employeesName,
             employees.nip AS employeesNIP,
-            divisis.divisi AS divisiName
+            divisis.divisi AS divisiName,
+            divisis.id AS divisiID,
+            employees.bagian_id AS bagianID
             "; // Corrected column names and aliases
 
         $dataQry = $this->asObject()
@@ -232,9 +234,10 @@ class PayrollsModel extends Model
 
     public function detailPayroll($payrollID)
     {
-        return $this->asArray()->select('payrolls.*, employees.name AS employeeName, employees.nip, divisis.divisi')
+        return $this->asArray()->select('payrolls.*, employees.name AS employeeName, employees.nip, divisis.divisi, bagian.nama_bagian')
             ->join('employees', 'employees.id = payrolls.employee_id')
             ->join('divisis', 'divisis.id = employees.division_id')
+            ->join('bagian', 'bagian.division_id = divisis.id', 'left')
             ->where('payrolls.id', $payrollID)
             ->where('employees.deletedAt', null)
             ->first();
@@ -342,6 +345,8 @@ class PayrollsModel extends Model
 
     public function getListPrintPayrollByDivision($divisionID, $adminID, $year, $month, $companyID)
     {
+        $bagianModel = new BagianModel();
+
         $condition = [
             'employees.company_id' => $companyID,
             "employees.deletedAt" => null,
@@ -355,7 +360,8 @@ class PayrollsModel extends Model
         payrolls.*,
         employees.name AS employeesName,
         employees.nip AS employeesNIP,
-        divisis.divisi AS divisiName
+        divisis.divisi AS divisiName,
+        employees.bagian_id 
         ";
 
         $dataQry = $this->asObject()
@@ -381,12 +387,15 @@ class PayrollsModel extends Model
             $potongan += ($p->nominal_pengurangan_gaji + $p->nominal_pinjaman_karyawan);
             $jumlahUpah += $p->nominal_gaji_diterima;
 
+            $bagian = $bagianModel->where('id', $p->bagian_id)->first();
+
             array_push($dataPayRolls, [
                 "no" => $no++,
                 "id" => $p->id,
                 "employee_id" => $p->employee_id,
                 "nip" => $p->employeesNIP,
                 "name"  => $p->employeesName,
+                "namaBagian" => $bagian == null ? "-" : $bagian['nama_bagian'],
                 "divisi" => $p->divisiName,
                 "hariKerja" => $p->hadir_final . "",
                 "upahPokok" => number_format($p->nominal_uang_gaji, 2, ',', '.'),
@@ -433,7 +442,7 @@ class PayrollsModel extends Model
 
         foreach ($employeePayroll as $ep) {
             $payrollDetail = $payrollModel->where('id', $ep['id'])->first();
-            $employee = $employeeModel->where('id', $ep['employee_id'])->first();
+            $employee = $employeeModel->getSingleEmployee($ep['employee_id']);
             $splitJamLembur = $formLemburModel->getTotalLemburJamPertamaKedua($payrollDetail['employee_id'], $payrollDetail['year_month']);
 
             $data[] = [
@@ -457,11 +466,15 @@ class PayrollsModel extends Model
         ];
     }
 
-    public function getPotonganPayroll($yearMonth, $companyID)
+    public function getPotonganPayroll($yearMonth, $companyID, $divisionID)
     {
         $divisiModel = new DivisisModel();
         $payrollModel = new PayrollsModel();
+        $companyModel = new CompaniesModel();
+        $bagianModel = new BagianModel();
+
         $divisiData = $divisiModel->where('company_id', $companyID)->where('deletedAt', null)->findAll();
+        $bagianData = $bagianModel->where('division_id', $divisionID)->where('deletedAt', null)->findAll();
 
         $res = [];
         $potonganRes = [
@@ -480,11 +493,12 @@ class PayrollsModel extends Model
             'totPotongan' => 0
         ];
 
-        foreach ($divisiData as $d) {
+        foreach ($bagianData as $b) {
             $employeePayroll = $employeePayroll = $payrollModel
                 ->select('employees.name, employees.id AS employeeID, payrolls.*')
                 ->join('employees', 'payrolls.employee_id = employees.id')
-                ->where('employees.division_id', $d['id'])
+                ->where('employees.bagian_id', $b['id'])
+                ->where('employees.division_id', $divisionID)
                 ->where('year_month', $yearMonth)
                 ->findAll();
 
@@ -537,7 +551,7 @@ class PayrollsModel extends Model
             $potonganRes['totPotPinjaman'] += $potonganSingle['totPotPinjaman'];
             $potonganRes['totPotongan'] += $potonganSingle['totPotongan'];
             $res[] = [
-                'divisi' => $d['divisi'],
+                'bagian' => $b['nama_bagian'],
                 'detail' => $detail,
                 'totPotonganSingle' =>  $potonganSingle,
             ];
@@ -545,14 +559,19 @@ class PayrollsModel extends Model
 
         return [
             'res' => $res,
-            'potAll' => $potonganRes
+            'potAll' => $potonganRes,
+            'unit' => $companyModel->where('id', $companyID)->first(),
+            'divisi' => $divisiModel->where('id', $divisionID)->first(),
         ];
     }
 
-    public function getSummaryPayroll($yearMonth, $companyID)
+    public function getSummaryPayroll($yearMonth, $companyID, $divisionID)
     {
         $divisiModel = new DivisisModel();
-        $divisiData = $divisiModel->where('company_id', $companyID)->where('deletedAt', null)->findAll();
+        $companyModel = new CompaniesModel();
+        $bagianModel = new BagianModel();
+
+        $bagianData = $bagianModel->where('division_id', $divisionID)->where('deletedAt', null)->findAll();
 
         $res = [];
         $upahPokok = 0;
@@ -565,7 +584,7 @@ class PayrollsModel extends Model
         $lembur = 0;
         $jamKerja = 0;
 
-        foreach ($divisiData as $d) {
+        foreach ($bagianData as $b) {
             $selectQry = "
                 COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
                 SUM(nominal_uang_gaji) AS upahBersih, 
@@ -579,7 +598,7 @@ class PayrollsModel extends Model
                 ->join('employees', 'employees.id = payrolls.employee_id')
                 ->where('payrolls.year_month', $yearMonth)
                 ->where('employees.company_id', $companyID)
-                ->where('employees.division_id', $d['id'])
+                ->where('employees.bagian_id', $b['id'])
                 ->findAll();
 
             // set total
@@ -590,14 +609,14 @@ class PayrollsModel extends Model
             $potongan += $employeePayrollTotal[0]['potongan'];
             $upahBersih += ($employeePayrollTotal[0]['upahBersih'] + $employeePayrollTotal[0]['tunjangan'] + $employeePayrollTotal[0]['cadangan'] - $employeePayrollTotal[0]['potongan']);
             $orangTotal += $employeePayrollTotal[0]['totalEmployee'];
-            $lembur +=  static::getTotalJamLemburInOnePeriode($d['id'], $yearMonth);
-            $jamKerja += static::getTotalJamKerjaInOnePeriode($d['id'], $yearMonth);
+            $lembur +=  static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $yearMonth);
+            $jamKerja += static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $yearMonth);
 
             $res[] = [
-                'divisi' => $d['divisi'],
+                'bagian' => $b['nama_bagian'],
                 'payrollTotal' => $employeePayrollTotal,
-                'totalJamKerja' => static::getTotalJamKerjaInOnePeriode($d['id'], $yearMonth),
-                'totalJamLembur' => static::getTotalJamLemburInOnePeriode($d['id'], $yearMonth),
+                'totalJamKerja' => static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $yearMonth),
+                'totalJamLembur' => static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $yearMonth),
             ];
         }
 
@@ -612,6 +631,8 @@ class PayrollsModel extends Model
             'upahBersih' => $upahBersih,
             'lembur' => $lembur,
             'jamKerja' => $jamKerja,
+            'unit' => $companyModel->where('id', $companyID)->first(),
+            'divisi' => $divisiModel->where('id', $divisionID)->first(),
         ];
     }
 
@@ -669,7 +690,7 @@ class PayrollsModel extends Model
         return $res == null ? 0 : $res['nominal'];
     }
 
-    static function getTotalJamKerjaInOnePeriode($divisionID, $yearMonth)
+    static function getTotalJamKerjaInOnePeriode($divisionID, $bagianID, $yearMonth)
     {
         $db = db_connect();
         $qry = "
@@ -677,12 +698,16 @@ class PayrollsModel extends Model
             FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(attendances.checkout, attendances.checkin)) / 3600)) AS totalJamKerja
         FROM 
             attendances
+        JOIN
+            employees ON employees.id = attendances.employee_id
         WHERE 
             DATE_FORMAT(periode, '%Y-%m') = '$yearMonth'
-            AND division_id = '$divisionID'
+            AND employees.division_id = '$divisionID'
             AND attendances.checkin IS NOT NULL
-            AND attendances.checkout IS NOT NULL;
+            AND attendances.checkout IS NOT NULL
+            AND employees.bagian_id = '$bagianID';
         ";
+
 
         $query = $db->query($qry);
         if ($query) {
@@ -693,11 +718,17 @@ class PayrollsModel extends Model
         }
     }
 
-    static function getTotalJamLemburInOnePeriode($divisionID, $yearMonth)
+    static function getTotalJamLemburInOnePeriode($divisionID, $bagianID, $yearMonth)
     {
         $formLemburModel = new FormLemburModel();
         $selectQry = "SUM(form_lembur.total_jam_lembur) AS totalJamLembur";
-        $result =  $formLemburModel->select($selectQry)->where('division_id', $divisionID)->where('DATE_FORMAT(periode, "%Y-%m")', $yearMonth)->findAll();
+        $result =  $formLemburModel
+            ->select($selectQry)
+            ->join('employees', 'employees.id = form_lembur.employee_id')
+            ->where('employees.division_id', $divisionID)
+            ->where('employees.bagian_id', $bagianID)
+            ->where('DATE_FORMAT(periode, "%Y-%m")', $yearMonth)
+            ->findAll();
         if (!empty($result)) {
             return $result[0]['totalJamLembur'];
         } else {

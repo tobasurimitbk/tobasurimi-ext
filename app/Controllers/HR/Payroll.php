@@ -5,6 +5,7 @@ namespace App\Controllers\HR;
 use App\Controllers\BaseController;
 use App\Models\AttendanceKeterlambatanModel;
 use App\Models\AttendancesModel;
+use App\Models\BagianModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
@@ -93,12 +94,16 @@ class Payroll extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        $bagianModel = new BagianModel();
+
         foreach ($payrollData['data'] as $p) {
+            $bagian = $bagianModel->where('id', $p->bagianID)->first();
             array_push($dataPayRolls, [
                 "no" => $no++,
                 "id" => $p->id,
                 "employee_id" => $p->employee_id,
                 "nip" => $p->employeesNIP,
+                "namaBagian" => ($bagian == null) ? "-" : $bagian['nama_bagian'],
                 "name"  => $p->employeesName,
                 "divisi" => $p->divisiName,
                 "hariKerja" => $p->hadir_final . " Hari",
@@ -607,7 +612,7 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfSummary($yearMonth)
+    public function exportPdfSummary($yearMonth, $divisionID)
     {
         $dompdf = new Dompdf();
 
@@ -624,7 +629,7 @@ class Payroll extends BaseController
             'month' => $month,
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'data' => $payrollModel->getSummaryPayroll($yearMonth, $this->this_company_id)
+            'data' => $payrollModel->getSummaryPayroll($yearMonth, $this->this_company_id, $divisionID)
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_summary_print', $data));
@@ -635,7 +640,7 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPotongan($yearMonth)
+    public function exportPdfPotongan($yearMonth, $divisionID)
     {
         $dompdf = new Dompdf();
         $payrollModel = new PayrollsModel();
@@ -646,7 +651,7 @@ class Payroll extends BaseController
         $data = [
             'year' => $year,
             'month' => $month,
-            'payrollData' => $payrollModel->getPotonganPayroll($yearMonth, $this->this_company_id)
+            'payrollData' => $payrollModel->getPotonganPayroll($yearMonth, $this->this_company_id, $divisionID)
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_potongan_print', $data));
