@@ -6299,3 +6299,7 @@ table.dataTable tbody tr td .btn {
   font-weight: 500 !important;
   color: #2f4858;
 }
+
+.detail-form .form-floating .select2 .selection .select2-selection__clear {
+  top: 35%;
+}
