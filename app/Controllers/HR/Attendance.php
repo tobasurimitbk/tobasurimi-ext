@@ -230,7 +230,7 @@ class Attendance extends BaseController
         $employeeData = $EmployeesModel->where('id', $employeeID)->findAll();
         $employeeStatus = $EmployeesModel->where('id', $employeeID)->first();
 
-        if ($employeeStatus != "Aktif") {
+        if ($employeeStatus['status'] != "Aktif") {
             return $this->response->setJSON([
                 'message' => "Status karyawan " . $employeeStatus['name'] . " adalah " . $employeeStatus['status'],
                 'status' => false,
