@@ -519,7 +519,7 @@
             $(".harga-modal").modal("hide")
         })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        $('#firstDataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             $(".create-form")[0].reset()
             $(".delete-form").css('display', '');
