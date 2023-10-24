@@ -23,7 +23,6 @@ class RMPurchaseOrderModel extends Model
         'po_date',
         'supplier_id',
         'pph',
-        'potong_kg',
         'cong_sebenarnya',
         'cong_batasan',
         'subsidi_langsung',

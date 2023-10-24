@@ -52,7 +52,7 @@
                             </table>
                             <table>
                                 <tr>
-                                    <td>Company Name </td>
+                                    <td>Unit </td>
                                     <td>:</td>
                                     <td><?= $payrollData['company']['company'] ?></td>
                                 </tr>
@@ -67,9 +67,14 @@
                                     <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                 </tr>
                                 <tr>
-                                    <td>No Induk / Divisi</td>
+                                    <td>No Induk / Departemen</td>
                                     <td>:</td>
                                     <td> <?= $p['employee']['nip'] ?> / <?= $payrollData['divisi']['divisi'] ?></td>
+                                </tr>
+                                <tr>
+                                    <td>Bagian</td>
+                                    <td>:</td>
+                                    <td> <?= $p['employee']['nama_bagian'] ?></td>
                                 </tr>
                                 <tr>
                                     <td>Nama</td>
@@ -92,7 +97,7 @@
                             </table>
                             <table>
                                 <tr>
-                                    <td>Company Name </td>
+                                    <td>Unit </td>
                                     <td>:</td>
                                     <td><?= $payrollData['company']['company'] ?></td>
                                 </tr>
@@ -107,9 +112,14 @@
                                     <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                 </tr>
                                 <tr>
-                                    <td>No Induk / Divisi</td>
+                                    <td>No Induk / Departemen</td>
                                     <td>:</td>
                                     <td> <?= $p['employee']['nip'] ?> / <?= $payrollData['divisi']['divisi'] ?></td>
+                                </tr>
+                                <tr>
+                                    <td>Bagian</td>
+                                    <td>:</td>
+                                    <td> <?= $p['employee']['nama_bagian'] ?></td>
                                 </tr>
                                 <tr>
                                     <td>Nama</td>
@@ -395,7 +405,7 @@
                                 </table>
                                 <table>
                                     <tr>
-                                        <td>Company Name </td>
+                                        <td>Unit </td>
                                         <td>:</td>
                                         <td><?= $payrollData['company']['company'] ?></td>
                                     </tr>
@@ -410,9 +420,14 @@
                                         <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                     </tr>
                                     <tr>
-                                        <td>No Induk / Divisi</td>
+                                        <td>No Induk / Departemen</td>
                                         <td>:</td>
                                         <td> <?= $p['employee']['nip'] ?> / <?= $payrollData['divisi']['divisi'] ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bagian</td>
+                                        <td>:</td>
+                                        <td> <?= $p['employee']['nama_bagian'] ?></td>
                                     </tr>
                                     <tr>
                                         <td>Nama</td>
@@ -450,9 +465,14 @@
                                         <td><?= $payrollData['year'] ?> / <?= $payrollData['month'] ?> / 1</td>
                                     </tr>
                                     <tr>
-                                        <td>No Induk / Divisi</td>
+                                        <td>No Induk / Departemen</td>
                                         <td>:</td>
                                         <td> <?= $p['employee']['nip'] ?> / <?= $payrollData['divisi']['divisi'] ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bagian</td>
+                                        <td>:</td>
+                                        <td> <?= $p['employee']['nama_bagian'] ?></td>
                                     </tr>
                                     <tr>
                                         <td>Nama</td>

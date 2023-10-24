@@ -66,7 +66,7 @@
                                 <th>No.</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
-                                <th onclick="changeSort('employees.division_id')" class="sort">Divisi</th>
+                                <th onclick="changeSort('employees.division_id')" class="sort">Departemen</th>
                                 <th>Mulai</th>
                                 <th>Selesai</th>
                                 <th onclick="changeSort('form_perijinan.status')" class="sort">Keterangan</th>

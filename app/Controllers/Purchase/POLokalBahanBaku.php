@@ -70,6 +70,9 @@ class POLokalBahanBaku extends BaseController
 
     public function getByIdPOLokalBahanBaku($id = null)
     {
+        //Get Company
+        $dataCompany =  $this->CompaniesModel->getCompanies();
+
         //Get Supplier
         $dataSupplier = $this->SupplierModel->getSupplierByType('BAHAN BAKU');
 
@@ -79,6 +82,7 @@ class POLokalBahanBaku extends BaseController
 
         $data = [
             "today" => date("d/m/Y"),
+            "dataCompany" => $dataCompany,
             "dataSupplier" => $dataSupplier
         ];
 
@@ -154,7 +158,25 @@ class POLokalBahanBaku extends BaseController
                 "po_date" => [
                     "rules" => "required"
                 ],
+                "po_no" => [
+                    "rules" => "required"
+                ],
                 "supplier_id" => [
+                    "rules" => "required"
+                ],
+                "company_id" => [
+                    "rules" => "required"
+                ],
+                "pph" => [
+                    "rules" => "required"
+                ],
+                "subsidi_langsung" => [
+                    "rules" => "required"
+                ],
+                "cong_sebenarnya" => [
+                    "rules" => "required"
+                ],
+                "cong_batasan" => [
                     "rules" => "required"
                 ]
             ];
@@ -172,11 +194,11 @@ class POLokalBahanBaku extends BaseController
 
             if ($this->validate($rules)) {
                 $insertData = [
-                    "company_id" => $this->this_company_id,
+                    "company_id" => $this->request->getPost("company_id"),
+                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "supplier_id" => $this->request->getPost("supplier_id"),
                     "pph" => $this->request->getPost("pph"),
-                    "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
                     "is_posted" => false,
                     "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
                     "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
@@ -185,14 +207,12 @@ class POLokalBahanBaku extends BaseController
                     "items" =>  json_decode($this->request->getPost("items"))
                 ];
 
-                $insertData["po_no"] = $this->RMPurchaseOrderModel->generateNoPo();
-
                 $payload = json_encode($insertData);
 
                 $insert = $this->RMPurchaseOrderModel->insert($insertData);
 
                 foreach ($insertData["items"] as $value) {
-                    $value->barang_id = $value->item_id;
+                    $value->barang_id = $value->barang_id;
                     $value->rm_purchase_order_id = $insert;
                     $value->remaining_qty = $value->qty;
                 }

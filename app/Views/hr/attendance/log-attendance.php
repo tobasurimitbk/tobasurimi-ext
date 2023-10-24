@@ -93,7 +93,7 @@
                             <div class="form-floating">
                                 <select class="form-select" name="divisiID" aria-label="Floating label select example">
                                     <option value="">
-                                        Cari Berdasarkan Divisi
+                                        Cari Departemen
                                     </option>
                                     <?php foreach ($divisi as $d) : ?>
                                         <option <?= @$_GET['divisiID'] == $d['id'] ? 'selected' : '' ?> value="<?= $d['id'] ?>">
@@ -101,7 +101,7 @@
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                                <label for="floatingInput">Cari Departemen</label>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -113,7 +113,7 @@
                                         </option>
                                     <?php endif; ?>
                                 </select>
-                                <label for="floatingInput">Cari Berdasarkan Karyawan</label>
+                                <label for="floatingInput">Cari Karyawan</label>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -132,7 +132,8 @@
                         <thead>
                             <tr>
                                 <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
-                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
+                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Departemen</td>
+                                <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Bagian</td>
                                 <?php
                                 $last_date = date("t", strtotime($year . "-" . $month . "-01"));
                                 for ($i = 1; $i <= $last_date; $i++) :
@@ -163,6 +164,8 @@
                                         &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
                                     <td style="vertical-align:middle;z-index:1" nowrap>
                                         &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
+                                    <td style="vertical-align:middle;z-index:1" nowrap>
+                                        &nbsp;<?php echo $res_user[$i]["namaBagian"]; ?></td>
                                     </td>
                                     <?php
                                     for ($j = 1; $j <= $last_date; $j++) :
@@ -304,7 +307,8 @@
                         <thead>
                             <tr>
                                 <td height="25">&nbsp;Karyawan</td>
-                                <td height="25">&nbsp;Divisi</td>
+                                <td height="25">&nbsp;Departemen</td>
+                                <td height="25">&nbsp;Bagian</td>
                                 <?php foreach ($statusPerizinan as $s) : ?>
                                     <td width="20" align="center">
                                         <b><?= explode("_", $s['value'])[1] ?></b>
@@ -328,6 +332,8 @@
                                         &nbsp;<?php echo $res_user[$i]["employeeName"]; ?></td>
                                     <td width="110">
                                         &nbsp;<?php echo $res_user[$i]["divisi"]; ?></td>
+                                    <td width="110">
+                                        &nbsp;<?php echo $res_user[$i]["namaBagian"]; ?></td>
                                     </td>
                                     <?php foreach ($statusPerizinan as $s) : ?>
                                         <td width="90" align="center">
@@ -455,7 +461,7 @@
     }
     // Search employee
     $("select[name='select2EmployeesName']").select2({
-        placeholder: "Cari Nama Karyawan",
+        placeholder: "Cari Karyawan",
         theme: "bootstrap-5",
         allowClear: true,
         minimumInputLength: 2,
@@ -486,7 +492,7 @@
     });
 
     $("select[name='divisiID']").select2({
-        placeholder: "Cari Berdasarkan Divisi",
+        placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
     });

@@ -71,13 +71,16 @@
         <tr align="center" style=" font-size:12px">
             <td> Bulan <?= date('M', strtotime("{$year}-{$month}-01")) ?> Tahun <?= $year ?> Periode 1</td>
         </tr>
+        <tr align="center" style=" font-size:12px">
+            <td>Unit <?= $payrollData['unit']['company'] ?> Departemen <?= $payrollData['divisi']['divisi'] ?></td>
+        </tr>
     </table>
 
     <table width="100%" border="1" id="dashed-border-table" style="margin-top: 30px;">
         <?php foreach ($payrollData['res'] as $payroll) : ?>
             <tr>
                 <td colspan="17">
-                    Bagian : <?= $payroll['divisi'] ?>
+                    Bagian : <?= $payroll['bagian'] ?>
                 </td>
             <tr>
                 <td>No</td>
@@ -89,8 +92,8 @@
                 <td>Potongan ASTEK</td>
                 <td>Potongan SPM</td>
                 <td>Potongan Ttp.Mulut</td>
-                <td>Pot.Baju,Seragam</td>
-                <td>Pot.Sepatu,Celana,Topi</td>
+                <td>Pot.Baju, <br>Seragam</td>
+                <td>Pot.Sepatu, <br> Celana,Topi</td>
                 <td>Potongan Denda</td>
                 <td>Potongan Kartu </td>
                 <td>Pot. Bon Koperasi</td>

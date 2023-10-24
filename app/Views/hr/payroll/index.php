@@ -59,7 +59,7 @@
                                     <div class="form-floating">
                                         <select class="form-select" id="divisionID" name="filterDivisiID" aria-label="Floating label select example">
                                             <option value="">
-                                                Cari Berdasarkan Divisi
+                                                Cari Departemen
                                             </option>
                                             <?php foreach ($divisi as $d) : ?>
                                                 <option value="<?= $d['id'] ?>">
@@ -67,7 +67,7 @@
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                                        <label for="floatingInput">Cari Departemen</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12 mt-3">
@@ -122,8 +122,8 @@
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                     <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Daftar Upah</button></li>
                     <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Slip Gaji</button></li>
-                    <li><button class="dropdown-item" onclick="print('<?= base_url('payroll/print/summary/' . $year . '-' . $month) ?>')">Summary</button></li>
-                    <li><button class="dropdown-item" onclick="print('<?= base_url('payroll/print/potongan/' . $year . '-' . $month) ?>')">Daftar Potongan</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/summary/' . $year . '-' . $month) ?>')">Summary</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan/' . $year . '-' . $month) ?>')">Daftar Potongan</button></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -181,7 +181,7 @@
                     <div class="form-floating mt-1">
                         <select class="form-select" name="filterDivisiID" id="filterDivisiID" aria-label="Floating label select example">
                             <option value="">
-                                Cari Berdasarkan Divisi
+                                Cari Departemen
                             </option>
                             <?php foreach ($divisi as $d) : ?>
                                 <option value="<?= $d['id'] ?>">
@@ -189,7 +189,7 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                        <label for="floatingInput">Cari Departemen</label>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -209,9 +209,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Lengkap</th>
-                                <th onclick="changeSort('divisis.divisi')" class="sort">Divisi</th>
+                                <th onclick="changeSort('divisis.divisi')" class="sort">Departemen</th>
+                                <th onclick="changeSort('employees.nip')" class="sort">Bagian</th>
                                 <th>Mulai</th>
                                 <th>Selesai</th>
                                 <th>Hari Kerja</th>
@@ -277,10 +277,6 @@
                 className: "text-center",
                 sortable: false,
                 width: "5%"
-            }, {
-                data: "nip",
-                className: "text-center",
-                width: "10%"
             },
             {
                 data: "name",
@@ -289,6 +285,11 @@
             {
                 data: "divisi",
                 className: "text-center"
+            },
+            {
+                data: "namaBagian",
+                className: "text-center",
+                width: "10%"
             },
             {
                 data: "startDate",
@@ -479,7 +480,7 @@
         } else if (divisionID == '') {
             Swal.fire({
                 icon: 'warning',
-                title: "Pilih divisi",
+                title: "Pilih departemen",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else if (employeeID == '') {
@@ -578,7 +579,7 @@
 
     // select2 divisi
     $("select[name='filterDivisiID']").select2({
-        placeholder: "Cari Berdasarkan Divisi",
+        placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
     });
@@ -671,7 +672,7 @@
         if (divisionID == "") {
             Swal.fire({
                 icon: 'warning',
-                title: 'Pilih Divisi Dahulu',
+                title: 'Pilih Departemen',
                 confirmButtonColor: '#4e73df',
             });
         } else {

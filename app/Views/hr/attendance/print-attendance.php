@@ -46,14 +46,14 @@
     <table class="mb-3" style="font-size: 12px;">
         <tbody>
             <tr>
-                <td width="100px"><b>Company Name</b></td>
+                <td width="100px"><b>Unit</b></td>
                 <td width="10px">:</td>
                 <td><?= $company['company'] ?></td>
             </tr>
             <tr>
-                <td width="100px"><b>Divisi</b></td>
+                <td width="100px"><b>Departemen</b></td>
                 <td width="10px">:</td>
-                <td><?= $divisi != null ? $divisi['divisi'] : "Semua Divisi" ?></td>
+                <td><?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?></td>
             </tr>
             <tr>
                 <td width="100px"><b>Bulan</b></td>
@@ -72,8 +72,9 @@
         <thead>
             <tr>
                 <td width="10" rowspan="2">&nbsp;No</td>
-                <td height="25" rowspan="2">&nbsp;Karyawan</td>
-                <td height="25" rowspan="2">&nbsp;Divisi</td>
+                <td height="25" rowspan="2" style="text-align: center;">&nbsp;Karyawan</td>
+                <td height="25" rowspan="2" style="text-align: center;">&nbsp;Departemen</td>
+                <td height="25" rowspan="2" style="text-align: center;">&nbsp;Bagian</td>
                 <td colspan="<?= $startMonth['totalDay']  ?>" style="text-align: center;"><?= $startMonth['firstMonthName'] ?></td>
                 <td colspan="<?= $endMonth['totalDay']  ?>" style="text-align: center;"><?= $endMonth['secondMonthName'] ?></td>
             <tr>
@@ -101,6 +102,9 @@
                     </td>
                     <td style="color: black; font-weight:normal;">
                         &nbsp;<?= $e["divisi"]; ?></td>
+                    </td>
+                    <td style="color: black; font-weight:normal;">
+                        &nbsp;<?= $e["namaBagian"]; ?></td>
                     </td>
                     <?php $j = 1; ?>
                     <?php foreach ($allDates as $a) : ?>
@@ -184,14 +188,14 @@
         <table class="mb-3" style="font-size: 12px;">
             <tbody>
                 <tr>
-                    <td width="100px"><b>Company Name</b></td>
+                    <td width="100px"><b>Unit</b></td>
                     <td width="10px">:</td>
                     <td><?= $company['company'] ?></td>
                 </tr>
                 <tr>
-                    <td width="100px"><b>Divisi</b></td>
+                    <td width="100px"><b>Bagian</b></td>
                     <td width="10px">:</td>
-                    <td><?= $divisi != null ? $divisi['divisi'] : "Semua Divisi" ?></td>
+                    <td><?= $divisi != null ? $divisi['divisi'] : "Semua Departemen" ?></td>
                 </tr>
                 <tr>
                     <td width="100px"><b>Bulan</b></td>
@@ -210,7 +214,8 @@
                 <tr align="center" style="font-weight: bold;">
                     <td width="10">&nbsp;No</td>
                     <td height="25">&nbsp;Karyawan</td>
-                    <td height="25">&nbsp;Divisi</td>
+                    <td height="25">&nbsp;Departemen</td>
+                    <td height="25">&nbsp;Bagian</td>
                     <?php foreach ($statusPerizinan as $s) : ?>
                         <td width="20" align="center">
                             <b><?= explode("_", $s['value'])[1] ?></b>
@@ -228,6 +233,9 @@
                             &nbsp;<?= $e['name'] ?></td>
                         <td>
                             &nbsp;<?= $e['divisi'] ?></td>
+                        </td>
+                        <td>
+                            &nbsp;<?= $e['namaBagian'] ?></td>
                         </td>
                         <?php foreach ($statusPerizinan as $s) : ?>
                             <td width="20" align="center">

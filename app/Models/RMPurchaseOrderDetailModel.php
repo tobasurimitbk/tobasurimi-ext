@@ -66,11 +66,10 @@ class RMPurchaseOrderDetailModel extends Model
 
         $builder = $this->db->table('rm_purchase_order_details')
             ->select('rm_purchase_orders.po_no,
-            rm_purchase_orders.status_penerimaan, rm_purchase_order_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan, hs_codes.code as hs_code')
+            rm_purchase_orders.status_penerimaan, rm_purchase_order_details.*, barang_master.barang_name as nama_barang, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
-            ->join('barangs', 'barangs.id = rm_purchase_order_details.barang_id', 'left')
-            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
-            ->join('hs_codes', 'barangs.hs_id = hs_codes.id', 'left');
+            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
 
@@ -86,10 +85,10 @@ class RMPurchaseOrderDetailModel extends Model
 
         $builder = $this->db->table('rm_purchase_order_details')
             ->select('rm_purchase_orders.po_no,
-            rm_purchase_orders.status_penerimaan, rm_purchase_order_details.*, barangs.nama_barang, barangs.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
+            rm_purchase_orders.status_penerimaan, rm_purchase_order_details.*, barang_master.barang_name as nama_barang, barang_master.kode_barang, satuans.id as id_satuan, satuans.nama_satuan')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
-            ->join('barangs', 'barangs.id = rm_purchase_order_details.barang_id', 'left')
-            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left');
+            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
 
@@ -99,12 +98,9 @@ class RMPurchaseOrderDetailModel extends Model
     public function getPoBBLokalDetailById($id)
     {
         $selectQry = "rm_purchase_order_details.*,
-                        FORMAT(CEILING(rm_purchase_order_details.daily_price), 'N', 'en-us') AS daily_price,
-                        FORMAT(CEILING(rm_purchase_order_details.general_price), 'N', 'en-us') AS general_price,
-                        FORMAT(CEILING(rm_purchase_order_details.monthly_price), 'N', 'en-us') AS monthly_price,
-                        barangs.kode_barang AS kodeBarang,
-                        barangs.nama_barang AS barangName,
-                        warehouses.warehouse_name AS warehouseName,
+                        barang_master.kode_barang AS kodeBarang,
+                        barang_master.barang_name AS barangName,
+                        divisis.divisi AS divisiName,
                         satuans.id as id_satuan, 
                         satuans.nama_satuan
                         ";
@@ -116,9 +112,9 @@ class RMPurchaseOrderDetailModel extends Model
         $poBBLokalDetailData = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('barangs', 'rm_purchase_order_details.barang_id = barangs.id', 'left')
-            ->join('warehouses', 'rm_purchase_order_details.bagian = warehouses.id', 'left')
-            ->join('satuans', 'satuans.id = barangs.satuan_id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang_id = barang_master.id', 'left')
+            ->join('divisis', 'rm_purchase_order_details.bagian = divisis.id', 'left')
+            ->join('satuans', 'satuans.id = barang_master.satuan_id', 'left')
             ->findAll();
 
         return $poBBLokalDetailData;

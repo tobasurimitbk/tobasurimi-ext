@@ -104,7 +104,7 @@
                             <div class="form-floating">
                                 <select class="form-select" name="divisiID" aria-label="Floating label select example">
                                     <option value="">
-                                        Cari Berdasarkan Divisi
+                                        Cari Departemen
                                     </option>
                                     <?php foreach ($divisi as $d) : ?>
                                         <option <?= @$_GET['divisiID'] == $d['id'] ? 'selected' : '' ?> value="<?= $d['id'] ?>">
@@ -112,7 +112,7 @@
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                                <label for="floatingInput">Cari Departemen</label>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -142,7 +142,8 @@
                         <thead>
                             <tr>
                                 <td height="25" rowspan="2" style="vertical-align:middle;z-index:1; text-align:center;">&nbsp;Karyawan</td>
-                                <td height="25" rowspan="2" style="vertical-align:middle;z-index:1; text-align:center;">&nbsp;Divisi</td>
+                                <td height="25" rowspan="2" style="vertical-align:middle;z-index:1; text-align:center;">&nbsp;Departemen</td>
+                                <td height="25" rowspan="2" style="vertical-align:middle;z-index:1; text-align:center;">&nbsp;Bagian</td>
                                 <td colspan="<?= $startMonth['totalDay'] * 2 ?>" style="text-align: center;"><?= $startMonth['firstMonthName'] ?></td>
                                 <td colspan="<?= $endMonth['totalDay'] * 2 ?>" style="text-align: center;"><?= $endMonth['secondMonthName'] ?></td>
                             <tr>
@@ -178,6 +179,9 @@
                                             </td>
                                             <td style="vertical-align:middle;z-index:1; text-align:center;" nowrap>
                                                 &nbsp;<?= $e["divisi"]; ?></td>
+                                            </td>
+                                            <td style="vertical-align:middle;z-index:1; text-align:center;" nowrap>
+                                                &nbsp;<?= $e["nama_bagian"]; ?></td>
                                             </td>
                                             <?php $j = 1; ?>
                                             <?php foreach ($allDates as $a) : ?>
@@ -277,7 +281,8 @@
                             <thead>
                                 <tr>
                                     <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Karyawan</td>
-                                    <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Divisi</td>
+                                    <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Departemen</td>
+                                    <td height="25" style="vertical-align:middle;z-index:1">&nbsp;Bagian</td>
                                     <?php foreach ($statusPerizinan as $s) : ?>
                                         <td width="20" align="center">
                                             <b><?= explode("_", $s['value'])[1] ?></b>
@@ -303,6 +308,9 @@
                                                     &nbsp;<?= $e['name'] ?></td>
                                                 <td width="110">
                                                     &nbsp;<?= $e['divisi'] ?></td>
+                                                </td>
+                                                <td width="110">
+                                                    &nbsp;<?= $e['nama_bagian'] ?></td>
                                                 </td>
                                                 <?php foreach ($statusPerizinan as $s) : ?>
                                                     <td width="20" align="center">
@@ -436,7 +444,7 @@
                                     <div class="form-floating">
                                         <select class="form-select" id="divisionID" name="filterDivisi" aria-label="Floating label select example">
                                             <option value="">
-                                                Cari Berdasarkan Divisi
+                                                Cari Departemen
                                             </option>
                                             <?php foreach ($divisi as $d) : ?>
                                                 <option value="<?= $d['id'] ?>">
@@ -444,7 +452,7 @@
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <label for="floatingInput">Cari Berdasarkan Divisi</label>
+                                        <label for="floatingInput">Cari Departemen</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12 mt-3">
@@ -578,7 +586,7 @@
         });
         // select2 divisi
         $("select[name='divisiID']").select2({
-            placeholder: "Cari Berdasarkan Divisi",
+            placeholder: "Cari Departemen",
             theme: "bootstrap-5",
             allowClear: true,
         });
@@ -987,7 +995,7 @@
         });
         // filter select2 init
         $("select[name='filterDivisi']").select2({
-            placeholder: "Cari Berdasarkan Divisi",
+            placeholder: "Cari Departemen",
             theme: "bootstrap-5",
             allowClear: true,
         });

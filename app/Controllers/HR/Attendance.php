@@ -59,6 +59,7 @@ class Attendance extends BaseController
             $dataResult[] = [
                 "employeeID" => $value['id'],
                 "divisi" => $value['divisi'],
+                "namaBagian" => $value['nama_bagian'],
                 "employeeName" => $value['name'],
                 "list_attendance" => $dataLog,
                 'statusAttendances' => [
@@ -229,7 +230,7 @@ class Attendance extends BaseController
         $employeeData = $EmployeesModel->where('id', $employeeID)->findAll();
         $employeeStatus = $EmployeesModel->where('id', $employeeID)->first();
 
-        if ($employeeStatus != "Aktif") {
+        if ($employeeStatus['status'] != "Aktif") {
             return $this->response->setJSON([
                 'message' => "Status karyawan " . $employeeStatus['name'] . " adalah " . $employeeStatus['status'],
                 'status' => false,
@@ -499,6 +500,7 @@ class Attendance extends BaseController
                 "employeeID" => $value['id'],
                 "employeeName" => $value['name'],
                 "list_attendance" => $dataLog,
+                "namaBagian" => $value['nama_bagian'],
                 "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
                 'statusAttendances' => [
                     'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $splitYearMonth[0], $splitYearMonth[1]),
@@ -568,6 +570,8 @@ class Attendance extends BaseController
             $dataResult[] = [
                 "employeeID" => $value['id'],
                 "employeeName" => $value['name'],
+                "namaBagian" => $value["nama_bagian"],
+                "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
                 "list_attendance" => $dataLog,
                 "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
                 'statusAttendances' => [
