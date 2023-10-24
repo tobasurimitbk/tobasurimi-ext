@@ -343,8 +343,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control disc" name="disc" id="disc" placeholder="Diskon %">
-                                <label for="floatingInput">Discount (%)</label>
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control disc" name="disc" id="disc" placeholder="Diskon (%) (Opsional)">
+                                <label for="floatingInput">Discount (%) (Opsional)</label>
                             </div>
                         </div>
                     </div>
@@ -373,7 +373,7 @@
                                 <select class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">PPN</label>
+                                <label for="floatingInput">PPN (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -381,7 +381,7 @@
                                 <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput">PPH</label>
+                                <label for="floatingInput">PPH (Opsional)</label>
                             </div>
                         </div>
                     </div>
