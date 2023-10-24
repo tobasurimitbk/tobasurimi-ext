@@ -131,7 +131,7 @@
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td colspan="5" style="text-align: right;">
+                <td colspan="4" style="text-align: right;">
                     Total
                 </td>
                 <td><?= number_format($payrollData['total']['jumlahUpah'], 2, ',', '.')  ?></td>
