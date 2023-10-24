@@ -27,7 +27,6 @@
                                 <th onclick="changeSort('satuans.nama_satuan')" class="sort">Satuan</th>
                                 <th class="sort">Harga Terakhir</th>
                                 <th class="sort">Supplier Terakhir</th>
-                                <th onclick="changeSort('barang_master.stok')" class="sort">Stok</th>
                                 <th class="sort" style="text-align: center;">Histori</th>
                             </tr>
                         </thead>
@@ -172,17 +171,6 @@
                 {
                     data: "supplier_terakhir",
                     className: "text-center",
-                },
-                {
-                    data: "stok",
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        return `
-                            <div class="text-danger">
-                                ${data}
-                            </div>
-                        `
-                    }
                 },
                 {
                     data: "id",

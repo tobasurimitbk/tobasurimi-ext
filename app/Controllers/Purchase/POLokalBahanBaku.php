@@ -256,7 +256,25 @@ class POLokalBahanBaku extends BaseController
                 "po_date" => [
                     "rules" => "required"
                 ],
+                "po_no" => [
+                    "rules" => "required"
+                ],
                 "supplier_id" => [
+                    "rules" => "required"
+                ],
+                "company_id" => [
+                    "rules" => "required"
+                ],
+                "pph" => [
+                    "rules" => "required"
+                ],
+                "subsidi_langsung" => [
+                    "rules" => "required"
+                ],
+                "cong_sebenarnya" => [
+                    "rules" => "required"
+                ],
+                "cong_batasan" => [
                     "rules" => "required"
                 ]
             ];
@@ -276,11 +294,11 @@ class POLokalBahanBaku extends BaseController
                 $id = $this->request->getPost("id");
 
                 $insertData = [
-                    "company_id" => $this->this_company_id,
+                    "company_id" => $this->request->getPost("company_id"),
+                    "po_no" => !empty($this->request->getPost("auto_generate")) ? $this->RMPurchaseOrderModel->generateNoPo() : $this->request->getPost("po_no"),
                     "po_date" => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
-                    "supplier_id" => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
+                    "supplier_id" => $this->request->getPost("supplier_id"),
                     "pph" => $this->request->getPost("pph"),
-                    "potong_kg" => !empty($this->request->getPost("potong_kg")) ? true : false,
                     "is_posted" => false,
                     "cong_sebenarnya" => $this->request->getPost("cong_sebenarnya") ? formatter($this->request->getPost("cong_sebenarnya"), "STR_TO_INT") : 0,
                     "cong_batasan" => $this->request->getPost("cong_batasan") ? formatter($this->request->getPost("cong_batasan"), "STR_TO_INT") : 0,
@@ -303,16 +321,17 @@ class POLokalBahanBaku extends BaseController
 
                         $dataDetail = [
                             "id" => $value->id ?? null,
-                            // "rm_purchase_order_id" => $this->request->getPost("id"),
-                            // "barang_id" => $value->item_id,
-                            // "spec" => $value->spec,
+                            "rm_purchase_order_id" => $this->request->getPost("id"),
+                            "barang_id" => $value->item_id,
+                            "supplier_harga_id" => $value->supplier_harga_id,
+                            "spec" => $value->spec,
                             "bagian" => $value->bagian,
                             "peti" => $value->peti,
                             "quality" => $value->quality,
-                            // "note" => $value->note,
-                            // "qty" => $value->qty,
+                            "note" => $value->note,
+                            "qty" => $value->qty,
                             // "remaining_qty" => $value->remaining_qty,
-                            // "general_price" => $value->general_price,
+                            "general_price" => $value->general_price,
                             "daily_price" => $value->daily_price,
                             "monthly_price" => $value->monthly_price,
                         ];
@@ -489,21 +508,21 @@ class POLokalBahanBaku extends BaseController
 
                 foreach ($dataPODetail as $value) {
                     $dataPO->itemName = $value->barangName;
-                    $totalPrice += formatter($value->general_price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT");
-                    $totalDailyPrice += formatter($value->daily_price, "CURR_TO_INT") * formatter($value->qty, "CURR_TO_INT");
+                    $totalPrice += formatter($value->general_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
+                    $totalDailyPrice += formatter($value->daily_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
                     $totalQty += formatter($value->qty, "STR_TO_FLOAT");
                 }
 
-                $dataPO->totalPrice = number_format($totalPrice);
-                $dataPO->totalDailyPrice = number_format($totalDailyPrice);
-                $dataPO->totalQty = number_format($totalQty);
-                $dataPO->totalPph = number_format($totalPrice * $pphTax);
-                $dataPO->totalDailyPph = number_format($totalDailyPrice * $pphTax);
-                $dataPO->totalPaid = number_format($totalPrice + $totalPrice * $pphTax);
-                $dataPO->totalDailyPaid = number_format($totalDailyPrice + $totalDailyPrice * $pphTax);
+                $dataPO->totalPrice = number_format($totalPrice, 2, '.', ',');
+                $dataPO->totalDailyPrice = number_format($totalDailyPrice, 2, '.', ',');
+                $dataPO->totalQty = number_format($totalQty, 2, '.', ',');
+                $dataPO->totalPph = number_format($totalPrice * $pphTax, 2, '.', ',');
+                $dataPO->totalDailyPph = number_format($totalDailyPrice * $pphTax, 2, '.', ',');
+                $dataPO->totalPaid = number_format($totalPrice + $totalPrice * $pphTax, 2, '.', ',');
+                $dataPO->totalDailyPaid = number_format(($totalDailyPrice + $totalDailyPrice * $pphTax), 2, '.', ',');
                 $dataPO->amount = terbilang($totalPrice);
                 $dataPO->amountDaily = terbilang($totalDailyPrice);
-                $dataPO->selisih = ($dataPO->cong_batasan ? formatter($dataPO->cong_batasan, "STR_TO_INT") : 0) - ($dataPO->cong_sebenarnya ? formatter($dataPO->cong_sebenarnya, "STR_TO_INT") : 0);
+                $dataPO->selisih = ($dataPO->cong_batasan ? formatter($dataPO->cong_batasan, "STR_TO_FLOAT") : 0) - ($dataPO->cong_sebenarnya ? formatter($dataPO->cong_sebenarnya, "STR_TO_FLOAT") : 0);
                 $dataPO->totalTambahan = $dataPO->selisih * $totalQty;
                 $dataPO->pphTambahan = $dataPO->totalTambahan * $pphTax;
 

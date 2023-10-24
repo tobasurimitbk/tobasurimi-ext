@@ -657,7 +657,7 @@ class PayrollsModel extends Model
             'potTutupMulut' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('Potongan Tutup Mulut', $employeePayroll['id']),
             'potBajuSeragam' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('Potongan Baju Seragam', $employeePayroll['id']),
             'potSepatuCelanaTopi' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('Potongan Sepatu Celana Topi', $employeePayroll['id']),
-            'potDenda' => ($employeePayroll == null) ? 0 : $employeePayroll['nominal_pengurangan_gaji'],
+            'potDenda' => ($employeePayroll == null) ? 0 : ($employeePayroll['nominal_pengurangan_gaji'] - $employeePayroll['nominal_pinjaman_karyawan']),
             'potKartu' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('Potongan Kartu', $employeePayroll['id']),
             'potBonKoperasi' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('Potongan Bon Koperasi', $employeePayroll['id']),
             'potPinjamanKoperasi' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('Potongan Pinjaman Koperasi', $employeePayroll['id']),
