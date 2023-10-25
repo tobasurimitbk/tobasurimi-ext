@@ -117,13 +117,18 @@ class PinjamanKaryawan extends BaseController
                     ->get()
                     ->getResult();
 
+                // ALPHA, CUTI HAID, CUTI HAMIL, CUTI MELAHIRKAN, LIBUR
                 if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
                     // ada hari libur
                     $tidakHadir++;
                 } elseif ($formPerizinan != null) {
                     // ada perizinan 
-                    $tidakHadir++;
-                } elseif ($formPerizinan == null) {
+                    if (in_array($formPerizinan['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L"])) {
+                        $tidakHadir++;
+                    } else {
+                        $hadir++;
+                    }
+                } else {
                     if (count($logAttandance) == 0) {
                         // alpha
                         $tidakHadir++;

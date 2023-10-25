@@ -227,6 +227,7 @@ class POLokalBahanPenolong extends BaseController
 
                 $insertData = [
                     "purchase_request_id"   => $purchase_request_id,
+                    "bc_type"               => formatter($this->request->getPost("bc_type"), "STR_TO_INT"),
                     "po_no"                 => !empty($this->request->getPost("auto_generate")) ? "" : $this->request->getPost("po_no"),
                     "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                     "po_type"               => 'Lokal',
@@ -358,6 +359,7 @@ class POLokalBahanPenolong extends BaseController
                         "po_no"                 => $this->AMPurchaseOrderModel->get_no(date('d'), date('m'), date('Y'), $dataDivisi["divisi"], date('y'), $this->request->getPost("divisi_id"), $last_day),
                         "po_date"               => $this->request->getPost("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("po_date")))) : "",
                         "po_type"               => 'Lokal',
+                        "bc_type"               => formatter($this->request->getPost("bc_type"), "STR_TO_INT"),
                         "supplier_id"           => formatter($this->request->getPost("supplier_id"), "STR_TO_INT"),
                         //"payment_term"          => $this->request->getPost("payment_term") ? formatter($this->request->getPost("payment_term"), "STR_TO_INT") : 0,
                         "payment_date"          => $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("payment_date")))) : "",
