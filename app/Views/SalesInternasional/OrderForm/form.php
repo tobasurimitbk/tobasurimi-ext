@@ -59,7 +59,7 @@
                                 }
                                 ?>
                             </select>
-                            <label for="floatingInput">Buyer</label>
+                            <label for="floatingInput">Customer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
