@@ -68,11 +68,19 @@ class POLokalBahanPenolong extends BaseController
             $dataValuta[$key] = (object)$dataValuta[$key];
         }
 
+        //Get BC Type By Metadata
+        $dataBC = $this->MetadataModel->get_by_name('Bea Cukai');
+
+        foreach (array_keys($dataBC) as $key) {
+            $dataBC[$key] = (object)$dataBC[$key];
+        }
+
         $data = [
             "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataValuta" => $dataValuta,
+            "dataBC" => $dataBC
         ];
 
         return view('Purchase/poLokalBahanPenolong/form', $data);
@@ -101,11 +109,19 @@ class POLokalBahanPenolong extends BaseController
             $dataValuta[$key] = (object)$dataValuta[$key];
         }
 
+        //Get BC Type By Metadata
+        $dataBC = $this->MetadataModel->get_by_name('Bea Cukai');
+
+        foreach (array_keys($dataBC) as $key) {
+            $dataBC[$key] = (object)$dataBC[$key];
+        }
+
         $data = [
             "today" => date("d/m/Y"),
             "dataSPP" => $dataSPP,
             "dataSupplier" => $dataSupplier,
-            "dataValuta" => $dataValuta
+            "dataValuta" => $dataValuta,
+            "dataBC" => $dataBC
         ];
 
         if (!empty($id)) {
