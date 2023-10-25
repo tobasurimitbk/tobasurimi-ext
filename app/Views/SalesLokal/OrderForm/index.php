@@ -32,7 +32,7 @@
                             <tr>
                                 <th>No.</th>
 
-                                <th onclick="changeSort('no_sales_order')" class="sort">No SO</th>
+                                <th onclick="changeSort('no_sales_order')" class="sort">No Order</th>
 
                                 <th onclick="changeSort('destination')" class="sort">Destinasi</th>
 
