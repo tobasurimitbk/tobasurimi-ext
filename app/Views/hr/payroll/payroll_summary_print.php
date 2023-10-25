@@ -75,7 +75,7 @@
             <td>Pembayaran dari tanggal <?= $startDate ?> s/d tanggal <?= $endDate ?> </td>
         </tr>
         <tr align="center" style=" font-size:12px">
-            <td>Unit <?= $data['unit']['company'] ?> Departemen <?= $data['divisi']['divisi'] ?></td>
+            <td>Unit <?= $data['unit']['company'] ?> - Departemen <?= $data['divisi']['divisi'] ?></td>
         </tr>
     </table>
 

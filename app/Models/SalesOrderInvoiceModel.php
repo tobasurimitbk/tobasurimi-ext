@@ -145,18 +145,30 @@ class SalesOrderInvoiceModel extends Model
         $formatMonth = str_pad($month, 2, 0, STR_PAD_LEFT);
         $numberTemplate = "/$year/$formatMonth";
 
+        // $lastData = $this->asObject()
+        //     ->like('no_faktur', $numberTemplate, 'before')
+        //     ->orderBy('createdAt', 'DESC')
+        //     ->first();
+        
         $lastData = $this->asObject()
-            ->like('no_faktur', $numberTemplate, 'before')
-            ->orderBy('createdAt', 'DESC')
-            ->first();
-
-        $invNumber = $format . '1' . $numberTemplate;
-
+        ->where("no_faktur LIKE '%$numberTemplate%'")
+        ->orderBy('createdAt', 'DESC')
+        ->first();
+        
+        $dummyNum = 0;
         if (!empty($lastData)) {
             $asd = explode('/', $lastData->no_faktur);
-            $lastIncrement = intval($asd[0]) + 1;
-
-            $invNumber = $format . $lastIncrement . $numberTemplate;
+            foreach ($asd as $key => $item) {
+                if ($key === 1) {
+                    if (preg_match('/^(.*?)(\d+)$/', $item, $matches)) {
+                        $prefix = $matches[1]; // "inv"
+                        $number = $matches[2]; // "nomer invoice"
+                    }
+                }
+            }
+            $numbers = $number + 1; // increment nomer invoice
+        
+            $invNumber = $format . $numbers . $numberTemplate;
         }
 
         return $invNumber;

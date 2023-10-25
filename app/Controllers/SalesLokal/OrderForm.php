@@ -671,79 +671,6 @@ class OrderForm extends BaseController
                 }
             }
 
-            // codingan lama
-            // foreach ($items as $row) {
-            //     $item = $this->DetailStockBarang
-            //         ->where('barang_id', $row->id_barang)
-            //         ->where('warehouse_id', $row->warehouse_id)
-            //         ->first();
-
-            //     if ($row->id && $row->isDeleted === false) {
-            //         $dataBefore = $this->SalesOrderDetailModel->asObject()->find($row->id);
-            //         if ($dataBefore->qty > $row->qty) {
-            //             $dataItems = $dataBefore->qty - $row->qty;
-            //             $stok = [
-            //                 "stok" => ($item['stok'] + $dataItems),
-            //             ];
-            //         } else {
-            //             $dataItems =  $row->qty - $dataBefore->qty;
-            //             $checkItems = $item['stok'] - $dataItems;
-
-
-            //             if ($checkItems < 0) {
-            //                 throw new ErrorException('barang tidak boleh kurang dari stock');
-            //             }
-            //             $stok = [
-            //                 "stok" => ($item['stok'] - $dataItems),
-            //             ];
-            //         }
-            //         $totalQty = $totalQty + $row->qty;
-
-            //         $valueBarang = [
-            //             "id_barang" => $row->id_barang,
-            //             "qty" => $row->qty,
-            //             "amount" => formatter($row->amount, "CURR_TO_INT"),
-            //             "keterangan" => $row->keterangan,
-            //             // "tax" => $row->tax,
-            //             "discount_percentage" => $row->discount_percentage,
-            //             "dept" => $row->dept,
-            //             "id_warehouse" => $row->warehouse_id,
-            //         ];
-
-            //         $this->DetailStockBarang->update($item['id'], $stok);
-
-            //         $this->SalesOrderDetailModel->update($row->id, $valueBarang);
-            //     } else if ($row->id && $row->isDeleted === true) {
-            //         $this->SalesOrderDetailModel->delete($row->id);
-            //         $stok = [
-            //             "stok" => ($item['stok'] + $row->qty),
-            //         ];
-            //         $this->DetailStockBarang->update($item['id'], $stok);
-            //     } else {
-            //         if ($item['stok'] > $row->qty) {
-            //             throw new ErrorException('barang tidak boleh kurang dari stock');
-            //         }
-            //         $totalQty = $totalQty + $row->qty;
-
-            //         $valueBarang = [
-            //             "id_sales_order" => $payload['id'],
-            //             "id_barang" => $row->id_barang,
-            //             "qty" => $row->qty,
-            //             "amount" => $row->amount,
-            //             "keterangan" => $row->keterangan,
-            //             "tax" => $row->tax,
-            //             "discount_percentage" => $row->discount_percentage,
-            //             "dept" => $row->dept,
-            //             "id_warehouse" => $row->warehouse_id,
-            //         ];
-            //         $this->SalesOrderDetailModel->save($valueBarang);
-            //         $stok = [
-            //             "stok" => ($item['stok'] - $row->qty),
-            //         ];
-            //         $this->DetailStockBarang->update($item['id'], $stok);
-            //     }
-            // }
-
             $this->SalesOrderModel->update($payload['id'], ['qty_barang' => $totalQty]);
 
             $this->db->transCommit();
@@ -786,20 +713,20 @@ class OrderForm extends BaseController
                 $dataDetail = $this->SalesOrderDetailModel->where('id_sales_order', $id)->findAll();
 
                 foreach ($dataDetail as $item) {
-                    $itemStock = $this->DetailStockBarang
+                    $itemStock = $this->stockDetailModel
                         ->asObject()
                         ->where('barang_id', $item['id_barang'])
                         ->where('warehouse_id', $item['id_warehouse'])
                         ->first();
-                    $stok = ['stok' => $itemStock->stok + $item['qty']];
-                    $this->DetailStockBarang->update($item['id'], $stok);
+                    $stok = ['qty' => $itemStock->qty + $item['qty']];
+                    $this->stockDetailModel->where('barang_id', $item['id_barang'])->set('qty', $itemStock->qty + $item['qty'])->update();
                     $this->SalesOrderDetailModel->delete($item['id']);
                 }
                 $this->db->transCommit();
 
                 $data = [
                     "status"            => true,
-                    "message"    => $dataDetail,
+                    "message"    => "Data SO Berhasil Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
