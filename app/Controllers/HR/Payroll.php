@@ -134,6 +134,7 @@ class Payroll extends BaseController
         $yearMonth = $this->request->getVar('yearMonth');
         $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
         $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+        $divisionGlobalID = $this->request->getVar('divisionGlobalID');
 
         $attendanceModel = new AttendancesModel();
         $payrollModel = new PayrollsModel();
@@ -142,20 +143,36 @@ class Payroll extends BaseController
         $AttendanceKeterlambatanModel = new AttendanceKeterlambatanModel();
         $PayrollGajiModel = new PayrollGajiConjunctionModel();
 
-        $dataAbsensiGenerated = $attendanceModel
-            ->where('year_month', $yearMonth)
-            ->where('company_id', $this->this_company_id)
-            ->countAllResults();
+        if ($divisionGlobalID == 'ALL') {
+            $dataAbsensiGenerated = $attendanceModel
+                ->where('year_month', $yearMonth)
+                ->where('company_id', $this->this_company_id)
+                ->countAllResults();
+        } else {
+            $dataAbsensiGenerated = $attendanceModel
+                ->where('year_month', $yearMonth)
+                ->where('division_id', $divisionGlobalID)
+                ->where('company_id', $this->this_company_id)
+                ->countAllResults();
+        }
 
         if ($dataAbsensiGenerated != 0) {
 
-            // delete firts if ada
-            $payrollModel->where('company_id', $this->this_company_id)
-                ->where('year_month', $yearMonth)
-                ->delete();
-
             // get employees
-            $employeesData = $employeesModel->getEmployees($this->this_company_id);
+            if ($divisionGlobalID == 'ALL') {
+                $employeesData = $employeesModel->getEmployees($this->this_company_id);
+                // delete firts if ada
+                $payrollModel->where('company_id', $this->this_company_id)
+                    ->where('year_month', $yearMonth)
+                    ->delete();
+            } else {
+                $employeesData = $employeesModel->getEmployeesByDivisionID($this->this_company_id, $this->request->getVar('divisionGlobalID'));
+                // delete firts if ada
+                $payrollModel->where('company_id', $this->this_company_id)
+                    ->where('year_month', $yearMonth)
+                    ->where('division_id', $divisionGlobalID)
+                    ->delete();
+            }
             $test = [];
             // Insert Again
             foreach ($employeesData as $e) {
@@ -165,6 +182,7 @@ class Payroll extends BaseController
                 $payrollID = $payrollModel->insert([
                     "company_id" => $e['company_id'],
                     "employee_id" => $e['id'],
+                    "division_id" => $e['division_id'],
                     "year_month" => $yearMonth,
                     "cuti_tahunan" => $status['CUTI TAHUNAN_CT'],
                     "cuti_haid" => $status['CUTI HAID_CHD'],
@@ -293,6 +311,7 @@ class Payroll extends BaseController
         $payrollID = $payrollModel->insert([
             "company_id" => $employeesData['company_id'],
             "employee_id" => $employeesData['id'],
+            "division_id" => $employeesData['division_id'],
             "year_month" => $yearMonth,
             "cuti_tahunan" => $status['CUTI TAHUNAN_CT'],
             "cuti_haid" => $status['CUTI HAID_CHD'],
@@ -569,8 +588,11 @@ class Payroll extends BaseController
         $month = explode("-", $yearMonth)[1];
         $payrollData = $payrollModel->getListPrintPayrollByDivision($divisionID, $this->userID, $year, $month, $this->this_company_id);
 
-        $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
-        $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
+        // get limit 1 untuk label periode
+        $payrollLimit = $payrollModel->where('year_month', $yearMonth)->where('division_id', $divisionID)->first();
+
+        $startDate = date('d/m/Y', strtotime($payrollLimit['start_date']));
+        $endDate = date('d/m/Y', strtotime($payrollLimit['end_date']));
 
         // validation
         if ($payrollData == null) {
@@ -621,8 +643,11 @@ class Payroll extends BaseController
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
 
-        $startDate = date('d/m/Y', strtotime("{$year}-{$month}-01 -1 month +22 days"));
-        $endDate = date('d/m/Y', strtotime("{$year}-{$month}-01  +20 days"));
+        // get limit 1 untuk label periode
+        $payrollLimit = $payrollModel->where('year_month', $yearMonth)->where('division_id', $divisionID)->first();
+
+        $startDate = date('d/m/Y', strtotime($payrollLimit['start_date']));
+        $endDate = date('d/m/Y', strtotime($payrollLimit['end_date']));
 
         $data = [
             'year' => $year,

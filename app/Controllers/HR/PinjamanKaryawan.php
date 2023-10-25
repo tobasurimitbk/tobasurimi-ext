@@ -8,6 +8,7 @@ use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
+use App\Models\GolonganModel;
 use App\Models\PinjamanKaryawanModel;
 use Dompdf\Dompdf;
 use Exception;
@@ -93,6 +94,7 @@ class PinjamanKaryawan extends BaseController
         }
 
         $employeeData = $employeesModel->getEmployees($this->this_company_id);
+        $golonganModel = new GolonganModel();
 
         foreach ($employeeData as $e) {
             $hadir = 0;
@@ -115,13 +117,18 @@ class PinjamanKaryawan extends BaseController
                     ->get()
                     ->getResult();
 
+                // ALPHA, CUTI HAID, CUTI HAMIL, CUTI MELAHIRKAN, LIBUR
                 if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
                     // ada hari libur
                     $tidakHadir++;
                 } elseif ($formPerizinan != null) {
                     // ada perizinan 
-                    $tidakHadir++;
-                } elseif ($formPerizinan == null) {
+                    if (in_array($formPerizinan['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L"])) {
+                        $tidakHadir++;
+                    } else {
+                        $hadir++;
+                    }
+                } else {
                     if (count($logAttandance) == 0) {
                         // alpha
                         $tidakHadir++;
@@ -131,6 +138,10 @@ class PinjamanKaryawan extends BaseController
                     }
                 }
             }
+
+            $golonganDetail = $golonganModel->where('golongan_name', $e['tipe'])->first();
+            $nominalPinjaman = $golonganDetail == null ? 0 : $golonganDetail['nominal_pinjaman'];
+
             $pinjamanKaryawanModel->insert([
                 'company_id' => $this->this_company_id,
                 'employee_id' => $e['id'],
@@ -141,8 +152,8 @@ class PinjamanKaryawan extends BaseController
                 'tidak_hadir' => $tidakHadir,
                 'hadir' => $hadir,
                 'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
-                'status_pinjaman' => ($tidakHadir <= 6) ? '0' : null,
-                'nominal' => ($tidakHadir <= 6) ? 100000 : null // default 100k
+                'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
+                'nominal' => ($tidakHadir <= 6) ? $nominalPinjaman : null
             ]);
         }
 
@@ -167,6 +178,7 @@ class PinjamanKaryawan extends BaseController
         $employeesModel = new EmployeesModel();
         $hariLiburModel = new BigDaysModel();
         $attendancesLogModel = new AttendancesLogModel();
+        $golonganModel = new GolonganModel();
 
         // date start end validation
         if (strtotime($startDate) > strtotime($endDate)) {
@@ -204,7 +216,7 @@ class PinjamanKaryawan extends BaseController
             $startDateTimestamp += 86400;
         }
 
-        $employeeData = $employeesModel->where('id', $employeeID)->findAll();
+        $employeeData = $employeesModel->where('id', $employeeID)->where('deletedAt', null)->where('status', "Aktif")->findAll();
 
         foreach ($employeeData as $e) {
             $hadir = 0;
@@ -243,6 +255,10 @@ class PinjamanKaryawan extends BaseController
                     }
                 }
             }
+
+            $golonganDetail = $golonganModel->where('golongan_name', $e['tipe'])->first();
+            $nominalPinjaman = $golonganDetail == null ? 0 : $golonganDetail['nominal_pinjaman'];
+
             $pinjamanKaryawanModel->insert([
                 'company_id' => $this->this_company_id,
                 'employee_id' => $e['id'],
@@ -253,8 +269,8 @@ class PinjamanKaryawan extends BaseController
                 'tidak_hadir' => $tidakHadir,
                 'hadir' => $hadir,
                 'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
-                'status_pinjaman' => ($tidakHadir <= 6) ? '0' : null,
-                'nominal' => ($tidakHadir <= 6) ? 100000 : null // default 100k
+                'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
+                'nominal' => ($tidakHadir <= 6) ? $nominalPinjaman : null
             ]);
         }
 

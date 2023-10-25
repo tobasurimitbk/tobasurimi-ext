@@ -126,7 +126,9 @@ class SalesOrderInvoiceModel extends Model
         $selectQry = "sales_order_invoice.*,
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
                       users.name AS seller_name,
-                      customers.name AS customer_name ";
+                      customers.name AS customer_name,
+                      sales_order_invoice.status_tax AS status_tax,
+                      sales_order_invoice.termasuk_pa AS termasuk_pa";
 
         $dataSalesOrderInvoice = $this->asObject()
             ->join('users', 'users.id = sales_order_invoice.id_user')
