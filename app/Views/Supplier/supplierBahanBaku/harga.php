@@ -64,13 +64,13 @@
                 <div class="row"> 
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="0" autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
+                            <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_umum" id="harga_umum" name="harga_umum" placeholder="Harga Umum">
                             <label for="floatingInput">Harga Umum</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="0" autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
+                            <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_harian" id="harga_harian" name="harga_harian" placeholder="Harga Harian">
                             <label for="floatingInput">Harga Harian</label>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="0" autocomplete="one-time-code" onkeyup="formatNumber(this)" type="text" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
+                            <input value="0" autocomplete="one-time-code" type="number" class="form-control harga_bulanan" id="harga_bulanan" name="harga_bulanan" placeholder="Harga Bulanan">
                             <label for="floatingInput">Harga Bulanan</label>
                         </div>
                     </div>
@@ -174,9 +174,9 @@
             bahan_baku_id: Number('<?= $item["bahan_baku_id"]?>'),
             barang_name: '<?= $item["barang_name"]?>',
             spesifikasi: '<?= $item["spesifikasi"]?>',
-            harga_umum: Number('<?= $item["harga_umum"] ? $item["harga_umum"] : 0; ?>').toLocaleString(),
-            harga_harian: Number('<?= $item["harga_harian"] ? $item["harga_harian"] : 0; ?>').toLocaleString(),
-            harga_bulanan: Number('<?= $item["harga_bulanan"] ? $item["harga_bulanan"] : 0; ?>').toLocaleString()
+            harga_umum: Number('<?= $item["harga_umum"] ? $item["harga_umum"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            harga_harian: Number('<?= $item["harga_harian"] ? $item["harga_harian"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            harga_bulanan: Number('<?= $item["harga_bulanan"] ? $item["harga_bulanan"] : 0; ?>').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
         })
     <?php } 
         }
@@ -412,13 +412,13 @@
                                 tag_html += spesifikasi;
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += "Rp " + harga_umum;
+                                tag_html += "Rp " + Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += "Rp " + harga_harian;
+                                tag_html += "Rp " + Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
                                 tag_html += "<td>";
-                                tag_html += "Rp " + harga_bulanan;
+                                tag_html += "Rp " + Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 tag_html += "</td>";
                                 tag_html += "<td>";
                                 tag_html += `
@@ -434,9 +434,9 @@
                                     ...item,
                                     row: row,
                                     id: id_supplier_harga,
-                                    harga_umum: harga_umum,
-                                    harga_harian: harga_harian,
-                                    harga_bulanan: harga_bulanan
+                                    harga_umum: Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    harga_harian: Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                    harga_bulanan: Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                 })
                             }
                             else
@@ -512,8 +512,43 @@
                         cancelButtonText: 'Batal',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            row = row + 1;
                             let tag_html = "";
+                            row = 0;
+
+                            $(".body-detail-table").empty()
+
+                            list_item.map(item => {
+                                row = row + 1;
+                                tag_html += `<tr>`;
+                                tag_html += "<td>";
+                                tag_html += row;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += item.barang_name;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += item.spesifikasi;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += "Rp " + item.harga_umum;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += "Rp " + item.harga_harian;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += "Rp " + item.harga_bulanan;
+                                tag_html += "</td>";
+                                tag_html += "<td>";
+                                tag_html += `
+                                <button class="btn btn-warning posting-spp mr-1" onclick="editHarga(${row})">
+                                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                </button><button class="btn btn-danger" onclick="deleteHarga(${row})">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>`;
+                                tag_html += "</td>";
+                                tag_html += "</tr>";
+                            })
+                            row = row + 1;
                             tag_html += `<tr>`;
                             tag_html += "<td>";
                             tag_html += row;
@@ -525,13 +560,13 @@
                             tag_html += spesifikasi;
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += "Rp " + harga_umum;
+                            tag_html += "Rp " + Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += "Rp " + harga_harian;
+                            tag_html += "Rp " + Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                             tag_html += "</td>";
                             tag_html += "<td>";
-                            tag_html += "Rp " + harga_bulanan;
+                            tag_html += "Rp " + Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                             tag_html += "</td>";
                             tag_html += "<td>";
                             tag_html += `
@@ -551,9 +586,9 @@
                                 bahan_baku_id: bahan_baku_id,
                                 barang_name: barang_name,
                                 spesifikasi: spesifikasi,
-                                harga_umum: harga_umum,
-                                harga_harian: harga_harian,
-                                harga_bulanan: harga_bulanan
+                                harga_umum: Number(harga_umum).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                harga_harian: Number(harga_harian).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                                harga_bulanan: Number(harga_bulanan).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                             })
 
                             reset()
@@ -576,9 +611,9 @@
 
         $(".row").val(current_row?.row);
         $(".id_supplier_harga").val(current_row?.id);
-        $(".harga_harian").val(current_row?.harga_harian);
-        $(".harga_umum").val(current_row?.harga_umum);
-        $(".harga_bulanan").val(current_row?.harga_bulanan);
+        $(".harga_harian").val(current_row?.harga_harian.replaceAll(",", ""));
+        $(".harga_umum").val(current_row?.harga_umum.replaceAll(",", ""));
+        $(".harga_bulanan").val(current_row?.harga_bulanan.replaceAll(",", ""));
         $(".bahan_baku").val(current_row?.bahan_baku_id).change();
         $(".spesifikasi").val(current_row?.spesifikasi);
     }
