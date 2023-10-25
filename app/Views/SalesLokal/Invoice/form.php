@@ -116,7 +116,7 @@
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= ($data->status_tax ?? false) ? 'checked' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= !empty($data->status_tax) ? ($data->status_tax == 'true') ? 'checked' : '' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -127,7 +127,7 @@
                                     <label for="floatingInput">Include Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= ($data->termasuk_pa ?? false) ? 'checked' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= !empty($data->termasuk_pa) ? ($data->termasuk_pa == 'true') ? 'checked' : '' : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -207,10 +207,13 @@
     $(document).ready(function() {
 
         <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) :?>
-
-        $('#taxTotal').html(<?= $data->ppn; ?>.toLocaleString());
-        $('#itemSubTotal').html(<?= $data->dpp; ?>.toLocaleString());
-        $('#grandTotal').html(<?= $data->total_invoice; ?>.toLocaleString());
+            
+            $('#taxTotal').html(<?= $data->ppn; ?>.toLocaleString());
+            $('#itemSubTotal').html(<?= $data->dpp; ?>.toLocaleString());
+            $('#grandTotal').html(<?= $data->total_invoice; ?>.toLocaleString());
+            <?php if (!empty($data->termasuk_pa) && ($data->termasuk_pa == 'true')) :?>
+                $('#includeTaxText').html('(Termasuk Pajak)');
+            <?php endif; ?>
         <?php endif; ?>
 
         const table = $('.dataTable').DataTable({
@@ -500,8 +503,11 @@
             
             if (taxStatus && includeTax) {
                 $('#includeTaxText').html('(Termasuk Pajak)');
-                grandTotal = itemSubTotal + taxTotalHtml - discTotal;
-            } else {
+                grandTotal = itemSubTotal - discTotal;
+            } else if (taxStatus && !includeTax) {
+                $('#includeTaxText').html('');
+                grandTotal = itemSubTotal  + taxTotalHtml - discTotal;
+            }else{
                 $('#includeTaxText').html('');
                 grandTotal = itemSubTotal - discTotal;
             }
