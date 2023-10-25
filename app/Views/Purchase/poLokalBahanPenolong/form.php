@@ -156,6 +156,14 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> class="form-select bc_type" id="bc_type" name="bc_type" aria-label="Floating label select example">
+                                <option value=""></option>
+                            </select>
+                            <label for="floatingInput">Dokumen BC (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOLokal) ? ($dataPOLokal->po_date ? date("d/m/Y", strtotime($dataPOLokal->payment_date)) : "") : ""; ?>" class="form-control input-picker payment_date" id="payment_date" name="payment_date" placeholder="Tanggal Pembayaran">
@@ -468,80 +476,24 @@
             theme: "bootstrap-5"
         })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.purchase_request_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.purchase_request_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.purchase_request_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
         // SUPPLIER
         $('.supplier_id').select2({
             placeholder: "",
             theme: "bootstrap-5"
         })
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.supplier_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.supplier_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.supplier_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+        // BC
+        $('.bc_type').select2({
+            placeholder: "",
+            theme: "bootstrap-5",
+            allowClear: true
+        })
 
         // FOREIGN EXHANGE
         $('.currency').select2({
             placeholder: "",
             theme: "bootstrap-5"
         })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.currency')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.currency')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.currency')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
         // PPN
         $('.ppn').select2({
@@ -550,27 +502,6 @@
             dropdownParent: $(".detail-modal .modal-content"),
             allowClear: true
         })
-
-        //CSS SELECT2 FLOATING LABEL
-        $('.ppn')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.ppn')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.ppn')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
 
         // PPH
         $('.pph').select2({
@@ -581,14 +512,14 @@
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.pph')
+        $('.form-select')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.pph')
+        $('.form-select')
             .parent('div')
             .children('span')
             .children('span')
@@ -596,7 +527,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.pph')
+        $('.form-select')
             .parent('div')
             .find('label')
             .css('z-index', '1');

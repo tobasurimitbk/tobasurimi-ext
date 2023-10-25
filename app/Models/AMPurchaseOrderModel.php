@@ -20,6 +20,7 @@ class AMPurchaseOrderModel extends Model
         'po_no',
         'po_date',
         'po_type',
+        'bc_type',
         'currency',
         'supplier_id',
         'total',
