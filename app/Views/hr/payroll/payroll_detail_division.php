@@ -247,15 +247,31 @@
                                 <td>:</td>
                                 <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                             </tr>
+                            <tr>
+                                <td>Potongan Pinjaman</td>
+                                <td>:</td>
+                                <td> <?= "Rp " . number_format($p['payroll']['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
+                            </tr>
+                            <?php $potIuranPinjamanBon = 0; ?>
                             <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
                                 <?php if ($pg['tipe'] == "MINUS") : ?>
-                                    <tr>
-                                        <td><?= $pg['name'] ?></td>
-                                        <td>:</td>
-                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                    </tr>
+                                    <?php if (in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                        <?php $potIuranPinjamanBon += $pg['nominal']; ?>
+                                    <?php endif; ?>
+                                    <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                        <tr>
+                                            <td><?= $pg['name'] ?></td>
+                                            <td>:</td>
+                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                        </tr>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            <tr>
+                                <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
+                                <td>:</td>
+                                <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
+                            </tr>
                             <tr>
                                 <td>Potongan Lain-Lain</td>
                                 <td>:</td>
@@ -270,15 +286,31 @@
                                 <td>:</td>
                                 <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                             </tr>
+                            <tr>
+                                <td>Potongan Pinjaman</td>
+                                <td>:</td>
+                                <td> <?= "Rp " . number_format($p['payroll']['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
+                            </tr>
+                            <?php $potIuranPinjamanBon = 0; ?>
                             <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
                                 <?php if ($pg['tipe'] == "MINUS") : ?>
-                                    <tr>
-                                        <td><?= $pg['name'] ?></td>
-                                        <td>:</td>
-                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                    </tr>
+                                    <?php if (in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                        <?php $potIuranPinjamanBon += $pg['nominal']; ?>
+                                    <?php endif; ?>
+                                    <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                        <tr>
+                                            <td><?= $pg['name'] ?></td>
+                                            <td>:</td>
+                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                        </tr>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            <tr>
+                                <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
+                                <td>:</td>
+                                <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
+                            </tr>
                             <tr>
                                 <td>Potongan Lain-Lain</td>
                                 <td>:</td>
@@ -287,39 +319,6 @@
                         </table>
                     </td>
                 </tr>
-                <!-- <tr>
-                    <td colspan="2">
-                        <hr>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <table>
-                            <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
-                                <?php if ($pg['tipe'] == "PLUS") : ?>
-                                    <tr>
-                                        <td><?= $pg['name'] ?></td>
-                                        <td>:</td>
-                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                    </tr>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </table>
-                    </td>
-                    <td>
-                        <table>
-                            <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
-                                <?php if ($pg['tipe'] == "PLUS") : ?>
-                                    <tr>
-                                        <td><?= $pg['name'] ?></td>
-                                        <td>:</td>
-                                        <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                    </tr>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </table>
-                    </td>
-                </tr> -->
                 <tr>
                     <td colspan="2">
                         <hr>
@@ -590,15 +589,31 @@
                                     <td>:</td>
                                     <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                                 </tr>
+                                <tr>
+                                    <td>Potongan Pinjaman</td>
+                                    <td>:</td>
+                                    <td> <?= "Rp " . number_format($p['payroll']['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
+                                </tr>
+                                <?php $potIuranPinjamanBon = 0; ?>
                                 <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
                                     <?php if ($pg['tipe'] == "MINUS") : ?>
-                                        <tr>
-                                            <td><?= $pg['name'] ?></td>
-                                            <td>:</td>
-                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                        </tr>
+                                        <?php if (in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                            <?php $potIuranPinjamanBon += $pg['nominal']; ?>
+                                        <?php endif; ?>
+                                        <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                            <tr>
+                                                <td><?= $pg['name'] ?></td>
+                                                <td>:</td>
+                                                <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                            </tr>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
+                                <tr>
+                                    <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
+                                    <td>:</td>
+                                    <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
+                                </tr>
                                 <tr>
                                     <td>Potongan Lain-Lain</td>
                                     <td>:</td>
@@ -613,15 +628,31 @@
                                     <td>:</td>
                                     <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                                 </tr>
+                                <tr>
+                                    <td>Potongan Pinjaman</td>
+                                    <td>:</td>
+                                    <td> <?= "Rp " . number_format($p['payroll']['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
+                                </tr>
+                                <?php $potIuranPinjamanBon = 0; ?>
                                 <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
                                     <?php if ($pg['tipe'] == "MINUS") : ?>
-                                        <tr>
-                                            <td><?= $pg['name'] ?></td>
-                                            <td>:</td>
-                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                        </tr>
+                                        <?php if (in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                            <?php $potIuranPinjamanBon += $pg['nominal']; ?>
+                                        <?php endif; ?>
+                                        <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                            <tr>
+                                                <td><?= $pg['name'] ?></td>
+                                                <td>:</td>
+                                                <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
+                                            </tr>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
+                                <tr>
+                                    <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
+                                    <td>:</td>
+                                    <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
+                                </tr>
                                 <tr>
                                     <td>Potongan Lain-Lain</td>
                                     <td>:</td>
@@ -630,39 +661,6 @@
                             </table>
                         </td>
                     </tr>
-                    <!-- <tr>
-                        <td colspan="2">
-                            <hr>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <table>
-                                <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
-                                    <?php if ($pg['tipe'] == "PLUS") : ?>
-                                        <tr>
-                                            <td><?= $pg['name'] ?></td>
-                                            <td>:</td>
-                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                        </tr>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </table>
-                        </td>
-                        <td>
-                            <table>
-                                <?php foreach ($p['perhitunganGaji'] as  $pg) : ?>
-                                    <?php if ($pg['tipe'] == "PLUS") : ?>
-                                        <tr>
-                                            <td><?= $pg['name'] ?></td>
-                                            <td>:</td>
-                                            <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
-                                        </tr>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </table>
-                        </td>
-                    </tr> -->
                     <tr>
                         <td colspan="2">
                             <hr>

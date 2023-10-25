@@ -520,21 +520,21 @@ class PayrollsModel extends Model
             ];
             foreach ($employeePayroll as $ep) {
                 $detail[] = static::getPotonganByEmployeeID($ep['employeeID'], $yearMonth);
-                foreach ($detail as $dp) {
-                    $potonganSingle['totPotIuranKoperasi'] += $dp['potIuranKoperasi'];
-                    $potonganSingle['totPotStm'] += $dp['potStm'];
-                    $potonganSingle['totPotAstek'] += $dp['potAstek'];
-                    $potonganSingle['totPotSpm'] += $dp['potSpm'];
-                    $potonganSingle['totPotTutupMulut'] += $dp['potTutupMulut'];
-                    $potonganSingle['totPotBajuSeragam'] += $dp['potBajuSeragam'];
-                    $potonganSingle['totPotSepatuCelanaTopi'] += $dp['potSepatuCelanaTopi'];
-                    $potonganSingle['totPotDenda'] += $dp['potDenda'];
-                    $potonganSingle['totPotKartu'] += $dp['potKartu'];
-                    $potonganSingle['totPotBonKoperasi'] += $dp['potBonKoperasi'];
-                    $potonganSingle['totPotPinjKoperasi'] += $dp['potPinjamanKoperasi'];
-                    $potonganSingle['totPotPinjaman'] += $dp['potPinjaman'];
-                    $potonganSingle['totPotongan'] += $dp['totPotongan'];
-                }
+            }
+            foreach ($detail as $dp) {
+                $potonganSingle['totPotIuranKoperasi'] += $dp['potIuranKoperasi'];
+                $potonganSingle['totPotStm'] += $dp['potStm'];
+                $potonganSingle['totPotAstek'] += $dp['potAstek'];
+                $potonganSingle['totPotSpm'] += $dp['potSpm'];
+                $potonganSingle['totPotTutupMulut'] += $dp['potTutupMulut'];
+                $potonganSingle['totPotBajuSeragam'] += $dp['potBajuSeragam'];
+                $potonganSingle['totPotSepatuCelanaTopi'] += $dp['potSepatuCelanaTopi'];
+                $potonganSingle['totPotDenda'] += $dp['potDenda'];
+                $potonganSingle['totPotKartu'] += $dp['potKartu'];
+                $potonganSingle['totPotBonKoperasi'] += $dp['potBonKoperasi'];
+                $potonganSingle['totPotPinjKoperasi'] += $dp['potPinjamanKoperasi'];
+                $potonganSingle['totPotPinjaman'] += $dp['potPinjaman'];
+                $potonganSingle['totPotongan'] += $dp['totPotongan'];
             }
 
             $potonganRes['totPotIuranKoperasi'] += $potonganSingle['totPotIuranKoperasi'];
@@ -685,7 +685,7 @@ class PayrollsModel extends Model
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $res = $payrollGajiModel->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('payroll_id', $payrollID)
-            ->like('tunjangan.name', $str)
+            ->where('tunjangan.name', $str)
             ->first();
         return $res == null ? 0 : $res['nominal'];
     }

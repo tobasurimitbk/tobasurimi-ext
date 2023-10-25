@@ -547,6 +547,8 @@ $routes->get('/stock', 'Warehouse\Stock::index', ['filter' => 'Auth']);
 $routes->get('/stock/all', 'Warehouse\Stock::allStock', ['filter' => 'Auth']);
 $routes->get('/stock/(:num)/(:num)', 'Warehouse\Stock::getStockInfo/$1/$2', ['filter' => 'Auth']);
 $routes->post('/stock/save', 'Warehouse\Stock::addNewStock', ['filter' => 'Auth']);
+// INVENTORI
+$routes->get('/stock-safety', 'Inventori\Inventori::stockSafetyView', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL
 $routes->get('/penerimaan-barang-lokal', 'Warehouse\PenerimaanBarangLokal::penerimaanBarangLokal', ['filter' => 'Auth']);

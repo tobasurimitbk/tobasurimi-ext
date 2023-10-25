@@ -247,15 +247,26 @@
                         <td>:</td>
                         <td> <?= "Rp " . number_format($payroll['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
                     </tr>
+                    <?php $potIuranPinjamanBon = 0; ?>
                     <?php foreach ($perhitunganGaji as  $p) : ?>
                         <?php if ($p['tipe'] == "MINUS") : ?>
-                            <tr>
-                                <td><?= $p['name'] ?></td>
-                                <td>:</td>
-                                <td> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
-                            </tr>
+                            <?php if (in_array($p['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                <?php $potIuranPinjamanBon += $p['nominal']; ?>
+                            <?php endif; ?>
+                            <?php if (!in_array($p['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                <tr>
+                                    <td><?= $p['name'] ?></td>
+                                    <td>:</td>
+                                    <td> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <tr>
+                        <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
+                        <td>:</td>
+                        <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
+                    </tr>
                     <tr>
                         <td>Potongan Lain-Lain</td>
                         <td>:</td>
@@ -275,15 +286,26 @@
                         <td>:</td>
                         <td> <?= "Rp " . number_format($payroll['nominal_pinjaman_karyawan'], 2, ',', '.') ?></td>
                     </tr>
+                    <?php $potIuranPinjamanBon = 0; ?>
                     <?php foreach ($perhitunganGaji as  $p) : ?>
                         <?php if ($p['tipe'] == "MINUS") : ?>
-                            <tr>
-                                <td><?= $p['name'] ?></td>
-                                <td>:</td>
-                                <td> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
-                            </tr>
+                            <?php if (in_array($p['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                <?php $potIuranPinjamanBon += $p['nominal']; ?>
+                            <?php endif; ?>
+                            <?php if (!in_array($p['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
+                                <tr>
+                                    <td><?= $p['name'] ?></td>
+                                    <td>:</td>
+                                    <td> <?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <tr>
+                        <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
+                        <td>:</td>
+                        <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
+                    </tr>
                     <tr>
                         <td>Potongan Lain-Lain</td>
                         <td>:</td>
