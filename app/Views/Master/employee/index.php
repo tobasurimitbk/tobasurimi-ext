@@ -113,8 +113,8 @@
                                 <select class="form-select tipe" name="tipe" id="tipe" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php foreach ($tipeEmployee as $t) : ?>
-                                        <option value="<?= $t['value'] ?>">
-                                            <?= $t['value'] ?>
+                                        <option value="<?= $t['golongan_name'] ?>">
+                                            <?= $t['golongan_name'] ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
