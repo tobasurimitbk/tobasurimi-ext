@@ -15,9 +15,9 @@
                 <button onclick="printPinjaman('<?= base_url('pinjaman-karyawan/print/' . $year . '-' . $month) ?>')" class="btn btn-warning btn-print float-right">
                     Print
                 </button>
-                <button class="btn btn-show-form btn-save float-right btn-submit">
+                <!-- <button class="btn btn-show-form btn-save float-right btn-submit">
                     Simpan
-                </button>
+                </button> -->
             <?php endif; ?>
         </div>
     </div>
@@ -98,7 +98,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th scope="col" style="width: 10px;"><input type="checkbox" id="parent"></th>
+                                <!-- <th scope="col" style="width: 10px;"><input type="checkbox" id="parent"></th> -->
                                 <th>No</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
@@ -109,7 +109,7 @@
                                 <th onclick="changeSort('pinjaman_karyawan.tidak_hadir')">Tidak Hadir</th>
                                 <th>Nominal</th>
                                 <th>Status Pinjaman</th>
-                                <th>Action</th>
+                                <!-- <th>Action</th> -->
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -299,27 +299,28 @@
         //responsive: true,
         display: "stripe",
         searching: false,
-        columns: [{
-                data: "id",
-                className: "text-center",
-                sortable: false,
-                width: "5%",
-                searchable: false,
-                render: function(data, type, row) {
-                    let id = row?.id;
-                    let is_boleh_minjam = row?.isBolehMinjam;
-                    let employeeName = row?.name;
-                    let status_pinjaman = row?.statusPinjaman;
-                    if (status_pinjaman == 1) {
-                        return '-';
-                    } else {
-                        return `
-                        <input name="id_pinjaman[]" data-employee_name="${employeeName}" class="child id_pinjaman" type="checkbox" value="${id}" ${is_boleh_minjam == 0 ? 'disabled' : ''}>
-                        `
-                    }
+        columns: [
+            // {
+            //     data: "id",
+            //     className: "text-center",
+            //     sortable: false,
+            //     width: "5%",
+            //     searchable: false,
+            //     render: function(data, type, row) {
+            //         let id = row?.id;
+            //         let is_boleh_minjam = row?.isBolehMinjam;
+            //         let employeeName = row?.name;
+            //         let status_pinjaman = row?.statusPinjaman;
+            //         if (status_pinjaman == 1) {
+            //             return '-';
+            //         } else {
+            //             return `
+            //             <input name="id_pinjaman[]" data-employee_name="${employeeName}" class="child id_pinjaman" type="checkbox" value="${id}" ${is_boleh_minjam == 0 ? 'disabled' : ''}>
+            //             `
+            //         }
 
-                }
-            },
+            //     }
+            // },
 
             {
                 data: "no",
@@ -366,16 +367,7 @@
                     let is_boleh_minjam = row?.isBolehMinjam;
                     let status_pinjaman = row?.statusPinjaman;
                     let id = row?.id;
-
-                    return `
-            <div class="form-floating">
-                <input value="${nominalPinjaman}" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" 
-                onchange="this.value = formatRupiah(this.value); changeNominalPinjaman(this)" 
-                autocomplete="one-time-code" data-id="${id}" name="nominalPinjaman" type="text" 
-                class="form-control target input-picker" ${is_boleh_minjam == 0 || status_pinjaman == 1 ? 'disabled' : ''}>
-                <label>Nominal Pinjaman</label>
-            </div>
-        `
+                    return formatRupiah(nominalPinjaman);
                 }
             },
 
@@ -412,35 +404,35 @@
                 }
             },
 
-            {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let employeeID = row?.employeeID;
-                    let employeeName = row?.name;
-                    let yearMonth = row?.monthYear;
-                    let startDate = row?.mulaiAbsen;
-                    let finishDate = row?.selesaiAbsen;
-                    let tipeGol = row?.tipeGol;
-                    let status_pinjaman = row?.statusPinjaman;
-                    let id = row?.id;
+            //     {
+            //         data: "id",
+            //         className: "text-center actions",
+            //         searchable: false,
+            //         sortable: false,
+            //         render: function(data, type, row) {
+            //             let employeeID = row?.employeeID;
+            //             let employeeName = row?.name;
+            //             let yearMonth = row?.monthYear;
+            //             let startDate = row?.mulaiAbsen;
+            //             let finishDate = row?.selesaiAbsen;
+            //             let tipeGol = row?.tipeGol;
+            //             let status_pinjaman = row?.statusPinjaman;
+            //             let id = row?.id;
 
-                    if (status_pinjaman == 1) {
-                        return '-';
-                    } else {
-                        return `
-            <div class="mt-0">
-                <button onclick="generateSingle(${employeeID}, '${employeeName}', '${yearMonth}', '${startDate}', '${finishDate}', '${tipeGol}', ${id})" class="btn btn-success posting-spp">
-                    <i class="fa-solid fa-sm fa-repeat"></i>
-                </button>
-            </div>
-        `
-                    }
+            //             if (status_pinjaman == 1) {
+            //                 return '-';
+            //             } else {
+            //                 return `
+            //     <div class="mt-0">
+            //         <button onclick="generateSingle(${employeeID}, '${employeeName}', '${yearMonth}', '${startDate}', '${finishDate}', '${tipeGol}', ${id})" class="btn btn-success posting-spp">
+            //             <i class="fa-solid fa-sm fa-repeat"></i>
+            //         </button>
+            //     </div>
+            // `
+            //             }
 
-                }
-            }
+            //         }
+            //     }
 
 
         ],
@@ -645,7 +637,8 @@
                                 }
                                 $('#loadingSpinner').hide();
                                 $('#formGeneratePinjaman')[0].reset();
-                                $("#generateModal").modal("hide")
+                                $("#generateModal").modal("hide");
+                                location.reload();
                             },
                             onError: function(response) {
                                 csrf.val(response.token);

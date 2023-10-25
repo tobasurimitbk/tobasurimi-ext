@@ -9,6 +9,7 @@ use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
 use App\Models\GajiConjunctionModel;
 use App\Models\GajiDivisiModel;
+use App\Models\GolonganModel;
 use App\Models\MetadataModel;
 use App\Models\UserModel;
 use App\Models\TunjanganModel;
@@ -26,6 +27,7 @@ class Employee extends BaseController
     protected $GajiDivisiModel;
     protected $DivisionModel;
     protected $MetaDataModel;
+    protected $GolonganModel;
 
     public function __construct()
     {
@@ -39,6 +41,7 @@ class Employee extends BaseController
         $this->GajiDivisiModel = new GajiDivisiModel();
         $this->DivisionModel = new DivisisModel();
         $this->MetaDataModel = new MetadataModel();
+        $this->GolonganModel = new GolonganModel();
     }
 
     public function employee()
@@ -47,7 +50,7 @@ class Employee extends BaseController
         $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
         $data = [
             "dataProvinces" => $dataProvinces,
-            "tipeEmployee" => $this->MetaDataModel->where('name', "Tipe Karyawan")->findAll()
+            "tipeEmployee" => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findall()
         ];
 
         return view('Master/employee/index', $data);
