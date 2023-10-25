@@ -18,6 +18,7 @@ class PayrollsModel extends Model
     protected $allowedFields    = [
         'company_id',
         'employee_id',
+        'division_id',
         'year_month',
         'cuti_tahunan',
         'cuti_haid',

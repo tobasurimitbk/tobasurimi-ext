@@ -27,6 +27,24 @@
                                         <label>Periode Absensi</label>
                                     </div>
                                 </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating mt-3">
+                                        <select class="form-select" id="divisionGlobalID" name="divisionGlobalID" aria-label="Floating label select example">
+                                            <option value="">
+                                                Cari Departemen
+                                            </option>
+                                            <option value="ALL">
+                                                Semua Departemen
+                                            </option>
+                                            <?php foreach ($divisi as $d) : ?>
+                                                <option value="<?= $d['id'] ?>">
+                                                    <?= $d['divisi']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput">Cari Departemen</label>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mt-3">
                                         <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDateGlobal" type="text" required class="form-control target input-picker startDate">
@@ -391,6 +409,7 @@
         var monthYearGlobal = $("input[name='monthYearGlobal']").val();
         var startDateGlobal = $("input[name='startDateGlobal']").val();
         var finishDateGlobal = $("input[name='finishDateGlobal']").val();
+        var divisionGlobalID = $("select[name='divisionGlobalID']").val();
 
         if (monthYearGlobal == '') {
             Swal.fire({
@@ -407,7 +426,13 @@
         } else if (finishDateGlobal == '') {
             Swal.fire({
                 icon: 'warning',
-                title: "Tanggal selesai  tidak boleh kosong",
+                title: "Tanggal selesai tidak boleh kosong",
+                confirmButtonColor: '#4e73df',
+            }).then(() => {});
+        } else if (divisionGlobalID == '') {
+            Swal.fire({
+                icon: 'warning',
+                title: "Pilih departemen dahulu",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else {
@@ -425,6 +450,7 @@
                 formData.append('yearMonth', monthYearGlobal);
                 formData.append('startDate', startDateGlobal);
                 formData.append('finishDate', finishDateGlobal);
+                formData.append('divisionGlobalID', divisionGlobalID);
 
                 $.ajax({
                     url: "<?= base_url("payroll/generate-global"); ?>",
@@ -457,6 +483,7 @@
                         }
                         $('#loadingSpinner').hide();
                         $('#generateModal').modal('hide');
+                        location.reload();
                     },
                     onError: function(response) {
                         Swal.fire({
@@ -508,7 +535,7 @@
         } else if (finishDatePersonal == '') {
             Swal.fire({
                 icon: 'warning',
-                title: "Tanggal selesai  tidak boleh kosong",
+                title: "Tanggal selesai tidak boleh kosong",
                 confirmButtonColor: '#4e73df',
             }).then(() => {});
         } else {
@@ -588,7 +615,7 @@
     }
 
     // select2 divisi
-    $("select[name='filterDivisiID']").select2({
+    $("select[name='filterDivisiID'], #divisionGlobalID").select2({
         placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
