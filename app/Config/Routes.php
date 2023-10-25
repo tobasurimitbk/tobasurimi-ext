@@ -757,6 +757,14 @@ $routes->post('/jabatan/save', 'Personalia\Jabatan::saveJabatan', ['filter' => '
 $routes->post('/jabatan/update', 'Personalia\Jabatan::updateJabatan', ['filter' => 'Auth']);
 $routes->post('/jabatan/delete', 'Personalia\Jabatan::deleteJabatan', ['filter' => 'Auth']);
 
+// GOLONGAN
+$routes->get('/golongan', 'HR\Golongan::index', ['filter' => 'Auth']);
+$routes->get('/golongan/all', 'HR\Golongan::all', ['filter' => 'Auth']);
+$routes->get('/golongan/id/(:segment)', 'HR\Golongan::get/$1', ['filter' => 'Auth']);
+$routes->post('/golongan/update', 'HR\Golongan::update', ['filter' => 'Auth']);
+$routes->post('/golongan/delete', 'HR\Golongan::delete', ['filter' => 'Auth']);
+$routes->post('/golongan/create', 'HR\Golongan::create', ['filter' => 'Auth']);
+
 // AKSES
 $routes->get('/akses', 'Setting\Akses::akses', ['filter' => 'Auth']);
 $routes->get('/akses/id', 'Setting\Akses::getAkses', ['filter' => 'Auth']);
